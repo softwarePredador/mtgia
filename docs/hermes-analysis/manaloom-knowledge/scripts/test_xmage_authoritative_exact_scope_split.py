@@ -5386,7 +5386,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produced_mana_symbols"], ["C", "C", "C"])
         self.assertEqual(effect["activation_mana_cost"], "{U}")
 
-    def test_simple_creature_sacrifice_mana_source_stays_blocked(self) -> None:
+    def test_simple_creature_sacrifice_mana_source_maps_contextual_only(self) -> None:
         row = queue_row(
             split.RAMP_CREATURE_UNIT,
             effect_classes=[],
@@ -5403,6 +5403,148 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             source_text=(
                 "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
                 "Mana.BlackMana(1), new SacrificeSourceCost()));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertTrue(effect["is_mana_source"])
+        self.assertTrue(effect["mana_source_contextual_only"])
+        self.assertTrue(effect["mana_activation_requires_sacrifice"])
+        self.assertFalse(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["produces"], "B")
+        self.assertEqual(effect["produced_mana_symbols"], ["B"])
+        self.assertEqual(effect["permanent_type"], "creature")
+
+    def test_simple_creature_tap_sacrifice_mana_source_maps(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Basal Thrull",
+                type_line="Creature - Thrull",
+                oracle_text="{T}, Sacrifice Basal Thrull: Add {B}{B}.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "Mana.BlackMana(2), new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["mana_produced"], 2)
+        self.assertEqual(effect["produced_mana_symbols"], ["B", "B"])
+
+    def test_simple_artifact_sacrifice_mana_source_with_activation_cost_maps(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Coal Golem",
+                type_line="Artifact Creature - Golem",
+                oracle_text="{3}, Sacrifice Coal Golem: Add {R}{R}{R}.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "Mana.RedMana(3), new GenericManaCost(3));"
+                "ability.addCost(new SacrificeSourceCost());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["activation_mana_cost"], "{3}")
+        self.assertEqual(effect["mana_produced"], 3)
+        self.assertEqual(effect["produced_mana_symbols"], ["R", "R", "R"])
+
+    def test_simple_artifact_sacrifice_mana_source_maps_composite_mana_constructor(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Composite Golem",
+                type_line="Artifact Creature - Golem",
+                oracle_text="Sacrifice Composite Golem: Add {W}{U}{B}{R}{G}.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new Mana(1, 1, 1, 1, 1, 0, 0, 0), new SacrificeSourceCost()));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["produced_mana_symbols"], ["W", "U", "B", "R", "G"])
+        self.assertEqual(effect["mana_produced"], 5)
+
+    def test_simple_artifact_sacrifice_mana_source_accepts_source_constructor_color_order(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Rith's Attendant",
+                type_line="Artifact Creature - Golem",
+                oracle_text="{1}, Sacrifice Rith's Attendant: Add {R}{G}{W}.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new Mana(1, 0, 0, 1, 1, 0, 0, 0), new ManaCostsImpl<>(\"{1}\"));"
+                "ability.addCost(new SacrificeSourceCost());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["produced_mana_symbols"], ["R", "G", "W"])
+        self.assertEqual(effect["produces"], "RGW")
+
+    def test_sacrifice_mana_source_with_multiple_mana_abilities_stays_blocked(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["BlueManaAbility", "SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Eye of Ramos",
+                type_line="Artifact",
+                oracle_text="{T}: Add {U}.\nSacrifice Eye of Ramos: Add {U}.",
+            ),
+            source_text=(
+                "this.addAbility(new BlueManaAbility());"
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "Mana.BlueMana(1), new SacrificeSourceCost()));"
             ),
         )
 

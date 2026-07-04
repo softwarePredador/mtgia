@@ -6262,6 +6262,96 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_self_sacrifice_mana_source_does_not_refresh_automatically(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        blood_pet = {
+            "name": "Blood Pet",
+            "type_line": "Creature - Thrull",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "mana_activation_requires_sacrifice": True,
+            "activation_requires_sacrifice": True,
+            "mana_produced": 1,
+            "produces": "B",
+            "produced_mana_symbols": ["B"],
+            "activation_requires_tap": False,
+            "mana_activation_requires_tap": False,
+            "permanent_type": "creature",
+        }
+        active.battlefield.append(blood_pet)
+
+        active.refresh_mana_sources(turn=3)
+
+        self.assertIn(blood_pet, active.battlefield)
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "mana_refreshed"
+                and data.get("player") == "Active"
+                and data.get("sources") == 0
+                for event, data in self.events
+            )
+        )
+
+    def test_self_sacrifice_mana_source_activates_only_for_contextual_unlock(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        unlock_card = {
+            "name": "Fixture Two Drop",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "cmc": 2,
+            "mana_cost": "{2}",
+        }
+        active.hand.append(unlock_card)
+        blood_pet = {
+            "name": "Blood Pet",
+            "type_line": "Creature - Thrull",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "mana_activation_requires_sacrifice": True,
+            "activation_requires_sacrifice": True,
+            "mana_produced": 1,
+            "produces": "B",
+            "produced_mana_symbols": ["B"],
+            "activation_requires_tap": False,
+            "mana_activation_requires_tap": False,
+            "permanent_type": "creature",
+            "_rule_logical_key": "battle_rule_v1:fixture_blood_pet",
+        }
+        active.battlefield.append(blood_pet)
+
+        activated = self.battle.activate_self_sacrifice_mana_sources(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=4,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertNotIn(blood_pet, active.battlefield)
+        self.assertIn(blood_pet, active.graveyard)
+        self.assertEqual(active.mana_pool.generic, 1)
+        self.assertEqual(active.mana_pool.black, 1)
+        self.assertTrue(
+            any(
+                event == "self_sacrifice_mana_source_activated"
+                and data.get("card") == "Blood Pet"
+                and data.get("produced") == 1
+                and data.get("bonus_color") == "black"
+                and data.get("unlock_target") == "Fixture Two Drop"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_blood_pet"
+                for event, data in self.events
+            )
+        )
+
     def test_mana_source_with_self_sacrifice_draw_refreshes_then_cashes_in(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -135,6 +135,7 @@ EXILE_SCOPE = "xmage_exile_target_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
 MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
+SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_self_sacrifice_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 COUNTER_DRAW_SCOPE = "xmage_counter_target_and_draw_card_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
@@ -8927,6 +8928,126 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     return None
 
 
+def sacrifice_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
+    normalized = strip_parenthetical_reminders(re.sub(r"\s+", " ", str(text or "").strip().lower())).strip()
+    prefix_match = re.match(
+        r"^(?P<costs>(?:\{(?:t|[0-9wubrgc]+)\},\s*)*)sacrifice [^:]+: add (?P<mana>.+?)\.?$",
+        normalized,
+    )
+    if not prefix_match:
+        return None
+    costs = prefix_match.group("costs") or ""
+    mana_phrase = prefix_match.group("mana").strip()
+    requires_tap = "{t}" in costs
+    activation_symbols = [
+        symbol.upper()
+        for symbol in re.findall(r"\{([0-9wubrgc]+)\}", costs)
+        if symbol.lower() != "t"
+    ]
+    activation_mana_cost = "".join(f"{{{symbol}}}" for symbol in activation_symbols)
+    if mana_phrase == "one mana of any color":
+        detail = {
+            "produces": "WUBRG",
+            "mana_produced": 1,
+            "mana_activation_requires_tap": requires_tap,
+            "mana_activation_requires_sacrifice": True,
+        }
+    else:
+        produced_symbols = _brace_mana_symbols(mana_phrase)
+        if not produced_symbols:
+            return None
+        detail = {
+            "produces": _unique_mana_symbols(produced_symbols),
+            "mana_produced": len(produced_symbols),
+            "produced_mana_symbols": produced_symbols,
+            "mana_activation_requires_tap": requires_tap,
+            "mana_activation_requires_sacrifice": True,
+        }
+    if activation_mana_cost:
+        detail["activation_mana_cost"] = activation_mana_cost
+    return detail
+
+
+def sacrifice_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    detail = sacrifice_mana_source_detail_from_line(text)
+    if detail is not None:
+        return detail
+
+    candidates = []
+    for line in normalized_oracle_lines(metadata):
+        line_detail = sacrifice_mana_source_detail_from_line(line)
+        if line_detail is not None:
+            candidates.append(line_detail)
+            continue
+        if "sacrifice " in line and "add " in line:
+            return None
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
+
+
+JAVA_MANA_METHOD_SYMBOLS = {
+    "White": "W",
+    "Blue": "U",
+    "Black": "B",
+    "Red": "R",
+    "Green": "G",
+    "Colorless": "C",
+}
+
+
+def java_simple_mana_symbols_from_source(source_text: str) -> list[str] | None:
+    text = source_text or ""
+    method_match = re.search(
+        r"Mana\.(White|Blue|Black|Red|Green|Colorless)Mana\s*\(\s*(\d+)\s*\)",
+        text,
+    )
+    if method_match:
+        return [JAVA_MANA_METHOD_SYMBOLS[method_match.group(1)]] * int(method_match.group(2))
+    constructor_match = re.search(r"new\s+Mana\s*\(\s*([0-9,\s]+)\)", text)
+    if constructor_match:
+        values = [int(value.strip()) for value in constructor_match.group(1).split(",") if value.strip()]
+        symbols: list[str] = []
+        for symbol, count in zip(["W", "U", "B", "R", "G", "C"], values[:6]):
+            symbols.extend([symbol] * max(0, count))
+        return symbols or None
+    return None
+
+
+def sacrifice_mana_source_source_blocker(source_text: str, detail: dict[str, Any]) -> str | None:
+    text = source_text or ""
+    if len(re.findall(r"new\s+SimpleManaAbility\s*\(", text)) != 1:
+        return "mana_source_sacrifice_source_not_single_simple_mana"
+    if "SacrificeSourceCost" not in text:
+        return "mana_source_sacrifice_source_cost_missing"
+    requires_tap = bool(detail.get("mana_activation_requires_tap"))
+    if requires_tap and "TapSourceCost" not in text:
+        return "mana_source_sacrifice_source_tap_cost_missing"
+    if not requires_tap and "TapSourceCost" in text:
+        return "mana_source_sacrifice_source_oracle_tap_mismatch"
+    activation_mana_cost = str(detail.get("activation_mana_cost") or "")
+    if activation_mana_cost:
+        generic_match = re.fullmatch(r"\{(\d+)\}", activation_mana_cost)
+        if generic_match:
+            generic_cost = generic_match.group(1)
+            if (
+                f"GenericManaCost({generic_cost})" not in text
+                and f'ManaCostsImpl<>("{activation_mana_cost}")' not in text
+                and f"ManaCostsImpl<>(\"{activation_mana_cost}\")" not in text
+            ):
+                return "mana_source_sacrifice_source_activation_cost_mismatch"
+        elif f'ManaCostsImpl<>("{activation_mana_cost}")' not in text:
+            return "mana_source_sacrifice_source_activation_cost_mismatch"
+    elif "GenericManaCost" in text or "ManaCostsImpl<>" in text:
+        return "mana_source_sacrifice_source_activation_cost_mismatch"
+    source_symbols = java_simple_mana_symbols_from_source(text)
+    expected_symbols = list(detail.get("produced_mana_symbols") or [])
+    if source_symbols is not None and expected_symbols and Counter(source_symbols) != Counter(expected_symbols):
+        return "mana_source_sacrifice_source_mana_output_mismatch"
+    return None
+
+
 def simple_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = strip_parenthetical_reminders(oracle_text(metadata))
     detail = simple_mana_source_detail_from_line(text)
@@ -14673,6 +14794,55 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_simple_mana_source_with_etb_draw",
+            ), "selected_exact_scope"
+        self_sacrifice_mana_source = (
+            classes == set()
+            and mana_ability_classes == {"SimpleManaAbility"}
+            and "SacrificeSourceCost" in source_text
+        )
+        if self_sacrifice_mana_source:
+            mana_source_detail = sacrifice_mana_source_detail_from_oracle(metadata)
+            if mana_source_detail is None:
+                return None, "mana_source_sacrifice_oracle_not_simple"
+            source_blocker = sacrifice_mana_source_source_blocker(source_text, mana_source_detail)
+            if source_blocker:
+                return None, source_blocker
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            mana_requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", False))
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": SELF_SACRIFICE_MANA_SOURCE_SCOPE,
+                "is_mana_source": True,
+                "mana_source_contextual_only": True,
+                "mana_activation_requires_sacrifice": True,
+                "activation_requires_sacrifice": True,
+                "mana_produced": int(mana_source_detail["mana_produced"]),
+                "produces": str(mana_source_detail["produces"]),
+                "activation_requires_tap": mana_requires_tap,
+                "mana_activation_requires_tap": mana_requires_tap,
+                "permanent_type": permanent_type,
+                "ability_kind": "activated_mana",
+                "xmage_mana_ability_classes": sorted(mana_ability_classes),
+                "xmage_ability_class": "SimpleManaAbility",
+                "xmage_cost_class": "SacrificeSourceCost",
+                "xmage_effect_classes": [],
+            }
+            if mana_source_detail.get("produced_mana_symbols"):
+                effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
+            if mana_source_detail.get("activation_mana_cost"):
+                effect_json["activation_mana_cost"] = mana_source_detail["activation_mana_cost"]
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_self_sacrifice_mana_source_permanent",
             ), "selected_exact_scope"
         auxiliary_abilities = mana_ability_classes - SAFE_MANA_ABILITY_CLASSES
         if auxiliary_abilities - SAFE_MANA_AUXILIARY_ABILITY_CLASSES:

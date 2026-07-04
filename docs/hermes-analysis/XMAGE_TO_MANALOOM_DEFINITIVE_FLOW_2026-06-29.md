@@ -7876,7 +7876,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG409 queue on the new server, the next exact runtime-backed work should
+post-PG410 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1806`
@@ -7988,6 +7988,45 @@ new server:
   from `26667` to `26664`, authoritative adapter-required count from `26353`
   to `26350`, and the top recursion work unit from `1809` to `1806`; the
   remaining `314` identities are still explicit missing-source exceptions.
+
+PG410 closed the exact self-sacrifice mana-source permanent subpattern on the
+new server:
+
+- Split support now maps XMage `SimpleManaAbility` plus `SacrificeSourceCost`
+  where the Oracle text and Java source agree on produced mana, optional tap
+  cost, and optional activation mana cost. The executable scope is
+  `xmage_self_sacrifice_mana_source_permanent_v1`.
+- Runtime support treats these permanents as contextual mana sources only:
+  `refresh_mana_sources` must not auto-sacrifice them. The battle runtime may
+  activate one only when sacrificing it unlocks a real payable spell/action.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` (`411` tests) and
+  `test_xmage_exact_scope_runtime.py` (`236` tests). The runtime tests cover
+  both non-refresh behavior and contextual activation.
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg410_self_sacrifice_mana_source_new_server`
+  produced `13` safe candidates: `Basal Thrull`, `Blood Pet`, `Blood Vassal`,
+  `Catalyst Elemental`, `Coal Golem`, `Composite Golem`, `Crosis's Attendant`,
+  `Darigaaz's Attendant`, `Dromar's Attendant`, `Morgue Toad`,
+  `Rith's Attendant`, `Satyr Hedonist`, and `Treva's Attendant`.
+- PostgreSQL package `PG410` was applied on the new server:
+  `13` upserted rows, `0` deprecated shadow rows, and postcheck `13/13`
+  `verified`/`auto` rows with Oracle hashes.
+- PG -> SQLite sync for the package loaded `13` PostgreSQL rows, updated `13`
+  SQLite rows, and exported `5374` canonical snapshot rows.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `13` selected cards. The generic E2E
+  battle scenario count was `0`; card behavior execution is covered by the
+  focused runtime tests above.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51`), and legacy contamination. The post-PG410 exact split recheck
+  produced `proposal_count=0`.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26664` to `26651`, authoritative adapter-required count from `26350`
+  to `26337`, creature mana-source work from `343` to `337`, and artifact
+  mana-source work from `274` to `267`; the remaining `314` identities are
+  still explicit missing-source exceptions.
 
 ## Required Artifacts Per Cycle
 
