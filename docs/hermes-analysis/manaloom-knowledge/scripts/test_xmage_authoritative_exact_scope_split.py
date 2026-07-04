@@ -141,6 +141,56 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "unsupported_adapter_work_unit")
 
+    def test_static_cant_be_blocked_creature_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.CANT_BE_BLOCKED_SOURCE_UNIT,
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["CantBeBlockedSourceAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Slither Blade",
+                type_line="Creature - Snake Rogue",
+                oracle_text="This creature can't be blocked.",
+            ),
+            source_text="""
+                import mage.abilities.keyword.CantBeBlockedSourceAbility;
+                this.addAbility(new CantBeBlockedSourceAbility());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE)
+        self.assertEqual(effect["effect"], "creature")
+        self.assertTrue(effect["cant_be_blocked"])
+        self.assertTrue(effect["unblockable"])
+        self.assertEqual(effect["static_effect"], "self_cant_be_blocked")
+
+    def test_static_cant_be_blocked_creature_blocks_filtered_evasion_text(self) -> None:
+        row = queue_row(
+            split.CANT_BE_BLOCKED_SOURCE_UNIT,
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["CantBeBlockedSourceAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Filtered Sneak",
+                type_line="Creature - Rogue",
+                oracle_text="Filtered Sneak can't be blocked except by Rogues.",
+            ),
+            source_text="""
+                this.addAbility(new CantBeBlockedSourceAbility());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_cant_be_blocked_oracle_not_exact")
+
     def test_static_play_lands_from_graveyard_maps_to_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

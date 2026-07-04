@@ -196,6 +196,7 @@ STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE = (
     "xmage_static_self_protection_from_colors_creature_v1"
 )
 STATIC_CAST_AS_FLASH_PERMISSION_SCOPE = "xmage_static_cast_spells_as_flash_permission_v1"
+STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE = "xmage_static_self_cant_be_blocked_creature_v1"
 STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
@@ -469,6 +470,10 @@ FLASH_PERMISSION_FILTERS = {
     "creature_or_enchantment_spells",
     "green_creature_spells",
 }
+CANT_BE_BLOCKED_SOURCE_UNIT = (
+    "xmage_signature::no_effect_class::CantBeBlockedSourceAbility::"
+    "no_target_class::no_condition_class::no_signal"
+)
 
 
 def utc_now() -> str:
@@ -4559,6 +4564,15 @@ def is_static_cast_as_flash_permission_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_static_cant_be_blocked_creature_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == CANT_BE_BLOCKED_SOURCE_UNIT
+        and not effect_classes(row)
+        and ability_classes(row) == {"CantBeBlockedSourceAbility"}
+        and not (row.get("xmage_signals") or [])
+    )
+
+
 def is_creature_etb_life_gain_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
         return False
@@ -5354,6 +5368,30 @@ def flash_permission_from_source(source: str) -> dict[str, str] | str:
         "flash_permission_filter": flash_filter,
         "flash_permission_controller": controller,
     }
+
+
+def oracle_is_static_cant_be_blocked(metadata: dict[str, Any]) -> bool:
+    text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if not text:
+        return False
+    text_without_period = text[:-1] if text.endswith(".") else text
+    source_name = re.sub(r"\s+", " ", str(metadata.get("name") or "").strip().lower())
+    if source_name and text_without_period == f"{source_name} can't be blocked":
+        return True
+    return text_without_period in {
+        "can't be blocked",
+        "this creature can't be blocked",
+    }
+
+
+def source_is_static_cant_be_blocked(source: str) -> bool:
+    text = source or ""
+    return (
+        "CantBeBlockedSourceAbility" in text
+        and "CantBeBlockedByCreaturesSourceEffect" not in text
+        and "SimpleEvasionAbility" not in text
+    )
 
 
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -10720,6 +10758,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature static source power/toughness boost equal to graveyard card count"
     elif scope == STATIC_CAST_AS_FLASH_PERMISSION_SCOPE:
         scope_kind = "static cast-as-though-flash timing permission permanent"
+    elif scope == STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE:
+        scope_kind = "creature static self can't-be-blocked evasion"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
@@ -10837,6 +10877,7 @@ def split_row(
         is_static_protection_from_colors_creature_unit(row)
     )
     static_cast_as_flash_permission_unit = is_static_cast_as_flash_permission_unit(row)
+    static_cant_be_blocked_creature_unit = is_static_cant_be_blocked_creature_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     dies_life_gain_creature_unit = is_creature_dies_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
@@ -10914,6 +10955,7 @@ def split_row(
         and not keyword_creature_unit
         and not static_protection_from_colors_creature_unit
         and not static_cast_as_flash_permission_unit
+        and not static_cant_be_blocked_creature_unit
         and not etb_life_gain_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
@@ -10971,6 +11013,7 @@ def split_row(
         and not etb_life_gain_creature_unit
         and not static_protection_from_colors_creature_unit
         and not static_cast_as_flash_permission_unit
+        and not static_cant_be_blocked_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not etb_draw_lose_life_creature_unit
@@ -11091,6 +11134,32 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_cast_spells_as_flash_permission",
+        ), "selected_exact_scope"
+
+    if static_cant_be_blocked_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_cant_be_blocked_not_creature"
+        if not oracle_is_static_cant_be_blocked(metadata):
+            return None, "static_cant_be_blocked_oracle_not_exact"
+        if not source_is_static_cant_be_blocked(source_text):
+            return None, "static_cant_be_blocked_source_not_exact"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "self_cant_be_blocked",
+            "target": "self",
+            "target_controller": "self",
+            "cant_be_blocked": True,
+            "cannot_be_blocked": True,
+            "unblockable": True,
+            "xmage_ability_class": "CantBeBlockedSourceAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_self_cant_be_blocked_creature",
         ), "selected_exact_scope"
 
     if permanent_activated_tutor_battlefield_unit:
@@ -16442,6 +16511,7 @@ def build_exact_split_report(
             and not is_static_keyword_creature_unit(row)
             and not is_static_protection_from_colors_creature_unit(row)
             and not is_static_cast_as_flash_permission_unit(row)
+            and not is_static_cant_be_blocked_creature_unit(row)
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_dies_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
@@ -16516,6 +16586,7 @@ def build_exact_split_report(
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
                 "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from color words only",
                 "passive::static_cast_as_flash_permission_variant_review_v1 rows with CastAsThoughItHadFlashAllEffect, SimpleStaticAbility, only safe static keyword auxiliaries including FlashAbility, and exact Oracle/XMage timing-permission filters",
+                "no-effect/no-signal CantBeBlockedSourceAbility creature rows with exact Oracle/XMage self can't-be-blocked evasion",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",

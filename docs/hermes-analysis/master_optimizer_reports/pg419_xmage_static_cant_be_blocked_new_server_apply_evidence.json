@@ -1,0 +1,48 @@
+{
+  "deploy_id": "pg419",
+  "slug": "xmage_static_cant_be_blocked_new_server",
+  "database_target": "127.0.0.1:15432/halder",
+  "family": "xmage_static_self_cant_be_blocked_creature",
+  "battle_model_scope": "xmage_static_self_cant_be_blocked_creature_v1",
+  "selected_count": 11,
+  "precheck": {
+    "target_rows": 11,
+    "existing_rule_rows": 0,
+    "expected_rule_rows_before": 0,
+    "would_deprecate_shadow_rows": 0
+  },
+  "apply": {
+    "upserted_rows": 11,
+    "deprecated_shadow_rows": 0
+  },
+  "postcheck": {
+    "promoted_rule_rows": 11,
+    "promoted_verified_auto_rows": 11,
+    "promoted_oracle_hash_rows": 11
+  },
+  "sync": {
+    "metadata_postgres_rows_matched": 6482,
+    "metadata_sqlite_cache_alias_rows": 6409,
+    "deck_cards_matched": "2699/2699",
+    "metadata_unresolved": 1,
+    "pg_rows_loaded": 11,
+    "sqlite_inserted_or_updated": 11,
+    "canonical_snapshot_rows_exported": 5495
+  },
+  "validation": {
+    "focused_unittest_count": 682,
+    "focused_unittest_status": "pass",
+    "package_e2e_status": "pass",
+    "xmage_strategy_audit": "26/26 pass",
+    "operational_surface_audit": "pass",
+    "legacy_contamination_audit": "pass",
+    "pg_hermes_sqlite_contract_audit": "51/51 pass",
+    "post_apply_exact_split_proposal_count": 0
+  },
+  "post_queue": {
+    "target_identity_count": 26529,
+    "xmage_authoritative_adapter_required_count": 26215,
+    "adapter_work_unit_count": 11421,
+    "manual_semantic_decision_units_remaining": 314
+  }
+}

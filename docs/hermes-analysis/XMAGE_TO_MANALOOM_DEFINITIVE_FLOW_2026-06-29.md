@@ -8368,6 +8368,43 @@ new server:
   post-PG418 exact split recheck produced `proposal_count=0`; the remaining
   `314` identities are still explicit missing-source exceptions.
 
+## 2026-07-04 PG419 Static Self Can't-Be-Blocked Creature Closure
+
+- Closed the exact XMage unit
+  `xmage_signature::no_effect_class::CantBeBlockedSourceAbility::no_target_class::no_condition_class::no_signal`
+  as ManaLoom scope `xmage_static_self_cant_be_blocked_creature_v1`.
+- The mapper requires the local XMage source to contain
+  `CantBeBlockedSourceAbility` and excludes filtered evasion sources such as
+  `CantBeBlockedByCreaturesSourceEffect` and `SimpleEvasionAbility`. The Oracle
+  gate accepts only exact self evasion text like `This creature can't be
+  blocked.` and still blocks conditional variants.
+- Runtime behavior is executable through the existing blocker assignment path:
+  cards with `cant_be_blocked`/`unblockable` cannot receive blockers. Focused
+  tests now cover positive mapping, negative conditional text, and combat
+  blocker assignment.
+- The PostgreSQL package promoted `11` cards:
+  `Covert Operative`, `Jhessian Infiltrator`, `Latch Seeker`, `Metathran
+  Soldier`, `Mist-Cloaked Herald`, `Phantom Ninja`, `Phantom Warrior`,
+  `Slither Blade`, `Talas Warrior`, `Tidal Kraken`, and `Triton Shorestalker`.
+  Precheck found `11` target rows, `0` existing rule rows, and `0` shadow rows;
+  apply inserted/updated `11`; postcheck verified `11/11` promoted rows as
+  `verified`/`auto` with Oracle hashes.
+- Hermes sync refreshed PostgreSQL card metadata against the new-server target
+  `127.0.0.1:15432/halder` and synced `11` PG rules into SQLite. The canonical
+  fallback export increased to `5495` rows.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `11` selected cards. Generic battle
+  scenario count remained `0`; combat execution is covered by the focused
+  runtime test.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26540` to `26529`, authoritative adapter-required count from `26226`
+  to `26215`, and the exact cant-be-blocked work unit to zero. The post-PG419
+  exact split recheck produced `proposal_count=0`; the remaining `314`
+  identities are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

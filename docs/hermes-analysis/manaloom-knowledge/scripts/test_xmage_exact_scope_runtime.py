@@ -112,6 +112,36 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             self.battle.can_cast_in_phase(artifact, {"effect": "passive"}, "combat", controller=active)
         )
 
+    def test_static_cant_be_blocked_creature_skips_blocker_assignment(self) -> None:
+        defender = self.battle.Player("Defender", None, [])
+        attacker = {
+            "name": "Slither Blade",
+            "type_line": "Creature - Snake Rogue",
+            "power": 1,
+            "toughness": 2,
+            "effect": "creature",
+            "cant_be_blocked": True,
+            "unblockable": True,
+            "battle_model_scope": "xmage_static_self_cant_be_blocked_creature_v1",
+        }
+        blocker = {
+            "name": "Grizzly Bears",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        defender.battlefield = [blocker]
+
+        assignments = self.battle.declare_blockers_step(
+            defender,
+            [attacker],
+            turn=4,
+            rng=random.Random(1),
+        )
+
+        self.assertEqual(assignments, [(attacker, [])])
+        self.assertNotIn("blocking", blocker)
+
     def test_static_play_lands_from_graveyard_uses_graveyard_land_when_no_hand_or_topdeck(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
