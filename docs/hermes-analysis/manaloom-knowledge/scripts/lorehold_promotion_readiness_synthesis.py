@@ -501,6 +501,16 @@ def build_synthesis(
     checklist = promotion_checklist(shape=shape, axis=axis, candidates=candidates, watch_items=watch_items)
     status = synthesize_status(candidates, checklist)
     promotion_allowed = False
+    next_actions = []
+    if watch_items:
+        next_actions.append("repair role/tag watch items before trusting automated cuts")
+    next_actions.extend(
+        [
+            "generate only named same-lane packages from a specific 607 failure target",
+            "run equal opponent and seed gates with trace proof that the candidate was drawn, cast, and used",
+            "promote only if the challenger preserves land/ramp/draw/removal/protection/wincon density and beats 607",
+        ]
+    )
     return {
         "generated_at": utc_now(),
         "artifact_type": "lorehold_promotion_readiness_synthesis",
@@ -538,12 +548,7 @@ def build_synthesis(
                 "cards such as Mana Vault and The One Ring stay hypotheses or blocked prior "
                 "evidence until they beat the current role they challenge."
             ),
-            "next_actions": [
-                "repair role/tag watch items before trusting automated cuts",
-                "generate only named same-lane packages from a specific 607 failure target",
-                "run equal opponent and seed gates with trace proof that the candidate was drawn, cast, and used",
-                "promote only if the challenger preserves land/ramp/draw/removal/protection/wincon density and beats 607",
-            ],
+            "next_actions": next_actions,
         },
     }
 

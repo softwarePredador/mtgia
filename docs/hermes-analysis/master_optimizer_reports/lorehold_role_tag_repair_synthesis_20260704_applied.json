@@ -1,0 +1,390 @@
+{
+  "after_repair": [
+    {
+      "active_rule_count": 1,
+      "battle_rule_evidence": [
+        {
+          "battle_model_scope": "deflecting_swat_control_commander_free_redirect_target_spell_or_ability_runtime_v1",
+          "category": "protection",
+          "effect": "redirect_removal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bac48343654a53205d790a8268bd2631",
+          "review_status": "verified"
+        }
+      ],
+      "blockers": [],
+      "card_id": "ae0d54e1-1471-4bb7-8b8d-09ef5b51b2ed",
+      "card_name": "Deflecting Swat",
+      "current_primary": "protection",
+      "current_tags": [
+        "protection",
+        "redirect_removal"
+      ],
+      "deck_row_id": 10060,
+      "lane": "stack_or_spell_protection",
+      "needs_update": false,
+      "oracle": {
+        "card_id": "ae0d54e1-1471-4bb7-8b8d-09ef5b51b2ed",
+        "oracle_text": "If you control a commander, you may cast this spell without paying its mana cost.\nYou may choose new targets for target spell or ability.",
+        "type_line": "Instant"
+      },
+      "reason": "Oracle and PG031 rule model a free commander-window target redirect, not card draw.",
+      "recommended_primary": "protection",
+      "recommended_tags": [
+        "protection",
+        "redirect_removal"
+      ]
+    },
+    {
+      "active_rule_count": 1,
+      "battle_rule_evidence": [
+        {
+          "battle_model_scope": "create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1",
+          "category": "board_development",
+          "effect": "token_maker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae4a933d873bec332ec2a46106b79277",
+          "review_status": "verified"
+        }
+      ],
+      "blockers": [],
+      "card_id": "356b93e3-62db-44ec-9322-4e999eefc674",
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "current_primary": "protection",
+      "current_tags": [
+        "protection",
+        "board_development",
+        "token_maker"
+      ],
+      "deck_row_id": 10063,
+      "lane": "pressure_protection",
+      "needs_update": false,
+      "oracle": {
+        "card_id": "356b93e3-62db-44ec-9322-4e999eefc674",
+        "oracle_text": "Create two 4/4 white Angel Warrior creature tokens with flying. Non-Angel creatures you control gain indestructible until your next turn.",
+        "type_line": "Sorcery"
+      },
+      "reason": "The spell creates a board while granting indestructible until next turn; it should not remain unknown.",
+      "recommended_primary": "protection",
+      "recommended_tags": [
+        "protection",
+        "board_development",
+        "token_maker"
+      ]
+    },
+    {
+      "active_rule_count": 1,
+      "battle_rule_evidence": [
+        {
+          "battle_model_scope": "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1",
+          "category": "interaction",
+          "effect": "vow_counter_each_player_sacrifice_rest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78fff8e218103b0710bc5ee9cf174ee9",
+          "review_status": "verified"
+        }
+      ],
+      "blockers": [],
+      "card_id": "6a219f1a-0b0a-4628-9d60-b81f7dbcab5c",
+      "card_name": "Promise of Loyalty",
+      "current_primary": "board_wipe",
+      "current_tags": [
+        "board_wipe",
+        "protection",
+        "interaction"
+      ],
+      "deck_row_id": 10098,
+      "lane": "pressure_protection",
+      "needs_update": false,
+      "oracle": {
+        "card_id": "6a219f1a-0b0a-4628-9d60-b81f7dbcab5c",
+        "oracle_text": "Each player puts a vow counter on a creature they control and sacrifices the rest. Each of those creatures can't attack you or planeswalkers you control for as long as it has a vow counter on it.",
+        "type_line": "Sorcery"
+      },
+      "reason": "The effect is a selective creature wipe with a vow attack restriction, not card draw.",
+      "recommended_primary": "board_wipe",
+      "recommended_tags": [
+        "board_wipe",
+        "protection",
+        "interaction"
+      ]
+    },
+    {
+      "active_rule_count": 1,
+      "battle_rule_evidence": [
+        {
+          "battle_model_scope": "single_target_spell_or_ability_redirect_additional_cost_annotation_v1",
+          "category": "protection",
+          "effect": "redirect_removal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d47b67e18fbd03ed1745f6917901d6c9",
+          "review_status": "verified"
+        }
+      ],
+      "blockers": [],
+      "card_id": "558a8bda-ea1a-4c01-b3c2-186a2ad6478d",
+      "card_name": "Redirect Lightning",
+      "current_primary": "protection",
+      "current_tags": [
+        "protection",
+        "redirect_removal",
+        "interaction"
+      ],
+      "deck_row_id": 10100,
+      "lane": "stack_or_spell_protection",
+      "needs_update": false,
+      "oracle": {
+        "card_id": "558a8bda-ea1a-4c01-b3c2-186a2ad6478d",
+        "oracle_text": "As an additional cost to cast this spell, pay 5 life or pay {2}.\nChange the target of target spell or ability with a single target.",
+        "type_line": "Instant \u2014 Lesson"
+      },
+      "reason": "Oracle and PG081 model changing the target of a single-target spell or ability; the earlier draw tag is stale forensic lineage.",
+      "recommended_primary": "protection",
+      "recommended_tags": [
+        "protection",
+        "redirect_removal",
+        "interaction"
+      ]
+    },
+    {
+      "active_rule_count": 1,
+      "battle_rule_evidence": [
+        {
+          "battle_model_scope": "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1",
+          "category": "interaction",
+          "effect": "selective_nonland_sacrifice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4d676e6ecea500f7aca4cbc7f7ae04a",
+          "review_status": "verified"
+        }
+      ],
+      "blockers": [],
+      "card_id": "abe21b14-7c49-4629-bbf2-8fce03d66d94",
+      "card_name": "Tragic Arrogance",
+      "current_primary": "board_wipe",
+      "current_tags": [
+        "board_wipe",
+        "removal",
+        "interaction"
+      ],
+      "deck_row_id": 10127,
+      "lane": "board_wipes",
+      "needs_update": false,
+      "oracle": {
+        "card_id": "abe21b14-7c49-4629-bbf2-8fce03d66d94",
+        "oracle_text": "For each player, you choose from among the permanents that player controls an artifact, a creature, an enchantment, and a planeswalker. Then each player sacrifices all other nonland permanents they control.",
+        "type_line": "Sorcery"
+      },
+      "reason": "The active rule is a controller-selected nonland permanent sacrifice wipe; unknown blocks same-lane cuts.",
+      "recommended_primary": "board_wipe",
+      "recommended_tags": [
+        "board_wipe",
+        "removal",
+        "interaction"
+      ]
+    }
+  ],
+  "artifact_type": "lorehold_role_tag_repair_synthesis",
+  "before_repair": [
+    {
+      "active_rule_count": 1,
+      "battle_rule_evidence": [
+        {
+          "battle_model_scope": "deflecting_swat_control_commander_free_redirect_target_spell_or_ability_runtime_v1",
+          "category": "protection",
+          "effect": "redirect_removal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bac48343654a53205d790a8268bd2631",
+          "review_status": "verified"
+        }
+      ],
+      "blockers": [],
+      "card_id": "ae0d54e1-1471-4bb7-8b8d-09ef5b51b2ed",
+      "card_name": "Deflecting Swat",
+      "current_primary": "draw",
+      "current_tags": [
+        "draw",
+        "protection",
+        "redirect_removal"
+      ],
+      "deck_row_id": 10060,
+      "lane": "stack_or_spell_protection",
+      "needs_update": true,
+      "oracle": {
+        "card_id": "ae0d54e1-1471-4bb7-8b8d-09ef5b51b2ed",
+        "oracle_text": "If you control a commander, you may cast this spell without paying its mana cost.\nYou may choose new targets for target spell or ability.",
+        "type_line": "Instant"
+      },
+      "reason": "Oracle and PG031 rule model a free commander-window target redirect, not card draw.",
+      "recommended_primary": "protection",
+      "recommended_tags": [
+        "protection",
+        "redirect_removal"
+      ]
+    },
+    {
+      "active_rule_count": 1,
+      "battle_rule_evidence": [
+        {
+          "battle_model_scope": "create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1",
+          "category": "board_development",
+          "effect": "token_maker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae4a933d873bec332ec2a46106b79277",
+          "review_status": "verified"
+        }
+      ],
+      "blockers": [],
+      "card_id": "356b93e3-62db-44ec-9322-4e999eefc674",
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "current_primary": "unknown",
+      "current_tags": [
+        "unknown"
+      ],
+      "deck_row_id": 10063,
+      "lane": "pressure_protection",
+      "needs_update": true,
+      "oracle": {
+        "card_id": "356b93e3-62db-44ec-9322-4e999eefc674",
+        "oracle_text": "Create two 4/4 white Angel Warrior creature tokens with flying. Non-Angel creatures you control gain indestructible until your next turn.",
+        "type_line": "Sorcery"
+      },
+      "reason": "The spell creates a board while granting indestructible until next turn; it should not remain unknown.",
+      "recommended_primary": "protection",
+      "recommended_tags": [
+        "protection",
+        "board_development",
+        "token_maker"
+      ]
+    },
+    {
+      "active_rule_count": 1,
+      "battle_rule_evidence": [
+        {
+          "battle_model_scope": "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1",
+          "category": "interaction",
+          "effect": "vow_counter_each_player_sacrifice_rest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78fff8e218103b0710bc5ee9cf174ee9",
+          "review_status": "verified"
+        }
+      ],
+      "blockers": [],
+      "card_id": "6a219f1a-0b0a-4628-9d60-b81f7dbcab5c",
+      "card_name": "Promise of Loyalty",
+      "current_primary": "draw",
+      "current_tags": [
+        "draw"
+      ],
+      "deck_row_id": 10098,
+      "lane": "pressure_protection",
+      "needs_update": true,
+      "oracle": {
+        "card_id": "6a219f1a-0b0a-4628-9d60-b81f7dbcab5c",
+        "oracle_text": "Each player puts a vow counter on a creature they control and sacrifices the rest. Each of those creatures can't attack you or planeswalkers you control for as long as it has a vow counter on it.",
+        "type_line": "Sorcery"
+      },
+      "reason": "The effect is a selective creature wipe with a vow attack restriction, not card draw.",
+      "recommended_primary": "board_wipe",
+      "recommended_tags": [
+        "board_wipe",
+        "protection",
+        "interaction"
+      ]
+    },
+    {
+      "active_rule_count": 1,
+      "battle_rule_evidence": [
+        {
+          "battle_model_scope": "single_target_spell_or_ability_redirect_additional_cost_annotation_v1",
+          "category": "protection",
+          "effect": "redirect_removal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d47b67e18fbd03ed1745f6917901d6c9",
+          "review_status": "verified"
+        }
+      ],
+      "blockers": [],
+      "card_id": "558a8bda-ea1a-4c01-b3c2-186a2ad6478d",
+      "card_name": "Redirect Lightning",
+      "current_primary": "draw",
+      "current_tags": [
+        "draw"
+      ],
+      "deck_row_id": 10100,
+      "lane": "stack_or_spell_protection",
+      "needs_update": true,
+      "oracle": {
+        "card_id": "558a8bda-ea1a-4c01-b3c2-186a2ad6478d",
+        "oracle_text": "As an additional cost to cast this spell, pay 5 life or pay {2}.\nChange the target of target spell or ability with a single target.",
+        "type_line": "Instant \u2014 Lesson"
+      },
+      "reason": "Oracle and PG081 model changing the target of a single-target spell or ability; the earlier draw tag is stale forensic lineage.",
+      "recommended_primary": "protection",
+      "recommended_tags": [
+        "protection",
+        "redirect_removal",
+        "interaction"
+      ]
+    },
+    {
+      "active_rule_count": 1,
+      "battle_rule_evidence": [
+        {
+          "battle_model_scope": "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1",
+          "category": "interaction",
+          "effect": "selective_nonland_sacrifice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4d676e6ecea500f7aca4cbc7f7ae04a",
+          "review_status": "verified"
+        }
+      ],
+      "blockers": [],
+      "card_id": "abe21b14-7c49-4629-bbf2-8fce03d66d94",
+      "card_name": "Tragic Arrogance",
+      "current_primary": "unknown",
+      "current_tags": [
+        "unknown"
+      ],
+      "deck_row_id": 10127,
+      "lane": "board_wipes",
+      "needs_update": true,
+      "oracle": {
+        "card_id": "abe21b14-7c49-4629-bbf2-8fce03d66d94",
+        "oracle_text": "For each player, you choose from among the permanents that player controls an artifact, a creature, an enchantment, and a planeswalker. Then each player sacrifices all other nonland permanents they control.",
+        "type_line": "Sorcery"
+      },
+      "reason": "The active rule is a controller-selected nonland permanent sacrifice wipe; unknown blocks same-lane cuts.",
+      "recommended_primary": "board_wipe",
+      "recommended_tags": [
+        "board_wipe",
+        "removal",
+        "interaction"
+      ]
+    }
+  ],
+  "decision": {
+    "reason": "The five current watch cards now have explicit primary roles and ordered multi-tags aligned to active battle rules and Oracle text.",
+    "safe_to_use_for_same_lane_cuts": true
+  },
+  "deck_id": 607,
+  "generated_at": "2026-07-04T21:16:36Z",
+  "postgres_writes": false,
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": true,
+  "sql": {
+    "apply_sqlite": "BEGIN;\nUPDATE deck_cards\nSET functional_tag = 'protection',\n    functional_tags_json = '[\"protection\",\"redirect_removal\"]'\nWHERE deck_id = 607\n  AND card_name = 'Deflecting Swat'\n  AND card_id = 'ae0d54e1-1471-4bb7-8b8d-09ef5b51b2ed';\n\nUPDATE deck_cards\nSET functional_tag = 'protection',\n    functional_tags_json = '[\"protection\",\"board_development\",\"token_maker\"]'\nWHERE deck_id = 607\n  AND card_name = 'Emeria''s Call // Emeria, Shattered Skyclave'\n  AND card_id = '356b93e3-62db-44ec-9322-4e999eefc674';\n\nUPDATE deck_cards\nSET functional_tag = 'board_wipe',\n    functional_tags_json = '[\"board_wipe\",\"protection\",\"interaction\"]'\nWHERE deck_id = 607\n  AND card_name = 'Promise of Loyalty'\n  AND card_id = '6a219f1a-0b0a-4628-9d60-b81f7dbcab5c';\n\nUPDATE deck_cards\nSET functional_tag = 'protection',\n    functional_tags_json = '[\"protection\",\"redirect_removal\",\"interaction\"]'\nWHERE deck_id = 607\n  AND card_name = 'Redirect Lightning'\n  AND card_id = '558a8bda-ea1a-4c01-b3c2-186a2ad6478d';\n\nUPDATE deck_cards\nSET functional_tag = 'board_wipe',\n    functional_tags_json = '[\"board_wipe\",\"removal\",\"interaction\"]'\nWHERE deck_id = 607\n  AND card_name = 'Tragic Arrogance'\n  AND card_id = 'abe21b14-7c49-4629-bbf2-8fce03d66d94';\nCOMMIT;\n",
+    "postcheck": "WITH expected AS (\nSELECT 'Deflecting Swat' AS expected_card_name, 'protection' AS expected_primary, '[\"protection\",\"redirect_removal\"]' AS expected_tags\nUNION ALL\nSELECT 'Emeria''s Call // Emeria, Shattered Skyclave' AS expected_card_name, 'protection' AS expected_primary, '[\"protection\",\"board_development\",\"token_maker\"]' AS expected_tags\nUNION ALL\nSELECT 'Promise of Loyalty' AS expected_card_name, 'board_wipe' AS expected_primary, '[\"board_wipe\",\"protection\",\"interaction\"]' AS expected_tags\nUNION ALL\nSELECT 'Redirect Lightning' AS expected_card_name, 'protection' AS expected_primary, '[\"protection\",\"redirect_removal\",\"interaction\"]' AS expected_tags\nUNION ALL\nSELECT 'Tragic Arrogance' AS expected_card_name, 'board_wipe' AS expected_primary, '[\"board_wipe\",\"removal\",\"interaction\"]' AS expected_tags\n)\nSELECT e.expected_card_name, dc.functional_tag, dc.functional_tags_json,\n       CASE WHEN dc.functional_tag = e.expected_primary\n             AND replace(dc.functional_tags_json, ' ', '') = e.expected_tags\n            THEN 'ok' ELSE 'mismatch' END AS status\nFROM expected e\nLEFT JOIN deck_cards dc\n  ON dc.deck_id = 607\n AND dc.card_name = e.expected_card_name\nORDER BY e.expected_card_name;\n",
+    "precheck": "SELECT deck_id, card_name, quantity, functional_tag, functional_tags_json, card_id\nFROM deck_cards\nWHERE deck_id = 607\n  AND card_name IN ('Deflecting Swat', 'Emeria''s Call // Emeria, Shattered Skyclave', 'Promise of Loyalty', 'Redirect Lightning', 'Tragic Arrogance')\nORDER BY card_name;\n",
+    "rollback_sqlite": "BEGIN;\nUPDATE deck_cards\nSET functional_tag = 'draw',\n    functional_tags_json = '[\"draw\",\"protection\",\"redirect_removal\"]'\nWHERE deck_id = 607\n  AND card_name = 'Deflecting Swat'\n  AND card_id = 'ae0d54e1-1471-4bb7-8b8d-09ef5b51b2ed';\n\nUPDATE deck_cards\nSET functional_tag = 'unknown',\n    functional_tags_json = '[\"unknown\"]'\nWHERE deck_id = 607\n  AND card_name = 'Emeria''s Call // Emeria, Shattered Skyclave'\n  AND card_id = '356b93e3-62db-44ec-9322-4e999eefc674';\n\nUPDATE deck_cards\nSET functional_tag = 'draw',\n    functional_tags_json = '[\"draw\"]'\nWHERE deck_id = 607\n  AND card_name = 'Promise of Loyalty'\n  AND card_id = '6a219f1a-0b0a-4628-9d60-b81f7dbcab5c';\n\nUPDATE deck_cards\nSET functional_tag = 'draw',\n    functional_tags_json = '[\"draw\"]'\nWHERE deck_id = 607\n  AND card_name = 'Redirect Lightning'\n  AND card_id = '558a8bda-ea1a-4c01-b3c2-186a2ad6478d';\n\nUPDATE deck_cards\nSET functional_tag = 'unknown',\n    functional_tags_json = '[\"unknown\"]'\nWHERE deck_id = 607\n  AND card_name = 'Tragic Arrogance'\n  AND card_id = 'abe21b14-7c49-4629-bbf2-8fce03d66d94';\nCOMMIT;\n"
+  },
+  "status": "role_tag_repair_applied",
+  "summary": {
+    "blocker_count_before": 0,
+    "eligible_update_count_before": 5,
+    "remaining_blocker_count": 0,
+    "remaining_update_count": 0,
+    "target_count": 5,
+    "updated_count": 5
+  }
+}

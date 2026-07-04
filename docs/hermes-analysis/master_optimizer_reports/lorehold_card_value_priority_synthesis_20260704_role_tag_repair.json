@@ -1,0 +1,4343 @@
+{
+  "artifact_type": "lorehold_card_value_priority_synthesis",
+  "candidate_replacement_pressure": {
+    "blocked_or_hypothesis_count": 161,
+    "ready_candidates": []
+  },
+  "current_card_priorities": [
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "engine"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "lorehold_opponent_upkeep_miracle_v1"
+        ]
+      },
+      "card_name": "Lorehold, the Historian",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "engine",
+      "primary_value_lane": "commander_intent",
+      "priority_class": "commander_core_anchor",
+      "quantity": 1,
+      "report_memberships": [],
+      "role_mapping_watch": [],
+      "safe_cmc": 5.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "commander_intent",
+        "hand_filter",
+        "topdeck_miracle_setup"
+      ],
+      "value_priority_index": 100
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "mana_development"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "land_tax_upkeep_opponent_more_lands_basic_land_tutor_to_hand_v1"
+        ]
+      },
+      "card_name": "Land Tax",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "tutor",
+      "primary_value_lane": "topdeck_miracle_setup",
+      "priority_class": "protected_topdeck_access_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "rule_count": 1,
+            "scopes": [
+              "land_tax_upkeep_opponent_more_lands_basic_land_tutor_to_hand_v1"
+            ]
+          },
+          "edhrec_lorehold": {
+            "inclusion": 2391,
+            "pct": 31.3,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.2
+          },
+          "source": "selection_access.current_access_anchors"
+        },
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "early_colored_rock",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 1.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "commander_synergy_engine",
+        "ramp",
+        "staple_floor_and_context",
+        "topdeck_miracle_setup",
+        "tutors_access"
+      ],
+      "value_priority_index": 100
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "engine"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "discard_replacement_to_top_v1"
+        ]
+      },
+      "card_name": "Library of Leng",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "engine",
+      "primary_value_lane": "topdeck_miracle_setup",
+      "priority_class": "protected_topdeck_access_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "rule_count": 3,
+            "scopes": [
+              "discard_replacement_to_top_v1"
+            ]
+          },
+          "edhrec_lorehold": {
+            "inclusion": 5944,
+            "pct": 77.7,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.75
+          },
+          "source": "selection_access.current_access_anchors"
+        },
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 1.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "commander_synergy_engine",
+        "hand_filter",
+        "recursion_recovery",
+        "staple_floor_and_context",
+        "topdeck_miracle_setup"
+      ],
+      "value_priority_index": 100
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "draw"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "scroll_rack_upkeep_single_exchange_v1"
+        ]
+      },
+      "card_name": "Scroll Rack",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "draw",
+      "primary_value_lane": "topdeck_miracle_setup",
+      "priority_class": "protected_topdeck_access_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "rule_count": 2,
+            "scopes": [
+              "scroll_rack_upkeep_single_exchange_v1"
+            ]
+          },
+          "edhrec_lorehold": {
+            "inclusion": 4572,
+            "pct": 59.8,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.57
+          },
+          "source": "selection_access.current_access_anchors"
+        },
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "commander_synergy_engine",
+        "staple_floor_and_context",
+        "topdeck_miracle_setup"
+      ],
+      "value_priority_index": 100
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "draw"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "senseis_top_reorder_and_draw_put_self_on_top_runtime_v1"
+        ]
+      },
+      "card_name": "Sensei's Divining Top",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "draw",
+      "primary_value_lane": "topdeck_miracle_setup",
+      "priority_class": "protected_topdeck_access_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "rule_count": 1,
+            "scopes": [
+              "senseis_top_reorder_and_draw_put_self_on_top_runtime_v1"
+            ]
+          },
+          "edhrec_lorehold": {
+            "inclusion": 5123,
+            "pct": 67.0,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.63
+          },
+          "source": "selection_access.current_access_anchors"
+        },
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 1.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "commander_synergy_engine",
+        "staple_floor_and_context",
+        "topdeck_miracle_setup"
+      ],
+      "value_priority_index": 100
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1"
+        ]
+      },
+      "card_name": "Bender's Waterskin",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "protected_turn_cycle_miracle_mana",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "turn_cycle_miracle_mana",
+          "policy_class": "protected_turn_cycle_miracle_mana",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "commander_synergy_engine",
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 96
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "political_colorless_mana_rock_multiplayer_untap_v1"
+        ]
+      },
+      "card_name": "Victory Chimes",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "protected_turn_cycle_miracle_mana",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "turn_cycle_miracle_mana",
+          "policy_class": "protected_turn_cycle_miracle_mana",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "commander_synergy_engine",
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 96
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "topdeck_miracle_setup"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "nonland_hand_miracle_zero_static_v1"
+        ]
+      },
+      "card_name": "Molecule Man",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "draw",
+      "primary_value_lane": "topdeck_miracle_setup",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [],
+            "role_categories": [
+              "topdeck_miracle_setup"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306"
+            ],
+            "variant_count": 1
+          }
+        },
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 6.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "commander_synergy_engine",
+        "payoffs_finishers",
+        "staple_floor_and_context",
+        "topdeck_miracle_setup"
+      ],
+      "value_priority_index": 95
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "draw"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "each_player_discard_hand_draw_seven_miracle_annotation_v1"
+        ]
+      },
+      "card_name": "Reforge the Soul",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "draw",
+      "primary_value_lane": "topdeck_miracle_setup",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [
+              "refill",
+              "wheel"
+            ],
+            "role_categories": [
+              "draw"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "1a76c69c236f182671a7d2069ecb48d9003261d1dd23ac144ae55c2c0a904367",
+              "4f48eee5a34dcf561e4d45f88ced34b9052ccb4f13697d69ce69f06aa2dbb99b",
+              "5570c465c492f07ba93dc89bfcb97bf3e08ae7e38bab6c7de0b24c77535a8648",
+              "69fc2e8dfcb40e24137a92b8823677e26538768b21602671f46158f3c303a42c",
+              "a073b0fdc0db03c432651caa8f41d275faa6d67e5efb3865daee7ff4ca543298",
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306",
+              "ba7d06f86f2381388259c4926e684407284f70e313e83f80df922827a67d8f68",
+              "cde4088aeef9659a963a0725a03c6589f0df1850d07b0f322c12165c88e02752"
+            ],
+            "variant_count": 8
+          }
+        },
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 5.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "commander_synergy_engine",
+        "hand_filter",
+        "payoffs_finishers",
+        "staple_floor_and_context",
+        "topdeck_miracle_setup"
+      ],
+      "value_priority_index": 95
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "sweeper"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "cascade_cascade_runtime_other_spells_mana_value_opponent_creature_damage_v1"
+        ]
+      },
+      "card_name": "Call Forth the Tempest",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "board_wipe",
+      "primary_value_lane": "topdeck_miracle_setup",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "cascade_cascade_runtime_other_spells_mana_value_opponent_creature_damage_v1"
+            ],
+            "effects": [
+              "damage_wipe"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 5021,
+            "pct": 65.6,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.63
+          },
+          "lane": "board_wipe",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Call Forth the Tempest",
+            "deck_count": 7,
+            "deck_ids": [
+              609,
+              610,
+              611,
+              612,
+              613,
+              614,
+              615
+            ],
+            "functional_tags": [
+              "board_wipe"
+            ]
+          }
+        },
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [
+              "cascade",
+              "dynamic_damage",
+              "free_cast",
+              "opponent_creature_damage"
+            ],
+            "role_categories": [
+              "sweeper"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "1a76c69c236f182671a7d2069ecb48d9003261d1dd23ac144ae55c2c0a904367",
+              "5154c88a8b0bff4bff121c164b0aff180b4515e52d46a3fac8b972c4ee026836",
+              "5570c465c492f07ba93dc89bfcb97bf3e08ae7e38bab6c7de0b24c77535a8648",
+              "69fc2e8dfcb40e24137a92b8823677e26538768b21602671f46158f3c303a42c",
+              "9370b6170e00bc9fdcb33358ed7653f0c06a2d454871361dbef4fdc75560e6ee",
+              "a073b0fdc0db03c432651caa8f41d275faa6d67e5efb3865daee7ff4ca543298",
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306",
+              "ba7d06f86f2381388259c4926e684407284f70e313e83f80df922827a67d8f68"
+            ],
+            "variant_count": 8
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 8.0,
+      "value_lanes": [
+        "board_wipes",
+        "card_draw_selection",
+        "payoffs_finishers",
+        "topdeck_miracle_setup"
+      ],
+      "value_priority_index": 93
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "role_categories": [
+          "draw",
+          "ramp"
+        ],
+        "rule_count": 2,
+        "scopes": [
+          "discover_10_as_one_card_value_component_v1",
+          "discover_10_treasure_difference_average_v1"
+        ]
+      },
+      "card_name": "Hit the Mother Lode",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "draw",
+      "primary_value_lane": "topdeck_miracle_setup",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 2,
+            "functions": [],
+            "role_categories": [
+              "draw",
+              "ramp"
+            ],
+            "rule_count": 2
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "1a76c69c236f182671a7d2069ecb48d9003261d1dd23ac144ae55c2c0a904367",
+              "5154c88a8b0bff4bff121c164b0aff180b4515e52d46a3fac8b972c4ee026836",
+              "a073b0fdc0db03c432651caa8f41d275faa6d67e5efb3865daee7ff4ca543298",
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306",
+              "ba7d06f86f2381388259c4926e684407284f70e313e83f80df922827a67d8f68",
+              "cde4088aeef9659a963a0725a03c6589f0df1850d07b0f322c12165c88e02752"
+            ],
+            "variant_count": 6
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 7.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "payoffs_finishers",
+        "ramp",
+        "topdeck_miracle_setup"
+      ],
+      "value_priority_index": 93
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "engine"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "shuffle_reveal_top_nonland_exile_free_cast_with_demonstrate_v1"
+        ]
+      },
+      "card_name": "Creative Technique",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "draw",
+      "primary_value_lane": "payoffs_finishers",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [],
+            "role_categories": [
+              "engine"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "9370b6170e00bc9fdcb33358ed7653f0c06a2d454871361dbef4fdc75560e6ee",
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306"
+            ],
+            "variant_count": 2
+          }
+        },
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 5.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "commander_synergy_engine",
+        "payoffs_finishers",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 92
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wincon"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "uncounterable_destroy_target_permanent_target_player_draw_four_extra_turn_exile_v1"
+        ]
+      },
+      "card_name": "Rise of the Eldrazi",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "wincon",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "uncounterable_destroy_target_permanent_target_player_draw_four_extra_turn_exile_v1"
+            ],
+            "effects": [
+              "composite_resolution"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 4206,
+            "pct": 55.0,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.54
+          },
+          "lane": "spot_removal",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Rise of the Eldrazi",
+            "deck_count": 6,
+            "deck_ids": [
+              609,
+              611,
+              613,
+              614,
+              615,
+              616
+            ],
+            "functional_tags": [
+              "wincon"
+            ]
+          }
+        },
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [
+              "draw",
+              "extra_turn",
+              "removal"
+            ],
+            "role_categories": [
+              "wincon"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "1a76c69c236f182671a7d2069ecb48d9003261d1dd23ac144ae55c2c0a904367",
+              "4f48eee5a34dcf561e4d45f88ced34b9052ccb4f13697d69ce69f06aa2dbb99b",
+              "69fc2e8dfcb40e24137a92b8823677e26538768b21602671f46158f3c303a42c",
+              "9370b6170e00bc9fdcb33358ed7653f0c06a2d454871361dbef4fdc75560e6ee",
+              "a073b0fdc0db03c432651caa8f41d275faa6d67e5efb3865daee7ff4ca543298",
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306",
+              "ba7d06f86f2381388259c4926e684407284f70e313e83f80df922827a67d8f68",
+              "cde4088aeef9659a963a0725a03c6589f0df1850d07b0f322c12165c88e02752"
+            ],
+            "variant_count": 8
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 12.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "interaction_removal",
+        "payoffs_finishers"
+      ],
+      "value_priority_index": 90
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "combat"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "graveyard_spell_exile_team_pump_combat_damage_copy_cast_until_eot_v1"
+        ]
+      },
+      "card_name": "Surge to Victory",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "wincon",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "graveyard_spell_exile_team_pump_combat_damage_copy_cast_until_eot_v1"
+            ],
+            "effects": [
+              "pump_all"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1505,
+            "pct": 19.7,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.18
+          },
+          "lane": "spot_removal",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Surge to Victory",
+            "deck_count": 0,
+            "deck_ids": [],
+            "functional_tags": []
+          }
+        },
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [],
+            "role_categories": [
+              "combat"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306"
+            ],
+            "variant_count": 1
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 6.0,
+      "value_lanes": [
+        "commander_synergy_engine",
+        "interaction_removal",
+        "payoffs_finishers",
+        "recursion_recovery"
+      ],
+      "value_priority_index": 90
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "removal"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "destroy_target_permanent_create_3_3_green_elephant_for_controller_v1"
+        ]
+      },
+      "card_name": "Generous Gift",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "removal",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "destroy_target_permanent_create_3_3_green_elephant_for_controller_v1"
+            ],
+            "effects": [
+              "remove_permanent"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 2484,
+            "pct": 32.5,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.01
+          },
+          "lane": "spot_removal",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Generous Gift",
+            "deck_count": 3,
+            "deck_ids": [
+              610,
+              614,
+              616
+            ],
+            "functional_tags": [
+              "removal"
+            ]
+          }
+        },
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "interaction_removal",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wincon"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "target_or_overload_graveyard_instant_sorcery_copy_cast_runtime_v1"
+        ]
+      },
+      "card_name": "Mizzix's Mastery",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "wincon",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [
+              "copy_cast",
+              "graveyard_spell_recursion",
+              "storm_payoff"
+            ],
+            "role_categories": [
+              "wincon"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "1a76c69c236f182671a7d2069ecb48d9003261d1dd23ac144ae55c2c0a904367",
+              "4b733dfd11e6b0f892b1242458b4fa6522fb3fb13699ff1c612b1e1d6b0bddc0",
+              "4f48eee5a34dcf561e4d45f88ced34b9052ccb4f13697d69ce69f06aa2dbb99b",
+              "5154c88a8b0bff4bff121c164b0aff180b4515e52d46a3fac8b972c4ee026836",
+              "5570c465c492f07ba93dc89bfcb97bf3e08ae7e38bab6c7de0b24c77535a8648",
+              "69fc2e8dfcb40e24137a92b8823677e26538768b21602671f46158f3c303a42c",
+              "a073b0fdc0db03c432651caa8f41d275faa6d67e5efb3865daee7ff4ca543298",
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306",
+              "ba7d06f86f2381388259c4926e684407284f70e313e83f80df922827a67d8f68"
+            ],
+            "variant_count": 9
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 4.0,
+      "value_lanes": [
+        "commander_synergy_engine",
+        "interaction_removal",
+        "payoffs_finishers",
+        "recursion_recovery"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "removal"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "path_to_exile_creature_exile_basic_land_compensation_runtime_v1"
+        ]
+      },
+      "card_name": "Path to Exile",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "removal",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "path_to_exile_creature_exile_basic_land_compensation_runtime_v1"
+            ],
+            "effects": [
+              "remove_creature"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 4377,
+            "pct": 57.2,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0
+          },
+          "lane": "spot_removal",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Path to Exile",
+            "deck_count": 3,
+            "deck_ids": [
+              609,
+              613,
+              616
+            ],
+            "functional_tags": [
+              "removal"
+            ]
+          }
+        },
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 1.0,
+      "value_lanes": [
+        "interaction_removal",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "removal"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1"
+        ]
+      },
+      "card_name": "Stroke of Midnight",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "removal",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1"
+            ],
+            "effects": [
+              "remove_permanent"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1375,
+            "pct": 18.0,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.01
+          },
+          "lane": "spot_removal",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Stroke of Midnight",
+            "deck_count": 2,
+            "deck_ids": [
+              610,
+              616
+            ],
+            "functional_tags": [
+              "removal"
+            ]
+          }
+        },
+        {
+          "policy_class": "current_role_card_not_global_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "interaction_removal",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "removal"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "swords_to_plowshares_creature_exile_life_equal_power_v1"
+        ]
+      },
+      "card_name": "Swords to Plowshares",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "removal",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "swords_to_plowshares_creature_exile_life_equal_power_v1"
+            ],
+            "effects": [
+              "remove_creature"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 5273,
+            "pct": 68.9,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.03
+          },
+          "lane": "spot_removal",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Swords to Plowshares",
+            "deck_count": 4,
+            "deck_ids": [
+              608,
+              609,
+              610,
+              615
+            ],
+            "functional_tags": [
+              "removal"
+            ]
+          }
+        },
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 1.0,
+      "value_lanes": [
+        "interaction_removal",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wincon"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "approach_second_cast_win_v2"
+        ]
+      },
+      "card_name": "Approach of the Second Sun",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "wincon",
+      "primary_value_lane": "payoffs_finishers",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [],
+            "role_categories": [
+              "wincon"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "1a76c69c236f182671a7d2069ecb48d9003261d1dd23ac144ae55c2c0a904367",
+              "5154c88a8b0bff4bff121c164b0aff180b4515e52d46a3fac8b972c4ee026836",
+              "5570c465c492f07ba93dc89bfcb97bf3e08ae7e38bab6c7de0b24c77535a8648",
+              "69fc2e8dfcb40e24137a92b8823677e26538768b21602671f46158f3c303a42c",
+              "9370b6170e00bc9fdcb33358ed7653f0c06a2d454871361dbef4fdc75560e6ee",
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306",
+              "ba7d06f86f2381388259c4926e684407284f70e313e83f80df922827a67d8f68"
+            ],
+            "variant_count": 7
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 7.0,
+      "value_lanes": [
+        "payoffs_finishers"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wincon"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "steal_all_creatures_until_eot_haste_attack_projection_v1"
+        ]
+      },
+      "card_name": "Insurrection",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "wincon",
+      "primary_value_lane": "payoffs_finishers",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [
+              "attack_damage_projection",
+              "gain_control_all_creatures_until_eot",
+              "haste_until_eot",
+              "untap_all_creatures_annotation"
+            ],
+            "role_categories": [
+              "wincon"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "69fc2e8dfcb40e24137a92b8823677e26538768b21602671f46158f3c303a42c",
+              "9370b6170e00bc9fdcb33358ed7653f0c06a2d454871361dbef4fdc75560e6ee",
+              "a073b0fdc0db03c432651caa8f41d275faa6d67e5efb3865daee7ff4ca543298",
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306",
+              "ba7d06f86f2381388259c4926e684407284f70e313e83f80df922827a67d8f68"
+            ],
+            "variant_count": 5
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 8.0,
+      "value_lanes": [
+        "payoffs_finishers"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wincon"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "instant_sorcery_cast_create_1_or_3_1_1_elementals_by_spell_mv_v1"
+        ]
+      },
+      "card_name": "Prismari Pianist",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "wincon",
+      "primary_value_lane": "payoffs_finishers",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [
+              "instant_sorcery_spell_cast_token_trigger"
+            ],
+            "role_categories": [
+              "wincon"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306"
+            ],
+            "variant_count": 1
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "commander_synergy_engine",
+        "payoffs_finishers"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wincon"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "life_total_flying_pegasus_token_maker_v1"
+        ]
+      },
+      "card_name": "Storm Herd",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "wincon",
+      "primary_value_lane": "payoffs_finishers",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [
+              "wide_token_finisher"
+            ],
+            "role_categories": [
+              "wincon"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "1a76c69c236f182671a7d2069ecb48d9003261d1dd23ac144ae55c2c0a904367",
+              "4f48eee5a34dcf561e4d45f88ced34b9052ccb4f13697d69ce69f06aa2dbb99b",
+              "9370b6170e00bc9fdcb33358ed7653f0c06a2d454871361dbef4fdc75560e6ee",
+              "a073b0fdc0db03c432651caa8f41d275faa6d67e5efb3865daee7ff4ca543298",
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306",
+              "ba7d06f86f2381388259c4926e684407284f70e313e83f80df922827a67d8f68",
+              "cde4088aeef9659a963a0725a03c6589f0df1850d07b0f322c12165c88e02752"
+            ],
+            "variant_count": 7
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 10.0,
+      "value_lanes": [
+        "payoffs_finishers"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "gift_card_you_and_permanents_hexproof_gifted_indestructible_v1"
+        ]
+      },
+      "card_name": "Dawn's Truce",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "gift_card_you_and_permanents_hexproof_gifted_indestructible_v1"
+            ],
+            "effects": [
+              "gift_hexproof_indestructible"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 828,
+            "pct": 10.8,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.01
+          },
+          "lane": "pressure_protection",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Dawn's Truce",
+            "deck_count": 2,
+            "deck_ids": [
+              613,
+              616
+            ],
+            "functional_tags": [
+              "protection"
+            ]
+          }
+        },
+        {
+          "policy_class": "current_role_card_not_global_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "protection_resilience",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "deflecting_swat_control_commander_free_redirect_target_spell_or_ability_runtime_v1"
+        ]
+      },
+      "card_name": "Deflecting Swat",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "deflecting_swat_control_commander_free_redirect_target_spell_or_ability_runtime_v1"
+            ],
+            "effects": [
+              "redirect_removal"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 2820,
+            "pct": 36.9,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.21
+          },
+          "lane": "stack_or_spell_protection",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Deflecting Swat",
+            "deck_count": 7,
+            "deck_ids": [
+              608,
+              609,
+              611,
+              613,
+              614,
+              615,
+              616
+            ],
+            "functional_tags": [
+              "draw"
+            ]
+          }
+        },
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "protection_resilience",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "flawless_maneuver_control_commander_free_creatures_indestructible_until_eot_v1"
+        ]
+      },
+      "card_name": "Flawless Maneuver",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "flawless_maneuver_control_commander_free_creatures_indestructible_until_eot_v1"
+            ],
+            "effects": [
+              "indestructible"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1528,
+            "pct": 20.0,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.02
+          },
+          "lane": "pressure_protection",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Flawless Maneuver",
+            "deck_count": 1,
+            "deck_ids": [
+              614
+            ],
+            "functional_tags": [
+              "protection"
+            ]
+          }
+        },
+        {
+          "policy_class": "current_role_card_not_global_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "protection_resilience",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "creature_body_target_creature_protection_from_chosen_color_activation_runtime_v1"
+        ]
+      },
+      "card_name": "Mother of Runes",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "creature_body_target_creature_protection_from_chosen_color_activation_runtime_v1"
+            ],
+            "effects": [
+              "creature"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 2641,
+            "pct": 34.5,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.22
+          },
+          "lane": "protection_resilience",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Mother of Runes",
+            "deck_count": 2,
+            "deck_ids": [
+              609,
+              614
+            ],
+            "functional_tags": [
+              "protection"
+            ]
+          }
+        },
+        {
+          "policy_class": "current_role_card_not_global_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 1.0,
+      "value_lanes": [
+        "protection_resilience",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "teferis_protection_life_lock_protection_all_permanents_phase_out_self_exile_v1"
+        ]
+      },
+      "card_name": "Teferi's Protection",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "teferis_protection_life_lock_protection_all_permanents_phase_out_self_exile_v1"
+            ],
+            "effects": [
+              "phase_out"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1620,
+            "pct": 21.2,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.05
+          },
+          "lane": "pressure_protection",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Teferi's Protection",
+            "deck_count": 7,
+            "deck_ids": [
+              608,
+              611,
+              612,
+              613,
+              614,
+              615,
+              616
+            ],
+            "functional_tags": [
+              "protection"
+            ]
+          }
+        },
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "protection_resilience",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "counterspell_with_random_replacement_annotation_v1"
+        ]
+      },
+      "card_name": "Tibalt's Trickery",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "counterspell_with_random_replacement_annotation_v1"
+            ],
+            "effects": [
+              "counter"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 982,
+            "pct": 12.8,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.08
+          },
+          "lane": "stack_or_spell_protection",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Tibalt's Trickery",
+            "deck_count": 1,
+            "deck_ids": [
+              609
+            ],
+            "functional_tags": [
+              "protection"
+            ]
+          }
+        },
+        {
+          "policy_class": "current_role_card_not_global_staple",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "protection_resilience",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wincon"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_annotation_v1",
+          "per_opponent_two_3_3_flying_hasty_elementals_graveyard_cost_reduction_runtime_attack_requirement_v1"
+        ]
+      },
+      "card_name": "Furygale Flocking",
+      "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+      "functional_tag": "wincon",
+      "primary_value_lane": "recursion_recovery",
+      "priority_class": "protected_payoff_finisher_anchor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "functions": [
+              "create_creature_tokens",
+              "graveyard_cost_reduction_annotation"
+            ],
+            "role_categories": [
+              "wincon"
+            ],
+            "rule_count": 1
+          },
+          "source": "payoff.current_payoff_anchors",
+          "variant_usage": {
+            "deck_hashes": [
+              "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306"
+            ],
+            "variant_count": 1
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 10.0,
+      "value_lanes": [
+        "payoffs_finishers",
+        "recursion_recovery"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 2,
+        "scopes": [
+          "saga_land_token_then_tutor_partial_v1"
+        ]
+      },
+      "card_name": "Urza's Saga",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "tutors_access",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "utility_land",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "mana_base",
+        "ramp",
+        "staple_floor_and_context",
+        "tutors_access"
+      ],
+      "value_priority_index": 88
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "commander_identity_mana_rock_deck_scoped_v1"
+        ]
+      },
+      "card_name": "Arcane Signet",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "early_colored_rock",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "activation_cost_net_mana_pair_rock_v1"
+        ]
+      },
+      "card_name": "Boros Signet",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "early_colored_rock",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "conditional_opponent_color_mana_rock_v1"
+        ]
+      },
+      "card_name": "Fellwar Stone",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "early_colored_rock",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "choose_both_with_commander_red_by_target_opponent_hand_impulse_top_three_v1"
+        ]
+      },
+      "card_name": "Jeska's Will",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "ritual_or_spell_burst",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "opponent_draw_tax_treasure_v1"
+        ]
+      },
+      "card_name": "Smothering Tithe",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "treasure_or_discard_ramp",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 4.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "manual_review"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "two_colorless_mana_rock_v1"
+        ]
+      },
+      "card_name": "Sol Ring",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "early_colorless_burst",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 1.0,
+      "value_lanes": [
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "pain_talisman_color_pair_partial_v1"
+        ]
+      },
+      "card_name": "Talisman of Conviction",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "early_colored_rock",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Arid Mesa",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "tutors_access",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "staple_floor_and_context",
+        "tutors_access"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Bloodstained Mire",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "tutors_access",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "staple_floor_and_context",
+        "tutors_access"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Flooded Strand",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "tutors_access",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "staple_floor_and_context",
+        "tutors_access"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Marsh Flats",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "tutors_access",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "staple_floor_and_context",
+        "tutors_access"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Scalding Tarn",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "tutors_access",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "staple_floor_and_context",
+        "tutors_access"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Windswept Heath",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "tutors_access",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "staple_floor_and_context",
+        "tutors_access"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Wooded Foothills",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "tutors_access",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "staple_floor_and_context",
+        "tutors_access"
+      ],
+      "value_priority_index": 86
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wipe"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "blasphemous_act_damage_13_each_creature_dynamic_cost_v1"
+        ]
+      },
+      "card_name": "Blasphemous Act",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "board_wipe",
+      "primary_value_lane": "board_wipes",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "blasphemous_act_damage_13_each_creature_dynamic_cost_v1"
+            ],
+            "effects": [
+              "damage_wipe"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 3096,
+            "pct": 40.5,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.08
+          },
+          "lane": "board_wipe",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Blasphemous Act",
+            "deck_count": 5,
+            "deck_ids": [
+              609,
+              610,
+              612,
+              614,
+              616
+            ],
+            "functional_tags": [
+              "board_wipe"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 9.0,
+      "value_lanes": [
+        "board_wipes"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wipe"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "exile_creatures_except_convoked_types_artifacts_enchantments_v1"
+        ]
+      },
+      "card_name": "Everything Comes to Dust",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "board_wipe",
+      "primary_value_lane": "board_wipes",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "exile_creatures_except_convoked_types_artifacts_enchantments_v1"
+            ],
+            "effects": [
+              "exile_artifact_enchantment_creature_convoke_wipe"
+            ],
+            "rule_count": 1
+          },
+          "lane": "board_wipe",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Everything Comes to Dust",
+            "deck_count": 0,
+            "deck_ids": [],
+            "functional_tags": []
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 10.0,
+      "value_lanes": [
+        "board_wipes"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wipe"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "modal_exile_wipe_creature_runtime_baseline_v1"
+        ]
+      },
+      "card_name": "Farewell",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "board_wipe",
+      "primary_value_lane": "board_wipes",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "modal_exile_wipe_creature_runtime_baseline_v1"
+            ],
+            "effects": [
+              "board_wipe"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1326,
+            "pct": 17.3,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.07
+          },
+          "lane": "board_wipe",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Farewell",
+            "deck_count": 2,
+            "deck_ids": [
+              613,
+              615
+            ],
+            "functional_tags": [
+              "board_wipe"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 6.0,
+      "value_lanes": [
+        "board_wipes",
+        "recursion_recovery"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "interaction"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "gift_card_destroy_all_creatures_return_one_own_creature_destroyed_this_way_v1"
+        ]
+      },
+      "card_name": "Starfall Invocation",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "board_wipe",
+      "primary_value_lane": "board_wipes",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "gift_card_destroy_all_creatures_return_one_own_creature_destroyed_this_way_v1"
+            ],
+            "effects": [
+              "gift_destroy_all_creatures_return_own_destroyed_creature"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1004,
+            "pct": 13.1,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.11
+          },
+          "lane": "board_wipe",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Starfall Invocation",
+            "deck_count": 2,
+            "deck_ids": [
+              612,
+              615
+            ],
+            "functional_tags": [
+              "board_wipe"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 5.0,
+      "value_lanes": [
+        "board_wipes",
+        "card_draw_selection",
+        "recursion_recovery"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "draw"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "first_opponent_noncreature_spell_power_tax_draw_v1"
+        ]
+      },
+      "card_name": "Esper Sentinel",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "draw",
+      "primary_value_lane": "commander_synergy_engine",
+      "priority_class": "structural_foundation",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "structural_foundation",
+          "source": "staple.current_staple_floor"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 1.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "commander_synergy_engine",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "stax_protection_reach"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "high_noon_one_spell_per_turn_static_and_self_sacrifice_damage_runtime_v1"
+        ]
+      },
+      "card_name": "High Noon",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "removal",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "high_noon_one_spell_per_turn_static_and_self_sacrifice_damage_runtime_v1"
+            ],
+            "effects": [
+              "passive"
+            ],
+            "rule_count": 1
+          },
+          "lane": "spot_removal",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "High Noon",
+            "deck_count": 0,
+            "deck_ids": [],
+            "functional_tags": []
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "interaction_removal"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "engine"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "front_creature_prowess_etb_return_instant_or_sorcery_graveyard_to_hand_mdfc_red_land_life_payment_runtime_v1"
+        ]
+      },
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "engine",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "front_creature_prowess_etb_return_instant_or_sorcery_graveyard_to_hand_mdfc_red_land_life_payment_runtime_v1"
+            ],
+            "effects": [
+              "creature"
+            ],
+            "rule_count": 1
+          },
+          "lane": "spot_removal",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Pinnacle Monk // Mystic Peak",
+            "deck_count": 4,
+            "deck_ids": [
+              608,
+              609,
+              610,
+              611
+            ],
+            "functional_tags": [
+              "engine"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 5.0,
+      "value_lanes": [
+        "commander_synergy_engine",
+        "interaction_removal",
+        "recursion_recovery"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "single_target_spell_or_ability_redirect_additional_cost_annotation_v1"
+        ]
+      },
+      "card_name": "Redirect Lightning",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "single_target_spell_or_ability_redirect_additional_cost_annotation_v1"
+            ],
+            "effects": [
+              "redirect_removal"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1579,
+            "pct": 20.6,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.15
+          },
+          "lane": "stack_or_spell_protection",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Redirect Lightning",
+            "deck_count": 3,
+            "deck_ids": [
+              608,
+              611,
+              613
+            ],
+            "functional_tags": [
+              "draw"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 1.0,
+      "value_lanes": [
+        "interaction_removal",
+        "protection_resilience"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "engine"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "etb_graveyard_impulse_recast_noncreature_spell_damage_any_target_v1"
+        ]
+      },
+      "card_name": "Thor, God of Thunder",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "removal",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "etb_graveyard_impulse_recast_noncreature_spell_damage_any_target_v1"
+            ],
+            "effects": [
+              "creature"
+            ],
+            "rule_count": 1
+          },
+          "lane": "spot_removal",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Thor, God of Thunder",
+            "deck_count": 0,
+            "deck_ids": [],
+            "functional_tags": []
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 5.0,
+      "value_lanes": [
+        "commander_synergy_engine",
+        "interaction_removal",
+        "recursion_recovery"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "removal"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "winds_of_abandon_opponent_creature_exile_basic_land_compensation_overload_runtime_v1"
+        ]
+      },
+      "card_name": "Winds of Abandon",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "removal",
+      "primary_value_lane": "interaction_removal",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "winds_of_abandon_opponent_creature_exile_basic_land_compensation_overload_runtime_v1"
+            ],
+            "effects": [
+              "remove_creature"
+            ],
+            "rule_count": 1
+          },
+          "lane": "spot_removal",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Winds of Abandon",
+            "deck_count": 0,
+            "deck_ids": [],
+            "functional_tags": []
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "board_wipes",
+        "interaction_removal"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wipe"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "avatars_wrath_airbend_all_other_creatures_nonhand_lock_self_exile_v1"
+        ]
+      },
+      "card_name": "Avatar's Wrath",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "avatars_wrath_airbend_all_other_creatures_nonhand_lock_self_exile_v1"
+            ],
+            "effects": [
+              "airbend_other_creatures"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1071,
+            "pct": 14.0,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.11
+          },
+          "lane": "pressure_protection",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Avatar's Wrath",
+            "deck_count": 0,
+            "deck_ids": [],
+            "functional_tags": []
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 4.0,
+      "value_lanes": [
+        "protection_resilience"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "board_development"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1"
+        ]
+      },
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "create_two_4_4_flying_angel_warrior_tokens_non_angel_indestructible_until_next_turn_v1"
+            ],
+            "effects": [
+              "token_maker"
+            ],
+            "rule_count": 1
+          },
+          "lane": "pressure_protection",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+            "deck_count": 1,
+            "deck_ids": [
+              609
+            ],
+            "functional_tags": [
+              "board_development"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 7.0,
+      "value_lanes": [
+        "protection_resilience"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "wipe"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "own_and_opponent_creature_indestructible_then_destroy_all_creatures_v1"
+        ]
+      },
+      "card_name": "Fated Clash",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "board_wipe",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "own_and_opponent_creature_indestructible_then_destroy_all_creatures_v1"
+            ],
+            "effects": [
+              "fated_clash_protect_then_destroy"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1195,
+            "pct": 15.6,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.15
+          },
+          "lane": "board_wipe",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Fated Clash",
+            "deck_count": 1,
+            "deck_ids": [
+              614
+            ],
+            "functional_tags": [
+              "board_wipe"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 5.0,
+      "value_lanes": [
+        "board_wipes",
+        "protection_resilience"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "creature_body_another_creature_protection_from_colorless_or_chosen_color_activation_runtime_v1"
+        ]
+      },
+      "card_name": "Giver of Runes",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "creature_body_another_creature_protection_from_colorless_or_chosen_color_activation_runtime_v1"
+            ],
+            "effects": [
+              "creature"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1500,
+            "pct": 19.6,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.13
+          },
+          "lane": "protection_resilience",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Giver of Runes",
+            "deck_count": 1,
+            "deck_ids": [
+              609
+            ],
+            "functional_tags": [
+              "protection"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 1.0,
+      "value_lanes": [
+        "protection_resilience"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "creature_body_uncounterable_ward_pay_life_static_counter_protection_runtime_v1"
+        ]
+      },
+      "card_name": "Hexing Squelcher",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "creature",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "creature_body_uncounterable_ward_pay_life_static_counter_protection_runtime_v1"
+            ],
+            "effects": [
+              "creature"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 3135,
+            "pct": 41.0,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.33
+          },
+          "lane": "protection_resilience",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Hexing Squelcher",
+            "deck_count": 5,
+            "deck_ids": [
+              609,
+              613,
+              614,
+              615,
+              616
+            ],
+            "functional_tags": [
+              "protection"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "protection_resilience"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "lightning_greaves_auto_attach_haste_shroud_equip_0_v1"
+        ]
+      },
+      "card_name": "Lightning Greaves",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "lightning_greaves_auto_attach_haste_shroud_equip_0_v1"
+            ],
+            "effects": [
+              "equipment_haste_shroud"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 3458,
+            "pct": 45.2,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.16
+          },
+          "lane": "protection_resilience",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Lightning Greaves",
+            "deck_count": 1,
+            "deck_ids": [
+              615
+            ],
+            "functional_tags": [
+              "protection"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "protection_resilience"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "interaction"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1"
+        ]
+      },
+      "card_name": "Promise of Loyalty",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "board_wipe",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "each_player_choose_creature_vow_counter_sacrifice_other_creatures_attack_restriction_v1"
+            ],
+            "effects": [
+              "vow_counter_each_player_sacrifice_rest"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1860,
+            "pct": 24.3,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": 0.2
+          },
+          "lane": "pressure_protection",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Promise of Loyalty",
+            "deck_count": 1,
+            "deck_ids": [
+              611
+            ],
+            "functional_tags": [
+              "draw"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 5.0,
+      "value_lanes": [
+        "board_wipes",
+        "protection_resilience"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "protection"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "equipment_auto_attach_haste_hexproof_v1"
+        ]
+      },
+      "card_name": "Swiftfoot Boots",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "protection",
+      "primary_value_lane": "protection_resilience",
+      "priority_class": "protected_interaction_resilience_floor",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "battle_rule_summary": {
+            "active_rule_count": 1,
+            "battle_model_scopes": [
+              "equipment_auto_attach_haste_hexproof_v1"
+            ],
+            "effects": [
+              "equipment_static_attachment"
+            ],
+            "rule_count": 1
+          },
+          "edhrec_lorehold": {
+            "inclusion": 1942,
+            "pct": 25.4,
+            "potential_decks": 7651,
+            "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+            "synergy": -0.17
+          },
+          "lane": "protection_resilience",
+          "source": "interaction.current_floor_profiles",
+          "variant_usage": {
+            "card_name": "Swiftfoot Boots",
+            "deck_count": 1,
+            "deck_ids": [
+              616
+            ],
+            "functional_tags": [
+              "protection"
+            ]
+          }
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "protection_resilience"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "support"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "static_cost_reduction_for_matching_spells_v1"
+        ]
+      },
+      "card_name": "Pearl Medallion",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "commander_contextual_staple",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "cost_reducer",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "commander_synergy_engine",
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "support"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "static_cost_reduction_for_matching_spells_v1"
+        ]
+      },
+      "card_name": "Ruby Medallion",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "commander_contextual_staple",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "commander_contextual_staple",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "cost_reducer",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "commander_synergy_engine",
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 84
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "discard_draw_two_create_two_treasures_v1"
+        ]
+      },
+      "card_name": "Big Score",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "current_role_card_not_global_staple",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "treasure_or_discard_ramp",
+          "policy_class": "current_mana_role_card",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 4.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "hand_filter",
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 78
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "discard_draw_create_treasures_v1"
+        ]
+      },
+      "card_name": "Unexpected Windfall",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "current_role_card_not_global_staple",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "treasure_or_discard_ramp",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 4.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "hand_filter",
+        "ramp",
+        "staple_floor_and_context"
+      ],
+      "value_priority_index": 78
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Prismatic Vista",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "tutors_access",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "policy_class": "current_role_card_not_global_staple",
+          "source": "staple.current_staple_floor"
+        },
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "staple_floor_and_context",
+        "tutors_access"
+      ],
+      "value_priority_index": 78
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 2,
+        "scopes": [
+          "ancient_tomb_bonus_mana_on_tap_v1"
+        ]
+      },
+      "card_name": "Ancient Tomb",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "fast_or_utility_land",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 76
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 2,
+        "scopes": [
+          "pain_cycle_sac_draw_land_v1"
+        ]
+      },
+      "card_name": "Sunbaked Canyon",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 76
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 2,
+        "scopes": [
+          "colorless_life_paid_draw_land_v1"
+        ]
+      },
+      "card_name": "War Room",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "utility_land",
+          "policy_class": "current_utility_land_watch",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 76
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "pain_land_colorless_or_boros_mana_life_loss_runtime_v1"
+        ]
+      },
+      "card_name": "Battlefield Forge",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": []
+      },
+      "card_name": "Command Beacon",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "utility_land",
+          "policy_class": "current_utility_land_watch",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": []
+      },
+      "card_name": "Command Tower",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": []
+      },
+      "card_name": "Eiganjo, Seat of the Empire",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "surveil_dual_typed_land_etb_runtime_v1"
+        ]
+      },
+      "card_name": "Elegant Parlor",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "mana_base",
+        "ramp",
+        "recursion_recovery"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "any_color_from_opponent_land_production_v1"
+        ]
+      },
+      "card_name": "Exotic Orchard",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "land_enters_tapped_mana_source_with_cycling_runtime_v1"
+        ]
+      },
+      "card_name": "Glittering Massif",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "hand_filter",
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "basic_one_color_land_v1"
+        ]
+      },
+      "card_name": "Mountain // Mountain",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 4,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "basic_one_color_land_v1"
+        ]
+      },
+      "card_name": "Plains // Plains",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 4,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "plaza_of_heroes_conditional_mana_and_legendary_creature_protection_v1"
+        ]
+      },
+      "card_name": "Plaza of Heroes",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "protection_resilience",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "land_enters_tapped_unless_basic_lands_count_mana_source_v1"
+        ]
+      },
+      "card_name": "Radiant Summit",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": []
+      },
+      "card_name": "Reliquary Tower",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "utility_land",
+          "policy_class": "current_utility_land_watch",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "shock_dual_typed_land_life_payment_runtime_v1"
+        ]
+      },
+      "card_name": "Sacred Foundry",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "bond_land_dual_source_etb_opponent_count_runtime_v1"
+        ]
+      },
+      "card_name": "Spectator Seating",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "sunbillow_verge_white_unconditional_red_if_mountain_or_plains_runtime_v1"
+        ]
+      },
+      "card_name": "Sunbillow Verge",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "land"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "land_enters_tapped_unless_opponents_control_lands_count_mana_source_v1"
+        ]
+      },
+      "card_name": "Turbulent Steppe",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "land",
+      "primary_value_lane": "mana_base",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "colored_land_fixing",
+          "policy_class": "current_fixing_floor",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 0.0,
+      "value_lanes": [
+        "mana_base",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "card_advantage"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1"
+        ]
+      },
+      "card_name": "Monument to Endurance",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "treasure_or_discard_ramp",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "hand_filter",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "ramp"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "legendary_artifact_mana_harness_and_end_step_blink_other_nonland_permanent_v1"
+        ]
+      },
+      "card_name": "The Mind Stone",
+      "cut_policy": "mana_sequence_cut_requires_named_land_or_ramp_gate",
+      "functional_tag": "ramp",
+      "primary_value_lane": "ramp",
+      "priority_class": "mana_foundation_support",
+      "quantity": 1,
+      "report_memberships": [
+        {
+          "lane": "early_colored_rock",
+          "policy_class": "protected_current_mana_foundation",
+          "source": "mana.current_mana_package"
+        }
+      ],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "protection_resilience",
+        "ramp"
+      ],
+      "value_priority_index": 74
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "draw"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "exile_value_free_casts_paradigm_annotation_v1"
+        ]
+      },
+      "card_name": "Improvisation Capstone",
+      "cut_policy": "same_lane_hypothesis_required_before_cut",
+      "functional_tag": "draw",
+      "primary_value_lane": "topdeck_miracle_setup",
+      "priority_class": "commander_synergy_support",
+      "quantity": 1,
+      "report_memberships": [],
+      "role_mapping_watch": [],
+      "safe_cmc": 7.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "topdeck_miracle_setup"
+      ],
+      "value_priority_index": 71
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "role_categories": [
+          "draw",
+          "wincon"
+        ],
+        "rule_count": 2,
+        "scopes": [
+          "tempting_offer_base_create_1_1_white_rabbit_component_runtime_v1",
+          "tempting_offer_base_draw_one_component_runtime_v1"
+        ]
+      },
+      "card_name": "Tempt with Bunnies",
+      "cut_policy": "same_lane_hypothesis_required_before_cut",
+      "functional_tag": "wincon",
+      "primary_value_lane": "payoffs_finishers",
+      "priority_class": "commander_synergy_support",
+      "quantity": 1,
+      "report_memberships": [],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "payoffs_finishers"
+      ],
+      "value_priority_index": 70
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "draw"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "class_level1_own_noncreature_spell_optional_discard_draw_level2_level3_runtime_v1"
+        ]
+      },
+      "card_name": "Artist's Talent",
+      "cut_policy": "same_lane_hypothesis_required_before_cut",
+      "functional_tag": "draw",
+      "primary_value_lane": "ramp",
+      "priority_class": "commander_synergy_support",
+      "quantity": 1,
+      "report_memberships": [],
+      "role_mapping_watch": [],
+      "safe_cmc": 2.0,
+      "value_lanes": [
+        "card_draw_selection",
+        "commander_synergy_engine",
+        "hand_filter",
+        "ramp"
+      ],
+      "value_priority_index": 68
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "interaction"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "controller_chooses_artifact_creature_enchantment_planeswalker_per_player_sacrifice_other_nonlands_v1"
+        ]
+      },
+      "card_name": "Tragic Arrogance",
+      "cut_policy": "same_lane_hypothesis_required_before_cut",
+      "functional_tag": "board_wipe",
+      "primary_value_lane": "board_wipes",
+      "priority_class": "role_density_support",
+      "quantity": 1,
+      "report_memberships": [],
+      "role_mapping_watch": [],
+      "safe_cmc": 5.0,
+      "value_lanes": [
+        "board_wipes"
+      ],
+      "value_priority_index": 62
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "role_categories": [
+          "support"
+        ],
+        "rule_count": 1,
+        "scopes": [
+          "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1"
+        ]
+      },
+      "card_name": "The Scarlet Witch",
+      "cut_policy": "same_lane_hypothesis_required_before_cut",
+      "functional_tag": "creature",
+      "primary_value_lane": "creature",
+      "priority_class": "review_watch_not_cut_proof",
+      "quantity": 1,
+      "report_memberships": [],
+      "role_mapping_watch": [],
+      "safe_cmc": 3.0,
+      "value_lanes": [],
+      "value_priority_index": 47
+    }
+  ],
+  "decision": {
+    "keep_607_card_value_policy": true,
+    "next_action": "use this priority map before any future package generator: candidates must name the same-lane card they challenge and prove the tradeoff in equal gate traces",
+    "reason": "Current 607 has protected anchors across topdeck access, turn-cycle miracle mana, payoff conversion, interaction, staples, and mana foundation. Current reports do not surface a direct replacement candidate; watch items are role/tag interpretation work, not evidence that a card should be cut."
+  },
+  "deck_id": 607,
+  "external_learning": [
+    {
+      "learning": "Commander deckbuilding starts with role categories and win plans, but the final list still has to play the intended commander plan.",
+      "source": "EDHREC How to Build a Commander Deck",
+      "url": "https://edhrec.com/articles/how-to-build-a-commander-deck"
+    },
+    {
+      "learning": "Synergy is commander-relative inclusion above the color baseline; it is useful evidence, but not automatic replacement proof.",
+      "source": "EDHREC Digital Deckbuilding synergy guide",
+      "url": "https://edhrec.com/articles/digital-deckbuilding-the-how-to-guide-to-building-a-commander-deck-using-edhrec-archidekt-and-commander-spellbook"
+    },
+    {
+      "learning": "Best-in-slot is deck-dependent. A staple can lose to a less famous card when the less famous card advances the deck plan better.",
+      "source": "Card Kingdom staples article",
+      "url": "https://blog.cardkingdom.com/commander-staples-arent-always-the-right-cards/"
+    },
+    {
+      "learning": "Lorehold's value comes from topdeck setup, discard-as-resource, miracle timing, and turning preparation into a high-impact spell turn.",
+      "source": "GameTyrant Lorehold deck tech",
+      "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech"
+    },
+    {
+      "learning": "Library of Leng, Scroll Rack, Sensei's Divining Top, and Land Tax are central topdeck/miracle engines, not generic draw slots.",
+      "source": "Draftsim Lorehold guide",
+      "url": "https://draftsim.com/lorehold-the-historian-edh-deck/"
+    }
+  ],
+  "generated_at": "2026-07-04T21:17:15Z",
+  "postgres_writes": false,
+  "role_mapping_watch_items": [],
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_reports": {
+    "interaction_resilience": "docs/hermes-analysis/master_optimizer_reports/lorehold_interaction_resilience_synthesis_20260704_learning.json",
+    "mana_sequence": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_sequence_policy_synthesis_20260704_learning.json",
+    "payoff_finisher_recursion": "docs/hermes-analysis/master_optimizer_reports/lorehold_payoff_finisher_recursion_synthesis_20260704_learning.json",
+    "selection_access": "docs/hermes-analysis/master_optimizer_reports/lorehold_selection_access_synthesis_20260704_learning.json",
+    "staple_policy": "docs/hermes-analysis/master_optimizer_reports/lorehold_staple_policy_synthesis_20260704_learning.json"
+  },
+  "status": "card_value_priority_no_direct_cut_ready_current_607",
+  "summary": {
+    "candidate_rows_considered": 161,
+    "cut_policy_counts": {
+      "mana_sequence_cut_requires_named_land_or_ramp_gate": 30,
+      "protected_anchor_no_cut_without_explicit_package_and_equal_gate": 20,
+      "same_lane_hypothesis_required_before_cut": 5,
+      "same_lane_only_with_card_use_and_equal_gate": 45
+    },
+    "primary_lane_counts": {
+      "board_wipes": 5,
+      "commander_intent": 1,
+      "commander_synergy_engine": 1,
+      "creature": 1,
+      "interaction_removal": 12,
+      "mana_base": 25,
+      "payoffs_finishers": 6,
+      "protection_resilience": 14,
+      "ramp": 16,
+      "recursion_recovery": 1,
+      "topdeck_miracle_setup": 9,
+      "tutors_access": 9
+    },
+    "priority_counts": {
+      "commander_contextual_staple": 2,
+      "commander_core_anchor": 1,
+      "commander_synergy_support": 3,
+      "mana_foundation_support": 30,
+      "protected_interaction_resilience_floor": 27,
+      "protected_payoff_finisher_anchor": 13,
+      "protected_topdeck_access_anchor": 4,
+      "protected_turn_cycle_miracle_mana": 2,
+      "review_watch_not_cut_proof": 1,
+      "role_density_support": 1,
+      "structural_foundation": 16
+    },
+    "ready_replacement_candidate_count": 0,
+    "role_mapping_watch_count": 0,
+    "source_statuses": {
+      "interaction": "interaction_resilience_no_direct_swap_ready_current_607",
+      "mana": "mana_sequence_no_direct_auto_upgrade_current_607",
+      "payoff": "payoff_finisher_recursion_no_direct_swap_ready_current_607",
+      "selection": "selection_access_no_swap_ready_current_607",
+      "staple": "staple_policy_no_direct_auto_include_current_607"
+    },
+    "total_cards": 100,
+    "total_rows": 94
+  }
+}
