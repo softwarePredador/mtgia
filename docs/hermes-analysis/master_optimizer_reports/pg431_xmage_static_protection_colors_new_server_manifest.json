@@ -1,0 +1,3075 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg431_xmage_static_protection_colors_new_server_20260704",
+  "deploy_id": "pg431",
+  "expected_rules": [
+    {
+      "card_name": "Abbey Gargoyles",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "abbey gargoyles",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Akroma, Angel of Wrath",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8fc7ca210eceb898ca1cb00328aa4d0b",
+      "min_rule_version": 2,
+      "normalized_name": "akroma, angel of wrath",
+      "oracle_hash": "d4f647d67b1a98bf76e7bdc199182cec",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "first_strike",
+          "trample",
+          "vigilance",
+          "haste"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Aven Smokeweaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "aven smokeweaver",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Black Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f58a63346e6066a6aa2eaf23e386d94b",
+      "min_rule_version": 2,
+      "normalized_name": "black knight",
+      "oracle_hash": "a0d8658b3e5fb2f8271d92def1c71dcb",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blood Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f58a63346e6066a6aa2eaf23e386d94b",
+      "min_rule_version": 2,
+      "normalized_name": "blood knight",
+      "oracle_hash": "efb3ac9920ef9475bfaf6e0ba6a7885f",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cemetery Gate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5c3ffd8252e9ce7e7b9428adb4f19bc6",
+      "min_rule_version": 2,
+      "normalized_name": "cemetery gate",
+      "oracle_hash": "555959771f8d6cec918d0cbf59923eba",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "defender"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cerulean Wyvern",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "min_rule_version": 2,
+      "normalized_name": "cerulean wyvern",
+      "oracle_hash": "984125bebd45ec63aeec123cf3bd73d8",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Coast Watcher",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "min_rule_version": 2,
+      "normalized_name": "coast watcher",
+      "oracle_hash": "984125bebd45ec63aeec123cf3bd73d8",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Death Speakers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "min_rule_version": 2,
+      "normalized_name": "death speakers",
+      "oracle_hash": "63b25b00eb4e370c528607069fd4ffda",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Defender of Chaos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a6d1d1f78df760eaa3d55060ed162c9",
+      "min_rule_version": 2,
+      "normalized_name": "defender of chaos",
+      "oracle_hash": "0a5067d02cd8e46a4bcbcc67b9410e61",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Defender of Law",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d63de8e51b839f8f151ea9dc27062ac9",
+      "min_rule_version": 2,
+      "normalized_name": "defender of law",
+      "oracle_hash": "fd4214bb098c9fa877e15d35d1a8f26f",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Duskrider Falcon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "min_rule_version": 2,
+      "normalized_name": "duskrider falcon",
+      "oracle_hash": "3b8ec30e4067e29dce0f42c253786055",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Freewind Falcon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "freewind falcon",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Galina's Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "min_rule_version": 2,
+      "normalized_name": "galina's knight",
+      "oracle_hash": "ed5b07f2f74081eea332ffbf640d290c",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Outlander",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+      "min_rule_version": 2,
+      "normalized_name": "goblin outlander",
+      "oracle_hash": "130000ab18784372f978852fa4dfa826",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Guma",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "min_rule_version": 2,
+      "normalized_name": "guma",
+      "oracle_hash": "978226458b33bce47981c36bbe3bd7b1",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hazerider Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "hazerider drake",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ihsan's Shade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+      "min_rule_version": 2,
+      "normalized_name": "ihsan's shade",
+      "oracle_hash": "130000ab18784372f978852fa4dfa826",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Iridescent Angel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20573d188cf1f913a6c70f1e60db138a",
+      "min_rule_version": 2,
+      "normalized_name": "iridescent angel",
+      "oracle_hash": "637e8db7eedcdf709ac43ae8aeae6347",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Karoo Meerkat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "min_rule_version": 2,
+      "normalized_name": "karoo meerkat",
+      "oracle_hash": "978226458b33bce47981c36bbe3bd7b1",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Llanowar Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "min_rule_version": 2,
+      "normalized_name": "llanowar knight",
+      "oracle_hash": "63b25b00eb4e370c528607069fd4ffda",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Melesse Spirit",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "min_rule_version": 2,
+      "normalized_name": "melesse spirit",
+      "oracle_hash": "3b8ec30e4067e29dce0f42c253786055",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mirran Crusader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcd78cede089197b6af61b58e99deeb7",
+      "min_rule_version": 2,
+      "normalized_name": "mirran crusader",
+      "oracle_hash": "cea3372b03471f61bd36990664a2d14b",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "double_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nacatl Outlander",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "min_rule_version": 2,
+      "normalized_name": "nacatl outlander",
+      "oracle_hash": "978226458b33bce47981c36bbe3bd7b1",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Narwhal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:581ee7566950004f7d704b4c1f92c751",
+      "min_rule_version": 2,
+      "normalized_name": "narwhal",
+      "oracle_hash": "661824483b2a5be3f3a6f7d0e3a0b4b8",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nightwind Glider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "min_rule_version": 2,
+      "normalized_name": "nightwind glider",
+      "oracle_hash": "3b8ec30e4067e29dce0f42c253786055",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Oraxid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "min_rule_version": 2,
+      "normalized_name": "oraxid",
+      "oracle_hash": "ed5b07f2f74081eea332ffbf640d290c",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Oversoul of Dusk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:77f5649525a2b87da65f30ad0fef428b",
+      "min_rule_version": 2,
+      "normalized_name": "oversoul of dusk",
+      "oracle_hash": "cc9debb4c93b0157ae1daa0a5c021fa8",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Paladin en-Vec",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0a103d6451e1bfb55b9bf36461ecf468",
+      "min_rule_version": 2,
+      "normalized_name": "paladin en-vec",
+      "oracle_hash": "ab0b068757fbc6620b7b9706a0a10828",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Repentant Blacksmith",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "min_rule_version": 2,
+      "normalized_name": "repentant blacksmith",
+      "oracle_hash": "ed5b07f2f74081eea332ffbf640d290c",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sabertooth Nishoba",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:367e8d8a6eb6bfbb6c73d63d1d1d833d",
+      "min_rule_version": 2,
+      "normalized_name": "sabertooth nishoba",
+      "oracle_hash": "abc3bb43a360f19fbf9db25ad2dba3f6",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scalebane's Elite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "min_rule_version": 2,
+      "normalized_name": "scalebane's elite",
+      "oracle_hash": "63b25b00eb4e370c528607069fd4ffda",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sea Sprite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "sea sprite",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shivan Zombie",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+      "min_rule_version": 2,
+      "normalized_name": "shivan zombie",
+      "oracle_hash": "130000ab18784372f978852fa4dfa826",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Silver Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:581ee7566950004f7d704b4c1f92c751",
+      "min_rule_version": 2,
+      "normalized_name": "silver knight",
+      "oracle_hash": "661824483b2a5be3f3a6f7d0e3a0b4b8",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sphinx of the Steel Wind",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:33d4310583c8b21efaafe4ed44856472",
+      "min_rule_version": 2,
+      "normalized_name": "sphinx of the steel wind",
+      "oracle_hash": "7fc39f6207b73f09374e0318ad4e5985",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "first_strike",
+          "lifelink",
+          "vigilance"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thermal Glider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "thermal glider",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Treetop Sentinel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "min_rule_version": 2,
+      "normalized_name": "treetop sentinel",
+      "oracle_hash": "984125bebd45ec63aeec123cf3bd73d8",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Valeron Outlander",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "min_rule_version": 2,
+      "normalized_name": "valeron outlander",
+      "oracle_hash": "63b25b00eb4e370c528607069fd4ffda",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vedalken Outlander",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "min_rule_version": 2,
+      "normalized_name": "vedalken outlander",
+      "oracle_hash": "ed5b07f2f74081eea332ffbf640d290c",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vodalian Zombie",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fd6294a83230dc9885158f312b16c2f5",
+      "min_rule_version": 2,
+      "normalized_name": "vodalian zombie",
+      "oracle_hash": "69797a32840ca0190c8f8cf1f7df5718",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of Duty",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "min_rule_version": 2,
+      "normalized_name": "voice of duty",
+      "oracle_hash": "984125bebd45ec63aeec123cf3bd73d8",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of Grace",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "min_rule_version": 2,
+      "normalized_name": "voice of grace",
+      "oracle_hash": "3b8ec30e4067e29dce0f42c253786055",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of Law",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "voice of law",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of Reason",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3fd0485f97bb6968dc95a6b2da681f2c",
+      "min_rule_version": 2,
+      "normalized_name": "voice of reason",
+      "oracle_hash": "c6a2697db64799c5999390daa2e8c45e",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of Truth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6a64ac08a8bdbf25dd531e6fec6c7ca2",
+      "min_rule_version": 2,
+      "normalized_name": "voice of truth",
+      "oracle_hash": "511c3f3b0345f5ad8bd37649ed0ea171",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vulshok Refugee",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "min_rule_version": 2,
+      "normalized_name": "vulshok refugee",
+      "oracle_hash": "ed5b07f2f74081eea332ffbf640d290c",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wall of Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5c3ffd8252e9ce7e7b9428adb4f19bc6",
+      "min_rule_version": 2,
+      "normalized_name": "wall of light",
+      "oracle_hash": "555959771f8d6cec918d0cbf59923eba",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "defender"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Weatherseed Faeries",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "weatherseed faeries",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "White Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ef5d72b9343731037c2d79cdcaf5e5e3",
+      "min_rule_version": 2,
+      "normalized_name": "white knight",
+      "oracle_hash": "c418a676f495b2c97acbd18ead1971bc",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Windreaper Falcon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3fd0485f97bb6968dc95a6b2da681f2c",
+      "min_rule_version": 2,
+      "normalized_name": "windreaper falcon",
+      "oracle_hash": "c6a2697db64799c5999390daa2e8c45e",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Yavimaya Barbarian",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "min_rule_version": 2,
+      "normalized_name": "yavimaya barbarian",
+      "oracle_hash": "978226458b33bce47981c36bbe3bd7b1",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zombie Outlander",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fd6294a83230dc9885158f312b16c2f5",
+      "min_rule_version": 2,
+      "normalized_name": "zombie outlander",
+      "oracle_hash": "69797a32840ca0190c8f8cf1f7df5718",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_self_protection_from_colors_creature": 53
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg431_xmage_static_protection_colors_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg431_xmage_static_protection_colors_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg431_xmage_static_protection_colors_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg431_xmage_static_protection_colors_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg431_xmage_static_protection_colors_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg431_xmage_static_protection_colors_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-04T21:01:14+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Abbey Gargoyles"
+      },
+      "card_name": "Abbey Gargoyles",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "normalized_name": "abbey gargoyles",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Akroma, Angel of Wrath"
+      },
+      "card_name": "Akroma, Angel of Wrath",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8fc7ca210eceb898ca1cb00328aa4d0b",
+      "normalized_name": "akroma, angel of wrath",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "first_strike",
+          "trample",
+          "vigilance",
+          "haste"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Aven Smokeweaver"
+      },
+      "card_name": "Aven Smokeweaver",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "normalized_name": "aven smokeweaver",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Black Knight"
+      },
+      "card_name": "Black Knight",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f58a63346e6066a6aa2eaf23e386d94b",
+      "normalized_name": "black knight",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Blood Knight"
+      },
+      "card_name": "Blood Knight",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f58a63346e6066a6aa2eaf23e386d94b",
+      "normalized_name": "blood knight",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Cemetery Gate"
+      },
+      "card_name": "Cemetery Gate",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5c3ffd8252e9ce7e7b9428adb4f19bc6",
+      "normalized_name": "cemetery gate",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "defender"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Cerulean Wyvern"
+      },
+      "card_name": "Cerulean Wyvern",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "normalized_name": "cerulean wyvern",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Coast Watcher"
+      },
+      "card_name": "Coast Watcher",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "normalized_name": "coast watcher",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Death Speakers"
+      },
+      "card_name": "Death Speakers",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "normalized_name": "death speakers",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Defender of Chaos"
+      },
+      "card_name": "Defender of Chaos",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a6d1d1f78df760eaa3d55060ed162c9",
+      "normalized_name": "defender of chaos",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Defender of Law"
+      },
+      "card_name": "Defender of Law",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d63de8e51b839f8f151ea9dc27062ac9",
+      "normalized_name": "defender of law",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Duskrider Falcon"
+      },
+      "card_name": "Duskrider Falcon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "normalized_name": "duskrider falcon",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Freewind Falcon"
+      },
+      "card_name": "Freewind Falcon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "normalized_name": "freewind falcon",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Galina's Knight"
+      },
+      "card_name": "Galina's Knight",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "normalized_name": "galina's knight",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Goblin Outlander"
+      },
+      "card_name": "Goblin Outlander",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+      "normalized_name": "goblin outlander",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Guma"
+      },
+      "card_name": "Guma",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "normalized_name": "guma",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Hazerider Drake"
+      },
+      "card_name": "Hazerider Drake",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "normalized_name": "hazerider drake",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Ihsan's Shade"
+      },
+      "card_name": "Ihsan's Shade",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+      "normalized_name": "ihsan's shade",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Iridescent Angel"
+      },
+      "card_name": "Iridescent Angel",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20573d188cf1f913a6c70f1e60db138a",
+      "normalized_name": "iridescent angel",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Karoo Meerkat"
+      },
+      "card_name": "Karoo Meerkat",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "normalized_name": "karoo meerkat",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Llanowar Knight"
+      },
+      "card_name": "Llanowar Knight",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "normalized_name": "llanowar knight",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Melesse Spirit"
+      },
+      "card_name": "Melesse Spirit",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "normalized_name": "melesse spirit",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Mirran Crusader"
+      },
+      "card_name": "Mirran Crusader",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcd78cede089197b6af61b58e99deeb7",
+      "normalized_name": "mirran crusader",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "double_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Nacatl Outlander"
+      },
+      "card_name": "Nacatl Outlander",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "normalized_name": "nacatl outlander",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Narwhal"
+      },
+      "card_name": "Narwhal",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:581ee7566950004f7d704b4c1f92c751",
+      "normalized_name": "narwhal",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Nightwind Glider"
+      },
+      "card_name": "Nightwind Glider",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "normalized_name": "nightwind glider",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Oraxid"
+      },
+      "card_name": "Oraxid",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "normalized_name": "oraxid",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Oversoul of Dusk"
+      },
+      "card_name": "Oversoul of Dusk",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:77f5649525a2b87da65f30ad0fef428b",
+      "normalized_name": "oversoul of dusk",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Paladin en-Vec"
+      },
+      "card_name": "Paladin en-Vec",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0a103d6451e1bfb55b9bf36461ecf468",
+      "normalized_name": "paladin en-vec",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Repentant Blacksmith"
+      },
+      "card_name": "Repentant Blacksmith",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "normalized_name": "repentant blacksmith",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Sabertooth Nishoba"
+      },
+      "card_name": "Sabertooth Nishoba",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:367e8d8a6eb6bfbb6c73d63d1d1d833d",
+      "normalized_name": "sabertooth nishoba",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Scalebane's Elite"
+      },
+      "card_name": "Scalebane's Elite",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "normalized_name": "scalebane's elite",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Sea Sprite"
+      },
+      "card_name": "Sea Sprite",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "normalized_name": "sea sprite",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Shivan Zombie"
+      },
+      "card_name": "Shivan Zombie",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+      "normalized_name": "shivan zombie",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Silver Knight"
+      },
+      "card_name": "Silver Knight",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:581ee7566950004f7d704b4c1f92c751",
+      "normalized_name": "silver knight",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Sphinx of the Steel Wind"
+      },
+      "card_name": "Sphinx of the Steel Wind",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:33d4310583c8b21efaafe4ed44856472",
+      "normalized_name": "sphinx of the steel wind",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "first_strike",
+          "lifelink",
+          "vigilance"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Thermal Glider"
+      },
+      "card_name": "Thermal Glider",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "normalized_name": "thermal glider",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Treetop Sentinel"
+      },
+      "card_name": "Treetop Sentinel",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "normalized_name": "treetop sentinel",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Valeron Outlander"
+      },
+      "card_name": "Valeron Outlander",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "normalized_name": "valeron outlander",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Vedalken Outlander"
+      },
+      "card_name": "Vedalken Outlander",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "normalized_name": "vedalken outlander",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Vodalian Zombie"
+      },
+      "card_name": "Vodalian Zombie",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fd6294a83230dc9885158f312b16c2f5",
+      "normalized_name": "vodalian zombie",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Voice of Duty"
+      },
+      "card_name": "Voice of Duty",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "normalized_name": "voice of duty",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Voice of Grace"
+      },
+      "card_name": "Voice of Grace",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "normalized_name": "voice of grace",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Voice of Law"
+      },
+      "card_name": "Voice of Law",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "normalized_name": "voice of law",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Voice of Reason"
+      },
+      "card_name": "Voice of Reason",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3fd0485f97bb6968dc95a6b2da681f2c",
+      "normalized_name": "voice of reason",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Voice of Truth"
+      },
+      "card_name": "Voice of Truth",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6a64ac08a8bdbf25dd531e6fec6c7ca2",
+      "normalized_name": "voice of truth",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Vulshok Refugee"
+      },
+      "card_name": "Vulshok Refugee",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "normalized_name": "vulshok refugee",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Wall of Light"
+      },
+      "card_name": "Wall of Light",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5c3ffd8252e9ce7e7b9428adb4f19bc6",
+      "normalized_name": "wall of light",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "defender"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Weatherseed Faeries"
+      },
+      "card_name": "Weatherseed Faeries",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "normalized_name": "weatherseed faeries",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "White Knight"
+      },
+      "card_name": "White Knight",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ef5d72b9343731037c2d79cdcaf5e5e3",
+      "normalized_name": "white knight",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "first_strike"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Windreaper Falcon"
+      },
+      "card_name": "Windreaper Falcon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3fd0485f97bb6968dc95a6b2da681f2c",
+      "normalized_name": "windreaper falcon",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Yavimaya Barbarian"
+      },
+      "card_name": "Yavimaya Barbarian",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "normalized_name": "yavimaya barbarian",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zombie Outlander"
+      },
+      "card_name": "Zombie Outlander",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fd6294a83230dc9885158f312b16c2f5",
+      "normalized_name": "zombie outlander",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Abbey Gargoyles",
+    "Akroma, Angel of Wrath",
+    "Aven Smokeweaver",
+    "Black Knight",
+    "Blood Knight",
+    "Cemetery Gate",
+    "Cerulean Wyvern",
+    "Coast Watcher",
+    "Death Speakers",
+    "Defender of Chaos",
+    "Defender of Law",
+    "Duskrider Falcon",
+    "Freewind Falcon",
+    "Galina's Knight",
+    "Goblin Outlander",
+    "Guma",
+    "Hazerider Drake",
+    "Ihsan's Shade",
+    "Iridescent Angel",
+    "Karoo Meerkat",
+    "Llanowar Knight",
+    "Melesse Spirit",
+    "Mirran Crusader",
+    "Nacatl Outlander",
+    "Narwhal",
+    "Nightwind Glider",
+    "Oraxid",
+    "Oversoul of Dusk",
+    "Paladin en-Vec",
+    "Repentant Blacksmith",
+    "Sabertooth Nishoba",
+    "Scalebane's Elite",
+    "Sea Sprite",
+    "Shivan Zombie",
+    "Silver Knight",
+    "Sphinx of the Steel Wind",
+    "Thermal Glider",
+    "Treetop Sentinel",
+    "Valeron Outlander",
+    "Vedalken Outlander",
+    "Vodalian Zombie",
+    "Voice of Duty",
+    "Voice of Grace",
+    "Voice of Law",
+    "Voice of Reason",
+    "Voice of Truth",
+    "Vulshok Refugee",
+    "Wall of Light",
+    "Weatherseed Faeries",
+    "White Knight",
+    "Windreaper Falcon",
+    "Yavimaya Barbarian",
+    "Zombie Outlander"
+  ],
+  "selected_count": 53,
+  "slug": "xmage_static_protection_colors_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Abbey Gargoyles",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "abbey gargoyles",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Akroma, Angel of Wrath",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8fc7ca210eceb898ca1cb00328aa4d0b",
+      "min_rule_version": 2,
+      "normalized_name": "akroma, angel of wrath",
+      "oracle_hash": "d4f647d67b1a98bf76e7bdc199182cec",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Aven Smokeweaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "aven smokeweaver",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Black Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f58a63346e6066a6aa2eaf23e386d94b",
+      "min_rule_version": 2,
+      "normalized_name": "black knight",
+      "oracle_hash": "a0d8658b3e5fb2f8271d92def1c71dcb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blood Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f58a63346e6066a6aa2eaf23e386d94b",
+      "min_rule_version": 2,
+      "normalized_name": "blood knight",
+      "oracle_hash": "efb3ac9920ef9475bfaf6e0ba6a7885f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cemetery Gate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5c3ffd8252e9ce7e7b9428adb4f19bc6",
+      "min_rule_version": 2,
+      "normalized_name": "cemetery gate",
+      "oracle_hash": "555959771f8d6cec918d0cbf59923eba",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cerulean Wyvern",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "min_rule_version": 2,
+      "normalized_name": "cerulean wyvern",
+      "oracle_hash": "984125bebd45ec63aeec123cf3bd73d8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Coast Watcher",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "min_rule_version": 2,
+      "normalized_name": "coast watcher",
+      "oracle_hash": "984125bebd45ec63aeec123cf3bd73d8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Death Speakers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "min_rule_version": 2,
+      "normalized_name": "death speakers",
+      "oracle_hash": "63b25b00eb4e370c528607069fd4ffda",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Defender of Chaos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a6d1d1f78df760eaa3d55060ed162c9",
+      "min_rule_version": 2,
+      "normalized_name": "defender of chaos",
+      "oracle_hash": "0a5067d02cd8e46a4bcbcc67b9410e61",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Defender of Law",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d63de8e51b839f8f151ea9dc27062ac9",
+      "min_rule_version": 2,
+      "normalized_name": "defender of law",
+      "oracle_hash": "fd4214bb098c9fa877e15d35d1a8f26f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Duskrider Falcon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "min_rule_version": 2,
+      "normalized_name": "duskrider falcon",
+      "oracle_hash": "3b8ec30e4067e29dce0f42c253786055",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Freewind Falcon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "freewind falcon",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Galina's Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "min_rule_version": 2,
+      "normalized_name": "galina's knight",
+      "oracle_hash": "ed5b07f2f74081eea332ffbf640d290c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Outlander",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+      "min_rule_version": 2,
+      "normalized_name": "goblin outlander",
+      "oracle_hash": "130000ab18784372f978852fa4dfa826",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Guma",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "min_rule_version": 2,
+      "normalized_name": "guma",
+      "oracle_hash": "978226458b33bce47981c36bbe3bd7b1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hazerider Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "hazerider drake",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ihsan's Shade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+      "min_rule_version": 2,
+      "normalized_name": "ihsan's shade",
+      "oracle_hash": "130000ab18784372f978852fa4dfa826",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Iridescent Angel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20573d188cf1f913a6c70f1e60db138a",
+      "min_rule_version": 2,
+      "normalized_name": "iridescent angel",
+      "oracle_hash": "637e8db7eedcdf709ac43ae8aeae6347",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Karoo Meerkat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "min_rule_version": 2,
+      "normalized_name": "karoo meerkat",
+      "oracle_hash": "978226458b33bce47981c36bbe3bd7b1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Llanowar Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "min_rule_version": 2,
+      "normalized_name": "llanowar knight",
+      "oracle_hash": "63b25b00eb4e370c528607069fd4ffda",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Melesse Spirit",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "min_rule_version": 2,
+      "normalized_name": "melesse spirit",
+      "oracle_hash": "3b8ec30e4067e29dce0f42c253786055",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mirran Crusader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcd78cede089197b6af61b58e99deeb7",
+      "min_rule_version": 2,
+      "normalized_name": "mirran crusader",
+      "oracle_hash": "cea3372b03471f61bd36990664a2d14b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nacatl Outlander",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "min_rule_version": 2,
+      "normalized_name": "nacatl outlander",
+      "oracle_hash": "978226458b33bce47981c36bbe3bd7b1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Narwhal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:581ee7566950004f7d704b4c1f92c751",
+      "min_rule_version": 2,
+      "normalized_name": "narwhal",
+      "oracle_hash": "661824483b2a5be3f3a6f7d0e3a0b4b8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nightwind Glider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "min_rule_version": 2,
+      "normalized_name": "nightwind glider",
+      "oracle_hash": "3b8ec30e4067e29dce0f42c253786055",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Oraxid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "min_rule_version": 2,
+      "normalized_name": "oraxid",
+      "oracle_hash": "ed5b07f2f74081eea332ffbf640d290c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Oversoul of Dusk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:77f5649525a2b87da65f30ad0fef428b",
+      "min_rule_version": 2,
+      "normalized_name": "oversoul of dusk",
+      "oracle_hash": "cc9debb4c93b0157ae1daa0a5c021fa8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Paladin en-Vec",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0a103d6451e1bfb55b9bf36461ecf468",
+      "min_rule_version": 2,
+      "normalized_name": "paladin en-vec",
+      "oracle_hash": "ab0b068757fbc6620b7b9706a0a10828",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Repentant Blacksmith",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "min_rule_version": 2,
+      "normalized_name": "repentant blacksmith",
+      "oracle_hash": "ed5b07f2f74081eea332ffbf640d290c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sabertooth Nishoba",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:367e8d8a6eb6bfbb6c73d63d1d1d833d",
+      "min_rule_version": 2,
+      "normalized_name": "sabertooth nishoba",
+      "oracle_hash": "abc3bb43a360f19fbf9db25ad2dba3f6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scalebane's Elite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "min_rule_version": 2,
+      "normalized_name": "scalebane's elite",
+      "oracle_hash": "63b25b00eb4e370c528607069fd4ffda",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sea Sprite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "sea sprite",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shivan Zombie",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+      "min_rule_version": 2,
+      "normalized_name": "shivan zombie",
+      "oracle_hash": "130000ab18784372f978852fa4dfa826",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Silver Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:581ee7566950004f7d704b4c1f92c751",
+      "min_rule_version": 2,
+      "normalized_name": "silver knight",
+      "oracle_hash": "661824483b2a5be3f3a6f7d0e3a0b4b8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sphinx of the Steel Wind",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:33d4310583c8b21efaafe4ed44856472",
+      "min_rule_version": 2,
+      "normalized_name": "sphinx of the steel wind",
+      "oracle_hash": "7fc39f6207b73f09374e0318ad4e5985",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thermal Glider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "thermal glider",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Treetop Sentinel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "min_rule_version": 2,
+      "normalized_name": "treetop sentinel",
+      "oracle_hash": "984125bebd45ec63aeec123cf3bd73d8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Valeron Outlander",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+      "min_rule_version": 2,
+      "normalized_name": "valeron outlander",
+      "oracle_hash": "63b25b00eb4e370c528607069fd4ffda",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vedalken Outlander",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "min_rule_version": 2,
+      "normalized_name": "vedalken outlander",
+      "oracle_hash": "ed5b07f2f74081eea332ffbf640d290c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vodalian Zombie",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fd6294a83230dc9885158f312b16c2f5",
+      "min_rule_version": 2,
+      "normalized_name": "vodalian zombie",
+      "oracle_hash": "69797a32840ca0190c8f8cf1f7df5718",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of Duty",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+      "min_rule_version": 2,
+      "normalized_name": "voice of duty",
+      "oracle_hash": "984125bebd45ec63aeec123cf3bd73d8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of Grace",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+      "min_rule_version": 2,
+      "normalized_name": "voice of grace",
+      "oracle_hash": "3b8ec30e4067e29dce0f42c253786055",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of Law",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "voice of law",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of Reason",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3fd0485f97bb6968dc95a6b2da681f2c",
+      "min_rule_version": 2,
+      "normalized_name": "voice of reason",
+      "oracle_hash": "c6a2697db64799c5999390daa2e8c45e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of Truth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6a64ac08a8bdbf25dd531e6fec6c7ca2",
+      "min_rule_version": 2,
+      "normalized_name": "voice of truth",
+      "oracle_hash": "511c3f3b0345f5ad8bd37649ed0ea171",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vulshok Refugee",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+      "min_rule_version": 2,
+      "normalized_name": "vulshok refugee",
+      "oracle_hash": "ed5b07f2f74081eea332ffbf640d290c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wall of Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5c3ffd8252e9ce7e7b9428adb4f19bc6",
+      "min_rule_version": 2,
+      "normalized_name": "wall of light",
+      "oracle_hash": "555959771f8d6cec918d0cbf59923eba",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Weatherseed Faeries",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+      "min_rule_version": 2,
+      "normalized_name": "weatherseed faeries",
+      "oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "White Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ef5d72b9343731037c2d79cdcaf5e5e3",
+      "min_rule_version": 2,
+      "normalized_name": "white knight",
+      "oracle_hash": "c418a676f495b2c97acbd18ead1971bc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Windreaper Falcon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3fd0485f97bb6968dc95a6b2da681f2c",
+      "min_rule_version": 2,
+      "normalized_name": "windreaper falcon",
+      "oracle_hash": "c6a2697db64799c5999390daa2e8c45e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Yavimaya Barbarian",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+      "min_rule_version": 2,
+      "normalized_name": "yavimaya barbarian",
+      "oracle_hash": "978226458b33bce47981c36bbe3bd7b1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zombie Outlander",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fd6294a83230dc9885158f312b16c2f5",
+      "min_rule_version": 2,
+      "normalized_name": "zombie outlander",
+      "oracle_hash": "69797a32840ca0190c8f8cf1f7df5718",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

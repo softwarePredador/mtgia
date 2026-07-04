@@ -8867,6 +8867,46 @@ new server:
   family/subpattern from that set, starting with highest leverage where runtime
   behavior is already focused-test covered.
 
+## 2026-07-04 PG431 Static Protection From Colors Closure
+
+- Closed the exact XMage static creature protection-from-colors family as
+  ManaLoom scope `xmage_static_self_protection_from_colors_creature_v1`.
+- The selected package accepted only no-effect/no-signal `ProtectionAbility`
+  creature rows where Oracle and local XMage source agree on color protection
+  words. Static self keywords such as flying, first strike, vigilance, trample,
+  lifelink, deathtouch, flash, defender, or indestructible are preserved in the
+  same executable creature rule when present. Protection from card types and
+  subtypes remain in their separate exact scopes.
+- Runtime behavior was already covered by focused tests for static protection
+  from color, card type, and subtype. PG431 reused the mapper/runtime tests and
+  performed no code mutation.
+- The PostgreSQL package promoted `53` cards. Precheck found `53` target rows,
+  `0` existing expected rows, and `0` shadow rows; apply inserted/updated `53`;
+  postcheck verified `53/53` promoted rows as `verified`/`auto` with Oracle
+  hashes.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `3968` PostgreSQL runtime rows, wrote `3960` SQLite runtime
+  rows, and exported `3935` canonical fallback rows.
+- PG431 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `53` selected cards. Generic
+  battle scenario count remained `0`; targeting/protection behavior remains
+  covered by the focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26918`, `xmage_authoritative_source_count=26604`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26604`. This is an exact
+  reduction of `53` from the post-PG430 queue.
+- The post-PG431 exact split recheck reports `proposal_count=579` and
+  `safe_for_batch_pg_package_count=579`. The largest remaining exact family is
+  `xmage_simple_mana_source_permanent` with `34` cards, followed by
+  `xmage_permanent_simple_activated_damage` and
+  `xmage_static_self_combat_keyword_creature` with `33` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -155,6 +155,33 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "61f2d737ae6d0abb207cfff12619cbea"
   },
+  "Abbey Gargoyles": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+    "battle_rule_oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7"
+  },
   "Abbey Griffin": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -1488,6 +1515,43 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:0e870121f472307183c1364d02e3dca9",
     "battle_rule_oracle_hash": "006e2b72eae264e2aaba82d99d07f593"
+  },
+  "Akroma, Angel of Wrath": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "first_strike": true,
+    "flying": true,
+    "haste": true,
+    "keywords": [
+      "flying",
+      "first_strike",
+      "trample",
+      "vigilance",
+      "haste"
+    ],
+    "protection_from": [
+      "black",
+      "red"
+    ],
+    "protection_from_colors": [
+      "black",
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "trample": true,
+    "vigilance": true,
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8fc7ca210eceb898ca1cb00328aa4d0b",
+    "battle_rule_oracle_hash": "d4f647d67b1a98bf76e7bdc199182cec"
   },
   "Alabaster Host Sanctifier": {
     "_keywords_are_self": true,
@@ -4544,6 +4608,33 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Aven Smokeweaver": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+    "battle_rule_oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7"
+  },
   "Avengers Tower": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -6547,6 +6638,33 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "976985e6f972bbbae68ad661a9065ee0"
   },
+  "Black Knight": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "first_strike": true,
+    "keywords": [
+      "first_strike"
+    ],
+    "protection_from": [
+      "white"
+    ],
+    "protection_from_colors": [
+      "white"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f58a63346e6066a6aa2eaf23e386d94b",
+    "battle_rule_oracle_hash": "a0d8658b3e5fb2f8271d92def1c71dcb"
+  },
   "Black Market Connections": {
     "ability_kind": "triggered",
     "battle_model_scope": "precombat_main_choose_modes_treasure_draw_shapeshifter_life_loss_v1",
@@ -7015,6 +7133,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:aa0c64421c6ae4bf06b653dea512f935",
     "battle_rule_oracle_hash": "49b4ed3350f7cb5ffce32eff082cc5ba"
+  },
+  "Blood Knight": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "first_strike": true,
+    "keywords": [
+      "first_strike"
+    ],
+    "protection_from": [
+      "white"
+    ],
+    "protection_from_colors": [
+      "white"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f58a63346e6066a6aa2eaf23e386d94b",
+    "battle_rule_oracle_hash": "efb3ac9920ef9475bfaf6e0ba6a7885f"
   },
   "Blood Moon": {
     "ability_kind": "static",
@@ -10883,6 +11028,33 @@
     "battle_rule_logical_key": "battle_rule_v1:8743cd6be80a842556c1a0be143ab4fd",
     "battle_rule_oracle_hash": "698aaa7e96078c00d799f92943f8dab4"
   },
+  "Cemetery Gate": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "defender": true,
+    "effect": "creature",
+    "keywords": [
+      "defender"
+    ],
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5c3ffd8252e9ce7e7b9428adb4f19bc6",
+    "battle_rule_oracle_hash": "555959771f8d6cec918d0cbf59923eba"
+  },
   "Centaur Archer": {
     "_activated_rule_effects": [
       {
@@ -10997,6 +11169,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:003e73a39c607e95c1b79431f0e6c126",
     "battle_rule_oracle_hash": "1e4094f05d8962ea4b3335786f533c17"
+  },
+  "Cerulean Wyvern": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "green"
+    ],
+    "protection_from_colors": [
+      "green"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+    "battle_rule_oracle_hash": "984125bebd45ec63aeec123cf3bd73d8"
   },
   "Chain of Vapor": {
     "battle_model_scope": "instant_bounce_target_nonland_permanent_to_owner_hand_copy_by_sacrifice_land_limited_executor_v1",
@@ -12420,6 +12619,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "a83000715f0b1b87a83e114a9ec812ab"
+  },
+  "Coast Watcher": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "green"
+    ],
+    "protection_from_colors": [
+      "green"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+    "battle_rule_oracle_hash": "984125bebd45ec63aeec123cf3bd73d8"
   },
   "Coastal Discovery": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -15556,6 +15782,28 @@
     "battle_rule_logical_key": "battle_rule_v1:7f2b1cf93136c4e6f40016e5392a7451",
     "battle_rule_oracle_hash": "11326914a120abaf48b741c8f9d80034"
   },
+  "Death Speakers": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+    "battle_rule_oracle_hash": "63b25b00eb4e370c528607069fd4ffda"
+  },
   "Death Stroke": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -15905,6 +16153,60 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8844850db13384812775c4a7d8e1dceb",
     "battle_rule_oracle_hash": "046f8028c16d78949015f208616ed254"
+  },
+  "Defender of Chaos": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "protection_from": [
+      "white"
+    ],
+    "protection_from_colors": [
+      "white"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8a6d1d1f78df760eaa3d55060ed162c9",
+    "battle_rule_oracle_hash": "0a5067d02cd8e46a4bcbcc67b9410e61"
+  },
+  "Defender of Law": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d63de8e51b839f8f151ea9dc27062ac9",
+    "battle_rule_oracle_hash": "fd4214bb098c9fa877e15d35d1a8f26f"
   },
   "Defenestrate": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -18916,6 +19218,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "7d65dbd938f2f2dc64d29a70d7138b22"
+  },
+  "Duskrider Falcon": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+    "battle_rule_oracle_hash": "3b8ec30e4067e29dce0f42c253786055"
   },
   "Dust Bowl": {
     "effect": "land",
@@ -26219,6 +26548,33 @@
     "battle_rule_logical_key": "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a",
     "battle_rule_oracle_hash": "3e96905e506a95b066f9255dddc7f323"
   },
+  "Freewind Falcon": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+    "battle_rule_oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7"
+  },
   "Frilled Cave-Wurm": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
@@ -26761,6 +27117,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:d6525baec4c35d68b522fb1fa2a96b9f",
     "battle_rule_oracle_hash": "e17ba3ddaf7febad91161213aad18a2a"
+  },
+  "Galina's Knight": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+    "battle_rule_oracle_hash": "ed5b07f2f74081eea332ffbf640d290c"
   },
   "Gallant Citizen": {
     "ability_kind": "triggered",
@@ -28867,6 +29245,28 @@
     "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
     "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
   },
+  "Goblin Outlander": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "white"
+    ],
+    "protection_from_colors": [
+      "white"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+    "battle_rule_oracle_hash": "130000ab18784372f978852fa4dfa826"
+  },
   "Goblin Rally": {
     "ability_kind": "one_shot",
     "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
@@ -30874,6 +31274,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "0e8983b2a791e2dbff3ad75a33c187f8"
   },
+  "Guma": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "blue"
+    ],
+    "protection_from_colors": [
+      "blue"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+    "battle_rule_oracle_hash": "978226458b33bce47981c36bbe3bd7b1"
+  },
   "Gurmag Swiftwing": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -31740,6 +32162,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:68abb87ba90186e55c4e4341506b1c4f",
     "battle_rule_oracle_hash": "a6e600363c1a67a7d0d507a0ae00021d"
+  },
+  "Hazerider Drake": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+    "battle_rule_oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7"
   },
   "Head of the Homestead": {
     "ability_kind": "triggered",
@@ -33778,6 +34227,28 @@
     "battle_rule_logical_key": "battle_rule_v1:f0668b054043b3db07eeb57e4cbd876e",
     "battle_rule_oracle_hash": "dce5f09110d0296c91f79dd364780729"
   },
+  "Ihsan's Shade": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "white"
+    ],
+    "protection_from_colors": [
+      "white"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+    "battle_rule_oracle_hash": "130000ab18784372f978852fa4dfa826"
+  },
   "Illegitimate Business": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -34724,6 +35195,41 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "44ff1c77519cb7c55d2bd71bddcaf5da"
+  },
+  "Iridescent Angel": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "white",
+      "blue",
+      "black",
+      "red",
+      "green"
+    ],
+    "protection_from_colors": [
+      "white",
+      "blue",
+      "black",
+      "red",
+      "green"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:20573d188cf1f913a6c70f1e60db138a",
+    "battle_rule_oracle_hash": "637e8db7eedcdf709ac43ae8aeae6347"
   },
   "Iridescent Blademaster": {
     "_activated_rule_effects": [
@@ -36327,6 +36833,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "8027ef491d501d5eb796d1b039c985fc"
+  },
+  "Karoo Meerkat": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "blue"
+    ],
+    "protection_from_colors": [
+      "blue"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+    "battle_rule_oracle_hash": "978226458b33bce47981c36bbe3bd7b1"
   },
   "Karplusan Forest": {
     "effect": "land",
@@ -39213,6 +39741,28 @@
     "battle_rule_logical_key": "battle_rule_v1:b4d210018767f5b0a4740adc889beb85",
     "battle_rule_oracle_hash": "fa07d150550fe544837233efd56086ac"
   },
+  "Llanowar Knight": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+    "battle_rule_oracle_hash": "63b25b00eb4e370c528607069fd4ffda"
+  },
   "Llanowar Reborn": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -41268,6 +41818,33 @@
     "battle_rule_logical_key": "battle_rule_v1:0a4eab7f075f8c25bd6e8cd872aa4dbe",
     "battle_rule_oracle_hash": "a0955a787ec1b1c7b6f17f2cf63d860b"
   },
+  "Melesse Spirit": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+    "battle_rule_oracle_hash": "3b8ec30e4067e29dce0f42c253786055"
+  },
   "Memorial to Folly": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -42042,6 +42619,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "5d946b626c0d9016c48fd478c5d25b6d"
+  },
+  "Mirran Crusader": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "double_strike": true,
+    "effect": "creature",
+    "keywords": [
+      "double_strike"
+    ],
+    "protection_from": [
+      "black",
+      "green"
+    ],
+    "protection_from_colors": [
+      "black",
+      "green"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dcd78cede089197b6af61b58e99deeb7",
+    "battle_rule_oracle_hash": "cea3372b03471f61bd36990664a2d14b"
   },
   "Mirrex": {
     "effect": "land",
@@ -44206,6 +44812,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "fe16de27ad58de7035c225e25923115b"
   },
+  "Nacatl Outlander": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "blue"
+    ],
+    "protection_from_colors": [
+      "blue"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+    "battle_rule_oracle_hash": "978226458b33bce47981c36bbe3bd7b1"
+  },
   "Naktamun Lorespinner // Wheel of Fortune": {
     "ability_kind": "prepare_spell",
     "battle_model_scope": "prepare_upkeep_any_player_one_or_fewer_hand_wheel_face_v1",
@@ -44493,6 +45121,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:e2f06b625a4ef5eeb8b8c16423d54ef6",
     "battle_rule_oracle_hash": "406bc2564cef306a6cedea401ab7fabc"
+  },
+  "Narwhal": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "first_strike": true,
+    "keywords": [
+      "first_strike"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:581ee7566950004f7d704b4c1f92c751",
+    "battle_rule_oracle_hash": "661824483b2a5be3f3a6f7d0e3a0b4b8"
   },
   "Natural Connection": {
     "battle_model_scope": "xmage_library_search_to_battlefield_spell_v1",
@@ -45105,6 +45760,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c",
     "battle_rule_oracle_hash": "0386f0160bd05b6ff392414aaf23531d"
+  },
+  "Nightwind Glider": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+    "battle_rule_oracle_hash": "3b8ec30e4067e29dce0f42c253786055"
   },
   "Nim Replica": {
     "_activated_rule_effects": [
@@ -46057,6 +46739,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "14b1f184767d229c71a7aa4617706d05"
   },
+  "Oraxid": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+    "battle_rule_oracle_hash": "ed5b07f2f74081eea332ffbf640d290c"
+  },
   "Orcish Bowmasters": {
     "ability_kind": "triggered",
     "amass_orcs": 1,
@@ -46570,6 +47274,32 @@
     "battle_rule_logical_key": "battle_rule_v1:021c1007409d808aeb5ade04d6976acb",
     "battle_rule_oracle_hash": "6d6514aa26a20163e68a86830a2d95ff"
   },
+  "Oversoul of Dusk": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "blue",
+      "black",
+      "red"
+    ],
+    "protection_from_colors": [
+      "blue",
+      "black",
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:77f5649525a2b87da65f30ad0fef428b",
+    "battle_rule_oracle_hash": "cc9debb4c93b0157ae1daa0a5c021fa8"
+  },
   "Owlbear": {
     "_keywords_are_self": true,
     "ability_kind": "triggered",
@@ -46699,6 +47429,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
     "battle_rule_oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be"
+  },
+  "Paladin en-Vec": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "first_strike": true,
+    "keywords": [
+      "first_strike"
+    ],
+    "protection_from": [
+      "black",
+      "red"
+    ],
+    "protection_from_colors": [
+      "black",
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0a103d6451e1bfb55b9bf36461ecf468",
+    "battle_rule_oracle_hash": "ab0b068757fbc6620b7b9706a0a10828"
   },
   "Paladin of the Bloodstained": {
     "ability_kind": "triggered",
@@ -53177,6 +53936,28 @@
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "2c0b1dbe5296d714f5c95e77b4d5ed9e"
   },
+  "Repentant Blacksmith": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+    "battle_rule_oracle_hash": "ed5b07f2f74081eea332ffbf640d290c"
+  },
   "Repercussion": {
     "ability_kind": "triggered_static_enchantment",
     "battle_model_scope": "creature_damage_controller_reflect_global_v1",
@@ -56244,6 +57025,35 @@
     "battle_rule_logical_key": "battle_rule_v1:2c9a26eecbbf51daffc43886faf0d832",
     "battle_rule_oracle_hash": "3ce1ce1000a01f48b04799e505df61a0"
   },
+  "Sabertooth Nishoba": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "keywords": [
+      "trample"
+    ],
+    "protection_from": [
+      "blue",
+      "red"
+    ],
+    "protection_from_colors": [
+      "blue",
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "trample": true,
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:367e8d8a6eb6bfbb6c73d63d1d1d833d",
+    "battle_rule_oracle_hash": "abc3bb43a360f19fbf9db25ad2dba3f6"
+  },
   "Sabertooth Wyvern": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -57418,6 +58228,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "2f8da37c0e286b9d2ab7b9caed62a8c2"
   },
+  "Scalebane's Elite": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+    "battle_rule_oracle_hash": "63b25b00eb4e370c528607069fd4ffda"
+  },
   "Scaled Behemoth": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -58392,6 +59224,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:4dda7793eef60955c269bfd43a0818a1",
     "battle_rule_oracle_hash": "c9a24dec452e92ccedcebdc41dcc1ad6"
+  },
+  "Sea Sprite": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+    "battle_rule_oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7"
   },
   "Seachrome Coast": {
     "effect": "land",
@@ -60331,6 +61190,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "b4ad3c1c263653e47115c48685a751fe"
   },
+  "Shivan Zombie": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "white"
+    ],
+    "protection_from_colors": [
+      "white"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8273f4430e0405695fbd386263ce7e61",
+    "battle_rule_oracle_hash": "130000ab18784372f978852fa4dfa826"
+  },
   "Shizo, Death's Storehouse": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -60845,6 +61726,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8570b94a88ceb1a106e55ff90c6e515d",
     "battle_rule_oracle_hash": "65cd817d42bcb69648e2ef26237708a2"
+  },
+  "Silver Knight": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "first_strike": true,
+    "keywords": [
+      "first_strike"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:581ee7566950004f7d704b4c1f92c751",
+    "battle_rule_oracle_hash": "661824483b2a5be3f3a6f7d0e3a0b4b8"
   },
   "Silver Myr": {
     "cmc": 2.0,
@@ -63477,6 +64385,41 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a619518cf24caa68fdd86b555687f20f",
     "battle_rule_oracle_hash": "8cccdd6f8ac9a1391ed6e7b17c9e2a00"
+  },
+  "Sphinx of the Steel Wind": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "first_strike": true,
+    "flying": true,
+    "keywords": [
+      "flying",
+      "first_strike",
+      "lifelink",
+      "vigilance"
+    ],
+    "lifelink": true,
+    "protection_from": [
+      "red",
+      "green"
+    ],
+    "protection_from_colors": [
+      "red",
+      "green"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "vigilance": true,
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:33d4310583c8b21efaafe4ed44856472",
+    "battle_rule_oracle_hash": "7fc39f6207b73f09374e0318ad4e5985"
   },
   "Spider-Punk": {
     "effect": "creature",
@@ -69353,6 +70296,33 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "2294ed88eb18bc16cde1f39ad3598d7d"
   },
+  "Thermal Glider": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+    "battle_rule_oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7"
+  },
   "Thespian's Stage": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -71619,6 +72589,33 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "fa07d150550fe544837233efd56086ac"
   },
+  "Treetop Sentinel": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "green"
+    ],
+    "protection_from_colors": [
+      "green"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+    "battle_rule_oracle_hash": "984125bebd45ec63aeec123cf3bd73d8"
+  },
   "Treetop Village": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -73756,6 +74753,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "de02b9eeaf0b651b456561c5ff229ff3"
   },
+  "Valeron Outlander": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:74860073739f0e777772f17f32bd2597",
+    "battle_rule_oracle_hash": "63b25b00eb4e370c528607069fd4ffda"
+  },
   "Valgavoth's Lair": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -74133,6 +75152,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:9e2c7c96d5b2a117731924d511bb0e2a",
     "battle_rule_oracle_hash": "1fa2fc4b26db2e2d0691f8170d03b4db"
+  },
+  "Vedalken Outlander": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+    "battle_rule_oracle_hash": "ed5b07f2f74081eea332ffbf640d290c"
   },
   "Veil of Summer": {
     "ability_kind": "one_shot",
@@ -75235,6 +76276,163 @@
     "battle_rule_logical_key": "battle_rule_v1:aa0c64421c6ae4bf06b653dea512f935",
     "battle_rule_oracle_hash": "ec9843e6ec6cb36ed1d45f1d8448fb85"
   },
+  "Vodalian Zombie": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "green"
+    ],
+    "protection_from_colors": [
+      "green"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fd6294a83230dc9885158f312b16c2f5",
+    "battle_rule_oracle_hash": "69797a32840ca0190c8f8cf1f7df5718"
+  },
+  "Voice of Duty": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "green"
+    ],
+    "protection_from_colors": [
+      "green"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6927fccbc6f7b93701c415d3dff35c9d",
+    "battle_rule_oracle_hash": "984125bebd45ec63aeec123cf3bd73d8"
+  },
+  "Voice of Grace": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8af5ae8756390d2878f17c5b62b0b795",
+    "battle_rule_oracle_hash": "3b8ec30e4067e29dce0f42c253786055"
+  },
+  "Voice of Law": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+    "battle_rule_oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7"
+  },
+  "Voice of Reason": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "blue"
+    ],
+    "protection_from_colors": [
+      "blue"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3fd0485f97bb6968dc95a6b2da681f2c",
+    "battle_rule_oracle_hash": "c6a2697db64799c5999390daa2e8c45e"
+  },
+  "Voice of Truth": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "white"
+    ],
+    "protection_from_colors": [
+      "white"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6a64ac08a8bdbf25dd531e6fec6c7ca2",
+    "battle_rule_oracle_hash": "511c3f3b0345f5ad8bd37649ed0ea171"
+  },
   "Voice of Victory": {
     "ability_kind": "static_and_attack_trigger",
     "battle_model_scope": "static_opponent_spell_lock_during_controller_turn_mobilize_2_annotation_v1",
@@ -75642,6 +76840,28 @@
     "battle_rule_logical_key": "battle_rule_v1:33e1dd27537361327415a737afccc230",
     "battle_rule_oracle_hash": "2166542fdd309faf49b670f6c0bafbc9"
   },
+  "Vulshok Refugee": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
+    "battle_rule_oracle_hash": "ed5b07f2f74081eea332ffbf640d290c"
+  },
   "Vulshok Replica": {
     "_activated_rule_effects": [
       {
@@ -75876,6 +77096,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8358ad4dae1cce40788051c6c95584b9",
     "battle_rule_oracle_hash": "5c9312a9432775bc6a4073c667c0407e"
+  },
+  "Wall of Light": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "defender": true,
+    "effect": "creature",
+    "keywords": [
+      "defender"
+    ],
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5c3ffd8252e9ce7e7b9428adb4f19bc6",
+    "battle_rule_oracle_hash": "555959771f8d6cec918d0cbf59923eba"
   },
   "Wall of Mist": {
     "_keywords_are_self": true,
@@ -77062,6 +78309,33 @@
     "battle_rule_logical_key": "battle_rule_v1:7df98700ba8ee232d2a8b15f1296ef47",
     "battle_rule_oracle_hash": "f69def908804331b655fcf9c8e19d67b"
   },
+  "Weatherseed Faeries": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "red"
+    ],
+    "protection_from_colors": [
+      "red"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:de0172d9c30a9cd1a8d535f95f8a98cd",
+    "battle_rule_oracle_hash": "080cf6b238ad42a4ac2e0083b88c1bb7"
+  },
   "Weave Fate": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
     "count": 2,
@@ -77239,6 +78513,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:776e69f786c18a8398012554b8e22907",
     "battle_rule_oracle_hash": "5384a7231f4c91ab45b4007b0ac7f8dc"
+  },
+  "White Knight": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "first_strike": true,
+    "keywords": [
+      "first_strike"
+    ],
+    "protection_from": [
+      "black"
+    ],
+    "protection_from_colors": [
+      "black"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ef5d72b9343731037c2d79cdcaf5e5e3",
+    "battle_rule_oracle_hash": "c418a676f495b2c97acbd18ead1971bc"
   },
   "White Lotus Hideout": {
     "effect": "land",
@@ -77833,6 +79134,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "186c932b86fa9cd5cf364250e6afed84"
+  },
+  "Windreaper Falcon": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from": [
+      "blue"
+    ],
+    "protection_from_colors": [
+      "blue"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3fd0485f97bb6968dc95a6b2da681f2c",
+    "battle_rule_oracle_hash": "c6a2697db64799c5999390daa2e8c45e"
   },
   "Winds of Abandon": {
     "basic_land_compensation_count": 1,
@@ -78754,6 +80082,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:cabf4daaa2645c660a82d0ffff105dd3",
     "battle_rule_oracle_hash": "b6cfe7c375aef62db015f7c59a222978"
+  },
+  "Yavimaya Barbarian": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "blue"
+    ],
+    "protection_from_colors": [
+      "blue"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
+    "battle_rule_oracle_hash": "978226458b33bce47981c36bbe3bd7b1"
   },
   "Yavimaya Coast": {
     "effect": "land",
@@ -79764,6 +81114,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:4af9314ad358717e45a26267f407ff72",
     "battle_rule_oracle_hash": "9d475c699b44221e9ead663c3e0fec22"
+  },
+  "Zombie Outlander": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+    "effect": "creature",
+    "protection_from": [
+      "green"
+    ],
+    "protection_from_colors": [
+      "green"
+    ],
+    "static_effect": "self_protection_from_colors",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fd6294a83230dc9885158f312b16c2f5",
+    "battle_rule_oracle_hash": "69797a32840ca0190c8f8cf1f7df5718"
   },
   "Zombify": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
