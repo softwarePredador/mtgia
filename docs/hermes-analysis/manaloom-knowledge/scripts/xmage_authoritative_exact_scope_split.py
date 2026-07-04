@@ -5022,22 +5022,131 @@ def activated_target_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, 
         for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True)
     )
     match = re.match(
-        rf"^(another )?target creature( you control)? gains ({keyword_words}) until end of turn\.?$",
+        rf"^(another\s+)?target\s+(.+?)\s+gains\s+({keyword_words}) until end of turn\.?$",
         effect_text,
     )
     if not match:
         return "activated_target_keyword_oracle_not_simple"
-    if match.group(1) and not match.group(2):
-        return "activated_target_keyword_oracle_not_simple"
+    target_data = activated_target_keyword_target_phrase_data(match.group(2))
+    if isinstance(target_data, str):
+        return target_data.replace("source", "oracle")
+    if match.group(1):
+        target_data["exclude_source"] = True
+        target_data.setdefault("target_constraints", {})["exclude_source"] = True
     activation = activation_cost_from_oracle_prefix(cost_text)
     if isinstance(activation, str):
         return str(activation).replace("activated_self_boost", "activated_target_keyword")
     return {
         "keyword": TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group(3)],
-        "target": "creature",
-        "target_controller": "self" if match.group(2) else "any",
-        "exclude_source": bool(match.group(1)),
+        **target_data,
         **activation,
+    }
+
+
+TARGET_KEYWORD_TARGET_COLOR_WORDS = {
+    "white": "W",
+    "blue": "U",
+    "black": "B",
+    "red": "R",
+    "green": "G",
+}
+
+
+def ordered_color_symbols(colors: list[str]) -> list[str]:
+    order = {"W": 0, "U": 1, "B": 2, "R": 3, "G": 4}
+    unique = list(dict.fromkeys(colors))
+    return sorted(unique, key=lambda color: order.get(color, 99))
+
+
+def target_keyword_subtypes_from_phrase(phrase: str) -> list[str]:
+    return [
+        token.lower()
+        for token in re.split(r"[^A-Za-z0-9']+", str(phrase or ""))
+        if token
+    ]
+
+
+def activated_target_keyword_target_phrase_data(phrase: str) -> dict[str, Any] | str:
+    target_phrase = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    target_controller = "any"
+    if target_phrase.endswith(" you control"):
+        target_controller = "self"
+        target_phrase = target_phrase[: -len(" you control")].strip()
+    combat_state = None
+    for prefix, state in (
+        ("attacking or blocking ", "attacking_or_blocking"),
+        ("attacking ", "attacking"),
+        ("blocking ", "blocking"),
+    ):
+        if target_phrase.startswith(prefix):
+            combat_state = state
+            target_phrase = target_phrase[len(prefix) :].strip()
+            break
+    constraints: dict[str, Any] = {"card_types": ["creature"]}
+    if combat_state:
+        constraints["combat_state"] = combat_state
+    power_match = re.fullmatch(r"creature with power (\d+) or greater", target_phrase)
+    if power_match:
+        constraints["power_min"] = int(power_match.group(1))
+        return {
+            "target": "creature",
+            "target_controller": target_controller,
+            "exclude_source": False,
+            "target_constraints": constraints,
+        }
+    power_match = re.fullmatch(r"creature with power (\d+) or less", target_phrase)
+    if power_match:
+        constraints["power_max"] = int(power_match.group(1))
+        return {
+            "target": "creature",
+            "target_controller": target_controller,
+            "exclude_source": False,
+            "target_constraints": constraints,
+        }
+    if target_phrase == "creature":
+        return {
+            "target": "creature",
+            "target_controller": target_controller,
+            "exclude_source": False,
+            "target_constraints": constraints,
+        }
+    if target_phrase.endswith(" creature"):
+        modifier = target_phrase[: -len(" creature")].strip()
+        if not modifier:
+            return "activated_target_keyword_source_target_not_supported"
+        color_parts = [part.strip() for part in re.split(r"\s+or\s+", modifier) if part.strip()]
+        color_symbols = [TARGET_KEYWORD_TARGET_COLOR_WORDS.get(part) for part in color_parts]
+        if color_symbols and all(color_symbols):
+            constraints["target_colors"] = ordered_color_symbols([str(symbol) for symbol in color_symbols])
+        elif modifier == "snow":
+            constraints["required_supertypes"] = ["snow"]
+        else:
+            subtypes = target_keyword_subtypes_from_phrase(modifier)
+            if not subtypes:
+                return "activated_target_keyword_source_target_not_supported"
+            constraints["target_subtypes"] = subtypes
+        return {
+            "target": "creature",
+            "target_controller": target_controller,
+            "exclude_source": False,
+            "target_constraints": constraints,
+        }
+    subtypes = target_keyword_subtypes_from_phrase(target_phrase)
+    if not subtypes:
+        return "activated_target_keyword_source_target_not_supported"
+    if combat_state:
+        constraints["target_subtypes"] = subtypes
+        return {
+            "target": "creature",
+            "target_controller": target_controller,
+            "exclude_source": False,
+            "target_constraints": constraints,
+        }
+    return {
+        "target": "permanent",
+        "target_controller": target_controller,
+        "exclude_source": False,
+        "target_constraints": {"card_types": ["permanent"], "target_subtypes": subtypes},
     }
 
 
@@ -5098,13 +5207,54 @@ def activated_target_keyword_target_from_source(source: str) -> dict[str, Any] |
     if len(target_constructors) != 1:
         return "activated_target_keyword_source_target_not_supported"
     if re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S):
-        return {"target": "creature", "target_controller": "any", "exclude_source": False}
+        return {
+            "target": "creature",
+            "target_controller": "any",
+            "exclude_source": False,
+            "target_constraints": {"card_types": ["creature"]},
+        }
     if re.search(r"new\s+TargetControlledCreaturePermanent\s*\(\s*\)", text, re.S):
-        return {"target": "creature", "target_controller": "self", "exclude_source": False}
+        return {
+            "target": "creature",
+            "target_controller": "self",
+            "exclude_source": False,
+            "target_constraints": {"card_types": ["creature"]},
+        }
     if "FILTER_ANOTHER_TARGET_CREATURE_YOU_CONTROL" in text:
-        return {"target": "creature", "target_controller": "self", "exclude_source": True}
+        return {
+            "target": "creature",
+            "target_controller": "self",
+            "exclude_source": True,
+            "target_constraints": {"card_types": ["creature"], "exclude_source": True},
+        }
+    if "FILTER_ANOTHER_TARGET_CREATURE" in text:
+        return {
+            "target": "creature",
+            "target_controller": "any",
+            "exclude_source": True,
+            "target_constraints": {"card_types": ["creature"], "exclude_source": True},
+        }
     if re.search(r"FILTER_CONTROLLED_CREATURE|FILTER_TARGET_CREATURE_YOU_CONTROL", text, re.S):
-        return {"target": "creature", "target_controller": "self", "exclude_source": False}
+        return {
+            "target": "creature",
+            "target_controller": "self",
+            "exclude_source": False,
+            "target_constraints": {"card_types": ["creature"]},
+        }
+    phrase_match = re.search(
+        r"new\s+Filter(?:Attacking)?Creature(?:Permanent)?\s*\(\s*\"([^\"]+)\"\s*\)",
+        text,
+        re.S,
+    )
+    if phrase_match and re.search(r"new\s+TargetPermanent\s*\(", text, re.S):
+        return activated_target_keyword_target_phrase_data(phrase_match.group(1))
+    subtype_match = re.search(
+        r"new\s+Filter(Creature)?Permanent\s*\(\s*SubType\.([A-Z0-9_]+)\s*,\s*\"([^\"]+)\"\s*\)",
+        text,
+        re.S,
+    )
+    if subtype_match and re.search(r"new\s+TargetPermanent\s*\(", text, re.S):
+        return activated_target_keyword_target_phrase_data(subtype_match.group(3))
     return "activated_target_keyword_source_target_not_supported"
 
 
@@ -7460,7 +7610,7 @@ def split_row(
         parsed_activation = activated_target_keyword_from_source(source_text, keyword_ability_class)
         if isinstance(parsed_activation, str):
             return None, parsed_activation
-        for key in ("keyword", "target", "target_controller", "exclude_source"):
+        for key in ("keyword", "target", "target_controller", "exclude_source", "target_constraints"):
             if parsed_activation.get(key) != oracle_keyword.get(key):
                 return None, f"activated_target_keyword_source_oracle_{key}_mismatch"
         source_cost = (
@@ -7475,9 +7625,7 @@ def split_row(
         )
         if source_cost != oracle_cost:
             return None, "activated_target_keyword_source_oracle_cost_mismatch"
-        target_constraints = {"card_types": ["creature"]}
-        if bool(oracle_keyword.get("exclude_source")):
-            target_constraints["exclude_source"] = True
+        target_constraints = dict(oracle_keyword.get("target_constraints") or {"card_types": ["creature"]})
         self_keywords = static_keywords_from_oracle(metadata)
         self_keyword_list: list[str] = []
         if self_keywords:
@@ -7490,7 +7638,7 @@ def split_row(
             "battle_model_scope": TARGET_KEYWORD_ACTIVATED_SCOPE,
             "ability_kind": "activated",
             "activated_effect": "target_keyword_until_eot",
-            "target": "creature",
+            "target": oracle_keyword["target"],
             "target_controller": oracle_keyword["target_controller"],
             "target_constraints": target_constraints,
             "power_delta": 0,
@@ -7522,7 +7670,7 @@ def split_row(
             "ability_kind": "static_and_activated",
             "activated_effect": "target_keyword_until_eot",
             "activated_battle_model_scope": TARGET_KEYWORD_ACTIVATED_SCOPE,
-            "target": "creature",
+            "target": oracle_keyword["target"],
             "target_controller": oracle_keyword["target_controller"],
             "target_constraints": target_constraints,
             "power_delta": 0,

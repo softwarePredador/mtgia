@@ -11164,9 +11164,30 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         for value in _as_list(constraints.get("required_supertypes") or constraints.get("target_supertypes"))
         if str(value or "").strip()
     }
-    if "legendary" in required_supertypes:
+    if required_supertypes:
         type_line = str(target.get("type_line") or "").lower()
-        if "legendary" not in type_line and not bool(target.get("legendary")):
+        for supertype in required_supertypes:
+            if supertype not in type_line and not bool(target.get(supertype)):
+                return False
+    required_subtypes = [
+        str(value or "").strip().lower()
+        for value in _as_list(
+            constraints.get("required_subtypes")
+            or constraints.get("target_subtypes")
+            or constraints.get("subtypes")
+        )
+        if str(value or "").strip()
+    ]
+    if required_subtypes:
+        match_mode = str(
+            constraints.get("required_subtype_match")
+            or constraints.get("target_subtype_match")
+            or "any"
+        ).lower()
+        if match_mode == "all":
+            if not all(permanent_has_subtype(target, subtype) for subtype in required_subtypes):
+                return False
+        elif not any(permanent_has_subtype(target, subtype) for subtype in required_subtypes):
             return False
     color_count_exact = first_present_value(constraints, ("color_count_exact", "target_color_count_exact"))
     if color_count_exact is not None:
@@ -40556,10 +40577,18 @@ def _target_keyword_target_candidates(player, opponents, permanent, effect_data,
         participants = [player]
     keywords = list((effect_data or {}).get("granted_keywords_until_eot") or [])
     keyword = str(keywords[0] if keywords else "").strip().lower().replace(" ", "_")
+    allowed_types = _constraint_card_types(effect_data or {})
+    needs_creature_candidate = (
+        target_type in {"", "creature", "target_creature"}
+        or "creature" in allowed_types
+        or not allowed_types
+    )
     candidates = []
     for owner in participants:
         for target in list(getattr(owner, "battlefield", []) or []):
-            if not is_battlefield_creature(target):
+            if needs_creature_candidate and not is_battlefield_creature(target):
+                continue
+            if not needs_creature_candidate and not is_permanent_card(target):
                 continue
             if card_has_keyword(target, keyword):
                 continue

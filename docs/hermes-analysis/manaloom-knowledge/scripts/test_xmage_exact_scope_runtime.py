@@ -4199,6 +4199,144 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertFalse(source.get("tapped", False))
         self.assertNotIn("haste", target)
 
+    def test_simple_activated_target_keyword_respects_permanent_subtype_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Fixture Marshal",
+            "type_line": "Creature - Human Wizard",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "target": "permanent",
+            "target_controller": "self",
+            "target_constraints": {"card_types": ["permanent"], "target_subtypes": ["soldier"]},
+            "granted_keywords_until_eot": ["flying"],
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "summoning_sick": False,
+        }
+        wrong = {"name": "Large Bear", "type_line": "Creature - Bear", "power": 9, "toughness": 9}
+        target = {"name": "Soldier Banner", "type_line": "Kindred Enchantment - Soldier"}
+        active.battlefield.extend([source, wrong, target])
+
+        activated = self.battle.activate_generic_target_keyword_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=23,
+            rng=random.Random(23),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn("flying", wrong)
+        self.assertTrue(target["flying"])
+        self.assertEqual(target["keywords"], ["flying"])
+
+    def test_simple_activated_target_keyword_respects_combat_subtype_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Fixture Horde",
+            "type_line": "Creature - Zombie",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "target": "creature",
+            "target_controller": "self",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "combat_state": "attacking",
+                "target_subtypes": ["zombie"],
+            },
+            "granted_keywords_until_eot": ["indestructible"],
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "summoning_sick": False,
+        }
+        wrong_subtype = {
+            "name": "Attacking Bear",
+            "type_line": "Creature - Bear",
+            "power": 9,
+            "toughness": 9,
+            "attacking": True,
+        }
+        wrong_state = {
+            "name": "Idle Zombie",
+            "type_line": "Creature - Zombie",
+            "power": 8,
+            "toughness": 8,
+            "attacking": False,
+        }
+        target = {
+            "name": "Attacking Zombie",
+            "type_line": "Creature - Zombie",
+            "power": 2,
+            "toughness": 2,
+            "attacking": True,
+        }
+        active.battlefield.extend([source, wrong_subtype, wrong_state, target])
+
+        activated = self.battle.activate_generic_target_keyword_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=24,
+            rng=random.Random(24),
+            phase="combat",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn("indestructible", wrong_subtype)
+        self.assertNotIn("indestructible", wrong_state)
+        self.assertTrue(target["indestructible"])
+
+    def test_simple_activated_target_keyword_respects_power_max_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Fixture Glider",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "target": "creature",
+            "target_controller": "self",
+            "target_constraints": {"card_types": ["creature"], "power_max": 3},
+            "granted_keywords_until_eot": ["flying"],
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+        }
+        wrong = {"name": "Huge Beast", "type_line": "Creature - Beast", "power": 9, "toughness": 9}
+        target = {"name": "Small Scout", "type_line": "Creature - Scout", "power": 2, "toughness": 2}
+        active.battlefield.extend([source, wrong, target])
+
+        activated = self.battle.activate_generic_target_keyword_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=25,
+            rng=random.Random(25),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn("flying", wrong)
+        self.assertTrue(target["flying"])
+
     def test_creature_tap_damage_blocks_summoning_sick_activation(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

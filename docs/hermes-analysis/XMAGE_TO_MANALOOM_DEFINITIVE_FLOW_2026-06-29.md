@@ -216,10 +216,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG377 Exact Adapter Waves
+## PG283-PG378 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG377 all-card exact adapter waves are applied and
-synced. PG375-PG377 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG378 all-card exact adapter waves are applied and
+synced. PG375-PG378 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -5788,6 +5788,36 @@ PG377 measured result:
   `proposal_count=0` over `7752` considered supported rows. The next cycle must
   implement another exact mapper/runtime subpattern before package generation.
 
+PG378 measured result:
+
+- PG378 promoted `16` constrained activated target-keyword permanent rules on
+  the new server:
+  `Accursed Horde`, `Air Marshal`, `Beacon Behemoth`, `Bloodthorn Taunter`,
+  `Hotfoot Gnome`, `Jawbone Skulkin`, `Kelsinko Ranger`,
+  `Krosan Groundshaker`, `Might Weaver`, `Mosstodon`, `Rage Weaver`,
+  `Rakeclaw Gargantuan`, `Sky Weaver`, `Sootstoke Kindler`,
+  `Spearbreaker Behemoth`, and `Whalebone Glider`.
+- The runtime now validates subtype/supertype target constraints and lets
+  activated target-keyword abilities consider `permanent` targets when XMage
+  uses `TargetPermanent`. The splitter now requires full Oracle/source
+  agreement on `target_constraints` before packaging.
+- Focused splitter tests passed with `302` tests; focused exact runtime tests
+  passed with `178` tests; py_compile passed.
+- PostgreSQL precheck matched `16/16` target card rows on the new server; apply
+  upserted `16` rows and deprecated `0` shadows; postcheck verified `16/16`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `16` PostgreSQL rows from the new target,
+  updated `16` SQLite rows, and exported `5079` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `16/16` cards.
+- Global all-card authoritative queue after PG378:
+  `target_identity_count=26979`, `xmage_authoritative_source_count=26665`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26665`.
+- Running the exact splitter after PG378 on supported units returned
+  `proposal_count=0` over `7736` considered supported rows. The next cycle must
+  implement another exact mapper/runtime subpattern before package generation.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -6418,12 +6448,12 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG377 queue on the new server, the next exact runtime-backed work should
+post-PG378 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1822`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1634`
-3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1130`
+3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `906`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `735`

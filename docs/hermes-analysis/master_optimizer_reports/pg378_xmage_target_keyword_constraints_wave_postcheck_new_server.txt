@@ -1,0 +1,19 @@
+       card_name       |    normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-----------------------+-----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Accursed Horde        | accursed horde        | battle_rule_v1:8c67f34e0b57af9ea8cdbd48c878f33d |                  1 |                           1 |                         1 |           0
+ Air Marshal           | air marshal           | battle_rule_v1:2232bfe70d4fa2a13350a5da6f366b6c |                  1 |                           1 |                         1 |           0
+ Beacon Behemoth       | beacon behemoth       | battle_rule_v1:329d92b495672340e910b7359b21eaf9 |                  1 |                           1 |                         1 |           0
+ Bloodthorn Taunter    | bloodthorn taunter    | battle_rule_v1:2b4f0c0679b006479e11eca798013366 |                  1 |                           1 |                         1 |           0
+ Hotfoot Gnome         | hotfoot gnome         | battle_rule_v1:c51f7f1bb5a04adc09d82c67e1cbcf41 |                  1 |                           1 |                         1 |           0
+ Jawbone Skulkin       | jawbone skulkin       | battle_rule_v1:65d4710d2887d605fab27666970f0631 |                  1 |                           1 |                         1 |           0
+ Kelsinko Ranger       | kelsinko ranger       | battle_rule_v1:bd7389e7119414624e491eeae0cab3fa |                  1 |                           1 |                         1 |           0
+ Krosan Groundshaker   | krosan groundshaker   | battle_rule_v1:df48f87ad1e8bbf0849d6a7c3e2a4663 |                  1 |                           1 |                         1 |           0
+ Might Weaver          | might weaver          | battle_rule_v1:52092f212cdeeb76a86cfce31664f2be |                  1 |                           1 |                         1 |           0
+ Mosstodon             | mosstodon             | battle_rule_v1:b1fa99745acc8edbae1d7552e8b0d7dd |                  1 |                           1 |                         1 |           0
+ Rage Weaver           | rage weaver           | battle_rule_v1:7a62ed14cead3de16784856e8bdf1f39 |                  1 |                           1 |                         1 |           0
+ Rakeclaw Gargantuan   | rakeclaw gargantuan   | battle_rule_v1:746c344f62541dfd3fe1130127725bd3 |                  1 |                           1 |                         1 |           0
+ Sky Weaver            | sky weaver            | battle_rule_v1:21f48065b7ffa526abb1491ac5edb0d8 |                  1 |                           1 |                         1 |           0
+ Sootstoke Kindler     | sootstoke kindler     | battle_rule_v1:87a49611dcbe7a1c23df28aa9975b885 |                  1 |                           1 |                         1 |           0
+ Spearbreaker Behemoth | spearbreaker behemoth | battle_rule_v1:d7e35429be788850292bac141af33339 |                  1 |                           1 |                         1 |           0
+ Whalebone Glider      | whalebone glider      | battle_rule_v1:c26201c5973671d16681b08139ba710e |                  1 |                           1 |                         1 |           0
+(16 rows)
