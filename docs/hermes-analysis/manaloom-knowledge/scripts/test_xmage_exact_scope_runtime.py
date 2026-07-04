@@ -2476,6 +2476,105 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_damage_target_spell_destroys_creature_to_graveyard_without_exile_flag(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        creature = {
+            "name": "Target Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.battlefield.append(creature)
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Strike",
+                "type_line": "Sorcery",
+                "oracle_text": "Fixture Strike deals 3 damage to target creature.",
+            },
+            turn=2,
+            rng=random.Random(24),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Bear"])
+        self.assertEqual(opponent.exile, [])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Strike"
+                and data.get("target") == "Target Bear"
+                and data.get("result") == "creature_destroyed"
+                and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
+    def test_fixed_damage_exile_if_dies_spell_exiles_lethal_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        creature = {
+            "name": "Target Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.battlefield.append(creature)
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+            "amount": 4,
+            "damage": 4,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "exile_if_dies_from_damage": True,
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Lava Coil",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Lava Coil deals 4 damage to target creature. "
+                    "If that creature would die this turn, exile it instead."
+                ),
+            },
+            turn=2,
+            rng=random.Random(25),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual(opponent.graveyard, [])
+        self.assertEqual([card["name"] for card in opponent.exile], ["Target Bear"])
+        self.assertEqual(opponent.exile[0].get("_exile_reason"), "damage_exile_if_dies")
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Lava Coil"
+                and data.get("target") == "Target Bear"
+                and data.get("result") == "creature_exiled_by_damage"
+                and data.get("destination") == "exile"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_any_target_does_not_treat_artifact_as_damage_target(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -2242,6 +2242,109 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "damage_additional_cost_not_supported")
 
+    def test_fixed_damage_exile_if_dies_spell_maps_to_runtime(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect", "ExileTargetIfDiesEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Lava Coil",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Lava Coil deals 4 damage to target creature. "
+                    "If that creature would die this turn, exile it instead."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(4));"
+                "this.getSpellAbility().addEffect(new ExileTargetIfDiesEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_EXILE_IF_DIES_SCOPE)
+        self.assertEqual(effect["amount"], 4)
+        self.assertEqual(effect["target"], "creature")
+        self.assertTrue(effect["exile_if_dies_from_damage"])
+        self.assertEqual(effect["xmage_effect_classes"], ["DamageTargetEffect", "ExileTargetIfDiesEffect"])
+
+    def test_fixed_damage_exile_if_dies_spell_maps_creature_or_planeswalker_target(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect", "ExileTargetIfDiesEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Scorching Dragonfire",
+                type_line="Instant",
+                oracle_text=(
+                    "Scorching Dragonfire deals 3 damage to target creature or planeswalker. "
+                    "If that creature or planeswalker would die this turn, exile it instead."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                "this.getSpellAbility().addEffect(new ExileTargetIfDiesEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_EXILE_IF_DIES_SCOPE)
+        self.assertEqual(effect["target"], "creature_or_planeswalker")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "planeswalker"]})
+
+    def test_fixed_damage_exile_if_dies_spell_blocks_additional_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect", "ExileTargetIfDiesEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Betrayer's Bargain",
+                type_line="Instant",
+                oracle_text=(
+                    "As an additional cost to cast this spell, sacrifice a creature or enchantment. "
+                    "Betrayer's Bargain deals 5 damage to target creature. "
+                    "If that creature would die this turn, exile it instead."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE_OR_ENCHANTMENT));"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(5));"
+                "this.getSpellAbility().addEffect(new ExileTargetIfDiesEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertIn(reason, {"additional_cost_detected", "damage_exile_if_dies_additional_cost_not_supported"})
+
+    def test_fixed_damage_exile_if_dies_spell_blocks_activated_permanent(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect", "ExileTargetIfDiesEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Nine-Ringed Bo",
+                type_line="Legendary Artifact - Equipment",
+                oracle_text=(
+                    "Equipped creature has \"{T}: This creature deals 1 damage to target creature. "
+                    "If that creature would die this turn, exile it instead.\""
+                ),
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(1), new TapSourceCost());"
+                "ability.addEffect(new ExileTargetIfDiesEffect());"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "not_instant_or_sorcery_spell")
+
     def test_fixed_damage_gain_life_spell_maps_to_direct_damage_with_life_gain(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["DamageTargetEffect", "GainLifeEffect"])
         proposal, reason = split.split_row(

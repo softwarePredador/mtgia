@@ -112,6 +112,8 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "graveyard_to_library_activation_cost_mana": "{B}",
             "graveyard_to_library_activation_cost_generic": 0,
             "graveyard_to_library_activation_cost_colors": ["B"],
+            "exile_if_dies_from_damage": True,
+            "exile_if_dies_target": "creature",
             "recursion_components": [
                 {
                     "target": "creature",
@@ -187,6 +189,8 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "graveyard_to_library_activation_cost_mana": "{B}",
             "graveyard_to_library_activation_cost_generic": 0,
             "graveyard_to_library_activation_cost_colors": ["B"],
+            "exile_if_dies_from_damage": True,
+            "exile_if_dies_target": "creature",
             "recursion_components": [
                 {
                     "target": "creature",

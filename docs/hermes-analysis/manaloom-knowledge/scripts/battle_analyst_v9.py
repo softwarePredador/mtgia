@@ -24075,6 +24075,58 @@ def move_zone_object_to_exile(owner, zone_name, card, *, reason=None, source=Non
     return "exile"
 
 
+def move_permanent_from_battlefield_to_exile(owner, permanent, *, reason=None, source=None, turn=None):
+    if not isinstance(permanent, dict):
+        return "none"
+    moved = battlefield_object_for_target(owner, permanent) or permanent
+    destination = move_zone_object_to_exile(
+        owner,
+        "battlefield",
+        moved,
+        reason=reason or "battlefield_to_exile",
+        source=source,
+        turn=turn,
+    )
+    if destination == "none":
+        return destination
+    _clear_battlefield_only_state(moved)
+    current_turn = turn if turn is not None else CURRENT_REPLAY_TURN
+    if destination == "exile":
+        moved["_put_into_exile_from_battlefield_turn"] = current_turn
+    emit_replay_event(
+        "permanent_moved_from_battlefield",
+        player=getattr(owner, "name", "?"),
+        card=moved.get("name", "?"),
+        permanent_type="permanent",
+        from_zone="battlefield",
+        to_zone=destination,
+        destination=destination,
+        reason=reason,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        turn=current_turn,
+    )
+    resolve_leave_battlefield_treasure_trigger(
+        owner,
+        moved,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
+    refresh_controlled_static_indestructible(
+        owner,
+        turn=current_turn,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
+    refresh_controlled_static_power_toughness_bonuses(
+        owner,
+        turn=current_turn,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
+    return destination
+
+
 def commander_color_identity_count(player):
     commander = player.commander if isinstance(player.commander, dict) else None
     if commander is None and player.command_zone:
@@ -39458,13 +39510,27 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
                     turn=turn,
                     phase=phase,
                 )
-                destination = move_creature_from_battlefield(
-                    opp,
-                    target,
-                    reason="damage",
-                    source=card,
-                )
-                result = "creature_destroyed"
+                if effect_data.get("exile_if_dies_from_damage"):
+                    destination = move_permanent_from_battlefield_to_exile(
+                        opp,
+                        target,
+                        reason="damage_exile_if_dies",
+                        source=card,
+                        turn=turn,
+                    )
+                    result = (
+                        "creature_exiled_by_damage"
+                        if destination == "exile"
+                        else "creature_removed_by_damage"
+                    )
+                else:
+                    destination = move_creature_from_battlefield(
+                        opp,
+                        target,
+                        reason="damage",
+                        source=card,
+                    )
+                    result = "creature_destroyed"
             elif target_kind == "planeswalker":
                 loyalty_before = int(target.get("loyalty", 0) or 0)
                 damage_to_planeswalker(card, target, target_amount)

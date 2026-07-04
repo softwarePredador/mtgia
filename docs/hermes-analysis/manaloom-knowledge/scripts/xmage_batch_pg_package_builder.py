@@ -100,6 +100,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "graveyard_self_return_activation_cost_generic",
     "graveyard_self_return_activation_cost_colors",
     "damage",
+    "exile_if_dies_from_damage",
+    "exile_if_dies_target",
     "life_gain",
     "counter_type",
     "counter_amount",

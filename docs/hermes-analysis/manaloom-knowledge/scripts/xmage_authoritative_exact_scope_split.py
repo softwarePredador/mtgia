@@ -90,6 +90,7 @@ DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
+DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
 DESTROY_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_controller_gain_life_spell_v1"
 CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1"
@@ -7792,6 +7793,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed spell-resolution creature-token maker"
     elif scope == DAMAGE_GAIN_LIFE_SCOPE:
         scope_kind = "fixed damage plus controller life-gain spell"
+    elif scope == DAMAGE_EXILE_IF_DIES_SCOPE:
+        scope_kind = "fixed damage spell with exile-if-dies replacement"
     elif scope == DESTROY_GAIN_LIFE_SCOPE:
         scope_kind = "fixed destroy-target plus controller life-gain spell"
     elif scope == LIFE_GAIN_DRAW_SCOPE:
@@ -10858,6 +10861,40 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_draw_spell"), "selected_exact_scope"
 
     if unit == DAMAGE_UNIT:
+        if classes == {"DamageTargetEffect", "ExileTargetIfDiesEffect"}:
+            if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
+                return None, "damage_exile_if_dies_additional_cost_not_supported"
+            oracle_lower = oracle_text(metadata).lower()
+            if "would die this turn" not in oracle_lower or "exile it instead" not in oracle_lower:
+                return None, "damage_exile_if_dies_oracle_not_exact"
+            amount = java_constructor_int(source_text, "DamageTargetEffect")
+            if amount is None or amount <= 0:
+                return None, "damage_amount_not_fixed"
+            target = damage_target_from_oracle(metadata)
+            if target is None:
+                return None, "damage_target_not_supported"
+            if not source_matches_target_constraint(source_text, target):
+                return None, "damage_target_source_mismatch"
+            target_base = restricted_target_base(target)
+            effect_json = {
+                "effect": "direct_damage",
+                "battle_model_scope": DAMAGE_EXILE_IF_DIES_SCOPE,
+                "amount": amount,
+                "damage": amount,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target),
+                "exile_if_dies_from_damage": True,
+                "exile_if_dies_target": target_base,
+                "xmage_effect_classes": ["DamageTargetEffect", "ExileTargetIfDiesEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_damage_exile_if_dies_spell",
+            ), "selected_exact_scope"
+
         if classes != {"DamageTargetEffect"}:
             return None, "damage_effect_class_not_pure"
         additional_cost_fields, additional_cost_reason = fixed_damage_spell_additional_cost_fields_from_source(
