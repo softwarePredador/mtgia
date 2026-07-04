@@ -3731,9 +3731,13 @@ def is_permanent_activated_recursion_to_hand_unit(row: dict[str, Any]) -> bool:
 def is_permanent_activated_recursion_to_battlefield_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
         return False
+    abilities = ability_classes(row)
     return (
         effect_classes(row) == {"ReturnFromGraveyardToBattlefieldTargetEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and abilities in (
+            {"SimpleActivatedAbility"},
+            {"ActivateAsSorceryActivatedAbility"},
+        )
         and "activated_ability" in set(row.get("xmage_signals") or [])
     )
 
@@ -6126,6 +6130,16 @@ def activated_recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> 
         return "activated_recursion_battlefield_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
     effect_text = re.split(r"\s+partner[—-]", effect_text, maxsplit=1)[0].strip()
+    activation_timing = None
+    timing_suffix = re.search(
+        r"\s*activate (?:only )?as a sorcery\.?$",
+        effect_text,
+    )
+    if timing_suffix:
+        activation_timing = "sorcery"
+        effect_text = effect_text[: timing_suffix.start()].strip()
+        if not effect_text.endswith("."):
+            effect_text += "."
     normalized_cost = cost_text
     life_cost = 0
     life_pattern = r"(?:^|,\s*)pay (?P<life>\d+) life(?:\s*,?|$)"
@@ -6161,6 +6175,8 @@ def activated_recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> 
     if target is None:
         return "activated_recursion_battlefield_target_not_supported"
     result = {**target, **activation}
+    if activation_timing:
+        result["activation_timing"] = activation_timing
     if life_cost:
         result["activation_life_cost"] = life_cost
     if sacrifice_target:
@@ -6200,8 +6216,10 @@ def activated_recursion_to_battlefield_from_source(source: str) -> dict[str, Any
         return "activated_recursion_battlefield_source_count_not_fixed"
     effect_index = text.find("ReturnFromGraveyardToBattlefieldTargetEffect")
     window = text[max(0, effect_index - 500) : effect_index + 1800]
-    if "SimpleActivatedAbility" not in window:
+    ability_match = re.search(r"\b(SimpleActivatedAbility|ActivateAsSorceryActivatedAbility)\b", window)
+    if not ability_match:
         return "activated_recursion_battlefield_source_not_simple_activated"
+    activation_timing = "sorcery" if ability_match.group(1) == "ActivateAsSorceryActivatedAbility" else None
 
     if "FilterPermanentCard" in text and "SubType.REBEL.getPredicate" in text:
         target = "rebel_permanent"
@@ -6270,6 +6288,8 @@ def activated_recursion_to_battlefield_from_source(source: str) -> dict[str, Any
         "activation_requires_tap": requires_tap,
         "activation_requires_sacrifice": requires_sacrifice,
     }
+    if activation_timing:
+        result["activation_timing"] = activation_timing
     if life_cost:
         result["activation_life_cost"] = life_cost
     if sacrifice_target:
@@ -8158,6 +8178,7 @@ def split_row(
             "activation_life_cost",
             "activation_sacrifice_target",
             "activation_requires_sacrifice_target",
+            "activation_timing",
         ):
             if parsed_activation.get(key) != oracle_target.get(key):
                 return None, f"activated_recursion_battlefield_source_oracle_{key}_mismatch"
@@ -8219,7 +8240,11 @@ def split_row(
             "graveyard_to_hand_target_count": int(oracle_target["count"]),
             "graveyard_to_hand_destination": "battlefield",
             "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
-            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_class": (
+                "ActivateAsSorceryActivatedAbility"
+                if parsed_activation.get("activation_timing") == "sorcery"
+                else "SimpleActivatedAbility"
+            ),
             "activation_cost_mana": parsed_activation["activation_cost_mana"],
             "activation_cost_generic": parsed_activation["activation_cost_generic"],
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
@@ -8249,7 +8274,11 @@ def split_row(
             "graveyard_to_hand_destination": "battlefield",
             "_activated_rule_effects": [activated_effect],
             "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
-            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_class": (
+                "ActivateAsSorceryActivatedAbility"
+                if parsed_activation.get("activation_timing") == "sorcery"
+                else "SimpleActivatedAbility"
+            ),
             "activation_cost_mana": parsed_activation["activation_cost_mana"],
             "activation_cost_generic": parsed_activation["activation_cost_generic"],
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
@@ -8265,6 +8294,9 @@ def split_row(
         if parsed_activation.get("activation_life_cost"):
             effect_json["activation_life_cost"] = parsed_activation["activation_life_cost"]
             effect_json["graveyard_to_hand_activation_life_cost"] = parsed_activation["activation_life_cost"]
+        if parsed_activation.get("activation_timing"):
+            effect_json["activation_timing"] = parsed_activation["activation_timing"]
+            activated_effect["activation_timing"] = parsed_activation["activation_timing"]
         if parsed_activation.get("activation_sacrifice_target"):
             effect_json["activation_sacrifice_target"] = parsed_activation["activation_sacrifice_target"]
             effect_json["activation_requires_sacrifice_target"] = True

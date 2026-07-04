@@ -368,10 +368,57 @@ Post-PG380 update:
     comparison.
 - delta since post-PG379: `15` identities promoted.
 
+Post-PG381 update:
+
+- source artifacts:
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_pg381_activate_as_sorcery_recursion_battlefield_new_server.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg381_activate_as_sorcery_recursion_battlefield_new_server_package_package.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg381_activate_as_sorcery_recursion_battlefield_new_server_e2e.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg381_activate_as_sorcery_recursion_battlefield_new_server_commander_legal.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg381_activate_as_sorcery_recursion_battlefield_new_server_supported_recheck.md`
+- promoted family:
+  - `xmage_permanent_simple_activated_graveyard_to_battlefield_v1` for `2`
+    exact `ReturnFromGraveyardToBattlefieldTargetEffect` permanents with
+    `ActivateAsSorceryActivatedAbility`, fixed `{3}{B}` activation cost,
+    source self-sacrifice, and target creature card in your graveyard:
+    `Bonecaller Cleric` and `Valgavoth's Faithful`.
+- implementation change:
+  - the exact-scope splitter now treats `ActivateAsSorceryActivatedAbility` as
+    a supported activated-recursion timing only when the Oracle text/source
+    agreement proves `Activate only as a sorcery.`
+  - effect JSON records `activation_timing = sorcery`, so the runtime/package
+    gate distinguishes sorcery-speed activated recursion from ordinary simple
+    activated recursion.
+  - variable-X or mana-value constrained neighbors, including `Sidisi, Regent
+    of the Mire`, remain blocked instead of being promoted into this package.
+- target battle-gap identities in authoritative queue: `26957`
+- XMage authoritative source resolved: `26643`
+- XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26643`
+- adapter work-unit keys: `11429`
+- final supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg381_activate_as_sorcery_recursion_battlefield_new_server_supported_recheck.md`
+  returned `proposal_count=0` over `7730` considered supported rows.
+- final audits:
+  - strategy consistency:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg381_activate_as_sorcery_recursion_battlefield_new_server.md`
+    -> `status=pass`, `26/26` pass.
+  - operational surface alignment:
+    `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg381_activate_as_sorcery_recursion_battlefield_new_server.md`
+    -> `status=pass`.
+  - legacy contamination:
+    `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg381_activate_as_sorcery_recursion_battlefield_new_server.md`
+    -> `status=pass`.
+  - PG-Hermes-SQLite contract:
+    `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg381_activate_as_sorcery_recursion_battlefield_new_server.md`
+    -> `status=pass`, `50/50` pass.
+- delta since post-PG380: `2` identities promoted.
+
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG380 queue above.
+historical only. The active execution baseline is the post-PG381 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -379,13 +426,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG380 control numbers:
+Current post-PG381 control numbers:
 
-- target battle-gap identities: `26959`
-- XMage-resolved authoritative source identities: `26645`
+- target battle-gap identities: `26957`
+- XMage-resolved authoritative source identities: `26643`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26645`
+- XMage authoritative adapter required: `26643`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -405,12 +452,12 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg380_activated_draw_discard_new_server_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG380, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg381_activate_as_sorcery_recursion_battlefield_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG381, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
-   `recursion::xmage_graveyard_return_variant_review_v1` (`1822`),
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1820`),
    `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
    `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
    (`1114`), `direct_damage::targeted_damage_variant_v1` (`901`), and
@@ -564,6 +611,26 @@ PG380 completion and PG381 starting hypothesis:
    generation.
 5. The largest remaining work units are now:
    `recursion::xmage_graveyard_return_variant_review_v1` (`1822`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
+   `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`901`), and
+   `add_counters::source_add_counters_variant_v1` (`795`).
+
+PG381 completion and PG382 starting hypothesis:
+
+1. PG381 promoted `2` exact permanent activated graveyard-to-battlefield rules
+   on the new server after extending the mapper/runtime contract for
+   sorcery-speed activated recursion.
+2. Tests passed: splitter `310`, exact runtime `184`, package builder,
+   py_compile, and E2E package validation `status=pass`.
+3. Post-PG381 governance passed with strategy consistency `26/26`,
+   operational surface `pass`, legacy contamination `pass`, and
+   PG-Hermes-SQLite contract `50/50` pass against the new server.
+4. The post-PG381 supported splitter returns `0` batch-safe proposals, so
+   PG382 must implement another narrow subpattern before PostgreSQL package
+   generation.
+5. The largest remaining work units are now:
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1820`),
    `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
    `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
    (`1114`), `direct_damage::targeted_damage_variant_v1` (`901`), and
@@ -857,15 +924,15 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG380 authoritative queue unless a newer queue exists:
+Use the post-PG381 authoritative queue unless a newer queue exists:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1822`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1820`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1619`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `901`
 5. `add_counters::source_add_counters_variant_v1` - `795`
-6. `life_gain::xmage_life_gain_variant_review_v1` - `740`
-7. `draw_cards::xmage_draw_card_variant_review_v1` - `676`
+6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
+7. `draw_cards::xmage_draw_card_variant_review_v1` - `636`
 8. `removal_destroy::targeted_destroy_variant_v1` - `624`
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`

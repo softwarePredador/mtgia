@@ -7855,6 +7855,70 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_recursion_to_battlefield_activate_as_sorcery_self_sacrifice(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(3)
+        active.mana_pool.add("black", 1)
+        target = {
+            "name": "Old Bear",
+            "type_line": "Creature - Bear",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "cmc": 2,
+        }
+        active.graveyard.append(target)
+        permanent = {
+            "name": "Bonecaller Cleric",
+            "type_line": "Creature - Human Cleric",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+            "activated_effect": "recursion",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+            "activation_timing": "sorcery",
+            "graveyard_to_hand_target": "creature",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "battlefield",
+            "graveyard_to_hand_activation_cost_mana": "{3}{B}",
+            "graveyard_to_hand_activation_cost_generic": 3,
+            "graveyard_to_hand_activation_cost_colors": ["B"],
+            "graveyard_to_hand_activation_requires_tap": False,
+            "graveyard_to_hand_activation_requires_sacrifice": True,
+            "summoning_sick": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_bonecaller_cleric",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=17,
+            rng=random.Random(17),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertEqual([card["name"] for card in active.graveyard], ["Bonecaller Cleric"])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Old Bear"])
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "utility_artifact_activated"
+                and data.get("card") == "Bonecaller Cleric"
+                and data.get("activation_kind") == "simple_activated_graveyard_to_battlefield"
+                and data.get("sacrificed_self") is True
+                and data.get("mana_paid") == 4
+                and data.get("returned_to_battlefield") == ["Old Bear"]
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_recursion_blocks_summoning_sick_tap_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

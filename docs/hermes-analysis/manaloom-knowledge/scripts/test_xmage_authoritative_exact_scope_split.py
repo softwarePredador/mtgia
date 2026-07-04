@@ -5182,6 +5182,51 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(activated["destination"], "battlefield")
         self.assertEqual(activated["activated_battle_model_scope"], split.PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE)
 
+    def test_permanent_activated_recursion_to_battlefield_accepts_activate_as_sorcery_self_sacrifice(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["ActivateAsSorceryActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bonecaller Cleric",
+                type_line="Creature - Human Cleric",
+                oracle_text=(
+                    "{3}{B}, Sacrifice this creature: Return target creature card "
+                    "from your graveyard to the battlefield. Activate only as a sorcery."
+                ),
+            ),
+            source_text="""
+                Ability ability = new ActivateAsSorceryActivatedAbility(
+                    new ReturnFromGraveyardToBattlefieldTargetEffect(),
+                    new ManaCostsImpl<>("{3}{B}")
+                );
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["xmage_ability_class"], "ActivateAsSorceryActivatedAbility")
+        self.assertEqual(effect["activation_timing"], "sorcery")
+        self.assertEqual(effect["activation_cost_mana"], "{3}{B}")
+        self.assertEqual(effect["activation_cost_generic"], 3)
+        self.assertEqual(effect["activation_cost_colors"], ["B"])
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["graveyard_to_hand_target"], "creature")
+        self.assertEqual(effect["graveyard_to_hand_destination"], "battlefield")
+        activated = effect["_activated_rule_effects"][0]
+        self.assertEqual(activated["xmage_ability_class"], "ActivateAsSorceryActivatedAbility")
+        self.assertEqual(activated["activation_timing"], "sorcery")
+
     def test_permanent_activated_recursion_to_battlefield_maps_protomatter_powder(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
