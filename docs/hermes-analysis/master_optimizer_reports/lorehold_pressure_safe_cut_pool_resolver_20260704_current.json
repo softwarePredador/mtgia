@@ -1,0 +1,128 @@
+{
+  "artifact_type": "lorehold_pressure_safe_cut_pool_resolver",
+  "contract_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_spell_payoff_contract_20260704_current.json",
+  "current_champion": "deck_607",
+  "deck_607_mutated": false,
+  "diagnostic_tradeoff_cut_plan": {
+    "blocked_reason_counts": {
+      "commander_never_cut": 1,
+      "cut_is_early_mana_floor_support": 14,
+      "cut_is_protection_shell": 14,
+      "diagnostic_lane_excluded:big_spell_value": 2,
+      "diagnostic_lane_excluded:commander": 1,
+      "diagnostic_lane_excluded:draw": 6,
+      "diagnostic_lane_excluded:early_mana": 18,
+      "diagnostic_lane_excluded:graveyard_recursion": 1,
+      "diagnostic_lane_excluded:hand_filter": 1,
+      "diagnostic_lane_excluded:mana_base": 28,
+      "diagnostic_lane_excluded:protection": 13,
+      "early_mana_floor_support": 18,
+      "mana_base_never_cut": 28,
+      "measured_high_cut_exposure": 34,
+      "never_cut_lane": 29,
+      "never_cut_or_mana_base": 29,
+      "prior_rejected_cut": 37,
+      "prior_rejected_cut_slot": 24,
+      "prior_rejected_signature": 4,
+      "protected_cut": 22,
+      "protection_shell": 14
+    },
+    "cut_plan_validation": {
+      "named_cut_count": 4,
+      "required_cut_count": 4,
+      "safe": true,
+      "violations": []
+    },
+    "eligible_diagnostic_cut_count": 5,
+    "natural_battle_gate_allowed": false,
+    "promotion_eligible": false,
+    "required_cut_count": 4,
+    "selected_cuts": [
+      {
+        "card_name": "Call Forth the Tempest",
+        "diagnostic_reason": "Least-blocked non-mana, non-protection pressure tradeoff slot; diagnostic-only because active seed-safe evidence still says blocked.",
+        "direct_event_count": 4,
+        "lane": "spell_velocity",
+        "manual_status": "structural_dependency",
+        "score": 102,
+        "status": "blocked",
+        "unique_exposure_count": 8
+      },
+      {
+        "card_name": "Tempt with Bunnies",
+        "diagnostic_reason": "Least-blocked non-mana, non-protection pressure tradeoff slot; diagnostic-only because active seed-safe evidence still says blocked.",
+        "direct_event_count": 3,
+        "lane": "wincon",
+        "manual_status": "structural_dependency",
+        "score": 69,
+        "status": "blocked",
+        "unique_exposure_count": 31
+      },
+      {
+        "card_name": "Everything Comes to Dust",
+        "diagnostic_reason": "Least-blocked non-mana, non-protection pressure tradeoff slot; diagnostic-only because active seed-safe evidence still says blocked.",
+        "direct_event_count": 31,
+        "lane": "spell_velocity",
+        "manual_status": "structural_dependency",
+        "score": 66,
+        "status": "blocked",
+        "unique_exposure_count": 34
+      },
+      {
+        "card_name": "Rise of the Eldrazi",
+        "diagnostic_reason": "Least-blocked non-mana, non-protection pressure tradeoff slot; diagnostic-only because active seed-safe evidence still says blocked.",
+        "direct_event_count": 48,
+        "lane": "removal",
+        "manual_status": "structural_dependency",
+        "score": 40,
+        "status": "blocked",
+        "unique_exposure_count": 60
+      }
+    ],
+    "status": "diagnostic_plan_available"
+  },
+  "gate_ready_cut_plan": {
+    "blocked_seed_safe_rows": [],
+    "cut_plan_validation": {
+      "named_cut_count": 0,
+      "required_cut_count": 4,
+      "safe": false,
+      "violations": [
+        {
+          "card_name": "",
+          "protected_anchor": "",
+          "violation": "cut_count_must_match_add_count_before_legal_deck_generation"
+        }
+      ]
+    },
+    "ready_cut_count": 0,
+    "required_cut_count": 4,
+    "selected_cuts": [],
+    "status": "not_ready"
+  },
+  "generated_at": "2026-07-04T22:15:21Z",
+  "method_notes": [
+    "Gate-ready cuts require the seed-safe report to provide four unblocked cut slots.",
+    "Diagnostic tradeoff cuts are not promotion evidence; they are only a way to learn how much pressure payoffs cost the miracle shell.",
+    "Deck 607 remains unchanged. Any diagnostic deck must be a separate copy and must not be promoted from forced or diagnostic evidence alone."
+  ],
+  "postgres_writes": false,
+  "primary_adds": [
+    "Monastery Mentor",
+    "Young Pyromancer",
+    "Guttersnipe",
+    "Storm-Kiln Artist"
+  ],
+  "seed_safe_cut_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260704_role_tag_repair.json",
+  "source_db_mutated": false,
+  "summary": {
+    "decision_status": "no_seed_safe_cut_plan_diagnostic_only_tradeoff_available",
+    "diagnostic_tradeoff_plan_available": true,
+    "gate_ready_cut_count": 0,
+    "gate_ready_plan_complete": false,
+    "natural_battle_gate_allowed_now": false,
+    "primary_add_count": 4,
+    "ready_deck_change_count": 0,
+    "recommended_next_action": "stage_diagnostic_only_pressure_tradeoff_copy_if_learning_needs_it"
+  }
+}

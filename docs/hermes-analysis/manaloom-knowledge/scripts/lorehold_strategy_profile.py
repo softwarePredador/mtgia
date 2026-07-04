@@ -129,6 +129,7 @@ NAME_TAGS = {
     "giver of runes": {"early_plan", "protection_window"},
     "ghostly prison": {"pressure_absorber", "protection_window"},
     "grand abolisher": {"protection_window", "spell_chain_conversion"},
+    "monastery mentor": {"pressure_absorber", "spell_chain_conversion"},
     "hall of heliod's generosity": {"graveyard_recursion"},
     "heat shimmer": {"deterministic_finisher", "spell_chain_conversion"},
     "land tax": {"early_plan", "topdeck_miracle_setup", "hand_filter"},
@@ -168,6 +169,8 @@ NAME_TAGS = {
     "worldfire": {"deterministic_finisher"},
     "guttersnipe": {"deterministic_finisher", "spell_chain_conversion"},
     "galvanoth": {"topdeck_miracle_setup", "spell_chain_conversion"},
+    "storm-kiln artist": {"early_plan", "spell_chain_conversion"},
+    "young pyromancer": {"pressure_absorber", "spell_chain_conversion"},
 }
 
 TEXT_TAG_PATTERNS = (

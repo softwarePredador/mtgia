@@ -160,6 +160,27 @@ class LoreholdStrategyProfileTests(unittest.TestCase):
                 )
                 self.assertTrue(expected_tags.issubset(tags))
 
+    def test_pressure_payoff_package_cards_are_plan_aligned(self):
+        cases = {
+            "Monastery Mentor": {"pressure_absorber", "spell_chain_conversion"},
+            "Young Pyromancer": {"pressure_absorber", "spell_chain_conversion"},
+            "Storm-Kiln Artist": {"early_plan", "spell_chain_conversion"},
+            "Guttersnipe": {"deterministic_finisher", "spell_chain_conversion"},
+        }
+
+        for name, expected_tags in cases.items():
+            with self.subTest(name=name):
+                tags = profile.strategy_tags_for_card(
+                    {
+                        "card_name": name,
+                        "roles": [],
+                        "type_line": "Creature",
+                        "oracle_text": "",
+                        "cmc": 3,
+                    }
+                )
+                self.assertTrue(expected_tags.issubset(tags))
+
 
 if __name__ == "__main__":
     unittest.main()
