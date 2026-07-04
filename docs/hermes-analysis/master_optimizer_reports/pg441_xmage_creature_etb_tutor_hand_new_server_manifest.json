@@ -1,0 +1,1271 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg441_xmage_creature_etb_tutor_hand_new_server_20260704_",
+  "deploy_id": "pg441",
+  "expected_rules": [
+    {
+      "card_name": "Borderland Ranger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "min_rule_version": 2,
+      "normalized_name": "borderland ranger",
+      "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_hand",
+        "target": "basic_land_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Civic Wayfinder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "min_rule_version": 2,
+      "normalized_name": "civic wayfinder",
+      "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_hand",
+        "target": "basic_land_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Daru Cavalier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6775001dd7541098c239a0b938f510d1",
+      "min_rule_version": 2,
+      "normalized_name": "daru cavalier",
+      "oracle_hash": "41fe645d9e551925b96b2d07568cecce",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "keywords": [
+          "first_strike"
+        ],
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deadeye Quartermaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9e97b00ca55bebfd72f637c1b183c116",
+      "min_rule_version": 2,
+      "normalized_name": "deadeye quartermaster",
+      "oracle_hash": "0a951c7941b92c9cd4dd1158cd6db5a4",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Environmental Scientist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "min_rule_version": 2,
+      "normalized_name": "environmental scientist",
+      "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_hand",
+        "target": "basic_land_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Farfinder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:508f7fd96ceb577a5f2dab380f6609cb",
+      "min_rule_version": 2,
+      "normalized_name": "farfinder",
+      "oracle_hash": "66bb7a6119514caebac90f810be795da",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_hand",
+        "keywords": [
+          "vigilance"
+        ],
+        "target": "basic_land_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gatecreeper Vine",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0dc034646dd47d08c47a9c864a1e9d91",
+      "min_rule_version": 2,
+      "normalized_name": "gatecreeper vine",
+      "oracle_hash": "5badaa30071e88ec1abf7a90a4b174c7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_or_gate_to_hand",
+        "keywords": [
+          "defender"
+        ],
+        "target": "basic_land_or_gate_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Matron",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d31ea65123fba8521086549312fda8f2",
+      "min_rule_version": 2,
+      "normalized_name": "goblin matron",
+      "oracle_hash": "285c67f13cdc988f44ee9e5eb3e0aecc",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heliod's Pilgrim",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+      "min_rule_version": 2,
+      "normalized_name": "heliod's pilgrim",
+      "oracle_hash": "6138101a172460fd94a162178ab2f459",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Howling Wolf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2433fd9cab6ea1f19548e0f766b82e4e",
+      "min_rule_version": 2,
+      "normalized_name": "howling wolf",
+      "oracle_hash": "06c26c7bc5ef8d84596f44569d3cca14",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 3,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 3,
+        "etb_tutor_target": "any_to_hand",
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nesting Wurm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aacc2a09fb5bbb4643c96c72260e6e26",
+      "min_rule_version": 2,
+      "normalized_name": "nesting wurm",
+      "oracle_hash": "873788b661c8627405133b3a1c381674",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 3,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 3,
+        "etb_tutor_target": "any_to_hand",
+        "keywords": [
+          "trample"
+        ],
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ranger of Eos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f77411c08095fd4bd3cc42ade3c1254d",
+      "min_rule_version": 2,
+      "normalized_name": "ranger of eos",
+      "oracle_hash": "be899355fd24b180088b1bf967734efb",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 2,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 2,
+        "etb_tutor_target": "creature_to_hand",
+        "target": "creature_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rune-Scarred Demon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0bae6fefb7dc4689f938c64fa7818332",
+      "min_rule_version": 2,
+      "normalized_name": "rune-scarred demon",
+      "oracle_hash": "6544a9183b59cb44dbad6f4ed0549b56",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "keywords": [
+          "flying"
+        ],
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Screaming Seahawk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9083a0a280f37d9cc680368622de965b",
+      "min_rule_version": 2,
+      "normalized_name": "screaming seahawk",
+      "oracle_hash": "348083d02bf53a9680361f640214da58",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "keywords": [
+          "flying"
+        ],
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Squadron Hawk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:877168f396e3b0b4ed186a76f0b99995",
+      "min_rule_version": 2,
+      "normalized_name": "squadron hawk",
+      "oracle_hash": "8760c3ad97cb4c0042f87b4d83336e1d",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 3,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 3,
+        "etb_tutor_target": "any_to_hand",
+        "keywords": [
+          "flying"
+        ],
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sylvan Ranger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "min_rule_version": 2,
+      "normalized_name": "sylvan ranger",
+      "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_hand",
+        "target": "basic_land_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Totem-Guide Hartebeest",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+      "min_rule_version": 2,
+      "normalized_name": "totem-guide hartebeest",
+      "oracle_hash": "6138101a172460fd94a162178ab2f459",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Transit Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:daedbef22c68668817a41354b76423bd",
+      "min_rule_version": 2,
+      "normalized_name": "transit mage",
+      "oracle_hash": "9459579bdb675a5e3f72daaeb58b2eee",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "artifact_to_hand",
+        "target": "artifact_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tribute Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cf4fcf67e3d80509176a51d7650e4d53",
+      "min_rule_version": 2,
+      "normalized_name": "tribute mage",
+      "oracle_hash": "4105067c06ea609ff5440f507564b08b",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "artifact_to_hand",
+        "target": "artifact_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_library_search_to_hand": 19
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg441_xmage_creature_etb_tutor_hand_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg441_xmage_creature_etb_tutor_hand_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg441_xmage_creature_etb_tutor_hand_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg441_xmage_creature_etb_tutor_hand_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg441_xmage_creature_etb_tutor_hand_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg441_xmage_creature_etb_tutor_hand_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-04T22:22:10+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Borderland Ranger"
+      },
+      "card_name": "Borderland Ranger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "normalized_name": "borderland ranger",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_hand",
+        "target": "basic_land_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Civic Wayfinder"
+      },
+      "card_name": "Civic Wayfinder",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "normalized_name": "civic wayfinder",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_hand",
+        "target": "basic_land_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Daru Cavalier"
+      },
+      "card_name": "Daru Cavalier",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6775001dd7541098c239a0b938f510d1",
+      "normalized_name": "daru cavalier",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "keywords": [
+          "first_strike"
+        ],
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Deadeye Quartermaster"
+      },
+      "card_name": "Deadeye Quartermaster",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9e97b00ca55bebfd72f637c1b183c116",
+      "normalized_name": "deadeye quartermaster",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Environmental Scientist"
+      },
+      "card_name": "Environmental Scientist",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "normalized_name": "environmental scientist",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_hand",
+        "target": "basic_land_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Farfinder"
+      },
+      "card_name": "Farfinder",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:508f7fd96ceb577a5f2dab380f6609cb",
+      "normalized_name": "farfinder",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_hand",
+        "keywords": [
+          "vigilance"
+        ],
+        "target": "basic_land_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Gatecreeper Vine"
+      },
+      "card_name": "Gatecreeper Vine",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0dc034646dd47d08c47a9c864a1e9d91",
+      "normalized_name": "gatecreeper vine",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_or_gate_to_hand",
+        "keywords": [
+          "defender"
+        ],
+        "target": "basic_land_or_gate_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Goblin Matron"
+      },
+      "card_name": "Goblin Matron",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d31ea65123fba8521086549312fda8f2",
+      "normalized_name": "goblin matron",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Heliod's Pilgrim"
+      },
+      "card_name": "Heliod's Pilgrim",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+      "normalized_name": "heliod's pilgrim",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Howling Wolf"
+      },
+      "card_name": "Howling Wolf",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2433fd9cab6ea1f19548e0f766b82e4e",
+      "normalized_name": "howling wolf",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 3,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 3,
+        "etb_tutor_target": "any_to_hand",
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Nesting Wurm"
+      },
+      "card_name": "Nesting Wurm",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aacc2a09fb5bbb4643c96c72260e6e26",
+      "normalized_name": "nesting wurm",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 3,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 3,
+        "etb_tutor_target": "any_to_hand",
+        "keywords": [
+          "trample"
+        ],
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ranger of Eos"
+      },
+      "card_name": "Ranger of Eos",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f77411c08095fd4bd3cc42ade3c1254d",
+      "normalized_name": "ranger of eos",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 2,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 2,
+        "etb_tutor_target": "creature_to_hand",
+        "target": "creature_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rune-Scarred Demon"
+      },
+      "card_name": "Rune-Scarred Demon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0bae6fefb7dc4689f938c64fa7818332",
+      "normalized_name": "rune-scarred demon",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "keywords": [
+          "flying"
+        ],
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Screaming Seahawk"
+      },
+      "card_name": "Screaming Seahawk",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9083a0a280f37d9cc680368622de965b",
+      "normalized_name": "screaming seahawk",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "keywords": [
+          "flying"
+        ],
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Squadron Hawk"
+      },
+      "card_name": "Squadron Hawk",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:877168f396e3b0b4ed186a76f0b99995",
+      "normalized_name": "squadron hawk",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 3,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 3,
+        "etb_tutor_target": "any_to_hand",
+        "keywords": [
+          "flying"
+        ],
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sylvan Ranger"
+      },
+      "card_name": "Sylvan Ranger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "normalized_name": "sylvan ranger",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_hand",
+        "target": "basic_land_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Totem-Guide Hartebeest"
+      },
+      "card_name": "Totem-Guide Hartebeest",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+      "normalized_name": "totem-guide hartebeest",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_hand",
+        "target": "any_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Transit Mage"
+      },
+      "card_name": "Transit Mage",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:daedbef22c68668817a41354b76423bd",
+      "normalized_name": "transit mage",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "artifact_to_hand",
+        "target": "artifact_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tribute Mage"
+      },
+      "card_name": "Tribute Mage",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cf4fcf67e3d80509176a51d7650e4d53",
+      "normalized_name": "tribute mage",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "artifact_to_hand",
+        "target": "artifact_to_hand",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_hand",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInHandEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Borderland Ranger",
+    "Civic Wayfinder",
+    "Daru Cavalier",
+    "Deadeye Quartermaster",
+    "Environmental Scientist",
+    "Farfinder",
+    "Gatecreeper Vine",
+    "Goblin Matron",
+    "Heliod's Pilgrim",
+    "Howling Wolf",
+    "Nesting Wurm",
+    "Ranger of Eos",
+    "Rune-Scarred Demon",
+    "Screaming Seahawk",
+    "Squadron Hawk",
+    "Sylvan Ranger",
+    "Totem-Guide Hartebeest",
+    "Transit Mage",
+    "Tribute Mage"
+  ],
+  "selected_count": 19,
+  "slug": "xmage_creature_etb_tutor_hand_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Borderland Ranger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "min_rule_version": 2,
+      "normalized_name": "borderland ranger",
+      "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Civic Wayfinder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "min_rule_version": 2,
+      "normalized_name": "civic wayfinder",
+      "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Daru Cavalier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6775001dd7541098c239a0b938f510d1",
+      "min_rule_version": 2,
+      "normalized_name": "daru cavalier",
+      "oracle_hash": "41fe645d9e551925b96b2d07568cecce",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deadeye Quartermaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9e97b00ca55bebfd72f637c1b183c116",
+      "min_rule_version": 2,
+      "normalized_name": "deadeye quartermaster",
+      "oracle_hash": "0a951c7941b92c9cd4dd1158cd6db5a4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Environmental Scientist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "min_rule_version": 2,
+      "normalized_name": "environmental scientist",
+      "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Farfinder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:508f7fd96ceb577a5f2dab380f6609cb",
+      "min_rule_version": 2,
+      "normalized_name": "farfinder",
+      "oracle_hash": "66bb7a6119514caebac90f810be795da",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gatecreeper Vine",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0dc034646dd47d08c47a9c864a1e9d91",
+      "min_rule_version": 2,
+      "normalized_name": "gatecreeper vine",
+      "oracle_hash": "5badaa30071e88ec1abf7a90a4b174c7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Matron",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d31ea65123fba8521086549312fda8f2",
+      "min_rule_version": 2,
+      "normalized_name": "goblin matron",
+      "oracle_hash": "285c67f13cdc988f44ee9e5eb3e0aecc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heliod's Pilgrim",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+      "min_rule_version": 2,
+      "normalized_name": "heliod's pilgrim",
+      "oracle_hash": "6138101a172460fd94a162178ab2f459",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Howling Wolf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2433fd9cab6ea1f19548e0f766b82e4e",
+      "min_rule_version": 2,
+      "normalized_name": "howling wolf",
+      "oracle_hash": "06c26c7bc5ef8d84596f44569d3cca14",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nesting Wurm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aacc2a09fb5bbb4643c96c72260e6e26",
+      "min_rule_version": 2,
+      "normalized_name": "nesting wurm",
+      "oracle_hash": "873788b661c8627405133b3a1c381674",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ranger of Eos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f77411c08095fd4bd3cc42ade3c1254d",
+      "min_rule_version": 2,
+      "normalized_name": "ranger of eos",
+      "oracle_hash": "be899355fd24b180088b1bf967734efb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rune-Scarred Demon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0bae6fefb7dc4689f938c64fa7818332",
+      "min_rule_version": 2,
+      "normalized_name": "rune-scarred demon",
+      "oracle_hash": "6544a9183b59cb44dbad6f4ed0549b56",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Screaming Seahawk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9083a0a280f37d9cc680368622de965b",
+      "min_rule_version": 2,
+      "normalized_name": "screaming seahawk",
+      "oracle_hash": "348083d02bf53a9680361f640214da58",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Squadron Hawk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:877168f396e3b0b4ed186a76f0b99995",
+      "min_rule_version": 2,
+      "normalized_name": "squadron hawk",
+      "oracle_hash": "8760c3ad97cb4c0042f87b4d83336e1d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sylvan Ranger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "min_rule_version": 2,
+      "normalized_name": "sylvan ranger",
+      "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Totem-Guide Hartebeest",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+      "min_rule_version": 2,
+      "normalized_name": "totem-guide hartebeest",
+      "oracle_hash": "6138101a172460fd94a162178ab2f459",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Transit Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:daedbef22c68668817a41354b76423bd",
+      "min_rule_version": 2,
+      "normalized_name": "transit mage",
+      "oracle_hash": "9459579bdb675a5e3f72daaeb58b2eee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tribute Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cf4fcf67e3d80509176a51d7650e4d53",
+      "min_rule_version": 2,
+      "normalized_name": "tribute mage",
+      "oracle_hash": "4105067c06ea609ff5440f507564b08b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

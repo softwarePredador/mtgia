@@ -1,0 +1,708 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-04T22:24:56.458160+00:00",
+  "manifest": "../../master_optimizer_reports/pg441_xmage_creature_etb_tutor_hand_new_server_manifest.json",
+  "package_id": "pg441_xmage_creature_etb_tutor_hand_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 19
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Borderland Ranger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+          "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Civic Wayfinder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+          "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Daru Cavalier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6775001dd7541098c239a0b938f510d1",
+          "oracle_hash": "41fe645d9e551925b96b2d07568cecce",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Deadeye Quartermaster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9e97b00ca55bebfd72f637c1b183c116",
+          "oracle_hash": "0a951c7941b92c9cd4dd1158cd6db5a4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Environmental Scientist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+          "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Farfinder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:508f7fd96ceb577a5f2dab380f6609cb",
+          "oracle_hash": "66bb7a6119514caebac90f810be795da",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Gatecreeper Vine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0dc034646dd47d08c47a9c864a1e9d91",
+          "oracle_hash": "5badaa30071e88ec1abf7a90a4b174c7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Goblin Matron",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d31ea65123fba8521086549312fda8f2",
+          "oracle_hash": "285c67f13cdc988f44ee9e5eb3e0aecc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Heliod's Pilgrim",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+          "oracle_hash": "6138101a172460fd94a162178ab2f459",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Howling Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2433fd9cab6ea1f19548e0f766b82e4e",
+          "oracle_hash": "06c26c7bc5ef8d84596f44569d3cca14",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Nesting Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:aacc2a09fb5bbb4643c96c72260e6e26",
+          "oracle_hash": "873788b661c8627405133b3a1c381674",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Ranger of Eos",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f77411c08095fd4bd3cc42ade3c1254d",
+          "oracle_hash": "be899355fd24b180088b1bf967734efb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Rune-Scarred Demon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0bae6fefb7dc4689f938c64fa7818332",
+          "oracle_hash": "6544a9183b59cb44dbad6f4ed0549b56",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Screaming Seahawk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9083a0a280f37d9cc680368622de965b",
+          "oracle_hash": "348083d02bf53a9680361f640214da58",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Squadron Hawk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:877168f396e3b0b4ed186a76f0b99995",
+          "oracle_hash": "8760c3ad97cb4c0042f87b4d83336e1d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Sylvan Ranger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+          "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Totem-Guide Hartebeest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+          "oracle_hash": "6138101a172460fd94a162178ab2f459",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Transit Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:daedbef22c68668817a41354b76423bd",
+          "oracle_hash": "9459579bdb675a5e3f72daaeb58b2eee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Tribute Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf4fcf67e3d80509176a51d7650e4d53",
+          "oracle_hash": "4105067c06ea609ff5440f507564b08b",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 19
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Borderland Ranger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+          "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Civic Wayfinder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+          "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Daru Cavalier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6775001dd7541098c239a0b938f510d1",
+          "oracle_hash": "41fe645d9e551925b96b2d07568cecce",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Deadeye Quartermaster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9e97b00ca55bebfd72f637c1b183c116",
+          "oracle_hash": "0a951c7941b92c9cd4dd1158cd6db5a4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Environmental Scientist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+          "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Farfinder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:508f7fd96ceb577a5f2dab380f6609cb",
+          "oracle_hash": "66bb7a6119514caebac90f810be795da",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Gatecreeper Vine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0dc034646dd47d08c47a9c864a1e9d91",
+          "oracle_hash": "5badaa30071e88ec1abf7a90a4b174c7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Goblin Matron",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d31ea65123fba8521086549312fda8f2",
+          "oracle_hash": "285c67f13cdc988f44ee9e5eb3e0aecc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Heliod's Pilgrim",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+          "oracle_hash": "6138101a172460fd94a162178ab2f459",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Howling Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2433fd9cab6ea1f19548e0f766b82e4e",
+          "oracle_hash": "06c26c7bc5ef8d84596f44569d3cca14",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Nesting Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:aacc2a09fb5bbb4643c96c72260e6e26",
+          "oracle_hash": "873788b661c8627405133b3a1c381674",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Ranger of Eos",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f77411c08095fd4bd3cc42ade3c1254d",
+          "oracle_hash": "be899355fd24b180088b1bf967734efb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Rune-Scarred Demon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0bae6fefb7dc4689f938c64fa7818332",
+          "oracle_hash": "6544a9183b59cb44dbad6f4ed0549b56",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Screaming Seahawk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9083a0a280f37d9cc680368622de965b",
+          "oracle_hash": "348083d02bf53a9680361f640214da58",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Squadron Hawk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:877168f396e3b0b4ed186a76f0b99995",
+          "oracle_hash": "8760c3ad97cb4c0042f87b4d83336e1d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Sylvan Ranger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+          "oracle_hash": "f2f4833506e6958d3a8e75af0b350496",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Totem-Guide Hartebeest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+          "oracle_hash": "6138101a172460fd94a162178ab2f459",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Transit Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:daedbef22c68668817a41354b76423bd",
+          "oracle_hash": "9459579bdb675a5e3f72daaeb58b2eee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "card_name": "Tribute Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf4fcf67e3d80509176a51d7650e4d53",
+          "oracle_hash": "4105067c06ea609ff5440f507564b08b",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 19
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Borderland Ranger",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Civic Wayfinder",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Daru Cavalier",
+          "logical_rule_key": "battle_rule_v1:6775001dd7541098c239a0b938f510d1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deadeye Quartermaster",
+          "logical_rule_key": "battle_rule_v1:9e97b00ca55bebfd72f637c1b183c116"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Environmental Scientist",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Farfinder",
+          "logical_rule_key": "battle_rule_v1:508f7fd96ceb577a5f2dab380f6609cb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gatecreeper Vine",
+          "logical_rule_key": "battle_rule_v1:0dc034646dd47d08c47a9c864a1e9d91"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Matron",
+          "logical_rule_key": "battle_rule_v1:d31ea65123fba8521086549312fda8f2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Heliod's Pilgrim",
+          "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Howling Wolf",
+          "logical_rule_key": "battle_rule_v1:2433fd9cab6ea1f19548e0f766b82e4e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nesting Wurm",
+          "logical_rule_key": "battle_rule_v1:aacc2a09fb5bbb4643c96c72260e6e26"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ranger of Eos",
+          "logical_rule_key": "battle_rule_v1:f77411c08095fd4bd3cc42ade3c1254d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rune-Scarred Demon",
+          "logical_rule_key": "battle_rule_v1:0bae6fefb7dc4689f938c64fa7818332"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Screaming Seahawk",
+          "logical_rule_key": "battle_rule_v1:9083a0a280f37d9cc680368622de965b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Squadron Hawk",
+          "logical_rule_key": "battle_rule_v1:877168f396e3b0b4ed186a76f0b99995"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sylvan Ranger",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Totem-Guide Hartebeest",
+          "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Transit Mage",
+          "logical_rule_key": "battle_rule_v1:daedbef22c68668817a41354b76423bd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tribute Mage",
+          "logical_rule_key": "battle_rule_v1:cf4fcf67e3d80509176a51d7650e4d53"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 19
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Borderland Ranger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Civic Wayfinder",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Daru Cavalier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6775001dd7541098c239a0b938f510d1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deadeye Quartermaster",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9e97b00ca55bebfd72f637c1b183c116"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Environmental Scientist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Farfinder",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:508f7fd96ceb577a5f2dab380f6609cb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gatecreeper Vine",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0dc034646dd47d08c47a9c864a1e9d91"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Matron",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d31ea65123fba8521086549312fda8f2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Heliod's Pilgrim",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Howling Wolf",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2433fd9cab6ea1f19548e0f766b82e4e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nesting Wurm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:aacc2a09fb5bbb4643c96c72260e6e26"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ranger of Eos",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f77411c08095fd4bd3cc42ade3c1254d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rune-Scarred Demon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0bae6fefb7dc4689f938c64fa7818332"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Screaming Seahawk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9083a0a280f37d9cc680368622de965b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Squadron Hawk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:877168f396e3b0b4ed186a76f0b99995"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sylvan Ranger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Totem-Guide Hartebeest",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Transit Mage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:daedbef22c68668817a41354b76423bd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tribute Mage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cf4fcf67e3d80509176a51d7650e4d53"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

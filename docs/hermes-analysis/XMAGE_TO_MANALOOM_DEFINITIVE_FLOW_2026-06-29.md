@@ -9314,6 +9314,57 @@ new server:
   `xmage_static_flying_can_block_only_flying_creature` with `18` cards and
   `xmage_simple_mana_source_with_activated_draw` with `17` cards.
 
+## 2026-07-04 PG441 Creature ETB Tutor To Hand Closure
+
+- Closed the exact XMage creature enters-the-battlefield library-search-to-hand
+  family as ManaLoom scope
+  `xmage_creature_etb_library_search_to_hand_v1`.
+- The selected package accepted creatures with
+  `EntersBattlefieldTriggeredAbility` plus `SearchLibraryPutInHandEffect`,
+  fixed tutor count, hand destination, and Oracle/XMage agreement on target
+  kind, name/subtype/card-type/mana-value constraints, and optional "up to"
+  count. Supported targets include basic land, basic land or Gate, named card,
+  Goblin/Aura/Equipment/Vehicle subtypes, low-mana-value creature cards, and
+  exact artifact mana-value windows. Oracle/source count mismatches, unsupported
+  target filters, non-simple ETB text, and subtype mismatches remain blockers.
+- The batch covers `19` cards: Borderland Ranger, Civic Wayfinder, Daru
+  Cavalier, Deadeye Quartermaster, Environmental Scientist, Farfinder,
+  Gatecreeper Vine, Goblin Matron, Heliod's Pilgrim, Howling Wolf, Nesting Wurm,
+  Ranger of Eos, Rune-Scarred Demon, Screaming Seahawk, Squadron Hawk, Sylvan
+  Ranger, Totem-Guide Hartebeest, Transit Mage, and Tribute Mage.
+- Focused mapper/runtime tests covered the exact-scope split and runtime
+  support already present for ETB tutor-to-hand cards; PG441 performed no code
+  mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `19` cards. Precheck found `19` target rows,
+  `0` missing targets, `0` existing expected rows, and `6` shadow rows to
+  deprecate; apply/postcheck verified `19/19` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `6` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4223` PostgreSQL runtime rows, wrote `4215` SQLite runtime
+  rows, and exported `4190` canonical fallback rows.
+- PG441 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `19` selected cards. Generic
+  battle scenario count remained `0`; actual ETB tutor behavior remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26663`, `xmage_authoritative_source_count=26349`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26349`. This is an exact
+  reduction of `19` from the post-PG440 queue.
+- The post-PG441 exact split recheck reports `proposal_count=324` and
+  `safe_for_batch_pg_package_count=324`. The largest remaining exact family is
+  `xmage_static_flying_can_block_only_flying_creature` with `18` cards,
+  followed by `xmage_simple_mana_source_with_activated_draw` with `17` cards,
+  `xmage_permanent_simple_activated_draw_discard` with `15` cards,
+  `xmage_dynamic_count_boost_target_creature_until_eot_spell` with `14` cards,
+  and `xmage_library_search_spell` with `14` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
