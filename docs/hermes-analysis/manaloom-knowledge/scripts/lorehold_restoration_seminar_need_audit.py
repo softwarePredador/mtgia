@@ -40,6 +40,13 @@ DEFAULT_TRACE_REPORTS = [
     REPORT_DIR / "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
     REPORT_DIR / "lorehold_forced_exposure_probe_20260630_after_607_fix_20260630_043721_volcanic_recursion_cut_pinnacle.json",
 ]
+DEFAULT_TRACE_REPORT_GLOBS = [
+    "*lorehold*gate*.json",
+    "*lorehold*probe*.json",
+    "*lorehold*trace*.json",
+    "*lorehold*checkpoint*.json",
+    "*lorehold*confirm*.json",
+]
 DEFAULT_RECURSION_MODEL_REPORT = (
     REPORT_DIR / "lorehold_recursion_cut_model_20260704_cmc_safe_learning_after_baseline_cut_fix.json"
 )
@@ -93,6 +100,13 @@ def read_existing_json(paths: Iterable[Path]) -> list[tuple[Path, dict[str, Any]
         if path.exists():
             out.append((path, read_json(path)))
     return out
+
+
+def discover_trace_report_paths(globs: Iterable[str]) -> list[Path]:
+    paths: list[Path] = []
+    for pattern in globs:
+        paths.extend(REPORT_DIR.glob(pattern))
+    return sorted(set(path for path in paths if path.is_file()))
 
 
 def connect(path: Path) -> sqlite3.Connection:
@@ -337,7 +351,90 @@ def collect_graveyard_events(
 
     for path, payload in reports:
         visit(payload, path)
-    return {"counts": dict(sorted(counts.items())), "samples": samples}
+    return {
+        "counts": dict(sorted(counts.items())),
+        "samples": samples,
+        "scan_summary": {
+            "mode": "loaded_reports",
+            "candidate_report_count": len(reports),
+            "parsed_report_count": len(reports),
+            "skipped_no_event_marker_count": 0,
+            "skipped_no_target_marker_count": 0,
+            "skipped_too_large_count": 0,
+            "parse_error_count": 0,
+            "parse_errors": [],
+        },
+    }
+
+
+def _read_path_text(path: Path) -> str | None:
+    try:
+        return path.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return None
+
+
+def collect_graveyard_events_from_paths(
+    paths: list[Path],
+    target_names: Iterable[str],
+    *,
+    max_report_mb: float | None = None,
+) -> dict[str, Any]:
+    target_names = sorted(set(str(name) for name in target_names if str(name)))
+    target_needles = target_names + [json.dumps(name) for name in target_names]
+    max_bytes = None if max_report_mb is None else int(max_report_mb * 1024 * 1024)
+    counts: Counter[str] = Counter()
+    samples: list[dict[str, Any]] = []
+    parsed_report_count = 0
+    skipped_no_event_marker_count = 0
+    skipped_no_target_marker_count = 0
+    skipped_too_large_count = 0
+    parse_errors: list[dict[str, Any]] = []
+
+    for path in paths:
+        try:
+            size = path.stat().st_size
+        except OSError:
+            parse_errors.append({"path": str(path), "error": "stat_failed"})
+            continue
+        if max_bytes is not None and size > max_bytes:
+            skipped_too_large_count += 1
+            continue
+        text = _read_path_text(path)
+        if text is None:
+            parse_errors.append({"path": str(path), "error": "read_failed"})
+            continue
+        if "permanent_moved_from_battlefield" not in text:
+            skipped_no_event_marker_count += 1
+            continue
+        if not any(needle in text for needle in target_needles):
+            skipped_no_target_marker_count += 1
+            continue
+        try:
+            payload = read_json(path)
+        except Exception as exc:
+            parse_errors.append({"path": str(path), "error": str(exc)[:240]})
+            continue
+        parsed_report_count += 1
+        result = collect_graveyard_events([(path, payload)], target_names)
+        counts.update(result["counts"])
+        samples.extend(result["samples"])
+
+    return {
+        "counts": dict(sorted(counts.items())),
+        "samples": samples[:20],
+        "scan_summary": {
+            "mode": "discovered_report_paths",
+            "candidate_report_count": len(paths),
+            "parsed_report_count": parsed_report_count,
+            "skipped_no_event_marker_count": skipped_no_event_marker_count,
+            "skipped_no_target_marker_count": skipped_no_target_marker_count,
+            "skipped_too_large_count": skipped_too_large_count,
+            "parse_error_count": len(parse_errors),
+            "parse_errors": parse_errors[:20],
+            "max_report_mb": max_report_mb,
+        },
+    }
 
 
 def cut_review(card: dict[str, Any], exposures: dict[str, dict[str, Any]]) -> dict[str, Any]:
@@ -395,15 +492,22 @@ def build_audit(
     db_path: Path,
     exposure_profiles: list[tuple[Path, dict[str, Any]]],
     trace_reports: list[tuple[Path, dict[str, Any]]],
+    trace_report_paths: list[Path] | None,
+    max_trace_report_mb: float | None,
     recursion_model_report: Path,
 ) -> dict[str, Any]:
     deck_cards = load_deck_cards(conn, deck_id)
     exposures = exposure_lookup(exposure_profiles)
     target_cards = [card for card in deck_cards if is_nonland_permanent(card)]
-    graveyard_events = collect_graveyard_events(
-        trace_reports,
-        [str(card["name"]) for card in target_cards],
-    )
+    target_names = [str(card["name"]) for card in target_cards]
+    if trace_report_paths is not None:
+        graveyard_events = collect_graveyard_events_from_paths(
+            trace_report_paths,
+            target_names,
+            max_report_mb=max_trace_report_mb,
+        )
+    else:
+        graveyard_events = collect_graveyard_events(trace_reports, target_names)
     target_rows = [
         target_priority(card, int(graveyard_events["counts"].get(str(card["name"]), 0)))
         for card in target_cards
@@ -448,6 +552,8 @@ def build_audit(
         "restoration_profile": restoration_profile,
         "restoration_variant_deck_ids": find_variant_rows(conn, RESTORATION_SEMINAR),
         "trace_reports": [str(path) for path, _payload in trace_reports],
+        "trace_report_paths": [str(path) for path in trace_report_paths or []],
+        "trace_scan_summary": graveyard_events.get("scan_summary") or {},
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
         "recursion_model": recursion_model,
         "summary": {
@@ -486,6 +592,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Source DB: `{payload['source_db']}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
+        f"- Trace scan mode: `{payload.get('trace_scan_summary', {}).get('mode', 'unknown')}`",
         "",
         "## Summary",
         "",
@@ -495,6 +602,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Manual-review cut count: `{summary['manual_review_cut_count']}`",
         f"- Blocked cut count: `{summary['blocked_cut_count']}`",
         f"- Recursion-model preflight-ready count: `{summary['preflight_ready_count_from_recursion_model']}`",
+        f"- Trace candidate reports: `{payload.get('trace_scan_summary', {}).get('candidate_report_count', 0)}`",
+        f"- Trace parsed reports: `{payload.get('trace_scan_summary', {}).get('parsed_report_count', 0)}`",
         "",
         "## Restoration Seminar",
         "",
@@ -541,6 +650,20 @@ def render_markdown(payload: dict[str, Any]) -> str:
                     source=sample["source_report"],
                 )
             )
+    scan = payload.get("trace_scan_summary") or {}
+    lines.extend(
+        [
+            "",
+            "### Trace Scan Summary",
+            "",
+            f"- Candidate reports: `{scan.get('candidate_report_count', 0)}`",
+            f"- Parsed reports: `{scan.get('parsed_report_count', 0)}`",
+            f"- Skipped without event marker: `{scan.get('skipped_no_event_marker_count', 0)}`",
+            f"- Skipped without target marker: `{scan.get('skipped_no_target_marker_count', 0)}`",
+            f"- Skipped too large: `{scan.get('skipped_too_large_count', 0)}`",
+            f"- Parse errors: `{scan.get('parse_error_count', 0)}`",
+        ]
+    )
     lines.extend(
         [
             "",
@@ -579,6 +702,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--deck-id", type=int, default=DEFAULT_DECK_ID)
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--trace-report", type=Path, action="append")
+    parser.add_argument("--discover-trace-reports", action="store_true")
+    parser.add_argument("--trace-report-glob", action="append", default=[])
+    parser.add_argument("--max-trace-report-mb", type=float)
     parser.add_argument("--recursion-model-report", type=Path, default=DEFAULT_RECURSION_MODEL_REPORT)
     parser.add_argument("--stem", default="lorehold_restoration_seminar_need_audit_20260704")
     return parser.parse_args()
@@ -587,7 +713,12 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     exposure_profiles = read_existing_json(args.exposure_profile or DEFAULT_EXPOSURE_PROFILES)
-    trace_reports = read_existing_json(args.trace_report or DEFAULT_TRACE_REPORTS)
+    trace_report_paths: list[Path] | None = None
+    if args.discover_trace_reports:
+        trace_report_paths = discover_trace_report_paths(args.trace_report_glob or DEFAULT_TRACE_REPORT_GLOBS)
+        trace_reports: list[tuple[Path, dict[str, Any]]] = []
+    else:
+        trace_reports = read_existing_json(args.trace_report or DEFAULT_TRACE_REPORTS)
     with connect(args.db) as conn:
         payload = build_audit(
             conn=conn,
@@ -595,6 +726,8 @@ def main() -> int:
             db_path=args.db,
             exposure_profiles=exposure_profiles,
             trace_reports=trace_reports,
+            trace_report_paths=trace_report_paths,
+            max_trace_report_mb=args.max_trace_report_mb,
             recursion_model_report=args.recursion_model_report,
         )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)

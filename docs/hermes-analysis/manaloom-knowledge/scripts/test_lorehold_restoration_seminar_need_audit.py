@@ -140,9 +140,51 @@ def test_build_audit_blocks_when_no_target_trace():
             db_path=Path("memory.db"),
             exposure_profiles=exposure_profiles(),
             trace_reports=[],
+            trace_report_paths=None,
+            max_trace_report_mb=None,
             recursion_model_report=Path("missing.json"),
         )
     assert payload["status"] == "blocked_no_current_target_graveyard_trace"
     assert payload["summary"]["nonland_permanent_target_count"] == 3
     assert payload["summary"]["target_graveyard_event_count"] == 0
     assert payload["restoration_seminar"]["cmc"] == 7
+
+
+def test_collect_graveyard_events_from_paths_prefilters_and_parses(tmp_path):
+    matching = tmp_path / "matching.json"
+    matching.write_text(
+        """
+        {
+          "events": [
+            {
+              "event": "permanent_moved_from_battlefield",
+              "data": {
+                "card": "Sensei's Divining Top",
+                "from_zone": "battlefield",
+                "to_zone": "graveyard",
+                "turn": 5
+              }
+            }
+          ]
+        }
+        """,
+        encoding="utf-8",
+    )
+    no_target = tmp_path / "no_target.json"
+    no_target.write_text(
+        '{"event": "permanent_moved_from_battlefield", "data": {"card": "Other"}}',
+        encoding="utf-8",
+    )
+    no_event = tmp_path / "no_event.json"
+    no_event.write_text('{"card": "Sensei\'s Divining Top"}', encoding="utf-8")
+
+    result = audit.collect_graveyard_events_from_paths(
+        [matching, no_target, no_event],
+        ["Sensei's Divining Top"],
+    )
+
+    assert result["counts"] == {"Sensei's Divining Top": 1}
+    assert result["scan_summary"]["candidate_report_count"] == 3
+    assert result["scan_summary"]["parsed_report_count"] == 1
+    assert result["scan_summary"]["skipped_no_event_marker_count"] == 1
+    assert result["scan_summary"]["skipped_no_target_marker_count"] == 1
