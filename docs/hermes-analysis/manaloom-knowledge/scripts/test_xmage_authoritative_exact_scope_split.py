@@ -228,6 +228,165 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 if "card_types" in fixture:
                     self.assertEqual(effect["graveyard_count_card_types"], fixture["card_types"])
 
+    def test_attack_trigger_grants_flying_to_another_attacking_creature(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["AttacksTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aerial Guide",
+                type_line="Creature - Drake",
+                oracle_text=(
+                    "Flying\n"
+                    "Whenever this creature attacks, another target attacking creature "
+                    "gains flying until end of turn."
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                Ability ability = new AttacksTriggeredAbility(
+                    new GainAbilityTargetEffect(FlyingAbility.getInstance(), Duration.EndOfTurn),
+                    false
+                );
+                ability.addTarget(new TargetPermanent(new FilterAttackingCreature("another target attacking creature")));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE)
+        self.assertEqual(effect["trigger"], "attack")
+        self.assertEqual(effect["trigger_effect"], "target_keyword_until_eot")
+        self.assertEqual(effect["granted_keywords_until_eot"], ["flying"])
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "exclude_source": True, "combat_state": "attacking"},
+        )
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+
+    def test_attack_trigger_grants_flying_to_controlled_subtype_without_flying(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["AttacksTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Trusted Pegasus",
+                type_line="Creature - Pegasus",
+                oracle_text=(
+                    "Flying\n"
+                    "Whenever this creature attacks, target attacking creature without flying "
+                    "gains flying until end of turn."
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                FilterPermanent filter = new FilterAttackingCreature("attacking creature without flying");
+                filter.add(Predicates.not(new AbilityPredicate(FlyingAbility.class)));
+                Ability ability = new AttacksTriggeredAbility(
+                    new GainAbilityTargetEffect(FlyingAbility.getInstance(), Duration.EndOfTurn),
+                    false
+                );
+                ability.addTarget(new TargetPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE)
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "card_types": ["creature"],
+                "combat_state": "attacking",
+                "excluded_keywords": ["flying"],
+            },
+        )
+
+    def test_attack_trigger_grants_flying_to_controlled_knight(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["AttacksTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Garrison Griffin",
+                type_line="Creature - Griffin",
+                oracle_text=(
+                    "Flying\n"
+                    "Whenever this creature attacks, target Knight you control gains flying until end of turn."
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                private static final FilterPermanent filter = new FilterControlledPermanent(SubType.KNIGHT);
+                Ability ability = new AttacksTriggeredAbility(
+                    new GainAbilityTargetEffect(FlyingAbility.getInstance(), Duration.EndOfTurn),
+                    false
+                );
+                ability.addTarget(new TargetPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "target_subtypes": ["knight"]},
+        )
+
+    def test_attack_trigger_blocks_non_matching_source_target(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["AttacksTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Mismatch",
+                type_line="Creature - Drake",
+                oracle_text=(
+                    "Flying\n"
+                    "Whenever this creature attacks, target creature you control gains flying until end of turn."
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                Ability ability = new AttacksTriggeredAbility(
+                    new GainAbilityTargetEffect(FlyingAbility.getInstance(), Duration.EndOfTurn),
+                    false
+                );
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "attack_target_keyword_source_oracle_mismatch")
+
     def test_creature_etb_dynamic_graveyard_count_damage_maps_to_runtime(self) -> None:
         fixtures = [
             {

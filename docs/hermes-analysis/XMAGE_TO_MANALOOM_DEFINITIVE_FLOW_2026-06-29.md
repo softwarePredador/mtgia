@@ -8171,6 +8171,53 @@ the new server:
   `proposal_count=0`; the remaining `314` identities are still explicit
   missing-source exceptions.
 
+PG415 closed the exact target-keyword-until-EOT attack trigger subpattern and
+one newly unlocked already-supported activated target-keyword row on the new
+server:
+
+- Split support now maps XMage `GainAbilityTargetEffect` with
+  `AttacksTriggeredAbility` into
+  `xmage_creature_attack_grant_keyword_target_creature_until_eot_v1` when the
+  local Java source and Oracle text agree on target controller, attacking state,
+  `another` source exclusion, subtype filters, optional trigger text, and the
+  granted keyword. The shared target parser also now recognizes `without
+  flying` as an excluded keyword and the implicit creature subtypes `Knight`
+  and `Dinosaur` for this target-keyword lane.
+- Runtime support now resolves attack-trigger keyword grants during combat:
+  the battle runtime chooses a legal target, applies the granted keyword until
+  end of turn, emits decision/replay evidence, respects target constraints, and
+  cleans the temporary keyword at cleanup.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` (`423` tests),
+  `test_xmage_exact_scope_runtime.py` (`242` tests), and package/sync helper
+  tests (`27` tests; existing SQLite `ResourceWarning` messages only).
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg415_attack_target_keyword_new_server`
+  produced `11` safe candidates: `Aerial Guide`, `Chasm Drake`,
+  `Garrison Griffin`, `Heavenly Qilin`, `Kinsbaile Balloonist`,
+  `Majestic Heliopterus`, `Pegasus Courser`, `Roc Charger`,
+  `Trailblazing Historian`, `Trained Condor`, and `Trusted Pegasus`.
+- PostgreSQL package `PG415` was applied on the new server:
+  precheck found `11` target card rows and `0` existing conflicting rule rows;
+  apply upserted `11` rows and deprecated `0` shadow rows; postcheck verified
+  `11/11` `verified`/`auto` rows with Oracle hashes.
+- PG -> Hermes/SQLite sync loaded `11` PostgreSQL rows, updated `11` SQLite
+  rows, and exported `5443` canonical snapshot rows. The metadata sync in the
+  same cycle matched `6432` PostgreSQL card rows, left `1` unresolved alias, and
+  performed `108` `deck_cards.card_id` backfill updates.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `11` selected cards. The generic E2E
+  battle scenario count was `0`; card behavior execution is covered by the
+  focused runtime test above.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51`), and legacy contamination.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26593` to `26582`, authoritative adapter-required count from `26279`
+  to `26268`, and the target-keyword/protection work unit from `1114` to
+  `1103`. The post-PG415 exact split recheck produced `proposal_count=0`; the
+  remaining `314` identities are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -11253,6 +11253,13 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
     ]
     if required_keywords and not all(card_has_keyword(target, keyword) for keyword in required_keywords):
         return False
+    excluded_keywords = [
+        str(value or "").strip().lower().replace(" ", "_")
+        for value in _as_list(constraints.get("excluded_keywords") or constraints.get("exclude_keywords"))
+        if str(value or "").strip()
+    ]
+    if excluded_keywords and any(card_has_keyword(target, keyword) for keyword in excluded_keywords):
+        return False
     target_colors = [
         value
         for value in _as_list(constraints.get("target_colors") or constraints.get("colors"))
@@ -26278,6 +26285,230 @@ def resolve_attack_treasure_triggers(player, attackers, turn, *, phase="combat")
             phase=phase,
         )
     return created
+
+
+ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE = (
+    "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1"
+)
+
+
+def attack_target_keyword_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    candidates = []
+    if permanent.get("battle_model_scope") == ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE:
+        candidates.append(dict(permanent))
+    try:
+        resolved = get_card_effect(permanent)
+    except Exception:
+        resolved = {}
+    if (
+        isinstance(resolved, dict)
+        and resolved.get("battle_model_scope") == ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE
+    ):
+        candidates.append(resolved)
+    for effect_data in candidates:
+        if (
+            effect_data.get("ability_kind") == "triggered"
+            and effect_data.get("trigger") == "attack"
+            and effect_data.get("trigger_effect") == "target_keyword_until_eot"
+        ):
+            keywords = [
+                str(keyword or "").strip().lower().replace(" ", "_")
+                for keyword in (effect_data.get("granted_keywords_until_eot") or [])
+                if str(keyword or "").strip()
+            ]
+            if len(keywords) == 1:
+                effect_data["granted_keywords_until_eot"] = keywords
+                return effect_data
+    return None
+
+
+def _attack_target_keyword_participants(player, opponents, effect_data):
+    target_controller = str((effect_data or {}).get("target_controller") or "any").lower()
+    if target_controller in {"self", "you", "controller", "controlled"}:
+        return [player]
+    if target_controller in {"opponent", "opponents"}:
+        return list(opponents or [])
+    return [player, *list(opponents or [])]
+
+
+def _attack_target_keyword_candidates(player, opponents, source, effect_data):
+    keywords = [
+        str(keyword or "").strip().lower().replace(" ", "_")
+        for keyword in (effect_data.get("granted_keywords_until_eot") or [])
+        if str(keyword or "").strip()
+    ]
+    if len(keywords) != 1:
+        return []
+    keyword = keywords[0]
+    target_type = str((effect_data or {}).get("target") or "creature").lower()
+    constraints = _target_constraints_dict(effect_data or {})
+    source_context = {**dict(source or {}), **dict(effect_data or {})}
+    candidates = []
+    for owner in _attack_target_keyword_participants(player, opponents, effect_data):
+        for target in list(getattr(owner, "battlefield", []) or []):
+            if not is_battlefield_creature(target):
+                continue
+            if constraints.get("exclude_source") and target is source:
+                continue
+            if not is_legal_target(
+                source_context,
+                target,
+                player,
+                target_type=target_type,
+                target_controller=owner,
+            ):
+                continue
+            candidates.append((owner, target))
+    return candidates
+
+
+def _choose_attack_target_keyword_target(player, opponents, source, effect_data):
+    candidates = _attack_target_keyword_candidates(player, opponents, source, effect_data)
+    if not candidates:
+        return None, None, []
+    keywords = [
+        str(keyword or "").strip().lower().replace(" ", "_")
+        for keyword in (effect_data.get("granted_keywords_until_eot") or [])
+        if str(keyword or "").strip()
+    ]
+    keyword = keywords[0] if len(keywords) == 1 else ""
+    owner, target = max(
+        candidates,
+        key=lambda item: (
+            1 if item[0] is player else 0,
+            0 if card_has_keyword(item[1], keyword) else 1,
+            1 if item[1].get("attacking") else 0,
+            target_priority(item[1]),
+            str(item[1].get("name") or ""),
+        ),
+    )
+    return owner, target, [target for _owner, target in candidates]
+
+
+def resolve_attack_target_keyword_triggers(player, attackers, opponents, all_players, turn, *, phase="combat"):
+    resolved = 0
+    for source in list(attackers or []):
+        if source not in getattr(player, "battlefield", []):
+            continue
+        effect_data = attack_target_keyword_effect_for_permanent(source)
+        if effect_data is None:
+            continue
+        target_owner, target, target_options = _choose_attack_target_keyword_target(
+            player,
+            opponents,
+            source,
+            effect_data,
+        )
+        keywords = list(effect_data.get("granted_keywords_until_eot") or [])
+        fields = replay_rule_fields(effect_data)
+        if target is None or target_owner is None:
+            emit_replay_event(
+                "trigger_skipped",
+                player=player.name,
+                card=source.get("name", "?"),
+                trigger="attack",
+                effect="target_keyword_until_eot",
+                reason="no_legal_target",
+                granted_keywords_until_eot=keywords,
+                turn=turn,
+                phase=phase,
+                **fields,
+            )
+            continue
+        current_keywords = list(target.get("keywords") or [])
+        merged_keywords = list(dict.fromkeys([*current_keywords, *keywords]))
+        set_until_eot(target, "keywords", merged_keywords)
+        for keyword in keywords:
+            set_until_eot(target, keyword, True)
+        decision = targeting_decision(
+            {**dict(source), **dict(effect_data)},
+            target,
+            player,
+            target_controller=target_owner,
+            target_type=str(effect_data.get("target") or "creature").lower(),
+        )
+        emit_decision_trace(
+            decision_type="attack_trigger_target_keyword",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    candidate,
+                    effect_data,
+                    action="attack_trigger_target_keyword",
+                    score=sum(target_priority(candidate)),
+                    target_controller=owner.name,
+                )
+                for owner, candidate in _attack_target_keyword_candidates(
+                    player,
+                    opponents,
+                    source,
+                    effect_data,
+                )[:8]
+            ],
+            chosen_option=decision_card_option(
+                target,
+                effect_data,
+                action="attack_trigger_target_keyword",
+                target_controller=target_owner.name,
+            ),
+            rejected_options=[],
+            score_components={
+                "source": source.get("name", "?"),
+                "target": target.get("name", "?"),
+                "keywords": keywords,
+                "available_targets": len(target_options),
+            },
+            rule_source=fields.get("rule_source", "battle_rule"),
+            rule_status=fields.get("rule_review_status", "verified"),
+            confidence="medium",
+            expected_benefit_score=max(4, sum(target_priority(target))),
+            actual_outcome="attack_trigger_target_keyword_used",
+            reason="grant_attack_keyword_to_best_legal_target",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={"temporary_keywords": len(keywords)},
+            risk_flags=["temporary_keyword", "attack_trigger"],
+        )
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=source.get("name", "?"),
+            trigger="attack",
+            effect="target_keyword_until_eot",
+            target=target.get("name", "?"),
+            target_player=target_owner.name,
+            granted_keywords_until_eot=keywords,
+            available_targets=len(target_options),
+            turn=turn,
+            phase=phase,
+            **fields,
+        )
+        emit_replay_event(
+            "stat_modifier_until_eot_resolved",
+            player=player.name,
+            card=source.get("name", "?"),
+            target_player=target_owner.name,
+            target=target.get("name", "?"),
+            target_power_before=target.get("power"),
+            target_power_after=target.get("power"),
+            target_toughness_before=target.get("toughness"),
+            target_toughness_after=target.get("toughness"),
+            power_delta=0,
+            toughness_delta=0,
+            granted_keywords_until_eot=keywords,
+            result="stat_modifier_until_eot_applied",
+            available_targets=len(target_options),
+            **target_selection_replay_fields(target, target_options),
+            turn=turn,
+            phase=phase,
+            **decision,
+            **fields,
+        )
+        resolved += 1
+    return resolved
 
 
 def resolve_controlled_attack_token_triggers(
@@ -55710,6 +55941,14 @@ def combat_phase_v8(attacker, opponents, all_players, turn, rng, stack):
     resolve_attack_treasure_triggers(
         attacker,
         attackers,
+        turn,
+        phase="combat",
+    )
+    resolve_attack_target_keyword_triggers(
+        attacker,
+        attackers,
+        alive_defenders,
+        all_players,
         turn,
         phase="combat",
     )

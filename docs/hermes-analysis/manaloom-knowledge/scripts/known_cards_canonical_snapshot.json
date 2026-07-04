@@ -1225,6 +1225,45 @@
     "battle_rule_logical_key": "battle_rule_v1:1498f35bbd99fcc8c3049a52e2ca660e",
     "battle_rule_oracle_hash": "42a63959fe9b8333f26fa224e63b8401"
   },
+  "Aerial Guide": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "attack_trigger_optional": false,
+    "attack_trigger_target_keyword": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking",
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "trigger": "attack",
+    "trigger_effect": "target_keyword_until_eot",
+    "xmage_ability_class": "AttacksTriggeredAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_granted_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae",
+    "battle_rule_oracle_hash": "359dc35b02c01fd10a6820d8dde25980"
+  },
   "Aerial Responder": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -15114,6 +15153,43 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:1700e1e7565591c3def06b8342aceb24",
     "battle_rule_oracle_hash": "fea19f543f5b93a83f8994aeea7bcd00"
+  },
+  "Chasm Drake": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "attack_trigger_optional": false,
+    "attack_trigger_target_keyword": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "trigger": "attack",
+    "trigger_effect": "target_keyword_until_eot",
+    "xmage_ability_class": "AttacksTriggeredAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_granted_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9ad55b4397b12dbadea41d4cfa871303",
+    "battle_rule_oracle_hash": "e4d468a8984897ccfa30beecdf24acd8"
   },
   "Chasm Skulker": {
     "cmc": 3.0,
@@ -35577,6 +35653,46 @@
     "battle_rule_logical_key": "battle_rule_v1:4eb7dcd745a142cb45c4077db59687d3",
     "battle_rule_oracle_hash": "29f1b4320917ca21c9997126f08eade8"
   },
+  "Garrison Griffin": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "attack_trigger_optional": false,
+    "attack_trigger_target_keyword": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "target_subtypes": [
+        "knight"
+      ]
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "trigger": "attack",
+    "trigger_effect": "target_keyword_until_eot",
+    "xmage_ability_class": "AttacksTriggeredAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_granted_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1ba8a066eb595bfa68fa0f7ac649110e",
+    "battle_rule_oracle_hash": "cd663e02090ca20aca08c426e43ea1a6"
+  },
   "Garruk's Companion": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -41987,6 +42103,44 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:644897bfa688d33b1a718723360e2480",
     "battle_rule_oracle_hash": "9c4cfbeb99bfea90a8a5d4c3c7894793"
+  },
+  "Heavenly Qilin": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "attack_trigger_optional": false,
+    "attack_trigger_target_keyword": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "trigger": "attack",
+    "trigger_effect": "target_keyword_until_eot",
+    "xmage_ability_class": "AttacksTriggeredAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_granted_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8",
+    "battle_rule_oracle_hash": "13953e4a3d0fdf170153301322a294cd"
   },
   "Heavy Ballista": {
     "_activated_rule_effects": [
@@ -48924,6 +49078,43 @@
     "battle_rule_logical_key": "battle_rule_v1:128e222b4de1e6308d98743711b54985",
     "battle_rule_oracle_hash": "17f75006159d550a6ecc317214adbb2b"
   },
+  "Kinsbaile Balloonist": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "attack_trigger_optional": true,
+    "attack_trigger_target_keyword": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "trigger": "attack",
+    "trigger_effect": "target_keyword_until_eot",
+    "xmage_ability_class": "AttacksTriggeredAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_granted_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cb7b0244b42311b6450eaaeae4f608b8",
+    "battle_rule_oracle_hash": "bdc2c420cceff82e0249aadb336da4f2"
+  },
   "Kiora, Behemoth Beckoner": {
     "cmc": 3.0,
     "effect": "draw_cards",
@@ -53403,6 +53594,47 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "d7f00fbbdd23e665a72acc7fcc074462"
+  },
+  "Majestic Heliopterus": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "attack_trigger_optional": false,
+    "attack_trigger_target_keyword": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true,
+      "target_subtypes": [
+        "dinosaur"
+      ]
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "trigger": "attack",
+    "trigger_effect": "target_keyword_until_eot",
+    "xmage_ability_class": "AttacksTriggeredAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_granted_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:58b134e8facaa8950c16c360702ef77b",
+    "battle_rule_oracle_hash": "789df848e690eb4720490ba73b04608e"
   },
   "Make Your Move": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -63245,6 +63477,45 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
     "battle_rule_oracle_hash": "046ce6c77f38cd754f7cd6360fa8e929"
+  },
+  "Pegasus Courser": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "attack_trigger_optional": false,
+    "attack_trigger_target_keyword": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking",
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "trigger": "attack",
+    "trigger_effect": "target_keyword_until_eot",
+    "xmage_ability_class": "AttacksTriggeredAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_granted_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae",
+    "battle_rule_oracle_hash": "359dc35b02c01fd10a6820d8dde25980"
   },
   "Penance": {
     "ability_kind": "activated",
@@ -73235,6 +73506,47 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f6bf5cb1f18dd3507636014bba69d2a8"
+  },
+  "Roc Charger": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "attack_trigger_optional": false,
+    "attack_trigger_target_keyword": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking",
+      "excluded_keywords": [
+        "flying"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "trigger": "attack",
+    "trigger_effect": "target_keyword_until_eot",
+    "xmage_ability_class": "AttacksTriggeredAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_granted_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d",
+    "battle_rule_oracle_hash": "ad767ca9ad8c91ba639f3bc0c6f871e1"
   },
   "Roc Hunter": {
     "_keywords_are_self": true,
@@ -94366,6 +94678,77 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67"
   },
+  "Trailblazing Historian": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_keyword_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilityTargetEffect",
+        "xmage_keyword_ability_class": "HasteAbility"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "activated_effect": "target_keyword_until_eot",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "granted_keywords_until_eot": [
+      "haste"
+    ],
+    "haste": true,
+    "keywords": [
+      "haste"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_keyword_ability_class": "HasteAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c51f7f1bb5a04adc09d82c67e1cbcf41",
+    "battle_rule_oracle_hash": "61d15f0c5dff94d1719d7d3d0eef8aca"
+  },
   "Train of Thought": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
     "count": 1,
@@ -94399,6 +94782,44 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:aa0c64421c6ae4bf06b653dea512f935",
     "battle_rule_oracle_hash": "49b4ed3350f7cb5ffce32eff082cc5ba"
+  },
+  "Trained Condor": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "attack_trigger_optional": false,
+    "attack_trigger_target_keyword": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "trigger": "attack",
+    "trigger_effect": "target_keyword_until_eot",
+    "xmage_ability_class": "AttacksTriggeredAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_granted_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8",
+    "battle_rule_oracle_hash": "9f01e8733bf327bbeb7ab09cc5023979"
   },
   "Training Center": {
     "effect": "land",
@@ -95212,6 +95633,47 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:4da20f36906aee9414f573afe9042ba6"
+  },
+  "Trusted Pegasus": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "attack_trigger_optional": false,
+    "attack_trigger_target_keyword": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking",
+      "excluded_keywords": [
+        "flying"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "trigger": "attack",
+    "trigger_effect": "target_keyword_until_eot",
+    "xmage_ability_class": "AttacksTriggeredAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_granted_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d",
+    "battle_rule_oracle_hash": "de5a2fde355df00b1c8c5cd5dcb5cdb5"
   },
   "Trusty Packbeast": {
     "ability_kind": "triggered",

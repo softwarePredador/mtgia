@@ -2395,6 +2395,86 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_attack_trigger_grants_keyword_to_best_legal_attacking_target_until_eot(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        guide = {
+            "name": "Aerial Guide",
+            "type_line": "Creature - Drake",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+            "ability_kind": "triggered",
+            "trigger": "attack",
+            "trigger_effect": "target_keyword_until_eot",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "combat_state": "attacking",
+                "exclude_source": True,
+            },
+            "granted_keywords_until_eot": ["flying"],
+            "keywords": ["flying"],
+            "_keywords_are_self": True,
+            "flying": True,
+            "attacking": True,
+            "_rule_logical_key": "battle_rule_v1:aerial-guide-test",
+        }
+        ground_attacker = {
+            "name": "Ground Beater",
+            "type_line": "Creature - Warrior",
+            "power": 3,
+            "toughness": 3,
+            "attacking": True,
+        }
+        idle_creature = {
+            "name": "Idle Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        existing_flyer = {
+            "name": "Sky Scout",
+            "type_line": "Creature - Scout",
+            "power": 1,
+            "toughness": 1,
+            "attacking": True,
+            "flying": True,
+        }
+        active.battlefield.extend([guide, ground_attacker, idle_creature, existing_flyer])
+
+        resolved = self.battle.resolve_attack_target_keyword_triggers(
+            active,
+            [guide, ground_attacker, existing_flyer],
+            [opponent],
+            [active, opponent],
+            turn=4,
+            phase="combat",
+        )
+
+        self.assertEqual(resolved, 1)
+        self.assertTrue(self.battle.card_has_keyword(guide, "flying"))
+        self.assertTrue(self.battle.card_has_keyword(ground_attacker, "flying"))
+        self.assertFalse(self.battle.card_has_keyword(idle_creature, "flying"))
+        self.assertTrue(self.battle.card_has_keyword(existing_flyer, "flying"))
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Aerial Guide"
+                and data.get("target") == "Ground Beater"
+                and data.get("effect") == "target_keyword_until_eot"
+                and data.get("granted_keywords_until_eot") == ["flying"]
+                and data.get("available_targets") == 2
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+
+        self.assertFalse(self.battle.card_has_keyword(ground_attacker, "flying"))
+        self.assertEqual(ground_attacker.get("keywords"), None)
+        self.assertTrue(self.battle.card_has_keyword(guide, "flying"))
+
     def test_simple_activated_life_gain_permanent_pays_mana_taps_and_gains_life(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
