@@ -2015,6 +2015,110 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_damage_spell_pays_creature_sacrifice_cost_before_damage(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        sacrifice = {
+            "name": "Spare Goblin",
+            "type_line": "Creature - Goblin",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+        }
+        target = {
+            "name": "Target Beast",
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+        }
+        active.battlefield.append(sacrifice)
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 5,
+            "damage": 5,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "requires_sacrifice_creature": True,
+            "additional_cost": "sacrifice_creature",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Conclusion",
+                "type_line": "Instant",
+                "oracle_text": "As an additional cost to cast this spell, sacrifice a creature. Fixture Conclusion deals 5 damage to target creature.",
+            },
+            turn=4,
+            rng=random.Random(31),
+            effect_data_override=effect,
+        )
+
+        self.assertNotIn(sacrifice, active.battlefield)
+        self.assertIn(sacrifice, active.graveyard)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Fixture Conclusion"
+                and data.get("cost") == "sacrifice_creature"
+                and data.get("sacrificed") == "Spare Goblin"
+                for event, data in self.events
+            )
+        )
+
+    def test_fixed_damage_spell_without_required_sacrifice_land_does_not_damage(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 8
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "requires_sacrifice_land": True,
+            "additional_cost": "sacrifice_land",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Volley",
+                "type_line": "Instant",
+                "oracle_text": "As an additional cost to cast this spell, sacrifice a land. Fixture Volley deals 3 damage to any target.",
+            },
+            turn=4,
+            rng=random.Random(32),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 8)
+        self.assertTrue(
+            any(
+                event == "additional_cost_failed"
+                and data.get("card") == "Fixture Volley"
+                and data.get("cost") == "sacrifice_land"
+                for event, data in self.events
+            )
+        )
+        self.assertFalse(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Volley"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_gain_life_spell_damages_target_and_gains_life(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -1,0 +1,297 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg379_fixed_damage_sacrifice_cost_new_server_20260704_02",
+  "deploy_id": "pg379",
+  "expected_rules": [
+    {
+      "card_name": "Collateral Damage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda",
+      "min_rule_version": 2,
+      "normalized_name": "collateral damage",
+      "oracle_hash": "d3ba7ac7a86a009d54adcd96a1159265",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fiery Conclusion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b",
+      "min_rule_version": 2,
+      "normalized_name": "fiery conclusion",
+      "oracle_hash": "183697b3f3a8978af7c064140c1f8c4f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magma Rift",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba",
+      "min_rule_version": 2,
+      "normalized_name": "magma rift",
+      "oracle_hash": "2b84caff4296c6292eee10eca1d7a872",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reckless Abandon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e",
+      "min_rule_version": 2,
+      "normalized_name": "reckless abandon",
+      "oracle_hash": "672ac46295c47c95948e7f9a09f03691",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shard Volley",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6",
+      "min_rule_version": 2,
+      "normalized_name": "shard volley",
+      "oracle_hash": "2205accfe98167bf9b880facea0a6396",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        }
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_damage_spell": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-04T02:28:20+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Collateral Damage"
+      },
+      "card_name": "Collateral Damage",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda",
+      "normalized_name": "collateral damage",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Fiery Conclusion"
+      },
+      "card_name": "Fiery Conclusion",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b",
+      "normalized_name": "fiery conclusion",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Magma Rift"
+      },
+      "card_name": "Magma Rift",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba",
+      "normalized_name": "magma rift",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Reckless Abandon"
+      },
+      "card_name": "Reckless Abandon",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e",
+      "normalized_name": "reckless abandon",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Shard Volley"
+      },
+      "card_name": "Shard Volley",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6",
+      "normalized_name": "shard volley",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        }
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Collateral Damage",
+    "Fiery Conclusion",
+    "Magma Rift",
+    "Reckless Abandon",
+    "Shard Volley"
+  ],
+  "selected_count": 5,
+  "slug": "fixed_damage_sacrifice_cost_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Collateral Damage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda",
+      "min_rule_version": 2,
+      "normalized_name": "collateral damage",
+      "oracle_hash": "d3ba7ac7a86a009d54adcd96a1159265",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fiery Conclusion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b",
+      "min_rule_version": 2,
+      "normalized_name": "fiery conclusion",
+      "oracle_hash": "183697b3f3a8978af7c064140c1f8c4f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magma Rift",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba",
+      "min_rule_version": 2,
+      "normalized_name": "magma rift",
+      "oracle_hash": "2b84caff4296c6292eee10eca1d7a872",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reckless Abandon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e",
+      "min_rule_version": 2,
+      "normalized_name": "reckless abandon",
+      "oracle_hash": "672ac46295c47c95948e7f9a09f03691",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shard Volley",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6",
+      "min_rule_version": 2,
+      "normalized_name": "shard volley",
+      "oracle_hash": "2205accfe98167bf9b880facea0a6396",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -18760,11 +18760,25 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         creature, _options, _reason = choose_creature_for_resource_cost(player)
         if creature is None:
             return False
+    if effect_data.get("requires_sacrifice_land"):
+        battlefield_lands = [
+            candidate
+            for candidate in player.battlefield
+            if isinstance(candidate, dict) and is_effective_land(candidate)
+        ]
+        land, _options, _risk_flags, _selection_reason = choose_land_for_resource_cost(
+            battlefield_lands,
+            zone="battlefield",
+        )
+        if land is None:
+            return False
     return True
 
 
 def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_context=None):
     """Pay non-mana costs that materially affect battlefield validity."""
+    if effect_data.get("_additional_card_costs_paid"):
+        return True
     cost_context = dict(cost_context or {})
     planned_sacrifices = list(cost_context.get("sacrifice_artifact_or_creature") or [])
     planned_blight = dict(cost_context.get("blight") or {})
@@ -18773,6 +18787,7 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         and not effect_data.get("requires_discard_land")
         and not effect_data.get("requires_sacrifice_creature")
         and not effect_data.get("requires_sacrifice_green_creature")
+        and not effect_data.get("requires_sacrifice_land")
         and not planned_sacrifices
         and not planned_blight
     ):
@@ -18911,6 +18926,45 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             hand_land_count_after=max(0, len(hand_lands) - 1),
             total_land_count_after=battlefield_land_count + max(0, len(hand_lands) - 1),
         )
+    if effect_data.get("requires_sacrifice_land"):
+        battlefield_lands = [
+            candidate
+            for candidate in player.battlefield
+            if isinstance(candidate, dict) and is_effective_land(candidate)
+        ]
+        sacrifice, land_options, strategic_risk_flags, selection_reason = choose_land_for_resource_cost(
+            battlefield_lands,
+            zone="battlefield",
+        )
+        if not sacrifice:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="sacrifice_land",
+                turn=turn,
+                land_options=land_options,
+                strategic_risk_flags=strategic_risk_flags,
+            )
+            return False
+        destination = move_permanent_from_battlefield(
+            player,
+            sacrifice,
+            reason="sacrifice_land",
+            source=card,
+        )
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="sacrifice_land",
+            sacrificed=sacrifice.get("name", "?"),
+            destination=destination,
+            turn=turn,
+            land_options=land_options,
+            selection_reason=selection_reason,
+            strategic_risk_flags=strategic_risk_flags,
+        )
     required_color = "G" if effect_data.get("requires_sacrifice_green_creature") else None
     if effect_data.get("requires_sacrifice_creature") or required_color:
         sacrifice, creature_options, selection_reason = choose_creature_for_resource_cost(
@@ -18978,6 +19032,7 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             ),
             turn=turn,
         )
+    effect_data["_additional_card_costs_paid"] = True
     return True
 
 
@@ -50117,6 +50172,9 @@ def apply_effect_immediate(
                 break
         finish_resolved_spell(player, card, turn=turn)
     elif effect in ("deal_damage", "direct_damage"):
+        if not pay_additional_card_costs(player, card, effect_data, turn=turn):
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+            return
         apply_direct_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "add_counters":
         resolve_add_counters_target_spell(player, opponents, card, effect_data, turn)

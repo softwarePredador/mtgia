@@ -276,10 +276,43 @@ Post-PG378 update:
   returned `proposal_count=0` over `7736` considered supported rows.
 - delta since post-PG377: `16` identities promoted.
 
+Post-PG379 update:
+
+- source artifacts:
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_pg379_fixed_damage_sacrifice_cost_new_server.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_package_package.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_e2e.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_commander_legal.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_supported_recheck.md`
+- promoted family:
+  - `xmage_fixed_damage_target_spell_v1` for `5` fixed `DamageTargetEffect`
+    spells with exact XMage `SacrificeTargetCost` support: `Collateral Damage`,
+    `Fiery Conclusion`, `Magma Rift`, `Reckless Abandon`, and `Shard Volley`.
+- implementation change:
+  - the runtime now handles generic spell additional-cost payment for
+    `requires_sacrifice_land` and marks paid additional costs to avoid double
+    payment on stack resolution.
+  - the exact-scope splitter now admits fixed direct-damage spells with
+    supported `sacrifice_creature` or `sacrifice_land` additional costs, while
+    blocking unsupported mixed costs such as creature-or-enchantment,
+    artifact-or-creature, permanent, subtype-only, and discard/random variants.
+- target battle-gap identities in authoritative queue: `26974`
+- XMage authoritative source resolved: `26660`
+- XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26660`
+- adapter work-unit keys: `11429`
+- final PG-Hermes-SQLite contract audit: `status=pass`, `49 pass`, `1 warn`
+  (`deck_id_607_has_no_pg_deck_id_note`, unrelated to PG379)
+- final supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_supported_recheck.md`
+  returned `proposal_count=0` over `7731` considered supported rows.
+- delta since post-PG378: `5` identities promoted.
+
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG378 queue above.
+historical only. The active execution baseline is the post-PG379 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -287,13 +320,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG378 control numbers:
+Current post-PG379 control numbers:
 
-- target battle-gap identities: `26979`
-- XMage-resolved authoritative source identities: `26665`
+- target battle-gap identities: `26974`
+- XMage-resolved authoritative source identities: `26660`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26665`
+- XMage authoritative adapter required: `26660`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -313,15 +346,15 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg378_target_keyword_constraints_new_server_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG378, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG379, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
    `recursion::xmage_graveyard_return_variant_review_v1` (`1822`),
    `draw_engine::xmage_draw_card_variant_review_v1` (`1634`),
    `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
-   (`1114`), `direct_damage::targeted_damage_variant_v1` (`906`), and
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`901`), and
    `add_counters::source_add_counters_variant_v1` (`795`).
 4. Promote only a narrow subpattern whose ManaLoom runtime behavior is already
    implemented or implemented in the same cycle.
@@ -437,8 +470,44 @@ PG378 completion and PG379 starting hypothesis:
    (`1114`), `direct_damage::targeted_damage_variant_v1` (`906`), and
    `add_counters::source_add_counters_variant_v1` (`795`).
 
+PG379 completion and PG380 starting hypothesis:
+
+1. PG379 promoted `5` fixed direct-damage spells with exact XMage
+   `SacrificeTargetCost` support on the new server: `Collateral Damage`,
+   `Fiery Conclusion`, `Magma Rift`, `Reckless Abandon`, and `Shard Volley`.
+2. PG379 added runtime payment for spell additional-cost land sacrifice and
+   guarded spell resolution against double payment after stack execution.
+3. Tests passed: splitter `305`, exact runtime `180`, py_compile, E2E package
+   validation `status=pass`, and PG/Hermes/SQLite contract audit
+   `status=pass`.
+4. The post-PG379 supported splitter returns `0` batch-safe proposals, so PG380
+   must implement another narrow subpattern before PostgreSQL package
+   generation.
+5. The largest remaining work units are now:
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1822`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1634`),
+   `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`901`), and
+   `add_counters::source_add_counters_variant_v1` (`795`).
+
 Fresh alignment evidence:
 
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_docs_after_update.md`
+  passed with `49` pass and `1` inherited warning.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_docs_after_update.md`
+  passed with `26/26` checks.
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_docs_after_update.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_docs_after_update.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
+  passed with `49` pass and `1` inherited warning.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
+  passed with `26/26` checks.
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
+  passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg378_target_keyword_constraints_new_server.md`
   passed with `49` pass and `1` inherited warning.
 - `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg378_target_keyword_constraints_new_server_docs_after_update.md`
@@ -1106,7 +1175,11 @@ Immediate checkpoint after PG361:
     the new server after adding subtype/supertype target legality and full
     `target_constraints` comparison. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/pg378_target_keyword_constraints_new_server_e2e.md`.
-75. Continue from the fresh post-PG378 queue. Since the exact splitter is now
+75. PG379 promoted `5` fixed direct-damage spell rows on the new server after
+    adding supported creature/land sacrifice additional costs to the exact
+    mapper and battle runtime. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_e2e.md`.
+76. Continue from the fresh post-PG379 queue. Since the exact splitter is now
     empty again, the next cycle must implement a new mapper/runtime subpattern
     before any PostgreSQL package can be generated.
 

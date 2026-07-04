@@ -1802,6 +1802,59 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["amount"], 3)
         self.assertEqual(effect["target"], "any_target")
 
+    def test_fixed_damage_spell_maps_creature_sacrifice_additional_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, sacrifice a creature. Fixture Blast deals 3 damage to any target."),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 3)
+        self.assertTrue(effect["requires_sacrifice_creature"])
+        self.assertEqual(effect["additional_cost"], "sacrifice_creature")
+        self.assertEqual(effect["xmage_additional_cost_target"], "creature")
+
+    def test_fixed_damage_spell_maps_land_sacrifice_additional_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, sacrifice a land. Fixture Volley deals 3 damage to any target."),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_LAND));"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["requires_sacrifice_land"])
+        self.assertEqual(effect["additional_cost"], "sacrifice_land")
+        self.assertEqual(effect["xmage_additional_cost_target"], "land")
+
+    def test_fixed_damage_spell_blocks_creature_or_enchantment_sacrifice_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, sacrifice a creature or enchantment. Fixture Flare deals 5 damage to target creature."),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE_OR_ENCHANTMENT));"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(5));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_additional_cost_not_supported")
+
     def test_fixed_damage_gain_life_spell_maps_to_direct_damage_with_life_gain(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["DamageTargetEffect", "GainLifeEffect"])
         proposal, reason = split.split_row(

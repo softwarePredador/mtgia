@@ -1,0 +1,232 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T02:30:57.948697+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_package_manifest.json",
+  "package_id": "pg379_fixed_damage_sacrifice_cost_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/canonical_battle_card_rules_pg379_fixed_damage_sacrifice_cost_new_server.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Collateral Damage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda",
+          "oracle_hash": "d3ba7ac7a86a009d54adcd96a1159265",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Fiery Conclusion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b",
+          "oracle_hash": "183697b3f3a8978af7c064140c1f8c4f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Magma Rift",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba",
+          "oracle_hash": "2b84caff4296c6292eee10eca1d7a872",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Reckless Abandon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e",
+          "oracle_hash": "672ac46295c47c95948e7f9a09f03691",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Shard Volley",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6",
+          "oracle_hash": "2205accfe98167bf9b880facea0a6396",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Collateral Damage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda",
+          "oracle_hash": "d3ba7ac7a86a009d54adcd96a1159265",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Fiery Conclusion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b",
+          "oracle_hash": "183697b3f3a8978af7c064140c1f8c4f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Magma Rift",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba",
+          "oracle_hash": "2b84caff4296c6292eee10eca1d7a872",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Reckless Abandon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e",
+          "oracle_hash": "672ac46295c47c95948e7f9a09f03691",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Shard Volley",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6",
+          "oracle_hash": "2205accfe98167bf9b880facea0a6396",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Collateral Damage",
+          "logical_rule_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fiery Conclusion",
+          "logical_rule_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Magma Rift",
+          "logical_rule_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Reckless Abandon",
+          "logical_rule_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shard Volley",
+          "logical_rule_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Collateral Damage",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fiery Conclusion",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Magma Rift",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Reckless Abandon",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shard Volley",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

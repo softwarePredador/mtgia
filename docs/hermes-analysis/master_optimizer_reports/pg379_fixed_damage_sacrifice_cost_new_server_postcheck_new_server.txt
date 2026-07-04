@@ -1,0 +1,8 @@
+     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Collateral Damage | collateral damage | battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda |                  1 |                           1 |                         1 |           0
+ Fiery Conclusion  | fiery conclusion  | battle_rule_v1:8f664511bf5204d8fd1046898525539b |                  1 |                           1 |                         1 |           0
+ Magma Rift        | magma rift        | battle_rule_v1:4e960957df9430121cec5e2e1ef736ba |                  1 |                           1 |                         1 |           0
+ Reckless Abandon  | reckless abandon  | battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e |                  1 |                           1 |                         1 |           0
+ Shard Volley      | shard volley      | battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6 |                  1 |                           1 |                         1 |           0
+(5 rows)

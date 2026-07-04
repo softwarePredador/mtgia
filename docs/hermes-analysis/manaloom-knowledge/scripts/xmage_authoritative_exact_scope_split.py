@@ -4236,7 +4236,9 @@ def activation_sacrifice_target_from_phrase(phrase: str) -> str | None:
     mapping = {
         "artifact or creature": "artifact_or_creature",
         "artifact or land": "artifact_or_land",
+        "creature or enchantment": "creature_or_enchantment",
         "creature or land": "creature_or_land",
+        "creature or planeswalker": "creature_or_planeswalker",
         "nontoken permanent": "nontoken_permanent",
         "non-token permanent": "nontoken_permanent",
         "token": "token",
@@ -5573,6 +5575,13 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
 def activation_sacrifice_target_from_source(source: str, window: str) -> str | None:
     text = source or ""
     relevant = (window or "") + "\n" + text
+    if "FILTER_PERMANENT_CREATURE_OR_ENCHANTMENT" in relevant:
+        return "creature_or_enchantment"
+    if (
+        "CardType.CREATURE.getPredicate()" in relevant
+        and "CardType.PLANESWALKER.getPredicate()" in relevant
+    ):
+        return "creature_or_planeswalker"
     if "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in relevant:
         return "artifact_or_creature"
     if "FilterControlledEnchantmentPermanent" in relevant:
@@ -5583,7 +5592,7 @@ def activation_sacrifice_target_from_source(source: str, window: str) -> str | N
         return "creature"
     if "FILTER_PERMANENT_ARTIFACT" in relevant:
         return "artifact"
-    if "FILTER_CONTROLLED_LAND" in relevant or "FILTER_LANDS" in relevant:
+    if "FILTER_CONTROLLED_LAND" in relevant or "FILTER_LANDS" in relevant or "FILTER_LAND" in relevant:
         return "land"
     if "TokenPredicate.TRUE" in relevant:
         return "token"
@@ -5600,6 +5609,37 @@ def activation_sacrifice_target_from_source(source: str, window: str) -> str | N
     if filter_match:
         return activation_sacrifice_target_from_phrase(filter_match.group(1))
     return None
+
+
+def fixed_damage_spell_additional_cost_fields_from_source(
+    source: str,
+    metadata: dict[str, Any],
+) -> tuple[dict[str, Any] | None, str | None]:
+    text = source or ""
+    has_cost = has_additional_cost(text) or "additional cost" in oracle_text(metadata).lower()
+    if not has_cost:
+        return {}, None
+    cost_count = len(re.findall(r"\.addCost\s*\(", text))
+    if cost_count != 1:
+        return None, "damage_additional_cost_not_supported"
+    if "SacrificeTargetCost" not in text:
+        return None, "damage_additional_cost_not_supported"
+    sacrifice_target = activation_sacrifice_target_from_source(text, text)
+    if sacrifice_target == "creature":
+        return {
+            "additional_cost": "sacrifice_creature",
+            "requires_sacrifice_creature": True,
+            "xmage_additional_cost_class": "SacrificeTargetCost",
+            "xmage_additional_cost_target": "creature",
+        }, None
+    if sacrifice_target == "land":
+        return {
+            "additional_cost": "sacrifice_land",
+            "requires_sacrifice_land": True,
+            "xmage_additional_cost_class": "SacrificeTargetCost",
+            "xmage_additional_cost_target": "land",
+        }, None
+    return None, "damage_additional_cost_not_supported"
 
 
 def spell_cast_draw_filter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -7174,7 +7214,10 @@ def split_row(
         if ability_kind(row) != "one_shot":
             return None, "not_one_shot_spell_ability"
         if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
-            return None, "additional_cost_detected"
+            if unit == DAMAGE_UNIT and effect_classes(row) == {"DamageTargetEffect"}:
+                pass
+            else:
+                return None, "additional_cost_detected"
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
@@ -9524,6 +9567,12 @@ def split_row(
     if unit == DAMAGE_UNIT:
         if classes != {"DamageTargetEffect"}:
             return None, "damage_effect_class_not_pure"
+        additional_cost_fields, additional_cost_reason = fixed_damage_spell_additional_cost_fields_from_source(
+            source_text,
+            metadata,
+        )
+        if additional_cost_reason is not None:
+            return None, additional_cost_reason
         amount = java_constructor_int(source_text, "DamageTargetEffect")
         if amount is None or amount <= 0:
             return None, "damage_amount_not_fixed"
@@ -9542,6 +9591,7 @@ def split_row(
             "target_constraints": target_constraints_for(target),
             "xmage_effect_class": "DamageTargetEffect",
             **flags,
+            **(additional_cost_fields or {}),
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_damage_spell"), "selected_exact_scope"
 

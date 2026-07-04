@@ -183,21 +183,25 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg376_scry_damage_draw_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg377_keyword_reminder_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg377_keyword_reminder_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg378_target_keyword_constraints_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg378_target_keyword_constraints_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26995`
-- XMage authoritative source resolved: `26681`
+- target all-card battle-gap identities: `26974`
+- XMage authoritative source resolved: `26660`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26681`
+- XMage authoritative adapter required: `26660`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26681` identities, card semantics are accepted from XMage; work is now
+- For `26660` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -216,10 +220,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG378 Exact Adapter Waves
+## PG283-PG379 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG378 all-card exact adapter waves are applied and
-synced. PG375-PG378 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG379 all-card exact adapter waves are applied and
+synced. PG375-PG379 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -235,6 +239,11 @@ patterns:
   `xmage_fixed_source_controller_draw_spell_v1`
 - `direct_damage::targeted_damage_variant_v1` ->
   `xmage_fixed_damage_target_spell_v1`
+- `direct_damage::targeted_damage_variant_v1` with fixed `DamageTargetEffect`
+  one-shot spells and exact XMage `SacrificeTargetCost` for either a creature or
+  land additional cost remains in `xmage_fixed_damage_target_spell_v1` with
+  structured `additional_cost`, `requires_sacrifice_creature` or
+  `requires_sacrifice_land`, and runtime payment before damage resolution.
 - `removal_destroy::targeted_destroy_variant_v1` ->
   `xmage_destroy_target_spell_v1`
 - `life_gain::xmage_life_gain_variant_review_v1` ->
@@ -5818,6 +5827,36 @@ PG378 measured result:
   `proposal_count=0` over `7736` considered supported rows. The next cycle must
   implement another exact mapper/runtime subpattern before package generation.
 
+PG379 measured result:
+
+- PG379 promoted `5` fixed direct-damage spells with exact XMage
+  `SacrificeTargetCost` support on the new server: `Collateral Damage`,
+  `Fiery Conclusion`, `Magma Rift`, `Reckless Abandon`, and `Shard Volley`.
+- The splitter now admits only pure fixed `DamageTargetEffect` one-shot spells
+  whose additional cost is an exact supported target sacrifice of a creature or
+  land. Mixed sacrifice filters such as creature-or-enchantment,
+  creature-or-planeswalker, artifact-or-creature, permanent, subtype-only, and
+  discard/random costs remain blocked.
+- The runtime now pays `requires_sacrifice_land` in the generic card additional
+  cost path and marks additional costs as paid so stack resolution cannot charge
+  the same spell twice.
+- Focused splitter tests passed with `305` tests; focused exact runtime tests
+  passed with `180` tests; py_compile passed.
+- PostgreSQL precheck matched `5/5` target card rows on the new server; apply
+  upserted `5` rows and deprecated `0` shadows; postcheck verified `5/5`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `5` PostgreSQL rows from the new target,
+  updated `5` SQLite rows, and exported `5084` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `5/5` cards.
+- Global all-card authoritative queue after PG379:
+  `target_identity_count=26974`, `xmage_authoritative_source_count=26660`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26660`.
+- Running the exact splitter after PG379 on supported units returned
+  `proposal_count=0` over `7731` considered supported rows. The next cycle must
+  implement another exact mapper/runtime subpattern before package generation.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -6448,13 +6487,13 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG378 queue on the new server, the next exact runtime-backed work should
+post-PG379 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1822`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1634`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
-4. `direct_damage::targeted_damage_variant_v1` - `906`
+4. `direct_damage::targeted_damage_variant_v1` - `901`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
 7. `draw_cards::xmage_draw_card_variant_review_v1` - `636`
