@@ -1,0 +1,823 @@
+{
+  "artifact_type": "lorehold_promotion_readiness_synthesis",
+  "axis_assessments": {
+    "card_value": {
+      "direct_swap_ready_count": null,
+      "loaded": true,
+      "ready_replacement_candidate_count": 0,
+      "role_mapping_watch_count": 5,
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_value_priority_synthesis_20260704_learning.json",
+      "status": "card_value_priority_keep_607_with_role_watch_items",
+      "status_class": "keep_607",
+      "total_cards": 100
+    },
+    "interaction": {
+      "direct_swap_ready_count": 0,
+      "loaded": true,
+      "ready_replacement_candidate_count": null,
+      "role_mapping_watch_count": null,
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_interaction_resilience_synthesis_20260704_learning.json",
+      "status": "interaction_resilience_no_direct_swap_ready_current_607",
+      "status_class": "keep_607",
+      "total_cards": 100
+    },
+    "mana": {
+      "direct_swap_ready_count": null,
+      "loaded": true,
+      "ready_replacement_candidate_count": null,
+      "role_mapping_watch_count": null,
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_sequence_policy_synthesis_20260704_learning.json",
+      "status": "mana_sequence_no_direct_auto_upgrade_current_607",
+      "status_class": "keep_607",
+      "total_cards": 100
+    },
+    "payoff": {
+      "direct_swap_ready_count": null,
+      "loaded": true,
+      "ready_replacement_candidate_count": null,
+      "role_mapping_watch_count": null,
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_payoff_finisher_recursion_synthesis_20260704_learning.json",
+      "status": "payoff_finisher_recursion_no_direct_swap_ready_current_607",
+      "status_class": "keep_607",
+      "total_cards": 100
+    },
+    "selection": {
+      "direct_swap_ready_count": null,
+      "loaded": true,
+      "ready_replacement_candidate_count": null,
+      "role_mapping_watch_count": null,
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_selection_access_synthesis_20260704_learning.json",
+      "status": "selection_access_no_swap_ready_current_607",
+      "status_class": "keep_607",
+      "total_cards": 100
+    },
+    "staple": {
+      "direct_swap_ready_count": null,
+      "loaded": true,
+      "ready_replacement_candidate_count": null,
+      "role_mapping_watch_count": null,
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_staple_policy_synthesis_20260704_learning.json",
+      "status": "staple_policy_no_direct_auto_include_current_607",
+      "status_class": "keep_607",
+      "total_cards": 100
+    }
+  },
+  "candidate_pressure": {
+    "already_in_607_count": 28,
+    "blocked_examples": [
+      {
+        "card_name": "Jeweled Lotus",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "banned",
+        "decision": "blocked_commander_banned_or_not_accessible",
+        "decision_reasons": [
+          "commander_ban_or_legality_block"
+        ],
+        "edhrec_rank": null,
+        "lane": "banned_fast_mana",
+        "policy_class": "not_accessible",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Mana Crypt",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "banned",
+        "decision": "blocked_commander_banned_or_not_accessible",
+        "decision_reasons": [
+          "commander_ban_or_legality_block"
+        ],
+        "edhrec_rank": null,
+        "lane": "banned_fast_mana",
+        "policy_class": "not_accessible",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Seething Song",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "blocked_prior_exact_reject",
+        "decision_reasons": [
+          "staple_policy:blocked_prior_exact_reject"
+        ],
+        "edhrec_rank": 370,
+        "lane": "contextual_mana_source",
+        "policy_class": "tested_or_policy_blocked",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Lotus Petal",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "blocked_prior_exact_reject",
+        "decision_reasons": [
+          "staple_policy:blocked_prior_exact_reject"
+        ],
+        "edhrec_rank": 117,
+        "lane": "early_colored_rock",
+        "policy_class": "tested_or_policy_blocked",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Mana Vault",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "blocked_prior_gate_rejected",
+        "decision_reasons": [
+          "mana_vault_current_pair_lost_with_real_card_use"
+        ],
+        "edhrec_rank": 144,
+        "lane": "fast_colorless_burst",
+        "policy_class": "tested_or_policy_blocked",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Chrome Mox",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "policy_blocked_no_premium_mox",
+        "decision_reasons": [
+          "staple_policy:policy_blocked_no_premium_mox"
+        ],
+        "edhrec_rank": 142,
+        "lane": "premium_mox_fast_mana",
+        "policy_class": "tested_or_policy_blocked",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Mox Amber",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "policy_blocked_no_premium_mox",
+        "decision_reasons": [
+          "staple_policy:policy_blocked_no_premium_mox"
+        ],
+        "edhrec_rank": 208,
+        "lane": "premium_mox_fast_mana",
+        "policy_class": "tested_or_policy_blocked",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Mox Opal",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "policy_blocked_no_premium_mox",
+        "decision_reasons": [
+          "staple_policy:policy_blocked_no_premium_mox"
+        ],
+        "edhrec_rank": 239,
+        "lane": "premium_mox_fast_mana",
+        "policy_class": "tested_or_policy_blocked",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Mox Diamond",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "policy_blocked_no_premium_mox",
+        "decision_reasons": [
+          "staple_policy:policy_blocked_no_premium_mox"
+        ],
+        "edhrec_rank": 246,
+        "lane": "premium_mox_fast_mana",
+        "policy_class": "tested_or_policy_blocked",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Chaos Warp",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "blocked_current_removal_floor_sufficient",
+        "decision_reasons": [
+          "interaction_synthesis_decision"
+        ],
+        "edhrec_rank": 29,
+        "lane": "interaction_removal",
+        "policy_class": "tested_or_policy_blocked_staple",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Enlightened Tutor",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "direct_tutor_swap_blocked",
+        "decision_reasons": [
+          "selection_synthesis_decision"
+        ],
+        "edhrec_rank": 115,
+        "lane": "tutors_access",
+        "policy_class": "tested_or_policy_blocked_staple",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Lotus Petal",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "blocked_prior_exact_reject",
+        "decision_reasons": [
+          "profiled_cut_prior_exact_reject"
+        ],
+        "edhrec_rank": 117,
+        "lane": "ramp",
+        "policy_class": "tested_or_policy_blocked_staple",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Chrome Mox",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "policy_blocked_no_premium_mox",
+        "decision_reasons": [
+          "premium_mox_policy_blocker"
+        ],
+        "edhrec_rank": 142,
+        "lane": "ramp",
+        "policy_class": "tested_or_policy_blocked_staple",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Mana Vault",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "blocked_prior_gate_rejected",
+        "decision_reasons": [
+          "mana_vault_current_pair_lost_with_card_exposure"
+        ],
+        "edhrec_rank": 144,
+        "lane": "ramp",
+        "policy_class": "tested_or_policy_blocked_staple",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Abrade",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "blocked_current_removal_floor_sufficient",
+        "decision_reasons": [
+          "interaction_synthesis_decision"
+        ],
+        "edhrec_rank": 153,
+        "lane": "interaction_removal",
+        "policy_class": "tested_or_policy_blocked_staple",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Boros Charm",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "prior_tibalt_replacement_rejected",
+        "decision_reasons": [
+          "interaction_synthesis_decision"
+        ],
+        "edhrec_rank": 173,
+        "lane": "protection_resilience",
+        "policy_class": "tested_or_policy_blocked_staple",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "The One Ring",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "blocked_existing_package_rejected",
+        "decision_reasons": [
+          "payoff_synthesis_decision"
+        ],
+        "edhrec_rank": 180,
+        "lane": "card_draw_selection",
+        "policy_class": "tested_or_policy_blocked_staple",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Mox Amber",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "policy_blocked_no_premium_mox",
+        "decision_reasons": [
+          "premium_mox_requires_explicit_policy_and_same_lane_gate"
+        ],
+        "edhrec_rank": 208,
+        "lane": "ramp",
+        "policy_class": "generic_or_policy_blocked_staple",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Gamble",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "direct_tutor_swap_blocked",
+        "decision_reasons": [
+          "selection_synthesis_decision"
+        ],
+        "edhrec_rank": 231,
+        "lane": "tutors_access",
+        "policy_class": "tested_or_policy_blocked_staple",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Mox Opal",
+        "classification": "blocked_or_rejected",
+        "commander_legality": "legal",
+        "decision": "policy_blocked_no_premium_mox",
+        "decision_reasons": [
+          "premium_mox_policy_blocker"
+        ],
+        "edhrec_rank": 239,
+        "lane": "ramp",
+        "policy_class": "tested_or_policy_blocked_staple",
+        "source_axis": "staple"
+      }
+    ],
+    "blocked_or_rejected_count": 38,
+    "candidate_rows_considered": 161,
+    "classification_counts": {
+      "already_in_607": 28,
+      "blocked_or_rejected": 38,
+      "hypothesis_or_gate_needed": 95
+    },
+    "gate_ready_candidate_count": 0,
+    "gate_ready_candidates": [],
+    "highest_pressure_hypotheses": [
+      {
+        "card_name": "Great Furnace",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_requires_same_lane_cut_and_gate",
+        "decision_reasons": [
+          "staple_policy:candidate_requires_same_lane_cut_and_gate"
+        ],
+        "edhrec_rank": 415,
+        "lane": "colored_land_fixing",
+        "policy_class": "tested_or_policy_blocked",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Ancient Den",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_land_upgrade_requires_current_land_cut",
+        "decision_reasons": [
+          "mana_base_already_passes_current_foundation"
+        ],
+        "edhrec_rank": 528,
+        "lane": "colored_land_fixing",
+        "policy_class": "land_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "City of Brass",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_land_upgrade_requires_current_land_cut",
+        "decision_reasons": [
+          "mana_base_already_passes_current_foundation"
+        ],
+        "edhrec_rank": null,
+        "lane": "colored_land_fixing",
+        "policy_class": "land_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Mana Confluence",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_land_upgrade_requires_current_land_cut",
+        "decision_reasons": [
+          "mana_base_already_passes_current_foundation"
+        ],
+        "edhrec_rank": null,
+        "lane": "colored_land_fixing",
+        "policy_class": "land_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Plateau",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_land_upgrade_requires_current_land_cut",
+        "decision_reasons": [
+          "mana_base_already_passes_current_foundation"
+        ],
+        "edhrec_rank": null,
+        "lane": "colored_land_fixing",
+        "policy_class": "land_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Treasonous Ogre",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_requires_same_lane_cut_and_sequence_gate",
+        "decision_reasons": [
+          "must_preserve_commander_turn_and_current_protected_anchors"
+        ],
+        "edhrec_rank": null,
+        "lane": "contextual_mana_source",
+        "policy_class": "same_lane_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Pyretic Ritual",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_requires_same_lane_cut_and_sequence_gate",
+        "decision_reasons": [
+          "must_preserve_commander_turn_and_current_protected_anchors"
+        ],
+        "edhrec_rank": null,
+        "lane": "early_colored_rock",
+        "policy_class": "same_lane_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Grim Monolith",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_fast_mana_requires_fixing_and_use_gate",
+        "decision_reasons": [
+          "colorless_burst_must_not_reduce_boros_fixing_or_miracle_cadence"
+        ],
+        "edhrec_rank": null,
+        "lane": "fast_colorless_burst",
+        "policy_class": "fast_mana_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "City of Traitors",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_land_requires_named_land_cut_and_equal_gate",
+        "decision_reasons": [
+          "fast_or_utility_land_cannot_cut_colored_or_protected_land_by_rank"
+        ],
+        "edhrec_rank": null,
+        "lane": "fast_or_utility_land",
+        "policy_class": "land_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Gemstone Caverns",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_land_requires_named_land_cut_and_equal_gate",
+        "decision_reasons": [
+          "fast_or_utility_land_cannot_cut_colored_or_protected_land_by_rank"
+        ],
+        "edhrec_rank": null,
+        "lane": "fast_or_utility_land",
+        "policy_class": "land_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Rite of Flame",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_spell_ramp_requires_spell_slot_gate",
+        "decision_reasons": [
+          "one_shot_or_contextual_ramp_is_not_opening_fixing"
+        ],
+        "edhrec_rank": null,
+        "lane": "ritual_or_spell_burst",
+        "policy_class": "spell_ramp_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Storm-Kiln Artist",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_hypothesis_requires_named_cut_and_equal_gate",
+        "decision_reasons": [
+          "staple_policy:candidate_hypothesis_requires_named_cut_and_equal_gate"
+        ],
+        "edhrec_rank": 233,
+        "lane": "treasure_or_discard_ramp",
+        "policy_class": "tested_or_policy_blocked",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Strike It Rich",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_spell_ramp_requires_spell_slot_gate",
+        "decision_reasons": [
+          "one_shot_or_contextual_ramp_is_not_opening_fixing"
+        ],
+        "edhrec_rank": null,
+        "lane": "treasure_or_discard_ramp",
+        "policy_class": "spell_ramp_hypothesis",
+        "source_axis": "mana"
+      },
+      {
+        "card_name": "Evolving Wilds",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "generic_land_staple_requires_mana_base_cut",
+        "decision_reasons": [
+          "current_607_mana_base_already_passes_color_and_land_foundation"
+        ],
+        "edhrec_rank": 16,
+        "lane": "mana_base",
+        "policy_class": "generic_or_low_context_signal",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Thought Vessel",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_requires_same_lane_cut_and_gate",
+        "decision_reasons": [
+          "staple_signal_without_current_cut_proof"
+        ],
+        "edhrec_rank": 21,
+        "lane": "ramp",
+        "policy_class": "commander_synergy_candidate",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Myriad Landscape",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "generic_land_staple_requires_mana_base_cut",
+        "decision_reasons": [
+          "current_607_mana_base_already_passes_color_and_land_foundation"
+        ],
+        "edhrec_rank": 24,
+        "lane": "mana_base",
+        "policy_class": "generic_or_low_context_signal",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Terramorphic Expanse",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "generic_land_staple_requires_mana_base_cut",
+        "decision_reasons": [
+          "current_607_mana_base_already_passes_color_and_land_foundation"
+        ],
+        "edhrec_rank": 28,
+        "lane": "mana_base",
+        "policy_class": "generic_or_low_context_signal",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Mind Stone",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_requires_same_lane_cut_and_gate",
+        "decision_reasons": [
+          "staple_signal_without_current_cut_proof"
+        ],
+        "edhrec_rank": 31,
+        "lane": "ramp",
+        "policy_class": "commander_synergy_candidate",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Solemn Simulacrum",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_requires_same_lane_cut_and_gate",
+        "decision_reasons": [
+          "staple_signal_without_current_cut_proof"
+        ],
+        "edhrec_rank": 34,
+        "lane": "card_draw_selection",
+        "policy_class": "commander_synergy_candidate",
+        "source_axis": "staple"
+      },
+      {
+        "card_name": "Polluted Delta",
+        "classification": "hypothesis_or_gate_needed",
+        "commander_legality": "legal",
+        "decision": "candidate_requires_same_lane_cut_and_gate",
+        "decision_reasons": [
+          "staple_signal_without_current_cut_proof"
+        ],
+        "edhrec_rank": 38,
+        "lane": "mana_base",
+        "policy_class": "commander_synergy_candidate",
+        "source_axis": "staple"
+      }
+    ],
+    "hypothesis_or_gate_needed_count": 95,
+    "lane_counts": {
+      "access_tutor": 2,
+      "banned_fast_mana": 2,
+      "card_draw_selection": 8,
+      "colored_land_fixing": 17,
+      "combo_synergy_and_finishers": 1,
+      "contextual_mana_source": 2,
+      "cost_reducer": 2,
+      "early_colored_rock": 6,
+      "early_colorless_burst": 1,
+      "fast_colorless_burst": 2,
+      "fast_or_utility_land": 3,
+      "generic_or_low_context_signal": 10,
+      "interaction_removal": 8,
+      "mana_base": 12,
+      "premium_mox_fast_mana": 4,
+      "pressure_protection": 2,
+      "protection_resilience": 5,
+      "ramp": 27,
+      "recursion_recovery": 3,
+      "ritual_or_spell_burst": 2,
+      "spot_removal": 3,
+      "stack_or_spell_protection": 7,
+      "topdeck_protection": 2,
+      "topdeck_setup": 1,
+      "treasure_or_discard_ramp": 6,
+      "turn_cycle_miracle_mana": 2,
+      "tutors_access": 6,
+      "unknown": 14,
+      "utility_land": 1
+    },
+    "source_counts": {
+      "interaction": 12,
+      "mana": 50,
+      "payoff": 14,
+      "selection": 5,
+      "staple": 80
+    },
+    "unique_candidate_count": 137
+  },
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "next_actions": [
+      "repair role/tag watch items before trusting automated cuts",
+      "generate only named same-lane packages from a specific 607 failure target",
+      "run equal opponent and seed gates with trace proof that the candidate was drawn, cast, and used",
+      "promote only if the challenger preserves land/ramp/draw/removal/protection/wincon density and beats 607"
+    ],
+    "promotion_allowed": false,
+    "reason": "The current learning axes agree that 607 remains protected: no candidate has a complete same-lane cut, equal-seed battle gate, and card-use proof. Legal cards such as Mana Vault and The One Ring stay hypotheses or blocked prior evidence until they beat the current role they challenge."
+  },
+  "deck_id": 607,
+  "deck_shape": {
+    "commander_names": [
+      "Lorehold, the Historian"
+    ],
+    "deck_id": 607,
+    "deck_rows": 94,
+    "deck_shape_ok": true,
+    "total_cards": 100
+  },
+  "external_learning": [
+    {
+      "learning": "Commander is a 100-card constructed format and Wizards now frames deck expectations through optional brackets. ManaLoom should keep format legality separate from power-bracket and deck-plan fit.",
+      "source": "Wizards Commander format page",
+      "url": "https://magic.wizards.com/en/formats/commander"
+    },
+    {
+      "learning": "Commander ban checks are format-specific. Mana Crypt, Jeweled Lotus, and the original Moxen are Commander-banned, but that does not make every legal fast-mana card correct for 607.",
+      "source": "Wizards banned and restricted list",
+      "url": "https://magic.wizards.com/en/banned-restricted-list"
+    },
+    {
+      "learning": "Mana Vault is Commander-legal in Scryfall data checked on 2026-07-04, so its current exclusion is evidence/policy based, not legality based.",
+      "source": "Scryfall Mana Vault API",
+      "url": "https://api.scryfall.com/cards/named?exact=Mana%20Vault"
+    },
+    {
+      "learning": "The One Ring is Commander-legal in Scryfall data checked on 2026-07-04, so it needs same-lane draw/protection proof before challenging 607.",
+      "source": "Scryfall The One Ring API",
+      "url": "https://api.scryfall.com/cards/named?exact=The%20One%20Ring"
+    },
+    {
+      "learning": "Recent Lorehold deckbuilding coverage emphasizes miracle/topdeck and Boros spellslinger execution. That supports prioritizing commander cadence over generic staple rank.",
+      "source": "EDHREC Lorehold articles",
+      "url": "https://edhrec.com/articles/tag/lorehold"
+    }
+  ],
+  "generated_at": "2026-07-04T21:09:33Z",
+  "learning_model": {
+    "deckbuilding_principles": [
+      "Legality is only the first filter; promotion needs commander-plan fit and battle proof.",
+      "Every replacement must name the same-lane card it challenges.",
+      "A famous staple is pressure to investigate, not automatic inclusion.",
+      "Protected anchors cannot be cut unless the candidate preserves the same function and wins an equal gate.",
+      "A candidate must be drawn/cast/used in evidence traces before a battle result can promote it."
+    ],
+    "lorehold_priority_order": [
+      "commander miracle/topdeck cadence",
+      "Top/Rack/Library/Land Tax access package",
+      "turn-cycle miracle mana such as Bender's Waterskin and Victory Chimes",
+      "interaction/protection that keeps the commander turn alive",
+      "payoff conversion and recursion that actually closes games",
+      "generic staples only after lane and sequence proof"
+    ],
+    "mana_policy": [
+      "Keep land/ramp counts and Boros source counts inside the proven 607 profile unless a candidate proves the tradeoff.",
+      "Fast colorless mana has to improve the critical turn without breaking colored fixing or miracle cadence.",
+      "Mana Vault is not blocked by Commander legality; it is blocked by current 607 gate evidence."
+    ],
+    "staple_policy": [
+      "The One Ring is legal but not automatically better than the current draw/protection/topdeck structure.",
+      "Original Moxen, Mana Crypt, and Jeweled Lotus remain Commander-banned under current official banlist evidence.",
+      "Premium or cEDH-style packages require budget/policy approval plus same-lane promotion proof."
+    ]
+  },
+  "postgres_writes": false,
+  "promotion_gate_checklist": [
+    {
+      "evidence": "100 cards, commanders=['Lorehold, the Historian']",
+      "gate": "baseline_deck_shape",
+      "passed": true
+    },
+    {
+      "evidence": "card_value, interaction, mana, payoff, selection, staple",
+      "gate": "all_axis_reports_loaded",
+      "passed": true
+    },
+    {
+      "evidence": "gate_ready_candidate_count=0",
+      "gate": "axis_decisions_do_not_promote_candidate",
+      "passed": true
+    },
+    {
+      "evidence": "role_mapping_watch_items=5",
+      "gate": "role_tag_watch_before_new_cuts",
+      "passed": false,
+      "required_before_promotion": true
+    },
+    {
+      "evidence": "No current candidate has a complete named cut plus equal gate proof.",
+      "gate": "same_lane_cut_named",
+      "passed": false,
+      "required_before_promotion": true
+    },
+    {
+      "evidence": "No current challenger has equal-opponent, equal-seed, card-used promotion proof over 607.",
+      "gate": "equal_battle_gate_with_card_use",
+      "passed": false,
+      "required_before_promotion": true
+    }
+  ],
+  "role_mapping_watch_items": [
+    {
+      "card_name": "Deflecting Swat",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "draw",
+      "primary_value_lane": "protection_resilience",
+      "watch": [
+        "draw_tag_masks_interaction_or_protection_function"
+      ]
+    },
+    {
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "unknown",
+      "primary_value_lane": "protection_resilience",
+      "watch": [
+        "unmapped_primary_tag:unknown"
+      ]
+    },
+    {
+      "card_name": "Promise of Loyalty",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "draw",
+      "primary_value_lane": "protection_resilience",
+      "watch": [
+        "draw_tag_masks_interaction_or_protection_function"
+      ]
+    },
+    {
+      "card_name": "Redirect Lightning",
+      "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+      "functional_tag": "draw",
+      "primary_value_lane": "interaction_removal",
+      "watch": [
+        "draw_tag_masks_interaction_or_protection_function"
+      ]
+    },
+    {
+      "card_name": "Tragic Arrogance",
+      "cut_policy": "review_role_mapping_before_cut",
+      "functional_tag": "unknown",
+      "primary_value_lane": "unknown",
+      "watch": [
+        "unmapped_primary_tag:unknown"
+      ]
+    }
+  ],
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_reports": {
+    "card_value": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_value_priority_synthesis_20260704_learning.json",
+    "interaction": "docs/hermes-analysis/master_optimizer_reports/lorehold_interaction_resilience_synthesis_20260704_learning.json",
+    "mana": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_sequence_policy_synthesis_20260704_learning.json",
+    "payoff": "docs/hermes-analysis/master_optimizer_reports/lorehold_payoff_finisher_recursion_synthesis_20260704_learning.json",
+    "selection": "docs/hermes-analysis/master_optimizer_reports/lorehold_selection_access_synthesis_20260704_learning.json",
+    "staple": "docs/hermes-analysis/master_optimizer_reports/lorehold_staple_policy_synthesis_20260704_learning.json"
+  },
+  "status": "promotion_readiness_keep_607_no_candidate_ready",
+  "summary": {
+    "axis_count": 6,
+    "blocked_or_rejected_count": 38,
+    "deck_rows": 94,
+    "gate_ready_candidate_count": 0,
+    "hypothesis_or_gate_needed_count": 95,
+    "promotion_allowed": false,
+    "reports_loaded": 6,
+    "role_mapping_watch_count": 5,
+    "total_cards": 100,
+    "unique_candidate_count": 137
+  }
+}
