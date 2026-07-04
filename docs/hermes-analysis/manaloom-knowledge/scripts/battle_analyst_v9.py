@@ -17255,7 +17255,7 @@ def resolve_generic_permanent_etb(
             turn=turn,
             **replay_rule_fields(effect_data),
         )
-    if effect_data.get("etb_damage_amount"):
+    if effect_data.get("etb_damage_amount") or effect_data.get("etb_dynamic_damage"):
         amount = int(effect_data.get("etb_damage_amount") or 0)
         etb_damage_effect = {
             **effect_data,
@@ -17263,8 +17263,22 @@ def resolve_generic_permanent_etb(
             "amount": amount,
             "damage": amount,
             "target": effect_data.get("etb_damage_target") or effect_data.get("target"),
+            "target_controller": effect_data.get("target_controller"),
             "target_constraints": effect_data.get("target_constraints") or {},
         }
+        if effect_data.get("etb_dynamic_damage"):
+            for key in (
+                "damage_amount_source",
+                "damage_base_amount",
+                "damage_per_count",
+                "damage_per_graveyard_count",
+                "graveyard_count_scope",
+                "graveyard_count_card_types",
+                "graveyard_count_subtypes",
+                "graveyard_count_card_names",
+            ):
+                if effect_data.get(key) is not None:
+                    etb_damage_effect[key] = effect_data.get(key)
         apply_direct_damage(
             player,
             opponents,

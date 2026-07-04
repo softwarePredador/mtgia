@@ -19288,6 +19288,43 @@
     "battle_rule_logical_key": "battle_rule_v1:a477e4ac3fa3dc3fd4429fa8ac2d7939",
     "battle_rule_oracle_hash": "581d2a5939d6cbf464ecd85a7495604e"
   },
+  "Cyclops Electromancer": {
+    "ability_kind": "triggered",
+    "amount": 0,
+    "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+    "damage": 0,
+    "damage_amount_source": "graveyard_card_count",
+    "damage_base_amount": 0,
+    "damage_per_graveyard_count": 1,
+    "effect": "creature",
+    "etb_damage_target": "creature",
+    "etb_dynamic_damage": true,
+    "graveyard_count_card_types": [
+      "instant",
+      "sorcery"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "opponent"
+    },
+    "target_controller": "opponent",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:38b4656bd20b7355310d44e4580bc6cc",
+    "battle_rule_oracle_hash": "6fa0a410670c7cae1dbe5a9aa56cc129"
+  },
   "D'Avenant Archer": {
     "_activated_rule_effects": [
       {
@@ -52015,6 +52052,38 @@
     "battle_rule_logical_key": "battle_rule_v1:c5987c2df49d9fa483a1cc9a5ac26fbb",
     "battle_rule_oracle_hash": "44735ae3d1d2459d0d25c8023930b6a1"
   },
+  "Lotleth Giant": {
+    "ability_kind": "triggered",
+    "amount": 0,
+    "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+    "damage": 0,
+    "damage_amount_source": "graveyard_card_count",
+    "damage_base_amount": 0,
+    "damage_per_graveyard_count": 1,
+    "effect": "creature",
+    "etb_damage_target": "opponent",
+    "etb_dynamic_damage": true,
+    "graveyard_count_card_types": [
+      "creature"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "instant": false,
+    "sorcery": false,
+    "target": "opponent",
+    "target_constraints": {
+      "scope": "opponent"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7a8697df610f35c9f5af7d1a0babeba2",
+    "battle_rule_oracle_hash": "87bb35781c7f441f3b92bd3ddd1332e5"
+  },
   "Lotus Bloom": {
     "cmc": 0.0,
     "effect": "ramp_ritual",
@@ -61240,6 +61309,43 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ecda6bfc60502b13ee8f4ad0ccad351b",
     "battle_rule_oracle_hash": "8d24b3d8144258d6e7637b1f848efb1e"
+  },
+  "Ossuary Rats": {
+    "ability_kind": "triggered",
+    "amount": 0,
+    "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+    "damage": 0,
+    "damage_amount_source": "graveyard_card_count",
+    "damage_base_amount": 0,
+    "damage_per_graveyard_count": 1,
+    "effect": "creature",
+    "etb_damage_target": "creature_or_planeswalker",
+    "etb_dynamic_damage": true,
+    "graveyard_count_card_types": [
+      "creature"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature_or_planeswalker",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "planeswalker"
+      ],
+      "controller": "opponent"
+    },
+    "target_controller": "opponent",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3c3475330943e9542421f2d7baafa684",
+    "battle_rule_oracle_hash": "efc330b3c7dad6d9bed7b84b60761592"
   },
   "Oswald Fiddlebender": {
     "effect": "creature",
@@ -99861,6 +99967,43 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
     "battle_rule_oracle_hash": "91702377ce6d69cc19357882d3ac24de"
+  },
+  "Warfire Javelineer": {
+    "ability_kind": "triggered",
+    "amount": 0,
+    "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+    "damage": 0,
+    "damage_amount_source": "graveyard_card_count",
+    "damage_base_amount": 0,
+    "damage_per_graveyard_count": 1,
+    "effect": "creature",
+    "etb_damage_target": "creature",
+    "etb_dynamic_damage": true,
+    "graveyard_count_card_types": [
+      "instant",
+      "sorcery"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "opponent"
+    },
+    "target_controller": "opponent",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:38b4656bd20b7355310d44e4580bc6cc",
+    "battle_rule_oracle_hash": "6fa0a410670c7cae1dbe5a9aa56cc129"
   },
   "Warleader's Call": {
     "ability_kind": "triggered",

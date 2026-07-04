@@ -228,6 +228,100 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 if "card_types" in fixture:
                     self.assertEqual(effect["graveyard_count_card_types"], fixture["card_types"])
 
+    def test_creature_etb_dynamic_graveyard_count_damage_maps_to_runtime(self) -> None:
+        fixtures = [
+            {
+                "name": "Cyclops Electromancer",
+                "oracle": (
+                    "When Cyclops Electromancer enters the battlefield, it deals X damage to target "
+                    "creature an opponent controls, where X is the number of instant and sorcery "
+                    "cards in your graveyard."
+                ),
+                "source": """
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(
+                        new DamageTargetEffect(new CardsInControllerGraveyardCount(
+                            StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY)))
+                        .setText("it deals X damage to target creature an opponent controls"));
+                    ability.addTarget(new TargetOpponentsCreaturePermanent());
+                """,
+                "target": "creature",
+                "target_controller": "opponent",
+                "card_types": ["instant", "sorcery"],
+                "per": 1,
+            },
+            {
+                "name": "Lotleth Giant",
+                "oracle": (
+                    "Undergrowth — When Lotleth Giant enters the battlefield, it deals 1 damage "
+                    "to target opponent for each creature card in your graveyard."
+                ),
+                "source": """
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(
+                        new DamageTargetEffect(new CardsInControllerGraveyardCount(
+                            StaticFilters.FILTER_CARD_CREATURE))));
+                    this.getSpellAbility().addTarget(new TargetOpponent());
+                """,
+                "target": "opponent",
+                "card_types": ["creature"],
+                "per": 1,
+            },
+            {
+                "name": "Ossuary Rats",
+                "oracle": (
+                    "When Ossuary Rats enters, it deals X damage to target creature or planeswalker "
+                    "an opponent controls, where X is the number of creature cards in your graveyard."
+                ),
+                "source": """
+                    FilterCreatureOrPlaneswalkerPermanent filter =
+                        new FilterCreatureOrPlaneswalkerPermanent(
+                            "creature or planeswalker an opponent controls");
+                    filter.add(TargetController.OPPONENT.getControllerPredicate());
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(
+                        new DamageTargetEffect(new CardsInControllerGraveyardCount(
+                            StaticFilters.FILTER_CARD_CREATURES))));
+                    ability.addTarget(new TargetPermanent(filter));
+                """,
+                "target": "creature_or_planeswalker",
+                "target_controller": "opponent",
+                "card_types": ["creature"],
+                "per": 1,
+            },
+        ]
+
+        for fixture in fixtures:
+            with self.subTest(card=fixture["name"]):
+                row = queue_row(
+                    split.RECURSION_UNIT,
+                    effect_classes=["DamageTargetEffect"],
+                    card_id=fixture["name"],
+                    ability_kind="triggered",
+                    ability_classes=["EntersBattlefieldTriggeredAbility"],
+                    xmage_signals=["targeting", "triggered_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=fixture["name"],
+                        type_line="Creature - Zombie",
+                        oracle_text=fixture["oracle"],
+                    ),
+                    source_text=fixture["source"],
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["effect"], "creature")
+                self.assertEqual(effect["battle_model_scope"], split.ETB_GRAVEYARD_COUNT_DAMAGE_CREATURE_SCOPE)
+                self.assertTrue(effect["etb_dynamic_damage"])
+                self.assertEqual(effect["damage_amount_source"], "graveyard_card_count")
+                self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+                self.assertEqual(effect["graveyard_count_card_types"], fixture["card_types"])
+                self.assertEqual(effect["damage_per_graveyard_count"], fixture["per"])
+                self.assertEqual(effect["target"], fixture["target"])
+                self.assertEqual(effect.get("target_controller"), fixture.get("target_controller"))
+                if fixture.get("target_controller"):
+                    self.assertEqual(effect["target_constraints"]["controller"], fixture["target_controller"])
+
     def test_dynamic_graveyard_count_damage_blocks_unsupported_neighbors(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

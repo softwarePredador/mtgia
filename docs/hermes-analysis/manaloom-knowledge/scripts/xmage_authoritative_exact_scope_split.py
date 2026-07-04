@@ -184,6 +184,9 @@ ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE = "xmage_creature_etb_draw_lose_life_v1"
 ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
+ETB_GRAVEYARD_COUNT_DAMAGE_CREATURE_SCOPE = (
+    "xmage_creature_etb_dynamic_graveyard_count_damage_v1"
+)
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
 ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_battlefield_v1"
@@ -4755,6 +4758,16 @@ def is_creature_etb_damage_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_graveyard_count_damage_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DamageTargetEffect"}
+        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
 def is_creature_etb_destroy_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DESTROY_UNIT:
         return False
@@ -5048,6 +5061,43 @@ def graveyard_count_damage_target_from_oracle(metadata: dict[str, Any]) -> str |
 def graveyard_count_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
     text = oracle_text(metadata)
     card_name = str(metadata.get("name") or "").strip()
+    etb_x_match = re.match(
+        r"^(?:[a-z0-9' -]+\s+[—-]\s+)?when .+ enters(?: the battlefield)?, "
+        r"(?:it|this creature) deals x damage to (?P<target>target creature an opponent controls|"
+        r"target creature or planeswalker an opponent controls), where x is the number of "
+        r"(?P<filter>instant and sorcery|creature) cards in your graveyard\.?$",
+        text,
+    )
+    if etb_x_match:
+        target_phrase = etb_x_match.group("target")
+        count_filter = etb_x_match.group("filter")
+        target = "creature_or_planeswalker" if "planeswalker" in target_phrase else "creature"
+        count_types = ["instant", "sorcery"] if count_filter == "instant and sorcery" else [count_filter]
+        return {
+            "target": target,
+            "target_controller": "opponent",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": count_types,
+            "damage_base_amount": 0,
+            "damage_per_graveyard_count": 1,
+        }
+    etb_for_each_match = re.match(
+        r"^(?:[a-z0-9' -]+\s+[—-]\s+)?when .+ enters(?: the battlefield)?, "
+        r"(?:it|this creature) deals (?P<amount>\d+) damage to target opponent for each "
+        r"(?P<filter>creature) card in your graveyard\.?$",
+        text,
+    )
+    if etb_for_each_match:
+        amount = int(etb_for_each_match.group("amount"))
+        if amount <= 0:
+            return "graveyard_count_damage_etb_per_count_not_positive"
+        return {
+            "target": "opponent",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": [etb_for_each_match.group("filter")],
+            "damage_base_amount": 0,
+            "damage_per_graveyard_count": amount,
+        }
     named_controller = re.match(
         r"^.+ deals x damage to target creature, where x is 2 plus the number of cards named (.+) in your graveyard\.?$",
         text,
@@ -5110,19 +5160,31 @@ def graveyard_count_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, An
     return None
 
 
-def graveyard_count_damage_source_target_matches(source: str, target: str) -> bool:
+def graveyard_count_damage_source_target_matches(
+    source: str,
+    target: str,
+    target_controller: str | None = None,
+) -> bool:
     text = source or ""
+    if target_controller == "opponent":
+        if target == "creature":
+            return "TargetOpponentsCreaturePermanent" in text
+        if target == "creature_or_planeswalker":
+            return "FilterCreatureOrPlaneswalkerPermanent" in text and "TargetController.OPPONENT" in text
     if target == "creature":
         return "TargetCreaturePermanent" in text
     if target == "any_target":
         return "TargetAnyTarget" in text
     if target == "player_or_planeswalker":
         return "TargetPlayerOrPlaneswalker" in text
+    if target == "opponent":
+        return "TargetOpponent" in text
     return False
 
 
 def graveyard_count_damage_from_source(source: str, metadata: dict[str, Any]) -> dict[str, Any] | str | None:
     text = source or ""
+    compact_text = re.sub(r"\s+", "", text)
     if "ExileXFromYourGraveCost" in text:
         return "graveyard_count_damage_exile_x_graveyard_cost_not_supported"
     if "AdventurePredicate" in text:
@@ -5166,6 +5228,39 @@ def graveyard_count_damage_from_source(source: str, metadata: dict[str, Any]) ->
             "damage_base_amount": 0,
             "damage_per_graveyard_count": 1,
         }
+    if (
+        "CardsInControllerGraveyardCount(StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY)" in compact_text
+        or "CardsInControllerGraveyardCount(newFilterInstantOrSorceryCard())" in compact_text
+    ):
+        return {
+            "target": "creature",
+            "target_controller": "opponent",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["instant", "sorcery"],
+            "damage_base_amount": 0,
+            "damage_per_graveyard_count": 1,
+        }
+    if (
+        "CardsInControllerGraveyardCount(StaticFilters.FILTER_CARD_CREATURE)" in compact_text
+        or "CardsInControllerGraveyardCount(StaticFilters.FILTER_CARD_CREATURES)" in compact_text
+    ):
+        if "TargetOpponent" in text:
+            return {
+                "target": "opponent",
+                "graveyard_count_scope": "controller_graveyard",
+                "graveyard_count_card_types": ["creature"],
+                "damage_base_amount": 0,
+                "damage_per_graveyard_count": 1,
+            }
+        if "FilterCreatureOrPlaneswalkerPermanent" in text and "TargetController.OPPONENT" in text:
+            return {
+                "target": "creature_or_planeswalker",
+                "target_controller": "opponent",
+                "graveyard_count_scope": "controller_graveyard",
+                "graveyard_count_card_types": ["creature"],
+                "damage_base_amount": 0,
+                "damage_per_graveyard_count": 1,
+            }
     return "graveyard_count_damage_source_dynamic_not_supported"
 
 
@@ -9889,6 +9984,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed damage spell with exile-if-dies replacement"
     elif scope == GRAVEYARD_COUNT_DAMAGE_SCOPE:
         scope_kind = "dynamic graveyard-count damage spell"
+    elif scope == ETB_GRAVEYARD_COUNT_DAMAGE_CREATURE_SCOPE:
+        scope_kind = "creature ETB dynamic graveyard-count damage trigger"
     elif scope == DESTROY_GAIN_LIFE_SCOPE:
         scope_kind = "fixed destroy-target plus controller life-gain spell"
     elif scope == LIFE_GAIN_DRAW_SCOPE:
@@ -10036,6 +10133,7 @@ def split_row(
     permanent_activated_draw_discard_unit = is_permanent_activated_draw_discard_unit(row)
     dies_recursion_creature_unit = is_creature_dies_recursion_unit(row)
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
+    etb_graveyard_count_damage_creature_unit = is_creature_etb_graveyard_count_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     etb_recursion_battlefield_creature_unit = is_creature_etb_recursion_battlefield_unit(row)
@@ -10108,6 +10206,7 @@ def split_row(
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
+        and not etb_graveyard_count_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not etb_recursion_battlefield_creature_unit
@@ -10159,6 +10258,7 @@ def split_row(
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
+        and not etb_graveyard_count_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not etb_recursion_battlefield_creature_unit
@@ -13850,6 +13950,67 @@ def split_row(
                 effect_json,
                 family_id="xmage_static_play_lands_from_graveyard",
             ), "selected_exact_scope"
+        if etb_graveyard_count_damage_creature_unit:
+            if not is_creature_metadata(metadata):
+                return None, "etb_graveyard_count_damage_not_creature"
+            if ability_kind(row) != "triggered":
+                return None, "etb_graveyard_count_damage_not_triggered"
+            oracle_spec = graveyard_count_damage_from_oracle(metadata)
+            if isinstance(oracle_spec, str):
+                return None, oracle_spec
+            if oracle_spec is None:
+                return None, "etb_graveyard_count_damage_oracle_not_supported"
+            source_spec = graveyard_count_damage_from_source(source_text, metadata)
+            if isinstance(source_spec, str):
+                return None, source_spec
+            if source_spec is None:
+                return None, "etb_graveyard_count_damage_source_not_supported"
+            for key in (
+                "target",
+                "target_controller",
+                "graveyard_count_scope",
+                "graveyard_count_card_types",
+                "graveyard_count_subtypes",
+                "graveyard_count_card_names",
+                "damage_base_amount",
+                "damage_per_graveyard_count",
+            ):
+                if oracle_spec.get(key) != source_spec.get(key):
+                    return None, f"etb_graveyard_count_damage_{key}_mismatch"
+            target = str(oracle_spec["target"])
+            target_controller = oracle_spec.get("target_controller")
+            if not graveyard_count_damage_source_target_matches(
+                source_text,
+                target,
+                str(target_controller) if target_controller else None,
+            ):
+                return None, "etb_graveyard_count_damage_target_source_mismatch"
+            target_constraints = target_constraints_for(target)
+            if target_controller:
+                target_constraints["controller"] = str(target_controller)
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": ETB_GRAVEYARD_COUNT_DAMAGE_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "etb_dynamic_damage": True,
+                "etb_damage_target": target,
+                "damage_amount_source": "graveyard_card_count",
+                "amount": 0,
+                "damage": 0,
+                "target": target,
+                "target_constraints": target_constraints,
+                "xmage_effect_class": "DamageTargetEffect",
+                "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+                **oracle_spec,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_etb_dynamic_graveyard_count_damage",
+            ), "selected_exact_scope"
         if graveyard_count_damage_unit:
             if not is_spell(metadata):
                 return None, "not_instant_or_sorcery_spell"
@@ -13872,6 +14033,7 @@ def split_row(
                 return None, "graveyard_count_damage_source_not_supported"
             for key in (
                 "target",
+                "target_controller",
                 "graveyard_count_scope",
                 "graveyard_count_card_types",
                 "graveyard_count_subtypes",
@@ -13882,8 +14044,16 @@ def split_row(
                 if oracle_spec.get(key) != source_spec.get(key):
                     return None, f"graveyard_count_damage_{key}_mismatch"
             target = str(oracle_spec["target"])
-            if not graveyard_count_damage_source_target_matches(source_text, target):
+            target_controller = oracle_spec.get("target_controller")
+            if not graveyard_count_damage_source_target_matches(
+                source_text,
+                target,
+                str(target_controller) if target_controller else None,
+            ):
                 return None, "graveyard_count_damage_target_source_mismatch"
+            target_constraints = target_constraints_for(target)
+            if target_controller:
+                target_constraints["controller"] = str(target_controller)
             effect_json = {
                 "effect": "direct_damage",
                 "battle_model_scope": GRAVEYARD_COUNT_DAMAGE_SCOPE,
@@ -13891,7 +14061,7 @@ def split_row(
                 "amount": 0,
                 "damage": 0,
                 "target": target,
-                "target_constraints": target_constraints_for(target),
+                "target_constraints": target_constraints,
                 "xmage_effect_class": "DamageTargetEffect",
                 **oracle_spec,
                 **flags,

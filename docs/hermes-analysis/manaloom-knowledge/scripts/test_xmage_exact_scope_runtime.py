@@ -4706,6 +4706,123 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_dynamic_graveyard_damage_counts_instant_sorcery(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard = [
+            {"name": "Lightning Bolt", "type_line": "Instant"},
+            {"name": "Faithless Looting", "type_line": "Sorcery"},
+            {"name": "Goblin Guide", "type_line": "Creature - Goblin"},
+        ]
+        target = {
+            "name": "Target Guardian",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_dynamic_damage": True,
+            "etb_damage_target": "creature",
+            "damage_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["instant", "sorcery"],
+            "damage_base_amount": 0,
+            "damage_per_graveyard_count": 1,
+            "target": "creature",
+            "target_controller": "opponent",
+            "target_constraints": {"card_types": ["creature"], "controller": "opponent"},
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_graveyard_damage",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Electromancer",
+                "type_line": "Creature - Cyclops Wizard",
+                "oracle_text": "When this creature enters, it deals X damage to target creature an opponent controls.",
+                "power": 4,
+                "toughness": 2,
+            },
+            turn=5,
+            rng=random.Random(50),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Electromancer"])
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Guardian"])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Electromancer"
+                and data.get("target") == "Target Guardian"
+                and data.get("amount") == 2
+                and data.get("graveyard_damage_count") == 2
+                and data.get("result") == "creature_destroyed"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_dynamic_graveyard_damage_counts_creatures_to_opponent(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 20
+        active.graveyard = [
+            {"name": "Sakura-Tribe Elder", "type_line": "Creature - Snake Shaman"},
+            {"name": "Satyr Wayfinder", "type_line": "Creature - Satyr"},
+            {"name": "Murder", "type_line": "Instant"},
+        ]
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_dynamic_damage": True,
+            "etb_damage_target": "opponent",
+            "damage_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["creature"],
+            "damage_base_amount": 0,
+            "damage_per_graveyard_count": 1,
+            "target": "opponent",
+            "target_constraints": {"scope": "opponent"},
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_graveyard_opponent_damage",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Giant",
+                "type_line": "Creature - Zombie Giant",
+                "oracle_text": "When this creature enters, it deals 1 damage to target opponent for each creature card in your graveyard.",
+                "power": 6,
+                "toughness": 5,
+            },
+            turn=6,
+            rng=random.Random(51),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 18)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Giant"
+                and data.get("target_player") == "Opponent"
+                and data.get("amount") == 2
+                and data.get("graveyard_damage_count") == 2
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_tap_damage_enters_without_damage_then_activates(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
