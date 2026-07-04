@@ -30,6 +30,88 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
     def tearDown(self) -> None:
         self.battle.REPLAY_EVENT_HANDLER = self.previous_handler
 
+    def test_static_flash_permission_artifact_filter_only_allows_artifacts(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        artifact = {"name": "Mind Stone", "type_line": "Artifact", "mana_cost": "{2}"}
+        creature = {"name": "Runeclaw Bear", "type_line": "Creature - Bear", "mana_cost": "{1}{G}"}
+        sorcery = {"name": "Divination", "type_line": "Sorcery", "mana_cost": "{2}{U}"}
+
+        self.assertFalse(
+            self.battle.can_cast_in_phase(artifact, {"effect": "passive"}, "combat", controller=active)
+        )
+
+        active.battlefield = [
+            {
+                "name": "Shimmer Myr",
+                "type_line": "Artifact Creature - Myr",
+                "effect": "flash_permission",
+                "cast_spells_as_flash": True,
+                "flash_permission_filter": "artifact_spells",
+                "flash_permission_controller": "self",
+            }
+        ]
+
+        self.assertTrue(
+            self.battle.can_cast_in_phase(artifact, {"effect": "passive"}, "combat", controller=active)
+        )
+        self.assertFalse(
+            self.battle.can_cast_in_phase(creature, {"effect": "creature"}, "combat", controller=active)
+        )
+        self.assertFalse(
+            self.battle.can_cast_in_phase(sorcery, {"effect": "draw_cards"}, "combat", controller=active)
+        )
+
+    def test_static_flash_permission_any_player_sliver_filter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        self.battle.bind_table_context([active, opponent])
+        active.battlefield = [
+            {
+                "name": "Quick Sliver",
+                "type_line": "Creature - Sliver",
+                "effect": "flash_permission",
+                "cast_spells_as_flash": True,
+                "flash_permission_filter": "sliver_spells",
+                "flash_permission_controller": "any_player",
+                "flash_permission_any_player": True,
+            }
+        ]
+        sliver = {"name": "Muscle Sliver", "type_line": "Creature - Sliver", "mana_cost": "{1}{G}"}
+        bear = {"name": "Runeclaw Bear", "type_line": "Creature - Bear", "mana_cost": "{1}{G}"}
+
+        self.assertTrue(
+            self.battle.can_cast_in_phase(sliver, {"effect": "creature"}, "combat", controller=opponent)
+        )
+        self.assertFalse(
+            self.battle.can_cast_in_phase(bear, {"effect": "creature"}, "combat", controller=opponent)
+        )
+
+    def test_static_flash_permission_green_creature_filter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.battlefield = [
+            {
+                "name": "Yeva, Nature's Herald",
+                "type_line": "Legendary Creature - Elf Shaman",
+                "effect": "flash_permission",
+                "cast_spells_as_flash": True,
+                "flash_permission_filter": "green_creature_spells",
+                "flash_permission_controller": "self",
+            }
+        ]
+        green_creature = {"name": "Elvish Mystic", "type_line": "Creature - Elf Druid", "mana_cost": "{G}"}
+        white_creature = {"name": "Savannah Lions", "type_line": "Creature - Cat", "mana_cost": "{W}"}
+        artifact = {"name": "Mind Stone", "type_line": "Artifact", "mana_cost": "{2}"}
+
+        self.assertTrue(
+            self.battle.can_cast_in_phase(green_creature, {"effect": "creature"}, "combat", controller=active)
+        )
+        self.assertFalse(
+            self.battle.can_cast_in_phase(white_creature, {"effect": "creature"}, "combat", controller=active)
+        )
+        self.assertFalse(
+            self.battle.can_cast_in_phase(artifact, {"effect": "passive"}, "combat", controller=active)
+        )
+
     def test_static_play_lands_from_graveyard_uses_graveyard_land_when_no_hand_or_topdeck(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -195,6 +195,7 @@ STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE = (
     "xmage_static_self_protection_from_colors_creature_v1"
 )
+STATIC_CAST_AS_FLASH_PERMISSION_SCOPE = "xmage_static_cast_spells_as_flash_permission_v1"
 STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
@@ -404,6 +405,11 @@ STATIC_SELF_KEYWORD_ORDER = [
     "shroud",
     "indestructible",
 ]
+FLASH_PERMISSION_AUXILIARY_ABILITY_CLASSES = {
+    **STATIC_SELF_KEYWORD_ABILITY_CLASSES,
+    "FlashAbility": "flash",
+}
+FLASH_PERMISSION_KEYWORD_ORDER = ["flash", *STATIC_SELF_KEYWORD_ORDER]
 TARGET_GRANT_KEYWORD_ABILITY_CLASSES = {
     key: value
     for key, value in STATIC_SELF_KEYWORD_ABILITY_CLASSES.items()
@@ -452,6 +458,17 @@ PROTECTION_OBJECT_COLOR_WORDS = {
     "GREEN": "green",
 }
 PROTECTION_COLOR_ORDER = ["white", "blue", "black", "red", "green"]
+
+FLASH_PERMISSION_UNIT = "passive::static_cast_as_flash_permission_variant_review_v1"
+FLASH_PERMISSION_FILTERS = {
+    "nonland_spells",
+    "artifact_spells",
+    "sorcery_spells",
+    "historic_spells",
+    "sliver_spells",
+    "creature_or_enchantment_spells",
+    "green_creature_spells",
+}
 
 
 def utc_now() -> str:
@@ -4530,6 +4547,18 @@ def is_static_protection_from_colors_creature_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_static_cast_as_flash_permission_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleStaticAbility"}
+    return (
+        str(row.get("adapter_work_unit") or "") == FLASH_PERMISSION_UNIT
+        and effect_classes(row) == {"CastAsThoughItHadFlashAllEffect"}
+        and set(row.get("xmage_signals") or []) == {"static_ability"}
+        and "SimpleStaticAbility" in abilities
+        and remaining.issubset(FLASH_PERMISSION_AUXILIARY_ABILITY_CLASSES)
+    )
+
+
 def is_creature_etb_life_gain_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
         return False
@@ -5201,6 +5230,130 @@ def oracle_text_after_leading_static_keywords(metadata: dict[str, Any]) -> str:
         skipping_keywords = False
         kept.append(line)
     return re.sub(r"\s+", " ", "\n".join(kept).strip()).lower()
+
+
+def static_keywords_before_flash_permission_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
+    raw = str(metadata.get("oracle_text") or "").strip()
+    if not raw:
+        return None
+    allowed = set(FLASH_PERMISSION_AUXILIARY_ABILITY_CLASSES.values())
+    keywords: set[str] = set()
+    for line in raw.splitlines():
+        cleaned = strip_parenthetical_reminders(line).strip().rstrip(".").lower()
+        if not cleaned:
+            continue
+        if "as though" in cleaned and "flash" in cleaned:
+            return keywords
+        parts = [
+            normalize_keyword_phrase(part)
+            for part in re.split(r"[,;]", cleaned)
+            if str(part or "").strip()
+        ]
+        if not parts:
+            continue
+        if any(part not in allowed for part in parts):
+            return None
+        keywords.update(parts)
+    return None
+
+
+def flash_permission_keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
+    return {
+        FLASH_PERMISSION_AUXILIARY_ABILITY_CLASSES[ability]
+        for ability in ability_classes(row)
+        if ability in FLASH_PERMISSION_AUXILIARY_ABILITY_CLASSES
+    }
+
+
+def ordered_flash_permission_keywords(keywords: set[str]) -> list[str]:
+    return [keyword for keyword in FLASH_PERMISSION_KEYWORD_ORDER if keyword in keywords]
+
+
+def oracle_text_after_leading_flash_permission_keywords(metadata: dict[str, Any]) -> str:
+    raw = str(metadata.get("oracle_text") or "").strip()
+    if not raw:
+        return ""
+    allowed = set(FLASH_PERMISSION_AUXILIARY_ABILITY_CLASSES.values())
+    kept: list[str] = []
+    skipping_keywords = True
+    for line in raw.splitlines():
+        cleaned = re.sub(r"\([^)]*\)", "", line).strip().rstrip(".")
+        parts = [
+            normalize_keyword_phrase(part)
+            for part in re.split(r"[,;]", cleaned)
+            if str(part or "").strip()
+        ]
+        if skipping_keywords and parts and all(part in allowed for part in parts):
+            continue
+        skipping_keywords = False
+        kept.append(line)
+    return re.sub(r"\s+", " ", "\n".join(kept).strip()).lower()
+
+
+def flash_permission_from_oracle(metadata: dict[str, Any]) -> dict[str, str] | str:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_flash_permission_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    patterns: list[tuple[str, str, str]] = [
+        (r"^you may cast spells as though they had flash\.?$", "nonland_spells", "self"),
+        (r"^you may cast artifact spells as though they had flash\.?$", "artifact_spells", "self"),
+        (r"^you may cast sorcery spells as though they had flash\.?$", "sorcery_spells", "self"),
+        (r"^you may cast historic spells as though they had flash\.?$", "historic_spells", "self"),
+        (r"^you may cast green creature spells as though they had flash\.?$", "green_creature_spells", "self"),
+        (r"^any player may cast sliver spells as though they had flash\.?$", "sliver_spells", "any_player"),
+        (
+            r"^any player may cast creature and enchantment spells as though they had flash\.?$",
+            "creature_or_enchantment_spells",
+            "any_player",
+        ),
+    ]
+    for pattern, flash_filter, controller in patterns:
+        if re.fullmatch(pattern, text):
+            return {
+                "flash_permission_filter": flash_filter,
+                "flash_permission_controller": controller,
+            }
+    return "flash_permission_oracle_filter_not_supported"
+
+
+def flash_permission_from_source(source: str) -> dict[str, str] | str:
+    text = source or ""
+    if len(re.findall(r"\bnew\s+CastAsThoughItHadFlashAllEffect\s*\(", text)) != 1:
+        return "flash_permission_source_not_single_effect"
+    effect_match = re.search(r"\bnew\s+CastAsThoughItHadFlashAllEffect\s*\(", text)
+    if not effect_match:
+        return "flash_permission_source_effect_not_found"
+    start = effect_match.start()
+    end = text.find(";", start)
+    snippet = text[start : end if end != -1 else len(text)]
+    controller = "any_player" if re.search(r",\s*true\s*\)?", snippet) else "self"
+
+    flash_filter: str | None = None
+    if "FilterNonlandCard" in text:
+        flash_filter = "nonland_spells"
+    elif "FilterArtifactCard" in text:
+        flash_filter = "artifact_spells"
+    elif "CardType.SORCERY.getPredicate()" in text:
+        flash_filter = "sorcery_spells"
+    elif "HistoricPredicate.instance" in text:
+        flash_filter = "historic_spells"
+    elif "SubType.SLIVER.getPredicate()" in text and "FilterCreatureCard" in text:
+        flash_filter = "sliver_spells"
+    elif (
+        "CardType.CREATURE.getPredicate()" in text
+        and "CardType.ENCHANTMENT.getPredicate()" in text
+    ):
+        flash_filter = "creature_or_enchantment_spells"
+    elif (
+        "FilterCreatureCard" in text
+        and ("ObjectColor.GREEN" in text or "ColorPredicate(ObjectColor.GREEN)" in text)
+    ):
+        flash_filter = "green_creature_spells"
+    if flash_filter not in FLASH_PERMISSION_FILTERS:
+        return "flash_permission_source_filter_not_supported"
+    return {
+        "flash_permission_filter": flash_filter,
+        "flash_permission_controller": controller,
+    }
 
 
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -10565,6 +10718,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature static source power/toughness boost gated by graveyard card count"
     elif scope == STATIC_GRAVEYARD_COUNT_BOOST_SCOPE:
         scope_kind = "creature static source power/toughness boost equal to graveyard card count"
+    elif scope == STATIC_CAST_AS_FLASH_PERMISSION_SCOPE:
+        scope_kind = "static cast-as-though-flash timing permission permanent"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
@@ -10681,6 +10836,7 @@ def split_row(
     static_protection_from_colors_creature_unit = (
         is_static_protection_from_colors_creature_unit(row)
     )
+    static_cast_as_flash_permission_unit = is_static_cast_as_flash_permission_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     dies_life_gain_creature_unit = is_creature_dies_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
@@ -10757,6 +10913,7 @@ def split_row(
         unit not in SUPPORTED_UNITS
         and not keyword_creature_unit
         and not static_protection_from_colors_creature_unit
+        and not static_cast_as_flash_permission_unit
         and not etb_life_gain_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
@@ -10813,6 +10970,7 @@ def split_row(
         (unit in SPELL_UNITS or boost_keyword_spell_unit)
         and not etb_life_gain_creature_unit
         and not static_protection_from_colors_creature_unit
+        and not static_cast_as_flash_permission_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not etb_draw_lose_life_creature_unit
@@ -10874,6 +11032,66 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if static_cast_as_flash_permission_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "flash_permission_not_permanent"
+        oracle_permission = flash_permission_from_oracle(metadata)
+        if isinstance(oracle_permission, str):
+            return None, oracle_permission
+        source_permission = flash_permission_from_source(source_text)
+        if isinstance(source_permission, str):
+            return None, source_permission
+        if source_permission != oracle_permission:
+            return None, "flash_permission_source_oracle_mismatch"
+        keywords = flash_permission_keywords_from_ability_classes(row)
+        oracle_keywords = static_keywords_before_flash_permission_from_oracle(metadata)
+        if oracle_keywords is None:
+            return None, "flash_permission_oracle_keyword_not_exact"
+        if keywords != oracle_keywords:
+            return None, "flash_permission_oracle_keyword_mismatch"
+        keyword_list = ordered_flash_permission_keywords(keywords)
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_type = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "planeswalker"
+            if "planeswalker" in type_line
+            else "battle"
+            if "battle" in type_line
+            else "permanent"
+        )
+        flash_filter = oracle_permission["flash_permission_filter"]
+        controller_scope = oracle_permission["flash_permission_controller"]
+        effect_json = {
+            "effect": "flash_permission",
+            "battle_model_scope": STATIC_CAST_AS_FLASH_PERMISSION_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "cast_as_though_flash",
+            "cast_spells_as_flash": True,
+            "cast_nonland_spells_as_flash": flash_filter == "nonland_spells",
+            "flash_permission_filter": flash_filter,
+            "flash_permission_controller": controller_scope,
+            "flash_permission_any_player": controller_scope == "any_player",
+            "permanent_type": permanent_type,
+            "xmage_effect_class": "CastAsThoughItHadFlashAllEffect",
+            "xmage_ability_class": "SimpleStaticAbility",
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_cast_spells_as_flash_permission",
+        ), "selected_exact_scope"
 
     if permanent_activated_tutor_battlefield_unit:
         if not is_permanent_metadata(metadata) or is_spell(metadata):
@@ -16223,6 +16441,7 @@ def build_exact_split_report(
             str(row.get("adapter_work_unit") or "") not in SUPPORTED_UNITS
             and not is_static_keyword_creature_unit(row)
             and not is_static_protection_from_colors_creature_unit(row)
+            and not is_static_cast_as_flash_permission_unit(row)
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_dies_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
@@ -16296,6 +16515,7 @@ def build_exact_split_report(
             "supported_dynamic_adapter_work_units": [
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
                 "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from color words only",
+                "passive::static_cast_as_flash_permission_variant_review_v1 rows with CastAsThoughItHadFlashAllEffect, SimpleStaticAbility, only safe static keyword auxiliaries including FlashAbility, and exact Oracle/XMage timing-permission filters",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",

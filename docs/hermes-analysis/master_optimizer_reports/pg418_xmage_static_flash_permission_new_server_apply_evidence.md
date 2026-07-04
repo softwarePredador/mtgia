@@ -1,0 +1,17 @@
+# PG418 PostgreSQL Apply Evidence
+
+- Generated at: `2026-07-04T17:54:30Z`
+- Database: `127.0.0.1:15432/halder`
+- Mutations performed: `["postgres_apply_pg418_xmage_static_flash_permission_new_server"]`
+
+## Precheck
+
+`{"cards":["High Fae Trickster","Hypersonic Dragon","Quick Sliver","Raff Capashen, Ship's Mage","Shimmer Myr","Vernal Equinox","Yeva, Nature's Herald"],"existing_expected_rows_before":0,"missing_targets":[],"row_count":7,"total_target_card_rows":7,"would_deprecate_shadow_rows":0}`
+
+## Apply
+
+`{"upserted_rows":7,"deprecated_shadow_rows":0}`
+
+## Postcheck
+
+`{"backup_rows":0,"cards":["High Fae Trickster","Hypersonic Dragon","Quick Sliver","Raff Capashen, Ship's Mage","Shimmer Myr","Vernal Equinox","Yeva, Nature's Herald"],"failed_cards":[],"promoted_oracle_hash_rows":7,"promoted_rule_rows":7,"promoted_verified_auto_rows":7,"row_count":7}`

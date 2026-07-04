@@ -8320,6 +8320,54 @@ subpattern on the new server:
   post-PG417 exact split recheck produced `proposal_count=0`; the remaining
   `314` identities are still explicit missing-source exceptions.
 
+PG418 closed the exact static cast-as-though-flash permission subpattern on the
+new server:
+
+- Split support now maps XMage `CastAsThoughItHadFlashAllEffect` plus
+  `SimpleStaticAbility` into
+  `xmage_static_cast_spells_as_flash_permission_v1` when Oracle and local Java
+  source agree on the exact timing-permission filter and controller scope.
+  Supported filters in this wave are nonland spells, artifact spells, sorcery
+  spells, historic spells, Sliver spells, creature-or-enchantment spells, and
+  green creature spells. Auxiliary `FlashAbility` and safe static self keywords
+  are preserved; Leyline/opening-hand, Background, Aura/enchant, conditional,
+  triggered, cost-reduction, and compound neighbors remain blocked for dedicated
+  mappers.
+- Runtime support now matches flash permissions by filter, respects `self` vs
+  `any_player`, and blocks non-instant artifact/enchantment/planeswalker/battle
+  spells outside main phases unless a matching permission exists. The existing
+  Vedalken Orrery nonland-spell behavior remains compatible.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` plus
+  `test_xmage_exact_scope_runtime.py` (`679` tests total), and
+  `test_xmage_batch_pg_package_builder.py` executed directly without errors.
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg418_static_flash_permission_new_server`
+  produced `7` safe candidates: `High Fae Trickster`, `Hypersonic Dragon`,
+  `Quick Sliver`, `Raff Capashen, Ship's Mage`, `Shimmer Myr`,
+  `Vernal Equinox`, and `Yeva, Nature's Herald`.
+- PostgreSQL package `PG418` was applied on the new server:
+  precheck found `7` target card rows; apply upserted `7` rows and deprecated
+  `0` shadow rows; postcheck verified `7/7` `verified`/`auto` rows with Oracle
+  hashes.
+- PG -> Hermes/SQLite sync loaded `7` PostgreSQL rows for the selected cards,
+  updated `7` SQLite rows, and exported `5484` canonical snapshot rows. The
+  metadata sync in the same cycle matched `6477` PostgreSQL card rows, left
+  `1` unresolved alias, and kept `deck_cards` backfill at `2699/2699` matched
+  rows.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `7` selected cards. The generic E2E
+  battle scenario count was `0`; card behavior execution is covered by the
+  focused runtime tests above.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51`), and legacy contamination.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26547` to `26540`, authoritative adapter-required count from `26233`
+  to `26226`, and the static cast-as-flash work unit from `34` to `27`. The
+  post-PG418 exact split recheck produced `proposal_count=0`; the remaining
+  `314` identities are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

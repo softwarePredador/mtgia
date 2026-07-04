@@ -43,6 +43,104 @@ def metadata(name: str = "Fixture Spell", *, type_line: str = "Instant", oracle_
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_static_cast_as_flash_permission_maps_artifact_filter(self) -> None:
+        row = queue_row(
+            split.FLASH_PERMISSION_UNIT,
+            effect_classes=["CastAsThoughItHadFlashAllEffect"],
+            ability_kind="static",
+            ability_classes=["FlashAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Shimmer Myr",
+                type_line="Artifact Creature - Myr",
+                oracle_text=(
+                    "Flash\n"
+                    "You may cast artifact spells as though they had flash."
+                ),
+            ),
+            source_text="""
+                private static final FilterArtifactCard filter = new FilterArtifactCard("artifact spells");
+                this.addAbility(FlashAbility.getInstance());
+                this.addAbility(new SimpleStaticAbility(new CastAsThoughItHadFlashAllEffect(
+                    Duration.WhileOnBattlefield, filter, false)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_CAST_AS_FLASH_PERMISSION_SCOPE)
+        self.assertEqual(effect["effect"], "flash_permission")
+        self.assertTrue(effect["cast_spells_as_flash"])
+        self.assertFalse(effect["cast_nonland_spells_as_flash"])
+        self.assertEqual(effect["flash_permission_filter"], "artifact_spells")
+        self.assertEqual(effect["flash_permission_controller"], "self")
+        self.assertEqual(effect["keywords"], ["flash"])
+
+    def test_static_cast_as_flash_permission_maps_any_player_sliver_filter(self) -> None:
+        row = queue_row(
+            split.FLASH_PERMISSION_UNIT,
+            effect_classes=["CastAsThoughItHadFlashAllEffect"],
+            ability_kind="static",
+            ability_classes=["FlashAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Quick Sliver",
+                type_line="Creature - Sliver",
+                oracle_text=(
+                    "Flash\n"
+                    "Any player may cast Sliver spells as though they had flash."
+                ),
+            ),
+            source_text="""
+                private static final FilterCreatureCard filter = new FilterCreatureCard("Sliver spells");
+                static { filter.add(SubType.SLIVER.getPredicate()); }
+                this.addAbility(FlashAbility.getInstance());
+                this.addAbility(new SimpleStaticAbility(new CastAsThoughItHadFlashAllEffect(
+                    Duration.WhileOnBattlefield, filter, true)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["flash_permission_filter"], "sliver_spells")
+        self.assertEqual(effect["flash_permission_controller"], "any_player")
+        self.assertTrue(effect["flash_permission_any_player"])
+
+    def test_static_cast_as_flash_permission_blocks_unmodeled_leyline_auxiliary(self) -> None:
+        row = queue_row(
+            split.FLASH_PERMISSION_UNIT,
+            effect_classes=["CastAsThoughItHadFlashAllEffect"],
+            ability_kind="static",
+            ability_classes=["LeylineAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Leyline of Anticipation",
+                type_line="Enchantment",
+                oracle_text=(
+                    "If Leyline of Anticipation is in your opening hand, you may begin the game "
+                    "with it on the battlefield.\n"
+                    "You may cast spells as though they had flash."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new LeylineAbility());
+                this.addAbility(new SimpleStaticAbility(new CastAsThoughItHadFlashAllEffect(
+                    Duration.WhileOnBattlefield, new FilterNonlandCard("spells"))));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "unsupported_adapter_work_unit")
+
     def test_static_play_lands_from_graveyard_maps_to_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

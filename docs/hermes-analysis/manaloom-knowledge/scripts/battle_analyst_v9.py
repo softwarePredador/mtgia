@@ -1065,16 +1065,74 @@ def attach_direct_resolution_context(
     return effect_data
 
 
+def _type_line_lower(card):
+    return str((card or {}).get("type_line") or "").lower() if isinstance(card, dict) else ""
+
+
+def card_is_historic_spell(card):
+    type_line = _type_line_lower(card)
+    return "artifact" in type_line or "legendary" in type_line or "saga" in type_line
+
+
+def flash_permission_card_matches(card, filter_name):
+    if not isinstance(card, dict) or is_effective_land(card):
+        return False
+    normalized_filter = str(filter_name or "nonland_spells").strip().lower()
+    type_line = _type_line_lower(card)
+    if normalized_filter == "nonland_spells":
+        return True
+    if normalized_filter == "artifact_spells":
+        return "artifact" in type_line
+    if normalized_filter == "sorcery_spells":
+        return "sorcery" in type_line
+    if normalized_filter == "historic_spells":
+        return card_is_historic_spell(card)
+    if normalized_filter == "sliver_spells":
+        return "creature" in type_line and permanent_has_subtype(card, "sliver")
+    if normalized_filter == "creature_or_enchantment_spells":
+        return "creature" in type_line or "enchantment" in type_line
+    if normalized_filter == "green_creature_spells":
+        return "creature" in type_line and _spell_has_color(card, "G")
+    return False
+
+
 def controller_casts_nonland_as_flash(controller, card):
     if controller is None or is_effective_land(card):
         return False
-    for permanent in getattr(controller, "battlefield", []) or []:
-        if not isinstance(permanent, dict):
-            continue
-        if not permanent.get("cast_nonland_spells_as_flash"):
-            continue
-        return True
+    for participant in _table_players_for(controller):
+        same_controller = participant is controller
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if not isinstance(permanent, dict):
+                continue
+            permission_controller = str(
+                permanent.get("flash_permission_controller")
+                or ("any_player" if permanent.get("flash_permission_any_player") else "self")
+            )
+            if not same_controller and permission_controller != "any_player":
+                continue
+            if permanent.get("cast_nonland_spells_as_flash"):
+                return True
+            if not permanent.get("cast_spells_as_flash"):
+                continue
+            if flash_permission_card_matches(card, permanent.get("flash_permission_filter")):
+                return True
     return False
+
+
+def spell_requires_main_phase(card, effect_data):
+    if is_effective_land(card):
+        return False
+    if card_has_keyword(card, "flash") or str((effect_data or {}).get("instant") or "").lower() == "true":
+        return False
+    type_line = _type_line_lower(card)
+    if "instant" in type_line:
+        return False
+    if (effect_data or {}).get("effect") == "creature":
+        return True
+    return any(
+        card_type in type_line
+        for card_type in ("sorcery", "creature", "artifact", "enchantment", "planeswalker", "battle")
+    )
 
 
 def can_cast_in_phase(card, effect_data, phase, controller=None):
@@ -1086,12 +1144,11 @@ def can_cast_in_phase(card, effect_data, phase, controller=None):
         return False
     if static_spell_limit_lock_for_card(controller, card, effect_data):
         return False
-    if phase not in MAIN_PHASES and controller_casts_nonland_as_flash(controller, card):
-        return True
-    if effect_data.get("effect") == "creature" and phase not in MAIN_PHASES:
-        return False
-    if is_sorcery(card) and phase not in MAIN_PHASES:
-        return False
+    if phase not in MAIN_PHASES:
+        if controller_casts_nonland_as_flash(controller, card):
+            return True
+        if spell_requires_main_phase(card, effect_data):
+            return False
     return True
 
 
@@ -51824,6 +51881,7 @@ def apply_effect_immediate(
             card=card.get("name", "?"),
             permission="cast_nonland_spells_as_flash",
             filter=permanent.get("flash_permission_filter", "nonland_spells"),
+            controller=permanent.get("flash_permission_controller", "self"),
             turn=turn,
             **replay_rule_fields(effect_data),
         )

@@ -1,0 +1,300 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T17:56:00.826381+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg418_xmage_static_flash_permission_new_server_manifest.json",
+  "package_id": "pg418_xmage_static_flash_permission_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg418_xmage_static_flash_permission_new_server_canonical_fallback.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "High Fae Trickster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6bd10a81f80c7bbd17d666a850c4520c",
+          "oracle_hash": "572253badba9314cde5c6fdc03511dec",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Hypersonic Dragon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fb124a02d6a37bc79aedb10df58ba1d9",
+          "oracle_hash": "7e47a005dffa0831100f100dfe67f60c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Quick Sliver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b036645e49a5ca7424c4f27d58d25c93",
+          "oracle_hash": "f2c32bf4b04621526ca050501bc253a1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Raff Capashen, Ship's Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bba49e7921dea07b1448fa76e8297475",
+          "oracle_hash": "81f88dd9406c4ef0e8189bc1071c2670",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Shimmer Myr",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:007474402d8a3f7cc66d62b9b3853aba",
+          "oracle_hash": "3f7693d00f1b35bec96c1dea4118dce3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Vernal Equinox",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fa82c1fc528ef736dd325f1c6151aebb",
+          "oracle_hash": "526d6d37bf9ebf99f174ac9dc59182d3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Yeva, Nature's Herald",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f5d926550a88a536437fbf494284474b",
+          "oracle_hash": "4ba84a36268272ffdd2e46ff3c4deab3",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "High Fae Trickster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6bd10a81f80c7bbd17d666a850c4520c",
+          "oracle_hash": "572253badba9314cde5c6fdc03511dec",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Hypersonic Dragon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fb124a02d6a37bc79aedb10df58ba1d9",
+          "oracle_hash": "7e47a005dffa0831100f100dfe67f60c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Quick Sliver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b036645e49a5ca7424c4f27d58d25c93",
+          "oracle_hash": "f2c32bf4b04621526ca050501bc253a1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Raff Capashen, Ship's Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bba49e7921dea07b1448fa76e8297475",
+          "oracle_hash": "81f88dd9406c4ef0e8189bc1071c2670",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Shimmer Myr",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:007474402d8a3f7cc66d62b9b3853aba",
+          "oracle_hash": "3f7693d00f1b35bec96c1dea4118dce3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Vernal Equinox",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fa82c1fc528ef736dd325f1c6151aebb",
+          "oracle_hash": "526d6d37bf9ebf99f174ac9dc59182d3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "card_name": "Yeva, Nature's Herald",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f5d926550a88a536437fbf494284474b",
+          "oracle_hash": "4ba84a36268272ffdd2e46ff3c4deab3",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "battle_rule_version": 2,
+          "card_name": "High Fae Trickster",
+          "logical_rule_key": "battle_rule_v1:6bd10a81f80c7bbd17d666a850c4520c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hypersonic Dragon",
+          "logical_rule_key": "battle_rule_v1:fb124a02d6a37bc79aedb10df58ba1d9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "battle_rule_version": 2,
+          "card_name": "Quick Sliver",
+          "logical_rule_key": "battle_rule_v1:b036645e49a5ca7424c4f27d58d25c93"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "battle_rule_version": 2,
+          "card_name": "Raff Capashen, Ship's Mage",
+          "logical_rule_key": "battle_rule_v1:bba49e7921dea07b1448fa76e8297475"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shimmer Myr",
+          "logical_rule_key": "battle_rule_v1:007474402d8a3f7cc66d62b9b3853aba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vernal Equinox",
+          "logical_rule_key": "battle_rule_v1:fa82c1fc528ef736dd325f1c6151aebb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+          "battle_rule_version": 2,
+          "card_name": "Yeva, Nature's Herald",
+          "logical_rule_key": "battle_rule_v1:f5d926550a88a536437fbf494284474b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "High Fae Trickster",
+          "component_keys": [],
+          "effect": "flash_permission",
+          "logical_rule_key": "battle_rule_v1:6bd10a81f80c7bbd17d666a850c4520c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hypersonic Dragon",
+          "component_keys": [],
+          "effect": "flash_permission",
+          "logical_rule_key": "battle_rule_v1:fb124a02d6a37bc79aedb10df58ba1d9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Quick Sliver",
+          "component_keys": [],
+          "effect": "flash_permission",
+          "logical_rule_key": "battle_rule_v1:b036645e49a5ca7424c4f27d58d25c93"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Raff Capashen, Ship's Mage",
+          "component_keys": [],
+          "effect": "flash_permission",
+          "logical_rule_key": "battle_rule_v1:bba49e7921dea07b1448fa76e8297475"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shimmer Myr",
+          "component_keys": [],
+          "effect": "flash_permission",
+          "logical_rule_key": "battle_rule_v1:007474402d8a3f7cc66d62b9b3853aba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vernal Equinox",
+          "component_keys": [],
+          "effect": "flash_permission",
+          "logical_rule_key": "battle_rule_v1:fa82c1fc528ef736dd325f1c6151aebb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Yeva, Nature's Herald",
+          "component_keys": [],
+          "effect": "flash_permission",
+          "logical_rule_key": "battle_rule_v1:f5d926550a88a536437fbf494284474b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
