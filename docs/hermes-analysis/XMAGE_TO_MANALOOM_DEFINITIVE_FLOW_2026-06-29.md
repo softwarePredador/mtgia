@@ -283,21 +283,34 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg403_dynamic_graveyard_count_boost_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg403_dynamic_graveyard_count_boost_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg403_dynamic_graveyard_count_boost_new_server_after_docs_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_pg404_dynamic_count_boost_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg404_dynamic_count_boost_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg404_dynamic_count_boost_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg404_dynamic_count_boost_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg404_dynamic_count_boost_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg404_dynamic_count_boost_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg404_dynamic_count_boost_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg404_dynamic_count_boost_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg404_dynamic_count_boost_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg404_dynamic_count_boost_new_server_after_docs_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg404_dynamic_count_boost_new_server_after_docs_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg404_dynamic_count_boost_new_server_after_docs_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg404_dynamic_count_boost_new_server_after_docs_final.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26753`
-- XMage authoritative source resolved: `26439`
+- target all-card battle-gap identities: `26739`
+- XMage authoritative source resolved: `26425`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26439`
+- XMage authoritative adapter required: `26425`
 - ManaLoom adapter work-unit keys: `11427`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26439` identities, card semantics are accepted from XMage; work is now
+- For `26425` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -316,10 +329,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG403 Exact Adapter And Integrity Waves
+## PG283-PG404 Exact Adapter And Integrity Waves
 
-As of 2026-07-04, the PG283-PG403 all-card exact adapter waves are applied and
-synced. PG375-PG403 and the PG399b/PG399c/PG402 integrity backfills were applied
+As of 2026-07-04, the PG283-PG404 all-card exact adapter waves are applied and
+synced. PG375-PG404 and the PG399b/PG399c/PG402 integrity backfills were applied
 against the new EasyPanel PostgreSQL target via the new-server tunnel and
 validated with `database_target=127.0.0.1:15432/halder`.
 
@@ -767,6 +780,14 @@ patterns:
   `xmage_creature_etb_add_counters_target_creature_v1`
 - `xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting` ->
   `xmage_fixed_boost_target_creature_until_eot_spell_v1`
+- `xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting`
+  with exact one-shot target-creature power/toughness boost or reduction until
+  end of turn where the dynamic value is one of the supported game-state
+  counts, including controller battlefield permanent counts by type/subtype,
+  all-battlefield subtype counts, controller hand count, or domain basic land
+  type count, with no additional costs, no X-spend costs, and no multi-target
+  target-pointer fanout ->
+  `xmage_dynamic_count_boost_target_creature_until_eot_spell_v1`
 - `xmage_signature::BoostControlledEffect::no_ability_class::no_target_class::no_condition_class::no_signal`
   with exact one-shot "Creatures you control get +N/+N until end of turn"
   Oracle text, one fixed `BoostControlledEffect`, no color/modal/dynamic
@@ -7067,6 +7088,62 @@ PG403 measured result:
   graveyard-count target-creature boost subpattern is therefore closed for
   currently safe exact scopes.
 
+PG404 measured result:
+
+- PG404 promoted `14` exact dynamic count target-creature boost rules on the
+  new server: `Defile`, `Desert's Due`, `Drag Down`, `Feeding Frenzy`,
+  `Gaea's Might`, `Hunger of the Nim`, `Inner Calm, Outer Strength`,
+  `Irradiate`, `Might of Alara`, `Might of the Masses`, `Nightmarish End`,
+  `Strength of Cedars`, `Warped Physique`, and `Wirewood Pride`.
+- All rows use `xmage_dynamic_count_boost_target_creature_until_eot_spell_v1`,
+  sourced from local XMage `BoostTargetEffect` with supported dynamic values:
+  `PermanentsOnBattlefieldCount` for controller battlefield type/subtype
+  counts, all-battlefield subtype counts for `Elf`/`Zombie`, `ArtifactYouControlCount`,
+  `CardsInControllerHandCount.ANY`, and `DomainValue.REGULAR`.
+- The splitter deliberately left unsupported neighbors blocked: X-spend pump
+  spells such as `Death Wind`, `Enrage`, `Howl from Beyond`, and
+  `Untamed Might`; multi-target target-pointer spells such as `Agony Warp`,
+  `Bounty of Might`, `Dauntless Onslaught`, and `Seeds of Strength`;
+  non-count formulas such as greatest mana value or target color count; and
+  additional-cost/choice formulas such as `Bloodcurdling Scream` and
+  `Pippin's Bravery`.
+- Runtime now computes `stat_modifier_until_eot` deltas from
+  `battlefield_permanent_count`, `controller_hand_count`, and
+  `domain_basic_land_types` in addition to the PG403 graveyard count source.
+  It emits generic `power_delta_per_count` and `toughness_delta_per_count`
+  replay fields while preserving the previous graveyard-named fields for
+  backward compatibility.
+- PG404 also fixed a runtime zero-toughness fallback bug: toughness `0` is no
+  longer treated as falsy and replaced by power during target stat evaluation.
+  This matters for mixed `+X/-X` effects such as `Warped Physique`.
+- Full exact splitter tests passed `383/383`, full exact runtime tests passed
+  `224/224`, and `py_compile` passed for the changed splitter, runtime, and
+  test files.
+- PostgreSQL precheck matched `1` Oracle-hash-backed target row for each card
+  on the new server. Apply backed up `2` old rows, deprecated `2` stale shadow
+  rows for `Defile`, and upserted `14` verified/auto rules. Postcheck verified
+  `14/14` promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync used `database_target=127.0.0.1:15432/halder`,
+  loaded `14` selected PostgreSQL rows, updated `16` SQLite rows, and exported
+  `5293` canonical snapshot rows. Metadata sync used the same new-server
+  target, matched `6298` PostgreSQL cards from `6103` unique requested names,
+  wrote `6225` SQLite alias rows, and matched `2699/2699` deck-card cache
+  rows with `108` local `card_id` updates.
+- E2E validation passed PostgreSQL source-of-truth, SQLite/Hermes cache,
+  canonical snapshot fallback, runtime `get_card_effect`, and no-override
+  stages for all 14 cards against `database_target=127.0.0.1:15432/halder`.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `51/51`.
+- Global all-card authoritative queue after PG404:
+  `target_identity_count=26739`, `xmage_authoritative_source_count=26425`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26425`.
+- Running the exact splitter after PG404 on supported units returned
+  `proposal_count=0` over `7579` considered supported rows. The dynamic
+  non-graveyard count target-creature boost subpattern is therefore closed for
+  currently safe exact scopes.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -7697,7 +7774,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG403 queue on the new server, the next exact runtime-backed work should
+post-PG404 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1809`

@@ -1242,6 +1242,20 @@ def _spell_has_color(card, requested_symbol):
     return symbol in _spell_color_symbols(card)
 
 
+def _numeric_card_stat(card, stat, fallback_stat=None, default=0):
+    if not isinstance(card, dict):
+        return int(default or 0)
+    value = card.get(stat)
+    if (value is None or value == "") and fallback_stat:
+        value = card.get(fallback_stat)
+    if value is None or value == "":
+        value = default
+    try:
+        return int(float(value))
+    except Exception:
+        return int(default or 0)
+
+
 def _card_type_matches(card, allowed_types):
     allowed = {str(value).lower() for value in _as_list(allowed_types) if value}
     if not allowed:
@@ -4228,8 +4242,8 @@ def resolve_add_counters_target_effect(
             finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return None
 
-    power_before = int(float(target.get("power") or 0))
-    toughness_before = int(float(target.get("toughness") or target.get("power") or 0))
+    power_before = _numeric_card_stat(target, "power")
+    toughness_before = _numeric_card_stat(target, "toughness", "power")
     counters_before = (
         int(target.get("plus_one_counters") or 0)
         if counter_type == "+1/+1"
@@ -4243,8 +4257,8 @@ def resolve_add_counters_target_effect(
         added = add_minus_one_counters(target, count)
     else:
         added = add_named_counters(target, counter_type, count)
-    power_after = int(float(target.get("power") or 0))
-    toughness_after = int(float(target.get("toughness") or target.get("power") or 0))
+    power_after = _numeric_card_stat(target, "power")
+    toughness_after = _numeric_card_stat(target, "toughness", "power")
     destination = None
     result = "counters_added"
     if counter_type == "-1/-1" and is_battlefield_creature(target) and toughness_after <= 0:
@@ -4389,7 +4403,7 @@ def choose_stat_modifier_target(player, opponents, card, effect_data):
 def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn, *, finish=True):
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
-    dynamic_deltas, dynamic_replay_fields = dynamic_graveyard_stat_modifier_deltas(player, opponents, effect_data)
+    dynamic_deltas, dynamic_replay_fields = dynamic_stat_modifier_deltas(player, opponents, effect_data)
     if dynamic_deltas is not None:
         power_delta, toughness_delta = dynamic_deltas
         effect_data = {**effect_data, "power_delta": power_delta, "toughness_delta": toughness_delta}
@@ -4417,8 +4431,8 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
             finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return None
 
-    power_before = int(float(target.get("power") or 0))
-    toughness_before = int(float(target.get("toughness") or target.get("power") or 0))
+    power_before = _numeric_card_stat(target, "power")
+    toughness_before = _numeric_card_stat(target, "toughness", "power")
     remember_until_eot(target, "power")
     remember_until_eot(target, "toughness")
     target["power"] = power_before + power_delta
@@ -4434,8 +4448,8 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
         set_until_eot(target, "keywords", merged_keywords)
         for keyword in granted_keywords:
             set_until_eot(target, keyword, True)
-    power_after = int(float(target.get("power") or 0))
-    toughness_after = int(float(target.get("toughness") or target.get("power") or 0))
+    power_after = _numeric_card_stat(target, "power")
+    toughness_after = _numeric_card_stat(target, "toughness", "power")
     destination = None
     result = "stat_modifier_until_eot_applied"
     if toughness_after <= 0 and is_battlefield_creature(target):
@@ -4488,8 +4502,8 @@ def resolve_controlled_stat_modifier_until_eot_spell(player, opponents, card, ef
     for target in list(getattr(player, "battlefield", []) or []):
         if not is_battlefield_creature(target):
             continue
-        power_before = int(float(target.get("power") or 0))
-        toughness_before = int(float(target.get("toughness") or target.get("power") or 0))
+        power_before = _numeric_card_stat(target, "power")
+        toughness_before = _numeric_card_stat(target, "toughness", "power")
         remember_until_eot(target, "power")
         remember_until_eot(target, "toughness")
         target["power"] = power_before + power_delta
@@ -41824,27 +41838,109 @@ def _graveyard_damage_card_matches(card, effect_data):
     return bool(allowed_types or allowed_subtypes or allowed_names)
 
 
-def dynamic_graveyard_stat_modifier_deltas(player, opponents, effect_data):
-    if str(effect_data.get("stat_modifier_amount_source") or "").lower() != "graveyard_card_count":
-        return None, {}
-    scope = str(effect_data.get("graveyard_count_scope") or "controller_graveyard").lower()
-    if scope == "controller_graveyard":
-        graveyard_players = [player]
-    elif scope == "all_graveyards":
-        graveyard_players = [player] + list(opponents or [])
-    elif scope == "opponents_graveyards":
-        graveyard_players = list(opponents or [])
+def _battlefield_count_card_matches(card, effect_data):
+    allowed_types = [
+        str(value).strip().lower()
+        for value in _as_list(effect_data.get("battlefield_count_card_types"))
+        if str(value).strip()
+    ]
+    if allowed_types and "permanent" not in allowed_types and not _card_type_matches(card, allowed_types):
+        return False
+    allowed_subtypes = [
+        str(value).strip().lower()
+        for value in _as_list(effect_data.get("battlefield_count_subtypes"))
+        if str(value).strip()
+    ]
+    if allowed_subtypes and not any(permanent_has_subtype(card, subtype) for subtype in allowed_subtypes):
+        return False
+    return bool(allowed_types or allowed_subtypes)
+
+
+def _battlefield_count_for_stat_modifier(player, opponents, effect_data):
+    scope = str(effect_data.get("battlefield_count_scope") or "controller_battlefield").lower()
+    if scope == "controller_battlefield":
+        battlefield_players = [player]
+    elif scope == "all_battlefields":
+        battlefield_players = [player] + list(opponents or [])
+    elif scope == "opponents_battlefield":
+        battlefield_players = list(opponents or [])
     else:
         return None, {
-            "stat_modifier_amount_source": "graveyard_card_count",
-            "graveyard_count_scope": scope,
-            "graveyard_count_status": "unsupported_scope",
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": scope,
+            "battlefield_count_status": "unsupported_scope",
         }
     count = 0
-    for participant in graveyard_players:
-        for graveyard_card in getattr(participant, "graveyard", []) or []:
-            if _graveyard_damage_card_matches(graveyard_card, effect_data):
+    for participant in battlefield_players:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if _battlefield_count_card_matches(permanent, effect_data):
                 count += 1
+    return count, {
+        "stat_modifier_amount_source": "battlefield_permanent_count",
+        "battlefield_count_scope": scope,
+        "battlefield_stat_modifier_count": count,
+    }
+
+
+def _domain_basic_land_type_count(player):
+    basic_land_types = {"plains", "island", "swamp", "mountain", "forest"}
+    seen = set()
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not _card_type_matches(permanent, ["land"]):
+            continue
+        for subtype in basic_land_types:
+            if permanent_has_subtype(permanent, subtype):
+                seen.add(subtype)
+    return len(seen)
+
+
+def _stat_modifier_count_from_source(player, opponents, effect_data):
+    amount_source = str(effect_data.get("stat_modifier_amount_source") or "").lower()
+    if amount_source == "graveyard_card_count":
+        scope = str(effect_data.get("graveyard_count_scope") or "controller_graveyard").lower()
+        if scope == "controller_graveyard":
+            graveyard_players = [player]
+        elif scope == "all_graveyards":
+            graveyard_players = [player] + list(opponents or [])
+        elif scope == "opponents_graveyards":
+            graveyard_players = list(opponents or [])
+        else:
+            return None, {
+                "stat_modifier_amount_source": "graveyard_card_count",
+                "graveyard_count_scope": scope,
+                "graveyard_count_status": "unsupported_scope",
+            }
+        count = 0
+        for participant in graveyard_players:
+            for graveyard_card in getattr(participant, "graveyard", []) or []:
+                if _graveyard_damage_card_matches(graveyard_card, effect_data):
+                    count += 1
+        return count, {
+            "stat_modifier_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": scope,
+            "graveyard_stat_modifier_count": count,
+        }
+    if amount_source == "battlefield_permanent_count":
+        return _battlefield_count_for_stat_modifier(player, opponents, effect_data)
+    if amount_source == "controller_hand_count":
+        count = len(getattr(player, "hand", []) or [])
+        return count, {
+            "stat_modifier_amount_source": "controller_hand_count",
+            "hand_stat_modifier_count": count,
+        }
+    if amount_source == "domain_basic_land_types":
+        count = _domain_basic_land_type_count(player)
+        return count, {
+            "stat_modifier_amount_source": "domain_basic_land_types",
+            "domain_basic_land_type_count": count,
+        }
+    return None, {}
+
+
+def dynamic_stat_modifier_deltas(player, opponents, effect_data):
+    count, replay_fields = _stat_modifier_count_from_source(player, opponents, effect_data)
+    if count is None:
+        return None, replay_fields
     try:
         power_base = int(float(effect_data.get("power_base_delta") or effect_data.get("base_power_delta") or 0))
     except Exception:
@@ -41865,11 +41961,11 @@ def dynamic_graveyard_stat_modifier_deltas(player, opponents, effect_data):
         power_base + (count * power_per),
         toughness_base + (count * toughness_per),
     ), {
-        "stat_modifier_amount_source": "graveyard_card_count",
-        "graveyard_count_scope": scope,
-        "graveyard_stat_modifier_count": count,
+        **replay_fields,
         "power_base_delta": power_base,
         "toughness_base_delta": toughness_base,
+        "power_delta_per_count": power_per,
+        "toughness_delta_per_count": toughness_per,
         "power_delta_per_graveyard_count": power_per,
         "toughness_delta_per_graveyard_count": toughness_per,
     }

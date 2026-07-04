@@ -7939,6 +7939,162 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "graveyard_count_boost_source_not_single")
 
+    def test_dynamic_count_boost_maps_defile_controlled_swamps(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Defile",
+                type_line="Instant",
+                oracle_text="Target creature gets -1/-1 until end of turn for each Swamp you control.",
+            ),
+            source_text="""
+                private static final FilterPermanent filter = new FilterControlledPermanent(SubType.SWAMP, "Swamp you control");
+                private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(filter, -1);
+                this.getSpellAbility().addEffect(new BoostTargetEffect(xValue, xValue, Duration.EndOfTurn));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_COUNT_BOOST_TARGET_SCOPE)
+        self.assertEqual(effect["stat_modifier_amount_source"], "battlefield_permanent_count")
+        self.assertEqual(effect["battlefield_count_scope"], "controller_battlefield")
+        self.assertEqual(effect["battlefield_count_card_types"], ["land"])
+        self.assertEqual(effect["battlefield_count_subtypes"], ["swamp"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], -1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], -1)
+
+    def test_dynamic_count_boost_maps_hunger_plus_zero_artifacts(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hunger of the Nim",
+                type_line="Instant",
+                oracle_text="Target creature gets +1/+0 until end of turn for each artifact you control.",
+            ),
+            source_text="""
+                getSpellAbility().addEffect(new BoostTargetEffect(
+                    ArtifactYouControlCount.instance, StaticValue.get(0), Duration.EndOfTurn
+                ));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battlefield_count_card_types"], ["artifact"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], 1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], 0)
+
+    def test_dynamic_count_boost_maps_domain_spell(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gaea's Might",
+                type_line="Instant",
+                oracle_text=(
+                    "Domain — Target creature gets +1/+1 until end of turn for each basic land type among lands you control."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new BoostTargetEffect(
+                    DomainValue.REGULAR, DomainValue.REGULAR, Duration.EndOfTurn
+                ));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["stat_modifier_amount_source"], "domain_basic_land_types")
+        self.assertEqual(effect["power_delta_per_graveyard_count"], 1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], 1)
+
+    def test_dynamic_count_boost_maps_deserts_due_base_plus_deserts(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Desert's Due",
+                type_line="Instant",
+                oracle_text=(
+                    "Target creature gets -2/-2 until end of turn. "
+                    "It gets an additional -1/-1 until end of turn for each Desert you control."
+                ),
+            ),
+            source_text="""
+                private static final DynamicValue desertCount = new PermanentsOnBattlefieldCount(
+                    new FilterControlledPermanent(SubType.DESERT)
+                );
+                private static final DynamicValue xValue = new AdditiveDynamicValue(
+                    new SignInversionDynamicValue(desertCount), StaticValue.get(-2)
+                );
+                this.getSpellAbility().addEffect(new BoostTargetEffect(xValue, xValue));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["power_base_delta"], -2)
+        self.assertEqual(effect["toughness_base_delta"], -2)
+        self.assertEqual(effect["battlefield_count_subtypes"], ["desert"])
+
+    def test_dynamic_count_boost_maps_wirewood_pride_elves_plural(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Wirewood Pride",
+                type_line="Instant",
+                oracle_text=(
+                    "Target creature gets +X/+X until end of turn, where X is the number of Elves on the battlefield."
+                ),
+            ),
+            source_text="""
+                private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(
+                    new FilterPermanent(SubType.ELF, "Elves on the battlefield"), null
+                );
+                this.getSpellAbility().addEffect(new BoostTargetEffect(xValue, xValue, Duration.EndOfTurn));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battlefield_count_scope"], "all_battlefields")
+        self.assertEqual(effect["battlefield_count_subtypes"], ["elf"])
+
+    def test_dynamic_count_boost_maps_feeding_frenzy_zombies_plural(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Feeding Frenzy",
+                type_line="Instant",
+                oracle_text=(
+                    "Target creature gets -X/-X until end of turn, where X is the number of Zombies on the battlefield."
+                ),
+            ),
+            source_text="""
+                private static final DynamicValue xValue = new SignInversionDynamicValue(
+                    new PermanentsOnBattlefieldCount(new FilterPermanent(SubType.ZOMBIE, "Zombies on the battlefield"), null)
+                );
+                this.getSpellAbility().addEffect(new BoostTargetEffect(xValue, xValue, Duration.EndOfTurn));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battlefield_count_scope"], "all_battlefields")
+        self.assertEqual(effect["battlefield_count_subtypes"], ["zombie"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], -1)
+
     def test_fixed_boost_controlled_creatures_spell_maps_to_controlled_stat_modifier(self) -> None:
         row = queue_row(split.BOOST_CONTROLLED_SPELL_UNIT, effect_classes=["BoostControlledEffect"])
         proposal, reason = split.split_row(

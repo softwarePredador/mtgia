@@ -156,6 +156,7 @@ BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 DYNAMIC_GRAVEYARD_COUNT_BOOST_TARGET_SCOPE = (
     "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1"
 )
+DYNAMIC_COUNT_BOOST_TARGET_SCOPE = "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1"
 BOOST_CONTROLLED_SPELL_SCOPE = "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1"
 BOOST_KEYWORD_SCOPE = "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
 SELF_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
@@ -3304,6 +3305,284 @@ def graveyard_count_boost_target_from_source(source: str) -> dict[str, Any] | st
         "power_delta_per_graveyard_count": power_per,
         "toughness_delta_per_graveyard_count": toughness_per,
     }
+
+
+def _dynamic_boost_sign(sign_token: str) -> int:
+    return -1 if str(sign_token or "").strip().startswith("-") else 1
+
+
+def _dynamic_count_boost_dict(
+    amount_source: str,
+    *,
+    power_per: int,
+    toughness_per: int,
+    power_base: int = 0,
+    toughness_base: int = 0,
+    **count_fields: Any,
+) -> dict[str, Any]:
+    return {
+        "stat_modifier_amount_source": amount_source,
+        "power_base_delta": power_base,
+        "toughness_base_delta": toughness_base,
+        "power_delta_per_graveyard_count": power_per,
+        "toughness_delta_per_graveyard_count": toughness_per,
+        **count_fields,
+    }
+
+
+def _controlled_battlefield_count_fields(filter_text: str) -> dict[str, Any] | None:
+    token = str(filter_text or "").strip().lower()
+    basic_land_subtypes = {"plains", "island", "swamp", "mountain", "forest", "desert"}
+    if token in basic_land_subtypes:
+        return {
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+            "battlefield_count_subtypes": [token],
+        }
+    if token == "artifact":
+        return {
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact"],
+        }
+    if token == "creature":
+        return {
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+        }
+    if token == "land":
+        return {
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+        }
+    return None
+
+
+def _battlefield_subtype_count_fields(plural_subtype: str) -> dict[str, Any]:
+    subtype = str(plural_subtype or "").strip().lower()
+    if subtype == "elves":
+        subtype = "elf"
+    elif subtype == "zombies":
+        subtype = "zombie"
+    elif subtype.endswith("ies"):
+        subtype = subtype[:-3] + "y"
+    elif subtype.endswith("s"):
+        subtype = subtype[:-1]
+    return {
+        "battlefield_count_scope": "all_battlefields",
+        "battlefield_count_subtypes": [subtype],
+    }
+
+
+def dynamic_count_boost_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    domain_match = re.match(
+        r"^(?:domain — )?target creature gets (?P<power>[+-])1/(?P<toughness>[+-])1 "
+        r"until end of turn for each basic land type among lands you control\.?$",
+        text,
+    )
+    if domain_match:
+        return _dynamic_count_boost_dict(
+            "domain_basic_land_types",
+            power_per=_dynamic_boost_sign(domain_match.group("power")),
+            toughness_per=_dynamic_boost_sign(domain_match.group("toughness")),
+        )
+    hand_match = re.match(
+        r"^target creature gets (?P<power>[+-])x/(?P<toughness>[+-])x until end of turn, "
+        r"where x is the number of cards in your hand\.?$",
+        text,
+    )
+    if hand_match:
+        return _dynamic_count_boost_dict(
+            "controller_hand_count",
+            power_per=_dynamic_boost_sign(hand_match.group("power")),
+            toughness_per=_dynamic_boost_sign(hand_match.group("toughness")),
+        )
+    controlled_match = re.match(
+        r"^target creature gets (?P<power>[+-])1/(?P<toughness>[+-])(?P<toughness_value>1|0) "
+        r"until end of turn for each (?P<filter>swamp|island|mountain|forest|plains|desert|artifact|creature|land) "
+        r"you control\.?$",
+        text,
+    )
+    if controlled_match:
+        count_fields = _controlled_battlefield_count_fields(controlled_match.group("filter"))
+        if count_fields is None:
+            return "dynamic_count_boost_oracle_filter_not_supported"
+        toughness_per = 0 if controlled_match.group("toughness_value") == "0" else _dynamic_boost_sign(controlled_match.group("toughness"))
+        return _dynamic_count_boost_dict(
+            "battlefield_permanent_count",
+            power_per=_dynamic_boost_sign(controlled_match.group("power")),
+            toughness_per=toughness_per,
+            **count_fields,
+        )
+    lands_match = re.match(
+        r"^target creature gets (?P<power>[+-])x/(?P<toughness>[+-])x until end of turn, "
+        r"where x is the number of lands you control\.?$",
+        text,
+    )
+    if lands_match:
+        return _dynamic_count_boost_dict(
+            "battlefield_permanent_count",
+            power_per=_dynamic_boost_sign(lands_match.group("power")),
+            toughness_per=_dynamic_boost_sign(lands_match.group("toughness")),
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["land"],
+        )
+    battlefield_subtype_match = re.match(
+        r"^target creature gets (?P<power>[+-])x/(?P<toughness>[+-])x until end of turn, "
+        r"where x is the number of (?P<subtype>[a-z]+) on the battlefield\.?$",
+        text,
+    )
+    if battlefield_subtype_match:
+        return _dynamic_count_boost_dict(
+            "battlefield_permanent_count",
+            power_per=_dynamic_boost_sign(battlefield_subtype_match.group("power")),
+            toughness_per=_dynamic_boost_sign(battlefield_subtype_match.group("toughness")),
+            **_battlefield_subtype_count_fields(battlefield_subtype_match.group("subtype")),
+        )
+    desert_due_match = re.match(
+        r"^target creature gets -2/-2 until end of turn\. it gets an additional -1/-1 "
+        r"until end of turn for each desert you control\.?$",
+        text,
+    )
+    if desert_due_match:
+        return _dynamic_count_boost_dict(
+            "battlefield_permanent_count",
+            power_per=-1,
+            toughness_per=-1,
+            power_base=-2,
+            toughness_base=-2,
+            battlefield_count_scope="controller_battlefield",
+            battlefield_count_card_types=["land"],
+            battlefield_count_subtypes=["desert"],
+        )
+    return None
+
+
+def _dynamic_count_source_spec_from_expr(source: str, expr: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    token = re.sub(r"\s+", " ", str(expr or "")).strip()
+    if re.fullmatch(r"StaticValue\.get\s*\(\s*0\s*\)", token):
+        return {"static_value": 0, "per": 0}
+    sign = -1 if (
+        "SignInversionDynamicValue" in token
+        or (token == "xValue" and "xValue = new SignInversionDynamicValue" in text)
+        or (token == "xValue" and "xValue = new PermanentsOnBattlefieldCount" in text and re.search(r"PermanentsOnBattlefieldCount\s*\([^;]+,\s*-1\s*\)", text, re.S))
+    ) else 1
+    if token == "xValue" and "AdditiveDynamicValue" in text and "StaticValue.get(-2)" in text:
+        return {
+            **_dynamic_count_boost_dict(
+                "battlefield_permanent_count",
+                power_per=-1,
+                toughness_per=-1,
+                power_base=-2,
+                toughness_base=-2,
+                battlefield_count_scope="controller_battlefield",
+                battlefield_count_card_types=["land"],
+                battlefield_count_subtypes=["desert"],
+            ),
+            "_full_spec": True,
+        }
+    if "DomainValue.REGULAR" in token or (token == "xValue" and "DomainValue.REGULAR" in text):
+        return {"stat_modifier_amount_source": "domain_basic_land_types", "per": sign}
+    if "CardsInControllerHandCount.ANY" in token or (token == "xValue" and "CardsInControllerHandCount.ANY" in text):
+        return {"stat_modifier_amount_source": "controller_hand_count", "per": sign}
+    if "ArtifactYouControlCount.instance" in token:
+        return {
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact"],
+            "per": sign,
+        }
+    if token != "xValue":
+        return "dynamic_count_boost_source_delta_not_supported"
+    if "FILTER_CONTROLLED_CREATURE" in text:
+        return {
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+            "per": sign,
+        }
+    if "FILTER_CONTROLLED_PERMANENT_LANDS" in text:
+        return {
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+            "per": sign,
+        }
+    subtype_match = re.search(r"FilterControlledPermanent\s*\(\s*SubType\.(SWAMP|ISLAND|MOUNTAIN|FOREST|PLAINS|DESERT)", text)
+    if subtype_match:
+        return {
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+            "battlefield_count_subtypes": [subtype_match.group(1).lower()],
+            "per": sign,
+        }
+    if "FilterControlledArtifactPermanent" in text:
+        return {
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact"],
+            "per": sign,
+        }
+    any_subtype_match = re.search(r"FilterPermanent\s*\(\s*SubType\.(ZOMBIE|ELF)", text)
+    if any_subtype_match:
+        return {
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "all_battlefields",
+            "battlefield_count_subtypes": [any_subtype_match.group(1).lower()],
+            "per": sign,
+        }
+    return "dynamic_count_boost_source_filter_not_supported"
+
+
+def dynamic_count_boost_target_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if "getSpellAbility().addCost" in text or "addCost(" in text:
+        return "dynamic_count_boost_additional_cost_not_supported"
+    if len(re.findall(r"new\s+TargetCreaturePermanent\s*\(", text)) != 1:
+        return "dynamic_count_boost_target_not_supported"
+    if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text):
+        return "dynamic_count_boost_target_not_supported"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "dynamic_count_boost_target_not_supported"
+    constructor_args = extract_constructor_args(text, "BoostTargetEffect")
+    if constructor_args is None:
+        return None
+    args = split_top_level_args(constructor_args)
+    if len(args) < 2:
+        return "dynamic_count_boost_source_not_single"
+    power_spec = _dynamic_count_source_spec_from_expr(text, args[0])
+    toughness_spec = _dynamic_count_source_spec_from_expr(text, args[1])
+    if isinstance(power_spec, str):
+        return power_spec
+    if isinstance(toughness_spec, str):
+        return toughness_spec
+    if power_spec is None or toughness_spec is None:
+        return "dynamic_count_boost_source_delta_not_supported"
+    if power_spec.get("_full_spec") and toughness_spec.get("_full_spec"):
+        return {key: value for key, value in power_spec.items() if key != "_full_spec"}
+    count_spec = toughness_spec if power_spec.get("static_value") is not None else power_spec
+    for spec in (power_spec, toughness_spec):
+        if spec.get("static_value") is None:
+            for key in (
+                "stat_modifier_amount_source",
+                "battlefield_count_scope",
+                "battlefield_count_card_types",
+                "battlefield_count_subtypes",
+            ):
+                if spec.get(key) != count_spec.get(key):
+                    return "dynamic_count_boost_source_mixed_counts_not_supported"
+    return _dynamic_count_boost_dict(
+        str(count_spec.get("stat_modifier_amount_source")),
+        power_per=int(power_spec.get("per") or 0),
+        toughness_per=int(toughness_spec.get("per") or 0),
+        **{
+            key: value
+            for key, value in count_spec.items()
+            if key not in {"stat_modifier_amount_source", "per", "static_value"}
+        },
+    )
 
 
 def fixed_boost_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, int] | None:
@@ -13146,6 +13425,34 @@ def split_row(
             return None, "boost_target_effect_class_not_pure"
         if ability_classes(row):
             return None, "boost_target_ability_class_not_simple"
+        oracle_dynamic_boost = dynamic_count_boost_target_from_oracle(metadata)
+        if isinstance(oracle_dynamic_boost, str):
+            return None, oracle_dynamic_boost
+        if oracle_dynamic_boost is not None:
+            source_dynamic_boost = dynamic_count_boost_target_from_source(source_text)
+            if isinstance(source_dynamic_boost, str):
+                return None, source_dynamic_boost
+            if source_dynamic_boost is None:
+                return None, "dynamic_count_boost_source_not_supported"
+            if source_dynamic_boost != oracle_dynamic_boost:
+                return None, "dynamic_count_boost_source_oracle_mismatch"
+            effect_json = {
+                "effect": "stat_modifier_until_eot",
+                "battle_model_scope": DYNAMIC_COUNT_BOOST_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"]},
+                "target_controller": "any",
+                "duration": "until_end_of_turn",
+                "xmage_effect_class": "BoostTargetEffect",
+                **source_dynamic_boost,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_dynamic_count_boost_target_creature_until_eot_spell",
+            ), "selected_exact_scope"
         source_boost = fixed_boost_target_from_source(source_text)
         if source_boost is None:
             return None, "boost_target_source_not_single_fixed"

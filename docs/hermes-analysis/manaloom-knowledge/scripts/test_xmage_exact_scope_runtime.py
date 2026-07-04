@@ -8918,6 +8918,191 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dynamic_battlefield_count_stat_modifier_counts_controlled_swamps(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.extend(
+            [
+                {"name": "Watery Grave", "type_line": "Land - Island Swamp", "cmc": 0},
+                {"name": "Basic Swamp", "type_line": "Basic Land - Swamp", "cmc": 0},
+                {"name": "Forest", "type_line": "Basic Land - Forest", "cmc": 0},
+            ]
+        )
+        opponent.battlefield.extend(
+            [
+                {"name": "Opponent Swamp", "type_line": "Basic Land - Swamp", "cmc": 0},
+                {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2},
+            ]
+        )
+        effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+            "battlefield_count_subtypes": ["swamp"],
+            "power_delta_per_graveyard_count": -1,
+            "toughness_delta_per_graveyard_count": -1,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Defile", "type_line": "Instant", "oracle_text": "Target creature gets -1/-1."},
+            turn=15,
+            rng=random.Random(15),
+            effect_data_override=effect,
+        )
+
+        self.assertFalse(any(card.get("name") == "Enemy Bear" for card in opponent.battlefield))
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Defile"
+                and data.get("battlefield_stat_modifier_count") == 2
+                and data.get("power_delta") == -2
+                and data.get("result") == "creature_put_into_graveyard_zero_toughness"
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_domain_stat_modifier_counts_basic_land_types(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.extend(
+            [
+                {"name": "Raugrin Triome", "type_line": "Land - Island Mountain Plains", "cmc": 0},
+                {"name": "Overgrown Tomb", "type_line": "Land - Swamp Forest", "cmc": 0},
+                {"name": "Own Bear", "type_line": "Creature - Bear", "power": 1, "toughness": 1},
+            ]
+        )
+        effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "stat_modifier_amount_source": "domain_basic_land_types",
+            "power_delta_per_graveyard_count": 1,
+            "toughness_delta_per_graveyard_count": 1,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Gaea's Might", "type_line": "Instant", "oracle_text": "Domain"},
+            turn=16,
+            rng=random.Random(16),
+            effect_data_override=effect,
+        )
+
+        target = next(card for card in active.battlefield if card.get("name") == "Own Bear")
+        self.assertEqual(target["power"], 6)
+        self.assertEqual(target["toughness"], 6)
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("domain_basic_land_type_count") == 5
+                and data.get("power_delta") == 5
+                and data.get("toughness_delta") == 5
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_battlefield_count_stat_modifier_counts_subtype_on_all_battlefields(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.extend(
+            [
+                {"name": "Own Elf", "type_line": "Creature - Elf Druid", "power": 1, "toughness": 1},
+                {"name": "Own Bear", "type_line": "Creature - Bear", "power": 1, "toughness": 1},
+            ]
+        )
+        opponent.battlefield.append({"name": "Enemy Elf", "type_line": "Creature - Elf Warrior", "power": 1, "toughness": 1})
+        effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "stat_modifier_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "all_battlefields",
+            "battlefield_count_subtypes": ["elf"],
+            "power_delta_per_graveyard_count": 1,
+            "toughness_delta_per_graveyard_count": 1,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Wirewood Pride", "type_line": "Instant", "oracle_text": "Target creature gets +X/+X."},
+            turn=18,
+            rng=random.Random(18),
+            effect_data_override=effect,
+        )
+
+        target = next(card for card in active.battlefield if card.get("name") == "Own Elf")
+        self.assertEqual(target["power"], 3)
+        self.assertEqual(target["toughness"], 3)
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("battlefield_stat_modifier_count") == 2
+                and data.get("power_delta") == 2
+                and data.get("toughness_delta") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_hand_count_stat_modifier_can_be_used_as_removal(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand.extend(
+            [
+                {"name": "Card A", "type_line": "Instant"},
+                {"name": "Card B", "type_line": "Sorcery"},
+                {"name": "Card C", "type_line": "Creature"},
+            ]
+        )
+        opponent.battlefield.append({"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 3})
+        effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "stat_modifier_amount_source": "controller_hand_count",
+            "power_delta_per_graveyard_count": 1,
+            "toughness_delta_per_graveyard_count": -1,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Warped Physique", "type_line": "Instant", "oracle_text": "Target creature gets +X/-X."},
+            turn=17,
+            rng=random.Random(17),
+            effect_data_override=effect,
+        )
+
+        self.assertFalse(any(card.get("name") == "Enemy Bear" for card in opponent.battlefield))
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("hand_stat_modifier_count") == 3
+                and data.get("power_delta") == 3
+                and data.get("toughness_delta") == -3
+                for event, data in self.events
+            )
+        )
+
     def test_controlled_stat_modifier_until_eot_spell_buffs_only_own_creatures_and_cleans_up(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

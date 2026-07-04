@@ -1,0 +1,355 @@
+{
+  "database_target": "127.0.0.1:15432/halder",
+  "deploy_id": "pg404",
+  "generated_at": "2026-07-04T12:07:26.334185+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg404_dynamic_count_boost_new_server_package_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg404_dynamic_count_boost_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 2,
+    "cards": [
+      "Defile",
+      "Desert's Due",
+      "Drag Down",
+      "Feeding Frenzy",
+      "Gaea's Might",
+      "Hunger of the Nim",
+      "Inner Calm, Outer Strength",
+      "Irradiate",
+      "Might of Alara",
+      "Might of the Masses",
+      "Nightmarish End",
+      "Strength of Cedars",
+      "Warped Physique",
+      "Wirewood Pride"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 14,
+    "promoted_rule_rows": 14,
+    "promoted_verified_auto_rows": 14,
+    "row_count": 14
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 2,
+      "card_name": "Defile",
+      "logical_rule_key": "battle_rule_v1:1100b16aa567a4166c89925fa02116ed",
+      "normalized_name": "defile",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Desert's Due",
+      "logical_rule_key": "battle_rule_v1:c47f8cfa7cc6a286de6d8e56a0b350eb",
+      "normalized_name": "desert's due",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Drag Down",
+      "logical_rule_key": "battle_rule_v1:210c9f43c60a296a79af941511abf2ea",
+      "normalized_name": "drag down",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Feeding Frenzy",
+      "logical_rule_key": "battle_rule_v1:00c7f63a7cceb61b5f8561db237f81ec",
+      "normalized_name": "feeding frenzy",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Gaea's Might",
+      "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0",
+      "normalized_name": "gaea's might",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Hunger of the Nim",
+      "logical_rule_key": "battle_rule_v1:9044a82a7faa7ba39758bbd225595fcd",
+      "normalized_name": "hunger of the nim",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Inner Calm, Outer Strength",
+      "logical_rule_key": "battle_rule_v1:9f6efe319b4033f156aad274dd198d88",
+      "normalized_name": "inner calm, outer strength",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Irradiate",
+      "logical_rule_key": "battle_rule_v1:b73631198cb3e8cbfdce3b5800531f1a",
+      "normalized_name": "irradiate",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Might of Alara",
+      "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0",
+      "normalized_name": "might of alara",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Might of the Masses",
+      "logical_rule_key": "battle_rule_v1:6bd781adebd1fd040b548b5ca68d66a3",
+      "normalized_name": "might of the masses",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Nightmarish End",
+      "logical_rule_key": "battle_rule_v1:68c94b97da910dce93cc269180b7f0fd",
+      "normalized_name": "nightmarish end",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Strength of Cedars",
+      "logical_rule_key": "battle_rule_v1:3ca636350943972a180f4f2535a9c384",
+      "normalized_name": "strength of cedars",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Warped Physique",
+      "logical_rule_key": "battle_rule_v1:d1e30e5fc99f7122f4debeb26047597a",
+      "normalized_name": "warped physique",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Wirewood Pride",
+      "logical_rule_key": "battle_rule_v1:c2abb3e20f0ac836039dbdb9cd080e2c",
+      "normalized_name": "wirewood pride",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Defile",
+      "Desert's Due",
+      "Drag Down",
+      "Feeding Frenzy",
+      "Gaea's Might",
+      "Hunger of the Nim",
+      "Inner Calm, Outer Strength",
+      "Irradiate",
+      "Might of Alara",
+      "Might of the Masses",
+      "Nightmarish End",
+      "Strength of Cedars",
+      "Warped Physique",
+      "Wirewood Pride"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 14,
+    "total_target_card_rows": 14,
+    "would_deprecate_shadow_rows": 2
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "f5277f99-036c-4fd6-a60f-b657067ba1a5",
+      "card_name": "Defile",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:1100b16aa567a4166c89925fa02116ed",
+      "normalized_name": "defile",
+      "oracle_hash": "ca60f5e3d71a02fd888b0f2ebdce61d9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "canonical_card_id": "8394e484-040e-4e7b-867e-10279b3e47a9",
+      "card_name": "Desert's Due",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:c47f8cfa7cc6a286de6d8e56a0b350eb",
+      "normalized_name": "desert's due",
+      "oracle_hash": "49adb7c8e3d3bb853d9326f0af9aaeb9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "170a6737-ef3a-4927-99c6-14d33c3ffab3",
+      "card_name": "Drag Down",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:210c9f43c60a296a79af941511abf2ea",
+      "normalized_name": "drag down",
+      "oracle_hash": "a3975b258df864690a219dcc1f4f95a7",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "b4696cc0-89b9-44ef-915e-9982aa419702",
+      "card_name": "Feeding Frenzy",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:00c7f63a7cceb61b5f8561db237f81ec",
+      "normalized_name": "feeding frenzy",
+      "oracle_hash": "ea2ff3ba1587cba08d9262aaa88fcd32",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "32235f70-656d-4ed3-9209-9556b33a2946",
+      "card_name": "Gaea's Might",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0",
+      "normalized_name": "gaea's might",
+      "oracle_hash": "be2ac80e1e9a2af2e3d54ad8ceb686c1",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "01973152-002e-4156-a8dc-5060ff3edf61",
+      "card_name": "Hunger of the Nim",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:9044a82a7faa7ba39758bbd225595fcd",
+      "normalized_name": "hunger of the nim",
+      "oracle_hash": "008a2e6c710c73f5a0972b451b66f7a7",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "5051fad5-7d23-4974-a0cd-ca3e9cf26e37",
+      "card_name": "Inner Calm, Outer Strength",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:9f6efe319b4033f156aad274dd198d88",
+      "normalized_name": "inner calm, outer strength",
+      "oracle_hash": "18d68ccf2f96f30acec5bb7f5093aaf3",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "d9763b2b-9650-46a7-9f71-8787d4d943fa",
+      "card_name": "Irradiate",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b73631198cb3e8cbfdce3b5800531f1a",
+      "normalized_name": "irradiate",
+      "oracle_hash": "3d4ec2868f66f9af1e0d63902702f7f2",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "1710a406-d403-4213-b5e8-e3b05a83e3d9",
+      "card_name": "Might of Alara",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0",
+      "normalized_name": "might of alara",
+      "oracle_hash": "be2ac80e1e9a2af2e3d54ad8ceb686c1",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "155a269f-dad3-418c-8dd6-16a70c2186ea",
+      "card_name": "Might of the Masses",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:6bd781adebd1fd040b548b5ca68d66a3",
+      "normalized_name": "might of the masses",
+      "oracle_hash": "265c407a7e7418e03ac6df0c6f7673dc",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "17aca86f-6523-42fb-a50a-1e8b686b1767",
+      "card_name": "Nightmarish End",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:68c94b97da910dce93cc269180b7f0fd",
+      "normalized_name": "nightmarish end",
+      "oracle_hash": "436d4fb570ffb05e0cdfbee2118b0981",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "b8ee8c11-535f-474f-914a-0c62d3a90821",
+      "card_name": "Strength of Cedars",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3ca636350943972a180f4f2535a9c384",
+      "normalized_name": "strength of cedars",
+      "oracle_hash": "6b950817f1f7afbec1f02f7e369ed926",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "f5bb500c-24d4-45e6-a941-5f8d7d44d96d",
+      "card_name": "Warped Physique",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:d1e30e5fc99f7122f4debeb26047597a",
+      "normalized_name": "warped physique",
+      "oracle_hash": "e59c03451b6154627e2115c632e45d87",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "9dfe87ef-22e5-4bc6-93e0-b1a6846bb5f6",
+      "card_name": "Wirewood Pride",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:c2abb3e20f0ac836039dbdb9cd080e2c",
+      "normalized_name": "wirewood pride",
+      "oracle_hash": "725d775135c01097c9ed49d586ec9ad0",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "dynamic_count_boost_new_server"
+}
