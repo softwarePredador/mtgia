@@ -128,6 +128,29 @@ def report_paths(tmp_path: Path, *, ready_candidate: bool = False, role_watch: b
                 ],
             },
         ),
+        "pressure": write_json(
+            tmp_path / "pressure.json",
+            {
+                "status": "pressure_tradeoff_diagnostic_only_keep_607",
+                "summary": {
+                    "promotion_allowed": False,
+                    "gate_ready_plan_complete": False,
+                    "natural_cards_with_trigger_signal": 2,
+                },
+                "candidate_cards": [
+                    {
+                        "card_name": "Guttersnipe",
+                        "decision": "hypothesis_natural_trigger_signal_but_full_package_regressed_miracle",
+                        "lane": "pressure_payoff",
+                    },
+                    {
+                        "card_name": "Monastery Mentor",
+                        "decision": "blocked_no_natural_card_use_in_pressure_smoke",
+                        "lane": "pressure_payoff",
+                    },
+                ],
+            },
+        ),
     }
     return paths
 
@@ -145,6 +168,7 @@ def build_payload(tmp_path: Path, *, ready_candidate: bool = False, role_watch: 
             selection_report_path=paths["selection"],
             interaction_report_path=paths["interaction"],
             payoff_report_path=paths["payoff"],
+            pressure_report_path=paths["pressure"],
         )
 
 
@@ -155,7 +179,7 @@ def test_baseline_keeps_607_when_no_candidate_is_ready(tmp_path):
     assert payload["decision"]["keep_607_as_protected_baseline"] is True
     assert payload["decision"]["promotion_allowed"] is False
     assert payload["summary"]["gate_ready_candidate_count"] == 0
-    assert payload["summary"]["unique_candidate_count"] == 5
+    assert payload["summary"]["unique_candidate_count"] == 7
     assert payload["deck_shape"]["deck_shape_ok"] is True
 
 
@@ -173,8 +197,8 @@ def test_candidate_classification_splits_blocked_and_hypotheses(tmp_path):
     payload = build_payload(tmp_path)
     counts = payload["candidate_pressure"]["classification_counts"]
 
-    assert counts["blocked_or_rejected"] == 3
-    assert counts["hypothesis_or_gate_needed"] == 2
+    assert counts["blocked_or_rejected"] == 4
+    assert counts["hypothesis_or_gate_needed"] == 3
     assert payload["summary"]["role_mapping_watch_count"] == 1
 
 
@@ -194,4 +218,5 @@ def test_markdown_surfaces_learning_model_and_sources(tmp_path):
     assert "Lorehold Promotion Readiness Synthesis" in markdown
     assert "keep_607_as_protected_baseline: `true`" in markdown
     assert "Mana Vault is not blocked by Commander legality" in markdown
+    assert "Pressure payoffs are valid hypotheses" in markdown
     assert "Scryfall The One Ring API" in markdown

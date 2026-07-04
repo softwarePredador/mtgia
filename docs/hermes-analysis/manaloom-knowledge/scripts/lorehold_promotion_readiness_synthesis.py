@@ -61,6 +61,7 @@ CANDIDATE_KEYS = {
     "selection": "candidate_access_cards",
     "interaction": "candidate_profiles",
     "payoff": "candidate_cards",
+    "pressure": "candidate_cards",
 }
 
 EXTERNAL_LEARNING = [
@@ -135,6 +136,11 @@ LEARNING_MODEL = {
         "Original Moxen, Mana Crypt, and Jeweled Lotus remain Commander-banned under current official banlist evidence.",
         "Premium or cEDH-style packages require budget/policy approval plus same-lane promotion proof.",
     ],
+    "pressure_policy": [
+        "Pressure payoffs are valid hypotheses only when they preserve the miracle/topdeck cadence that makes 607 win.",
+        "A pressure package with a better structural score is still rejected if its natural traces collapse topdeck setup.",
+        "Forced-access probes explain card behavior, but natural promotion still requires same-lane cuts and equal-gate proof.",
+    ],
 }
 
 
@@ -197,6 +203,13 @@ def default_payoff_report() -> Path:
     return newest_report(
         "lorehold_payoff_finisher_recursion_synthesis_20260704*.json",
         REPORT_DIR / "lorehold_payoff_finisher_recursion_synthesis_20260704_learning.json",
+    )
+
+
+def default_pressure_report() -> Path:
+    return newest_report(
+        "lorehold_pressure_tradeoff_decision_synthesis_20260704*.json",
+        REPORT_DIR / "lorehold_pressure_tradeoff_decision_synthesis_20260704_current.json",
     )
 
 
@@ -483,6 +496,7 @@ def build_synthesis(
     selection_report_path: Path,
     interaction_report_path: Path,
     payoff_report_path: Path,
+    pressure_report_path: Path,
 ) -> dict[str, Any]:
     paths = {
         "card_value": card_value_report_path,
@@ -491,6 +505,7 @@ def build_synthesis(
         "selection": selection_report_path,
         "interaction": interaction_report_path,
         "payoff": payoff_report_path,
+        "pressure": pressure_report_path,
     }
     reports = {name: read_json_if_exists(path) for name, path in paths.items()}
     shape = deck_shape(conn, deck_id)
@@ -650,6 +665,7 @@ def main() -> int:
     parser.add_argument("--selection-report", type=Path, default=None)
     parser.add_argument("--interaction-report", type=Path, default=None)
     parser.add_argument("--payoff-report", type=Path, default=None)
+    parser.add_argument("--pressure-report", type=Path, default=None)
     parser.add_argument(
         "--out-prefix",
         type=Path,
@@ -667,6 +683,7 @@ def main() -> int:
             selection_report_path=args.selection_report or default_selection_report(),
             interaction_report_path=args.interaction_report or default_interaction_report(),
             payoff_report_path=args.payoff_report or default_payoff_report(),
+            pressure_report_path=args.pressure_report or default_pressure_report(),
         )
     json_path, md_path = write_outputs(payload, args.out_prefix)
     print(json.dumps({"status": payload["status"], "json": str(json_path), "markdown": str(md_path)}, indent=2))

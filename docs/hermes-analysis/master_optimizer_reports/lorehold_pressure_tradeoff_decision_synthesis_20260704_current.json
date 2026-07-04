@@ -1,0 +1,248 @@
+{
+  "added": [
+    "Monastery Mentor",
+    "Young Pyromancer",
+    "Guttersnipe",
+    "Storm-Kiln Artist"
+  ],
+  "artifact_type": "lorehold_pressure_tradeoff_decision_synthesis",
+  "candidate_cards": [
+    {
+      "card_name": "Monastery Mentor",
+      "decision": "hypothesis_natural_access_only_needs_smaller_package_or_safe_cut",
+      "lane": "pressure_payoff",
+      "natural_accessed_games": 0,
+      "natural_cast_count": 0,
+      "natural_cost_count": 0,
+      "natural_event_counts": {},
+      "natural_near_access_games": 1,
+      "natural_trigger_count": 0
+    },
+    {
+      "card_name": "Young Pyromancer",
+      "decision": "hypothesis_natural_trigger_signal_but_full_package_regressed_miracle",
+      "lane": "pressure_payoff",
+      "natural_accessed_games": 1,
+      "natural_cast_count": 1,
+      "natural_cost_count": 2,
+      "natural_event_counts": {
+        "cost_paid:Young Pyromancer": 2,
+        "spell_cast:Young Pyromancer": 1,
+        "spell_resolved:Young Pyromancer": 1,
+        "trigger_resolved:Young Pyromancer": 6
+      },
+      "natural_near_access_games": 1,
+      "natural_trigger_count": 6
+    },
+    {
+      "card_name": "Guttersnipe",
+      "decision": "hypothesis_natural_trigger_signal_but_full_package_regressed_miracle",
+      "lane": "pressure_payoff",
+      "natural_accessed_games": 2,
+      "natural_cast_count": 0,
+      "natural_cost_count": 2,
+      "natural_event_counts": {
+        "cost_paid:Guttersnipe": 2,
+        "trigger_resolved:Guttersnipe": 7
+      },
+      "natural_near_access_games": 1,
+      "natural_trigger_count": 7
+    },
+    {
+      "card_name": "Storm-Kiln Artist",
+      "decision": "hypothesis_natural_cast_or_cost_signal_but_full_package_regressed_miracle",
+      "lane": "pressure_payoff",
+      "natural_accessed_games": 2,
+      "natural_cast_count": 0,
+      "natural_cost_count": 2,
+      "natural_event_counts": {
+        "cost_paid:Storm-Kiln Artist": 2
+      },
+      "natural_near_access_games": 2,
+      "natural_trigger_count": 0
+    }
+  ],
+  "candidate_key": "candidate_607_pressure_payoff_diagnostic_tradeoff_v1",
+  "decision": {
+    "decision_reasons": [
+      "No seed-safe cut plan exists for the full four-card package.",
+      "The generated candidate is diagnostic-only and explicitly promotion-ineligible.",
+      "The structure matrix ranks the candidate higher, but structure-only improvement is not promotion proof.",
+      "The smoke gate tied baseline wins, but smoke scope is not a confirmed equal-seed promotion gate.",
+      "The candidate regressed Lorehold's miracle/topdeck execution, which is the protected 607 plan."
+    ],
+    "keep_607_as_protected_baseline": true,
+    "next_actions": [
+      "do_not_promote_or_apply_the_four_card_pressure_tradeoff",
+      "do_not_rerun_the_full_package_until_a_seed_safe_cut_model_changes",
+      "use the natural Guttersnipe/Young Pyromancer signal only as a smaller-package hypothesis",
+      "treat Monastery Mentor and Storm-Kiln Artist forced probes as card-understanding evidence, not natural promotion proof",
+      "preserve 607 miracle/topdeck cadence as a hard gate for future pressure packages"
+    ],
+    "promotion_allowed": false
+  },
+  "deck_607_mutated": false,
+  "forced_probe_evidence": {
+    "Monastery Mentor": {
+      "card_event_counts": {
+        "cost_paid:Monastery Mentor": 3,
+        "spell_cast:Monastery Mentor": 3,
+        "spell_resolved:Monastery Mentor": 3
+      },
+      "card_name": "Monastery Mentor",
+      "effect_count": 3,
+      "focus": {
+        "accessed_games": 3,
+        "dominant_zone": "graveyard",
+        "drawn_games": 0,
+        "library_only_games": 0,
+        "near_access_games": 0,
+        "opening_hand_games": 3,
+        "trace_count": 200,
+        "trace_games": 3,
+        "zone_counts": {
+          "graveyard": 118,
+          "hand": 82
+        }
+      },
+      "forced_access_mode": "opening_hand",
+      "record": {
+        "losses": 1,
+        "stalls": 0,
+        "win_rate": 66.67,
+        "wins": 2
+      },
+      "treasure_like_count": 0
+    },
+    "Storm-Kiln Artist": {
+      "card_event_counts": {
+        "cost_paid:Storm-Kiln Artist": 3
+      },
+      "card_name": "Storm-Kiln Artist",
+      "effect_count": 7,
+      "focus": {
+        "accessed_games": 3,
+        "dominant_zone": "hand",
+        "drawn_games": 0,
+        "library_only_games": 0,
+        "near_access_games": 0,
+        "opening_hand_games": 3,
+        "trace_count": 196,
+        "trace_games": 3,
+        "zone_counts": {
+          "absent": 2,
+          "battlefield": 31,
+          "graveyard": 21,
+          "hand": 142
+        }
+      },
+      "forced_access_mode": "opening_hand",
+      "record": {
+        "losses": 2,
+        "stalls": 0,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "treasure_like_count": 0
+    }
+  },
+  "generated_at": "2026-07-04T22:25:14Z",
+  "natural_smoke_gate": {
+    "baseline_record": {
+      "avg_win_turn": 18.67,
+      "losses": 1,
+      "stalls": 0,
+      "win_rate": 75.0,
+      "wins": 3
+    },
+    "candidate_record": {
+      "avg_win_turn": 15.67,
+      "losses": 1,
+      "stalls": 0,
+      "win_rate": 75.0,
+      "wins": 3
+    },
+    "miracle_regressed": true,
+    "strategic_deltas": {
+      "discard_to_top_replacement": {
+        "baseline": 11,
+        "candidate": 3,
+        "delta": -8
+      },
+      "lorehold_spell_cast": {
+        "baseline": 58,
+        "candidate": 50,
+        "delta": -8
+      },
+      "lorehold_upkeep_rummage": {
+        "baseline": 19,
+        "candidate": 16,
+        "delta": -3
+      },
+      "miracle_cast": {
+        "baseline": 20,
+        "candidate": 5,
+        "delta": -15
+      },
+      "static_cost_reduction_total": {
+        "baseline": 22,
+        "candidate": 28,
+        "delta": 6
+      },
+      "topdeck_manipulation_activated": {
+        "baseline": 19,
+        "candidate": 4,
+        "delta": -15
+      }
+    },
+    "topdeck_regressed": true,
+    "wins_tied_or_better": true
+  },
+  "postgres_writes": false,
+  "removed": [
+    "Call Forth the Tempest",
+    "Tempt with Bunnies",
+    "Everything Comes to Dust",
+    "Rise of the Eldrazi"
+  ],
+  "resolver_summary": {
+    "decision_status": "no_seed_safe_cut_plan_diagnostic_only_tradeoff_available",
+    "diagnostic_tradeoff_plan_available": true,
+    "gate_ready_cut_count": 0,
+    "gate_ready_plan_complete": false,
+    "natural_battle_gate_allowed_now": false,
+    "primary_add_count": 4,
+    "ready_deck_change_count": 0,
+    "recommended_next_action": "stage_diagnostic_only_pressure_tradeoff_copy_if_learning_needs_it"
+  },
+  "source_db_mutated": false,
+  "source_reports": {
+    "candidate": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_tradeoff_diagnostic_variant_20260704_current.json",
+    "forced_monastery": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_tradeoff_diagnostic_variant_forced_monastery_20260704.json",
+    "forced_storm_kiln": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_tradeoff_diagnostic_variant_forced_storm_kiln_20260704.json",
+    "matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_tradeoff_diagnostic_variant_matrix_20260704_current.json",
+    "resolver": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_cut_pool_resolver_20260704_current.json",
+    "smoke_gate": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_tradeoff_diagnostic_variant_battle_20260704_smoke.json"
+  },
+  "status": "pressure_tradeoff_diagnostic_only_keep_607",
+  "structure": {
+    "baseline_score": 139.038,
+    "candidate_intent": 100.0,
+    "candidate_score": 140.901,
+    "ranked_deck_keys": [
+      "candidate_607_pressure_payoff_diagnostic_tradeoff_v1",
+      "deck_607"
+    ],
+    "score_delta": 1.863
+  },
+  "summary": {
+    "diagnostic_only": true,
+    "forced_monastery_token_maker_count": 3,
+    "forced_storm_kiln_treasure_like_count": 0,
+    "gate_ready_cut_count": 0,
+    "gate_ready_plan_complete": false,
+    "natural_cards_with_cost_or_cast_signal": 3,
+    "natural_cards_with_trigger_signal": 2,
+    "promotion_allowed": false
+  }
+}
