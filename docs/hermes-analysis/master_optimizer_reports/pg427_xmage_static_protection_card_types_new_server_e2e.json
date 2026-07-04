@@ -1,0 +1,402 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T19:58:00.656689+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg427_xmage_static_protection_card_types_new_server_manifest.json",
+  "package_id": "pg427_xmage_static_protection_card_types_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg427_xmage_static_protection_card_types_new_server_canonical_fallback.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Angelic Curator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b067ac2a5f8fe2f33fc1ea6586c92f68",
+          "oracle_hash": "c6da5f0c4b2d68f5ca57f71674898e63",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Azorius First-Wing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d1459b62eb8c5236cecc0803294e9c0a",
+          "oracle_hash": "0bed20a30ce1893bce2a5f3525a3586d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Beloved Chaplain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:219f2afb6ddef7cf8e3f05b9f56145b4",
+          "oracle_hash": "85465de2f7bb9355e2abee50bf175551",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Commander Eesha",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cb4ddef26b3af5c6fae84cbcc063bcbd",
+          "oracle_hash": "8c397f94332b7738a90dffa5e34c1766",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Horizon Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8bad75f82fd0185f7d6515eae6a7ee75",
+          "oracle_hash": "483bc74a05388029147248b9fa3327e5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Nacatl Savage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+          "oracle_hash": "c326b8227109ed7986576e4fc2fd8738",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Needlebug",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:813777fa7616859ba02a555d1232f605",
+          "oracle_hash": "e6aa03762d0c8998b46747f47b554641",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Tel-Jilad Chosen",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+          "oracle_hash": "c326b8227109ed7986576e4fc2fd8738",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Tel-Jilad Outrider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+          "oracle_hash": "c326b8227109ed7986576e4fc2fd8738",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Yavimaya Scion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+          "oracle_hash": "c326b8227109ed7986576e4fc2fd8738",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Angelic Curator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b067ac2a5f8fe2f33fc1ea6586c92f68",
+          "oracle_hash": "c6da5f0c4b2d68f5ca57f71674898e63",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Azorius First-Wing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d1459b62eb8c5236cecc0803294e9c0a",
+          "oracle_hash": "0bed20a30ce1893bce2a5f3525a3586d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Beloved Chaplain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:219f2afb6ddef7cf8e3f05b9f56145b4",
+          "oracle_hash": "85465de2f7bb9355e2abee50bf175551",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Commander Eesha",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cb4ddef26b3af5c6fae84cbcc063bcbd",
+          "oracle_hash": "8c397f94332b7738a90dffa5e34c1766",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Horizon Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8bad75f82fd0185f7d6515eae6a7ee75",
+          "oracle_hash": "483bc74a05388029147248b9fa3327e5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Nacatl Savage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+          "oracle_hash": "c326b8227109ed7986576e4fc2fd8738",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Needlebug",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:813777fa7616859ba02a555d1232f605",
+          "oracle_hash": "e6aa03762d0c8998b46747f47b554641",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Tel-Jilad Chosen",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+          "oracle_hash": "c326b8227109ed7986576e4fc2fd8738",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Tel-Jilad Outrider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+          "oracle_hash": "c326b8227109ed7986576e4fc2fd8738",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "card_name": "Yavimaya Scion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+          "oracle_hash": "c326b8227109ed7986576e4fc2fd8738",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Angelic Curator",
+          "logical_rule_key": "battle_rule_v1:b067ac2a5f8fe2f33fc1ea6586c92f68"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Azorius First-Wing",
+          "logical_rule_key": "battle_rule_v1:d1459b62eb8c5236cecc0803294e9c0a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Beloved Chaplain",
+          "logical_rule_key": "battle_rule_v1:219f2afb6ddef7cf8e3f05b9f56145b4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Commander Eesha",
+          "logical_rule_key": "battle_rule_v1:cb4ddef26b3af5c6fae84cbcc063bcbd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Horizon Drake",
+          "logical_rule_key": "battle_rule_v1:8bad75f82fd0185f7d6515eae6a7ee75"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nacatl Savage",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Needlebug",
+          "logical_rule_key": "battle_rule_v1:813777fa7616859ba02a555d1232f605"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tel-Jilad Chosen",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tel-Jilad Outrider",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Yavimaya Scion",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Angelic Curator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b067ac2a5f8fe2f33fc1ea6586c92f68"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Azorius First-Wing",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d1459b62eb8c5236cecc0803294e9c0a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Beloved Chaplain",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:219f2afb6ddef7cf8e3f05b9f56145b4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Commander Eesha",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cb4ddef26b3af5c6fae84cbcc063bcbd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Horizon Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8bad75f82fd0185f7d6515eae6a7ee75"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nacatl Savage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Needlebug",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:813777fa7616859ba02a555d1232f605"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tel-Jilad Chosen",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tel-Jilad Outrider",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Yavimaya Scion",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

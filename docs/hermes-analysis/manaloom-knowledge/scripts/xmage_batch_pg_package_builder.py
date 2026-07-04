@@ -169,6 +169,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "cycling_status",
     "xmage_auxiliary_ability_classes",
     "static_effect",
+    "protection_from_card_types",
     "cast_spells_as_flash",
     "cast_nonland_spells_as_flash",
     "flash_permission_filter",

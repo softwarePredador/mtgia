@@ -365,12 +365,16 @@ Evidence:
 - `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg323_creature_etb_add_counters_wave.md`
 - `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg323_existing_supported_recheck.md`
 
-After PG323, the post-ETB-add-counters queue is the current scheduling source:
-`target_identity_count=27312`, `xmage_authoritative_source_count=26998`,
-`xmage_authoritative_adapter_required_count=26998`, `parser_gap=0`, and
+After PG427, the post-static-card-type-protection queue is the current
+scheduling source:
+`target_identity_count=26359`, `xmage_authoritative_source_count=26045`,
+`xmage_authoritative_adapter_required_count=26045`, `parser_gap=0`, and
 `xmage_missing_source_exception_count=314`. Continue by adding a new exact
 subpattern/runtime adapter for a remaining high-volume family from that queue;
-do not schedule from any older PG315/PG320/PG321/PG322 queue artifact.
+do not schedule from any older PG323, PG400, PG425, or PG426 queue artifact.
+PG427 closed `10` creatures with exact self-protection from artifact,
+enchantment, creature, or land sources through
+`xmage_static_self_protection_from_card_types_creature_v1`.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the
 approved PostgreSQL mutation through the evidence runner instead of ad hoc SQL:

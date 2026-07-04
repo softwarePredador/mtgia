@@ -12883,6 +12883,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["keywords"], ["flying"])
         self.assertTrue(effect["flying"])
 
+    def test_static_protection_from_artifacts_creature_maps_card_type_protection(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Nacatl Savage",
+                type_line="Creature - Cat Warrior",
+                oracle_text="Protection from artifacts",
+            ),
+            source_text="""
+                this.addAbility(new ProtectionAbility(new FilterArtifactCard("artifacts")));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_PROTECTION_FROM_CARD_TYPES_CREATURE_SCOPE)
+        self.assertEqual(effect["static_effect"], "self_protection_from_card_types")
+        self.assertEqual(effect["protection_from_card_types"], ["artifact"])
+
+    def test_static_protection_from_card_type_creature_preserves_static_keywords(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FlyingAbility,ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Azorius First-Wing",
+                type_line="Creature - Griffin",
+                oracle_text="Flying, protection from enchantments",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new ProtectionAbility(new FilterEnchantmentCard("enchantments")));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_PROTECTION_FROM_CARD_TYPES_CREATURE_SCOPE)
+        self.assertEqual(effect["protection_from_card_types"], ["enchantment"])
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+
     def test_static_protection_with_flash_creature_maps_timing_keyword_and_color(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::FlashAbility,ProtectionAbility::no_target_class::no_condition_class::no_signal",
@@ -12944,7 +12996,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["protection_from"], ["white", "blue", "black", "red", "green"])
         self.assertEqual(effect["keywords"], ["flying"])
 
-    def test_static_protection_creature_blocks_non_color_protection(self) -> None:
+    def test_static_protection_creature_blocks_subtype_protection(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",
             effect_classes=[],
@@ -12954,18 +13006,18 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(
-                name="Nacatl Savage",
-                type_line="Creature - Cat Warrior",
-                oracle_text="Protection from artifacts",
+                name="Dragonstalker",
+                type_line="Creature - Bird Soldier",
+                oracle_text="Flying, protection from Dragons",
             ),
             source_text="""
-                private static final FilterCard filter = new FilterArtifactCard("artifacts");
-                this.addAbility(new ProtectionAbility(filter));
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new ProtectionAbility(new FilterPermanent(SubType.DRAGON, "Dragons")));
             """,
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "static_protection_oracle_not_color_exact")
+        self.assertEqual(reason, "static_protection_oracle_not_color_or_card_type_exact")
 
     def test_static_keyword_creature_requires_creature_type(self) -> None:
         row = queue_row(

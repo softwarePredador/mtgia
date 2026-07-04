@@ -10846,6 +10846,57 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_static_protection_from_card_type_creature_blocks_matching_source_type(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        creature = {
+            "name": "Nacatl Savage",
+            "type_line": "Creature - Cat Warrior",
+            "oracle_text": "Protection from artifacts",
+            "controller": "Active",
+            "power": 2,
+            "toughness": 1,
+        }
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+            "ability_kind": "static",
+            "static_effect": "self_protection_from_card_types",
+            "protection_from_card_types": ["artifact"],
+        }
+        permanent = self.battle.enrich_card({**creature, **effect})
+        active.battlefield.append(permanent)
+
+        artifact_spell = {
+            "name": "Fixture Artifact Bolt",
+            "type_line": "Artifact",
+            "colors": [],
+            "oracle_text": "Fixture Artifact Bolt deals 3 damage to target creature.",
+        }
+        red_spell = {
+            "name": "Fixture Red Burn",
+            "type_line": "Instant",
+            "colors": ["R"],
+            "oracle_text": "Fixture Red Burn deals 3 damage to target creature.",
+        }
+
+        self.assertFalse(
+            self.battle.is_legal_target(
+                artifact_spell,
+                permanent,
+                opponent,
+                target_type="creature",
+            )
+        )
+        self.assertTrue(
+            self.battle.is_legal_target(
+                red_spell,
+                permanent,
+                opponent,
+                target_type="creature",
+            )
+        )
+
     def test_static_protection_from_color_creature_blocks_matching_colored_targeting(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

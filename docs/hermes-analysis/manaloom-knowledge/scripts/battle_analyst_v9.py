@@ -11279,6 +11279,13 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         source_colors = set(protection_colors_for_source(spell))
     if any(c in protections for c in source_colors):
         return False
+    protected_card_types = {
+        str(card_type or "").strip().lower()
+        for card_type in _as_list(target.get("protection_from_card_types"))
+        if str(card_type or "").strip()
+    }
+    if protected_card_types and any(target_matches_type(spell, card_type) for card_type in protected_card_types):
+        return False
     allowed_types = _constraint_card_types(spell)
     if allowed_types and "permanent" not in allowed_types:
         if not any(target_matches_type(target, allowed_type) for allowed_type in allowed_types):

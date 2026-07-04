@@ -8685,6 +8685,45 @@ new server:
   to `26055`, and the exact split recheck now reports `proposal_count=0`.
   The remaining `314` identities are still explicit missing-source exceptions.
 
+## 2026-07-04 PG427 Static Card-Type Protection Closure
+
+- Closed the exact XMage static creature-protection unit where
+  `ProtectionAbility` grants self-protection from a card type: artifact,
+  enchantment, creature, or land. Broader protection from subtypes,
+  multicolor, mana values, or conditional protection remains blocked for
+  separate exact adapters.
+- The mapper now translates the local XMage source and Oracle text into
+  ManaLoom scope `xmage_static_self_protection_from_card_types_creature_v1`
+  with `static_effect=self_protection_from_card_types` and
+  `protection_from_card_types`. Existing supported self keywords such as
+  `flying` and `flash` are preserved on the same rule.
+- Runtime behavior now extends target legality: `is_legal_target` rejects a
+  source whose card type matches the target permanent's
+  `protection_from_card_types`, while nonmatching sources remain legal.
+  Focused tests cover artifact-source rejection, nonartifact instant
+  allowance, mapper acceptance, and subtype-protection rejection.
+- The PostgreSQL package promoted `10` cards:
+  `Angelic Curator`, `Azorius First-Wing`, `Beloved Chaplain`,
+  `Commander Eesha`, `Horizon Drake`, `Nacatl Savage`, `Needlebug`,
+  `Tel-Jilad Chosen`, `Tel-Jilad Outrider`, and `Yavimaya Scion`.
+  Precheck found `10` target rows, `0` existing rule rows, and `0` shadow rows;
+  apply inserted/updated `10`; postcheck verified `10/10` promoted rows as
+  `verified`/`auto` with Oracle hashes.
+- Hermes sync refreshed PostgreSQL card metadata against
+  `127.0.0.1:15432/halder` and synced `10` PG rules into SQLite. The canonical
+  fallback export increased to `5665` rows.
+- PG427 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `10` selected cards. Generic
+  battle scenario count remained `0`; target legality is covered by focused
+  runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26369` to `26359`, authoritative adapter-required count from `26055`
+  to `26045`, and the exact split recheck reports `proposal_count=0`.
+  The remaining `314` identities are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
