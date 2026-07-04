@@ -8989,6 +8989,48 @@ new server:
   `xmage_boost_keyword_target_creature_until_eot_spell` with `25` cards and
   `xmage_creature_dies_create_tokens` with `24` cards.
 
+## 2026-07-04 PG434 Static Self Combat Keyword Creature Closure
+
+- Closed the exact XMage static self combat-keyword creature family as
+  ManaLoom scope `xmage_static_self_combat_keyword_creature_v1`.
+- The selected package accepted only no-effect/no-signal creature rows whose
+  local XMage abilities are static self keywords supported by the battle
+  runtime. The batch is primarily `flash` creatures, including combinations
+  with flying, reach, deathtouch, first strike, haste, defender, trample,
+  vigilance, and indestructible. Protection and ward variants remain separate
+  exact scopes/blockers.
+- Runtime behavior was already covered by focused tests for keyword enrichment
+  on permanents, flash timing, and static combat keyword interpretation. PG434
+  reused the mapper/runtime tests and performed no code mutation.
+- The PostgreSQL package promoted `33` cards. Precheck found `33` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `33/33` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4068` PostgreSQL runtime rows, wrote `4060` SQLite runtime
+  rows, and exported `4035` canonical fallback rows.
+- PG434 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `33` selected cards. Generic
+  battle scenario count remained `0`; actual keyword behavior remains covered
+  by the focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26818`, `xmage_authoritative_source_count=26504`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26504`. This is an exact
+  reduction of `33` from the post-PG433 queue.
+- The post-PG434 exact split recheck reports `proposal_count=479` and
+  `safe_for_batch_pg_package_count=479`. The largest remaining exact family is
+  `xmage_boost_keyword_target_creature_until_eot_spell` with `25` cards,
+  followed by `xmage_creature_dies_create_tokens` and
+  `xmage_permanent_simple_activated_target_keyword_until_eot` with `24` cards
+  each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

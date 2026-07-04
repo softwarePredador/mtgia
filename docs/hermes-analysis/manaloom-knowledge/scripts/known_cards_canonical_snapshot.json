@@ -2054,6 +2054,28 @@
     "battle_rule_logical_key": "battle_rule_v1:78e232de32da15132bfaee5129cf6d51",
     "battle_rule_oracle_hash": "51344ff045fa0d5d3e04e04be34285f6"
   },
+  "Ambush Viper": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "deathtouch": true,
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash",
+      "deathtouch"
+    ],
+    "xmage_ability_classes": [
+      "DeathtouchAbility",
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0d334008fea61bb626110dc1db32b6d0",
+    "battle_rule_oracle_hash": "c8f16b33c4b28977abb1746f0387728e"
+  },
   "Amonkhet Raceway": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -4027,6 +4049,25 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "1db4e006bbe1c463de8c0044b43b0eb4"
   },
+  "Ashcoat Bear": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+    "battle_rule_oracle_hash": "4a2c565e9fda686748cd261b1298b784"
+  },
   "Ashen Powder": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
     "battlefield_controller": "self",
@@ -4736,6 +4777,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557",
     "battle_rule_oracle_hash": "e67201c53659f5c13214d1a60cd8f652"
+  },
+  "Aven Reedstalker": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "3baebb06100722ec034bcfe15b534fb7"
   },
   "Aven Sentry": {
     "_keywords_are_self": true,
@@ -6480,6 +6543,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:abd1c0f34c739ff646806725283ab285",
     "battle_rule_oracle_hash": "8c4b52de0b3d7a4a30116a40dcc51dd1"
+  },
+  "Benalish Knight": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "first_strike": true,
+    "flash": true,
+    "keywords": [
+      "flash",
+      "first_strike"
+    ],
+    "xmage_ability_classes": [
+      "FirstStrikeAbility",
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e69be624f5717c9c450521ca938fde94",
+    "battle_rule_oracle_hash": "fcb744ee0a138e1bb29c33212f14398c"
   },
   "Benalish Marshal": {
     "ability_kind": "static",
@@ -8851,6 +8936,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f679f436d97fee9e3c5008da40f24bea",
     "battle_rule_oracle_hash": "1f4ad05059a4aa53dc005dd509606c36"
+  },
+  "Bounding Wolf": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash",
+      "reach"
+    ],
+    "reach": true,
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "ReachAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:015f4c1e88bfb228ee80d796a1aef0d1",
+    "battle_rule_oracle_hash": "c6a597480f571cbfab0ea87ebc019b85"
   },
   "Bountiful Landscape": {
     "effect": "land",
@@ -12861,6 +12968,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "d452cc3af96e02b7789a527e41c8692a"
   },
+  "Cloaked Siren": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3"
+  },
   "Clock of Omens": {
     "effect": "passive",
     "battle_rule_source": "curated",
@@ -15079,6 +15208,25 @@
     "battle_rule_logical_key": "battle_rule_v1:3bb2acfbae9c082368cb5c4f55486990",
     "battle_rule_oracle_hash": "53ef9c8794128fdba3d1b15c9dbc9f71"
   },
+  "Crystacean": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+    "battle_rule_oracle_hash": "4a2c565e9fda686748cd261b1298b784"
+  },
   "Crystal Grotto": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -15944,6 +16092,31 @@
     "battle_rule_logical_key": "battle_rule_v1:4861207cdea84c3f0de9c4492b7b9fb9",
     "battle_rule_oracle_hash": "7dd3906f42df1ac5364b28969f62ea9c"
   },
+  "Darksteel Sentinel": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "indestructible": true,
+    "keywords": [
+      "flash",
+      "vigilance",
+      "indestructible"
+    ],
+    "vigilance": true,
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "IndestructibleAbility",
+      "VigilanceAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:69cf1a8a74e0b40c022ba0cefbac4f29",
+    "battle_rule_oracle_hash": "8ced2ff7a7a3af95d0f8198bd4dc3d2b"
+  },
   "Darkwater Catacombs": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -16044,6 +16217,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
+  },
+  "Dawn's Light Archer": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash",
+      "reach"
+    ],
+    "reach": true,
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "ReachAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:015f4c1e88bfb228ee80d796a1aef0d1",
+    "battle_rule_oracle_hash": "c6a597480f571cbfab0ea87ebc019b85"
   },
   "Dawn's Truce": {
     "battle_model_scope": "gift_card_you_and_permanents_hexproof_gifted_indestructible_v1",
@@ -23303,6 +23498,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "013d0dc780954bdd1a7176ced2aefb3e"
   },
+  "Faerie Invaders": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3"
+  },
   "Faerie Mastermind": {
     "ability_kind": "triggered",
     "activated_each_player_draw_cost": "{3}{U}",
@@ -24826,6 +25043,25 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0ec21fb7926cc051327c2aef53549b01",
     "battle_rule_oracle_hash": "6cb7c3a573c3fc76d7a0275462aba0e4"
+  },
+  "Fire Nation Ambushers": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+    "battle_rule_oracle_hash": "4a2c565e9fda686748cd261b1298b784"
   },
   "Fire Nation Palace": {
     "effect": "land",
@@ -28046,6 +28282,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:d6525baec4c35d68b522fb1fa2a96b9f",
     "battle_rule_oracle_hash": "e17ba3ddaf7febad91161213aad18a2a"
+  },
+  "Galewind Moose": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash",
+      "reach",
+      "trample",
+      "vigilance"
+    ],
+    "reach": true,
+    "trample": true,
+    "vigilance": true,
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "ReachAbility",
+      "TrampleAbility",
+      "VigilanceAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3b9008f96c5d746ad6e1f5e17dd87e20",
+    "battle_rule_oracle_hash": "46fdf1268a89e54af4894249c88fad6c"
   },
   "Galina's Knight": {
     "ability_kind": "static",
@@ -33025,6 +33289,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "92d3a7365d504031843fe62c684067dc"
   },
+  "Havenwood Wurm": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash",
+      "trample"
+    ],
+    "trample": true,
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "TrampleAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ef412605d53621e6df6854b57f9b352c",
+    "battle_rule_oracle_hash": "0401904a9ced72875eddd7de1e5a55f4"
+  },
   "Havoc Devils": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -34121,6 +34407,25 @@
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "34800e10f2cc4ada6a104213ade817dc"
   },
+  "Hired Blade": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+    "battle_rule_oracle_hash": "4a2c565e9fda686748cd261b1298b784"
+  },
   "Hired Poisoner": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -34852,6 +35157,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "b6762ae8f274cab819e8c201cc88f3c8"
+  },
+  "Hussar Patrol": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash",
+      "vigilance"
+    ],
+    "vigilance": true,
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "VigilanceAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0e7ff9ef8e5837f51587ddb7ba59851c",
+    "battle_rule_oracle_hash": "f9e4e3bae652f9e091908dc888e27dbe"
   },
   "Hydroelectric Specimen // Hydroelectric Laboratory": {
     "ability_kind": "triggered",
@@ -38538,6 +38865,25 @@
     "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
     "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
+  "King Cheetah": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+    "battle_rule_oracle_hash": "bf2c44e6fc09515648b91b1bb4ec3f5f"
+  },
   "King of the Pride": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
@@ -40961,6 +41307,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:28eac3740a610b2b39f04e52527943c0",
     "battle_rule_oracle_hash": "49cf6ad10d1f7f69263bd280ce851120"
+  },
+  "Living Tempest": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "3baebb06100722ec034bcfe15b534fb7"
   },
   "Llanowar Dead": {
     "activation_requires_tap": true,
@@ -43499,6 +43867,25 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
     "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
+  },
+  "Merfolk of the Depths": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+    "battle_rule_oracle_hash": "4a2c565e9fda686748cd261b1298b784"
   },
   "Mesa Cavalier": {
     "_keywords_are_self": true,
@@ -47149,6 +47536,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "d48f2d889bce4c66cf9d49c3ec55af2c"
+  },
+  "Nephalia Seakite": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3"
   },
   "Nest Robber": {
     "_keywords_are_self": true,
@@ -51294,6 +51703,31 @@
     "battle_rule_logical_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
     "battle_rule_oracle_hash": "cdedef666a078c7e40d101c144102bec"
   },
+  "Plumeveil": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "defender": true,
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying",
+      "defender"
+    ],
+    "xmage_ability_classes": [
+      "DefenderAbility",
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0d9e9efd643d383269e6284f7db3a9af",
+    "battle_rule_oracle_hash": "1635dbfc5c0c438f8c4162633c303ed3"
+  },
   "Plummet": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -51488,6 +51922,25 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8f1112c7845590f7af48ef2fe27e4042",
     "battle_rule_oracle_hash": "93c7e9b37205b9ff286a1f6c48cc55fe"
+  },
+  "Pouncing Cheetah": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+    "battle_rule_oracle_hash": "bf2c44e6fc09515648b91b1bb4ec3f5f"
   },
   "Power Depot": {
     "effect": "land",
@@ -53467,6 +53920,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:33e1dd27537361327415a737afccc230",
     "battle_rule_oracle_hash": "2166542fdd309faf49b670f6c0bafbc9"
+  },
+  "Raging Kavu": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "haste": true,
+    "keywords": [
+      "flash",
+      "haste"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "HasteAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1d62ae53017137f3b6a850b6cd6a2606",
+    "battle_rule_oracle_hash": "ef26d540d93145fee85f76dbeb57fff9"
   },
   "Raging Minotaur": {
     "_keywords_are_self": true,
@@ -57280,6 +57755,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "1f81560a71f06b9096f654565bfc1cb4"
+  },
+  "Riptide Turtle": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "defender": true,
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash",
+      "defender"
+    ],
+    "xmage_ability_classes": [
+      "DefenderAbility",
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8a884a5f51973344420a302d0455f390",
+    "battle_rule_oracle_hash": "08e19ac1e964423ace0df0845826d3a2"
   },
   "Rise Again": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
@@ -62269,6 +62766,28 @@
     "battle_rule_logical_key": "battle_rule_v1:2942aac8d8f5522b082ea69ad8340e5c",
     "battle_rule_oracle_hash": "70faa0c21661cc0baf04ba81a8bc1e61"
   },
+  "Sentinels of Glen Elendra": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "3baebb06100722ec034bcfe15b534fb7"
+  },
   "Sephiroth's Intervention": {
     "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
     "controller_gains_life": 2,
@@ -65010,6 +65529,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "38926740b4c7d16469c24868ce4ac946"
   },
+  "Skyline Predator": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3"
+  },
   "Skyraker Giant": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -66993,6 +67534,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "0f205f5ed92fe1fcf38ce4a429026e33"
   },
+  "Spire Monitor": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3"
+  },
   "Spire of Industry": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -68906,6 +69469,28 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Stormrider Spirit": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "3baebb06100722ec034bcfe15b534fb7"
+  },
   "Story Seeker": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -70442,6 +71027,28 @@
     "battle_rule_logical_key": "battle_rule_v1:fab8ffbbd808fe4ee9128f5f3b83148e",
     "battle_rule_oracle_hash": "a2011900444fa6f89be7c9a6d46a5956"
   },
+  "Swift Spinner": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash",
+      "reach"
+    ],
+    "reach": true,
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "ReachAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:015f4c1e88bfb228ee80d796a1aef0d1",
+    "battle_rule_oracle_hash": "5b68bdd096c620fd99f2fa2d5b655469"
+  },
   "Swiftblade Vindicator": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -71222,6 +71829,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "0eb8f6509f829b9bc6c98e8dd5cf17e0"
+  },
+  "Tangle Spider": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash",
+      "reach"
+    ],
+    "reach": true,
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "ReachAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:015f4c1e88bfb228ee80d796a1aef0d1",
+    "battle_rule_oracle_hash": "5b68bdd096c620fd99f2fa2d5b655469"
   },
   "Tanglebloom": {
     "_activated_rule_effects": [
@@ -78495,6 +79124,28 @@
     "battle_rule_logical_key": "battle_rule_v1:6a85170698c85498bf618c0c0283a770",
     "battle_rule_oracle_hash": "020e696ec9560830bb82bf0244595d69"
   },
+  "Vexing Gull": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "3baebb06100722ec034bcfe15b534fb7"
+  },
   "Vial of Dragonfire": {
     "_activated_rule_effects": [
       {
@@ -82055,6 +82706,28 @@
     "battle_rule_logical_key": "battle_rule_v1:73675a4e3548ce04c5253f5c2e48a20e",
     "battle_rule_oracle_hash": "ffd969ec7b7f72e7e1e71b9031a0907d"
   },
+  "Wind Strider": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+    "battle_rule_oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3"
+  },
   "Wind-Scarred Crag": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -82268,6 +82941,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8844850db13384812775c4a7d8e1dceb",
     "battle_rule_oracle_hash": "bcac23c50272f5a5a76e9aa0c17a9019"
+  },
+  "Winged Coatl": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "deathtouch": true,
+    "effect": "creature",
+    "flash": true,
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying",
+      "deathtouch"
+    ],
+    "xmage_ability_classes": [
+      "DeathtouchAbility",
+      "FlashAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c269497a1b68cc205b2db22742d203ba",
+    "battle_rule_oracle_hash": "c76841e62af8f16f47552bcce367e463"
   },
   "Winged Portent": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -83443,6 +84141,25 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:38c388eb57e81c936e9c75a06b4e871d",
     "battle_rule_oracle_hash": "f4ae5074d9d8d85a9ae3d23e317c0b15"
+  },
+  "Zealous Guardian": {
+    "_keywords_are_self": true,
+    "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "xmage_ability_classes": [
+      "FlashAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+    "battle_rule_oracle_hash": "bf2c44e6fc09515648b91b1bb4ec3f5f"
   },
   "Zealous Lorecaster": {
     "ability_kind": "triggered",

@@ -1,0 +1,60 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "family_counts": {
+    "xmage_static_self_combat_keyword_creature": 33
+  },
+  "generated_at": "2026-07-04T21:24:38.890292+00:00",
+  "package": "pg434_xmage_static_self_combat_keyword_new_server",
+  "postcheck": {
+    "backup_rows": 0,
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 33,
+    "promoted_rule_rows": 33,
+    "promoted_verified_auto_rows": 33,
+    "row_count": 33
+  },
+  "precheck": {
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 33,
+    "total_target_card_rows": 33,
+    "would_deprecate_shadow_rows": 0
+  },
+  "selected_cards": [
+    "Ambush Viper",
+    "Ashcoat Bear",
+    "Aven Reedstalker",
+    "Benalish Knight",
+    "Bounding Wolf",
+    "Cloaked Siren",
+    "Crystacean",
+    "Darksteel Sentinel",
+    "Dawn's Light Archer",
+    "Faerie Invaders",
+    "Fire Nation Ambushers",
+    "Galewind Moose",
+    "Havenwood Wurm",
+    "Hired Blade",
+    "Hussar Patrol",
+    "King Cheetah",
+    "Living Tempest",
+    "Merfolk of the Depths",
+    "Nephalia Seakite",
+    "Plumeveil",
+    "Pouncing Cheetah",
+    "Raging Kavu",
+    "Riptide Turtle",
+    "Sentinels of Glen Elendra",
+    "Skyline Predator",
+    "Spire Monitor",
+    "Stormrider Spirit",
+    "Swift Spinner",
+    "Tangle Spider",
+    "Vexing Gull",
+    "Wind Strider",
+    "Winged Coatl",
+    "Zealous Guardian"
+  ],
+  "selected_count": 33,
+  "status": "pass"
+}
