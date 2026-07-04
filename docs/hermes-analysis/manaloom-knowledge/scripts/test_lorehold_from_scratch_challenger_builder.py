@@ -17,6 +17,7 @@ class LoreholdFromScratchChallengerBuilderTest(unittest.TestCase):
                 "spell_pressure_mana_conversion_deoverfill",
                 "spell_pressure_mana_conversion",
                 "spell_pressure_topdeck",
+                "spell_volume_access_depressure",
                 "recursion_discard_engine",
                 "recursion_discard_pressure_repair",
             },
@@ -192,6 +193,54 @@ class LoreholdFromScratchChallengerBuilderTest(unittest.TestCase):
             },
         )
         self.assertEqual(candidate["candidate_key"], "challenger_lorehold_spell_pressure_mana_conversion_deoverfill_v1")
+        self.assertEqual(candidate["quantity_total"], 100)
+        self.assertEqual(candidate["land_quantity"], 34)
+        self.assertEqual(candidate["missing_required_cards"], [])
+        self.assertEqual(candidate["commander_intent_alignment"]["risks"], [])
+
+    def test_spell_volume_access_depressure_removes_unproven_pressure_payoffs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            report = builder.build_all(
+                source_db=builder.DEFAULT_SOURCE_DB,
+                plan_keys=["spell_volume_access_depressure"],
+                corpus_deck_ids=list(builder.DEFAULT_CORPUS_DECK_IDS),
+                out_dir=Path(tmp),
+                stem="unit_from_scratch_spell_volume_depressure",
+                opponent_limit=3,
+                games=1,
+                game_timeout_seconds=5.0,
+            )
+
+        candidate = report["candidates"][0]
+        names = {card["card_name"] for card in candidate["final_deck"]}
+        for card_name in (
+            "Artist's Talent",
+            "Boros Charm",
+            "Deflecting Palm",
+            "Gamble",
+            "Perch Protection",
+            "Tempt with Bunnies",
+            "Wheel of Fortune",
+        ):
+            self.assertIn(card_name, names)
+        for card_name in (
+            "Aetherflux Reservoir",
+            "Apex of Power",
+            "Dance with Calamity",
+            "Dragon's Rage Channeler",
+            "Faithless Looting",
+            "Guttersnipe",
+            "Monastery Mentor",
+            "Olórin's Searing Light",
+            "Penance",
+            "Ruby Medallion",
+            "Soulfire Eruption",
+            "Storm-Kiln Artist",
+            "Wheel of Fate",
+            "Young Pyromancer",
+        ):
+            self.assertNotIn(card_name, names)
+        self.assertEqual(candidate["candidate_key"], "challenger_lorehold_spell_volume_access_depressure_v1")
         self.assertEqual(candidate["quantity_total"], 100)
         self.assertEqual(candidate["land_quantity"], 34)
         self.assertEqual(candidate["missing_required_cards"], [])

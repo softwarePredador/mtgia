@@ -768,6 +768,144 @@ CHALLENGER_PLANS: dict[str, dict[str, Any]] = {
         "min_basics": 8,
         "mountain_bias": 0.58,
     },
+    "spell_volume_access_depressure": {
+        "mode": "from_scratch",
+        "candidate_key": "challenger_lorehold_spell_volume_access_depressure_v1",
+        "candidate_name": "Lorehold From-Scratch Spell Volume Access Depressure v1",
+        "candidate_archetype": "from-scratch-spell-volume-access-depressure",
+        "intent": (
+            "Pivot from the pressure-payoff hypothesis after the deoverfill trace: "
+            "keep the event-positive access, protection, wheel, and miracle cards, "
+            "restore 607 cards that had events in the same smoke window, and block "
+            "Guttersnipe plus Storm-Kiln Artist until natural traces prove pressure causality."
+        ),
+        "required_cards": [
+            "Approach of the Second Sun",
+            "Arcane Signet",
+            "Artist's Talent",
+            "Bender's Waterskin",
+            "Boros Charm",
+            "Boros Signet",
+            "Call Forth the Tempest",
+            "Creative Technique",
+            "Dawn's Truce",
+            "Deflecting Palm",
+            "Deflecting Swat",
+            "Esper Sentinel",
+            "Everything Comes to Dust",
+            "Farewell",
+            "Fellwar Stone",
+            "Flawless Maneuver",
+            "Gamble",
+            "Generous Gift",
+            "Giver of Runes",
+            "Hexing Squelcher",
+            "High Noon",
+            "Hit the Mother Lode",
+            "Jeska's Will",
+            "Land Tax",
+            "Library of Leng",
+            "Lightning Greaves",
+            "Mizzix's Mastery",
+            "Molecule Man",
+            "Monument to Endurance",
+            "Mother of Runes",
+            "Path to Exile",
+            "Pearl Medallion",
+            "Perch Protection",
+            "Promise of Loyalty",
+            "Reforge the Soul",
+            "Scroll Rack",
+            "Sensei's Divining Top",
+            "Silence",
+            "Smothering Tithe",
+            "Sol Ring",
+            "Starfall Invocation",
+            "Stroke of Midnight",
+            "Swords to Plowshares",
+            "Talisman of Conviction",
+            "Teferi's Protection",
+            "Tempt with Bunnies",
+            "The Mind Stone",
+            "The Scarlet Witch",
+            "Tibalt's Trickery",
+            "Unexpected Windfall",
+            "Victory Chimes",
+            "Wheel of Fortune",
+            "Winds of Abandon",
+        ],
+        "excluded_cards": [
+            "Aetherflux Reservoir",
+            "Apex of Power",
+            "Dance with Calamity",
+            "Dragon's Rage Channeler",
+            "Faithless Looting",
+            "Guttersnipe",
+            "Monastery Mentor",
+            "Olórin's Searing Light",
+            "Penance",
+            "Ruby Medallion",
+            "Soulfire Eruption",
+            "Storm-Kiln Artist",
+            "Wheel of Fate",
+            "Young Pyromancer",
+        ],
+        "land_priority": [
+            "Ancient Tomb",
+            "Arid Mesa",
+            "Battlefield Forge",
+            "Bloodstained Mire",
+            "Command Beacon",
+            "Command Tower",
+            "Eiganjo, Seat of the Empire",
+            "Elegant Parlor",
+            "Exotic Orchard",
+            "Flooded Strand",
+            "Glittering Massif",
+            "Marsh Flats",
+            "Plaza of Heroes",
+            "Prismatic Vista",
+            "Radiant Summit",
+            "Reliquary Tower",
+            "Sacred Foundry",
+            "Scalding Tarn",
+            "Spectator Seating",
+            "Sunbaked Canyon",
+            "Sunbillow Verge",
+            "Turbulent Steppe",
+            "Urza's Saga",
+            "War Room",
+            "Windswept Heath",
+            "Wooded Foothills",
+        ],
+        "package_weights": {
+            "topdeck_miracle_setup": 11.0,
+            "hand_filter": 9.0,
+            "spell_chain_conversion": 9.0,
+            "protection_window": 9.0,
+            "pressure_absorber": 9.0,
+            "deterministic_finisher": 8.0,
+            "early_plan": 7.0,
+            "graveyard_recursion": 5.0,
+        },
+        "package_count_caps": {
+            "hand_filter": 17,
+        },
+        "role_targets": {
+            "land": 34,
+            "ramp": 18,
+            "draw": 15,
+            "removal": 10,
+            "protection": 13,
+            "board_wipe": 5,
+            "tutor": 3,
+            "wincon": 9,
+            "recursion": 4,
+        },
+        "land_target": 34,
+        "min_basics": 8,
+        "mountain_bias": 0.58,
+    },
     "access_density_control": {
         "mode": "from_scratch",
         "candidate_key": "challenger_lorehold_access_density_control_v1",
@@ -1123,8 +1261,15 @@ def build_nonlands(
     selected: dict[str, dict[str, Any]] = {}
     missing: list[str] = []
     excluded = {normalize_name(name) for name in plan.get("excluded_cards") or []}
+    package_count_caps = {str(key): int(value) for key, value in (plan.get("package_count_caps") or {}).items()}
     for card_name in plan.get("required_cards") or []:
         add_named_card(selected, pool, str(card_name), missing=missing)
+
+    def exceeds_package_cap(row: Mapping[str, Any], package_counts: Counter[str]) -> bool:
+        if not package_count_caps:
+            return False
+        tags = strategy_tags_for_card(card_payload(row))
+        return any(tag in package_count_caps and package_counts[tag] >= package_count_caps[tag] for tag in tags)
 
     while len(selected) < target_count:
         role_counts = weighted_role_counts(selected.values())
@@ -1136,6 +1281,7 @@ def build_nonlands(
             and key not in excluded
             and not bool(entry["representative"].get("is_commander"))
             and "land" not in card_roles(entry["representative"])
+            and not exceeds_package_cap(entry["representative"], package_counts)
         ]
         if not candidates:
             break
@@ -1220,6 +1366,7 @@ def summarize_rows(rows: list[Mapping[str, Any]], plan: Mapping[str, Any]) -> di
         "final_deck": final_deck,
         "required_cards": list(plan.get("required_cards") or []),
         "excluded_cards": list(plan.get("excluded_cards") or []),
+        "package_count_caps": dict(plan.get("package_count_caps") or {}),
     }
 
 
