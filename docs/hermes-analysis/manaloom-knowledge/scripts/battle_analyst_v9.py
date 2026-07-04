@@ -30242,6 +30242,259 @@ def activate_karns_sylex(player, permanent, opponents, all_players, turn, rng, *
     return True
 
 
+def _permanent_library_tutor_activation_plan(player, permanent, opponents, turn, effect_data):
+    if effect_data is None or permanent not in getattr(player, "battlefield", []):
+        return None
+    if effect_data.get("activation_requires_sacrifice_target") or effect_data.get("activation_sacrifice_target"):
+        return None
+    requires_tap = bool(effect_data.get("activation_requires_tap"))
+    if requires_tap and permanent.get("tapped"):
+        return None
+    if (
+        requires_tap
+        and is_battlefield_creature(permanent)
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return None
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    activation_cost_generic = adjusted_activated_ability_generic_cost(
+        player,
+        permanent,
+        int(effect_data.get("activation_cost_generic") or 0),
+        activation_colors=activation_cost_colors,
+    )
+    activation_cost_text = _activation_cost_text(activation_cost_generic, activation_cost_colors)
+    if not player.can_pay(activation_cost_text):
+        return None
+    target_type = str(effect_data.get("tutor_target") or effect_data.get("target") or "any_to_battlefield")
+    if not target_type.endswith("_to_battlefield"):
+        target_type = f"{target_type}_to_battlefield"
+    candidates = constrained_library_tutor_candidates(player, target_type, effect_data)
+    if not candidates:
+        return None
+    scored_candidates = [
+        (
+            candidate,
+            *tutor_candidate_score(candidate, target_type, player, opponents, turn),
+        )
+        for candidate in candidates
+    ]
+    scored_candidates.sort(
+        key=lambda item: (
+            -item[1],
+            -int(float(item[0].get("cmc") or item[0].get("mana_value") or 0)),
+            item[0].get("name", ""),
+        )
+    )
+    try:
+        selection_count = max(1, int(effect_data.get("tutor_count") or effect_data.get("count") or 1))
+    except (TypeError, ValueError):
+        selection_count = 1
+    selected = scored_candidates[:selection_count]
+    return {
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_cost_text": activation_cost_text,
+        "target_type": target_type,
+        "scored_candidates": scored_candidates,
+        "selected": selected,
+        "expected_score": sum(score for _candidate, score, _reason in selected),
+    }
+
+
+def can_activate_permanent_library_tutor(player, permanent, opponents, *, effect_data=None):
+    effect_data = effect_data or library_tutor_battlefield_effect_for_permanent(permanent)
+    return _permanent_library_tutor_activation_plan(
+        player,
+        permanent,
+        opponents or [],
+        CURRENT_REPLAY_TURN,
+        effect_data,
+    ) is not None
+
+
+def activate_permanent_library_tutor(player, opponents, permanent, turn, rng, *, phase="precombat_main"):
+    if phase not in MAIN_PHASES:
+        return False
+    effect_data = library_tutor_battlefield_effect_for_permanent(permanent)
+    plan = _permanent_library_tutor_activation_plan(player, permanent, opponents or [], turn, effect_data)
+    if plan is None:
+        return False
+    activation_cost_text = plan["activation_cost_text"]
+    if not player.spend_mana(activation_cost_text):
+        return False
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    sacrificed_source = False
+    if effect_data.get("activation_requires_sacrifice"):
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        player.record_permanent_sacrificed(permanent, turn)
+        sacrificed_source = True
+    selected_cards = [
+        candidate
+        for candidate, _score, _reason in plan["selected"]
+    ]
+    moved_cards, destination = move_library_tutor_selection(
+        player,
+        selected_cards,
+        plan["target_type"],
+        effect_data,
+    )
+    if destination == "battlefield":
+        for moved_card in moved_cards:
+            if is_effective_land(moved_card):
+                trigger_landfall(player, moved_card, turn, "activated_library_tutor_to_battlefield")
+
+    fields = replay_rule_fields(effect_data)
+    chosen_card = moved_cards[0] if moved_cards else (selected_cards[0] if selected_cards else None)
+    chosen_score = plan["selected"][0][1] if plan["selected"] else 0
+    chosen_reason = plan["selected"][0][2] if plan["selected"] else "no_candidate"
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                candidate,
+                get_card_effect(candidate),
+                score=score,
+                action="activate_library_tutor_to_battlefield",
+                target_type=plan["target_type"],
+                destination="battlefield",
+                reason=reason,
+            )
+            for candidate, score, reason in plan["scored_candidates"][:10]
+        ],
+        chosen_option=decision_card_option(
+            chosen_card,
+            get_card_effect(chosen_card) if chosen_card else None,
+            score=chosen_score,
+            action="activate_library_tutor_to_battlefield" if chosen_card else "no_target",
+            target_type=plan["target_type"],
+            destination=destination,
+            reason=chosen_reason,
+        ),
+        rejected_options=[
+            decision_card_option(
+                candidate,
+                get_card_effect(candidate),
+                score=score,
+                action="defer_library_tutor_to_battlefield",
+                target_type=plan["target_type"],
+                destination="battlefield",
+                reason=reason,
+            )
+            for candidate, score, reason in plan["scored_candidates"][len(plan["selected"]):10]
+        ],
+        score_components={
+            "activation_cost": activation_cost_text,
+            "activation_cost_generic": plan["activation_cost_generic"],
+            "activation_cost_colors": plan["activation_cost_colors"],
+            "candidate_count": len(plan["scored_candidates"]),
+            "selected_count": len(moved_cards),
+            "target_type": plan["target_type"],
+            "selected_cards": [card.get("name", "?") for card in moved_cards],
+            "enters_tapped": bool(effect_data.get("tutor_enters_tapped")),
+            "sacrificed_source": sacrificed_source,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium" if moved_cards else "low",
+        expected_benefit_score=plan["expected_score"],
+        actual_outcome="library_tutor_to_battlefield_activated" if moved_cards else "no_target_moved",
+        reason="activate_library_tutor_when_valid_battlefield_target_available",
+        strategic_principle="convert activated tutor into the best battlefield resource available",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -(plan["activation_cost_generic"] + len(plan["activation_cost_colors"])),
+            "cards_to_battlefield": len(moved_cards),
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "permanents": -1 if sacrificed_source else 0,
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "sacrifice_source": sacrificed_source,
+                "no_target_moved": not moved_cards,
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect="tutor",
+        activation_kind="simple_activated_library_tutor_to_battlefield",
+        activation_cost=activation_cost_text,
+        target_type=plan["target_type"],
+        destination=destination,
+        found_cards=[card.get("name", "?") for card in moved_cards],
+        found_count=len(moved_cards),
+        entered_tapped=bool(effect_data.get("tutor_enters_tapped")),
+        tapped=bool(permanent.get("tapped")),
+        sacrificed_source=sacrificed_source,
+        mana_paid=plan["activation_cost_generic"] + len(plan["activation_cost_colors"]),
+        phase=phase,
+        turn=turn,
+        **fields,
+    )
+    return bool(moved_cards)
+
+
+def activate_permanent_library_tutors_to_battlefield(
+    player,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase="precombat_main",
+):
+    if not player.is_alive() or phase != "precombat_main":
+        return 0
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if artifact_activated_abilities_locked(player, permanent, all_players):
+            continue
+        effect_data = library_tutor_battlefield_effect_for_permanent(permanent)
+        plan = _permanent_library_tutor_activation_plan(
+            player,
+            permanent,
+            opponents or [],
+            turn,
+            effect_data,
+        )
+        if plan is None:
+            continue
+        options.append((plan["expected_score"], -plan["activation_cost_generic"], permanent))
+    if not options:
+        return 0
+    options.sort(
+        key=lambda item: (
+            item[0],
+            item[1],
+            str(item[2].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return 1 if activate_permanent_library_tutor(
+        player,
+        opponents,
+        options[0][2],
+        turn,
+        rng,
+        phase=phase,
+    ) else 0
+
+
 def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, phase="postcombat_main"):
     if not player.is_alive():
         return 0
@@ -30446,6 +30699,16 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         return 1
 
     if activate_target_player_shuffle_artifacts(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase=phase,
+    ):
+        return 1
+
+    if activate_permanent_library_tutors_to_battlefield(
         player,
         opponents,
         all_players,
@@ -40687,6 +40950,9 @@ SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE = "xmage_permanent_simple_activated_target
 PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
 SIMPLE_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
 SIMPLE_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = "xmage_permanent_simple_activated_graveyard_to_library_v1"
+SIMPLE_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE = (
+    "xmage_permanent_simple_activated_library_search_to_battlefield_v1"
+)
 GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
 GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
     "xmage_graveyard_simple_activated_self_return_to_battlefield_v1"
@@ -40986,7 +41252,74 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             graveyard_to_library_effect[key] = permanent.get(key)
         effects.append(graveyard_to_library_effect)
+    if (
+        not any(
+            effect.get("battle_model_scope") == SIMPLE_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE
+            for effect in effects
+        )
+        and permanent.get("activated_effect") == "tutor"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE
+    ):
+        tutor_effect = {
+            "effect": "tutor",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "tutor",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": permanent.get("tutor_target") or permanent.get("target") or "any_to_battlefield",
+            "target_constraints": permanent.get("target_constraints"),
+            "count": permanent.get("tutor_count") or permanent.get("count") or 1,
+            "destination": permanent.get("tutor_destination") or permanent.get("destination") or "battlefield",
+            "tutor_target": permanent.get("tutor_target") or permanent.get("target") or "any_to_battlefield",
+            "tutor_count": permanent.get("tutor_count") or permanent.get("count") or 1,
+            "tutor_destination": permanent.get("tutor_destination") or permanent.get("destination") or "battlefield",
+            "tutor_enters_tapped": bool(permanent.get("tutor_enters_tapped")),
+            "up_to_count": bool(permanent.get("up_to_count")),
+            "tutor_up_to_count": bool(permanent.get("tutor_up_to_count") or permanent.get("up_to_count")),
+        }
+        for key in (
+            "target_subtypes",
+            "target_card_types",
+            "target_colors",
+            "required_supertypes",
+            "target_names",
+            "target_mana_value_min",
+            "target_mana_value_max",
+            "requires_different_names",
+        ):
+            if permanent.get(key) not in (None, "", [], {}):
+                tutor_effect[key] = permanent.get(key)
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            tutor_effect[key] = permanent.get(key)
+        effects.append(tutor_effect)
     return effects
+
+
+def library_tutor_battlefield_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activated_effect") == "tutor"
+            and str(effect_data.get("tutor_destination") or effect_data.get("destination") or "battlefield")
+            == "battlefield"
+        ):
+            return effect_data
+    return None
 
 
 def graveyard_to_library_effect_for_permanent(permanent):

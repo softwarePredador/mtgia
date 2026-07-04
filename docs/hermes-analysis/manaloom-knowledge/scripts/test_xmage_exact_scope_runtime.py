@@ -987,6 +987,145 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_permanent_activated_library_tutor_to_battlefield_pays_taps_and_moves_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.library = [
+            {"name": "Fixture Rebel", "type_line": "Creature - Rebel", "cmc": 2, "mana_value": 2},
+            {"name": "Fixture Giant", "type_line": "Creature - Giant", "cmc": 3, "mana_value": 3},
+        ]
+        active.mana_pool.add("generic", 4)
+        scope = "xmage_permanent_simple_activated_library_search_to_battlefield_v1"
+        activated_effect = {
+            "effect": "tutor",
+            "battle_model_scope": scope,
+            "ability_kind": "activated",
+            "activated_effect": "tutor",
+            "target": "any_to_battlefield",
+            "tutor_target": "any_to_battlefield",
+            "count": 1,
+            "tutor_count": 1,
+            "destination": "battlefield",
+            "tutor_destination": "battlefield",
+            "target_subtypes": ["rebel"],
+            "target_card_types": ["artifact", "creature", "enchantment", "planeswalker", "land", "battle"],
+            "target_mana_value_max": 3,
+            "activation_cost_generic": 4,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+        }
+        scout = {
+            "name": "Amrou Scout",
+            "type_line": "Creature - Kithkin Rebel Scout",
+            "effect": "creature",
+            "battle_model_scope": scope,
+            "activated_effect": "tutor",
+            "activated_battle_model_scope": scope,
+            "summoning_sick": False,
+            "tapped": False,
+            "_activated_rule_effects": [activated_effect],
+            "_rule_logical_key": "battle_rule_v1:fixture_amrou_scout",
+        }
+        active.battlefield = [scout]
+
+        activated = self.battle.activate_permanent_library_tutor(
+            active,
+            [opponent],
+            scout,
+            3,
+            random.Random(3),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(scout.get("tapped"))
+        self.assertIn(scout, active.battlefield)
+        self.assertTrue(any(card.get("name") == "Fixture Rebel" for card in active.battlefield))
+        self.assertFalse(any(card.get("name") == "Fixture Giant" for card in active.battlefield))
+        self.assertEqual([card["name"] for card in active.library], ["Fixture Giant"])
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Amrou Scout"
+                and data.get("activation_kind") == "simple_activated_library_tutor_to_battlefield"
+                and data.get("found_cards") == ["Fixture Rebel"]
+                and data.get("destination") == "battlefield"
+                for event, data in self.events
+            )
+        )
+
+    def test_permanent_activated_library_tutor_to_battlefield_sacrifices_source_and_enters_tapped(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.library = [
+            {"name": "Plains", "type_line": "Basic Land - Plains", "cmc": 0, "mana_value": 0},
+            {"name": "Mountain", "type_line": "Basic Land - Mountain", "cmc": 0, "mana_value": 0},
+            {"name": "Sacred Foundry", "type_line": "Land - Mountain Plains", "cmc": 0, "mana_value": 0},
+        ]
+        active.mana_pool.add("generic", 3)
+        scope = "xmage_permanent_simple_activated_library_search_to_battlefield_v1"
+        activated_effect = {
+            "effect": "tutor",
+            "battle_model_scope": scope,
+            "ability_kind": "activated",
+            "activated_effect": "tutor",
+            "target": "basic_land_to_battlefield",
+            "tutor_target": "basic_land_to_battlefield",
+            "count": 2,
+            "tutor_count": 2,
+            "destination": "battlefield",
+            "tutor_destination": "battlefield",
+            "tutor_enters_tapped": True,
+            "up_to_count": True,
+            "tutor_up_to_count": True,
+            "activation_cost_generic": 3,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": True,
+        }
+        hart = {
+            "name": "Burnished Hart",
+            "type_line": "Artifact Creature - Elk",
+            "effect": "creature",
+            "battle_model_scope": scope,
+            "activated_effect": "tutor",
+            "activated_battle_model_scope": scope,
+            "_activated_rule_effects": [activated_effect],
+            "_rule_logical_key": "battle_rule_v1:fixture_burnished_hart",
+        }
+        active.battlefield = [hart]
+
+        activated = self.battle.activate_permanent_library_tutor(
+            active,
+            [opponent],
+            hart,
+            4,
+            random.Random(4),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertNotIn(hart, active.battlefield)
+        self.assertIn(hart, active.graveyard)
+        battlefield_by_name = {card.get("name"): card for card in active.battlefield}
+        self.assertEqual(set(battlefield_by_name), {"Plains", "Mountain"})
+        self.assertTrue(battlefield_by_name["Plains"].get("tapped"))
+        self.assertTrue(battlefield_by_name["Mountain"].get("tapped"))
+        self.assertEqual([card["name"] for card in active.library], ["Sacred Foundry"])
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Burnished Hart"
+                and data.get("sacrificed_source") is True
+                and data.get("entered_tapped") is True
+                and set(data.get("found_cards") or []) == {"Plains", "Mountain"}
+                for event, data in self.events
+            )
+        )
+
     def test_library_tutor_to_top_moves_selected_card_to_library_top(self) -> None:
         active = self.battle.Player(
             "Active",

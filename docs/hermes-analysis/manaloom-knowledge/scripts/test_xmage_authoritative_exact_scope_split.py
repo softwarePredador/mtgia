@@ -11201,6 +11201,133 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["keywords"], ["flying"])
         self.assertTrue(effect["flying"])
 
+    def test_permanent_activated_tutor_to_battlefield_maps_rebel_mana_value(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInPlayEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Amrou Scout",
+                type_line="Creature - Kithkin Rebel Scout",
+                oracle_text=(
+                    "{4}, {T}: Search your library for a Rebel permanent card with mana value 3 or less, "
+                    "put it onto the battlefield, then shuffle."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterPermanentCard("Rebel permanent card with mana value 3 or less");
+                static {
+                    filter.add(SubType.REBEL.getPredicate());
+                    filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 4));
+                }
+                Ability ability = new SimpleActivatedAbility(
+                    new SearchLibraryPutInPlayEffect(new TargetCardInLibrary(filter), false),
+                    new ManaCostsImpl<>("{4}"));
+                ability.addCost(new TapSourceCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["target"], "any_to_battlefield")
+        self.assertEqual(effect["target_subtypes"], ["rebel"])
+        self.assertEqual(
+            effect["target_card_types"],
+            ["artifact", "creature", "enchantment", "planeswalker", "land", "battle"],
+        )
+        self.assertEqual(effect["target_mana_value_max"], 3)
+        self.assertEqual(effect["activation_cost_mana"], "{4}")
+        self.assertEqual(effect["activation_cost_generic"], 4)
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+        self.assertFalse(effect["tutor_enters_tapped"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["tutor_target"], "any_to_battlefield")
+
+    def test_permanent_activated_tutor_to_battlefield_maps_self_sacrifice_basic_land(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInPlayEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Burnished Hart",
+                type_line="Artifact Creature - Elk",
+                oracle_text=(
+                    "{3}, Sacrifice Burnished Hart: Search your library for up to two basic land cards, "
+                    "put them onto the battlefield tapped, then shuffle."
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new SearchLibraryPutInPlayEffect(
+                        new TargetCardInLibrary(0, 2, StaticFilters.FILTER_CARD_BASIC_LANDS), true),
+                    new GenericManaCost(3));
+                ability.addCost(new SacrificeSourceCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["target"], "basic_land_to_battlefield")
+        self.assertEqual(effect["count"], 2)
+        self.assertTrue(effect["up_to_count"])
+        self.assertTrue(effect["tutor_enters_tapped"])
+        self.assertEqual(effect["activation_cost_mana"], "{3}")
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertTrue(effect["activated_self_sacrifice_tutor_to_battlefield"])
+
+    def test_permanent_activated_tutor_to_battlefield_blocks_sacrifice_target_cost(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInPlayEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Kuldotha Forgemaster",
+                type_line="Artifact Creature - Construct",
+                oracle_text=(
+                    "{T}, Sacrifice three artifacts: Search your library for an artifact card, "
+                    "put it onto the battlefield, then shuffle."
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new SearchLibraryPutInPlayEffect(
+                        new TargetCardInLibrary(StaticFilters.FILTER_CARD_ARTIFACT), false),
+                    new ManaCostsImpl<>("{0}"));
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new SacrificeTargetCost(3, StaticFilters.FILTER_PERMANENT_ARTIFACT));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertIn(
+            reason,
+            {
+                "activated_library_tutor_oracle_cost_not_supported",
+                "activated_library_tutor_source_cost_not_supported",
+            },
+        )
+
     def test_creature_etb_library_tutor_to_hand_maps_basic_land_scope(self) -> None:
         row = queue_row(
             split.ETB_TUTOR_HAND_CREATURE_UNIT,

@@ -170,6 +170,9 @@ PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = (
 TUTOR_BATTLEFIELD_SCOPE = "xmage_library_search_to_battlefield_spell_v1"
 TUTOR_TOP_SCOPE = "xmage_library_search_to_library_top_spell_v1"
 TUTOR_HAND_SCOPE = "xmage_library_search_to_hand_spell_v1"
+PERMANENT_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE = (
+    "xmage_permanent_simple_activated_library_search_to_battlefield_v1"
+)
 ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_battlefield_v1"
 ETB_TUTOR_HAND_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_hand_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
@@ -4637,6 +4640,16 @@ def is_permanent_activated_destroy_unit(row: dict[str, Any]) -> bool:
         return False
     return (
         effect_classes(row) == {"DestroyTargetEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "activated_ability" in set(row.get("xmage_signals") or [])
+    )
+
+
+def is_permanent_activated_tutor_battlefield_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != TUTOR_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"SearchLibraryPutInPlayEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
         and "activated_ability" in set(row.get("xmage_signals") or [])
     )
@@ -9923,17 +9936,25 @@ def parse_library_tutor_query(query: str) -> dict[str, Any] | None:
     named_match = re.fullmatch(r"cards? named (?P<name>.+)", phrase)
     if named_match:
         parsed["target"] = "any"
-        parsed["target_names"] = [named_match.group("name").strip()]
+        parsed["target_names"] = [
+            name.strip()
+            for name in re.split(r"\s+or\s+", named_match.group("name").strip())
+            if name.strip()
+        ]
         return parsed if count > 0 else None
 
     mana_value_match = re.fullmatch(
-        r"(?P<card_type>artifact|creature|instant|sorcery|enchantment|planeswalker) cards? "
+        r"(?P<card_type>artifact|creature|instant|sorcery|enchantment|planeswalker|permanent) cards? "
         r"with mana value (?P<first>\d+)(?: or (?P<second>\d+)| or less)?",
         phrase,
     )
     if mana_value_match:
-        parsed["target"] = mana_value_match.group("card_type")
-        parsed["target_card_types"] = [mana_value_match.group("card_type")]
+        parsed["target"] = "any" if mana_value_match.group("card_type") == "permanent" else mana_value_match.group("card_type")
+        parsed["target_card_types"] = (
+            ["artifact", "creature", "enchantment", "planeswalker", "land", "battle"]
+            if mana_value_match.group("card_type") == "permanent"
+            else [mana_value_match.group("card_type")]
+        )
         first = int(mana_value_match.group("first"))
         second = mana_value_match.group("second")
         if second is not None:
@@ -9959,7 +9980,17 @@ def parse_library_tutor_query(query: str) -> dict[str, Any] | None:
         "instant and/or sorcery card": {"target": "instant_or_sorcery"},
         "planeswalker card": {"target": "planeswalker", "target_card_types": ["planeswalker"]},
         "planeswalker cards": {"target": "planeswalker", "target_card_types": ["planeswalker"]},
+        "permanent card": {
+            "target": "any",
+            "target_card_types": ["artifact", "creature", "enchantment", "planeswalker", "land", "battle"],
+        },
+        "permanent cards": {
+            "target": "any",
+            "target_card_types": ["artifact", "creature", "enchantment", "planeswalker", "land", "battle"],
+        },
         "sorcery card": {"target": "sorcery", "target_card_types": ["sorcery"]},
+        "basic forest card": {"target": "forest", "required_supertypes": ["basic"]},
+        "basic forest cards": {"target": "forest", "required_supertypes": ["basic"]},
         "aura card": {"target": "any", "target_subtypes": ["aura"]},
         "aura cards": {"target": "any", "target_subtypes": ["aura"]},
         "aura or equipment card": {"target": "any", "target_subtypes": ["aura", "equipment"]},
@@ -9983,6 +10014,18 @@ def parse_library_tutor_query(query: str) -> dict[str, Any] | None:
     }
     if phrase in exact_specs:
         parsed.update(exact_specs[phrase])
+        return parsed if count > 0 else None
+
+    subtype_permanent_match = re.fullmatch(
+        r"(?P<subtype>[a-z][a-z' -]+?) permanent cards?(?: with mana value (?P<mv>\d+) or less)?",
+        phrase,
+    )
+    if subtype_permanent_match:
+        parsed["target"] = "any"
+        parsed["target_card_types"] = ["artifact", "creature", "enchantment", "planeswalker", "land", "battle"]
+        parsed["target_subtypes"] = [subtype_permanent_match.group("subtype").strip()]
+        if subtype_permanent_match.group("mv") is not None:
+            parsed["target_mana_value_max"] = int(subtype_permanent_match.group("mv"))
         return parsed if count > 0 else None
 
     target = library_tutor_target_from_phrase(phrase)
@@ -10108,6 +10151,8 @@ def library_tutor_source_query(source: str) -> dict[str, Any] | None:
             return dict(spec)
     if re.search(r"new\s+TargetCardInLibrary\s*\(\s*\)", text):
         return {"target": "any"}
+    if re.search(r"new\s+FilterBasicCard\s*\(\s*SubType\.FOREST\s*\)", text):
+        return {"target": "forest", "required_supertypes": ["basic"]}
     if "new FilterPlaneswalkerCard" in text:
         return {"target": "planeswalker", "target_card_types": ["planeswalker"]}
     if "new FilterCreatureCard" in text:
@@ -10118,6 +10163,11 @@ def library_tutor_source_query(source: str) -> dict[str, Any] | None:
         base = {"target": "enchantment", "target_card_types": ["enchantment"]}
     elif "new FilterLandCard" in text:
         base = {"target": "land", "target_card_types": ["land"]}
+    elif "new FilterPermanentCard" in text:
+        base = {
+            "target": "any",
+            "target_card_types": ["artifact", "creature", "enchantment", "planeswalker", "land", "battle"],
+        }
     else:
         base = {}
     if "SuperType.BASIC" in text and "SubType.FOREST" in text and "SubType.ISLAND" in text:
@@ -10129,8 +10179,11 @@ def library_tutor_source_query(source: str) -> dict[str, Any] | None:
         "SubType.EQUIPMENT": "equipment",
         "SubType.VEHICLE": "vehicle",
         "SubType.DRAGON": "dragon",
+        "SubType.ELF": "elf",
         "SubType.GOBLIN": "goblin",
+        "SubType.MERFOLK": "merfolk",
         "SubType.MERCENARY": "mercenary",
+        "SubType.REBEL": "rebel",
         "SubType.ARCANE": "arcane",
         "SubType.TRAP": "trap",
         "SubType.FOREST": "forest",
@@ -10155,7 +10208,7 @@ def library_tutor_source_query(source: str) -> dict[str, Any] | None:
             base = {"target": "any"}
         if not (len(source_subtypes) == 1 and source_subtypes[0] in {"plains", "forest"} and base.get("target") in {"plains", "forest"}):
             base["target_subtypes"] = source_subtypes
-    if "SuperType.LEGENDARY" in text:
+    if re.search(r"SuperType\.LEGENDARY\.getPredicate\s*\(\s*\)", text):
         base.setdefault("target", "any")
         base["required_supertypes"] = ["legendary"]
     mana_value_match = re.search(
@@ -10173,7 +10226,7 @@ def library_tutor_source_query(source: str) -> dict[str, Any] | None:
         elif comparison in {"OR_GREATER", "MORE_THAN"}:
             base["target_mana_value_min"] = value if comparison == "OR_GREATER" else value + 1
     filter_match = re.search(
-        r'new\s+Filter(?:Card|LandCard|CreatureCard|ArtifactCard|EnchantmentCard|PlaneswalkerCard)\s*\(\s*"([^"]+)"\s*\)',
+        r'new\s+Filter(?:Card|LandCard|CreatureCard|ArtifactCard|EnchantmentCard|PlaneswalkerCard|PermanentCard)\s*\(\s*"([^"]+)"\s*\)',
         text,
     )
     if filter_match:
@@ -10256,6 +10309,100 @@ def library_tutor_from_source(source: str, effect_class: str) -> dict[str, Any] 
             "enters_tapped": False,
         }
     return "library_tutor_source_effect_not_supported"
+
+
+def activated_library_tutor_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = activated_ability_line_from_oracle(metadata)
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if text.count(":") != 1:
+        return "activated_library_tutor_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    source_name = re.sub(r"\s+", " ", str(metadata.get("name") or "").strip().lower())
+    if source_name:
+        source_sacrifice_pattern = rf"(^|,\s*)sacrifice {re.escape(source_name)}(?=,|$)"
+        cost_text = re.sub(
+            source_sacrifice_pattern,
+            lambda match: f"{match.group(1)}sacrifice this permanent",
+            cost_text,
+        )
+    activation = activation_cost_from_oracle_prefix(cost_text, allow_source_sacrifice=True)
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_library_tutor")
+    match = re.match(
+        r"^search your library for (?P<query>.+?)(?:,| and) put "
+        r"(?:it|that card|them|those cards) onto the battlefield(?P<tapped> tapped)?, "
+        r"then shuffle(?: your library)?\.(?: .*)?$",
+        effect_text,
+    )
+    if not match:
+        return "activated_library_tutor_oracle_not_simple"
+    parsed = parse_library_tutor_query(match.group("query"))
+    if parsed is None:
+        return "activated_library_tutor_oracle_target_not_supported"
+    parsed["destination"] = "battlefield"
+    parsed["enters_tapped"] = bool(match.group("tapped"))
+    return {**parsed, **activation}
+
+
+def activated_library_tutor_to_battlefield_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    effect_matches = re.findall(r"SearchLibraryPutInPlayEffect\s*\(", text)
+    if len(effect_matches) != 1:
+        return "activated_library_tutor_source_effect_not_supported"
+    effect_index = text.find("SearchLibraryPutInPlayEffect")
+    window = text[max(0, effect_index - 500) : effect_index + 1800]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_library_tutor_source_not_simple_activated"
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_library_tutor_source_cost_not_supported"
+    parsed_target = library_tutor_source_query(text)
+    if parsed_target is None:
+        return "activated_library_tutor_source_target_not_supported"
+    count, up_to = library_tutor_count_from_source(text)
+    tapped_match = re.search(
+        r"SearchLibraryPutInPlayEffect\s*\(\s*(?:new\s+TargetCardInLibrary\s*\([^)]*\)|\w+)\s*,\s*(true|false)",
+        text,
+        re.S,
+    )
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
+    if mana_match:
+        cost_text = mana_match.group(1)
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
+    cost_text = canonical_mana_cost_text(cost_text)
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_library_tutor_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        **parsed_target,
+        "count": count,
+        "up_to_count": up_to,
+        "destination": "battlefield",
+        "enters_tapped": bool(tapped_match and tapped_match.group(1) == "true"),
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+    }
 
 
 def library_tutor_specs_match(source_tutor: dict[str, Any], oracle_tutor: dict[str, Any]) -> str | None:
@@ -10468,6 +10615,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated graveyard-to-hand ability"
     elif scope == PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE:
         scope_kind = "permanent with a simple activated graveyard-to-battlefield ability"
+    elif scope == PERMANENT_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE:
+        scope_kind = "permanent with a simple activated library-search-to-battlefield ability"
     elif scope == LIBRARY_PICK_SPELL_SCOPE:
         scope_kind = "fixed reveal-top-library pick-to-hand spell"
     elif scope == GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE:
@@ -10564,6 +10713,7 @@ def split_row(
     permanent_activated_self_boost_unit = is_permanent_activated_self_boost_unit(row)
     permanent_activated_target_boost_unit = is_permanent_activated_target_boost_unit(row)
     permanent_activated_target_keyword_unit = is_permanent_activated_target_keyword_unit(row)
+    permanent_activated_tutor_battlefield_unit = is_permanent_activated_tutor_battlefield_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
     static_graveyard_count_pt_unit = is_static_graveyard_count_pt_unit(row)
@@ -10639,6 +10789,7 @@ def split_row(
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_boost_unit
         and not permanent_activated_target_keyword_unit
+        and not permanent_activated_tutor_battlefield_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
         and not static_graveyard_count_pt_unit
@@ -10692,6 +10843,7 @@ def split_row(
         and not permanent_activated_life_gain_unit
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_keyword_unit
+        and not permanent_activated_tutor_battlefield_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
         and not static_graveyard_count_pt_unit
@@ -10722,6 +10874,113 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if permanent_activated_tutor_battlefield_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_library_tutor_not_permanent"
+        oracle_tutor = activated_library_tutor_to_battlefield_from_oracle(metadata)
+        if isinstance(oracle_tutor, str):
+            return None, oracle_tutor
+        source_tutor = activated_library_tutor_to_battlefield_from_source(source_text)
+        if isinstance(source_tutor, str):
+            return None, source_tutor
+        mismatch = library_tutor_specs_match(source_tutor, oracle_tutor)
+        if mismatch:
+            return None, f"activated_library_tutor_source_oracle_{mismatch}_mismatch"
+        for key in (
+            "activation_cost_mana",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "activation_requires_tap",
+            "activation_requires_sacrifice",
+        ):
+            if source_tutor.get(key) != oracle_tutor.get(key):
+                return None, f"activated_library_tutor_source_oracle_{key}_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "planeswalker"
+            if "planeswalker" in type_line
+            else "land"
+            if "land" in type_line
+            else "battle"
+            if "battle" in type_line
+            else "permanent"
+        )
+        target = f"{oracle_tutor['target']}_to_battlefield"
+        target_constraints = library_tutor_effect_constraints(oracle_tutor)
+        activated_effect = {
+            "effect": "tutor",
+            "battle_model_scope": PERMANENT_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "tutor",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE,
+            "target": target,
+            "tutor_target": target,
+            "target_constraints": target_constraints,
+            "count": int(oracle_tutor["count"]),
+            "tutor_count": int(oracle_tutor["count"]),
+            "destination": "battlefield",
+            "tutor_destination": "battlefield",
+            "tutor_enters_tapped": bool(oracle_tutor.get("enters_tapped")),
+            "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": source_tutor["activation_cost_mana"],
+            "activation_cost_generic": source_tutor["activation_cost_generic"],
+            "activation_cost_colors": source_tutor["activation_cost_colors"],
+            "activation_requires_tap": source_tutor["activation_requires_tap"],
+            "activation_requires_sacrifice": source_tutor["activation_requires_sacrifice"],
+            **target_constraints,
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "tutor",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE,
+            "target": target,
+            "tutor_target": target,
+            "target_constraints": target_constraints,
+            "count": int(oracle_tutor["count"]),
+            "tutor_count": int(oracle_tutor["count"]),
+            "destination": "battlefield",
+            "tutor_destination": "battlefield",
+            "tutor_enters_tapped": bool(oracle_tutor.get("enters_tapped")),
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": source_tutor["activation_cost_mana"],
+            "activation_cost_generic": source_tutor["activation_cost_generic"],
+            "activation_cost_colors": source_tutor["activation_cost_colors"],
+            "activation_requires_tap": source_tutor["activation_requires_tap"],
+            "activation_requires_sacrifice": source_tutor["activation_requires_sacrifice"],
+            **target_constraints,
+        }
+        if bool(oracle_tutor.get("up_to_count")):
+            activated_effect["up_to_count"] = True
+            activated_effect["tutor_up_to_count"] = True
+            effect_json["up_to_count"] = True
+            effect_json["tutor_up_to_count"] = True
+        if bool(source_tutor.get("activation_requires_sacrifice")):
+            activated_effect["activated_self_sacrifice_tutor_to_battlefield"] = True
+            effect_json["activated_self_sacrifice_tutor_to_battlefield"] = True
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_library_search_to_battlefield",
+        ), "selected_exact_scope"
 
     if permanent_activated_draw_unit:
         if not is_permanent_metadata(metadata) or is_spell(metadata):

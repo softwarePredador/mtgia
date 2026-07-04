@@ -8265,6 +8265,61 @@ subpattern on the new server:
   post-PG416 exact split recheck produced `proposal_count=0`; the remaining
   `314` identities are still explicit missing-source exceptions.
 
+PG417 closed the exact permanent activated library-search-to-battlefield
+subpattern on the new server:
+
+- Split support now maps XMage `SearchLibraryPutInPlayEffect` plus
+  `SimpleActivatedAbility` permanents into
+  `xmage_permanent_simple_activated_library_search_to_battlefield_v1` when
+  Oracle and local Java source agree on search target, count, destination,
+  tapped entry, mana cost, tap requirement, and source-sacrifice requirement.
+  The mapper also normalizes Oracle costs that sacrifice the named source
+  itself. Neighboring costs that sacrifice other permanents, discard, exile, or
+  use composite costs remain blocked for later dedicated mappers.
+- Runtime support now detects the activated tutor effect, checks tap and
+  summoning-sickness restrictions, pays the activated mana cost, taps or
+  sacrifices the source when required, chooses the best valid library target
+  with existing tutor scoring/constraints, moves selected cards to the
+  battlefield, preserves tapped-entry semantics, triggers landfall for tutored
+  lands, and emits decision/replay evidence.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` plus
+  `test_xmage_exact_scope_runtime.py` (`673` tests total).
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg417_activated_tutor_battlefield_new_server`
+  produced `21` safe candidates: `Amrou Scout`, `Bogbrew Witch`,
+  `Burnished Hart`, `Cateran Brute`, `Cateran Kidnappers`,
+  `Cateran Persuader`, `Dawntreader Elk`, `Diligent Farmhand`,
+  `Embodiment of Spring`, `Font of Fertility`, `Frontier Guide`,
+  `Moggcatcher`, `Neverwinter Dryad`, `Oashra Cultivator`, `Planar Bridge`,
+  `Ramosian Commander`, `Ramosian Lieutenant`, `Ramosian Sergeant`,
+  `Seahunter`, `Skyshroud Poacher`, and `Whisper Squad`.
+- PostgreSQL package `PG417` was applied on the new server:
+  precheck found `21` target card rows; apply promoted `21/21`
+  `verified`/`auto` rows with Oracle hashes and deprecated `2` nonmatching
+  shadow rows for `Burnished Hart`.
+- PG -> Hermes/SQLite sync loaded `21` PostgreSQL rows for the selected cards,
+  updated `23` SQLite rows, and exported `5477` canonical snapshot rows. The
+  metadata sync in the same cycle matched `6457` PostgreSQL card rows, left
+  `1` unresolved alias, and kept `deck_cards` backfill at `2699/2699` matched
+  rows.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `21` selected cards. The generic E2E
+  battle scenario count was `0`; card behavior execution is covered by the
+  focused runtime tests above.
+- The PG/Hermes/SQLite contract audit initially exposed `44` pre-existing
+  trusted executable PostgreSQL rules without `oracle_hash`. A narrow PG
+  backfill populated those hashes from `cards.oracle_text`; the rerun passed
+  `51/51` checks.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51` after oracle-hash backfill), and legacy contamination.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26568` to `26547`, authoritative adapter-required count from `26254`
+  to `26233`, and the library-tutor work unit from `605` to `584`. The
+  post-PG417 exact split recheck produced `proposal_count=0`; the remaining
+  `314` identities are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
