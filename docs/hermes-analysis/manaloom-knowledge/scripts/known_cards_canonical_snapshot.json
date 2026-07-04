@@ -10328,6 +10328,27 @@
     "battle_rule_logical_key": "battle_rule_v1:ea3402c83a775c8f219f253347e038e2",
     "battle_rule_oracle_hash": "bfd583dfcfc9007d5900720e29e4499e"
   },
+  "Borderland Ranger": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "basic_land_to_hand",
+    "target": "basic_land_to_hand",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+    "battle_rule_oracle_hash": "f2f4833506e6958d3a8e75af0b350496"
+  },
   "Boreal Druid": {
     "activation_requires_tap": true,
     "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
@@ -12598,6 +12619,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:6ee70b87e4893f5465ae9fad90cb3063"
   },
+  "Call the Gatewatch": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "planeswalker_to_hand",
+    "target_card_types": [
+      "planeswalker"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:caae61758f5148c88717d895a55aa3e2",
+    "battle_rule_oracle_hash": "c2f91fea6b8e3049f33ee913296a213c"
+  },
   "Call to Mind": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
     "count": 1,
@@ -13584,6 +13626,30 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b53caf6e1ec35c80ef4ef3df05ed35ec"
+  },
+  "Cateran Summons": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "any_to_hand",
+    "target_card_types": [
+      "creature"
+    ],
+    "target_subtypes": [
+      "mercenary"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2d7e82f759e6d816feb9c1b1054766a8",
+    "battle_rule_oracle_hash": "47864ad63a4d50c1691191e60f961bc5"
   },
   "Cathar Commando": {
     "cmc": 2.0,
@@ -15194,6 +15260,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f119ebf954ce4843b21b58fdc207d117",
     "battle_rule_oracle_hash": "1d826e552c54f954b975cae24da0c287"
+  },
+  "Civic Wayfinder": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "basic_land_to_hand",
+    "target": "basic_land_to_hand",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+    "battle_rule_oracle_hash": "f2f4833506e6958d3a8e75af0b350496"
   },
   "Clarion Cathars": {
     "ability_kind": "triggered",
@@ -19498,6 +19585,35 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "0d9aa422b6f45a15dcf118580559ac7e"
   },
+  "Daru Cavalier": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "any_to_hand",
+    "first_strike": true,
+    "keywords": [
+      "first_strike"
+    ],
+    "target": "any_to_hand",
+    "target_names": [
+      "daru cavalier"
+    ],
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6775001dd7541098c239a0b938f510d1",
+    "battle_rule_oracle_hash": "41fe645d9e551925b96b2d07568cecce"
+  },
   "Daru Encampment": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -19792,6 +19908,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:148909635213079cb97344100615f5c2"
+  },
+  "Deadeye Quartermaster": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "any_to_hand",
+    "target": "any_to_hand",
+    "target_subtypes": [
+      "equipment",
+      "vehicle"
+    ],
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9e97b00ca55bebfd72f637c1b183c116",
+    "battle_rule_oracle_hash": "0a951c7941b92c9cd4dd1158cd6db5a4"
   },
   "Deadly Dispute": {
     "cmc": 2.0,
@@ -21629,14 +21770,22 @@
     "battle_rule_oracle_hash": "f9559e8f061153f5b7b70303f2f322f4"
   },
   "Diabolic Tutor": {
-    "cmc": 4.0,
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
     "effect": "tutor",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e0587cee59b9a889961aa400e97dd9c6"
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "any_to_hand",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3c1042b6ae3a2c610e70ad411460a46e",
+    "battle_rule_oracle_hash": "7c881aaacf79f25b41c9788cf307e795"
   },
   "Diamond City": {
     "effect": "land",
@@ -22324,6 +22473,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:72bb59188e2df380602ed08f4ee5b827",
     "battle_rule_oracle_hash": "96125603ad98c8ef33157389b9d59b62"
+  },
+  "District Guide": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "basic_land_or_gate_to_hand",
+    "target": "basic_land_or_gate_to_hand",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cae4abb78b40dd74ed99c9bd02ebc897",
+    "battle_rule_oracle_hash": "bd379aab37683cb261cd236e97a6040a"
   },
   "Dive Bomber": {
     "_activated_rule_effects": [
@@ -25057,6 +25227,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a2c478eb91086987f990c46671af3084"
   },
+  "Eerie Procession": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "any_to_hand",
+    "target_subtypes": [
+      "arcane"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:762264b1d43e6e1344585b6762d633f5",
+    "battle_rule_oracle_hash": "98942b8c0812342e18938bf9c7ebeec4"
+  },
   "Eerie Ultimatum": {
     "cmc": 7.0,
     "effect": "recursion",
@@ -27097,6 +27288,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2",
     "battle_rule_oracle_hash": "b5a5cbb8782f56430eb30d5717308adc"
+  },
+  "Environmental Scientist": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "basic_land_to_hand",
+    "target": "basic_land_to_hand",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+    "battle_rule_oracle_hash": "f2f4833506e6958d3a8e75af0b350496"
   },
   "Ephemerate": {
     "battle_model_scope": "exile_then_return_target_creature_you_control_rebound_v1",
@@ -29238,6 +29450,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:c5aef30c5a5904e02c4cfe40957080d3",
     "battle_rule_oracle_hash": "4f0536b65096d1326139fe7f7f9435db"
+  },
+  "Farfinder": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "basic_land_to_hand",
+    "keywords": [
+      "vigilance"
+    ],
+    "target": "basic_land_to_hand",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "vigilance": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:508f7fd96ceb577a5f2dab380f6609cb",
+    "battle_rule_oracle_hash": "66bb7a6119514caebac90f810be795da"
   },
   "Farhaven Elf": {
     "ability_kind": "triggered",
@@ -34580,6 +34818,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "ad93796bfbcd1783e12072beff489fcf"
   },
+  "Gatecreeper Vine": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "defender": true,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "basic_land_or_gate_to_hand",
+    "keywords": [
+      "defender"
+    ],
+    "target": "basic_land_or_gate_to_hand",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0dc034646dd47d08c47a9c864a1e9d91",
+    "battle_rule_oracle_hash": "5badaa30071e88ec1abf7a90a4b174c7"
+  },
   "Gates of Istfell": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -36774,14 +37038,28 @@
     "battle_rule_oracle_hash": "dd5eab544bcdd29cd5f1297eb5d7e2bc"
   },
   "Goblin Matron": {
-    "cmc": 3.0,
-    "effect": "tutor",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2434c487a4a822bcd42dfd83d639e7a9"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "any_to_hand",
+    "target": "any_to_hand",
+    "target_subtypes": [
+      "goblin"
+    ],
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d31ea65123fba8521086549312fda8f2",
+    "battle_rule_oracle_hash": "285c67f13cdc988f44ee9e5eb3e0aecc"
   },
   "Goblin Motivator": {
     "_activated_rule_effects": [
@@ -40885,6 +41163,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eb04bb80a47324c44cea5835eba5bea7"
   },
+  "Heliod's Pilgrim": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "any_to_hand",
+    "target": "any_to_hand",
+    "target_subtypes": [
+      "aura"
+    ],
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+    "battle_rule_oracle_hash": "6138101a172460fd94a162178ab2f459"
+  },
   "HELIOS One": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -42239,6 +42541,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e35051e9c60b94a84ac9b71c11c7fc4b"
   },
+  "Howling Wolf": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 3,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 3,
+    "etb_tutor_target": "any_to_hand",
+    "etb_tutor_up_to_count": true,
+    "target": "any_to_hand",
+    "target_names": [
+      "howling wolf"
+    ],
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2433fd9cab6ea1f19548e0f766b82e4e",
+    "battle_rule_oracle_hash": "06c26c7bc5ef8d84596f44569d3cca14"
+  },
   "Howltooth Hollow": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -42996,6 +43324,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2773ed99df0bd463ce080fb7fda1ee5a",
     "battle_rule_oracle_hash": "b152edf79027fbb9390f8f70f9250923"
+  },
+  "Ignite the Beacon": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": true,
+    "max_count": 2,
+    "sorcery": false,
+    "target": "planeswalker_to_hand",
+    "target_card_types": [
+      "planeswalker"
+    ],
+    "up_to_count": true,
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:08ac438e086ce79989b6a0e05eed4b74",
+    "battle_rule_oracle_hash": "e6265bc22dd6b0fe6d4bb70a1ff9f1c7"
   },
   "Ignoble Hierarch": {
     "ability_kind": "activated",
@@ -53641,6 +53991,30 @@
     "battle_rule_logical_key": "battle_rule_v1:26b884cd8d9f751d78fec341b3074df7",
     "battle_rule_oracle_hash": "b0f4662b119d93ea24108a7ac73eb12c"
   },
+  "Merchant Scroll": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "instant_to_hand",
+    "target_card_types": [
+      "instant"
+    ],
+    "target_colors": [
+      "U"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0d4352abb63d2eac010177d2e1f5f7e6",
+    "battle_rule_oracle_hash": "9e130df41e16842e764941c6669ea620"
+  },
   "Merfolk Looter": {
     "ability_kind": "activated",
     "activated_discard_count": 1,
@@ -57988,6 +58362,37 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "87a3deae567354bb77198b24bc4c05d4"
   },
+  "Nesting Wurm": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 3,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 3,
+    "etb_tutor_target": "any_to_hand",
+    "etb_tutor_up_to_count": true,
+    "keywords": [
+      "trample"
+    ],
+    "target": "any_to_hand",
+    "target_names": [
+      "nesting wurm"
+    ],
+    "trample": true,
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:aacc2a09fb5bbb4643c96c72260e6e26",
+    "battle_rule_oracle_hash": "873788b661c8627405133b3a1c381674"
+  },
   "Nettlecyst": {
     "cmc": 3.0,
     "effect": "token_maker",
@@ -59624,14 +60029,26 @@
     "battle_rule_oracle_hash": "49a4a97393af2f748de0cf9b9b1375dc"
   },
   "Open the Armory": {
-    "cmc": 2.0,
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
     "effect": "tutor",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:758101e162d55b30cebd868b8669eaf5"
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "any_to_hand",
+    "target_subtypes": [
+      "aura",
+      "equipment"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:868d143f306cb5e8dfc486f76f8b6369",
+    "battle_rule_oracle_hash": "fa220f5773cf5c988e507c714b849503"
   },
   "Open the Omenpaths": {
     "effect": "ramp_ritual",
@@ -63148,15 +63565,26 @@
     "battle_rule_oracle_hash": "93a92215b9b63d5d82905ffb77ec263e"
   },
   "Plea for Guidance": {
-    "cmc": 6.0,
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
     "effect": "tutor",
-    "target": "artifact_or_enchantment",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b7f43bde5b5b36f9ac73c3d319a1da4c"
+    "instant": false,
+    "max_count": 2,
+    "sorcery": true,
+    "target": "enchantment_to_hand",
+    "target_card_types": [
+      "enchantment"
+    ],
+    "up_to_count": true,
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c0342670c739d786cd63c9aa0eb13e83",
+    "battle_rule_oracle_hash": "5c417011e3ed943702026eefc309340f"
   },
   "Plover Knights": {
     "_keywords_are_self": true,
@@ -66797,6 +67225,33 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e9a2f41b86aad0a56d142873b1267daf"
+  },
+  "Ranger of Eos": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 2,
+    "etb_tutor_target": "creature_to_hand",
+    "etb_tutor_up_to_count": true,
+    "target": "creature_to_hand",
+    "target_card_types": [
+      "creature"
+    ],
+    "target_mana_value_max": 1,
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f77411c08095fd4bd3cc42ade3c1254d",
+    "battle_rule_oracle_hash": "be899355fd24b180088b1bf967734efb"
   },
   "Ranger's Guile": {
     "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
@@ -72179,14 +72634,30 @@
     "battle_rule_oracle_hash": "3e2e7609e4267fc6e89824d487e207a1"
   },
   "Rune-Scarred Demon": {
-    "cmc": 7.0,
-    "effect": "tutor",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d83f2e5cb364c71f107f223491fa2dfb"
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "any_to_hand",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "any_to_hand",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0bae6fefb7dc4689f938c64fa7818332",
+    "battle_rule_oracle_hash": "6544a9183b59cb44dbad6f4ed0549b56"
   },
   "Rune-Tail, Kitsune Ascendant // Rune-Tail's Essence": {
     "ability_kind": "state_triggered_static_replacement",
@@ -72640,6 +73111,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "06b3aec61afaf78ce3aa52646016a6fd"
+  },
+  "Safewright Quest": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "land_to_hand",
+    "target_card_types": [
+      "land"
+    ],
+    "target_subtypes": [
+      "forest",
+      "plains"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cd7fc0b01dfcf89afa14a9591f7e22bb",
+    "battle_rule_oracle_hash": "6d6ed58f38f4a9226bf9d849cbed96d1"
   },
   "Sage's Knowledge": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
@@ -73309,6 +73805,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c82a87930ce3e98fa9de892c49d73b83",
     "battle_rule_oracle_hash": "de517c804272d32243aff46171907675"
+  },
+  "Sarkhan's Triumph": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": true,
+    "max_count": 1,
+    "sorcery": false,
+    "target": "creature_to_hand",
+    "target_card_types": [
+      "creature"
+    ],
+    "target_subtypes": [
+      "dragon"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0f1e6a10f42f7c0c834c89ae0c6e72e4",
+    "battle_rule_oracle_hash": "b31496681c661b16b744df79de670d1b"
   },
   "Sarpadian Simulacrum": {
     "_activated_rule_effects": [
@@ -74791,6 +75311,35 @@
     "battle_rule_logical_key": "battle_rule_v1:77190ec2e1e1dcb8b15429e5d53e68bd:screaming_nemesis_runtime_v1",
     "battle_rule_oracle_hash": "77190ec2e1e1dcb8b15429e5d53e68bd"
   },
+  "Screaming Seahawk": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "any_to_hand",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "any_to_hand",
+    "target_names": [
+      "screaming seahawk"
+    ],
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9083a0a280f37d9cc680368622de965b",
+    "battle_rule_oracle_hash": "348083d02bf53a9680361f640214da58"
+  },
   "Scrivener": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
@@ -75662,6 +76211,25 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b80128195cfc1f53ed0353d609e362bb",
     "battle_rule_oracle_hash": "1e608944a95a919699467ca65cc383dd"
+  },
+  "Seek the Horizon": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 3,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 3,
+    "sorcery": true,
+    "target": "basic_land_to_hand",
+    "up_to_count": true,
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:18d04737564bf889d16bdd128abb8848",
+    "battle_rule_oracle_hash": "d74a1f98d1c82a4c62e872c89438fbc9"
   },
   "Seething Landscape": {
     "effect": "land",
@@ -79318,6 +79886,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "f85c1179ce217b4ffc36b1b8b359fbc9"
   },
+  "Skyshroud Sentinel": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 3,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 3,
+    "etb_tutor_target": "any_to_hand",
+    "etb_tutor_up_to_count": true,
+    "target": "any_to_hand",
+    "target_names": [
+      "skyshroud sentinel"
+    ],
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8b37bfb8924d03b85324e385e2c17666",
+    "battle_rule_oracle_hash": "1ff341c586feed508faf3c994f24ec6e"
+  },
   "Skyshroud Troopers": {
     "activation_requires_tap": true,
     "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
@@ -80629,14 +81223,22 @@
     "battle_rule_logical_key": "battle_rule_v1:a49abd9efbf7d8770e41a2f772bc9b8f"
   },
   "Solve the Equation": {
-    "cmc": 3.0,
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
     "effect": "tutor",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2434c487a4a822bcd42dfd83d639e7a9"
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "instant_or_sorcery_to_hand",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:43267ad1d8a2accee0fd7fbf8e17dcb1",
+    "battle_rule_oracle_hash": "14e38120c0e1603f7bca82f1c2b5e5f1"
   },
   "Song of the Dryads": {
     "cmc": 3.0,
@@ -82323,6 +82925,37 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "53fc9e33bd355888d15f3f814c7115c8"
+  },
+  "Squadron Hawk": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 3,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 3,
+    "etb_tutor_target": "any_to_hand",
+    "etb_tutor_up_to_count": true,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "any_to_hand",
+    "target_names": [
+      "squadron hawk"
+    ],
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:877168f396e3b0b4ed186a76f0b99995",
+    "battle_rule_oracle_hash": "8760c3ad97cb4c0042f87b4d83336e1d"
   },
   "Squee, Goblin Nabob": {
     "ability_kind": "triggered",
@@ -86094,6 +86727,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93",
     "battle_rule_oracle_hash": "3eac0c8c8db1b161301ced144cb8b983"
+  },
+  "Sylvan Ranger": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "basic_land_to_hand",
+    "target": "basic_land_to_hand",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+    "battle_rule_oracle_hash": "f2f4833506e6958d3a8e75af0b350496"
   },
   "Sylvan Safekeeper": {
     "effect": "creature",
@@ -90456,6 +91110,30 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "4b4003fb692765461b421fa340664340"
   },
+  "Time of Need": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "required_supertypes": [
+      "legendary"
+    ],
+    "sorcery": true,
+    "target": "creature_to_hand",
+    "target_card_types": [
+      "creature"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e5c23aff5977ec12d3a85ee773fe69df",
+    "battle_rule_oracle_hash": "9e4dbb5c6d939e1d3801c29b6173e7b5"
+  },
   "Time Warp": {
     "cmc": 5.0,
     "count": 1,
@@ -91229,6 +91907,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d3015888c824fd41fa9d2387db8d9190"
   },
+  "Totem-Guide Hartebeest": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "any_to_hand",
+    "target": "any_to_hand",
+    "target_subtypes": [
+      "aura"
+    ],
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+    "battle_rule_oracle_hash": "6138101a172460fd94a162178ab2f459"
+  },
   "Touch of Brilliance": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
     "count": 2,
@@ -91807,6 +92509,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "f38b5b02b3ca8ba9f8161b26c0910899"
   },
+  "Transit Mage": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "artifact_to_hand",
+    "target": "artifact_to_hand",
+    "target_card_types": [
+      "artifact"
+    ],
+    "target_mana_value_max": 5,
+    "target_mana_value_min": 4,
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:daedbef22c68668817a41354b76423bd",
+    "battle_rule_oracle_hash": "9459579bdb675a5e3f72daaeb58b2eee"
+  },
   "Transmute Artifact": {
     "effect": "tutor",
     "target": "artifact_or_enchantment",
@@ -91817,6 +92545,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:19a6b12e4f32350914e970a7184a5a45",
     "battle_rule_oracle_hash": "19041d488057f64bd11c517d89d45498"
+  },
+  "Trapmaker's Snare": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": true,
+    "max_count": 1,
+    "sorcery": false,
+    "target": "any_to_hand",
+    "target_subtypes": [
+      "trap"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b9456967545569631aad27c2e338e700",
+    "battle_rule_oracle_hash": "17aaa73f597367e9b8c77f1fa28f5301"
   },
   "Travel the Overworld": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -92177,14 +92926,30 @@
     "battle_rule_oracle_hash": "9ecfe01e2f527aa1c3d999ccf654d08f"
   },
   "Tribute Mage": {
-    "cmc": 3.0,
-    "effect": "tutor",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2434c487a4a822bcd42dfd83d639e7a9"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_tutor_count": 1,
+    "etb_tutor_target": "artifact_to_hand",
+    "target": "artifact_to_hand",
+    "target_card_types": [
+      "artifact"
+    ],
+    "target_mana_value_max": 2,
+    "target_mana_value_min": 2,
+    "trigger": "enters_battlefield",
+    "trigger_effect": "library_tutor_to_hand",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cf4fcf67e3d80509176a51d7650e4d53",
+    "battle_rule_oracle_hash": "4105067c06ea609ff5440f507564b08b"
   },
   "Tribute to the World Tree": {
     "cmc": 3.0,

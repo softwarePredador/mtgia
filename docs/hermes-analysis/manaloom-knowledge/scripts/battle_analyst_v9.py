@@ -23523,7 +23523,7 @@ def resolve_land_tax_upkeep_trigger(player, permanent, turn, all_players=None):
         )
         return 0
 
-    candidates = library_tutor_candidates(player, target_type)
+    candidates = constrained_library_tutor_candidates(player, target_type, effect_data)
     scored_candidates = [
         (
             candidate,
@@ -33963,6 +33963,9 @@ def library_tutor_candidates(player, target_type):
         elif target_type in ("enchantment", "enchantment_to_hand"):
             if "enchantment" in type_line:
                 candidates.append(candidate)
+        elif target_type in ("planeswalker", "planeswalker_to_hand"):
+            if "planeswalker" in type_line:
+                candidates.append(candidate)
         elif target_type in (
             "artifact_or_enchantment",
             "artifact_or_enchantment_to_hand",
@@ -34167,9 +34170,40 @@ def _tutor_mana_value_cap(effect_data):
     return None
 
 
+def _tutor_mana_value_floor(effect_data):
+    if not isinstance(effect_data, dict):
+        return None
+    explicit = first_present_value(
+        effect_data,
+        (
+            "target_mana_value_min",
+            "target_cmc_min",
+            "min_target_mana_value",
+            "min_target_cmc",
+        ),
+    )
+    if explicit is not None:
+        try:
+            return int(float(explicit))
+        except Exception:
+            return None
+    return None
+
+
 def constrained_library_tutor_candidates(player, target_type, effect_data=None):
     candidates = library_tutor_candidates(player, target_type)
     if isinstance(effect_data, dict):
+        required_names = {
+            normalize_card_name(name)
+            for name in _as_list(effect_data.get("target_names"))
+            if str(name).strip()
+        }
+        if required_names:
+            candidates = [
+                candidate
+                for candidate in candidates
+                if normalize_card_name(candidate.get("name", "")) in required_names
+            ]
         required_subtypes = [
             str(subtype).strip().lower()
             for subtype in _as_list(effect_data.get("target_subtypes"))
@@ -34192,6 +34226,31 @@ def constrained_library_tutor_candidates(player, target_type, effect_data=None):
                 for candidate in candidates
                 if _card_type_matches(candidate, required_card_types)
             ]
+        required_colors = [
+            str(color).strip()
+            for color in _as_list(effect_data.get("target_colors"))
+            if str(color).strip()
+        ]
+        if required_colors:
+            candidates = [
+                candidate
+                for candidate in candidates
+                if all(card_has_color(candidate, color) for color in required_colors)
+            ]
+        required_supertypes = [
+            str(supertype).strip().lower()
+            for supertype in _as_list(effect_data.get("required_supertypes"))
+            if str(supertype).strip()
+        ]
+        if required_supertypes:
+            candidates = [
+                candidate
+                for candidate in candidates
+                if all(
+                    supertype in str(candidate.get("type_line") or "").lower()
+                    for supertype in required_supertypes
+                )
+            ]
         if effect_data.get("requires_different_names"):
             unique = []
             seen_names = set()
@@ -34202,6 +34261,17 @@ def constrained_library_tutor_candidates(player, target_type, effect_data=None):
                 seen_names.add(normalized)
                 unique.append(candidate)
             candidates = unique
+    mana_value_floor = _tutor_mana_value_floor(effect_data)
+    if mana_value_floor is not None:
+        filtered = []
+        for candidate in candidates:
+            try:
+                if card_mana_value(candidate) < mana_value_floor:
+                    continue
+            except Exception:
+                continue
+            filtered.append(candidate)
+        candidates = filtered
     mana_value_cap = _tutor_mana_value_cap(effect_data)
     if mana_value_cap is not None:
         filtered = []
@@ -38705,7 +38775,7 @@ def apply_equipment_static_attachment(player, card, effect_data, turn):
 def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn):
     target_type = effect_data.get("etb_tutor_target") or effect_data.get("target") or "any"
     count = max(1, int(effect_data.get("etb_tutor_count") or effect_data.get("count") or 1))
-    candidates = library_tutor_candidates(player, target_type)
+    candidates = constrained_library_tutor_candidates(player, target_type, effect_data)
     scored_candidates = [
         (
             candidate,

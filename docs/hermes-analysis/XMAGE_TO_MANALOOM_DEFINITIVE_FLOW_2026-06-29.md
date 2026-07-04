@@ -7856,7 +7856,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG405 queue on the new server, the next exact runtime-backed work should
+post-PG406 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1809`
@@ -7881,6 +7881,35 @@ Selection rule:
   to the next largest reusable work unit;
 - do not implement broad `xmage_*_review_v1` behavior directly and do not
   schedule card-by-card work before all reusable subpatterns have been tried.
+
+## Latest Cycle Evidence
+
+PG406 closed the exact `SearchLibraryPutInHandEffect` tutor-to-hand subpattern
+on the new server:
+
+- Runtime/split support added for `xmage_library_search_to_hand_spell_v1` and
+  `xmage_creature_etb_library_search_to_hand_v1`.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` (`394` tests) and
+  `test_xmage_exact_scope_runtime.py` (`230` tests).
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg406_tutor_to_hand_new_server`
+  produced `35` safe candidates (`14` spell tutor-to-hand, `21` ETB creature
+  tutor-to-hand).
+- PostgreSQL package `PG406` applied on the new server:
+  `35` upserted rows, `14` deprecated shadow rows, postcheck `35/35`
+  `verified`/`auto` rows with Oracle hashes.
+- PG -> SQLite sync loaded `35` PostgreSQL rows, updated `49` SQLite rows, and
+  exported `5342` canonical snapshot rows.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect`.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51`), and legacy contamination.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26718` to `26683` and authoritative adapter-required count from
+  `26404` to `26369`. The post-PG406 exact split recheck produced
+  `proposal_count=0`.
 
 ## Required Artifacts Per Cycle
 

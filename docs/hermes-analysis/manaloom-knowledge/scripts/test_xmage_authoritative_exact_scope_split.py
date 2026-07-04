@@ -2219,6 +2219,119 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target"], "sorcery_to_top")
         self.assertEqual(effect["count"], 1)
 
+    def test_library_tutor_to_hand_spell_is_package_safe(self) -> None:
+        row = queue_row(split.TUTOR_HAND_UNIT, effect_classes=["SearchLibraryPutInHandEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Tutor",
+                type_line="Sorcery",
+                oracle_text="Search your library for a card, reveal it, put it into your hand, then shuffle.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "tutor")
+        self.assertEqual(effect["battle_model_scope"], split.TUTOR_HAND_SCOPE)
+        self.assertEqual(effect["target"], "any_to_hand")
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["count"], 1)
+
+    def test_library_tutor_to_hand_spell_preserves_subtype_constraints(self) -> None:
+        row = queue_row(split.TUTOR_HAND_UNIT, effect_classes=["SearchLibraryPutInHandEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Armory",
+                type_line="Sorcery",
+                oracle_text="Search your library for an Aura or Equipment card, reveal it, put it into your hand, then shuffle.",
+            ),
+            source_text="""
+                private static final FilterCard auraOrEquipmentTarget = new FilterCard("Aura or Equipment card");
+                this.getSpellAbility().addEffect(
+                    new SearchLibraryPutInHandEffect(new TargetCardInLibrary(1, 1, auraOrEquipmentTarget), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TUTOR_HAND_SCOPE)
+        self.assertEqual(effect["target"], "any_to_hand")
+        self.assertEqual(effect["target_subtypes"], ["aura", "equipment"])
+
+    def test_library_tutor_to_hand_spell_preserves_land_subtype_constraints(self) -> None:
+        row = queue_row(split.TUTOR_HAND_UNIT, effect_classes=["SearchLibraryPutInHandEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Safewright",
+                type_line="Sorcery",
+                oracle_text="Search your library for a Forest or Plains card, reveal it, put it into your hand, then shuffle.",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("Forest or Plains card");
+                static {
+                    filter.add(Predicates.or(SubType.FOREST.getPredicate(), SubType.PLAINS.getPredicate()));
+                }
+                this.getSpellAbility().addEffect(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(filter), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "land_to_hand")
+        self.assertEqual(effect["target_card_types"], ["land"])
+        self.assertEqual(effect["target_subtypes"], ["forest", "plains"])
+
+    def test_library_tutor_to_hand_spell_preserves_source_creature_subtype_constraint(self) -> None:
+        row = queue_row(split.TUTOR_HAND_UNIT, effect_classes=["SearchLibraryPutInHandEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Mercenary",
+                type_line="Sorcery",
+                oracle_text="Search your library for a Mercenary card, reveal that card, put it into your hand, then shuffle.",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCreatureCard("Mercenary card");
+                static {
+                    filter.add(SubType.MERCENARY.getPredicate());
+                }
+                this.getSpellAbility().addEffect(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(filter), true, true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "any_to_hand")
+        self.assertEqual(effect["target_card_types"], ["creature"])
+        self.assertEqual(effect["target_subtypes"], ["mercenary"])
+
+    def test_library_tutor_to_hand_spell_blocks_dynamic_land_count(self) -> None:
+        row = queue_row(split.TUTOR_HAND_UNIT, effect_classes=["SearchLibraryPutInHandEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Beseech",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Search your library for a card with mana value less than or equal to the number of lands you control, "
+                    "reveal it, put it into your hand, then shuffle."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("card with mana value less than or equal to the number of lands you control");
+                this.getSpellAbility().addEffect(new SearchLibraryPutInHandEffect(new TargetCardInLibrary(filter), true));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "library_tutor_oracle_target_not_supported")
+
     def test_library_tutor_spell_blocks_additional_cost(self) -> None:
         row = queue_row(split.TUTOR_UNIT, effect_classes=["SearchLibraryPutInPlayEffect"])
         proposal, reason = split.split_row(
@@ -10169,6 +10282,133 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["tutor_enters_tapped"])
         self.assertEqual(effect["keywords"], ["flying"])
         self.assertTrue(effect["flying"])
+
+    def test_creature_etb_library_tutor_to_hand_maps_basic_land_scope(self) -> None:
+        row = queue_row(
+            split.ETB_TUTOR_HAND_CREATURE_UNIT,
+            effect_classes=["SearchLibraryPutInHandEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Ranger",
+                type_line="Creature - Elf Scout",
+                oracle_text=(
+                    "When Fixture Ranger enters the battlefield, you may search your library for a basic land card, "
+                    "reveal it, put it into your hand, then shuffle."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutInHandEffect(new TargetCardInLibrary(StaticFilters.FILTER_CARD_BASIC_LAND), true), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TUTOR_HAND_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_tutor_target"], "basic_land_to_hand")
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+
+    def test_creature_etb_library_tutor_to_hand_preserves_keyword_and_any_card(self) -> None:
+        row = queue_row(
+            split.ETB_TUTOR_HAND_CREATURE_UNIT,
+            effect_classes=["SearchLibraryPutInHandEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Demon",
+                type_line="Creature - Demon",
+                oracle_text=(
+                    "Flying\n"
+                    "When Fixture Demon enters the battlefield, you may search your library for a card, "
+                    "put it into your hand, then shuffle."
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutInHandEffect(new TargetCardInLibrary(), false), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_tutor_target"], "any_to_hand")
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+
+    def test_creature_etb_library_tutor_to_hand_preserves_mana_value_constraint(self) -> None:
+        row = queue_row(
+            split.ETB_TUTOR_HAND_CREATURE_UNIT,
+            effect_classes=["SearchLibraryPutInHandEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Tribute",
+                type_line="Creature - Human Wizard",
+                oracle_text=(
+                    "When Fixture Tribute enters the battlefield, you may search your library for an artifact card "
+                    "with mana value 2, reveal that card, put it into your hand, then shuffle."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterArtifactCard("artifact card with mana value 2");
+                static {
+                    filter.add(new ManaValuePredicate(ComparisonType.EQUAL_TO, 2));
+                }
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutInHandEffect(new TargetCardInLibrary(filter), true), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_tutor_target"], "artifact_to_hand")
+        self.assertEqual(effect["target_card_types"], ["artifact"])
+        self.assertEqual(effect["target_mana_value_min"], 2)
+        self.assertEqual(effect["target_mana_value_max"], 2)
+
+    def test_creature_etb_library_tutor_to_hand_blocks_distinct_name_source(self) -> None:
+        row = queue_row(
+            split.ETB_TUTOR_HAND_CREATURE_UNIT,
+            effect_classes=["SearchLibraryPutInHandEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Shared",
+                type_line="Creature - Human",
+                oracle_text=(
+                    "When Fixture Shared enters the battlefield, you may search your library for up to two creature cards "
+                    "with different names, reveal them, put them into your hand, then shuffle."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutInHandEffect(new TargetCardWithDifferentNameInLibrary(
+                        0, 2, StaticFilters.FILTER_CARD_CREATURES), true), true));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_library_tutor_to_hand_source_distinct_names_not_supported")
 
     def test_creature_etb_library_tutor_to_battlefield_blocks_condition(self) -> None:
         row = queue_row(

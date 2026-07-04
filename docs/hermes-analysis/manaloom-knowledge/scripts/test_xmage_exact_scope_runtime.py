@@ -11313,6 +11313,71 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_etb_library_tutor_to_hand_respects_mana_value_constraints(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.library = [
+            {"name": "Sol Ring", "type_line": "Artifact", "cmc": 1, "mana_value": 1},
+            {"name": "Fixture Lens", "type_line": "Artifact", "cmc": 2, "mana_value": 2},
+            {"name": "Thran Dynamo", "type_line": "Artifact", "cmc": 4, "mana_value": 4},
+        ]
+        permanent = {"name": "Fixture Tribute", "type_line": "Creature - Human Wizard"}
+        effect_data = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_library_search_to_hand_v1",
+            "trigger": "enters_battlefield",
+            "etb_tutor_target": "artifact_to_hand",
+            "etb_tutor_count": 1,
+            "target_card_types": ["artifact"],
+            "target_mana_value_min": 2,
+            "target_mana_value_max": 2,
+            "_rule_logical_key": "battle_rule_v1:fixture_tribute",
+        }
+
+        self.battle.resolve_etb_library_tutor_to_hand(
+            active,
+            [opponent],
+            permanent,
+            effect_data,
+            turn=3,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Fixture Lens"])
+        self.assertEqual([card["name"] for card in active.library], ["Sol Ring", "Thran Dynamo"])
+        self.assertTrue(
+            any(
+                event == "tutor_resolved"
+                and data.get("card") == "Fixture Tribute"
+                and data.get("found") == "Fixture Lens"
+                and data.get("destination") == "hand"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_tribute"
+                for event, data in self.events
+            )
+        )
+
+    def test_library_tutor_constraints_support_names_colors_and_supertypes(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.library = [
+            {"name": "Jace's Ingenuity", "type_line": "Instant", "mana_cost": "{3}{U}{U}", "colors": ["U"], "cmc": 5},
+            {"name": "Lightning Bolt", "type_line": "Instant", "mana_cost": "{R}", "colors": ["R"], "cmc": 1},
+            {"name": "Thalia's Lancers", "type_line": "Creature - Human Knight", "cmc": 5},
+            {"name": "Akroma's Memorial", "type_line": "Legendary Artifact", "cmc": 7},
+        ]
+
+        blue_instants = self.battle.constrained_library_tutor_candidates(
+            active,
+            "instant_to_hand",
+            {"target_card_types": ["instant"], "target_colors": ["U"]},
+        )
+        named_legend = self.battle.constrained_library_tutor_candidates(
+            active,
+            "any_to_hand",
+            {"target_names": ["Akroma's Memorial"], "required_supertypes": ["legendary"]},
+        )
+
+        self.assertEqual([card["name"] for card in blue_instants], ["Jace's Ingenuity"])
+        self.assertEqual([card["name"] for card in named_legend], ["Akroma's Memorial"])
+
 
 if __name__ == "__main__":
     unittest.main()

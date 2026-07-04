@@ -34,6 +34,8 @@ COUNTER_UNIT = "counter_spell::counter_target_stack_object_variant_v1"
 BOUNCE_UNIT = "bounce::targeted_return_to_hand_variant_v1"
 RECURSION_UNIT = "recursion::xmage_graveyard_return_variant_review_v1"
 TUTOR_UNIT = "tutor::xmage_library_search_variant_review_v1"
+TUTOR_HAND_UNIT = "tutor::any_tutor_to_hand_v1"
+ETB_TUTOR_HAND_CREATURE_UNIT = "creature::etb_tutor_to_hand_creature_variant_v1"
 BOARD_WIPE_UNIT = "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1"
 ADD_COUNTERS_TARGET_UNIT = "add_counters::targeted_add_counters_variant_v1"
 BOOST_TARGET_UNIT = (
@@ -81,6 +83,8 @@ SUPPORTED_UNITS = {
     BOUNCE_UNIT,
     RECURSION_UNIT,
     TUTOR_UNIT,
+    TUTOR_HAND_UNIT,
+    ETB_TUTOR_HAND_CREATURE_UNIT,
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
@@ -149,7 +153,9 @@ PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = (
 )
 TUTOR_BATTLEFIELD_SCOPE = "xmage_library_search_to_battlefield_spell_v1"
 TUTOR_TOP_SCOPE = "xmage_library_search_to_library_top_spell_v1"
+TUTOR_HAND_SCOPE = "xmage_library_search_to_hand_spell_v1"
 ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_battlefield_v1"
+ETB_TUTOR_HAND_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_hand_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
@@ -199,6 +205,7 @@ SPELL_UNITS = {
     BOUNCE_UNIT,
     RECURSION_UNIT,
     TUTOR_UNIT,
+    TUTOR_HAND_UNIT,
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
@@ -4651,6 +4658,19 @@ def is_creature_etb_tutor_to_battlefield_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_tutor_to_hand_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != ETB_TUTOR_HAND_CREATURE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"SearchLibraryPutInHandEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
 def is_creature_etb_token_unit(row: dict[str, Any]) -> bool:
     return (
         str(row.get("adapter_work_unit") or "") == ETB_TOKEN_CREATURE_UNIT
@@ -8815,13 +8835,28 @@ COUNT_WORDS = {
 }
 
 
-def library_tutor_target_from_phrase(phrase: str) -> str | None:
+def _clean_library_tutor_phrase(phrase: str) -> str:
     normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
     normalized = normalized.removesuffix(".")
+    for prefix in ("a ", "an "):
+        if normalized.startswith(prefix):
+            normalized = normalized[len(prefix) :]
+            break
+    return normalized
+
+
+def library_tutor_target_from_phrase(phrase: str) -> str | None:
+    normalized = _clean_library_tutor_phrase(phrase)
     mapping = {
+        "card": "any",
+        "cards": "any",
         "basic land card": "basic_land",
         "basic land cards": "basic_land",
         "basic lands": "basic_land",
+        "basic plains card": "basic_plains",
+        "basic plains cards": "basic_plains",
+        "basic land card or gate card": "basic_land_or_gate",
+        "basic land card or a gate card": "basic_land_or_gate",
         "basic land cards and/or gate cards": "basic_land_or_gate",
         "basic lands and/or gates": "basic_land_or_gate",
         "basic land cards and/or town cards with different names": "basic_land_or_town",
@@ -8835,13 +8870,30 @@ def library_tutor_target_from_phrase(phrase: str) -> str | None:
         "snow land card": "snow_land",
         "plains, island, swamp, or mountain card": "plains_island_swamp_or_mountain",
         "plains, island, swamp, mountain, or forest card": "basic_land_type",
+        "instant card": "instant",
         "sorcery card": "sorcery",
+        "instant or sorcery card": "instant_or_sorcery",
+        "instant and/or sorcery card": "instant_or_sorcery",
+        "creature card": "creature",
+        "creature cards": "creature",
+        "enchantment card": "enchantment",
+        "enchantment cards": "enchantment",
+        "planeswalker card": "planeswalker",
+        "planeswalker cards": "planeswalker",
+        "artifact card": "artifact",
+        "artifact cards": "artifact",
     }
     return mapping.get(normalized)
 
 
 def parse_library_tutor_query(query: str) -> dict[str, Any] | None:
     text = re.sub(r"\s+", " ", str(query or "").strip().lower())
+    if "less than or equal to the number of lands you control" in text:
+        return None
+    if "white card, a blue card, a black card, a red card, and a green card" in text:
+        return None
+    if " and a " in text and any(marker in text for marker in ("basic forest", "basic plains")):
+        return None
     up_to = False
     count = 1
     phrase = text
@@ -8852,14 +8904,93 @@ def parse_library_tutor_query(query: str) -> dict[str, Any] | None:
         up_to = True
         phrase = match.group("phrase")
     else:
-        for prefix in ("a ", "an "):
-            if phrase.startswith(prefix):
-                phrase = phrase[len(prefix) :]
-                break
+        any_number_match = re.match(r"^any number of (?P<phrase>.+)$", phrase)
+        if any_number_match:
+            count = 99
+            up_to = True
+            phrase = any_number_match.group("phrase")
+    phrase = _clean_library_tutor_phrase(phrase)
+    parsed: dict[str, Any] = {"count": count, "up_to_count": up_to}
+
+    if "targetcardwithdifferentname" in phrase:
+        return None
+    if " with different names" in phrase or " that each have different names" in phrase:
+        parsed["requires_different_names"] = True
+        phrase = phrase.replace(" that each have different names", "")
+        phrase = phrase.replace(" with different names", "")
+    if " not named " in phrase:
+        return None
+
+    named_match = re.fullmatch(r"cards? named (?P<name>.+)", phrase)
+    if named_match:
+        parsed["target"] = "any"
+        parsed["target_names"] = [named_match.group("name").strip()]
+        return parsed if count > 0 else None
+
+    mana_value_match = re.fullmatch(
+        r"(?P<card_type>artifact|creature|instant|sorcery|enchantment|planeswalker) cards? "
+        r"with mana value (?P<first>\d+)(?: or (?P<second>\d+)| or less)?",
+        phrase,
+    )
+    if mana_value_match:
+        parsed["target"] = mana_value_match.group("card_type")
+        parsed["target_card_types"] = [mana_value_match.group("card_type")]
+        first = int(mana_value_match.group("first"))
+        second = mana_value_match.group("second")
+        if second is not None:
+            values = sorted([first, int(second)])
+            parsed["target_mana_value_min"] = values[0]
+            parsed["target_mana_value_max"] = values[1]
+        elif phrase.endswith("or less"):
+            parsed["target_mana_value_max"] = first
+        else:
+            parsed["target_mana_value_min"] = first
+            parsed["target_mana_value_max"] = first
+        return parsed if count > 0 else None
+
+    exact_specs: dict[str, dict[str, Any]] = {
+        "artifact card": {"target": "artifact", "target_card_types": ["artifact"]},
+        "artifact cards": {"target": "artifact", "target_card_types": ["artifact"]},
+        "creature card": {"target": "creature", "target_card_types": ["creature"]},
+        "creature cards": {"target": "creature", "target_card_types": ["creature"]},
+        "enchantment card": {"target": "enchantment", "target_card_types": ["enchantment"]},
+        "enchantment cards": {"target": "enchantment", "target_card_types": ["enchantment"]},
+        "instant card": {"target": "instant", "target_card_types": ["instant"]},
+        "instant or sorcery card": {"target": "instant_or_sorcery"},
+        "instant and/or sorcery card": {"target": "instant_or_sorcery"},
+        "planeswalker card": {"target": "planeswalker", "target_card_types": ["planeswalker"]},
+        "planeswalker cards": {"target": "planeswalker", "target_card_types": ["planeswalker"]},
+        "sorcery card": {"target": "sorcery", "target_card_types": ["sorcery"]},
+        "aura card": {"target": "any", "target_subtypes": ["aura"]},
+        "aura cards": {"target": "any", "target_subtypes": ["aura"]},
+        "aura or equipment card": {"target": "any", "target_subtypes": ["aura", "equipment"]},
+        "equipment or vehicle card": {"target": "any", "target_subtypes": ["equipment", "vehicle"]},
+        "forest or plains card": {"target": "land", "target_card_types": ["land"], "target_subtypes": ["forest", "plains"]},
+        "dragon card": {"target": "any", "target_subtypes": ["dragon"]},
+        "dragon cards": {"target": "any", "target_subtypes": ["dragon"]},
+        "dragon creature card": {"target": "creature", "target_card_types": ["creature"], "target_subtypes": ["dragon"]},
+        "goblin card": {"target": "any", "target_subtypes": ["goblin"]},
+        "goblin cards": {"target": "any", "target_subtypes": ["goblin"]},
+        "mercenary card": {"target": "any", "target_card_types": ["creature"], "target_subtypes": ["mercenary"]},
+        "arcane card": {"target": "any", "target_subtypes": ["arcane"]},
+        "trap card": {"target": "any", "target_subtypes": ["trap"]},
+        "legendary card": {"target": "any", "required_supertypes": ["legendary"]},
+        "legendary creature card": {
+            "target": "creature",
+            "target_card_types": ["creature"],
+            "required_supertypes": ["legendary"],
+        },
+        "blue instant card": {"target": "instant", "target_card_types": ["instant"], "target_colors": ["U"]},
+    }
+    if phrase in exact_specs:
+        parsed.update(exact_specs[phrase])
+        return parsed if count > 0 else None
+
     target = library_tutor_target_from_phrase(phrase)
     if target is None or count <= 0:
         return None
-    return {"target": target, "count": count, "up_to_count": up_to}
+    parsed["target"] = target
+    return parsed
 
 
 def library_tutor_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -8875,6 +9006,21 @@ def library_tutor_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
         if parsed is None:
             return "library_tutor_oracle_target_not_supported"
         parsed["destination"] = "library_top"
+        parsed["enters_tapped"] = False
+        return parsed
+
+    hand_match = re.match(
+        r"^search your library for (?P<query>.+?)"
+        r"(?:, reveal (?:it|that card|them|those cards))?, put "
+        r"(?:it|that card|them|those cards) into your hand, "
+        r"then shuffle(?: your library)?\.?$",
+        text,
+    )
+    if hand_match:
+        parsed = parse_library_tutor_query(hand_match.group("query"))
+        if parsed is None:
+            return "library_tutor_oracle_target_not_supported"
+        parsed["destination"] = "hand"
         parsed["enters_tapped"] = False
         return parsed
 
@@ -8918,20 +9064,140 @@ def etb_library_tutor_to_battlefield_from_oracle(metadata: dict[str, Any]) -> di
     return parsed
 
 
-def library_tutor_target_from_source(source: str) -> str | None:
+def etb_library_tutor_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    if " if " in f" {text} " or " additional cost " in f" {text} " or "players can't" in text.lower():
+        return "etb_library_tutor_to_hand_oracle_not_simple"
+    match = re.fullmatch(
+        r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+"
+        r"(?:you may )?search your library for (?P<query>.+?)"
+        r"(?:, reveal (?:it|that card|them|those cards))?, put "
+        r"(?:it|that card|them|those cards) into your hand, "
+        r"then shuffle(?: your library)?\.?",
+        text,
+    )
+    if not match:
+        return "etb_library_tutor_to_hand_oracle_not_simple"
+    parsed = parse_library_tutor_query(match.group("query"))
+    if parsed is None:
+        return "etb_library_tutor_to_hand_oracle_target_not_supported"
+    parsed["destination"] = "hand"
+    parsed["enters_tapped"] = False
+    return parsed
+
+
+def library_tutor_source_query(source: str) -> dict[str, Any] | None:
     text = source or ""
-    if "FILTER_CARD_BASIC_LAND" in text:
-        return "basic_land"
-    if "FILTER_CARD_LANDS" in text:
-        return "land"
-    if "SubType.PLAINS" in text:
-        return "plains"
+    static_specs: list[tuple[str, dict[str, Any]]] = [
+        ("FILTER_CARD_BASIC_PLAINS", {"target": "basic_plains"}),
+        ("FILTER_CARD_BASIC_LANDS", {"target": "basic_land"}),
+        ("FILTER_CARD_BASIC_LAND", {"target": "basic_land"}),
+        ("FILTER_CARD_LANDS", {"target": "land"}),
+        ("FILTER_CARD_CREATURES", {"target": "creature", "target_card_types": ["creature"]}),
+        ("FILTER_CARD_CREATURE", {"target": "creature", "target_card_types": ["creature"]}),
+        ("FILTER_CARD_INSTANT_OR_SORCERY", {"target": "instant_or_sorcery"}),
+        ("FILTER_CARD_INSTANTS", {"target": "instant", "target_card_types": ["instant"]}),
+        ("FILTER_CARD_SORCERIES", {"target": "sorcery", "target_card_types": ["sorcery"]}),
+        ("FILTER_CARD_ENCHANTMENTS", {"target": "enchantment", "target_card_types": ["enchantment"]}),
+        ("FILTER_CARD_ENCHANTMENT", {"target": "enchantment", "target_card_types": ["enchantment"]}),
+        ("FILTER_CARD_ARTIFACTS", {"target": "artifact", "target_card_types": ["artifact"]}),
+        ("FILTER_CARD_ARTIFACT", {"target": "artifact", "target_card_types": ["artifact"]}),
+    ]
+    for marker, spec in static_specs:
+        if marker in text:
+            return dict(spec)
+    if re.search(r"new\s+TargetCardInLibrary\s*\(\s*\)", text):
+        return {"target": "any"}
+    if "new FilterPlaneswalkerCard" in text:
+        return {"target": "planeswalker", "target_card_types": ["planeswalker"]}
+    if "new FilterCreatureCard" in text:
+        base: dict[str, Any] = {"target": "creature", "target_card_types": ["creature"]}
+    elif "new FilterArtifactCard" in text:
+        base = {"target": "artifact", "target_card_types": ["artifact"]}
+    elif "new FilterEnchantmentCard" in text:
+        base = {"target": "enchantment", "target_card_types": ["enchantment"]}
+    elif "new FilterLandCard" in text:
+        base = {"target": "land", "target_card_types": ["land"]}
+    else:
+        base = {}
     if "SuperType.BASIC" in text and "SubType.FOREST" in text and "SubType.ISLAND" in text:
-        return "basic_forest_or_island"
-    filter_match = re.search(r'new\s+Filter(?:Land)?Card\s*\(\s*"([^"]+)"\s*\)', text)
+        return {"target": "basic_forest_or_island"}
+    if "ObjectColor.BLUE" in text and "CardType.INSTANT" in text:
+        return {"target": "instant", "target_card_types": ["instant"], "target_colors": ["U"]}
+    subtype_markers = {
+        "SubType.AURA": "aura",
+        "SubType.EQUIPMENT": "equipment",
+        "SubType.VEHICLE": "vehicle",
+        "SubType.DRAGON": "dragon",
+        "SubType.GOBLIN": "goblin",
+        "SubType.MERCENARY": "mercenary",
+        "SubType.ARCANE": "arcane",
+        "SubType.TRAP": "trap",
+        "SubType.FOREST": "forest",
+        "SubType.PLAINS": "plains",
+        "SubType.ISLAND": "island",
+    }
+    source_subtypes = [
+        subtype
+        for marker, subtype in subtype_markers.items()
+        if marker in text
+    ]
+    if source_subtypes:
+        if set(source_subtypes) == {"forest", "island"} and "SuperType.BASIC" in text:
+            return {"target": "basic_forest_or_island"}
+        if set(source_subtypes) == {"forest", "plains"} and not base:
+            base = {"target": "land", "target_card_types": ["land"]}
+        if not base:
+            if source_subtypes == ["plains"]:
+                return {"target": "plains"}
+            if source_subtypes == ["forest"]:
+                return {"target": "forest"}
+            base = {"target": "any"}
+        if not (len(source_subtypes) == 1 and source_subtypes[0] in {"plains", "forest"} and base.get("target") in {"plains", "forest"}):
+            base["target_subtypes"] = source_subtypes
+    if "SuperType.LEGENDARY" in text:
+        base.setdefault("target", "any")
+        base["required_supertypes"] = ["legendary"]
+    mana_value_match = re.search(
+        r"ManaValuePredicate\s*\(\s*ComparisonType\.(?P<comparison>EQUAL_TO|FEWER_THAN|OR_LESS|OR_GREATER|MORE_THAN)\s*,\s*(?P<value>\d+)",
+        text,
+    )
+    if mana_value_match:
+        value = int(mana_value_match.group("value"))
+        comparison = mana_value_match.group("comparison")
+        if comparison == "EQUAL_TO":
+            base["target_mana_value_min"] = value
+            base["target_mana_value_max"] = value
+        elif comparison in {"FEWER_THAN", "OR_LESS"}:
+            base["target_mana_value_max"] = value - 1 if comparison == "FEWER_THAN" else value
+        elif comparison in {"OR_GREATER", "MORE_THAN"}:
+            base["target_mana_value_min"] = value if comparison == "OR_GREATER" else value + 1
+    filter_match = re.search(
+        r'new\s+Filter(?:Card|LandCard|CreatureCard|ArtifactCard|EnchantmentCard|PlaneswalkerCard)\s*\(\s*"([^"]+)"\s*\)',
+        text,
+    )
     if filter_match:
-        return library_tutor_target_from_phrase(filter_match.group(1))
+        parsed = parse_library_tutor_query(filter_match.group(1))
+        if parsed is not None:
+            parsed = {key: value for key, value in parsed.items() if key not in {"count", "up_to_count"}}
+            if base:
+                merged = {**base, **parsed}
+                if base.get("target_card_types") and "target_card_types" not in parsed:
+                    merged["target_card_types"] = base["target_card_types"]
+                return merged
+            return parsed
+    if base:
+        base.setdefault("target", "any")
+        return base
     return None
+
+
+def library_tutor_target_from_source(source: str) -> str | None:
+    spec = library_tutor_source_query(source)
+    if spec is None:
+        return None
+    return str(spec.get("target") or "") or None
 
 
 def library_tutor_count_from_source(source: str) -> tuple[int, bool]:
@@ -8951,8 +9217,8 @@ def library_tutor_from_source(source: str, effect_class: str) -> dict[str, Any] 
         return "library_tutor_source_additional_cost_not_supported"
     if "TargetCardWithDifferentNameInLibrary" in text:
         return "library_tutor_source_distinct_names_not_supported"
-    target = library_tutor_target_from_source(text)
-    if target is None:
+    parsed_target = library_tutor_source_query(text)
+    if parsed_target is None:
         return "library_tutor_source_target_not_supported"
     count, up_to = library_tutor_count_from_source(text)
     if effect_class == "SearchLibraryPutInPlayEffect":
@@ -8964,7 +9230,7 @@ def library_tutor_from_source(source: str, effect_class: str) -> dict[str, Any] 
             re.S,
         )
         return {
-            "target": target,
+            **parsed_target,
             "count": count,
             "up_to_count": up_to,
             "destination": "battlefield",
@@ -8974,13 +9240,69 @@ def library_tutor_from_source(source: str, effect_class: str) -> dict[str, Any] 
         if "SearchLibraryPutOnLibraryEffect" not in text:
             return "library_tutor_source_effect_not_found"
         return {
-            "target": target,
+            **parsed_target,
             "count": count,
             "up_to_count": up_to,
             "destination": "library_top",
             "enters_tapped": False,
         }
+    if effect_class == "SearchLibraryPutInHandEffect":
+        if "SearchLibraryPutInHandEffect" not in text:
+            return "library_tutor_source_effect_not_found"
+        return {
+            **parsed_target,
+            "count": count,
+            "up_to_count": up_to,
+            "destination": "hand",
+            "enters_tapped": False,
+        }
     return "library_tutor_source_effect_not_supported"
+
+
+def library_tutor_specs_match(source_tutor: dict[str, Any], oracle_tutor: dict[str, Any]) -> str | None:
+    scalar_keys = (
+        "target",
+        "count",
+        "up_to_count",
+        "destination",
+        "enters_tapped",
+        "target_mana_value_min",
+        "target_mana_value_max",
+        "requires_different_names",
+    )
+    list_keys = (
+        "target_subtypes",
+        "target_card_types",
+        "target_colors",
+        "required_supertypes",
+        "target_names",
+    )
+    for key in scalar_keys:
+        if source_tutor.get(key) != oracle_tutor.get(key):
+            return key
+    for key in list_keys:
+        source_values = sorted(str(value).lower() for value in source_tutor.get(key) or [])
+        oracle_values = sorted(str(value).lower() for value in oracle_tutor.get(key) or [])
+        if source_values != oracle_values:
+            return key
+    return None
+
+
+def library_tutor_effect_constraints(tutor_spec: dict[str, Any]) -> dict[str, Any]:
+    constraints: dict[str, Any] = {}
+    for key in (
+        "target_subtypes",
+        "target_card_types",
+        "target_colors",
+        "required_supertypes",
+        "target_names",
+        "target_mana_value_min",
+        "target_mana_value_max",
+        "requires_different_names",
+    ):
+        if key in tutor_spec:
+            constraints[key] = tutor_spec[key]
+    return constraints
 
 
 def target_constraints_for(target: str) -> dict[str, Any]:
@@ -9215,6 +9537,7 @@ def split_row(
     etb_graveyard_to_library_creature_unit = is_creature_etb_graveyard_to_library_unit(row)
     etb_library_pick_creature_unit = is_creature_etb_library_pick_unit(row)
     etb_tutor_battlefield_creature_unit = is_creature_etb_tutor_to_battlefield_unit(row)
+    etb_tutor_hand_creature_unit = is_creature_etb_tutor_to_hand_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
     dies_token_creature_unit = is_creature_dies_token_unit(row)
     etb_add_counters_creature_unit = is_creature_etb_add_counters_unit(row)
@@ -9283,6 +9606,7 @@ def split_row(
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
         and not etb_tutor_battlefield_creature_unit
+        and not etb_tutor_hand_creature_unit
         and not etb_token_creature_unit
         and not dies_token_creature_unit
         and not etb_add_counters_creature_unit
@@ -9330,6 +9654,7 @@ def split_row(
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
         and not etb_tutor_battlefield_creature_unit
+        and not etb_tutor_hand_creature_unit
         and not etb_token_creature_unit
         and not dies_token_creature_unit
         and not etb_add_counters_creature_unit
@@ -11535,9 +11860,9 @@ def split_row(
         source_tutor = library_tutor_from_source(source_text, "SearchLibraryPutInPlayEffect")
         if isinstance(source_tutor, str):
             return None, source_tutor.replace("library_tutor", "etb_library_tutor")
-        for key in ("target", "count", "up_to_count", "destination", "enters_tapped"):
-            if source_tutor.get(key) != oracle_tutor.get(key):
-                return None, f"etb_library_tutor_source_oracle_{key}_mismatch"
+        mismatch = library_tutor_specs_match(source_tutor, oracle_tutor)
+        if mismatch:
+            return None, f"etb_library_tutor_source_oracle_{mismatch}_mismatch"
         target = f"{oracle_tutor['target']}_to_battlefield"
         keyword_list = ordered_keywords(keywords_from_ability_classes(row))
         effect_json = {
@@ -11553,6 +11878,7 @@ def split_row(
             "tutor_enters_tapped": bool(oracle_tutor.get("enters_tapped")),
             "xmage_effect_class": "SearchLibraryPutInPlayEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+            **library_tutor_effect_constraints(oracle_tutor),
         }
         if keyword_list:
             effect_json["keywords"] = keyword_list
@@ -11564,6 +11890,50 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_library_search_to_battlefield",
+        ), "selected_exact_scope"
+
+    if etb_tutor_hand_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_library_tutor_to_hand_not_creature"
+        oracle_tutor = etb_library_tutor_to_hand_from_oracle(metadata)
+        if isinstance(oracle_tutor, str):
+            return None, oracle_tutor
+        source_tutor = library_tutor_from_source(source_text, "SearchLibraryPutInHandEffect")
+        if isinstance(source_tutor, str):
+            return None, source_tutor.replace("library_tutor", "etb_library_tutor_to_hand")
+        mismatch = library_tutor_specs_match(source_tutor, oracle_tutor)
+        if mismatch:
+            return None, f"etb_library_tutor_to_hand_source_oracle_{mismatch}_mismatch"
+        target = f"{oracle_tutor['target']}_to_hand"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_TUTOR_HAND_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "library_tutor_to_hand",
+            "etb_tutor_target": target,
+            "etb_tutor_count": int(oracle_tutor["count"]),
+            "target": target,
+            "count": int(oracle_tutor["count"]),
+            "destination": "hand",
+            "xmage_effect_class": "SearchLibraryPutInHandEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+            **library_tutor_effect_constraints(oracle_tutor),
+        }
+        if oracle_tutor.get("up_to_count"):
+            effect_json["etb_tutor_up_to_count"] = True
+            effect_json["up_to_count"] = True
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_library_search_to_hand",
         ), "selected_exact_scope"
 
     if creature_tap_damage_unit and is_creature_metadata(metadata):
@@ -13613,14 +13983,18 @@ def split_row(
             effect_json["up_to_count"] = True
         return build_proposal(row, metadata, effect_json, family_id="xmage_graveyard_to_hand_spell"), "selected_exact_scope"
 
-    if unit == TUTOR_UNIT:
+    if unit in {TUTOR_UNIT, TUTOR_HAND_UNIT}:
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
         if ability_classes(row):
             return None, "tutor_ability_class_not_simple"
         if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
             return None, "additional_cost_detected"
-        if classes not in ({"SearchLibraryPutInPlayEffect"}, {"SearchLibraryPutOnLibraryEffect"}):
+        if classes not in (
+            {"SearchLibraryPutInPlayEffect"},
+            {"SearchLibraryPutOnLibraryEffect"},
+            {"SearchLibraryPutInHandEffect"},
+        ):
             return None, "tutor_effect_class_not_supported"
         effect_class = next(iter(classes))
         oracle_tutor = library_tutor_from_oracle(metadata)
@@ -13629,20 +14003,33 @@ def split_row(
         source_tutor = library_tutor_from_source(source_text, effect_class)
         if isinstance(source_tutor, str):
             return None, source_tutor
-        for key in ("target", "count", "up_to_count", "destination", "enters_tapped"):
-            if source_tutor.get(key) != oracle_tutor.get(key):
-                return None, f"library_tutor_source_oracle_{key}_mismatch"
+        mismatch = library_tutor_specs_match(source_tutor, oracle_tutor)
+        if mismatch:
+            return None, f"library_tutor_source_oracle_{mismatch}_mismatch"
         destination = oracle_tutor["destination"]
-        target = f"{oracle_tutor['target']}_to_battlefield" if destination == "battlefield" else f"{oracle_tutor['target']}_to_top"
+        suffix = {
+            "battlefield": "to_battlefield",
+            "library_top": "to_top",
+            "hand": "to_hand",
+        }.get(str(destination), "to_hand")
+        target = f"{oracle_tutor['target']}_{suffix}"
         count = int(oracle_tutor["count"])
-        scope = TUTOR_BATTLEFIELD_SCOPE if destination == "battlefield" else TUTOR_TOP_SCOPE
+        scope = (
+            TUTOR_BATTLEFIELD_SCOPE
+            if destination == "battlefield"
+            else TUTOR_TOP_SCOPE
+            if destination == "library_top"
+            else TUTOR_HAND_SCOPE
+        )
         effect_json = {
             "effect": "tutor",
             "battle_model_scope": scope,
             "target": target,
             "count": count,
             "max_count": count,
+            "destination": destination,
             "xmage_effect_class": effect_class,
+            **library_tutor_effect_constraints(oracle_tutor),
             **flags,
         }
         if oracle_tutor.get("up_to_count"):
@@ -14042,6 +14429,7 @@ def build_exact_split_report(
             and not is_creature_etb_damage_unit(row)
             and not is_creature_etb_graveyard_to_library_unit(row)
             and not is_creature_etb_library_pick_unit(row)
+            and not is_creature_etb_tutor_to_hand_unit(row)
             and not is_creature_tap_damage_unit(row)
             and not is_creature_etb_token_unit(row)
             and not is_creature_dies_token_unit(row)

@@ -1,0 +1,424 @@
+{
+  "apply_summary": {
+    "backup_rows": 14,
+    "backup_table": "manaloom_deploy_audit.pg406_tutor_to_hand_new_server_20260704_130304",
+    "deprecated_shadow_rows": 14,
+    "manual_apply_command": "psql -v ON_ERROR_STOP=1 -f docs/hermes-analysis/master_optimizer_reports/pg406_tutor_to_hand_new_server_package_apply.sql",
+    "upserted_rows": 35
+  },
+  "database_target": "127.0.0.1:15432/halder",
+  "deploy_id": "PG406",
+  "generated_at": "2026-07-04T13:04:51.126113+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg406_tutor_to_hand_new_server_package_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg406_tutor_to_hand_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 14,
+    "cards": [
+      "Borderland Ranger",
+      "Call the Gatewatch",
+      "Cateran Summons",
+      "Civic Wayfinder",
+      "Daru Cavalier",
+      "Deadeye Quartermaster",
+      "Diabolic Tutor",
+      "District Guide",
+      "Eerie Procession",
+      "Environmental Scientist",
+      "Farfinder",
+      "Gatecreeper Vine",
+      "Goblin Matron",
+      "Heliod's Pilgrim",
+      "Howling Wolf",
+      "Ignite the Beacon",
+      "Merchant Scroll",
+      "Nesting Wurm",
+      "Open the Armory",
+      "Plea for Guidance",
+      "Ranger of Eos",
+      "Rune-Scarred Demon",
+      "Safewright Quest",
+      "Sarkhan's Triumph",
+      "Screaming Seahawk",
+      "Seek the Horizon",
+      "Skyshroud Sentinel",
+      "Solve the Equation",
+      "Squadron Hawk",
+      "Sylvan Ranger",
+      "Time of Need",
+      "Totem-Guide Hartebeest",
+      "Transit Mage",
+      "Trapmaker's Snare",
+      "Tribute Mage"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 35,
+    "promoted_rule_rows": 35,
+    "promoted_verified_auto_rows": 35,
+    "row_count": 35
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 14,
+      "card_name": "Borderland Ranger",
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "normalized_name": "borderland ranger",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Call the Gatewatch",
+      "logical_rule_key": "battle_rule_v1:caae61758f5148c88717d895a55aa3e2",
+      "normalized_name": "call the gatewatch",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Cateran Summons",
+      "logical_rule_key": "battle_rule_v1:2d7e82f759e6d816feb9c1b1054766a8",
+      "normalized_name": "cateran summons",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Civic Wayfinder",
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "normalized_name": "civic wayfinder",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Daru Cavalier",
+      "logical_rule_key": "battle_rule_v1:6775001dd7541098c239a0b938f510d1",
+      "normalized_name": "daru cavalier",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Deadeye Quartermaster",
+      "logical_rule_key": "battle_rule_v1:9e97b00ca55bebfd72f637c1b183c116",
+      "normalized_name": "deadeye quartermaster",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Diabolic Tutor",
+      "logical_rule_key": "battle_rule_v1:3c1042b6ae3a2c610e70ad411460a46e",
+      "normalized_name": "diabolic tutor",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "District Guide",
+      "logical_rule_key": "battle_rule_v1:cae4abb78b40dd74ed99c9bd02ebc897",
+      "normalized_name": "district guide",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Eerie Procession",
+      "logical_rule_key": "battle_rule_v1:762264b1d43e6e1344585b6762d633f5",
+      "normalized_name": "eerie procession",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Environmental Scientist",
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "normalized_name": "environmental scientist",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Farfinder",
+      "logical_rule_key": "battle_rule_v1:508f7fd96ceb577a5f2dab380f6609cb",
+      "normalized_name": "farfinder",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Gatecreeper Vine",
+      "logical_rule_key": "battle_rule_v1:0dc034646dd47d08c47a9c864a1e9d91",
+      "normalized_name": "gatecreeper vine",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Goblin Matron",
+      "logical_rule_key": "battle_rule_v1:d31ea65123fba8521086549312fda8f2",
+      "normalized_name": "goblin matron",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Heliod's Pilgrim",
+      "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+      "normalized_name": "heliod's pilgrim",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Howling Wolf",
+      "logical_rule_key": "battle_rule_v1:2433fd9cab6ea1f19548e0f766b82e4e",
+      "normalized_name": "howling wolf",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Ignite the Beacon",
+      "logical_rule_key": "battle_rule_v1:08ac438e086ce79989b6a0e05eed4b74",
+      "normalized_name": "ignite the beacon",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Merchant Scroll",
+      "logical_rule_key": "battle_rule_v1:0d4352abb63d2eac010177d2e1f5f7e6",
+      "normalized_name": "merchant scroll",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Nesting Wurm",
+      "logical_rule_key": "battle_rule_v1:aacc2a09fb5bbb4643c96c72260e6e26",
+      "normalized_name": "nesting wurm",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Open the Armory",
+      "logical_rule_key": "battle_rule_v1:868d143f306cb5e8dfc486f76f8b6369",
+      "normalized_name": "open the armory",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Plea for Guidance",
+      "logical_rule_key": "battle_rule_v1:c0342670c739d786cd63c9aa0eb13e83",
+      "normalized_name": "plea for guidance",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Ranger of Eos",
+      "logical_rule_key": "battle_rule_v1:f77411c08095fd4bd3cc42ade3c1254d",
+      "normalized_name": "ranger of eos",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Rune-Scarred Demon",
+      "logical_rule_key": "battle_rule_v1:0bae6fefb7dc4689f938c64fa7818332",
+      "normalized_name": "rune-scarred demon",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Safewright Quest",
+      "logical_rule_key": "battle_rule_v1:cd7fc0b01dfcf89afa14a9591f7e22bb",
+      "normalized_name": "safewright quest",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Sarkhan's Triumph",
+      "logical_rule_key": "battle_rule_v1:0f1e6a10f42f7c0c834c89ae0c6e72e4",
+      "normalized_name": "sarkhan's triumph",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Screaming Seahawk",
+      "logical_rule_key": "battle_rule_v1:9083a0a280f37d9cc680368622de965b",
+      "normalized_name": "screaming seahawk",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Seek the Horizon",
+      "logical_rule_key": "battle_rule_v1:18d04737564bf889d16bdd128abb8848",
+      "normalized_name": "seek the horizon",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Skyshroud Sentinel",
+      "logical_rule_key": "battle_rule_v1:8b37bfb8924d03b85324e385e2c17666",
+      "normalized_name": "skyshroud sentinel",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Solve the Equation",
+      "logical_rule_key": "battle_rule_v1:43267ad1d8a2accee0fd7fbf8e17dcb1",
+      "normalized_name": "solve the equation",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Squadron Hawk",
+      "logical_rule_key": "battle_rule_v1:877168f396e3b0b4ed186a76f0b99995",
+      "normalized_name": "squadron hawk",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Sylvan Ranger",
+      "logical_rule_key": "battle_rule_v1:8b86c15462bd876a6003e8f63063e2ef",
+      "normalized_name": "sylvan ranger",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Time of Need",
+      "logical_rule_key": "battle_rule_v1:e5c23aff5977ec12d3a85ee773fe69df",
+      "normalized_name": "time of need",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Totem-Guide Hartebeest",
+      "logical_rule_key": "battle_rule_v1:1a4b45547bbe36030aa08de22d039cf4",
+      "normalized_name": "totem-guide hartebeest",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Transit Mage",
+      "logical_rule_key": "battle_rule_v1:daedbef22c68668817a41354b76423bd",
+      "normalized_name": "transit mage",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Trapmaker's Snare",
+      "logical_rule_key": "battle_rule_v1:b9456967545569631aad27c2e338e700",
+      "normalized_name": "trapmaker's snare",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 14,
+      "card_name": "Tribute Mage",
+      "logical_rule_key": "battle_rule_v1:cf4fcf67e3d80509176a51d7650e4d53",
+      "normalized_name": "tribute mage",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck_before_apply": {
+    "cards": [
+      "Borderland Ranger",
+      "Call the Gatewatch",
+      "Cateran Summons",
+      "Civic Wayfinder",
+      "Daru Cavalier",
+      "Deadeye Quartermaster",
+      "Diabolic Tutor",
+      "District Guide",
+      "Eerie Procession",
+      "Environmental Scientist",
+      "Farfinder",
+      "Gatecreeper Vine",
+      "Goblin Matron",
+      "Heliod's Pilgrim",
+      "Howling Wolf",
+      "Ignite the Beacon",
+      "Merchant Scroll",
+      "Nesting Wurm",
+      "Open the Armory",
+      "Plea for Guidance",
+      "Ranger of Eos",
+      "Rune-Scarred Demon",
+      "Safewright Quest",
+      "Sarkhan's Triumph",
+      "Screaming Seahawk",
+      "Seek the Horizon",
+      "Skyshroud Sentinel",
+      "Solve the Equation",
+      "Squadron Hawk",
+      "Sylvan Ranger",
+      "Time of Need",
+      "Totem-Guide Hartebeest",
+      "Transit Mage",
+      "Trapmaker's Snare",
+      "Tribute Mage"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 35,
+    "source": "manual precheck output captured in Codex session before apply",
+    "total_target_card_rows": 35,
+    "would_deprecate_shadow_rows": 14
+  },
+  "slug": "tutor_to_hand_new_server"
+}
