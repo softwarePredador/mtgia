@@ -7876,10 +7876,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG408 queue on the new server, the next exact runtime-backed work should
+post-PG409 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1809`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1806`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1610`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `827`
@@ -7945,6 +7945,49 @@ the new server:
   to `26353`, creature mana-source work from `351` to `343`, and artifact
   mana-source work from `279` to `274`. The post-PG408 exact split recheck
   produced `proposal_count=0`.
+
+PG409 closed the exact creature ETB graveyard-to-battlefield subpattern on the
+new server:
+
+- Split support now maps `ReturnFromGraveyardToBattlefieldTargetEffect` with
+  `EntersBattlefieldTriggeredAbility` into
+  `xmage_creature_etb_return_graveyard_card_to_battlefield_v1`, including
+  land, artifact, and Vampire-or-Wizard creature target filters where XMage and
+  Oracle text agree.
+- Runtime support now resolves the existing ETB graveyard recursion path with
+  battlefield destination for these exact filters; focused tests exercise land
+  return and Vampire/Wizard creature selection.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` (`406` tests),
+  `test_xmage_exact_scope_runtime.py` (`234` tests), and explicit package
+  builder tests (`7` tests).
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg409_etb_recursion_battlefield_new_server`
+  produced `3` safe candidates: `Bloodline Necromancer`, `Quarry Beetle`, and
+  `Sharuum the Hegemon`. `Rot Hulk` remained blocked as
+  `etb_recursion_battlefield_target_not_supported`.
+- PostgreSQL package `PG409` was applied on the new server:
+  `3` upserted rows, `0` deprecated shadow rows, and postcheck `3/3`
+  `verified`/`auto` rows with Oracle hashes.
+- PG -> SQLite sync for the package loaded `3` PostgreSQL rows, updated `3`
+  SQLite rows, and exported `5361` canonical snapshot rows.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `3` selected cards. The generic E2E
+  battle scenario count was `0`; card behavior execution is covered by the
+  focused runtime tests above.
+- Contract cleanup in the same closeout backfilled missing `oracle_hash` for
+  `44` older trusted executable PostgreSQL rows on
+  `127.0.0.1:15432/halder`; postcheck left `0` trusted executable rows without
+  `oracle_hash`. Full PG -> SQLite sync then updated `4222` SQLite rows and
+  exported `5361` canonical snapshot rows.
+- Final governance audits passed after the hash backfill:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51`), and legacy contamination. The post-PG409 exact split recheck
+  produced `proposal_count=0`.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26667` to `26664`, authoritative adapter-required count from `26353`
+  to `26350`, and the top recursion work unit from `1809` to `1806`; the
+  remaining `314` identities are still explicit missing-source exceptions.
 
 ## Required Artifacts Per Cycle
 

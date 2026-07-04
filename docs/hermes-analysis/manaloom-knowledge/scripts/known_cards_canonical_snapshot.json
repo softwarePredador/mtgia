@@ -9242,6 +9242,45 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:96aaf3627d3740cec22086acb290065e"
   },
+  "Bloodline Necromancer": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+    "battlefield_controller": "self",
+    "destination": "battlefield",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "battlefield",
+    "etb_recursion_target": "vampire_or_wizard_creature",
+    "keywords": [
+      "lifelink"
+    ],
+    "lifelink": true,
+    "target": "vampire_or_wizard_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "vampire",
+        "wizard"
+      ],
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2b7be1f5d59767be6bb2844a144e788e",
+    "battle_rule_oracle_hash": "e713552fc98c793350f82c31624b470d"
+  },
   "Bloodlust Inciter": {
     "_activated_rule_effects": [
       {
@@ -66094,6 +66133,36 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f1a99e76647a37f9bc0f202822a2c126"
   },
+  "Quarry Beetle": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+    "battlefield_controller": "self",
+    "destination": "battlefield",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "battlefield",
+    "etb_recursion_target": "land",
+    "target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0d34c60d7e646ad88946ab4f21adea4a",
+    "battle_rule_oracle_hash": "4819c64ce86068970b8382c00989c0e6"
+  },
   "Quartzwood Crasher": {
     "cmc": 5.0,
     "effect": "token_maker",
@@ -77699,6 +77768,41 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "d5ee316cfdebfa02b98fdbddab4548f8"
+  },
+  "Sharuum the Hegemon": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+    "battlefield_controller": "self",
+    "destination": "battlefield",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "battlefield",
+    "etb_recursion_target": "artifact",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1eda23314f8caeb65cf14584c5ec2f2b",
+    "battle_rule_oracle_hash": "bc8850d8a71aa330bebf823f85e5314f"
   },
   "Shatter": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",

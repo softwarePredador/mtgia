@@ -380,7 +380,7 @@ def build_apply_sql(proposals: list[dict[str, Any]], backup_table: str) -> str:
 
 CREATE SCHEMA IF NOT EXISTS manaloom_deploy_audit;
 
-CREATE TABLE manaloom_deploy_audit.{backup_table} AS
+CREATE TABLE IF NOT EXISTS manaloom_deploy_audit.{backup_table} AS
 SELECT *
 FROM public.card_battle_rules
 WHERE {backup_where};

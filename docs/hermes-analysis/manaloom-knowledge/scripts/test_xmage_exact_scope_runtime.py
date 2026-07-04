@@ -8403,6 +8403,110 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_graveyard_recursion_returns_land_to_battlefield(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Quarry Beetle", "type_line": "Creature - Insect"}
+        active.battlefield.append(permanent)
+        target = {"name": "Target Plains", "type_line": "Basic Land - Plains", "cmc": 0}
+        non_target = {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2}
+        active.graveyard.extend([non_target, target])
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "land",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "battlefield",
+            "target_graveyard_controller": "self",
+            "battlefield_controller": "self",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
+            "_rule_logical_key": "battle_rule_v1:fixture_quarry_beetle",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=10,
+            rng=random.Random(10),
+        )
+
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Bear"])
+        self.assertEqual([card["name"] for card in active.hand], [])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Quarry Beetle", "Target Plains"])
+        returned_land = active.battlefield[1]
+        self.assertEqual(returned_land.get("effect"), "land")
+        self.assertTrue(
+            any(
+                event == "etb_recursion_resolved"
+                and data.get("card") == "Quarry Beetle"
+                and data.get("recovered") == ["Target Plains"]
+                and data.get("target_type") == "land"
+                and data.get("destination") == "battlefield"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_quarry_beetle"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_graveyard_recursion_returns_vampire_or_wizard_to_battlefield(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Bloodline Necromancer", "type_line": "Creature - Vampire Wizard"}
+        active.battlefield.append(permanent)
+        non_target = {"name": "Target Soldier", "type_line": "Creature - Human Soldier", "cmc": 2}
+        target = {"name": "Target Wizard", "type_line": "Creature - Human Wizard", "cmc": 3}
+        active.graveyard.extend([non_target, target])
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "vampire_or_wizard_creature",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "battlefield",
+            "target_graveyard_controller": "self",
+            "battlefield_controller": "self",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "subtypes": ["vampire", "wizard"],
+            },
+            "_rule_logical_key": "battle_rule_v1:fixture_bloodline_necromancer",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=10,
+            rng=random.Random(10),
+        )
+
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Soldier"])
+        self.assertEqual([card["name"] for card in active.hand], [])
+        self.assertEqual(
+            [card["name"] for card in active.battlefield],
+            ["Bloodline Necromancer", "Target Wizard"],
+        )
+        returned_creature = active.battlefield[1]
+        self.assertEqual(returned_creature.get("effect"), "creature")
+        self.assertTrue(
+            any(
+                event == "etb_recursion_resolved"
+                and data.get("card") == "Bloodline Necromancer"
+                and data.get("recovered") == ["Target Wizard"]
+                and data.get("target_type") == "vampire_or_wizard_creature"
+                and data.get("destination") == "battlefield"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_bloodline_necromancer"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_mill_then_return_can_return_freshly_milled_land(self) -> None:
         active = self.battle.Player(
             "Active",

@@ -1,0 +1,164 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T14:35:45.038197+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg409_etb_recursion_battlefield_new_server_package_manifest.json",
+  "package_id": "pg409_etb_recursion_battlefield_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+          "card_name": "Bloodline Necromancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2b7be1f5d59767be6bb2844a144e788e",
+          "oracle_hash": "e713552fc98c793350f82c31624b470d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+          "card_name": "Quarry Beetle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0d34c60d7e646ad88946ab4f21adea4a",
+          "oracle_hash": "4819c64ce86068970b8382c00989c0e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+          "card_name": "Sharuum the Hegemon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1eda23314f8caeb65cf14584c5ec2f2b",
+          "oracle_hash": "bc8850d8a71aa330bebf823f85e5314f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+          "card_name": "Bloodline Necromancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2b7be1f5d59767be6bb2844a144e788e",
+          "oracle_hash": "e713552fc98c793350f82c31624b470d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+          "card_name": "Quarry Beetle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0d34c60d7e646ad88946ab4f21adea4a",
+          "oracle_hash": "4819c64ce86068970b8382c00989c0e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+          "card_name": "Sharuum the Hegemon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1eda23314f8caeb65cf14584c5ec2f2b",
+          "oracle_hash": "bc8850d8a71aa330bebf823f85e5314f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bloodline Necromancer",
+          "logical_rule_key": "battle_rule_v1:2b7be1f5d59767be6bb2844a144e788e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+          "battle_rule_version": 2,
+          "card_name": "Quarry Beetle",
+          "logical_rule_key": "battle_rule_v1:0d34c60d7e646ad88946ab4f21adea4a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sharuum the Hegemon",
+          "logical_rule_key": "battle_rule_v1:1eda23314f8caeb65cf14584c5ec2f2b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Bloodline Necromancer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2b7be1f5d59767be6bb2844a144e788e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Quarry Beetle",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0d34c60d7e646ad88946ab4f21adea4a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sharuum the Hegemon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1eda23314f8caeb65cf14584c5ec2f2b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

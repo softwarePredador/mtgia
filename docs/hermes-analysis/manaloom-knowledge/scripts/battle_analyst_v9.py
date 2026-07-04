@@ -37710,6 +37710,9 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "mercenary" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("elf_card", "elf"):
         return "elf" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("vampire_or_wizard_creature", "vampire_wizard_creature"):
+        subtype_tokens = type_line.replace("-", " ").replace("—", " ").split()
+        return is_creature_card(card) and bool({"vampire", "wizard"}.intersection(subtype_tokens))
     if target in ("mount_card", "mount"):
         return "mount" in type_tokens
     if target in ("vehicle_card", "vehicle"):

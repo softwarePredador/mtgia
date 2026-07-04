@@ -338,6 +338,32 @@ def test_manifest_expected_rule_preserves_activation_discard_cost_fields() -> No
     assert expected["required_effect_fields"]["activation_requires_discard_card"] is True
 
 
+def test_apply_sql_preserves_existing_backup_table_for_idempotent_rerun() -> None:
+    proposal = {
+        "normalized_name": "quarry beetle",
+        "card_name": "Quarry Beetle",
+        "oracle_hash": "hash-quarry",
+        "logical_rule_key": "battle_rule_v1:hash-quarry",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_battlefield_v1",
+            "etb_recursion_target": "land",
+            "etb_recursion_destination": "battlefield",
+        },
+        "deck_role_json": {"category": "unknown", "effect": "creature"},
+        "source": "curated",
+        "confidence": 0.96,
+        "review_status": "verified",
+        "execution_status": "auto",
+        "notes": "fixture",
+    }
+
+    sql = builder.build_apply_sql([proposal], "pg_fixture_backup")
+
+    assert "CREATE TABLE IF NOT EXISTS manaloom_deploy_audit.pg_fixture_backup AS" in sql
+    assert "DROP TABLE" not in sql
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",

@@ -185,6 +185,7 @@ ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE = "xmage_creature_etb_draw_lose_life_v1"
 ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
+ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_battlefield_v1"
 ETB_MILL_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_mill_then_return_graveyard_card_to_hand_v1"
 ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE = "xmage_creature_etb_put_graveyard_card_on_library_v1"
 ETB_LIBRARY_PICK_CREATURE_SCOPE = "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1"
@@ -1334,6 +1335,9 @@ def recursion_target_constraints_for(
         constraints["subtypes"] = ["mercenary"]
     elif target == "elf_card":
         constraints["subtypes"] = ["elf"]
+    elif target == "vampire_or_wizard_creature":
+        constraints["card_types"] = ["creature"]
+        constraints["subtypes"] = ["vampire", "wizard"]
     elif target == "mount_card":
         constraints["subtypes"] = ["mount"]
     elif target == "vehicle_card":
@@ -2528,8 +2532,16 @@ def source_supports_battlefield_recursion_target_type(source_text: str, target_t
             or "FilterCreatureCard" in text
             or "creature card" in lowered
         )
+    if target == "land":
+        return "FILTER_CARD_LAND" in text or "FilterLandCard" in text or "land card" in lowered
     if target == "artifact":
         return "FILTER_CARD_ARTIFACT" in text or "FilterArtifactCard" in text or "artifact card" in lowered
+    if target == "vampire_or_wizard_creature":
+        return (
+            "FilterCreatureCard" in text
+            and "SubType.VAMPIRE.getPredicate" in text
+            and "SubType.WIZARD.getPredicate" in text
+        ) or "vampire or wizard creature card" in lowered
     if target == "ally_creature":
         return "FilterCreatureCard" in text and "SubType.ALLY.getPredicate" in text
     if target == "outlaw_creature":
@@ -4602,6 +4614,19 @@ def is_creature_etb_recursion_unit(row: dict[str, Any]) -> bool:
     remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
     return (
         effect_classes(row) == {"ReturnFromGraveyardToHandTargetEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
+def is_creature_etb_recursion_battlefield_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"ReturnFromGraveyardToBattlefieldTargetEffect"}
         and "EntersBattlefieldTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
@@ -8497,6 +8522,7 @@ def etb_recursion_target_from_phrase(phrase: str) -> str | None:
     normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
     target_patterns: list[tuple[str, str]] = [
         ("spirit_instant_or_sorcery", r"spirit, instant, or sorcery"),
+        ("vampire_or_wizard_creature", r"vampire or wizard creature"),
         ("instant_or_sorcery", r"instant (?:or|and/or) sorcery"),
         ("artifact_or_enchantment", r"artifact or enchantment"),
         ("artifact_or_creature", r"artifact or creature"),
@@ -8687,6 +8713,48 @@ def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any
         trigger_prefix
         + r"return up to (?P<count>one|two|\d+) target (?P<phrase>.+?) cards? "
         r"from your graveyard to your hand\.?$",
+        text,
+    )
+    if up_to_match:
+        target_type = etb_recursion_target_from_phrase(up_to_match.group("phrase"))
+        count = word_count_value(up_to_match.group("count"))
+        if target_type is not None and count is not None:
+            return {"target": target_type, "count": count, "up_to_count": True}
+    return None
+
+
+def etb_recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text_after_leading_static_keywords(metadata)
+    trigger_prefix = r"^when (?:this creature|[^,]+?) enters(?: the battlefield)?, (?:you may )?"
+    mana_value_match = re.match(
+        trigger_prefix
+        + r"return target (?P<phrase>.+?) card with (?:mana value|converted mana cost) "
+        r"(?P<mana_value_max>\d+) or less from your graveyard to (?:the|your) battlefield\.?$",
+        text,
+    )
+    if mana_value_match:
+        target_type = etb_recursion_target_from_phrase(mana_value_match.group("phrase"))
+        if target_type is None:
+            return None
+        return {
+            "target": target_type,
+            "count": 1,
+            "up_to_count": False,
+            "mana_value_max": int(mana_value_match.group("mana_value_max")),
+        }
+    single_match = re.match(
+        trigger_prefix
+        + r"return target (?P<phrase>.+?) card from your graveyard to (?:the|your) battlefield\.?$",
+        text,
+    )
+    if single_match:
+        target_type = etb_recursion_target_from_phrase(single_match.group("phrase"))
+        if target_type is not None:
+            return {"target": target_type, "count": 1, "up_to_count": False}
+    up_to_match = re.match(
+        trigger_prefix
+        + r"return up to (?P<count>one|two|\d+) target (?P<phrase>.+?) cards? "
+        r"from your graveyard to (?:the|your) battlefield\.?$",
         text,
     )
     if up_to_match:
@@ -9513,6 +9581,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_DAMAGE_CREATURE_SCOPE,
         ETB_DESTROY_CREATURE_SCOPE,
         ETB_RECURSION_CREATURE_SCOPE,
+        ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE,
         ETB_MILL_RECURSION_CREATURE_SCOPE,
         ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE,
         ETB_LIBRARY_PICK_CREATURE_SCOPE,
@@ -9628,6 +9697,7 @@ def split_row(
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
+    etb_recursion_battlefield_creature_unit = is_creature_etb_recursion_battlefield_unit(row)
     etb_mill_recursion_creature_unit = is_creature_etb_mill_then_return_unit(row)
     etb_graveyard_to_library_creature_unit = is_creature_etb_graveyard_to_library_unit(row)
     etb_library_pick_creature_unit = is_creature_etb_library_pick_unit(row)
@@ -9697,6 +9767,7 @@ def split_row(
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
+        and not etb_recursion_battlefield_creature_unit
         and not etb_mill_recursion_creature_unit
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
@@ -9745,6 +9816,7 @@ def split_row(
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
+        and not etb_recursion_battlefield_creature_unit
         and not etb_mill_recursion_creature_unit
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
@@ -11806,6 +11878,62 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_graveyard_to_hand",
+        ), "selected_exact_scope"
+
+    if etb_recursion_battlefield_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_recursion_battlefield_not_creature"
+        target = etb_recursion_to_battlefield_from_oracle(metadata)
+        if target is None:
+            return None, "etb_recursion_battlefield_target_not_supported"
+        target_type = str(target["target"])
+        target_graveyard_controller = "self"
+        mana_value_max = target.get("mana_value_max")
+        if not source_supports_battlefield_recursion_target(source_text, target_graveyard_controller):
+            return None, "etb_recursion_battlefield_source_target_not_supported"
+        if not source_supports_battlefield_recursion_target_type(source_text, target_type):
+            return None, "etb_recursion_battlefield_source_target_not_supported"
+        if not source_supports_battlefield_recursion_mana_value(source_text, mana_value_max):
+            return None, "etb_recursion_battlefield_source_mana_value_not_supported"
+        count = int(target["count"])
+        target_constraints = recursion_target_constraints_for(
+            target_type,
+            controller=target_graveyard_controller,
+            mana_value_max=mana_value_max,
+        )
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": target_type,
+            "etb_recursion_count": count,
+            "etb_recursion_destination": "battlefield",
+            "target": target_type,
+            "target_constraints": target_constraints,
+            "destination": "battlefield",
+            "target_controller": target_graveyard_controller,
+            "target_graveyard_controller": target_graveyard_controller,
+            "battlefield_controller": "self",
+            "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        if mana_value_max is not None:
+            effect_json["etb_recursion_mana_value_max"] = mana_value_max
+        if target.get("up_to_count"):
+            effect_json["etb_recursion_up_to_count"] = True
+            effect_json["up_to_count"] = True
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_graveyard_to_battlefield",
         ), "selected_exact_scope"
 
     if etb_mill_recursion_creature_unit:

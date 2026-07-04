@@ -9983,6 +9983,159 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
         )
 
+    def test_creature_etb_recursion_to_battlefield_maps_land_target(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Quarry Beetle",
+                type_line="Creature - Insect",
+                oracle_text=(
+                    "When Quarry Beetle enters the battlefield, you may return target "
+                    "land card from your graveyard to the battlefield."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility("
+                "new ReturnFromGraveyardToBattlefieldTargetEffect(), true);"
+                "ability.addTarget(new TargetCardInYourGraveyard(new FilterLandCard("
+                "\"land card from your graveyard\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_recursion_target"], "land")
+        self.assertEqual(effect["etb_recursion_count"], 1)
+        self.assertEqual(effect["etb_recursion_destination"], "battlefield")
+        self.assertEqual(effect["destination"], "battlefield")
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
+        )
+
+    def test_creature_etb_recursion_to_battlefield_maps_vampire_or_wizard_target(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "LifelinkAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bloodline Necromancer",
+                type_line="Creature - Vampire Wizard",
+                oracle_text=(
+                    "Lifelink\n"
+                    "When Bloodline Necromancer enters the battlefield, you may return target "
+                    "Vampire or Wizard creature card from your graveyard to the battlefield."
+                ),
+            ),
+            source_text=(
+                "private static final FilterCreatureCard filter = new FilterCreatureCard("
+                "\"Vampire or Wizard creature card from your graveyard\");"
+                "filter.add(Predicates.or(SubType.VAMPIRE.getPredicate(), "
+                "SubType.WIZARD.getPredicate()));"
+                "Ability ability = new EntersBattlefieldTriggeredAbility("
+                "new ReturnFromGraveyardToBattlefieldTargetEffect(), true);"
+                "Target target = new TargetCardInYourGraveyard(filter);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_recursion_target"], "vampire_or_wizard_creature")
+        self.assertEqual(effect["keywords"], ["lifelink"])
+        self.assertTrue(effect["lifelink"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "subtypes": ["vampire", "wizard"],
+            },
+        )
+
+    def test_creature_etb_recursion_to_battlefield_maps_artifact_target(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sharuum the Hegemon",
+                type_line="Legendary Artifact Creature - Sphinx",
+                oracle_text=(
+                    "Flying\n"
+                    "When Sharuum the Hegemon enters the battlefield, you may return target "
+                    "artifact card from your graveyard to the battlefield."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility("
+                "new ReturnFromGraveyardToBattlefieldTargetEffect(), true);"
+                "ability.addTarget(new TargetCardInYourGraveyard("
+                "StaticFilters.FILTER_CARD_ARTIFACT_FROM_YOUR_GRAVEYARD));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_recursion_target"], "artifact")
+        self.assertEqual(effect["etb_recursion_destination"], "battlefield")
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["artifact"]},
+        )
+
+    def test_creature_etb_recursion_to_battlefield_blocks_reflexive_cost_variant(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "ReflexiveTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Young Necromancer",
+                type_line="Creature - Human Warlock",
+                oracle_text=(
+                    "When Young Necromancer enters the battlefield, you may exile two cards "
+                    "from your graveyard. When you do, return target creature card from your "
+                    "graveyard to the battlefield."
+                ),
+            ),
+            source_text=(
+                "new EntersBattlefieldTriggeredAbility(new DoWhenCostPaid("
+                "new ReflexiveTriggeredAbility(new ReturnFromGraveyardToBattlefieldTargetEffect(), false), "
+                "new ExileFromGraveCost(new TargetCardInYourGraveyard(2, StaticFilters.FILTER_CARD_CARDS))))"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertNotEqual(reason, "selected_exact_scope")
+
     def test_creature_etb_mill_then_return_permanent_maps_to_triggered_scope(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
