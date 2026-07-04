@@ -1,0 +1,1499 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg438_xmage_static_filtered_evasion_new_server_20260704_",
+  "deploy_id": "pg438",
+  "expected_rules": [
+    {
+      "card_name": "Amrou Kithkin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:86fe64ae174fad58c83c7a16343c90a4",
+      "min_rule_version": 2,
+      "normalized_name": "amrou kithkin",
+      "oracle_hash": "911aec072fe708e55839fe763df20c7b",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "power",
+            "operator": "gte",
+            "value": 3
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Amrou Seekers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:05b23b8fe038ff75c4f52bdcaacb3578",
+      "min_rule_version": 2,
+      "normalized_name": "amrou seekers",
+      "oracle_hash": "5245e53e1b4c5e6f902b903699716c96",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "can_be_blocked_only_by_filters": [
+          {
+            "kind": "artifact"
+          },
+          {
+            "colors": [
+              "W"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Arlinn's Wolf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42bc0d93a1e5b47067d6cb88e7e01396",
+      "min_rule_version": 2,
+      "normalized_name": "arlinn's wolf",
+      "oracle_hash": "e62f2e076a718412d77c3d0db993a7f6",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "power",
+            "operator": "lte",
+            "value": 2
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Barrenton Cragtreads",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6467bdc78dca66b91626fd8ddd35ed23",
+      "min_rule_version": 2,
+      "normalized_name": "barrenton cragtreads",
+      "oracle_hash": "bd6a1f1abc059371dfb9ce46d3906892",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "R"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Rats",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+      "min_rule_version": 2,
+      "normalized_name": "bog rats",
+      "oracle_hash": "79324fd12a483fcb164031830e0e51b2",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "subtype_all",
+            "subtypes": [
+              "wall"
+            ]
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deathcult Rogue",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:756a4caa99e8b8b43c01e611a2e847c4",
+      "min_rule_version": 2,
+      "normalized_name": "deathcult rogue",
+      "oracle_hash": "89f510e044ef83cdc7daa281a0504364",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "can_be_blocked_only_by_filters": [
+          {
+            "kind": "subtype_all",
+            "subtypes": [
+              "rogue"
+            ]
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dread Warlock",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+      "min_rule_version": 2,
+      "normalized_name": "dread warlock",
+      "oracle_hash": "f58ca9efe4094b1851179c88368505e2",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "can_be_blocked_only_by_filters": [
+          {
+            "colors": [
+              "B"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Duskmantle Operative",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+      "min_rule_version": 2,
+      "normalized_name": "duskmantle operative",
+      "oracle_hash": "cc32e22fa524d67bf8b50674a1eba81e",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "power",
+            "operator": "gte",
+            "value": 4
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fleet-Footed Monk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f798aa38ee85e6010b87cc8f377e2c7c",
+      "min_rule_version": 2,
+      "normalized_name": "fleet-footed monk",
+      "oracle_hash": "226ced24290a70802140cd6d9af026d4",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "power",
+            "operator": "gte",
+            "value": 2
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goldmeadow Dodger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+      "min_rule_version": 2,
+      "normalized_name": "goldmeadow dodger",
+      "oracle_hash": "cc32e22fa524d67bf8b50674a1eba81e",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "power",
+            "operator": "gte",
+            "value": 4
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kor Castigator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:90832f7c85efe9f2dc5a32b7be2c8dea",
+      "min_rule_version": 2,
+      "normalized_name": "kor castigator",
+      "oracle_hash": "48075286fd297118ac42ea9167c0ebf1",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "subtype_all",
+            "subtypes": [
+              "eldrazi",
+              "scion"
+            ]
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mudbrawler Raiders",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:657d3c61d21b24772f990860178f3b1e",
+      "min_rule_version": 2,
+      "normalized_name": "mudbrawler raiders",
+      "oracle_hash": "3aa58f60404a53ceb104407f17423fe4",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "U"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prowling Nightstalker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+      "min_rule_version": 2,
+      "normalized_name": "prowling nightstalker",
+      "oracle_hash": "f58ca9efe4094b1851179c88368505e2",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "can_be_blocked_only_by_filters": [
+          {
+            "colors": [
+              "B"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rampart Crawler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+      "min_rule_version": 2,
+      "normalized_name": "rampart crawler",
+      "oracle_hash": "79324fd12a483fcb164031830e0e51b2",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "subtype_all",
+            "subtypes": [
+              "wall"
+            ]
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Raven's Run Dragoon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5dbcbe3d8a12ebf95368fa48717425a8",
+      "min_rule_version": 2,
+      "normalized_name": "raven's run dragoon",
+      "oracle_hash": "9fb236f92fd9d4c0e99d041befa6e6c2",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "B"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "River Darter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:98d26d1e23e4fa79692c6c6f6604a88f",
+      "min_rule_version": 2,
+      "normalized_name": "river darter",
+      "oracle_hash": "00f6e63dca4d94fa19682832bfe47800",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "subtype_all",
+            "subtypes": [
+              "dinosaur"
+            ]
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rubblebelt Runner",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:08158712fb780a504e4b772479068ec9",
+      "min_rule_version": 2,
+      "normalized_name": "rubblebelt runner",
+      "oracle_hash": "0fd55172b613c04abdf1377dc2b505f9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "token"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sacred Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c17d1c01f4f0816712abc2ef6be71f1e",
+      "min_rule_version": 2,
+      "normalized_name": "sacred knight",
+      "oracle_hash": "59b7480c2b3fca46740549f190187b27",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "B",
+              "R"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skirk Shaman",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:40c8636e4167ff7d88799326c20ed4be",
+      "min_rule_version": 2,
+      "normalized_name": "skirk shaman",
+      "oracle_hash": "dbd0b4f4c218685d92756fc557694429",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "can_be_blocked_only_by_filters": [
+          {
+            "kind": "artifact"
+          },
+          {
+            "colors": [
+              "R"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sootwalkers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5b390cfb544bc8bf531e767473518a5e",
+      "min_rule_version": 2,
+      "normalized_name": "sootwalkers",
+      "oracle_hash": "64934bf3f3a50e5c7f29b347db56bfe6",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "W"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wanderbrine Rootcutters",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2135f788b0154d0cbe8b264586f2d597",
+      "min_rule_version": 2,
+      "normalized_name": "wanderbrine rootcutters",
+      "oracle_hash": "32462b11137647db3e1899e0261c074d",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "G"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_filtered_evasion_creature": 21
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg438_xmage_static_filtered_evasion_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg438_xmage_static_filtered_evasion_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg438_xmage_static_filtered_evasion_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg438_xmage_static_filtered_evasion_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg438_xmage_static_filtered_evasion_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg438_xmage_static_filtered_evasion_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-04T21:59:07+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Amrou Kithkin"
+      },
+      "card_name": "Amrou Kithkin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:86fe64ae174fad58c83c7a16343c90a4",
+      "normalized_name": "amrou kithkin",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "power",
+            "operator": "gte",
+            "value": 3
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Amrou Seekers"
+      },
+      "card_name": "Amrou Seekers",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:05b23b8fe038ff75c4f52bdcaacb3578",
+      "normalized_name": "amrou seekers",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "can_be_blocked_only_by_filters": [
+          {
+            "kind": "artifact"
+          },
+          {
+            "colors": [
+              "W"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Arlinn's Wolf"
+      },
+      "card_name": "Arlinn's Wolf",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42bc0d93a1e5b47067d6cb88e7e01396",
+      "normalized_name": "arlinn's wolf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "power",
+            "operator": "lte",
+            "value": 2
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Barrenton Cragtreads"
+      },
+      "card_name": "Barrenton Cragtreads",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6467bdc78dca66b91626fd8ddd35ed23",
+      "normalized_name": "barrenton cragtreads",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "R"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Bog Rats"
+      },
+      "card_name": "Bog Rats",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+      "normalized_name": "bog rats",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "subtype_all",
+            "subtypes": [
+              "wall"
+            ]
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Deathcult Rogue"
+      },
+      "card_name": "Deathcult Rogue",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:756a4caa99e8b8b43c01e611a2e847c4",
+      "normalized_name": "deathcult rogue",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "can_be_blocked_only_by_filters": [
+          {
+            "kind": "subtype_all",
+            "subtypes": [
+              "rogue"
+            ]
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Dread Warlock"
+      },
+      "card_name": "Dread Warlock",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+      "normalized_name": "dread warlock",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "can_be_blocked_only_by_filters": [
+          {
+            "colors": [
+              "B"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Duskmantle Operative"
+      },
+      "card_name": "Duskmantle Operative",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+      "normalized_name": "duskmantle operative",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "power",
+            "operator": "gte",
+            "value": 4
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Fleet-Footed Monk"
+      },
+      "card_name": "Fleet-Footed Monk",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f798aa38ee85e6010b87cc8f377e2c7c",
+      "normalized_name": "fleet-footed monk",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "power",
+            "operator": "gte",
+            "value": 2
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Goldmeadow Dodger"
+      },
+      "card_name": "Goldmeadow Dodger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+      "normalized_name": "goldmeadow dodger",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "power",
+            "operator": "gte",
+            "value": 4
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kor Castigator"
+      },
+      "card_name": "Kor Castigator",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:90832f7c85efe9f2dc5a32b7be2c8dea",
+      "normalized_name": "kor castigator",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "subtype_all",
+            "subtypes": [
+              "eldrazi",
+              "scion"
+            ]
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mudbrawler Raiders"
+      },
+      "card_name": "Mudbrawler Raiders",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:657d3c61d21b24772f990860178f3b1e",
+      "normalized_name": "mudbrawler raiders",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "U"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Prowling Nightstalker"
+      },
+      "card_name": "Prowling Nightstalker",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+      "normalized_name": "prowling nightstalker",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "can_be_blocked_only_by_filters": [
+          {
+            "colors": [
+              "B"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rampart Crawler"
+      },
+      "card_name": "Rampart Crawler",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+      "normalized_name": "rampart crawler",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "subtype_all",
+            "subtypes": [
+              "wall"
+            ]
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Raven's Run Dragoon"
+      },
+      "card_name": "Raven's Run Dragoon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5dbcbe3d8a12ebf95368fa48717425a8",
+      "normalized_name": "raven's run dragoon",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "B"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "River Darter"
+      },
+      "card_name": "River Darter",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:98d26d1e23e4fa79692c6c6f6604a88f",
+      "normalized_name": "river darter",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "subtype_all",
+            "subtypes": [
+              "dinosaur"
+            ]
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rubblebelt Runner"
+      },
+      "card_name": "Rubblebelt Runner",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:08158712fb780a504e4b772479068ec9",
+      "normalized_name": "rubblebelt runner",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "kind": "token"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sacred Knight"
+      },
+      "card_name": "Sacred Knight",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c17d1c01f4f0816712abc2ef6be71f1e",
+      "normalized_name": "sacred knight",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "B",
+              "R"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Skirk Shaman"
+      },
+      "card_name": "Skirk Shaman",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:40c8636e4167ff7d88799326c20ed4be",
+      "normalized_name": "skirk shaman",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "can_be_blocked_only_by_filters": [
+          {
+            "kind": "artifact"
+          },
+          {
+            "colors": [
+              "R"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sootwalkers"
+      },
+      "card_name": "Sootwalkers",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5b390cfb544bc8bf531e767473518a5e",
+      "normalized_name": "sootwalkers",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "W"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Wanderbrine Rootcutters"
+      },
+      "card_name": "Wanderbrine Rootcutters",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2135f788b0154d0cbe8b264586f2d597",
+      "normalized_name": "wanderbrine rootcutters",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        "cant_be_blocked_by_filters": [
+          {
+            "colors": [
+              "G"
+            ],
+            "kind": "color"
+          }
+        ],
+        "effect": "creature",
+        "static_effect": "self_filtered_evasion",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleEvasionAbility",
+        "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Amrou Kithkin",
+    "Amrou Seekers",
+    "Arlinn's Wolf",
+    "Barrenton Cragtreads",
+    "Bog Rats",
+    "Deathcult Rogue",
+    "Dread Warlock",
+    "Duskmantle Operative",
+    "Fleet-Footed Monk",
+    "Goldmeadow Dodger",
+    "Kor Castigator",
+    "Mudbrawler Raiders",
+    "Prowling Nightstalker",
+    "Rampart Crawler",
+    "Raven's Run Dragoon",
+    "River Darter",
+    "Rubblebelt Runner",
+    "Sacred Knight",
+    "Skirk Shaman",
+    "Sootwalkers",
+    "Wanderbrine Rootcutters"
+  ],
+  "selected_count": 21,
+  "slug": "xmage_static_filtered_evasion_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Amrou Kithkin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:86fe64ae174fad58c83c7a16343c90a4",
+      "min_rule_version": 2,
+      "normalized_name": "amrou kithkin",
+      "oracle_hash": "911aec072fe708e55839fe763df20c7b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Amrou Seekers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:05b23b8fe038ff75c4f52bdcaacb3578",
+      "min_rule_version": 2,
+      "normalized_name": "amrou seekers",
+      "oracle_hash": "5245e53e1b4c5e6f902b903699716c96",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Arlinn's Wolf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42bc0d93a1e5b47067d6cb88e7e01396",
+      "min_rule_version": 2,
+      "normalized_name": "arlinn's wolf",
+      "oracle_hash": "e62f2e076a718412d77c3d0db993a7f6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Barrenton Cragtreads",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6467bdc78dca66b91626fd8ddd35ed23",
+      "min_rule_version": 2,
+      "normalized_name": "barrenton cragtreads",
+      "oracle_hash": "bd6a1f1abc059371dfb9ce46d3906892",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Rats",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+      "min_rule_version": 2,
+      "normalized_name": "bog rats",
+      "oracle_hash": "79324fd12a483fcb164031830e0e51b2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deathcult Rogue",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:756a4caa99e8b8b43c01e611a2e847c4",
+      "min_rule_version": 2,
+      "normalized_name": "deathcult rogue",
+      "oracle_hash": "89f510e044ef83cdc7daa281a0504364",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dread Warlock",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+      "min_rule_version": 2,
+      "normalized_name": "dread warlock",
+      "oracle_hash": "f58ca9efe4094b1851179c88368505e2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Duskmantle Operative",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+      "min_rule_version": 2,
+      "normalized_name": "duskmantle operative",
+      "oracle_hash": "cc32e22fa524d67bf8b50674a1eba81e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fleet-Footed Monk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f798aa38ee85e6010b87cc8f377e2c7c",
+      "min_rule_version": 2,
+      "normalized_name": "fleet-footed monk",
+      "oracle_hash": "226ced24290a70802140cd6d9af026d4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goldmeadow Dodger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+      "min_rule_version": 2,
+      "normalized_name": "goldmeadow dodger",
+      "oracle_hash": "cc32e22fa524d67bf8b50674a1eba81e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kor Castigator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:90832f7c85efe9f2dc5a32b7be2c8dea",
+      "min_rule_version": 2,
+      "normalized_name": "kor castigator",
+      "oracle_hash": "48075286fd297118ac42ea9167c0ebf1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mudbrawler Raiders",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:657d3c61d21b24772f990860178f3b1e",
+      "min_rule_version": 2,
+      "normalized_name": "mudbrawler raiders",
+      "oracle_hash": "3aa58f60404a53ceb104407f17423fe4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prowling Nightstalker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+      "min_rule_version": 2,
+      "normalized_name": "prowling nightstalker",
+      "oracle_hash": "f58ca9efe4094b1851179c88368505e2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rampart Crawler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+      "min_rule_version": 2,
+      "normalized_name": "rampart crawler",
+      "oracle_hash": "79324fd12a483fcb164031830e0e51b2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Raven's Run Dragoon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5dbcbe3d8a12ebf95368fa48717425a8",
+      "min_rule_version": 2,
+      "normalized_name": "raven's run dragoon",
+      "oracle_hash": "9fb236f92fd9d4c0e99d041befa6e6c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "River Darter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:98d26d1e23e4fa79692c6c6f6604a88f",
+      "min_rule_version": 2,
+      "normalized_name": "river darter",
+      "oracle_hash": "00f6e63dca4d94fa19682832bfe47800",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rubblebelt Runner",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:08158712fb780a504e4b772479068ec9",
+      "min_rule_version": 2,
+      "normalized_name": "rubblebelt runner",
+      "oracle_hash": "0fd55172b613c04abdf1377dc2b505f9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sacred Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c17d1c01f4f0816712abc2ef6be71f1e",
+      "min_rule_version": 2,
+      "normalized_name": "sacred knight",
+      "oracle_hash": "59b7480c2b3fca46740549f190187b27",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skirk Shaman",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:40c8636e4167ff7d88799326c20ed4be",
+      "min_rule_version": 2,
+      "normalized_name": "skirk shaman",
+      "oracle_hash": "dbd0b4f4c218685d92756fc557694429",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sootwalkers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5b390cfb544bc8bf531e767473518a5e",
+      "min_rule_version": 2,
+      "normalized_name": "sootwalkers",
+      "oracle_hash": "64934bf3f3a50e5c7f29b347db56bfe6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wanderbrine Rootcutters",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2135f788b0154d0cbe8b264586f2d597",
+      "min_rule_version": 2,
+      "normalized_name": "wanderbrine rootcutters",
+      "oracle_hash": "32462b11137647db3e1899e0261c074d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_filtered_evasion_creature_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

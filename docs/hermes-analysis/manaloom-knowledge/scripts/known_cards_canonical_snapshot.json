@@ -2345,6 +2345,58 @@
     "battle_rule_logical_key": "battle_rule_v1:abcfd8a217652da7900e0b2e59338ac4",
     "battle_rule_oracle_hash": "bbc1be0a824d331690f0f8b59bbc9e62"
   },
+  "Amrou Kithkin": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "kind": "power",
+        "operator": "gte",
+        "value": 3
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:86fe64ae174fad58c83c7a16343c90a4",
+    "battle_rule_oracle_hash": "911aec072fe708e55839fe763df20c7b"
+  },
+  "Amrou Seekers": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "can_be_blocked_only_by_filters": [
+      {
+        "kind": "artifact"
+      },
+      {
+        "colors": [
+          "W"
+        ],
+        "kind": "color"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:05b23b8fe038ff75c4f52bdcaacb3578",
+    "battle_rule_oracle_hash": "5245e53e1b4c5e6f902b903699716c96"
+  },
   "An Offer You Can't Refuse": {
     "ability_kind": "one_shot",
     "battle_model_scope": "counter_noncreature_spell_target_controller_treasure_two_v1",
@@ -4045,6 +4097,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:08d9df008ee631abc65fee573ded07c2",
     "battle_rule_oracle_hash": "55fe8efd99ddba967ab95921a4ac24b4"
+  },
+  "Arlinn's Wolf": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "kind": "power",
+        "operator": "lte",
+        "value": 2
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:42bc0d93a1e5b47067d6cb88e7e01396",
+    "battle_rule_oracle_hash": "e62f2e076a718412d77c3d0db993a7f6"
   },
   "Armageddon": {
     "ability_kind": "one_shot",
@@ -6056,6 +6132,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "895cb27417aabc0a73bc8fc150b66626"
+  },
+  "Barrenton Cragtreads": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "colors": [
+          "R"
+        ],
+        "kind": "color"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6467bdc78dca66b91626fd8ddd35ed23",
+    "battle_rule_oracle_hash": "bd6a1f1abc059371dfb9ce46d3906892"
   },
   "Barrow Witches": {
     "ability_kind": "triggered",
@@ -8660,6 +8761,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
     "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
+  "Bog Rats": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "kind": "subtype_all",
+        "subtypes": [
+          "wall"
+        ]
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+    "battle_rule_oracle_hash": "79324fd12a483fcb164031830e0e51b2"
   },
   "Bog Smugglers": {
     "ability_kind": "static",
@@ -17625,6 +17751,31 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "ebbac293edf84438566b73cc6913d22b"
   },
+  "Deathcult Rogue": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "can_be_blocked_only_by_filters": [
+      {
+        "kind": "subtype_all",
+        "subtypes": [
+          "rogue"
+        ]
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:756a4caa99e8b8b43c01e611a2e847c4",
+    "battle_rule_oracle_hash": "89f510e044ef83cdc7daa281a0504364"
+  },
   "Deathgaze Cockatrice": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -20658,6 +20809,31 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "24695c070e253104f3d7871d1dd31e62"
   },
+  "Dread Warlock": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "can_be_blocked_only_by_filters": [
+      {
+        "colors": [
+          "B"
+        ],
+        "kind": "color"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+    "battle_rule_oracle_hash": "f58ca9efe4094b1851179c88368505e2"
+  },
   "Dreadbore": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -21209,6 +21385,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "f1bc61c589787def6b90b04df0a5dba2"
+  },
+  "Duskmantle Operative": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "kind": "power",
+        "operator": "gte",
+        "value": 4
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+    "battle_rule_oracle_hash": "cc32e22fa524d67bf8b50674a1eba81e"
   },
   "Duskmantle, House of Shadow": {
     "effect": "land",
@@ -27184,6 +27384,30 @@
     "battle_rule_logical_key": "battle_rule_v1:73622071c1ad89267708f914a0729bf2",
     "battle_rule_oracle_hash": "fa955216fa827bf75c5b79dcbdb4b97e"
   },
+  "Fleet-Footed Monk": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "kind": "power",
+        "operator": "gte",
+        "value": 2
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f798aa38ee85e6010b87cc8f377e2c7c",
+    "battle_rule_oracle_hash": "226ced24290a70802140cd6d9af026d4"
+  },
   "Fleetfoot Dancer": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -32024,6 +32248,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:aa0c64421c6ae4bf06b653dea512f935",
     "battle_rule_oracle_hash": "49b4ed3350f7cb5ffce32eff082cc5ba"
+  },
+  "Goldmeadow Dodger": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "kind": "power",
+        "operator": "gte",
+        "value": 4
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+    "battle_rule_oracle_hash": "cc32e22fa524d67bf8b50674a1eba81e"
   },
   "Goldmire Bridge": {
     "effect": "land",
@@ -40943,6 +41191,32 @@
     "battle_rule_logical_key": "battle_rule_v1:f02b2deb33fa99677fcd434c5d27a1e4",
     "battle_rule_oracle_hash": "c2697c07d36a7fa3b054ad337b71714b"
   },
+  "Kor Castigator": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "kind": "subtype_all",
+        "subtypes": [
+          "eldrazi",
+          "scion"
+        ]
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:90832f7c85efe9f2dc5a32b7be2c8dea",
+    "battle_rule_oracle_hash": "48075286fd297118ac42ea9167c0ebf1"
+  },
   "Kor Haven": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -48275,6 +48549,31 @@
     "battle_rule_logical_key": "battle_rule_v1:7fa008d8a221f35fec32658e8e76ee6a",
     "battle_rule_oracle_hash": "1f83035c18ab3f8d29bf4dfe2dcb6ee3"
   },
+  "Mudbrawler Raiders": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "colors": [
+          "U"
+        ],
+        "kind": "color"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:657d3c61d21b24772f990860178f3b1e",
+    "battle_rule_oracle_hash": "3aa58f60404a53ceb104407f17423fe4"
+  },
   "Mudflat Village": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -55067,6 +55366,31 @@
     "battle_rule_logical_key": "battle_rule_v1:60d4479197c6e201840dd9a929ea5945",
     "battle_rule_oracle_hash": "14a3433526473af8426745e64f3ad35a"
   },
+  "Prowling Nightstalker": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "can_be_blocked_only_by_filters": [
+      {
+        "colors": [
+          "B"
+        ],
+        "kind": "color"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+    "battle_rule_oracle_hash": "f58ca9efe4094b1851179c88368505e2"
+  },
   "Pseudodragon Familiar": {
     "_activated_rule_effects": [
       {
@@ -56993,6 +57317,31 @@
     "battle_rule_logical_key": "battle_rule_v1:46ba2b759b0c9a870fc137d59e42ecd5",
     "battle_rule_oracle_hash": "4ce07a0d5e5a33a68517b988b63dbe42"
   },
+  "Rampart Crawler": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "kind": "subtype_all",
+        "subtypes": [
+          "wall"
+        ]
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+    "battle_rule_oracle_hash": "79324fd12a483fcb164031830e0e51b2"
+  },
   "Ramunap Ruins": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -57223,6 +57572,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
     "battle_rule_oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1"
+  },
+  "Raven's Run Dragoon": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "colors": [
+          "B"
+        ],
+        "kind": "color"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5dbcbe3d8a12ebf95368fa48717425a8",
+    "battle_rule_oracle_hash": "9fb236f92fd9d4c0e99d041befa6e6c2"
   },
   "Ravenous Chupacabra": {
     "ability_kind": "triggered",
@@ -60637,6 +61011,31 @@
     "battle_rule_logical_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
     "battle_rule_oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe"
   },
+  "River Darter": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "kind": "subtype_all",
+        "subtypes": [
+          "dinosaur"
+        ]
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:98d26d1e23e4fa79692c6c6f6604a88f",
+    "battle_rule_oracle_hash": "00f6e63dca4d94fa19682832bfe47800"
+  },
   "River Delta": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -61434,6 +61833,28 @@
     "battle_rule_logical_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
     "battle_rule_oracle_hash": "91702377ce6d69cc19357882d3ac24de"
   },
+  "Rubblebelt Runner": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "kind": "token"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:08158712fb780a504e4b772479068ec9",
+    "battle_rule_oracle_hash": "0fd55172b613c04abdf1377dc2b505f9"
+  },
   "Ruby Medallion": {
     "ability_kind": "static",
     "applies_to_controller": "source_controller",
@@ -62073,6 +62494,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "33b9a82ff9bf4322c280434b47fb3436"
+  },
+  "Sacred Knight": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "colors": [
+          "B",
+          "R"
+        ],
+        "kind": "color"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c17d1c01f4f0816712abc2ef6be71f1e",
+    "battle_rule_oracle_hash": "59b7480c2b3fca46740549f190187b27"
   },
   "Sacred Nectar": {
     "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
@@ -67507,6 +67954,34 @@
     "battle_rule_logical_key": "battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd",
     "battle_rule_oracle_hash": "262b967f9e07cb229f7af108b99ce784"
   },
+  "Skirk Shaman": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "can_be_blocked_only_by_filters": [
+      {
+        "kind": "artifact"
+      },
+      {
+        "colors": [
+          "R"
+        ],
+        "kind": "color"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:40c8636e4167ff7d88799326c20ed4be",
+    "battle_rule_oracle_hash": "dbd0b4f4c218685d92756fc557694429"
+  },
   "Skirsdag Cultist": {
     "_activated_rule_effects": [
       {
@@ -69486,6 +69961,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:87a49611dcbe7a1c23df28aa9975b885",
     "battle_rule_oracle_hash": "976ed9d2e22785317e639fb337da7c40"
+  },
+  "Sootwalkers": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "colors": [
+          "W"
+        ],
+        "kind": "color"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5b390cfb544bc8bf531e767473518a5e",
+    "battle_rule_oracle_hash": "64934bf3f3a50e5c7f29b347db56bfe6"
   },
   "Sorin's Thirst": {
     "amount": 2,
@@ -84028,6 +84528,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
     "battle_rule_oracle_hash": "fd9f823347bc1af8d128deb10d562b9f"
+  },
+  "Wanderbrine Rootcutters": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+    "cant_be_blocked_by_filters": [
+      {
+        "colors": [
+          "G"
+        ],
+        "kind": "color"
+      }
+    ],
+    "effect": "creature",
+    "static_effect": "self_filtered_evasion",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleEvasionAbility",
+    "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2135f788b0154d0cbe8b264586f2d597",
+    "battle_rule_oracle_hash": "32462b11137647db3e1899e0261c074d"
   },
   "Wanderer's Intervention": {
     "amount": 4,

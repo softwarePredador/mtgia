@@ -9171,6 +9171,53 @@ new server:
   `xmage_permanent_simple_activated_library_search_to_battlefield`, and
   `xmage_static_filtered_evasion_creature`, with `21` cards each.
 
+## 2026-07-04 PG438 Static Filtered Evasion Closure
+
+- Closed the exact XMage static filtered blocker-legality evasion family as
+  ManaLoom scope `xmage_static_filtered_evasion_creature_v1`.
+- The selected package accepted only creature permanents with
+  `SimpleEvasionAbility` plus `CantBeBlockedByCreaturesSourceEffect`, no
+  target class, no condition class, and Oracle/XMage agreement on whether the
+  creature cannot be blocked by matching blockers or can be blocked only by
+  matching blockers. Supported filters include color, artifact, token, power
+  comparison, and subtype. Source/Oracle mismatches and unsupported phrasing
+  remain blockers.
+- The batch covers `21` cards with static blocker restrictions, including
+  "can't be blocked by" and "can be blocked only by" variants for colors,
+  artifacts, tokens, subtypes, and power thresholds.
+- Focused mapper/runtime tests covered Oracle/source reconciliation, color,
+  artifact, power, subtype and token filter parsing, legal blocker rejection,
+  and allowed-blocker-only logic. PG438 reused existing mapper/runtime support
+  and performed no code mutation. The focused test lane passed `718` tests.
+- The PostgreSQL package promoted `21` cards. Precheck found `21` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `21/21` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4162` PostgreSQL runtime rows, wrote `4154` SQLite runtime
+  rows, and exported `4129` canonical fallback rows.
+- PG438 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `21` selected cards. Generic
+  battle scenario count remained `0`; actual blocker-legality behavior remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26724`, `xmage_authoritative_source_count=26410`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26410`. This is an exact
+  reduction of `21` from the post-PG437 queue.
+- The post-PG438 exact split recheck reports `proposal_count=385` and
+  `safe_for_batch_pg_package_count=385`. The largest remaining exact families
+  are `xmage_dynamic_count_damage_spell` and
+  `xmage_permanent_simple_activated_library_search_to_battlefield`, with `21`
+  cards each, followed by `xmage_creature_etb_library_search_to_hand` with
+  `19` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
