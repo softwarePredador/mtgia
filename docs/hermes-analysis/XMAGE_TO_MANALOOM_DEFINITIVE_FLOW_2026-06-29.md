@@ -7876,10 +7876,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG411 queue on the new server, the next exact runtime-backed work should
+post-PG413 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1803`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1799`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1610`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `827`
@@ -8071,6 +8071,66 @@ PG411 closed three exact recursion-to-hand subpatterns on the new server:
   to `26334`, and the top recursion work unit from `1806` to `1803`. The
   post-PG411 exact split recheck produced `proposal_count=0`; the remaining
   `314` identities are still explicit missing-source exceptions.
+
+PG412 closed the exact creature ETB dynamic graveyard-count damage subpattern
+on the new server:
+
+- Split support now maps XMage `DamageTargetEffect` with
+  `EntersBattlefieldTriggeredAbility` where the damage amount is an exact
+  supported controller graveyard card count into
+  `xmage_creature_etb_dynamic_graveyard_count_damage_v1`.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` (`415` tests) and
+  `test_xmage_exact_scope_runtime.py` (`240` tests). Runtime tests cover
+  creature ETB damage counting instant/sorcery cards and creature cards in the
+  controller's graveyard.
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg412_etb_graveyard_count_damage_new_server`
+  produced `4` safe candidates: `Cyclops Electromancer`, `Lotleth Giant`,
+  `Ossuary Rats`, and `Warfire Javelineer`.
+- PostgreSQL package `PG412` was applied on the new server:
+  `4` upserted rows, `0` deprecated shadow rows, and postcheck `4/4`
+  `verified`/`auto` rows with Oracle hashes.
+- PG -> SQLite sync for the package loaded `4` PostgreSQL rows, updated `4`
+  SQLite rows, and exported `5381` canonical snapshot rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51`), and legacy contamination.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26648` to `26644`, authoritative adapter-required count from `26334`
+  to `26330`, and the top recursion work unit from `1803` to `1799`. The
+  post-PG412 exact split recheck produced `proposal_count=0`.
+
+PG413 closed the exact static creature protection-from-colors subpattern on the
+new server:
+
+- Split support now maps no-effect/no-signal XMage `ProtectionAbility` rows
+  into `xmage_static_self_protection_from_colors_creature_v1` only when Oracle
+  text and local XMage source agree on exact color protection. Protection from
+  artifacts, creatures, monocolored, multicolored, or subtypes remains blocked
+  for later dedicated target/permanent matchers.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` (`417` tests) and
+  `test_xmage_exact_scope_runtime.py` (`241` tests). Runtime tests cover
+  `protection_from` persistence, target legality rejection for a matching
+  colored source, and direct damage resolving as `no_legal_creature_target`.
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg413_static_protection_colors_new_server`
+  produced `19` safe candidates. The split also left `12` non-color protection
+  rows blocked as `static_protection_oracle_not_color_exact`.
+- PostgreSQL package `PG413` was applied on the new server:
+  `19` upserted rows, `0` deprecated shadow rows, and postcheck `19/19`
+  `verified`/`auto` rows with Oracle hashes.
+- PG -> SQLite sync for the package loaded `19` PostgreSQL rows, updated `19`
+  SQLite rows, and exported `5400` canonical snapshot rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51`), and legacy contamination.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26644` to `26625` and authoritative adapter-required count from
+  `26330` to `26311`. The post-PG413 exact split recheck produced
+  `proposal_count=0`; the remaining `314` identities are still explicit
+  missing-source exceptions.
 
 ## Required Artifacts Per Cycle
 

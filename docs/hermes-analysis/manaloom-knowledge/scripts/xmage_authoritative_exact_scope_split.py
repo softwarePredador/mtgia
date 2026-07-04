@@ -173,6 +173,9 @@ SELF_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_boost_until_
 TARGET_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 TARGET_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
+STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE = (
+    "xmage_static_self_protection_from_colors_creature_v1"
+)
 STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
@@ -415,6 +418,21 @@ TARGET_GRANT_KEYWORD_ORACLE_WORDS = {
     "trample": "trample",
     "vigilance": "vigilance",
 }
+PROTECTION_COLOR_WORDS = {
+    "white": "white",
+    "blue": "blue",
+    "black": "black",
+    "red": "red",
+    "green": "green",
+}
+PROTECTION_OBJECT_COLOR_WORDS = {
+    "WHITE": "white",
+    "BLUE": "blue",
+    "BLACK": "black",
+    "RED": "red",
+    "GREEN": "green",
+}
+PROTECTION_COLOR_ORDER = ["white", "blue", "black", "red", "green"]
 
 
 def utc_now() -> str:
@@ -4482,6 +4500,16 @@ def is_static_keyword_creature_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_static_protection_from_colors_creature_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "")
+        == "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal"
+        and not effect_classes(row)
+        and ability_classes(row) == {"ProtectionAbility"}
+        and not (row.get("xmage_signals") or [])
+    )
+
+
 def is_creature_etb_life_gain_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
         return False
@@ -4983,6 +5011,64 @@ def normalize_keyword_phrase(value: str) -> str:
 
 def ordered_keywords(keywords: set[str]) -> list[str]:
     return [keyword for keyword in STATIC_SELF_KEYWORD_ORDER if keyword in keywords]
+
+
+def ordered_protection_colors(colors: set[str] | list[str]) -> list[str]:
+    present = {str(color or "").strip().lower() for color in colors if str(color or "").strip()}
+    return [color for color in PROTECTION_COLOR_ORDER if color in present]
+
+
+def protection_from_colors_from_oracle(metadata: dict[str, Any]) -> list[str] | None:
+    raw = str(metadata.get("oracle_text") or "").strip()
+    if not raw:
+        return None
+    text = re.sub(r"\([^)]*\)", "", raw)
+    text = re.sub(r"\s+", " ", text).strip().rstrip(".").lower()
+    match = re.fullmatch(r"protection from (.+)", text)
+    if not match:
+        return None
+    body = re.sub(r"\bfrom\s+", "", match.group(1))
+    body = re.sub(r"\s*,\s*and\s+", ", ", body)
+    parts = [
+        part.strip()
+        for part in re.split(r"\s*,\s*|\s+and\s+", body)
+        if part.strip()
+    ]
+    if not parts:
+        return None
+    if any(part not in PROTECTION_COLOR_WORDS for part in parts):
+        return None
+    return ordered_protection_colors(parts)
+
+
+def protection_from_colors_from_source(source: str) -> list[str] | str:
+    text = source or ""
+    if not re.search(r"\bProtectionAbility\b", text):
+        return "static_protection_source_missing_protection_ability"
+    ability_constructors = re.findall(
+        r"(?:ProtectionAbility\.from|new\s+ProtectionAbility)\s*\(",
+        text,
+    )
+    if len(ability_constructors) != 1:
+        return "static_protection_source_multiple_protection_abilities"
+    unsupported_filter_markers = (
+        "FilterArtifactCard",
+        "FilterCreatureCard",
+        "FilterPermanentCard",
+        "CardTypePredicate",
+        "SubTypePredicate",
+        "MonocoloredPredicate",
+        "MulticoloredPredicate",
+    )
+    if any(marker in text for marker in unsupported_filter_markers):
+        return "static_protection_source_not_color_exact"
+    colors = {
+        PROTECTION_OBJECT_COLOR_WORDS[match]
+        for match in re.findall(r"ObjectColor\.(WHITE|BLUE|BLACK|RED|GREEN)\b", text)
+    }
+    if not colors:
+        return "static_protection_source_not_color_exact"
+    return ordered_protection_colors(colors)
 
 
 def static_keywords_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
@@ -10123,6 +10209,9 @@ def split_row(
 ) -> tuple[dict[str, Any] | None, str]:
     unit = str(row.get("adapter_work_unit") or "")
     keyword_creature_unit = is_static_keyword_creature_unit(row)
+    static_protection_from_colors_creature_unit = (
+        is_static_protection_from_colors_creature_unit(row)
+    )
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     dies_life_gain_creature_unit = is_creature_dies_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
@@ -10196,6 +10285,7 @@ def split_row(
     if (
         unit not in SUPPORTED_UNITS
         and not keyword_creature_unit
+        and not static_protection_from_colors_creature_unit
         and not etb_life_gain_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
@@ -10249,6 +10339,7 @@ def split_row(
     if (
         (unit in SPELL_UNITS or boost_keyword_spell_unit)
         and not etb_life_gain_creature_unit
+        and not static_protection_from_colors_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not etb_draw_lose_life_creature_unit
@@ -11957,6 +12048,35 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_source_boost_equal_graveyard_count",
+        ), "selected_exact_scope"
+
+    if static_protection_from_colors_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_protection_not_creature"
+        oracle_colors = protection_from_colors_from_oracle(metadata)
+        if oracle_colors is None:
+            return None, "static_protection_oracle_not_color_exact"
+        source_colors = protection_from_colors_from_source(source_text)
+        if isinstance(source_colors, str):
+            return None, source_colors
+        if source_colors != oracle_colors:
+            return None, "static_protection_source_oracle_mismatch"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "self_protection_from_colors",
+            "target": "self",
+            "target_controller": "self",
+            "protection_from": oracle_colors,
+            "protection_from_colors": oracle_colors,
+            "xmage_ability_class": "ProtectionAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_self_protection_from_colors_creature",
         ), "selected_exact_scope"
 
     if keyword_creature_unit:
@@ -15432,6 +15552,7 @@ def build_exact_split_report(
         if (
             str(row.get("adapter_work_unit") or "") not in SUPPORTED_UNITS
             and not is_static_keyword_creature_unit(row)
+            and not is_static_protection_from_colors_creature_unit(row)
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_dies_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
@@ -15503,6 +15624,7 @@ def build_exact_split_report(
             "supported_adapter_work_units": sorted(SUPPORTED_UNITS),
             "supported_dynamic_adapter_work_units": [
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
+                "no-effect/no-signal ProtectionAbility creature rows with exact Oracle/XMage protection from color words only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",

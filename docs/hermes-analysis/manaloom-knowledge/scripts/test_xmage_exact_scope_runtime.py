@@ -9924,6 +9924,89 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertFalse(self.battle.is_legal_target({"name": "Enemy Spell"}, permanent_without_shroud, opponent))
         self.assertTrue(self.battle.is_legal_target({"name": "Own Spell"}, permanent_without_shroud, active))
 
+    def test_static_protection_from_color_creature_blocks_matching_colored_targeting(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        creature = {
+            "name": "Fixture Red Refugee",
+            "type_line": "Creature - Human Warrior",
+            "oracle_text": "Protection from red",
+            "controller": "Active",
+            "power": 3,
+            "toughness": 2,
+        }
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+            "ability_kind": "static",
+            "static_effect": "self_protection_from_colors",
+            "protection_from": ["red"],
+            "protection_from_colors": ["red"],
+        }
+        permanent = self.battle.enrich_card({**creature, **effect})
+        active.battlefield.append(permanent)
+
+        red_spell = {
+            "name": "Fixture Red Burn",
+            "type_line": "Instant",
+            "colors": ["R"],
+            "mana_cost": "{R}",
+            "oracle_text": "Fixture Red Burn deals 3 damage to target creature.",
+        }
+        black_spell = {
+            "name": "Fixture Black Burn",
+            "type_line": "Instant",
+            "colors": ["B"],
+            "mana_cost": "{B}",
+        }
+
+        self.assertEqual(permanent["protection_from"], ["red"])
+        self.assertFalse(
+            self.battle.is_legal_target(
+                red_spell,
+                permanent,
+                opponent,
+                target_type="creature",
+            )
+        )
+        self.assertTrue(
+            self.battle.is_legal_target(
+                black_spell,
+                permanent,
+                opponent,
+                target_type="creature",
+            )
+        )
+
+        self.battle.apply_effect_immediate(
+            opponent,
+            [active],
+            red_spell,
+            turn=12,
+            rng=random.Random(12),
+            effect_data_override={
+                "effect": "direct_damage",
+                "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                "ability_kind": "one_shot",
+                "damage": 3,
+                "amount": 3,
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"], "controller": "opponent"},
+                "_rule_logical_key": "battle_rule_v1:fixture_red_burn",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Red Refugee"])
+        self.assertEqual(active.graveyard, [])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Red Burn"
+                and data.get("result") == "no_legal_creature_target"
+                for event, data in self.events
+            )
+        )
+
     def test_destroy_all_enchantments_board_wipe_resolves_by_type(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

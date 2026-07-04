@@ -11963,7 +11963,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "recursion_exile_self_source_x_count_not_supported")
 
-    def test_static_keyword_creature_blocks_protection_until_color_scope_exists(self) -> None:
+    def test_static_protection_from_color_creature_maps_to_runtime(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",
             effect_classes=[],
@@ -11973,14 +11973,71 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(
+                name="Death Speakers",
                 type_line="Creature - Cleric",
                 oracle_text="Protection from black",
             ),
-            source_text="this.addAbility(new ProtectionAbility(filter));",
+            source_text="this.addAbility(ProtectionAbility.from(ObjectColor.BLACK));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE)
+        self.assertEqual(effect["static_effect"], "self_protection_from_colors")
+        self.assertEqual(effect["protection_from"], ["black"])
+        self.assertEqual(effect["protection_from_colors"], ["black"])
+
+    def test_static_protection_from_multiple_colors_creature_maps_filter_predicates(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Oversoul of Dusk",
+                type_line="Creature - Spirit Avatar",
+                oracle_text="Protection from blue, from black, and from red",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("blue, black, and red");
+                static {
+                    filter.add(new ColorPredicate(ObjectColor.BLUE));
+                    filter.add(new ColorPredicate(ObjectColor.BLACK));
+                    filter.add(new ColorPredicate(ObjectColor.RED));
+                }
+                this.addAbility(new ProtectionAbility(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["protection_from"], ["blue", "black", "red"])
+
+    def test_static_protection_creature_blocks_non_color_protection(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Nacatl Savage",
+                type_line="Creature - Cat Warrior",
+                oracle_text="Protection from artifacts",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterArtifactCard("artifacts");
+                this.addAbility(new ProtectionAbility(filter));
+            """,
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "unsupported_adapter_work_unit")
+        self.assertEqual(reason, "static_protection_oracle_not_color_exact")
 
     def test_static_keyword_creature_requires_creature_type(self) -> None:
         row = queue_row(
