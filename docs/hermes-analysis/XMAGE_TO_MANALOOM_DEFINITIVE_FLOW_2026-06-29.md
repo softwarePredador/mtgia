@@ -9557,6 +9557,53 @@ new server:
   `xmage_fixed_damage_exile_if_dies_spell` and `xmage_fixed_draw_spell` with
   `12` cards each.
 
+## 2026-07-04 PG446 Library Search Closure
+
+- Closed the exact XMage spell tutor-to-hand family as ManaLoom scope
+  `xmage_library_search_to_hand_spell_v1`.
+- The selected package accepted local XMage library-search spells whose source
+  and Oracle text agree on a supported tutor-to-hand filter. This closes narrow
+  tutor rows while leaving broader `xmage_library_search_variant` neighbors
+  blocked until their filters, destinations, or special costs have exact runtime
+  scopes.
+- The batch covers `14` cards: Call the Gatewatch, Cateran Summons, Diabolic
+  Tutor, Eerie Procession, Ignite the Beacon, Merchant Scroll, Open the Armory,
+  Plea for Guidance, Safewright Quest, Sarkhan's Triumph, Seek the Horizon,
+  Solve the Equation, Time of Need, and Trapmaker's Snare.
+- Focused mapper/runtime tests covered exact tutor-to-hand split behavior,
+  subtype/land-subtype/source-subtype preservation, dynamic-land-count
+  blocking, and runtime retrieval paths; PG446 performed no code mutation. The
+  focused test lane passed `718` checks.
+- The PostgreSQL package promoted `14` cards. Precheck found `14` target rows,
+  `0` missing targets, `0` existing expected rows, and `8` shadow rows to
+  deprecate; apply/postcheck verified `14/14` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `8` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4301` PostgreSQL runtime rows, wrote `4293` SQLite runtime
+  rows, and exported `4268` canonical fallback rows.
+- PG446 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `14` selected cards. Generic
+  battle scenario count remained `0`; tutor-to-hand behavior remains covered by
+  focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26585`, `xmage_authoritative_source_count=26271`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26271`. This is an exact
+  reduction of `14` from the post-PG445 queue.
+- The post-PG446 exact split recheck reports `proposal_count=246` and
+  `safe_for_batch_pg_package_count=246`. The largest remaining exact families
+  are `xmage_self_sacrifice_mana_source_permanent` and
+  `xmage_static_self_cant_block_creature` with `13` cards each, followed by
+  `xmage_fixed_damage_exile_if_dies_spell` and `xmage_fixed_draw_spell` with
+  `12` cards each, and `xmage_static_self_cant_be_blocked_creature` with `11`
+  cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

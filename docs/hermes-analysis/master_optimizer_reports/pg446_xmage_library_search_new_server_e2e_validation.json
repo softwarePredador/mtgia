@@ -1,0 +1,538 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-04T23:02:30.659189+00:00",
+  "manifest": "../../master_optimizer_reports/pg446_xmage_library_search_new_server_manifest.json",
+  "package_id": "pg446_xmage_library_search_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 14
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Call the Gatewatch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:caae61758f5148c88717d895a55aa3e2",
+          "oracle_hash": "c2f91fea6b8e3049f33ee913296a213c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Cateran Summons",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2d7e82f759e6d816feb9c1b1054766a8",
+          "oracle_hash": "47864ad63a4d50c1691191e60f961bc5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Diabolic Tutor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3c1042b6ae3a2c610e70ad411460a46e",
+          "oracle_hash": "7c881aaacf79f25b41c9788cf307e795",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Eerie Procession",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:762264b1d43e6e1344585b6762d633f5",
+          "oracle_hash": "98942b8c0812342e18938bf9c7ebeec4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Ignite the Beacon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:08ac438e086ce79989b6a0e05eed4b74",
+          "oracle_hash": "e6265bc22dd6b0fe6d4bb70a1ff9f1c7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Merchant Scroll",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0d4352abb63d2eac010177d2e1f5f7e6",
+          "oracle_hash": "9e130df41e16842e764941c6669ea620",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Open the Armory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:868d143f306cb5e8dfc486f76f8b6369",
+          "oracle_hash": "fa220f5773cf5c988e507c714b849503",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Plea for Guidance",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c0342670c739d786cd63c9aa0eb13e83",
+          "oracle_hash": "5c417011e3ed943702026eefc309340f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Safewright Quest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cd7fc0b01dfcf89afa14a9591f7e22bb",
+          "oracle_hash": "6d6ed58f38f4a9226bf9d849cbed96d1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Sarkhan's Triumph",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0f1e6a10f42f7c0c834c89ae0c6e72e4",
+          "oracle_hash": "b31496681c661b16b744df79de670d1b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Seek the Horizon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:18d04737564bf889d16bdd128abb8848",
+          "oracle_hash": "d74a1f98d1c82a4c62e872c89438fbc9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Solve the Equation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:43267ad1d8a2accee0fd7fbf8e17dcb1",
+          "oracle_hash": "14e38120c0e1603f7bca82f1c2b5e5f1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Time of Need",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e5c23aff5977ec12d3a85ee773fe69df",
+          "oracle_hash": "9e4dbb5c6d939e1d3801c29b6173e7b5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Trapmaker's Snare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b9456967545569631aad27c2e338e700",
+          "oracle_hash": "17aaa73f597367e9b8c77f1fa28f5301",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 14
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Call the Gatewatch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:caae61758f5148c88717d895a55aa3e2",
+          "oracle_hash": "c2f91fea6b8e3049f33ee913296a213c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Cateran Summons",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2d7e82f759e6d816feb9c1b1054766a8",
+          "oracle_hash": "47864ad63a4d50c1691191e60f961bc5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Diabolic Tutor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3c1042b6ae3a2c610e70ad411460a46e",
+          "oracle_hash": "7c881aaacf79f25b41c9788cf307e795",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Eerie Procession",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:762264b1d43e6e1344585b6762d633f5",
+          "oracle_hash": "98942b8c0812342e18938bf9c7ebeec4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Ignite the Beacon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:08ac438e086ce79989b6a0e05eed4b74",
+          "oracle_hash": "e6265bc22dd6b0fe6d4bb70a1ff9f1c7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Merchant Scroll",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0d4352abb63d2eac010177d2e1f5f7e6",
+          "oracle_hash": "9e130df41e16842e764941c6669ea620",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Open the Armory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:868d143f306cb5e8dfc486f76f8b6369",
+          "oracle_hash": "fa220f5773cf5c988e507c714b849503",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Plea for Guidance",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c0342670c739d786cd63c9aa0eb13e83",
+          "oracle_hash": "5c417011e3ed943702026eefc309340f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Safewright Quest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cd7fc0b01dfcf89afa14a9591f7e22bb",
+          "oracle_hash": "6d6ed58f38f4a9226bf9d849cbed96d1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Sarkhan's Triumph",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0f1e6a10f42f7c0c834c89ae0c6e72e4",
+          "oracle_hash": "b31496681c661b16b744df79de670d1b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Seek the Horizon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:18d04737564bf889d16bdd128abb8848",
+          "oracle_hash": "d74a1f98d1c82a4c62e872c89438fbc9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Solve the Equation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:43267ad1d8a2accee0fd7fbf8e17dcb1",
+          "oracle_hash": "14e38120c0e1603f7bca82f1c2b5e5f1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Time of Need",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e5c23aff5977ec12d3a85ee773fe69df",
+          "oracle_hash": "9e4dbb5c6d939e1d3801c29b6173e7b5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "card_name": "Trapmaker's Snare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b9456967545569631aad27c2e338e700",
+          "oracle_hash": "17aaa73f597367e9b8c77f1fa28f5301",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 14
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Call the Gatewatch",
+          "logical_rule_key": "battle_rule_v1:caae61758f5148c88717d895a55aa3e2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cateran Summons",
+          "logical_rule_key": "battle_rule_v1:2d7e82f759e6d816feb9c1b1054766a8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Diabolic Tutor",
+          "logical_rule_key": "battle_rule_v1:3c1042b6ae3a2c610e70ad411460a46e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eerie Procession",
+          "logical_rule_key": "battle_rule_v1:762264b1d43e6e1344585b6762d633f5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ignite the Beacon",
+          "logical_rule_key": "battle_rule_v1:08ac438e086ce79989b6a0e05eed4b74"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Merchant Scroll",
+          "logical_rule_key": "battle_rule_v1:0d4352abb63d2eac010177d2e1f5f7e6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Open the Armory",
+          "logical_rule_key": "battle_rule_v1:868d143f306cb5e8dfc486f76f8b6369"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Plea for Guidance",
+          "logical_rule_key": "battle_rule_v1:c0342670c739d786cd63c9aa0eb13e83"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Safewright Quest",
+          "logical_rule_key": "battle_rule_v1:cd7fc0b01dfcf89afa14a9591f7e22bb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sarkhan's Triumph",
+          "logical_rule_key": "battle_rule_v1:0f1e6a10f42f7c0c834c89ae0c6e72e4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Seek the Horizon",
+          "logical_rule_key": "battle_rule_v1:18d04737564bf889d16bdd128abb8848"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Solve the Equation",
+          "logical_rule_key": "battle_rule_v1:43267ad1d8a2accee0fd7fbf8e17dcb1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Time of Need",
+          "logical_rule_key": "battle_rule_v1:e5c23aff5977ec12d3a85ee773fe69df"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Trapmaker's Snare",
+          "logical_rule_key": "battle_rule_v1:b9456967545569631aad27c2e338e700"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 14
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Call the Gatewatch",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:caae61758f5148c88717d895a55aa3e2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cateran Summons",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:2d7e82f759e6d816feb9c1b1054766a8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Diabolic Tutor",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:3c1042b6ae3a2c610e70ad411460a46e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eerie Procession",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:762264b1d43e6e1344585b6762d633f5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ignite the Beacon",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:08ac438e086ce79989b6a0e05eed4b74"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Merchant Scroll",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:0d4352abb63d2eac010177d2e1f5f7e6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Open the Armory",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:868d143f306cb5e8dfc486f76f8b6369"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Plea for Guidance",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:c0342670c739d786cd63c9aa0eb13e83"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Safewright Quest",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:cd7fc0b01dfcf89afa14a9591f7e22bb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sarkhan's Triumph",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:0f1e6a10f42f7c0c834c89ae0c6e72e4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Seek the Horizon",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:18d04737564bf889d16bdd128abb8848"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Solve the Equation",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:43267ad1d8a2accee0fd7fbf8e17dcb1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Time of Need",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:e5c23aff5977ec12d3a85ee773fe69df"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Trapmaker's Snare",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:b9456967545569631aad27c2e338e700"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

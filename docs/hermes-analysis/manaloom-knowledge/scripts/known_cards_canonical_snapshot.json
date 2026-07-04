@@ -11867,6 +11867,27 @@
     "battle_rule_logical_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a",
     "battle_rule_oracle_hash": "32d68e2d062d46dece64180695886a79"
   },
+  "Call the Gatewatch": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "planeswalker_to_hand",
+    "target_card_types": [
+      "planeswalker"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:caae61758f5148c88717d895a55aa3e2",
+    "battle_rule_oracle_hash": "c2f91fea6b8e3049f33ee913296a213c"
+  },
   "Call to Mind": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
     "count": 1,
@@ -13055,6 +13076,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:e5814832444189cd9aafc32f08f0e129",
     "battle_rule_oracle_hash": "b95100c6362fee271724db44162ba7ab"
+  },
+  "Cateran Summons": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "any_to_hand",
+    "target_card_types": [
+      "creature"
+    ],
+    "target_subtypes": [
+      "mercenary"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2d7e82f759e6d816feb9c1b1054766a8",
+    "battle_rule_oracle_hash": "47864ad63a4d50c1691191e60f961bc5"
   },
   "Cathartic Reunion": {
     "ability_kind": "one_shot",
@@ -20411,6 +20456,24 @@
     "battle_rule_logical_key": "battle_rule_v1:e83b8e386f8ebf8e037dab9688873ce0",
     "battle_rule_oracle_hash": "f9559e8f061153f5b7b70303f2f322f4"
   },
+  "Diabolic Tutor": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "any_to_hand",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3c1042b6ae3a2c610e70ad411460a46e",
+    "battle_rule_oracle_hash": "7c881aaacf79f25b41c9788cf307e795"
+  },
   "Diamond City": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -23539,6 +23602,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "59cc5a77af529dd5bb59b6980d1e1e12"
+  },
+  "Eerie Procession": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "any_to_hand",
+    "target_subtypes": [
+      "arcane"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:762264b1d43e6e1344585b6762d633f5",
+    "battle_rule_oracle_hash": "98942b8c0812342e18938bf9c7ebeec4"
   },
   "Eidolon of Philosophy": {
     "ability_kind": "activated",
@@ -39673,6 +39757,28 @@
     "battle_rule_logical_key": "battle_rule_v1:2773ed99df0bd463ce080fb7fda1ee5a",
     "battle_rule_oracle_hash": "b152edf79027fbb9390f8f70f9250923"
   },
+  "Ignite the Beacon": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": true,
+    "max_count": 2,
+    "sorcery": false,
+    "target": "planeswalker_to_hand",
+    "target_card_types": [
+      "planeswalker"
+    ],
+    "up_to_count": true,
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:08ac438e086ce79989b6a0e05eed4b74",
+    "battle_rule_oracle_hash": "e6265bc22dd6b0fe6d4bb70a1ff9f1c7"
+  },
   "Ignoble Hierarch": {
     "ability_kind": "activated",
     "battle_model_scope": "one_mana_zero_one_exalted_tricolor_mana_dork_v1",
@@ -48690,6 +48796,30 @@
     "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
     "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
+  "Merchant Scroll": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "instant_to_hand",
+    "target_card_types": [
+      "instant"
+    ],
+    "target_colors": [
+      "U"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0d4352abb63d2eac010177d2e1f5f7e6",
+    "battle_rule_oracle_hash": "9e130df41e16842e764941c6669ea620"
+  },
   "Merfolk Looter": {
     "ability_kind": "activated",
     "activated_discard_count": 1,
@@ -54346,6 +54476,28 @@
     "battle_rule_logical_key": "battle_rule_v1:0179c6cc3d20112655e43b1269bf2290",
     "battle_rule_oracle_hash": "49a4a97393af2f748de0cf9b9b1375dc"
   },
+  "Open the Armory": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "any_to_hand",
+    "target_subtypes": [
+      "aura",
+      "equipment"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:868d143f306cb5e8dfc486f76f8b6369",
+    "battle_rule_oracle_hash": "fa220f5773cf5c988e507c714b849503"
+  },
   "Open the Omenpaths": {
     "effect": "ramp_ritual",
     "instant": true,
@@ -57587,6 +57739,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "93a92215b9b63d5d82905ffb77ec263e"
+  },
+  "Plea for Guidance": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 2,
+    "sorcery": true,
+    "target": "enchantment_to_hand",
+    "target_card_types": [
+      "enchantment"
+    ],
+    "up_to_count": true,
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c0342670c739d786cd63c9aa0eb13e83",
+    "battle_rule_oracle_hash": "5c417011e3ed943702026eefc309340f"
   },
   "Plover Knights": {
     "_keywords_are_self": true,
@@ -66555,6 +66729,31 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "06b3aec61afaf78ce3aa52646016a6fd"
   },
+  "Safewright Quest": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "land_to_hand",
+    "target_card_types": [
+      "land"
+    ],
+    "target_subtypes": [
+      "forest",
+      "plains"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cd7fc0b01dfcf89afa14a9591f7e22bb",
+    "battle_rule_oracle_hash": "6d6ed58f38f4a9226bf9d849cbed96d1"
+  },
   "Sage's Knowledge": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
     "count": 1,
@@ -67162,6 +67361,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c82a87930ce3e98fa9de892c49d73b83",
     "battle_rule_oracle_hash": "de517c804272d32243aff46171907675"
+  },
+  "Sarkhan's Triumph": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": true,
+    "max_count": 1,
+    "sorcery": false,
+    "target": "creature_to_hand",
+    "target_card_types": [
+      "creature"
+    ],
+    "target_subtypes": [
+      "dragon"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0f1e6a10f42f7c0c834c89ae0c6e72e4",
+    "battle_rule_oracle_hash": "b31496681c661b16b744df79de670d1b"
   },
   "Sarpadian Simulacrum": {
     "_activated_rule_effects": [
@@ -69374,6 +69597,25 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b80128195cfc1f53ed0353d609e362bb",
     "battle_rule_oracle_hash": "1e608944a95a919699467ca65cc383dd"
+  },
+  "Seek the Horizon": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 3,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 3,
+    "sorcery": true,
+    "target": "basic_land_to_hand",
+    "up_to_count": true,
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:18d04737564bf889d16bdd128abb8848",
+    "battle_rule_oracle_hash": "d74a1f98d1c82a4c62e872c89438fbc9"
   },
   "Seething Landscape": {
     "effect": "land",
@@ -74272,6 +74514,24 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:7cf3d68b56f34ef24c6766142072ecd1",
     "battle_rule_oracle_hash": "26e18e44356c6f9c61fd592dca42a2d1"
+  },
+  "Solve the Equation": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "sorcery": true,
+    "target": "instant_or_sorcery_to_hand",
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:43267ad1d8a2accee0fd7fbf8e17dcb1",
+    "battle_rule_oracle_hash": "14e38120c0e1603f7bca82f1c2b5e5f1"
   },
   "Somberwald Dryad": {
     "ability_kind": "static",
@@ -82944,6 +83204,30 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "4b4003fb692765461b421fa340664340"
   },
+  "Time of Need": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 1,
+    "required_supertypes": [
+      "legendary"
+    ],
+    "sorcery": true,
+    "target": "creature_to_hand",
+    "target_card_types": [
+      "creature"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e5c23aff5977ec12d3a85ee773fe69df",
+    "battle_rule_oracle_hash": "9e4dbb5c6d939e1d3801c29b6173e7b5"
+  },
   "Timeless Lotus": {
     "activation_requires_tap": true,
     "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
@@ -84184,6 +84468,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:19a6b12e4f32350914e970a7184a5a45",
     "battle_rule_oracle_hash": "19041d488057f64bd11c517d89d45498"
+  },
+  "Trapmaker's Snare": {
+    "battle_model_scope": "xmage_library_search_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "tutor",
+    "instant": true,
+    "max_count": 1,
+    "sorcery": false,
+    "target": "any_to_hand",
+    "target_subtypes": [
+      "trap"
+    ],
+    "xmage_effect_class": "SearchLibraryPutInHandEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b9456967545569631aad27c2e338e700",
+    "battle_rule_oracle_hash": "17aaa73f597367e9b8c77f1fa28f5301"
   },
   "Travel the Overworld": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
