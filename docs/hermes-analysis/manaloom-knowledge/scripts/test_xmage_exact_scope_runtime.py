@@ -539,6 +539,106 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_source_controller_draw_spell_pays_creature_sacrifice_cost(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Card A"}, {"name": "Card B"}, {"name": "Card C"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        sacrifice = {
+            "name": "Spare Creature",
+            "type_line": "Creature - Citizen",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+        }
+        active.battlefield.append(sacrifice)
+        effect = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "count": 2,
+            "requires_sacrifice_creature": True,
+            "additional_cost": "sacrifice_creature",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Reap",
+                "type_line": "Instant",
+                "oracle_text": "As an additional cost to cast this spell, sacrifice a creature. Draw two cards.",
+            },
+            turn=1,
+            rng=random.Random(11),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Card A", "Card B"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Spare Creature", "Fixture Reap"])
+        self.assertEqual(active.battlefield, [])
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Fixture Reap"
+                and data.get("cost") == "sacrifice_creature"
+                and data.get("sacrificed") == "Spare Creature"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "draw_cards_resolved"
+                and data.get("card") == "Fixture Reap"
+                and data.get("cards_drawn") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_fixed_source_controller_draw_spell_pays_discard_card_cost(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Card A"}, {"name": "Card B"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand.append({"name": "Discard Me", "type_line": "Creature - Citizen"})
+        effect = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "count": 2,
+            "requires_discard_card": True,
+            "additional_cost": "discard_card",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Voice",
+                "type_line": "Sorcery",
+                "oracle_text": "As an additional cost to cast this spell, discard a card. Draw two cards.",
+            },
+            turn=2,
+            rng=random.Random(12),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Card A", "Card B"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Discard Me", "Fixture Voice"])
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Fixture Voice"
+                and data.get("cost") == "discard_card"
+                and data.get("discarded") == "Discard Me"
+                for event, data in self.events
+            )
+        )
+
     def test_dig_to_hand_respects_instant_or_sorcery_filter(self) -> None:
         active = self.battle.Player(
             "Active",

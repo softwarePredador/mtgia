@@ -1164,6 +1164,88 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 2)
         self.assertTrue(proposal["safe_for_batch_pg_package"])
 
+    def test_fixed_source_controller_draw_spell_accepts_creature_sacrifice_cost(self) -> None:
+        row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Altar's Reap",
+                oracle_text="As an additional cost to cast this spell, sacrifice a creature.\nDraw two cards.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_SCOPE)
+        self.assertEqual(effect["count"], 2)
+        self.assertEqual(effect["additional_cost"], "sacrifice_creature")
+        self.assertTrue(effect["requires_sacrifice_creature"])
+        self.assertEqual(effect["xmage_additional_cost_class"], "SacrificeTargetCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "creature")
+
+    def test_fixed_source_controller_draw_spell_accepts_discard_card_cost(self) -> None:
+        row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Tormenting Voice",
+                oracle_text="As an additional cost to cast this spell, discard a card.\nDraw two cards.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new DiscardCardCost());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["additional_cost"], "discard_card")
+        self.assertTrue(effect["requires_discard_card"])
+        self.assertEqual(effect["xmage_additional_cost_class"], "DiscardCardCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "card")
+
+    def test_fixed_source_controller_draw_spell_accepts_discard_land_cost(self) -> None:
+        row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Magmatic Insight",
+                oracle_text="As an additional cost to cast this spell, discard a land card.\nDraw two cards.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new DiscardTargetCost(new TargetCardInHand(new FilterLandCard())));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["additional_cost"], "discard_land")
+        self.assertTrue(effect["requires_discard_land"])
+        self.assertEqual(effect["xmage_additional_cost_class"], "DiscardTargetCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "land")
+
+    def test_fixed_source_controller_draw_spell_blocks_unsupported_additional_cost(self) -> None:
+        row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bankrupt in Blood",
+                oracle_text="As an additional cost to cast this spell, sacrifice two creatures.\nDraw three cards.",
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(2, StaticFilters.FILTER_PERMANENT_CREATURES));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(3));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "draw_additional_cost_not_supported")
+
     def test_reveal_library_pick_spell_creature_or_land_is_package_safe(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["RevealLibraryPickControllerEffect"])
         proposal, reason = split.split_row(

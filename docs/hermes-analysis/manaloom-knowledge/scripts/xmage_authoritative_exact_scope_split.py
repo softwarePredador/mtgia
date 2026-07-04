@@ -5833,6 +5833,51 @@ def fixed_damage_spell_additional_cost_fields_from_source(
     return None, "damage_additional_cost_not_supported"
 
 
+def fixed_draw_spell_additional_cost_fields_from_source(
+    source: str,
+    metadata: dict[str, Any],
+) -> tuple[dict[str, Any] | None, str | None]:
+    text = source or ""
+    has_cost = has_additional_cost(text) or "additional cost" in oracle_text(metadata).lower()
+    if not has_cost:
+        return {}, None
+    cost_count = len(re.findall(r"\.addCost\s*\(", text))
+    if cost_count != 1:
+        return None, "draw_additional_cost_not_supported"
+    lowered_oracle = oracle_text(metadata).lower()
+    if "DiscardCardCost" in text and re.search(r"additional cost.*discard a card", lowered_oracle):
+        return {
+            "additional_cost": "discard_card",
+            "requires_discard_card": True,
+            "xmage_additional_cost_class": "DiscardCardCost",
+            "xmage_additional_cost_target": "card",
+        }, None
+    if (
+        "DiscardTargetCost" in text
+        and "FilterLandCard" in text
+        and re.search(r"additional cost.*discard a land card", lowered_oracle)
+    ):
+        return {
+            "additional_cost": "discard_land",
+            "requires_discard_land": True,
+            "xmage_additional_cost_class": "DiscardTargetCost",
+            "xmage_additional_cost_target": "land",
+        }, None
+    if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice a creature", lowered_oracle
+    ):
+        if re.search(r"SacrificeTargetCost\s*\(\s*2\b", text):
+            return None, "draw_additional_cost_not_supported"
+        if "FILTER_PERMANENT_CREATURE" in text and "FILTER_PERMANENT_CREATURES" not in text:
+            return {
+                "additional_cost": "sacrifice_creature",
+                "requires_sacrifice_creature": True,
+                "xmage_additional_cost_class": "SacrificeTargetCost",
+                "xmage_additional_cost_target": "creature",
+            }, None
+    return None, "draw_additional_cost_not_supported"
+
+
 def spell_cast_draw_filter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     text = re.sub(r"\s*\([^)]*historic[^)]*\)\s*", " ", text).strip()
@@ -7427,6 +7472,8 @@ def split_row(
             return None, "not_one_shot_spell_ability"
         if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
             if unit == DAMAGE_UNIT and effect_classes(row) == {"DamageTargetEffect"}:
+                pass
+            elif unit == DRAW_UNIT and effect_classes(row) == {"DrawCardSourceControllerEffect"}:
                 pass
             else:
                 return None, "additional_cost_detected"
@@ -9835,6 +9882,12 @@ def split_row(
 
         if classes != {"DrawCardSourceControllerEffect"}:
             return None, "draw_effect_class_not_pure"
+        additional_cost_fields, additional_cost_reason = fixed_draw_spell_additional_cost_fields_from_source(
+            source_text,
+            metadata,
+        )
+        if additional_cost_reason is not None:
+            return None, additional_cost_reason
         count = java_constructor_int(source_text, "DrawCardSourceControllerEffect", default=1)
         if count is None or count <= 0:
             return None, "draw_count_missing"
@@ -9844,6 +9897,7 @@ def split_row(
             "count": count,
             "xmage_effect_class": "DrawCardSourceControllerEffect",
             **flags,
+            **(additional_cost_fields or {}),
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_draw_spell"), "selected_exact_scope"
 
