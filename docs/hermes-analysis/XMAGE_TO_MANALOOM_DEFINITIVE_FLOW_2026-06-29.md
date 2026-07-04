@@ -9075,6 +9075,55 @@ new server:
   `xmage_permanent_simple_activated_target_keyword_until_eot`, with `24` cards
   each.
 
+## 2026-07-04 PG436 Permanent Activated Target Keyword Until EOT Closure
+
+- Closed the exact XMage permanent simple activated target-keyword until-end-of
+  turn family as ManaLoom scope
+  `xmage_permanent_simple_activated_target_keyword_until_eot_v1`.
+- The selected package accepted only permanents with a simple activated
+  `GainAbilityTargetEffect`, one supported keyword, fixed mana/tap cost data,
+  no sacrifice cost, and Oracle/XMage agreement on target controller, target
+  constraints, keyword, and duration. Source-sacrifice, unsupported snow or
+  complex costs, unsupported target lanes, and protection-style variants remain
+  blockers.
+- The batch covers `24` cards granting deathtouch, first strike, flying,
+  haste, indestructible, lifelink, trample, or vigilance until EOT, including
+  target constraints by controller, color, subtype, power, attacking state,
+  and exclude-source where present.
+- Focused mapper/runtime tests covered activated target-keyword parsing,
+  mana/tap payment, summoning-sick tap refusal, source static keyword
+  preservation, subtype/color/power/combat target restrictions, and EOT
+  cleanup. PG436 reused existing mapper/runtime support and performed no code
+  mutation. The focused test lane passed `718` tests.
+- The PostgreSQL package promoted `24` cards. Precheck found `24` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `24/24` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4117` PostgreSQL runtime rows, wrote `4109` SQLite runtime
+  rows, and exported `4084` canonical fallback rows.
+- PG436 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `24` selected cards. Generic
+  battle scenario count remained `0`; actual activated target-keyword behavior
+  remains covered by the focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26769`, `xmage_authoritative_source_count=26455`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26455`. This is an exact
+  reduction of `24` from the post-PG435 queue.
+- The post-PG436 exact split recheck reports `proposal_count=430` and
+  `safe_for_batch_pg_package_count=430`. The largest remaining exact family is
+  `xmage_creature_dies_create_tokens` with `24` cards, followed by
+  `xmage_dynamic_count_damage_spell`,
+  `xmage_permanent_simple_activated_library_search_to_battlefield`, and
+  `xmage_static_filtered_evasion_creature`, with `21` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

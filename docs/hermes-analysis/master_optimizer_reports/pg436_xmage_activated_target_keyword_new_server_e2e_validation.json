@@ -1,0 +1,878 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-04T21:43:10.201646+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg436_xmage_activated_target_keyword_new_server_manifest.json",
+  "package_id": "pg436_xmage_activated_target_keyword_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 24
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Accursed Horde",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c67f34e0b57af9ea8cdbd48c878f33d",
+          "oracle_hash": "27c98e40046b8cace7fadfe05e3591c6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Air Marshal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2232bfe70d4fa2a13350a5da6f366b6c",
+          "oracle_hash": "0bbaaa05e21aefaaa46a6777ece08f03",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Alabaster Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1d4f0780d5dd542aa811296cb7294b1d",
+          "oracle_hash": "f38f948b50c037941ca79c15b07d8815",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Axgard Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79",
+          "oracle_hash": "5785676441484c00207f2484c65243ac",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Beacon Behemoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:329d92b495672340e910b7359b21eaf9",
+          "oracle_hash": "5d1268fdeb009fcd0db1b0f36ca881b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Bloodlust Inciter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79",
+          "oracle_hash": "5785676441484c00207f2484c65243ac",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Bloodthorn Taunter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2b4f0c0679b006479e11eca798013366",
+          "oracle_hash": "d2219644a60b27c03cea299c96cab7e5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Crimson Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:265eb45d5b7c049042f3bfbdee9ad6f0",
+          "oracle_hash": "8e1cbce4de6488ec9ea812d860efe108",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Goblin Motivator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79",
+          "oracle_hash": "5785676441484c00207f2484c65243ac",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Hotfoot Gnome",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c51f7f1bb5a04adc09d82c67e1cbcf41",
+          "oracle_hash": "61d15f0c5dff94d1719d7d3d0eef8aca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Jawbone Skulkin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65d4710d2887d605fab27666970f0631",
+          "oracle_hash": "6bbbe1b85dae6cd7344f26c9e763cd05",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Kelsinko Ranger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bd7389e7119414624e491eeae0cab3fa",
+          "oracle_hash": "40942a590ae1b1e9fadb81e5a6d75f66",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Krosan Groundshaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:df48f87ad1e8bbf0849d6a7c3e2a4663",
+          "oracle_hash": "55532aefda2802f96a7972b49ae36065",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Might Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:52092f212cdeeb76a86cfce31664f2be",
+          "oracle_hash": "6540de2c344e29e67a5ccc4af53d889e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Mosstodon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b1fa99745acc8edbae1d7552e8b0d7dd",
+          "oracle_hash": "70a503b9043a29835d0f5715c3ce8939",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Onyx Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0584c17ed05ff1b9825059d1ab3ac656",
+          "oracle_hash": "61294bb5c755dc2daf527f364b686571",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Rage Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7a62ed14cead3de16784856e8bdf1f39",
+          "oracle_hash": "6882311d4a293fff651d713c6a1d58b4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Rakeclaw Gargantuan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:746c344f62541dfd3fe1130127725bd3",
+          "oracle_hash": "1af7c044b849c1f0ed4ebecfc5055d2a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Sky Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:21f48065b7ffa526abb1491ac5edb0d8",
+          "oracle_hash": "d910b26b9376634f418d7da55f990082",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Sootstoke Kindler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:87a49611dcbe7a1c23df28aa9975b885",
+          "oracle_hash": "976ed9d2e22785317e639fb337da7c40",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Spearbreaker Behemoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d7e35429be788850292bac141af33339",
+          "oracle_hash": "5d75e55d6ad99263aadfbaf704432a42",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Trailblazing Historian",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c51f7f1bb5a04adc09d82c67e1cbcf41",
+          "oracle_hash": "61d15f0c5dff94d1719d7d3d0eef8aca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Whalebone Glider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c26201c5973671d16681b08139ba710e",
+          "oracle_hash": "cfc85fd50c7be0ab40d8515516f99634",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Whip Sergeant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:225e955ff817043977cbe3fcb909b9d2",
+          "oracle_hash": "f7a0e1a5a2b5f2799692b1dc62e7f2b7",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 24
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Accursed Horde",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c67f34e0b57af9ea8cdbd48c878f33d",
+          "oracle_hash": "27c98e40046b8cace7fadfe05e3591c6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Air Marshal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2232bfe70d4fa2a13350a5da6f366b6c",
+          "oracle_hash": "0bbaaa05e21aefaaa46a6777ece08f03",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Alabaster Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1d4f0780d5dd542aa811296cb7294b1d",
+          "oracle_hash": "f38f948b50c037941ca79c15b07d8815",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Axgard Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79",
+          "oracle_hash": "5785676441484c00207f2484c65243ac",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Beacon Behemoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:329d92b495672340e910b7359b21eaf9",
+          "oracle_hash": "5d1268fdeb009fcd0db1b0f36ca881b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Bloodlust Inciter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79",
+          "oracle_hash": "5785676441484c00207f2484c65243ac",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Bloodthorn Taunter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2b4f0c0679b006479e11eca798013366",
+          "oracle_hash": "d2219644a60b27c03cea299c96cab7e5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Crimson Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:265eb45d5b7c049042f3bfbdee9ad6f0",
+          "oracle_hash": "8e1cbce4de6488ec9ea812d860efe108",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Goblin Motivator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79",
+          "oracle_hash": "5785676441484c00207f2484c65243ac",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Hotfoot Gnome",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c51f7f1bb5a04adc09d82c67e1cbcf41",
+          "oracle_hash": "61d15f0c5dff94d1719d7d3d0eef8aca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Jawbone Skulkin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65d4710d2887d605fab27666970f0631",
+          "oracle_hash": "6bbbe1b85dae6cd7344f26c9e763cd05",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Kelsinko Ranger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bd7389e7119414624e491eeae0cab3fa",
+          "oracle_hash": "40942a590ae1b1e9fadb81e5a6d75f66",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Krosan Groundshaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:df48f87ad1e8bbf0849d6a7c3e2a4663",
+          "oracle_hash": "55532aefda2802f96a7972b49ae36065",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Might Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:52092f212cdeeb76a86cfce31664f2be",
+          "oracle_hash": "6540de2c344e29e67a5ccc4af53d889e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Mosstodon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b1fa99745acc8edbae1d7552e8b0d7dd",
+          "oracle_hash": "70a503b9043a29835d0f5715c3ce8939",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Onyx Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0584c17ed05ff1b9825059d1ab3ac656",
+          "oracle_hash": "61294bb5c755dc2daf527f364b686571",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Rage Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7a62ed14cead3de16784856e8bdf1f39",
+          "oracle_hash": "6882311d4a293fff651d713c6a1d58b4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Rakeclaw Gargantuan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:746c344f62541dfd3fe1130127725bd3",
+          "oracle_hash": "1af7c044b849c1f0ed4ebecfc5055d2a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Sky Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:21f48065b7ffa526abb1491ac5edb0d8",
+          "oracle_hash": "d910b26b9376634f418d7da55f990082",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Sootstoke Kindler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:87a49611dcbe7a1c23df28aa9975b885",
+          "oracle_hash": "976ed9d2e22785317e639fb337da7c40",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Spearbreaker Behemoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d7e35429be788850292bac141af33339",
+          "oracle_hash": "5d75e55d6ad99263aadfbaf704432a42",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Trailblazing Historian",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c51f7f1bb5a04adc09d82c67e1cbcf41",
+          "oracle_hash": "61d15f0c5dff94d1719d7d3d0eef8aca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Whalebone Glider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c26201c5973671d16681b08139ba710e",
+          "oracle_hash": "cfc85fd50c7be0ab40d8515516f99634",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "card_name": "Whip Sergeant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:225e955ff817043977cbe3fcb909b9d2",
+          "oracle_hash": "f7a0e1a5a2b5f2799692b1dc62e7f2b7",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 24
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Accursed Horde",
+          "logical_rule_key": "battle_rule_v1:8c67f34e0b57af9ea8cdbd48c878f33d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Air Marshal",
+          "logical_rule_key": "battle_rule_v1:2232bfe70d4fa2a13350a5da6f366b6c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Alabaster Mage",
+          "logical_rule_key": "battle_rule_v1:1d4f0780d5dd542aa811296cb7294b1d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Axgard Cavalry",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Beacon Behemoth",
+          "logical_rule_key": "battle_rule_v1:329d92b495672340e910b7359b21eaf9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bloodlust Inciter",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bloodthorn Taunter",
+          "logical_rule_key": "battle_rule_v1:2b4f0c0679b006479e11eca798013366"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Crimson Mage",
+          "logical_rule_key": "battle_rule_v1:265eb45d5b7c049042f3bfbdee9ad6f0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Motivator",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hotfoot Gnome",
+          "logical_rule_key": "battle_rule_v1:c51f7f1bb5a04adc09d82c67e1cbcf41"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jawbone Skulkin",
+          "logical_rule_key": "battle_rule_v1:65d4710d2887d605fab27666970f0631"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kelsinko Ranger",
+          "logical_rule_key": "battle_rule_v1:bd7389e7119414624e491eeae0cab3fa"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Krosan Groundshaker",
+          "logical_rule_key": "battle_rule_v1:df48f87ad1e8bbf0849d6a7c3e2a4663"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Might Weaver",
+          "logical_rule_key": "battle_rule_v1:52092f212cdeeb76a86cfce31664f2be"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mosstodon",
+          "logical_rule_key": "battle_rule_v1:b1fa99745acc8edbae1d7552e8b0d7dd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Onyx Mage",
+          "logical_rule_key": "battle_rule_v1:0584c17ed05ff1b9825059d1ab3ac656"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rage Weaver",
+          "logical_rule_key": "battle_rule_v1:7a62ed14cead3de16784856e8bdf1f39"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rakeclaw Gargantuan",
+          "logical_rule_key": "battle_rule_v1:746c344f62541dfd3fe1130127725bd3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sky Weaver",
+          "logical_rule_key": "battle_rule_v1:21f48065b7ffa526abb1491ac5edb0d8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sootstoke Kindler",
+          "logical_rule_key": "battle_rule_v1:87a49611dcbe7a1c23df28aa9975b885"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spearbreaker Behemoth",
+          "logical_rule_key": "battle_rule_v1:d7e35429be788850292bac141af33339"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Trailblazing Historian",
+          "logical_rule_key": "battle_rule_v1:c51f7f1bb5a04adc09d82c67e1cbcf41"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Whalebone Glider",
+          "logical_rule_key": "battle_rule_v1:c26201c5973671d16681b08139ba710e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Whip Sergeant",
+          "logical_rule_key": "battle_rule_v1:225e955ff817043977cbe3fcb909b9d2"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 24
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Accursed Horde",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8c67f34e0b57af9ea8cdbd48c878f33d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Air Marshal",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2232bfe70d4fa2a13350a5da6f366b6c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Alabaster Mage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1d4f0780d5dd542aa811296cb7294b1d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Axgard Cavalry",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Beacon Behemoth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:329d92b495672340e910b7359b21eaf9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bloodlust Inciter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bloodthorn Taunter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2b4f0c0679b006479e11eca798013366"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Crimson Mage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:265eb45d5b7c049042f3bfbdee9ad6f0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Motivator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:390389de6d07280cec26bbd1d23eea79"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hotfoot Gnome",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c51f7f1bb5a04adc09d82c67e1cbcf41"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jawbone Skulkin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:65d4710d2887d605fab27666970f0631"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kelsinko Ranger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:bd7389e7119414624e491eeae0cab3fa"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Krosan Groundshaker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:df48f87ad1e8bbf0849d6a7c3e2a4663"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Might Weaver",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:52092f212cdeeb76a86cfce31664f2be"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mosstodon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b1fa99745acc8edbae1d7552e8b0d7dd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Onyx Mage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0584c17ed05ff1b9825059d1ab3ac656"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rage Weaver",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7a62ed14cead3de16784856e8bdf1f39"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rakeclaw Gargantuan",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:746c344f62541dfd3fe1130127725bd3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sky Weaver",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:21f48065b7ffa526abb1491ac5edb0d8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sootstoke Kindler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:87a49611dcbe7a1c23df28aa9975b885"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spearbreaker Behemoth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d7e35429be788850292bac141af33339"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Trailblazing Historian",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c51f7f1bb5a04adc09d82c67e1cbcf41"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Whalebone Glider",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:c26201c5973671d16681b08139ba710e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Whip Sergeant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:225e955ff817043977cbe3fcb909b9d2"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
