@@ -1,0 +1,165 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg400_play_lands_from_graveyard_new_server_20260704_1043",
+  "deploy_id": "PG400",
+  "expected_rules": [
+    {
+      "card_name": "Crucible of Worlds",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+      "min_rule_version": 2,
+      "normalized_name": "crucible of worlds",
+      "oracle_hash": "cbfe8d699b0aab297f7c1ce0658589d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_play_lands_from_graveyard_v1",
+        "effect": "recursion",
+        "static_effect": "play_lands_from_graveyard",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "PlayFromGraveyardControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ramunap Excavator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+      "min_rule_version": 2,
+      "normalized_name": "ramunap excavator",
+      "oracle_hash": "cbfe8d699b0aab297f7c1ce0658589d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_play_lands_from_graveyard_v1",
+        "effect": "recursion",
+        "static_effect": "play_lands_from_graveyard",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "PlayFromGraveyardControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_play_lands_from_graveyard": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg400_play_lands_from_graveyard_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg400_play_lands_from_graveyard_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg400_play_lands_from_graveyard_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg400_play_lands_from_graveyard_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg400_play_lands_from_graveyard_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg400_play_lands_from_graveyard_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-04T10:43:32+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Crucible of Worlds"
+      },
+      "card_name": "Crucible of Worlds",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+      "normalized_name": "crucible of worlds",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_play_lands_from_graveyard_v1",
+        "effect": "recursion",
+        "static_effect": "play_lands_from_graveyard",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "PlayFromGraveyardControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ramunap Excavator"
+      },
+      "card_name": "Ramunap Excavator",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+      "normalized_name": "ramunap excavator",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_play_lands_from_graveyard_v1",
+        "effect": "recursion",
+        "static_effect": "play_lands_from_graveyard",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "PlayFromGraveyardControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Crucible of Worlds",
+    "Ramunap Excavator"
+  ],
+  "selected_count": 2,
+  "slug": "play_lands_from_graveyard_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Crucible of Worlds",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+      "min_rule_version": 2,
+      "normalized_name": "crucible of worlds",
+      "oracle_hash": "cbfe8d699b0aab297f7c1ce0658589d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_play_lands_from_graveyard_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ramunap Excavator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+      "min_rule_version": 2,
+      "normalized_name": "ramunap excavator",
+      "oracle_hash": "cbfe8d699b0aab297f7c1ce0658589d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_play_lands_from_graveyard_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

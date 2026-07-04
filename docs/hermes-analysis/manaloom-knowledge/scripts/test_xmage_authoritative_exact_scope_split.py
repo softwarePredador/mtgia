@@ -43,6 +43,85 @@ def metadata(name: str = "Fixture Spell", *, type_line: str = "Instant", oracle_
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_static_play_lands_from_graveyard_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["PlayFromGraveyardControllerEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Crucible of Worlds",
+                type_line="Artifact",
+                oracle_text="You may play lands from your graveyard.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleStaticAbility(
+                    PlayFromGraveyardControllerEffect.playLands()));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_LAND_PLAY_SCOPE)
+        self.assertEqual(effect["ability_kind"], "static")
+        self.assertEqual(effect["static_effect"], "play_lands_from_graveyard")
+        self.assertTrue(effect["play_lands_from_graveyard"])
+        self.assertEqual(effect["land_play_source_zone"], "graveyard")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
+        )
+
+    def test_static_play_lands_from_graveyard_blocks_extra_unmodeled_ability(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["PlayFromGraveyardControllerEffect"],
+            ability_classes=["SimpleStaticAbility", "UnearthAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Perennial Behemoth",
+                type_line="Creature - Dinosaur",
+                oracle_text="You may play lands from your graveyard.\nUnearth {G}{G}",
+            ),
+            source_text="""
+                this.addAbility(new SimpleStaticAbility(
+                    PlayFromGraveyardControllerEffect.playLands()));
+                this.addAbility(new UnearthAbility(new ManaCostsImpl<>("{G}{G}")));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "play_lands_from_graveyard_ability_class_not_simple_static")
+
+    def test_static_play_lands_from_graveyard_blocks_cast_spells_variant(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["PlayFromGraveyardControllerEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Yawgmoth's Agenda",
+                type_line="Enchantment",
+                oracle_text="You may play lands and cast spells from your graveyard.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleStaticAbility(
+                    PlayFromGraveyardControllerEffect.playLandsAndCastSpells(Duration.WhileOnBattlefield)));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "play_lands_from_graveyard_oracle_not_exact")
+
     def test_return_all_graveyard_enchantments_to_battlefield_spell_maps_to_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

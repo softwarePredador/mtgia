@@ -141,6 +141,7 @@ RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
 )
 GRAVEYARD_TO_LIBRARY_SPELL_SCOPE = "xmage_put_target_graveyard_card_on_library_spell_v1"
 LIBRARY_PICK_SPELL_SCOPE = "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1"
+GRAVEYARD_LAND_PLAY_SCOPE = "xmage_static_play_lands_from_graveyard_v1"
 PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = (
     "xmage_permanent_simple_activated_graveyard_to_library_v1"
 )
@@ -726,6 +727,17 @@ def ability_classes(row: dict[str, Any]) -> set[str]:
 
 def oracle_text(metadata: dict[str, Any]) -> str:
     return re.sub(r"\s+", " ", str(metadata.get("oracle_text") or "").strip()).lower()
+
+
+def oracle_is_play_lands_from_graveyard(metadata: dict[str, Any]) -> bool:
+    return oracle_text(metadata) == "you may play lands from your graveyard."
+
+
+def source_supports_play_lands_from_graveyard(source_text: str) -> bool:
+    return (
+        "SimpleStaticAbility" in (source_text or "")
+        and "PlayFromGraveyardControllerEffect.playLands()" in (source_text or "")
+    )
 
 
 def has_oracle_complexity(metadata: dict[str, Any], tokens: set[str] = SPELL_COMPLEXITY_TOKENS) -> bool:
@@ -8446,6 +8458,11 @@ def split_row(
     graveyard_self_return_unit = (
         graveyard_self_return_to_hand_unit or graveyard_self_return_to_battlefield_unit
     )
+    play_lands_from_graveyard_unit = (
+        unit == RECURSION_UNIT
+        and effect_classes(row) == {"PlayFromGraveyardControllerEffect"}
+        and "SimpleStaticAbility" in ability_classes(row)
+    )
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
     draw_self_cost_reduction_spell_unit = (
@@ -8537,6 +8554,7 @@ def split_row(
         and not permanent_activated_graveyard_exile_unit
         and not permanent_activated_graveyard_to_library_unit
         and not graveyard_self_return_unit
+        and not play_lands_from_graveyard_unit
         and not draw_self_cost_reduction_spell_unit
     ):
         if not is_spell(metadata):
@@ -11855,6 +11873,33 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_return_target_to_hand_spell"), "selected_exact_scope"
 
     if unit == RECURSION_UNIT:
+        if classes == {"PlayFromGraveyardControllerEffect"}:
+            if ability_classes(row) != {"SimpleStaticAbility"}:
+                return None, "play_lands_from_graveyard_ability_class_not_simple_static"
+            if not oracle_is_play_lands_from_graveyard(metadata):
+                return None, "play_lands_from_graveyard_oracle_not_exact"
+            if not source_supports_play_lands_from_graveyard(source_text):
+                return None, "play_lands_from_graveyard_source_not_supported"
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": GRAVEYARD_LAND_PLAY_SCOPE,
+                "ability_kind": "static",
+                "static_effect": "play_lands_from_graveyard",
+                "play_lands_from_graveyard": True,
+                "land_play_source_zone": "graveyard",
+                "target": "land",
+                "target_controller": "self",
+                "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
+                "xmage_effect_class": "PlayFromGraveyardControllerEffect",
+                "xmage_ability_class": "SimpleStaticAbility",
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_static_play_lands_from_graveyard",
+            ), "selected_exact_scope"
         if classes == {"RevealLibraryPickControllerEffect"}:
             if ability_classes(row):
                 return None, "library_pick_ability_class_not_simple"

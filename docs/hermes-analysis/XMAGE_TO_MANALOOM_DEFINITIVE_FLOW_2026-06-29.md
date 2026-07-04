@@ -230,21 +230,33 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg399c_hash_backfill_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg399c_hash_backfill_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg399c_hash_backfill_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_pg400_play_lands_from_graveyard_new_server_candidate.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg400_play_lands_from_graveyard_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg400_play_lands_from_graveyard_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg400_play_lands_from_graveyard_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg400_play_lands_from_graveyard_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg400_play_lands_from_graveyard_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg400_play_lands_from_graveyard_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg400_play_lands_from_graveyard_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26762`
-- XMage authoritative source resolved: `26448`
+- target all-card battle-gap identities: `26760`
+- XMage authoritative source resolved: `26446`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26448`
+- XMage authoritative adapter required: `26446`
 - ManaLoom adapter work-unit keys: `11427`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26448` identities, card semantics are accepted from XMage; work is now
+- For `26446` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -263,10 +275,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG399c Exact Adapter And Integrity Waves
+## PG283-PG400 Exact Adapter And Integrity Waves
 
-As of 2026-07-04, the PG283-PG399 all-card exact adapter waves are applied and
-synced. PG375-PG399 and the PG399b/PG399c integrity backfills were applied
+As of 2026-07-04, the PG283-PG400 all-card exact adapter waves are applied and
+synced. PG375-PG400 and the PG399b/PG399c integrity backfills were applied
 against the new EasyPanel PostgreSQL target via the new-server tunnel and
 validated with `database_target=127.0.0.1:15432/halder`.
 
@@ -397,6 +409,14 @@ patterns:
   the bottom of its owner's library, supported mana/tap costs, and optional
   self combat keywords ->
   `xmage_permanent_simple_activated_graveyard_to_library_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` with
+  `PlayFromGraveyardControllerEffect + SimpleStaticAbility`, exact Oracle text
+  "You may play lands from your graveyard.", and exact XMage
+  `PlayFromGraveyardControllerEffect.playLands()` source ->
+  `xmage_static_play_lands_from_graveyard_v1`. This scope deliberately blocks
+  extra unmodeled ability classes such as `UnearthAbility` and the broader
+  `playLandsAndCastSpells(...)` variants until their combined runtime contract
+  exists.
 - `draw_engine::xmage_draw_card_variant_review_v1` with
   `DrawCardSourceControllerEffect + EntersBattlefieldTriggeredAbility` on
   creatures and fixed Oracle/source draw count ->
@@ -6801,6 +6821,53 @@ PG399 measured result:
   self-cost-reduction and fixed target-player draw spillover are therefore
   closed for currently supported exact scopes.
 
+PG400 measured result:
+
+- PG400 promoted `2` exact static graveyard land-play rules on the new server:
+  `Crucible of Worlds` and `Ramunap Excavator`.
+- Both rows use `xmage_static_play_lands_from_graveyard_v1`, sourced from
+  local XMage `PlayFromGraveyardControllerEffect.playLands()` under
+  `SimpleStaticAbility` with exact Oracle text "You may play lands from your
+  graveyard.".
+- The splitter deliberately left `Perennial Behemoth` blocked by
+  `play_lands_from_graveyard_ability_class_not_simple_static` because its XMage
+  class also has `UnearthAbility`. That card needs a combined/secondary ability
+  lane before it can be considered fully closed.
+- Runtime now supports static graveyard land-play permission through
+  `choose_land_play_candidate` / `play_land_candidate`, preserving normal hand
+  land priority, preserving top-library land permission priority, removing
+  graveyard lands through `remove_cards_from_graveyard(...)`, and emitting
+  `played_from_graveyard`, `graveyard_land_play_source`, and
+  `graveyard_land_play_scope` replay fields.
+- Full exact splitter tests passed `371/371`, exact runtime tests passed
+  `213/213`, and `py_compile` passed for the changed splitter, runtime, and
+  test files.
+- PostgreSQL precheck matched `1` Oracle-hash-backed target row for each card
+  on the new server. Apply backed up `2` existing rows, deprecated `2` stale
+  shadow rows for `Crucible of Worlds`, and upserted `2` verified/auto rules.
+  Postcheck verified `2/2` promoted rows as `verified`, `auto`, and
+  hash-backed.
+- PG -> Hermes/SQLite sync used `database_target=127.0.0.1:15432/halder`,
+  loaded `4131` PostgreSQL rows, updated `4128` SQLite rows, and exported
+  `5273` canonical snapshot rows. Metadata sync used the same new-server
+  target, matched `6278` PostgreSQL cards from `6083` unique requested names,
+  wrote `6205` SQLite alias rows, and backfilled `2699/2699` deck-card cache
+  rows with `96` local `card_id` updates.
+- E2E validation passed PostgreSQL source-of-truth, SQLite/Hermes cache,
+  canonical snapshot fallback, runtime `get_card_effect`, and no-override
+  stages for both cards against `database_target=127.0.0.1:15432/halder`.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `51/51`.
+- Global all-card authoritative queue after PG400:
+  `target_identity_count=26760`, `xmage_authoritative_source_count=26446`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26446`.
+- Running the exact splitter after PG400 on supported units returned
+  `proposal_count=0` over `7600` considered supported rows. The static
+  graveyard land-play subpattern is therefore closed for currently safe exact
+  scopes.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -7431,10 +7498,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG399c queue on the new server, the next exact runtime-backed work should
+post-PG400 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1818`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1816`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1610`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `851`

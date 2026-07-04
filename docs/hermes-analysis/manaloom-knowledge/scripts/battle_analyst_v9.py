@@ -21453,9 +21453,10 @@ def activate_hand_cycling(
 
 
 TOPDECK_LAND_PLAY_SCOPE = "look_top_library_play_lands_from_top_if_opponent_more_lands_v1"
+GRAVEYARD_LAND_PLAY_SCOPE = "xmage_static_play_lands_from_graveyard_v1"
 
 
-def _topdeck_land_play_effects(permanent):
+def _land_play_permission_effects(permanent):
     if not isinstance(permanent, dict):
         return []
     effects = [permanent]
@@ -21466,6 +21467,10 @@ def _topdeck_land_play_effects(permanent):
     if isinstance(resolved, dict) and resolved is not permanent:
         effects.append(resolved)
     return effects
+
+
+def _topdeck_land_play_effects(permanent):
+    return _land_play_permission_effects(permanent)
 
 
 def topdeck_land_play_permission(player, opponents):
@@ -21496,6 +21501,23 @@ def topdeck_land_play_permission(player, opponents):
     return None
 
 
+def graveyard_land_play_permission(player):
+    """Return the permanent granting static graveyard land play, if active."""
+    for permanent in getattr(player, "battlefield", []) or []:
+        for effect_data in _land_play_permission_effects(permanent):
+            scope = str(effect_data.get("battle_model_scope") or "")
+            if scope != GRAVEYARD_LAND_PLAY_SCOPE:
+                continue
+            if not effect_data.get("play_lands_from_graveyard"):
+                continue
+            return {
+                "source": permanent,
+                "effect_data": effect_data,
+                "scope": scope,
+            }
+    return None
+
+
 def choose_land_play_candidate(player, opponents):
     if player.lands_played_this_turn >= player.max_lands_per_turn:
         return None
@@ -21505,6 +21527,7 @@ def choose_land_play_candidate(player, opponents):
             "card": lands_in_hand[0],
             "source_zone": "hand",
             "topdeck_permission": None,
+            "graveyard_permission": None,
         }
     permission = topdeck_land_play_permission(player, opponents)
     if permission and player.library and is_effective_land(player.library[0]):
@@ -21512,7 +21535,18 @@ def choose_land_play_candidate(player, opponents):
             "card": player.library[0],
             "source_zone": "library",
             "topdeck_permission": permission,
+            "graveyard_permission": None,
         }
+    graveyard_permission = graveyard_land_play_permission(player)
+    if graveyard_permission:
+        lands_in_graveyard = [card for card in getattr(player, "graveyard", []) or [] if is_effective_land(card)]
+        if lands_in_graveyard:
+            return {
+                "card": lands_in_graveyard[0],
+                "source_zone": "graveyard",
+                "topdeck_permission": None,
+                "graveyard_permission": graveyard_permission,
+            }
     return None
 
 
@@ -21533,6 +21567,15 @@ def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
             if land in getattr(player, "exile", []) or []:
                 player.exile.remove(land)
             else:
+                return False
+        elif source_zone == "graveyard":
+            removed = remove_cards_from_graveyard(
+                player,
+                [land],
+                turn=turn,
+                source_event="graveyard_land_play",
+            )
+            if not removed:
                 return False
         elif land not in player.hand:
             return False
@@ -21584,6 +21627,8 @@ def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
     )
     permission = candidate.get("topdeck_permission") or {}
     permission_source = permission.get("source") or {}
+    graveyard_permission = candidate.get("graveyard_permission") or {}
+    graveyard_permission_source = graveyard_permission.get("source") or {}
     emit_replay_event(
         "land_played",
         player=player.name,
@@ -21609,8 +21654,13 @@ def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
         life_after=player.life,
         source_zone=source_zone,
         played_from_top_library=source_zone == "library",
+        played_from_graveyard=source_zone == "graveyard",
         topdeck_play_source=permission_source.get("name") if permission_source else None,
         topdeck_play_scope=permission.get("scope"),
+        graveyard_land_play_source=(
+            graveyard_permission_source.get("name") if graveyard_permission_source else None
+        ),
+        graveyard_land_play_scope=graveyard_permission.get("scope"),
         turn=turn,
         **replay_rule_fields(eff),
     )

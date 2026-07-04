@@ -30,6 +30,86 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
     def tearDown(self) -> None:
         self.battle.REPLAY_EVENT_HANDLER = self.previous_handler
 
+    def test_static_play_lands_from_graveyard_uses_graveyard_land_when_no_hand_or_topdeck(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        crucible = {
+            "name": "Crucible of Worlds",
+            "type_line": "Artifact",
+            "effect": "recursion",
+            "battle_model_scope": "xmage_static_play_lands_from_graveyard_v1",
+            "static_effect": "play_lands_from_graveyard",
+            "play_lands_from_graveyard": True,
+            "land_play_source_zone": "graveyard",
+            "_rule_logical_key": "battle_rule_v1:fixture_crucible",
+        }
+        graveyard_land = {"name": "Misty Rainforest", "type_line": "Land"}
+        active.battlefield = [crucible]
+        active.hand = []
+        active.library = [{"name": "Nonland Spell", "type_line": "Sorcery"}]
+        active.graveyard = [graveyard_land]
+
+        candidate = self.battle.choose_land_play_candidate(active, [opponent])
+        self.assertIsNotNone(candidate)
+        self.assertEqual(candidate["card"], graveyard_land)
+        self.assertEqual(candidate["source_zone"], "graveyard")
+
+        played = self.battle.play_land_candidate(
+            active,
+            [opponent],
+            [active, opponent],
+            1,
+            None,
+            candidate,
+        )
+
+        self.assertTrue(played)
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual(active.lands_played_this_turn, 1)
+        self.assertTrue(any(card.get("name") == "Misty Rainforest" for card in active.battlefield))
+        self.assertTrue(
+            any(
+                event == "land_played"
+                and data.get("card") == "Misty Rainforest"
+                and data.get("source_zone") == "graveyard"
+                and data.get("played_from_graveyard") is True
+                and data.get("graveyard_land_play_source") == "Crucible of Worlds"
+                and data.get("graveyard_land_play_scope") == "xmage_static_play_lands_from_graveyard_v1"
+                for event, data in self.events
+            )
+        )
+
+    def test_static_play_lands_from_graveyard_does_not_override_hand_land(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        crucible = {
+            "name": "Ramunap Excavator",
+            "type_line": "Creature - Naga Cleric",
+            "effect": "recursion",
+            "battle_model_scope": "xmage_static_play_lands_from_graveyard_v1",
+            "static_effect": "play_lands_from_graveyard",
+            "play_lands_from_graveyard": True,
+        }
+        hand_land = {"name": "Forest", "type_line": "Basic Land - Forest"}
+        graveyard_land = {"name": "Evolving Wilds", "type_line": "Land"}
+        active.battlefield = [crucible]
+        active.hand = [hand_land]
+        active.graveyard = [graveyard_land]
+
+        candidate = self.battle.choose_land_play_candidate(active, [])
+
+        self.assertIsNotNone(candidate)
+        self.assertEqual(candidate["card"], hand_land)
+        self.assertEqual(candidate["source_zone"], "hand")
+        self.assertIsNone(candidate["graveyard_permission"])
+
+    def test_static_play_lands_from_graveyard_requires_permission(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.hand = []
+        active.library = [{"name": "Nonland Spell", "type_line": "Sorcery"}]
+        active.graveyard = [{"name": "Evolving Wilds", "type_line": "Land"}]
+
+        self.assertIsNone(self.battle.choose_land_play_candidate(active, []))
+
     def test_static_controlled_power_toughness_boost_applies_without_accumulating(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

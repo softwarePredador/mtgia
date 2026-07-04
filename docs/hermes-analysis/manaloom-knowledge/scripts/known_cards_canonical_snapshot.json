@@ -18052,15 +18052,32 @@
     "battle_rule_oracle_hash": "e15689e9f3a9539495fdbd3834b83b66"
   },
   "Crucible of Worlds": {
-    "cmc": 3.0,
-    "effect": "ramp_permanent",
-    "mana_produced": 1,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f29d2ecc795a6845ed61a66604a3958b"
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_play_lands_from_graveyard_v1",
+    "effect": "recursion",
+    "instant": false,
+    "land_play_source_zone": "graveyard",
+    "play_lands_from_graveyard": true,
+    "sorcery": false,
+    "static_effect": "play_lands_from_graveyard",
+    "target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "PlayFromGraveyardControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+    "battle_rule_oracle_hash": "cbfe8d699b0aab297f7c1ce0658589d9"
   },
   "Cruel Cut": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -65847,6 +65864,34 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:46ba2b759b0c9a870fc137d59e42ecd5",
     "battle_rule_oracle_hash": "4ce07a0d5e5a33a68517b988b63dbe42"
+  },
+  "Ramunap Excavator": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_play_lands_from_graveyard_v1",
+    "effect": "recursion",
+    "instant": false,
+    "land_play_source_zone": "graveyard",
+    "play_lands_from_graveyard": true,
+    "sorcery": false,
+    "static_effect": "play_lands_from_graveyard",
+    "target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "PlayFromGraveyardControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+    "battle_rule_oracle_hash": "cbfe8d699b0aab297f7c1ce0658589d9"
   },
   "Ramunap Ruins": {
     "effect": "land",
