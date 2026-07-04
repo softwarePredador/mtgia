@@ -8489,6 +8489,47 @@ new server:
   post-PG421 exact split recheck produced `proposal_count=0`; the remaining
   `314` identities are still explicit missing-source exceptions.
 
+## 2026-07-04 PG422 Static Filtered Evasion Creature Closure
+
+- Closed the exact XMage unit
+  `CantBeBlockedByCreaturesSourceEffect::SimpleEvasionAbility` as ManaLoom
+  scope `xmage_static_filtered_evasion_creature_v1`.
+- The mapper accepts only creatures whose Oracle text and local XMage source
+  agree on a runtime-supported blocker filter: power threshold, color,
+  subtype, artifact, token, or `can't be blocked except by ...` allowed
+  blocker filters. Broader conditional evasion remains blocked for separate
+  adapters.
+- Runtime behavior now extends `blocker_can_block_attacker`: after flying/reach
+  and block-only-flying checks, blockers matching
+  `cant_be_blocked_by_filters` are rejected, and blockers must match one of
+  `can_be_blocked_only_by_filters` when present. Focused tests cover color,
+  power, subtype, artifact, and `except by` legalities.
+- The PostgreSQL package promoted `21` cards:
+  `Amrou Kithkin`, `Amrou Seekers`, `Arlinn's Wolf`,
+  `Barrenton Cragtreads`, `Bog Rats`, `Deathcult Rogue`, `Dread Warlock`,
+  `Duskmantle Operative`, `Fleet-Footed Monk`, `Goldmeadow Dodger`,
+  `Kor Castigator`, `Mudbrawler Raiders`, `Prowling Nightstalker`,
+  `Rampart Crawler`, `Raven's Run Dragoon`, `River Darter`,
+  `Rubblebelt Runner`, `Sacred Knight`, `Skirk Shaman`, `Sootwalkers`, and
+  `Wanderbrine Rootcutters`. Precheck found `21` target rows, `0` existing
+  rule rows, and `0` shadow rows; apply inserted/updated `21`; postcheck
+  verified `21/21` promoted rows as `verified`/`auto` with Oracle hashes.
+- Hermes sync refreshed PostgreSQL card metadata against
+  `127.0.0.1:15432/halder` and synced `21` PG rules into SQLite. The canonical
+  fallback export increased to `5595` rows.
+- PG422 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `21` selected cards. Generic
+  battle scenario count remained `0`; combat legality is covered by focused
+  runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26450` to `26429`, authoritative adapter-required count from `26136`
+  to `26115`, and the exact filtered-evasion work unit to zero. The post-PG422
+  exact split recheck produced `proposal_count=0`; the remaining `314`
+  identities are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

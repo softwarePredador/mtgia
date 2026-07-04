@@ -271,6 +271,136 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(assignments, [(attacker, [blocker])])
         self.assertTrue(blocker.get("blocking"))
 
+    def test_static_filtered_evasion_rejects_matching_color_blocker(self) -> None:
+        attacker = {
+            "name": "Barrenton Cragtreads",
+            "type_line": "Creature - Kithkin Scout",
+            "power": 0,
+            "toughness": 4,
+            "cant_be_blocked_by_filters": [{"kind": "color", "colors": ["R"]}],
+            "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        }
+        red_blocker = {
+            "name": "Red Bear",
+            "type_line": "Creature - Bear",
+            "colors": ["R"],
+            "power": 2,
+            "toughness": 2,
+        }
+        white_blocker = {
+            "name": "White Bear",
+            "type_line": "Creature - Bear",
+            "colors": ["W"],
+            "power": 2,
+            "toughness": 2,
+        }
+
+        self.assertFalse(self.battle.blocker_can_block_attacker(red_blocker, attacker))
+        self.assertTrue(self.battle.blocker_can_block_attacker(white_blocker, attacker))
+
+    def test_static_filtered_evasion_only_by_color_allows_only_matching_color(self) -> None:
+        attacker = {
+            "name": "Dread Warlock",
+            "type_line": "Creature - Human Wizard Warlock",
+            "power": 2,
+            "toughness": 2,
+            "can_be_blocked_only_by_filters": [{"kind": "color", "colors": ["B"]}],
+            "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        }
+        black_blocker = {
+            "name": "Black Bear",
+            "type_line": "Creature - Bear",
+            "colors": ["B"],
+            "power": 2,
+            "toughness": 2,
+        }
+        green_blocker = {
+            "name": "Green Bear",
+            "type_line": "Creature - Bear",
+            "colors": ["G"],
+            "power": 2,
+            "toughness": 2,
+        }
+
+        self.assertTrue(self.battle.blocker_can_block_attacker(black_blocker, attacker))
+        self.assertFalse(self.battle.blocker_can_block_attacker(green_blocker, attacker))
+
+    def test_static_filtered_evasion_only_by_artifact_or_white(self) -> None:
+        attacker = {
+            "name": "Amrou Seekers",
+            "type_line": "Creature - Kithkin Rebel",
+            "power": 2,
+            "toughness": 2,
+            "can_be_blocked_only_by_filters": [
+                {"kind": "artifact"},
+                {"kind": "color", "colors": ["W"]},
+            ],
+            "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        }
+        artifact_blocker = {
+            "name": "Bronze Sable",
+            "type_line": "Artifact Creature - Sable",
+            "power": 2,
+            "toughness": 1,
+        }
+        white_blocker = {
+            "name": "Savannah Lions",
+            "type_line": "Creature - Cat",
+            "colors": ["W"],
+            "power": 2,
+            "toughness": 1,
+        }
+        red_blocker = {
+            "name": "Red Bear",
+            "type_line": "Creature - Bear",
+            "colors": ["R"],
+            "power": 2,
+            "toughness": 2,
+        }
+
+        self.assertTrue(self.battle.blocker_can_block_attacker(artifact_blocker, attacker))
+        self.assertTrue(self.battle.blocker_can_block_attacker(white_blocker, attacker))
+        self.assertFalse(self.battle.blocker_can_block_attacker(red_blocker, attacker))
+
+    def test_static_filtered_evasion_rejects_matching_power_and_subtype_filters(self) -> None:
+        power_attacker = {
+            "name": "Amrou Kithkin",
+            "type_line": "Creature - Kithkin",
+            "cant_be_blocked_by_filters": [{"kind": "power", "operator": "gte", "value": 3}],
+            "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        }
+        self.assertFalse(
+            self.battle.blocker_can_block_attacker(
+                {"name": "Hill Giant", "type_line": "Creature - Giant", "power": 3, "toughness": 3},
+                power_attacker,
+            )
+        )
+        self.assertTrue(
+            self.battle.blocker_can_block_attacker(
+                {"name": "Grizzly Bears", "type_line": "Creature - Bear", "power": 2, "toughness": 2},
+                power_attacker,
+            )
+        )
+
+        subtype_attacker = {
+            "name": "Kor Castigator",
+            "type_line": "Creature - Kor Wizard Ally",
+            "cant_be_blocked_by_filters": [{"kind": "subtype_all", "subtypes": ["eldrazi", "scion"]}],
+            "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+        }
+        self.assertFalse(
+            self.battle.blocker_can_block_attacker(
+                {"name": "Eldrazi Scion", "type_line": "Creature - Eldrazi Scion", "power": 1, "toughness": 1},
+                subtype_attacker,
+            )
+        )
+        self.assertTrue(
+            self.battle.blocker_can_block_attacker(
+                {"name": "Eldrazi Spawn", "type_line": "Creature - Eldrazi Spawn", "power": 0, "toughness": 1},
+                subtype_attacker,
+            )
+        )
+
     def test_static_play_lands_from_graveyard_uses_graveyard_land_when_no_hand_or_topdeck(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

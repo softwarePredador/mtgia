@@ -180,6 +180,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "landwalk_keyword",
     "landwalk_land_type",
     "landwalk_land_types",
+    "cant_be_blocked_by_filters",
+    "can_be_blocked_only_by_filters",
     "can_block_only_flying",
     "block_restriction",
     "static_power_toughness_source",

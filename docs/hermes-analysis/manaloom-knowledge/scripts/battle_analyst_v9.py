@@ -54572,6 +54572,68 @@ def _player_controls_landwalk_land(player, land_type):
     return False
 
 
+def _evasion_filter_list(value):
+    if value is None:
+        return []
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError:
+            return []
+    if isinstance(value, dict):
+        return [value]
+    if isinstance(value, (list, tuple)):
+        return [item for item in value if isinstance(item, dict)]
+    return []
+
+
+def _permanent_numeric_power(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    raw_power = permanent.get("power")
+    if raw_power is None:
+        raw_power = permanent.get("printed_power")
+    try:
+        return int(raw_power)
+    except (TypeError, ValueError):
+        return None
+
+
+def _blocker_matches_evasion_filter(blocker, filter_spec):
+    if not isinstance(blocker, dict) or not isinstance(filter_spec, dict):
+        return False
+    kind = str(filter_spec.get("kind") or "").strip().lower()
+    if kind == "power":
+        power = _permanent_numeric_power(blocker)
+        if power is None:
+            return False
+        operator = str(filter_spec.get("operator") or "").strip().lower()
+        try:
+            value = int(filter_spec.get("value"))
+        except (TypeError, ValueError):
+            return False
+        if operator == "gte":
+            return power >= value
+        if operator == "lte":
+            return power <= value
+        return False
+    if kind == "color":
+        colors = filter_spec.get("colors") or []
+        if isinstance(colors, str):
+            colors = [colors]
+        return any(card_has_color(blocker, color) for color in colors)
+    if kind in {"subtype", "subtype_all"}:
+        subtypes = filter_spec.get("subtypes") or filter_spec.get("subtype") or []
+        if isinstance(subtypes, str):
+            subtypes = [subtypes]
+        return bool(subtypes) and all(permanent_has_subtype(blocker, subtype) for subtype in subtypes)
+    if kind == "artifact":
+        return is_artifact_permanent(blocker)
+    if kind == "token":
+        return is_token_permanent(blocker)
+    return False
+
+
 def blocker_can_block_attacker(blocker, attacker):
     if not isinstance(blocker, dict) or not isinstance(attacker, dict):
         return False
@@ -54580,6 +54642,18 @@ def blocker_can_block_attacker(blocker, attacker):
     if blocker.get("can_block_only_flying") and not attacker.get("flying"):
         return False
     if blocker.get("block_restriction") == "creatures_with_flying_only" and not attacker.get("flying"):
+        return False
+    cant_block_filters = _evasion_filter_list(attacker.get("cant_be_blocked_by_filters"))
+    if cant_block_filters and any(
+        _blocker_matches_evasion_filter(blocker, filter_spec)
+        for filter_spec in cant_block_filters
+    ):
+        return False
+    only_by_filters = _evasion_filter_list(attacker.get("can_be_blocked_only_by_filters"))
+    if only_by_filters and not any(
+        _blocker_matches_evasion_filter(blocker, filter_spec)
+        for filter_spec in only_by_filters
+    ):
         return False
     return True
 

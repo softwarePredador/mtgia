@@ -191,6 +191,120 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_cant_be_blocked_oracle_not_exact")
 
+    def test_static_filtered_evasion_creature_maps_color_filter(self) -> None:
+        row = queue_row(
+            split.FILTERED_EVASION_UNIT,
+            effect_classes=["CantBeBlockedByCreaturesSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleEvasionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Barrenton Cragtreads",
+                type_line="Creature - Kithkin Scout",
+                oracle_text="This creature can't be blocked by red creatures.",
+            ),
+            source_text="""
+                private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("red creatures");
+                static { filter.add(new ColorPredicate(ObjectColor.RED)); }
+                this.addAbility(new SimpleEvasionAbility(new CantBeBlockedByCreaturesSourceEffect(
+                    filter, Duration.WhileOnBattlefield)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_FILTERED_EVASION_CREATURE_SCOPE)
+        self.assertEqual(effect["static_effect"], "self_filtered_evasion")
+        self.assertEqual(effect["cant_be_blocked_by_filters"], [{"kind": "color", "colors": ["R"]}])
+
+    def test_static_filtered_evasion_creature_maps_power_filter(self) -> None:
+        row = queue_row(
+            split.FILTERED_EVASION_UNIT,
+            effect_classes=["CantBeBlockedByCreaturesSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleEvasionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Amrou Kithkin",
+                type_line="Creature - Kithkin",
+                oracle_text="This creature can't be blocked by creatures with power 3 or greater.",
+            ),
+            source_text="""
+                private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("creatures with power 3 or greater");
+                static { filter.add(new PowerPredicate(ComparisonType.MORE_THAN, 2)); }
+                this.addAbility(new SimpleEvasionAbility(new CantBeBlockedByCreaturesSourceEffect(
+                    filter, Duration.WhileOnBattlefield)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(
+            proposal["effect_json"]["cant_be_blocked_by_filters"],
+            [{"kind": "power", "operator": "gte", "value": 3}],
+        )
+
+    def test_static_filtered_evasion_creature_maps_except_by_allowed_filters(self) -> None:
+        row = queue_row(
+            split.FILTERED_EVASION_UNIT,
+            effect_classes=["CantBeBlockedByCreaturesSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleEvasionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Amrou Seekers",
+                type_line="Creature - Kithkin Rebel",
+                oracle_text="This creature can't be blocked except by artifact creatures and/or white creatures.",
+            ),
+            source_text="""
+                private static final FilterCreaturePermanent filter = new FilterCreaturePermanent(
+                    "except by artifact creatures and/or white creatures");
+                static {
+                    filter.add(Predicates.not(Predicates.or(
+                        CardType.ARTIFACT.getPredicate(),
+                        new ColorPredicate(ObjectColor.WHITE))));
+                }
+                this.addAbility(new SimpleEvasionAbility(new CantBeBlockedByCreaturesSourceEffect(
+                    filter, Duration.WhileOnBattlefield)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(
+            proposal["effect_json"]["can_be_blocked_only_by_filters"],
+            [{"kind": "artifact"}, {"kind": "color", "colors": ["W"]}],
+        )
+
+    def test_static_filtered_evasion_creature_blocks_source_oracle_mismatch(self) -> None:
+        row = queue_row(
+            split.FILTERED_EVASION_UNIT,
+            effect_classes=["CantBeBlockedByCreaturesSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleEvasionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mismatch Sneak",
+                type_line="Creature - Rogue",
+                oracle_text="This creature can't be blocked by red creatures.",
+            ),
+            source_text="""
+                private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("blue creatures");
+                static { filter.add(new ColorPredicate(ObjectColor.BLUE)); }
+                this.addAbility(new SimpleEvasionAbility(new CantBeBlockedByCreaturesSourceEffect(
+                    filter, Duration.WhileOnBattlefield)));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_filtered_evasion_source_oracle_mismatch")
+
     def test_static_basic_landwalk_creature_maps_to_runtime(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::SwampwalkAbility::no_target_class::no_condition_class::no_signal",

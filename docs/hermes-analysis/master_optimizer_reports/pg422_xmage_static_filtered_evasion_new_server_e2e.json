@@ -1,0 +1,776 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T18:57:36.301292+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg422_xmage_static_filtered_evasion_new_server_manifest.json",
+  "package_id": "pg422_xmage_static_filtered_evasion_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg422_xmage_static_filtered_evasion_new_server_canonical_fallback.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 21
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Amrou Kithkin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86fe64ae174fad58c83c7a16343c90a4",
+          "oracle_hash": "911aec072fe708e55839fe763df20c7b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Amrou Seekers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:05b23b8fe038ff75c4f52bdcaacb3578",
+          "oracle_hash": "5245e53e1b4c5e6f902b903699716c96",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Arlinn's Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42bc0d93a1e5b47067d6cb88e7e01396",
+          "oracle_hash": "e62f2e076a718412d77c3d0db993a7f6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Barrenton Cragtreads",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6467bdc78dca66b91626fd8ddd35ed23",
+          "oracle_hash": "bd6a1f1abc059371dfb9ce46d3906892",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Bog Rats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+          "oracle_hash": "79324fd12a483fcb164031830e0e51b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Deathcult Rogue",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:756a4caa99e8b8b43c01e611a2e847c4",
+          "oracle_hash": "89f510e044ef83cdc7daa281a0504364",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Dread Warlock",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+          "oracle_hash": "f58ca9efe4094b1851179c88368505e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Duskmantle Operative",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+          "oracle_hash": "cc32e22fa524d67bf8b50674a1eba81e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Fleet-Footed Monk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f798aa38ee85e6010b87cc8f377e2c7c",
+          "oracle_hash": "226ced24290a70802140cd6d9af026d4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Goldmeadow Dodger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+          "oracle_hash": "cc32e22fa524d67bf8b50674a1eba81e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Kor Castigator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90832f7c85efe9f2dc5a32b7be2c8dea",
+          "oracle_hash": "48075286fd297118ac42ea9167c0ebf1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Mudbrawler Raiders",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:657d3c61d21b24772f990860178f3b1e",
+          "oracle_hash": "3aa58f60404a53ceb104407f17423fe4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Prowling Nightstalker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+          "oracle_hash": "f58ca9efe4094b1851179c88368505e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Rampart Crawler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+          "oracle_hash": "79324fd12a483fcb164031830e0e51b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Raven's Run Dragoon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5dbcbe3d8a12ebf95368fa48717425a8",
+          "oracle_hash": "9fb236f92fd9d4c0e99d041befa6e6c2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "River Darter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:98d26d1e23e4fa79692c6c6f6604a88f",
+          "oracle_hash": "00f6e63dca4d94fa19682832bfe47800",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Rubblebelt Runner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:08158712fb780a504e4b772479068ec9",
+          "oracle_hash": "0fd55172b613c04abdf1377dc2b505f9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Sacred Knight",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c17d1c01f4f0816712abc2ef6be71f1e",
+          "oracle_hash": "59b7480c2b3fca46740549f190187b27",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Skirk Shaman",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:40c8636e4167ff7d88799326c20ed4be",
+          "oracle_hash": "dbd0b4f4c218685d92756fc557694429",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Sootwalkers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5b390cfb544bc8bf531e767473518a5e",
+          "oracle_hash": "64934bf3f3a50e5c7f29b347db56bfe6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Wanderbrine Rootcutters",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2135f788b0154d0cbe8b264586f2d597",
+          "oracle_hash": "32462b11137647db3e1899e0261c074d",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 21
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Amrou Kithkin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86fe64ae174fad58c83c7a16343c90a4",
+          "oracle_hash": "911aec072fe708e55839fe763df20c7b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Amrou Seekers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:05b23b8fe038ff75c4f52bdcaacb3578",
+          "oracle_hash": "5245e53e1b4c5e6f902b903699716c96",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Arlinn's Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42bc0d93a1e5b47067d6cb88e7e01396",
+          "oracle_hash": "e62f2e076a718412d77c3d0db993a7f6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Barrenton Cragtreads",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6467bdc78dca66b91626fd8ddd35ed23",
+          "oracle_hash": "bd6a1f1abc059371dfb9ce46d3906892",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Bog Rats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+          "oracle_hash": "79324fd12a483fcb164031830e0e51b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Deathcult Rogue",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:756a4caa99e8b8b43c01e611a2e847c4",
+          "oracle_hash": "89f510e044ef83cdc7daa281a0504364",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Dread Warlock",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+          "oracle_hash": "f58ca9efe4094b1851179c88368505e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Duskmantle Operative",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+          "oracle_hash": "cc32e22fa524d67bf8b50674a1eba81e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Fleet-Footed Monk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f798aa38ee85e6010b87cc8f377e2c7c",
+          "oracle_hash": "226ced24290a70802140cd6d9af026d4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Goldmeadow Dodger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480",
+          "oracle_hash": "cc32e22fa524d67bf8b50674a1eba81e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Kor Castigator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90832f7c85efe9f2dc5a32b7be2c8dea",
+          "oracle_hash": "48075286fd297118ac42ea9167c0ebf1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Mudbrawler Raiders",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:657d3c61d21b24772f990860178f3b1e",
+          "oracle_hash": "3aa58f60404a53ceb104407f17423fe4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Prowling Nightstalker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8",
+          "oracle_hash": "f58ca9efe4094b1851179c88368505e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Rampart Crawler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf",
+          "oracle_hash": "79324fd12a483fcb164031830e0e51b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Raven's Run Dragoon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5dbcbe3d8a12ebf95368fa48717425a8",
+          "oracle_hash": "9fb236f92fd9d4c0e99d041befa6e6c2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "River Darter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:98d26d1e23e4fa79692c6c6f6604a88f",
+          "oracle_hash": "00f6e63dca4d94fa19682832bfe47800",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Rubblebelt Runner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:08158712fb780a504e4b772479068ec9",
+          "oracle_hash": "0fd55172b613c04abdf1377dc2b505f9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Sacred Knight",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c17d1c01f4f0816712abc2ef6be71f1e",
+          "oracle_hash": "59b7480c2b3fca46740549f190187b27",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Skirk Shaman",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:40c8636e4167ff7d88799326c20ed4be",
+          "oracle_hash": "dbd0b4f4c218685d92756fc557694429",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Sootwalkers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5b390cfb544bc8bf531e767473518a5e",
+          "oracle_hash": "64934bf3f3a50e5c7f29b347db56bfe6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "card_name": "Wanderbrine Rootcutters",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2135f788b0154d0cbe8b264586f2d597",
+          "oracle_hash": "32462b11137647db3e1899e0261c074d",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 21
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Amrou Kithkin",
+          "logical_rule_key": "battle_rule_v1:86fe64ae174fad58c83c7a16343c90a4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Amrou Seekers",
+          "logical_rule_key": "battle_rule_v1:05b23b8fe038ff75c4f52bdcaacb3578"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Arlinn's Wolf",
+          "logical_rule_key": "battle_rule_v1:42bc0d93a1e5b47067d6cb88e7e01396"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Barrenton Cragtreads",
+          "logical_rule_key": "battle_rule_v1:6467bdc78dca66b91626fd8ddd35ed23"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bog Rats",
+          "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deathcult Rogue",
+          "logical_rule_key": "battle_rule_v1:756a4caa99e8b8b43c01e611a2e847c4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dread Warlock",
+          "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Duskmantle Operative",
+          "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fleet-Footed Monk",
+          "logical_rule_key": "battle_rule_v1:f798aa38ee85e6010b87cc8f377e2c7c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goldmeadow Dodger",
+          "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kor Castigator",
+          "logical_rule_key": "battle_rule_v1:90832f7c85efe9f2dc5a32b7be2c8dea"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mudbrawler Raiders",
+          "logical_rule_key": "battle_rule_v1:657d3c61d21b24772f990860178f3b1e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Prowling Nightstalker",
+          "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rampart Crawler",
+          "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Raven's Run Dragoon",
+          "logical_rule_key": "battle_rule_v1:5dbcbe3d8a12ebf95368fa48717425a8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "River Darter",
+          "logical_rule_key": "battle_rule_v1:98d26d1e23e4fa79692c6c6f6604a88f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rubblebelt Runner",
+          "logical_rule_key": "battle_rule_v1:08158712fb780a504e4b772479068ec9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sacred Knight",
+          "logical_rule_key": "battle_rule_v1:c17d1c01f4f0816712abc2ef6be71f1e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skirk Shaman",
+          "logical_rule_key": "battle_rule_v1:40c8636e4167ff7d88799326c20ed4be"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sootwalkers",
+          "logical_rule_key": "battle_rule_v1:5b390cfb544bc8bf531e767473518a5e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wanderbrine Rootcutters",
+          "logical_rule_key": "battle_rule_v1:2135f788b0154d0cbe8b264586f2d597"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 21
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Amrou Kithkin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:86fe64ae174fad58c83c7a16343c90a4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Amrou Seekers",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:05b23b8fe038ff75c4f52bdcaacb3578"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Arlinn's Wolf",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:42bc0d93a1e5b47067d6cb88e7e01396"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Barrenton Cragtreads",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6467bdc78dca66b91626fd8ddd35ed23"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bog Rats",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deathcult Rogue",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:756a4caa99e8b8b43c01e611a2e847c4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dread Warlock",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Duskmantle Operative",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fleet-Footed Monk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f798aa38ee85e6010b87cc8f377e2c7c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goldmeadow Dodger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3019050ec69fd9ce2500f558a3d26480"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kor Castigator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:90832f7c85efe9f2dc5a32b7be2c8dea"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mudbrawler Raiders",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:657d3c61d21b24772f990860178f3b1e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Prowling Nightstalker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c078f41a424441825be38e11c9fcaff8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rampart Crawler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:eb449df7f6ae2847c1d1028a8b2f23bf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Raven's Run Dragoon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5dbcbe3d8a12ebf95368fa48717425a8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "River Darter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:98d26d1e23e4fa79692c6c6f6604a88f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rubblebelt Runner",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:08158712fb780a504e4b772479068ec9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sacred Knight",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c17d1c01f4f0816712abc2ef6be71f1e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skirk Shaman",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:40c8636e4167ff7d88799326c20ed4be"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sootwalkers",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5b390cfb544bc8bf531e767473518a5e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wanderbrine Rootcutters",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2135f788b0154d0cbe8b264586f2d597"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

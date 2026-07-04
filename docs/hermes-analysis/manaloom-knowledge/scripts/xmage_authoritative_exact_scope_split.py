@@ -198,6 +198,7 @@ STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE = (
 STATIC_CAST_AS_FLASH_PERMISSION_SCOPE = "xmage_static_cast_spells_as_flash_permission_v1"
 STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE = "xmage_static_self_cant_be_blocked_creature_v1"
 STATIC_LANDWALK_CREATURE_SCOPE = "xmage_static_self_basic_landwalk_creature_v1"
+STATIC_FILTERED_EVASION_CREATURE_SCOPE = "xmage_static_filtered_evasion_creature_v1"
 STATIC_FLYING_CAN_BLOCK_ONLY_FLYING_CREATURE_SCOPE = (
     "xmage_static_flying_can_block_only_flying_creature_v1"
 )
@@ -476,6 +477,10 @@ FLASH_PERMISSION_FILTERS = {
 }
 CANT_BE_BLOCKED_SOURCE_UNIT = (
     "xmage_signature::no_effect_class::CantBeBlockedSourceAbility::"
+    "no_target_class::no_condition_class::no_signal"
+)
+FILTERED_EVASION_UNIT = (
+    "xmage_signature::CantBeBlockedByCreaturesSourceEffect::SimpleEvasionAbility::"
     "no_target_class::no_condition_class::no_signal"
 )
 FLYING_CAN_BLOCK_ONLY_FLYING_UNIT = (
@@ -4588,6 +4593,15 @@ def is_static_cant_be_blocked_creature_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_static_filtered_evasion_creature_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == FILTERED_EVASION_UNIT
+        and effect_classes(row) == {"CantBeBlockedByCreaturesSourceEffect"}
+        and ability_classes(row) == {"SimpleEvasionAbility"}
+        and not (row.get("xmage_signals") or [])
+    )
+
+
 def basic_landwalk_type_for_row(row: dict[str, Any]) -> str | None:
     abilities = ability_classes(row)
     if len(abilities) != 1:
@@ -5478,6 +5492,195 @@ def source_is_static_flying_can_block_only_flying(source: str) -> bool:
         and "SimpleEvasionAbility" not in text
         and "LandwalkAbility" not in text
     )
+
+
+COLOR_WORD_TO_SYMBOL = {
+    "white": "W",
+    "blue": "U",
+    "black": "B",
+    "red": "R",
+    "green": "G",
+}
+COLOR_SYMBOL_ORDER = ["W", "U", "B", "R", "G"]
+OBJECT_COLOR_TO_SYMBOL = {
+    "WHITE": "W",
+    "BLUE": "U",
+    "BLACK": "B",
+    "RED": "R",
+    "GREEN": "G",
+}
+
+
+def ordered_color_symbols(symbols: list[str]) -> list[str]:
+    normalized = {str(symbol or "").strip().upper() for symbol in symbols if str(symbol or "").strip()}
+    return [symbol for symbol in COLOR_SYMBOL_ORDER if symbol in normalized]
+
+
+def evasion_filter_from_phrase(phrase: str) -> list[dict[str, Any]] | None:
+    normalized = re.sub(r"\s+", " ", phrase or "").strip().lower().rstrip(".")
+    if not normalized:
+        return None
+    power_match = re.fullmatch(r"creatures with power (\d+) or greater", normalized)
+    if power_match:
+        return [{"kind": "power", "operator": "gte", "value": int(power_match.group(1))}]
+    power_match = re.fullmatch(r"creatures with power (\d+) or less", normalized)
+    if power_match:
+        return [{"kind": "power", "operator": "lte", "value": int(power_match.group(1))}]
+    if normalized == "creature tokens":
+        return [{"kind": "token"}]
+    subtype_phrases = {
+        "walls": ["wall"],
+        "wall creatures": ["wall"],
+        "rogues": ["rogue"],
+        "rogue creatures": ["rogue"],
+        "dinosaurs": ["dinosaur"],
+        "dinosaur creatures": ["dinosaur"],
+        "eldrazi scions": ["eldrazi", "scion"],
+        "eldrazi scion creatures": ["eldrazi", "scion"],
+    }
+    if normalized in subtype_phrases:
+        return [{"kind": "subtype_all", "subtypes": subtype_phrases[normalized]}]
+    if normalized in {"artifact creatures", "artifact creature"}:
+        return [{"kind": "artifact"}]
+    artifact_color_match = re.fullmatch(
+        r"artifact creatures and/or (white|blue|black|red|green) creatures",
+        normalized,
+    )
+    if artifact_color_match:
+        return [
+            {"kind": "artifact"},
+            {"kind": "color", "colors": [COLOR_WORD_TO_SYMBOL[artifact_color_match.group(1)]]},
+        ]
+    colors = re.findall(r"\b(white|blue|black|red|green)\b", normalized)
+    if colors and "creature" in normalized:
+        return [{"kind": "color", "colors": ordered_color_symbols([COLOR_WORD_TO_SYMBOL[color] for color in colors])}]
+    return None
+
+
+def filtered_evasion_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    text = re.sub(r"\s+", " ", text).strip().lower().rstrip(".")
+    if not text:
+        return None
+    source_name = re.sub(r"\s+", " ", str(metadata.get("name") or "").strip().lower())
+    subjects = ["this creature"]
+    if source_name:
+        subjects.append(re.escape(source_name))
+    for subject in subjects:
+        except_match = re.fullmatch(rf"{subject} can't be blocked except by (.+)", text)
+        if except_match:
+            filters = evasion_filter_from_phrase(except_match.group(1))
+            if filters:
+                return {"mode": "can_be_blocked_only_by", "filters": filters}
+        by_match = re.fullmatch(rf"{subject} can't be blocked by (.+)", text)
+        if by_match:
+            filters = evasion_filter_from_phrase(by_match.group(1))
+            if filters:
+                return {"mode": "cant_be_blocked_by", "filters": filters}
+    return None
+
+
+def source_filter_add_chunks(source: str) -> list[str]:
+    chunks: list[str] = []
+    lines = (source or "").splitlines()
+    idx = 0
+    while idx < len(lines):
+        line = lines[idx]
+        if ".add(" not in line or "this.subtype.add" in line:
+            idx += 1
+            continue
+        chunk = line
+        idx += 1
+        while ";" not in chunk and idx < len(lines):
+            chunk += "\n" + lines[idx]
+            idx += 1
+        chunks.append(chunk)
+    return chunks
+
+
+def filtered_evasion_spec_from_source(source: str) -> dict[str, Any] | None:
+    text = source or ""
+    if (
+        "CantBeBlockedByCreaturesSourceEffect" not in text
+        or "SimpleEvasionAbility" not in text
+        or "Duration.WhileOnBattlefield" not in text
+    ):
+        return None
+    chunks = "\n".join(source_filter_add_chunks(text))
+    direct_constructor_subtypes = re.findall(
+        r"new\s+FilterCreaturePermanent\s*\(\s*SubType\.([A-Z_]+)\s*,",
+        text,
+    )
+    mode = "can_be_blocked_only_by" if "Predicates.not" in chunks else "cant_be_blocked_by"
+    filters: list[dict[str, Any]] = []
+    power_match = re.search(r"PowerPredicate\s*\(\s*ComparisonType\.([A-Z_]+)\s*,\s*(\d+)\s*\)", chunks)
+    if power_match:
+        comparison = power_match.group(1)
+        value = int(power_match.group(2))
+        if comparison == "MORE_THAN":
+            filters.append({"kind": "power", "operator": "gte", "value": value + 1})
+        elif comparison == "OR_GREATER":
+            filters.append({"kind": "power", "operator": "gte", "value": value})
+        elif comparison == "FEWER_THAN":
+            filters.append({"kind": "power", "operator": "lte", "value": value - 1})
+        else:
+            return None
+    colors = ordered_color_symbols(
+        [
+            OBJECT_COLOR_TO_SYMBOL[color]
+            for color in re.findall(r"ObjectColor\.([A-Z]+)", chunks)
+            if color in OBJECT_COLOR_TO_SYMBOL
+        ]
+    )
+    subtypes = [
+        subtype.strip().lower().replace("_", " ")
+        for subtype in re.findall(r"SubType\.([A-Z_]+)\.getPredicate\(\)", chunks)
+    ]
+    subtypes.extend(
+        subtype.strip().lower().replace("_", " ")
+        for subtype in direct_constructor_subtypes
+    )
+    subtypes = list(dict.fromkeys(subtypes))
+    has_artifact_filter = "CardType.ARTIFACT.getPredicate()" in chunks
+    has_token_filter = "TokenPredicate.TRUE" in chunks
+    if mode == "can_be_blocked_only_by":
+        if has_artifact_filter:
+            filters.append({"kind": "artifact"})
+        if colors:
+            filters.append({"kind": "color", "colors": colors})
+        if subtypes:
+            filters.append({"kind": "subtype_all", "subtypes": subtypes})
+        if has_token_filter or power_match:
+            return None
+    else:
+        if colors:
+            filters.append({"kind": "color", "colors": colors})
+        if subtypes:
+            filters.append({"kind": "subtype_all", "subtypes": subtypes})
+        if has_artifact_filter:
+            filters.append({"kind": "artifact"})
+        if has_token_filter:
+            filters.append({"kind": "token"})
+    if not filters:
+        return None
+    return {"mode": mode, "filters": filters}
+
+
+def canonical_evasion_filter(value: dict[str, Any]) -> str:
+    normalized = dict(value)
+    if isinstance(normalized.get("colors"), list):
+        normalized["colors"] = ordered_color_symbols([str(color) for color in normalized["colors"]])
+    if isinstance(normalized.get("subtypes"), list):
+        normalized["subtypes"] = sorted({str(subtype).strip().lower() for subtype in normalized["subtypes"]})
+    return json.dumps(normalized, sort_keys=True, separators=(",", ":"))
+
+
+def evasion_specs_match(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    if left.get("mode") != right.get("mode"):
+        return False
+    left_filters = {canonical_evasion_filter(filter_spec) for filter_spec in left.get("filters") or []}
+    right_filters = {canonical_evasion_filter(filter_spec) for filter_spec in right.get("filters") or []}
+    return bool(left_filters) and left_filters == right_filters
 
 
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -10848,6 +11051,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature static self can't-be-blocked evasion"
     elif scope == STATIC_LANDWALK_CREATURE_SCOPE:
         scope_kind = "creature static self basic landwalk evasion"
+    elif scope == STATIC_FILTERED_EVASION_CREATURE_SCOPE:
+        scope_kind = "creature static filtered blocker legality evasion"
     elif scope == STATIC_FLYING_CAN_BLOCK_ONLY_FLYING_CREATURE_SCOPE:
         scope_kind = "creature static flying with block-only-flying restriction"
     elif scope in {
@@ -10969,6 +11174,7 @@ def split_row(
     static_cast_as_flash_permission_unit = is_static_cast_as_flash_permission_unit(row)
     static_cant_be_blocked_creature_unit = is_static_cant_be_blocked_creature_unit(row)
     static_basic_landwalk_creature_unit = is_static_basic_landwalk_creature_unit(row)
+    static_filtered_evasion_creature_unit = is_static_filtered_evasion_creature_unit(row)
     static_flying_can_block_only_flying_creature_unit = (
         is_static_flying_can_block_only_flying_creature_unit(row)
     )
@@ -11051,6 +11257,7 @@ def split_row(
         and not static_cast_as_flash_permission_unit
         and not static_cant_be_blocked_creature_unit
         and not static_basic_landwalk_creature_unit
+        and not static_filtered_evasion_creature_unit
         and not static_flying_can_block_only_flying_creature_unit
         and not etb_life_gain_creature_unit
         and not dies_life_gain_creature_unit
@@ -11111,6 +11318,7 @@ def split_row(
         and not static_cast_as_flash_permission_unit
         and not static_cant_be_blocked_creature_unit
         and not static_basic_landwalk_creature_unit
+        and not static_filtered_evasion_creature_unit
         and not static_flying_can_block_only_flying_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
@@ -11258,6 +11466,38 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_self_cant_be_blocked_creature",
+        ), "selected_exact_scope"
+
+    if static_filtered_evasion_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_filtered_evasion_not_creature"
+        oracle_evasion = filtered_evasion_spec_from_oracle(metadata)
+        if not oracle_evasion:
+            return None, "static_filtered_evasion_oracle_not_exact"
+        source_evasion = filtered_evasion_spec_from_source(source_text)
+        if not source_evasion:
+            return None, "static_filtered_evasion_source_not_exact"
+        if not evasion_specs_match(oracle_evasion, source_evasion):
+            return None, "static_filtered_evasion_source_oracle_mismatch"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_FILTERED_EVASION_CREATURE_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "self_filtered_evasion",
+            "target": "self",
+            "target_controller": "self",
+            "xmage_effect_class": "CantBeBlockedByCreaturesSourceEffect",
+            "xmage_ability_class": "SimpleEvasionAbility",
+        }
+        if oracle_evasion["mode"] == "cant_be_blocked_by":
+            effect_json["cant_be_blocked_by_filters"] = oracle_evasion["filters"]
+        else:
+            effect_json["can_be_blocked_only_by_filters"] = oracle_evasion["filters"]
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_filtered_evasion_creature",
         ), "selected_exact_scope"
 
     if static_basic_landwalk_creature_unit:
@@ -16674,6 +16914,7 @@ def build_exact_split_report(
             and not is_static_cast_as_flash_permission_unit(row)
             and not is_static_cant_be_blocked_creature_unit(row)
             and not is_static_basic_landwalk_creature_unit(row)
+            and not is_static_filtered_evasion_creature_unit(row)
             and not is_static_flying_can_block_only_flying_creature_unit(row)
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_dies_life_gain_unit(row)
