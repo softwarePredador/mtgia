@@ -4382,6 +4382,81 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_damage_creature_preserves_self_keyword_and_activates(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 5
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "ability_kind": "static_and_activated",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 1,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "keywords": ["haste"],
+            "_keywords_are_self": True,
+            "haste": True,
+            "xmage_ability_classes": ["HasteAbility", "SimpleActivatedAbility"],
+            "_rule_logical_key": "battle_rule_v1:fixture_hasty_sparkmage",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Hasty Sparkmage",
+                "type_line": "Creature - Human Shaman",
+                "oracle_text": "Haste\n{T}: Fixture Hasty Sparkmage deals 1 damage to any target.",
+                "power": 0,
+                "toughness": 1,
+            },
+            turn=7,
+            rng=random.Random(57),
+            effect_data_override=effect,
+        )
+
+        permanent = active.battlefield[0]
+        self.assertTrue(permanent["haste"])
+        self.assertFalse(permanent["summoning_sick"])
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(58),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(permanent["tapped"])
+        self.assertEqual(opponent.life, 4)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Hasty Sparkmage"
+                and data.get("activation_kind") == "simple_activated_damage"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_hasty_sparkmage"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Hasty Sparkmage"
+                and data.get("amount") == 1
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_damage_respects_flying_creature_target_constraint(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

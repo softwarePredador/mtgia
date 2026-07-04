@@ -3579,6 +3579,68 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activated_damage_amount"], 1)
         self.assertTrue(effect["activation_requires_tap"])
 
+    def test_permanent_activated_damage_allows_static_keyword_auxiliary(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Hellkite",
+                type_line="Creature - Dragon",
+                oracle_text="Flying\n{1}{R}: Fixture Hellkite deals 1 damage to any target.",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(1),
+                    new ManaCostsImpl<>("{1}{R}")
+                );
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 1)
+        self.assertEqual(effect["activation_cost_mana"], "{1}{R}")
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertEqual(effect["xmage_ability_classes"], ["FlyingAbility", "SimpleActivatedAbility"])
+
+    def test_permanent_activated_damage_rejects_non_keyword_auxiliary(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["CrewAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Vehicle",
+                type_line="Artifact - Vehicle",
+                oracle_text="{T}: Fixture Vehicle deals 1 damage to any target.",
+            ),
+            source_text="""
+                this.addAbility(new CrewAbility(2));
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(1), new TapSourceCost());
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "not_instant_or_sorcery_spell")
+
     def test_permanent_activated_damage_maps_flying_creature_target(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,

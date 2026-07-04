@@ -4009,9 +4009,12 @@ def is_permanent_activated_draw_discard_unit(row: dict[str, Any]) -> bool:
 def is_permanent_activated_damage_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DAMAGE_UNIT:
         return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleActivatedAbility"}
     return (
         effect_classes(row) == {"DamageTargetEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "SimpleActivatedAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and "activated_ability" in set(row.get("xmage_signals") or [])
     )
 
@@ -10671,6 +10674,13 @@ def split_row(
         if parsed_activation.get("activation_requires_sacrifice"):
             effect_json["activated_self_sacrifice_damage"] = True
             activated_effect["activated_self_sacrifice_damage"] = True
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            effect_json["xmage_ability_classes"] = sorted(ability_classes(row))
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,
@@ -12788,7 +12798,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with LookLibraryAndPickControllerEffect, EntersBattlefieldTriggeredAbility, exact ETB look-library pick-one-to-hand Oracle/source agreement, and only static self keywords",
                 "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInPlayEffect, EntersBattlefieldTriggeredAbility, exact ETB land tutor-to-battlefield Oracle/source agreement, and only static self keywords",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
-                "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
+                "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility plus only static self keywords, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect, SimpleActivatedAbility, exact fixed activated life-gain Oracle text, and mana/tap/source self-sacrifice costs only",
                 "xmage_signature BoostControlledEffect one-shot spell rows with exact fixed controlled-creature boost until EOT and no color/modal/dynamic filters",

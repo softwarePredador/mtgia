@@ -117,6 +117,29 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "graveyard_to_library_activation_cost_colors": ["B"],
             "exile_if_dies_from_damage": True,
             "exile_if_dies_target": "creature",
+            "keywords": ["haste"],
+            "_keywords_are_self": True,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 1,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "_activated_rule_effects": [
+                {
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+                    "amount": 1,
+                    "damage": 1,
+                    "target": "any_target",
+                }
+            ],
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_classes": ["HasteAbility", "SimpleActivatedAbility"],
+            "xmage_effect_class": "DamageTargetEffect",
             "recursion_components": [
                 {
                     "target": "creature",
@@ -197,6 +220,29 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "graveyard_to_library_activation_cost_colors": ["B"],
             "exile_if_dies_from_damage": True,
             "exile_if_dies_target": "creature",
+            "keywords": ["haste"],
+            "_keywords_are_self": True,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 1,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "_activated_rule_effects": [
+                {
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+                    "amount": 1,
+                    "damage": 1,
+                    "target": "any_target",
+                }
+            ],
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_classes": ["HasteAbility", "SimpleActivatedAbility"],
+            "xmage_effect_class": "DamageTargetEffect",
             "recursion_components": [
                 {
                     "target": "creature",

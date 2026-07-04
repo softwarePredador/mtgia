@@ -223,21 +223,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg395_dies_life_gain_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg396_dies_damage_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg396_dies_damage_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg397_activated_damage_keywords_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg397_activated_damage_keywords_new_server.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26804`
-- XMage authoritative source resolved: `26490`
+- target all-card battle-gap identities: `26787`
+- XMage authoritative source resolved: `26473`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26490`
+- XMage authoritative adapter required: `26473`
 - ManaLoom adapter work-unit keys: `11427`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26490` identities, card semantics are accepted from XMage; work is now
+- For `26473` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -256,10 +258,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG396 Exact Adapter Waves
+## PG283-PG397 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG396 all-card exact adapter waves are applied and
-synced. PG375-PG396 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG397 all-card exact adapter waves are applied and
+synced. PG375-PG397 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -6626,6 +6628,58 @@ PG396 measured result:
   dies-damage neighbors are explicitly blocked by
   `dies_damage_amount_not_fixed=1` and `dies_damage_target_not_supported=1`.
 
+PG397 measured result:
+
+- PG397 promoted `17` permanent simple activated damage rules with static
+  self-keyword auxiliaries on the new server: `Aven Archer`,
+  `Crimson Manticore`, `Cunning Sparkmage`, `Dive Bomber`,
+  `Divebomber Griffin`, `Fanatical Firebrand`, `Jeska, Warrior Adept`,
+  `Kamahl, Pit Fighter`, `Mawcor`, `Sarpadian Simulacrum`, `Scaldkin`,
+  `Shivan Hellkite`, `Skyway Sniper`, `Stinging Barrier`, `Storm Spirit`,
+  `Thornwind Faeries`, and `Vulshok Sorcerer`.
+- The splitter now accepts `DamageTargetEffect + SimpleActivatedAbility` source
+  rows with only safe static self keyword ability classes such as `Flying`,
+  `Haste`, `Reach`, `Defender`, and `First Strike`. It preserves
+  `keywords`, `_keywords_are_self`, `xmage_ability_classes`, and the exact
+  activated damage metadata while still blocking unsupported costs, dynamic
+  amounts, compound effects, and unsupported targets.
+- Runtime coverage uses the existing
+  `xmage_permanent_simple_activated_damage_v1` path and adds focused proof that
+  a self-keyword creature keeps the static keyword and can still activate the
+  damage ability with rule provenance. The package builder now also carries
+  `_keywords_are_self`, `activated_battle_model_scope`,
+  `activated_damage_amount`, `_activated_rule_effects`, and XMage class fields
+  into E2E required fields.
+- Full exact splitter tests passed `364/364`, full exact runtime tests passed
+  `207/207`, package-builder tests passed `6/6`, and `py_compile` passed for
+  the changed scripts.
+- PostgreSQL precheck matched `17/17` target card rows on the new server; apply
+  upserted `17` rows and deprecated `0` shadows; postcheck verified `17/17`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `7754` PostgreSQL rows from
+  `database_target=127.0.0.1:15432/halder`, updated `7549` SQLite rows, and
+  exported `5256` canonical snapshot rows. Full metadata sync used the same
+  new-server target, matched `6255` PostgreSQL cards from `6064` unique
+  requested names, backfilled `2699/2699` deck-card cache rows, and left one
+  unrelated unresolved alias: `Surgical Suite/Hospital Room`.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, runtime
+  `get_card_effect`, and no-override battle checks for all `17` cards against
+  `database_target=127.0.0.1:15432/halder`.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `pass` with `49` pass checks and one existing
+  SQLite oracle-hash coverage warning
+  (`trusted_executable_rules_missing_oracle_hash=2`).
+- Global all-card authoritative queue after PG397:
+  `target_identity_count=26787`, `xmage_authoritative_source_count=26473`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26473`.
+- Running the exact splitter after PG397 on supported units returned
+  `proposal_count=0` over `7627` considered supported rows. The static-keyword
+  activated-damage subpattern is therefore closed; remaining
+  `direct_damage::targeted_damage_variant_v1` rows are blocked by cost,
+  target, dynamic amount, compound effect, or Oracle mismatch reasons.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -7256,13 +7310,13 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG396 queue on the new server, the next exact runtime-backed work should
+post-PG397 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1818`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1610`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
-4. `direct_damage::targeted_damage_variant_v1` - `868`
+4. `direct_damage::targeted_damage_variant_v1` - `851`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `728`
 7. `removal_destroy::targeted_destroy_variant_v1` - `612`

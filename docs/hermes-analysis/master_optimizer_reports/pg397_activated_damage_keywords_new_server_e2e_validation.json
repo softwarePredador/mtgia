@@ -1,0 +1,640 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T09:33:22.973224+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg397_activated_damage_keywords_new_server_package_manifest.json",
+  "package_id": "pg397_activated_damage_keywords_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 17
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Aven Archer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d5341d706939b1fc99fe1350dbdd2caf",
+          "oracle_hash": "ff0959005adcc5916ebbfbc68019084a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Crimson Manticore",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ee50af001d948901a4759d98c7d953ce",
+          "oracle_hash": "c60843c06379a65cda17b11d8722038b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Cunning Sparkmage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7b5a3290b2e56ffd19c2c48fee98f942",
+          "oracle_hash": "f715d6258f6601d0484e65b349490531",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Dive Bomber",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3f77c0ef112c89cbb058590822479815",
+          "oracle_hash": "b145a239769c3f9dda021b8278e18bf0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Divebomber Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:54f6bc38c4a561eeff5a274fa0cc70df",
+          "oracle_hash": "aad57b7ada0732ea25b1b7532381024c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Fanatical Firebrand",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0c95d595a2b1ecdca52e311eafdcd41e",
+          "oracle_hash": "d38a860ef72dda97a39593feb215174e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Jeska, Warrior Adept",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e67c398e703075e22be0534a11980b0b",
+          "oracle_hash": "2e5f88dd30b01f820f05e7a5e5f5cc42",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Kamahl, Pit Fighter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dee9caed362118576a9ab517015ff8a1",
+          "oracle_hash": "8d8b4512f4c5a8aa733e5eeb9a5d2083",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Mawcor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:27f6e8dab5d9321be5e187a4da518020",
+          "oracle_hash": "56ce2fe4091f1171025effc171272525",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Sarpadian Simulacrum",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab61cb1000afb2936a59c73032efb313",
+          "oracle_hash": "77dde89d00fd54b395c81e156fd224ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Scaldkin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fdbdbe2d5014764c6160e973ab225441",
+          "oracle_hash": "5a52e3fd978ee7083641b5b52d8c0645",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Shivan Hellkite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:94d9023b123f3927629f869a9e607823",
+          "oracle_hash": "37573976ed48c984160657762532e910",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Skyway Sniper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:de982ce5b9578bbf895fec4943505a19",
+          "oracle_hash": "0ac25ffabfd8c18e6ec16015241d5477",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Stinging Barrier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:60361af04d9fb9739c31570ac303ef42",
+          "oracle_hash": "41590c21871cd0bd64a11bab406c595b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Storm Spirit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49c7599b3fd5e13be598e31a0c1cdcb0",
+          "oracle_hash": "bb0c8293a45260ecd482ae046012b37c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Thornwind Faeries",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:27f6e8dab5d9321be5e187a4da518020",
+          "oracle_hash": "56ce2fe4091f1171025effc171272525",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Vulshok Sorcerer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7b5a3290b2e56ffd19c2c48fee98f942",
+          "oracle_hash": "f715d6258f6601d0484e65b349490531",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 17
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Aven Archer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d5341d706939b1fc99fe1350dbdd2caf",
+          "oracle_hash": "ff0959005adcc5916ebbfbc68019084a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Crimson Manticore",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ee50af001d948901a4759d98c7d953ce",
+          "oracle_hash": "c60843c06379a65cda17b11d8722038b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Cunning Sparkmage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7b5a3290b2e56ffd19c2c48fee98f942",
+          "oracle_hash": "f715d6258f6601d0484e65b349490531",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Dive Bomber",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3f77c0ef112c89cbb058590822479815",
+          "oracle_hash": "b145a239769c3f9dda021b8278e18bf0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Divebomber Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:54f6bc38c4a561eeff5a274fa0cc70df",
+          "oracle_hash": "aad57b7ada0732ea25b1b7532381024c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Fanatical Firebrand",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0c95d595a2b1ecdca52e311eafdcd41e",
+          "oracle_hash": "d38a860ef72dda97a39593feb215174e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Jeska, Warrior Adept",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e67c398e703075e22be0534a11980b0b",
+          "oracle_hash": "2e5f88dd30b01f820f05e7a5e5f5cc42",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Kamahl, Pit Fighter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dee9caed362118576a9ab517015ff8a1",
+          "oracle_hash": "8d8b4512f4c5a8aa733e5eeb9a5d2083",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Mawcor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:27f6e8dab5d9321be5e187a4da518020",
+          "oracle_hash": "56ce2fe4091f1171025effc171272525",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Sarpadian Simulacrum",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab61cb1000afb2936a59c73032efb313",
+          "oracle_hash": "77dde89d00fd54b395c81e156fd224ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Scaldkin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fdbdbe2d5014764c6160e973ab225441",
+          "oracle_hash": "5a52e3fd978ee7083641b5b52d8c0645",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Shivan Hellkite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:94d9023b123f3927629f869a9e607823",
+          "oracle_hash": "37573976ed48c984160657762532e910",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Skyway Sniper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:de982ce5b9578bbf895fec4943505a19",
+          "oracle_hash": "0ac25ffabfd8c18e6ec16015241d5477",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Stinging Barrier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:60361af04d9fb9739c31570ac303ef42",
+          "oracle_hash": "41590c21871cd0bd64a11bab406c595b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Storm Spirit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49c7599b3fd5e13be598e31a0c1cdcb0",
+          "oracle_hash": "bb0c8293a45260ecd482ae046012b37c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Thornwind Faeries",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:27f6e8dab5d9321be5e187a4da518020",
+          "oracle_hash": "56ce2fe4091f1171025effc171272525",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Vulshok Sorcerer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7b5a3290b2e56ffd19c2c48fee98f942",
+          "oracle_hash": "f715d6258f6601d0484e65b349490531",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 17
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aven Archer",
+          "logical_rule_key": "battle_rule_v1:d5341d706939b1fc99fe1350dbdd2caf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Crimson Manticore",
+          "logical_rule_key": "battle_rule_v1:ee50af001d948901a4759d98c7d953ce"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cunning Sparkmage",
+          "logical_rule_key": "battle_rule_v1:7b5a3290b2e56ffd19c2c48fee98f942"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dive Bomber",
+          "logical_rule_key": "battle_rule_v1:3f77c0ef112c89cbb058590822479815"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Divebomber Griffin",
+          "logical_rule_key": "battle_rule_v1:54f6bc38c4a561eeff5a274fa0cc70df"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fanatical Firebrand",
+          "logical_rule_key": "battle_rule_v1:0c95d595a2b1ecdca52e311eafdcd41e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jeska, Warrior Adept",
+          "logical_rule_key": "battle_rule_v1:e67c398e703075e22be0534a11980b0b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kamahl, Pit Fighter",
+          "logical_rule_key": "battle_rule_v1:dee9caed362118576a9ab517015ff8a1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mawcor",
+          "logical_rule_key": "battle_rule_v1:27f6e8dab5d9321be5e187a4da518020"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sarpadian Simulacrum",
+          "logical_rule_key": "battle_rule_v1:ab61cb1000afb2936a59c73032efb313"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scaldkin",
+          "logical_rule_key": "battle_rule_v1:fdbdbe2d5014764c6160e973ab225441"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shivan Hellkite",
+          "logical_rule_key": "battle_rule_v1:94d9023b123f3927629f869a9e607823"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skyway Sniper",
+          "logical_rule_key": "battle_rule_v1:de982ce5b9578bbf895fec4943505a19"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Stinging Barrier",
+          "logical_rule_key": "battle_rule_v1:60361af04d9fb9739c31570ac303ef42"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Storm Spirit",
+          "logical_rule_key": "battle_rule_v1:49c7599b3fd5e13be598e31a0c1cdcb0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thornwind Faeries",
+          "logical_rule_key": "battle_rule_v1:27f6e8dab5d9321be5e187a4da518020"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vulshok Sorcerer",
+          "logical_rule_key": "battle_rule_v1:7b5a3290b2e56ffd19c2c48fee98f942"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 17
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aven Archer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d5341d706939b1fc99fe1350dbdd2caf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Crimson Manticore",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ee50af001d948901a4759d98c7d953ce"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cunning Sparkmage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7b5a3290b2e56ffd19c2c48fee98f942"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dive Bomber",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3f77c0ef112c89cbb058590822479815"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Divebomber Griffin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:54f6bc38c4a561eeff5a274fa0cc70df"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fanatical Firebrand",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0c95d595a2b1ecdca52e311eafdcd41e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jeska, Warrior Adept",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e67c398e703075e22be0534a11980b0b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kamahl, Pit Fighter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:dee9caed362118576a9ab517015ff8a1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mawcor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:27f6e8dab5d9321be5e187a4da518020"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sarpadian Simulacrum",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ab61cb1000afb2936a59c73032efb313"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scaldkin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fdbdbe2d5014764c6160e973ab225441"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shivan Hellkite",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:94d9023b123f3927629f869a9e607823"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skyway Sniper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:de982ce5b9578bbf895fec4943505a19"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Stinging Barrier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:60361af04d9fb9739c31570ac303ef42"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Storm Spirit",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49c7599b3fd5e13be598e31a0c1cdcb0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thornwind Faeries",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:27f6e8dab5d9321be5e187a4da518020"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vulshok Sorcerer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7b5a3290b2e56ffd19c2c48fee98f942"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

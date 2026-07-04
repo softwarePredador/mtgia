@@ -114,10 +114,13 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "additional_counter",
     "counter_grants_keywords",
     "keywords",
+    "_keywords_are_self",
     "trigger",
     "trigger_effect",
     "ability_kind",
     "activated_effect",
+    "activated_battle_model_scope",
+    "activated_damage_amount",
     "activated_draw",
     "activated_draw_discard",
     "activated_draw_count",
@@ -160,6 +163,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "static_toughness_bonus_per_graveyard_count",
     "dynamic_power_equals_graveyard_count",
     "dynamic_toughness_equals_graveyard_count",
+    "_activated_rule_effects",
+    "xmage_ability_class",
+    "xmage_ability_classes",
+    "xmage_effect_class",
 )
 
 
