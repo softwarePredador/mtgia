@@ -5679,6 +5679,41 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.mana_pool.generic, 0)
         self.assertTrue(engineer["tapped"])
 
+    def test_simple_mana_source_permanent_enters_tapped_and_skips_refresh(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "B",
+            "produced_mana_symbols": ["B"],
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "artifact",
+            "enters_tapped": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Charcoal Diamond",
+                "type_line": "Artifact",
+                "oracle_text": "This artifact enters tapped.\n{T}: Add {B}.",
+            },
+            turn=6,
+            rng=random.Random(6),
+            effect_data_override=effect,
+        )
+        permanent = active.battlefield[0]
+        active.refresh_mana_sources(turn=7)
+
+        self.assertTrue(permanent.get("tapped"))
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(active.mana_pool.black, 0)
+
     def test_mana_source_activation_mana_cost_is_paid_before_fixed_symbols_added(self) -> None:
         active = self.battle.Player("Active", None, [])
         blue_source = {

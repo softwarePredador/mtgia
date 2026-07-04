@@ -213,21 +213,25 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg391_target_player_draw_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg392_activated_draw_discard_cost_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg392_activated_draw_discard_cost_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg393_simple_mana_auxiliary_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg393_simple_mana_auxiliary_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg393_simple_mana_auxiliary_new_server_after_hash_cleanup_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg393_simple_mana_auxiliary_new_server_after_hash_cleanup.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26868`
-- XMage authoritative source resolved: `26554`
+- target all-card battle-gap identities: `26843`
+- XMage authoritative source resolved: `26529`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26554`
+- XMage authoritative adapter required: `26529`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26554` identities, card semantics are accepted from XMage; work is now
+- For `26529` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -246,10 +250,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG392 Exact Adapter Waves
+## PG283-PG393 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG392 all-card exact adapter waves are applied and
-synced. PG375-PG392 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG393 all-card exact adapter waves are applied and
+synced. PG375-PG393 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -543,6 +547,16 @@ patterns:
 - `ramp_permanent::xmage_artifact_mana_source_variant_review_v1` and
   `ramp_permanent::xmage_creature_mana_source_variant_review_v1` ->
   `xmage_simple_tap_mana_source_permanent_v1`
+- `ramp_permanent::xmage_artifact_mana_source_variant_review_v1` and
+  `ramp_permanent::xmage_creature_mana_source_variant_review_v1` may also map
+  to `xmage_simple_tap_mana_source_permanent_v1` when one simple tap mana line
+  is embedded in multi-line Oracle text and all auxiliary abilities are safe
+  static self keywords or `EntersBattlefieldTappedAbility`. Parenthetical mana
+  reminders are stripped before matching. Crew, cycling, suspend, alternative
+  costs, conditional mana, multiple complex mana abilities, unsafe activated
+  abilities, and unsupported auxiliary ability classes remain blocked by
+  `mana_source_auxiliary_ability_not_supported` or the narrower mana-source
+  blockers.
 - `counter_spell::counter_target_stack_object_variant_v1` ->
   `xmage_counter_target_spell_v1`
 - `bounce::targeted_return_to_hand_variant_v1` ->
@@ -6395,6 +6409,64 @@ PG392 measured result:
   `proposal_count=0` over `7646` considered supported rows. The next cycle must
   implement another exact mapper/runtime subpattern before package generation.
 
+PG393 measured result:
+
+- PG393 promoted `25` simple tap mana-source permanents with safe auxiliary
+  text on the new server: `Charcoal Diamond`, `Darksteel Ingot`,
+  `Deathbloom Gardener`, `Druid of the Anima`, `Fire Diamond`, `Fire Sprites`,
+  `Hedron Crawler`, `Leyline Prowler`, `Lotus Guardian`, `Maraleaf Pixie`,
+  `Marble Diamond`, `Moss Diamond`, `Noxious Newt`, `Obelisk of Bant`,
+  `Obelisk of Esper`, `Obelisk of Grixis`, `Obelisk of Jund`,
+  `Obelisk of Naya`, `Sky Diamond`, `Steward of Valeron`,
+  `Sylvan Caryatid`, `Timeless Lotus`, `Urborg Elf`, `Vine Trellis`, and
+  `Warden of Geometries`.
+- The splitter now maps one simple `{T}: Add ...` mana ability from single-line
+  or multi-line Oracle text, strips parenthetical mana reminders, and carries
+  safe auxiliary metadata for static self keywords plus enters-tapped state.
+  Unsupported neighbor cases remain blocked, including crew/cycling/suspend,
+  alternative costs, conditional mana, multiple complex mana abilities, and
+  unsupported auxiliary ability classes.
+- Runtime coverage keeps `ramp_permanent` behavior exact for these promoted
+  permanents, including enters-tapped state so a newly entered tapped mana
+  source does not immediately refresh as usable mana.
+- Full exact splitter tests passed `350/350`, full exact runtime tests passed
+  `202/202`, package-builder tests passed `6/6`, and `py_compile` passed for
+  the changed scripts.
+- PostgreSQL precheck matched `25/25` target card rows on the new server; apply
+  upserted `25` rows and deprecated `16` stale review-only shadows; postcheck
+  verified `25/25` promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `7698` PostgreSQL rows from the new target,
+  updated `7470` SQLite rows, and exported `5200` canonical snapshot rows.
+  Full metadata sync used `postgres_target=127.0.0.1:15432/halder`, matched
+  `6200` PostgreSQL cards from `6009` unique requested names, backfilled
+  `2699/2699` deck-card cache rows, and left one unrelated unresolved alias:
+  `Surgical Suite/Hospital Room`.
+- Contract cleanup in the same closeout backfilled missing `oracle_hash` for
+  the two remaining trusted executable SQLite/PG curated rows surfaced by the
+  audit: `Angel's Grace` and `Seething Song`. The cleanup used
+  `public.cards.oracle_text` md5 on the new server, synced SQLite again from
+  PostgreSQL, and raised the final PG-Hermes-SQLite contract audit from
+  `49 pass / 1 warn` to `50/50 pass`.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot,
+  runtime `get_card_effect`, and no-override battle checks for all `25` cards
+  against `database_target=127.0.0.1:15432/halder`.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and final
+  PG-Hermes-SQLite contract `50/50` pass.
+- Global all-card authoritative queue after PG393:
+  `target_identity_count=26843`, `xmage_authoritative_source_count=26529`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26529`.
+- Running the exact splitter after PG393 and the hash cleanup on supported
+  units returned
+  `proposal_count=0` over `7621` considered supported rows. Mana-source
+  neighbors now remain explicitly classified, with
+  `mana_source_auxiliary_ability_not_supported=305`,
+  `mana_source_unsafe_ability_class=133`,
+  `mana_source_safe_ability_missing=132`,
+  `mana_source_effect_class_not_simple=24`, and
+  `mana_source_oracle_not_simple=21`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -7025,7 +7097,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG392 queue on the new server, the next exact runtime-backed work should
+post-PG393 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1818`

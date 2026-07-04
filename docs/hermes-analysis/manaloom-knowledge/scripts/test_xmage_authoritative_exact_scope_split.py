@@ -4030,6 +4030,109 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produced_mana_symbols"], ["G", "U"])
         self.assertEqual(effect["permanent_type"], "creature")
 
+    def test_simple_colorless_mana_source_ignores_parenthetical_reminder(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["ColorlessManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hedron Crawler",
+                type_line="Artifact Creature - Construct",
+                oracle_text="{T}: Add {C}. ({C} represents colorless mana.)",
+            ),
+            source_text="this.addAbility(new ColorlessManaAbility());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "C")
+        self.assertEqual(effect["produced_mana_symbols"], ["C"])
+
+    def test_simple_mana_source_with_enters_tapped_auxiliary_maps(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["BlackManaAbility", "EntersBattlefieldTappedAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Charcoal Diamond",
+                type_line="Artifact",
+                oracle_text="This artifact enters tapped.\n{T}: Add {B}.",
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTappedAbility());"
+                "this.addAbility(new BlackManaAbility());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["produces"], "B")
+        self.assertTrue(effect["enters_tapped"])
+
+    def test_simple_mana_source_with_static_keyword_auxiliary_maps(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility", "IndestructibleAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Darksteel Ingot",
+                type_line="Artifact",
+                oracle_text=(
+                    "Indestructible (Effects that say \"destroy\" don't destroy this artifact.)\n"
+                    "{T}: Add one mana of any color."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(IndestructibleAbility.getInstance());"
+                "this.addAbility(new AnyColorManaAbility());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["keywords"], ["indestructible"])
+
+    def test_simple_mana_source_with_unsupported_auxiliary_stays_blocked(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility", "CrewAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cultivator's Caravan",
+                type_line="Artifact - Vehicle",
+                oracle_text=(
+                    "{T}: Add one mana of any color.\n"
+                    "Crew 3 (Tap any number of creatures you control with total power 3 or more: "
+                    "This Vehicle becomes an artifact creature until end of turn.)"
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new AnyColorManaAbility());"
+                "this.addAbility(new CrewAbility(3));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_source_auxiliary_ability_not_supported")
+
     def test_simple_creature_mana_source_with_activation_cost_maps_fixed_symbols(self) -> None:
         row = queue_row(
             split.RAMP_CREATURE_UNIT,

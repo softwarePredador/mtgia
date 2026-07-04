@@ -329,6 +329,11 @@ STATIC_SELF_KEYWORD_ABILITY_CLASSES = {
     "VigilanceAbility": "vigilance",
 }
 
+SAFE_MANA_AUXILIARY_ABILITY_CLASSES = {
+    "EntersBattlefieldTappedAbility",
+    *STATIC_SELF_KEYWORD_ABILITY_CLASSES.keys(),
+}
+
 STATIC_SELF_KEYWORD_ORDER = [
     "flying",
     "first_strike",
@@ -7546,6 +7551,16 @@ UNSUPPORTED_SIMPLE_MANA_ORACLE_TOKENS = {
 }
 
 
+def normalized_oracle_lines(metadata: dict[str, Any]) -> list[str]:
+    raw_text = str(metadata.get("oracle_text") or "").strip().lower()
+    lines = []
+    for raw_line in raw_text.splitlines():
+        line = strip_parenthetical_reminders(re.sub(r"\s+", " ", raw_line.strip())).strip()
+        if line:
+            lines.append(line)
+    return lines
+
+
 def _unique_mana_symbols(symbols: list[str]) -> str:
     return "".join(dict.fromkeys(symbols))
 
@@ -7554,8 +7569,7 @@ def _brace_mana_symbols(text: str) -> list[str]:
     return [symbol.upper() for symbol in re.findall(r"\{([wubrgc])\}", text)]
 
 
-def simple_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
-    text = oracle_text(metadata)
+def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     if any(token in text for token in UNSUPPORTED_SIMPLE_MANA_ORACLE_TOKENS):
         return None
     if text == "{t}: add one mana of any color.":
@@ -7583,10 +7597,32 @@ def simple_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str,
                 "produced_mana_symbols": symbols,
                 "activation_mana_cost": match.group("cost").upper(),
             }
-    match = re.match(r"^\{t\}: add \{([wubrgc])\} or \{([wubrgc])\}\.?$", text)
+    match = re.match(
+        r"^\{t\}: add (?P<choices>\{[wubrgc]\}(?:, \{[wubrgc]\})*(?:,? or \{[wubrgc]\}))\.?$",
+        text,
+    )
     if match:
-        produced = "".join(dict.fromkeys([match.group(1).upper(), match.group(2).upper()]))
+        produced = _unique_mana_symbols(_brace_mana_symbols(match.group("choices")))
         return {"produces": produced, "mana_produced": 1}
+    return None
+
+
+def simple_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    detail = simple_mana_source_detail_from_line(text)
+    if detail is not None:
+        return detail
+
+    candidates = []
+    for line in normalized_oracle_lines(metadata):
+        line_detail = simple_mana_source_detail_from_line(line)
+        if line_detail is not None:
+            candidates.append(line_detail)
+            continue
+        if "add " in line and ("{t}" in line or "mana" in line):
+            return None
+    if len(candidates) == 1:
+        return candidates[0]
     return None
 
 
@@ -12287,6 +12323,9 @@ def split_row(
             return None, "mana_source_unsafe_ability_class"
         if not mana_ability_classes.intersection(SAFE_MANA_ABILITY_CLASSES):
             return None, "mana_source_safe_ability_missing"
+        auxiliary_abilities = mana_ability_classes - SAFE_MANA_ABILITY_CLASSES
+        if auxiliary_abilities - SAFE_MANA_AUXILIARY_ABILITY_CLASSES:
+            return None, "mana_source_auxiliary_ability_not_supported"
         if classes - {"BasicManaEffect", "AddManaOfAnyColorEffect"}:
             return None, "mana_source_effect_class_not_simple"
         source_blocker = simple_mana_source_source_blocker(source_text, mana_ability_classes)
@@ -12309,6 +12348,17 @@ def split_row(
             "xmage_mana_ability_classes": sorted(mana_ability_classes),
             "xmage_effect_classes": sorted(classes),
         }
+        static_keywords = sorted(
+            {
+                STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
+                for ability in auxiliary_abilities
+                if ability in STATIC_SELF_KEYWORD_ABILITY_CLASSES
+            }
+        )
+        if static_keywords:
+            effect_json["keywords"] = static_keywords
+        if "EntersBattlefieldTappedAbility" in mana_ability_classes:
+            effect_json["enters_tapped"] = True
         if mana_source_detail.get("produced_mana_symbols"):
             effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
         if mana_source_detail.get("activation_mana_cost"):
