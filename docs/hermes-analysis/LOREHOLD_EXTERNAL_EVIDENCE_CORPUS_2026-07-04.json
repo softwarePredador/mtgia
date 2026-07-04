@@ -1,0 +1,276 @@
+{
+  "generated_at": "2026-07-04T00:00:00Z",
+  "artifact_type": "lorehold_external_evidence_corpus",
+  "commander": "Lorehold, the Historian",
+  "sources": [
+    {
+      "source_key": "wizards_commander_format",
+      "source_type": "official_rules",
+      "url": "https://magic.wizards.com/en/formats/commander",
+      "observed_signal": "Commander uses 99 plus 1 deck construction, singleton rules, commander color identity, and allows colorless legal cards."
+    },
+    {
+      "source_key": "scryfall_lorehold_mana_vault_one_ring",
+      "source_type": "oracle_legality_game_changer",
+      "url": "https://scryfall.com/",
+      "observed_signal": "Scryfall API checks on 2026-07-04 showed Lorehold, Mana Vault, The One Ring, Lapse of Certainty, Brainstone, Planetarium of Wan Shi Tong, fast mana, and listed pressure cards as Commander legal in Lorehold color identity where relevant. Mana Vault, The One Ring, Chrome Mox, Grim Monolith, Mox Diamond, Lion's Eye Diamond, and Underworld Breach were game_changer=true."
+    },
+    {
+      "source_key": "edhrec_miracles_every_turn",
+      "source_type": "public_strategy_article",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander",
+      "observed_signal": "Lorehold wants topdeck control; Sensei's Divining Top, Scroll Rack, Library of Leng, Brainstone, Planetarium of Wan Shi Tong, Elegant Parlor, and Tocasia's Dig Site are cited as setup options."
+    },
+    {
+      "source_key": "draftsim_approach_lapse_combo",
+      "source_type": "public_combo_article",
+      "url": "https://draftsim.com/lorehold-approach-combo/",
+      "observed_signal": "Approach of the Second Sun plus Lapse of Certainty is presented as a Lorehold line that can set Approach on top and miracle it during an opponent upkeep."
+    },
+    {
+      "source_key": "edhrec_cedh_average_deck",
+      "source_type": "public_average_deck",
+      "url": "https://edhrec.com/average-decks/lorehold-the-historian/cedh",
+      "observed_signal": "The cEDH average deck lane includes fast mana, one-ring/value, tutor, protection, storm, Breach/Wheel, and compact artifact acceleration signals."
+    },
+    {
+      "source_key": "draftsim_lorehold_deck_guide",
+      "source_type": "public_strategy_article",
+      "url": "https://draftsim.com/lorehold-the-historian-edh-deck/",
+      "observed_signal": "Lorehold is described as a big instant/sorcery and control shell where Approach, Surge to Victory, Mizzix's Mastery, Storm Herd, and setup cards are central."
+    },
+    {
+      "source_key": "gametyrant_lorehold_deck_tech",
+      "source_type": "public_strategy_article",
+      "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech",
+      "observed_signal": "Public strategy groups Lorehold cards into topdeck manipulation, big Miracle spells, discard payoffs, and aggressive spell support such as Monastery Mentor, Young Pyromancer, and Guttersnipe."
+    },
+    {
+      "source_key": "cardkingdom_lorehold_synergy",
+      "source_type": "public_strategy_article",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/",
+      "observed_signal": "Library of Leng is highlighted as a key replacement-effect synergy with Lorehold discard/draw. The article also points to reanimator shells using high-cost white recursion spells and Karmic Guide."
+    }
+  ],
+  "signals": [
+    {
+      "signal_key": "external_topdeck_miracle_anchor_floor",
+      "package_key": "external_topdeck_miracle_anchor_floor",
+      "signal_type": "existing_anchor_support",
+      "contract_path": "support_existing_607",
+      "lane": "topdeck_miracle_setup",
+      "external_strength": "high",
+      "source_keys": [
+        "edhrec_miracles_every_turn",
+        "draftsim_lorehold_deck_guide",
+        "cardkingdom_lorehold_synergy"
+      ],
+      "add_cards": [
+        "Library of Leng",
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Elegant Parlor"
+      ],
+      "proposed_cut_cards": [],
+      "evidence_summary": "Multiple external sources independently reinforce the current 607 topdeck/miracle floor rather than replacing it.",
+      "notes": [
+        "This validates protected anchors already present in 607.",
+        "It does not create a new deck-change candidate."
+      ]
+    },
+    {
+      "signal_key": "external_brainstone_planetarium_topdeck_extension",
+      "package_key": "external_brainstone_planetarium_topdeck_extension",
+      "signal_type": "topdeck_extension",
+      "contract_path": "same_lane_package",
+      "lane": "topdeck_miracle_setup",
+      "external_strength": "medium",
+      "source_keys": [
+        "edhrec_miracles_every_turn",
+        "scryfall_lorehold_mana_vault_one_ring"
+      ],
+      "add_cards": [
+        "Brainstone",
+        "Planetarium of Wan Shi Tong"
+      ],
+      "proposed_cut_cards": [
+        "Creative Technique"
+      ],
+      "known_internal_package_keys": [
+        "planetarium_of_wan_shi_tong_same_lane_benchmark_cut_creative_technique",
+        "brainstone_topdeck_miracle"
+      ],
+      "known_internal_decisions": [
+        "Brainstone deck-6 path was invalid for protected deck 607 in the current contract.",
+        "Planetarium of Wan Shi Tong over Creative Technique lost a natural gate and did not override 607."
+      ],
+      "evidence_summary": "External sources support these as topdeck tools, but the only named 607 cut is protected or previously rejected.",
+      "notes": [
+        "Requires new cut evidence before any retest."
+      ]
+    },
+    {
+      "signal_key": "external_approach_lapse_deterministic_line",
+      "package_key": "external_approach_lapse_deterministic_line",
+      "signal_type": "combo_line",
+      "contract_path": "same_lane_package",
+      "lane": "deterministic_finisher",
+      "external_strength": "medium",
+      "source_keys": [
+        "draftsim_approach_lapse_combo",
+        "scryfall_lorehold_mana_vault_one_ring"
+      ],
+      "add_cards": [
+        "Lapse of Certainty"
+      ],
+      "proposed_cut_cards": [],
+      "evidence_summary": "Approach plus Lapse is a concrete public deterministic line, but current 607 has no seed-safe named cut for it.",
+      "notes": [
+        "Useful as a future diagnostic or package hypothesis.",
+        "Cannot promote without a named cut, runtime support, and natural gate."
+      ]
+    },
+    {
+      "signal_key": "external_cedh_fast_mana_engine",
+      "package_key": "external_cedh_fast_mana_engine",
+      "signal_type": "fast_mana_shell",
+      "contract_path": "full_shell",
+      "lane": "early_plan",
+      "external_strength": "high",
+      "source_keys": [
+        "edhrec_cedh_average_deck",
+        "scryfall_lorehold_mana_vault_one_ring"
+      ],
+      "add_cards": [
+        "Chrome Mox",
+        "Mana Vault",
+        "Grim Monolith",
+        "Mox Diamond",
+        "Lion's Eye Diamond",
+        "Lotus Petal"
+      ],
+      "proposed_cut_cards": [
+        "Bender's Waterskin"
+      ],
+      "known_internal_package_keys": [
+        "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
+        "mana_vault_fast_mana_cut_arcane_signet",
+        "lotus_petal_same_lane_benchmark_cut_bender_s_waterskin",
+        "lion_s_eye_diamond_same_lane_benchmark_cut_bender_s_waterskin",
+        "grim_monolith_same_lane_benchmark_cut_bender_s_waterskin"
+      ],
+      "known_internal_decisions": [
+        "Mana Vault over Bender's Waterskin lost the confirmed 607 gate.",
+        "Fast-mana variants must not cut the 607 miracle-timing floor without pressure-safe proof."
+      ],
+      "evidence_summary": "The public cEDH average deck supports a faster shell, but this is a bracket/full-shell signal, not a current one-for-one 607 upgrade.",
+      "notes": [
+        "Requires separate high-power shell contract and bracket declaration."
+      ]
+    },
+    {
+      "signal_key": "external_one_ring_value_engine",
+      "package_key": "external_one_ring_value_engine",
+      "signal_type": "value_protection_engine",
+      "contract_path": "same_lane_package",
+      "lane": "card_draw_selection",
+      "external_strength": "high_global_low_context",
+      "source_keys": [
+        "edhrec_cedh_average_deck",
+        "scryfall_lorehold_mana_vault_one_ring"
+      ],
+      "add_cards": [
+        "The One Ring"
+      ],
+      "proposed_cut_cards": [
+        "Creative Technique",
+        "Improvisation Capstone",
+        "Redirect Lightning"
+      ],
+      "known_internal_decisions": [
+        "The One Ring was accessed and used in current 607 tests, but tested cuts lost to 607."
+      ],
+      "evidence_summary": "The One Ring is legal and a game changer, but current internal battle proof rejects the tested 607 cuts.",
+      "notes": [
+        "Do not treat global staple strength as cut proof."
+      ]
+    },
+    {
+      "signal_key": "external_spell_pressure_creature_package",
+      "package_key": "external_spell_pressure_creature_package",
+      "signal_type": "pressure_package",
+      "contract_path": "full_shell",
+      "lane": "pressure_absorber",
+      "external_strength": "medium",
+      "source_keys": [
+        "gametyrant_lorehold_deck_tech",
+        "scryfall_lorehold_mana_vault_one_ring"
+      ],
+      "add_cards": [
+        "Monastery Mentor",
+        "Young Pyromancer",
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "proposed_cut_cards": [],
+      "known_internal_package_keys": [
+        "storm_kiln_artist_cut_arcane_signet"
+      ],
+      "known_internal_decisions": [
+        "Storm-Kiln Artist showed real strategic signal after runtime correction but regressed Winota when tested over Arcane Signet."
+      ],
+      "evidence_summary": "Public pressure/payoff cards align with the known 607 weakness target, but they need a pressure-safe shell instead of a blind one-card swap.",
+      "notes": [
+        "Good candidate family for a future full-shell or multi-card package contract."
+      ]
+    },
+    {
+      "signal_key": "external_breach_wheel_aetherflux_conversion_shell",
+      "package_key": "external_breach_wheel_aetherflux_conversion_shell",
+      "signal_type": "spell_chain_conversion_shell",
+      "contract_path": "full_shell",
+      "lane": "spell_chain_conversion",
+      "external_strength": "high",
+      "source_keys": [
+        "edhrec_cedh_average_deck",
+        "draftsim_lorehold_deck_guide",
+        "scryfall_lorehold_mana_vault_one_ring"
+      ],
+      "add_cards": [
+        "Underworld Breach",
+        "Wheel of Fortune",
+        "Aetherflux Reservoir",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "proposed_cut_cards": [],
+      "known_internal_decisions": [
+        "Prior miracle-pressure-conversion and recursion-discard shells produced useful telemetry but did not beat 607."
+      ],
+      "evidence_summary": "External data supports a compact high-power conversion shell, but prior broad shells failed and this needs a smaller named contract.",
+      "notes": [
+        "Do not promote from structure or public cEDH list alone."
+      ]
+    },
+    {
+      "signal_key": "external_discard_reanimator_alt_shell",
+      "package_key": "external_discard_reanimator_alt_shell",
+      "signal_type": "alternate_archetype",
+      "contract_path": "full_shell",
+      "lane": "graveyard_recursion",
+      "external_strength": "medium",
+      "source_keys": [
+        "cardkingdom_lorehold_synergy"
+      ],
+      "add_cards": [
+        "Storm of Souls",
+        "Late to Dinner",
+        "Karmic Guide"
+      ],
+      "proposed_cut_cards": [],
+      "evidence_summary": "External strategy suggests a relaxed reanimator direction, but this is an alternate archetype and not a current 607 cut.",
+      "notes": [
+        "Would require a new commander intent profile or full-shell contract."
+      ]
+    }
+  ]
+}
