@@ -8447,6 +8447,48 @@ new server:
   split recheck produced `proposal_count=0`; the remaining `314` identities are
   still explicit missing-source exceptions.
 
+## 2026-07-04 PG421 Static Flying Block-Only-Flying Creature Closure
+
+- Closed the exact XMage no-effect/no-signal unit
+  `CanBlockOnlyFlyingAbility,FlyingAbility` as ManaLoom scope
+  `xmage_static_flying_can_block_only_flying_creature_v1`.
+- The mapper accepts only creatures whose local XMage source contains both
+  `FlyingAbility` and `CanBlockOnlyFlyingAbility`, with no effects, no extra
+  signals, and exact Oracle text after reminder removal:
+  `Flying` plus `This creature can block only creatures with flying.`.
+  Similar filtered evasion, landwalk, or non-exact block restriction text
+  remains blocked for separate adapters.
+- Runtime behavior now routes blocker legality through
+  `blocker_can_block_attacker`: flying attackers still require flying/reach
+  blockers, and creatures with `can_block_only_flying` or
+  `block_restriction=creatures_with_flying_only` cannot block nonflying
+  attackers. Focused tests cover both rejected nonflying attackers and allowed
+  flying attackers.
+- The PostgreSQL package promoted `18` cards:
+  `Belbe's Percher`, `Cloud Djinn`, `Cloud Dragon`, `Cloud Elemental`,
+  `Cloud Pirates`, `Cloud Spirit`, `Cloud Sprite`, `Hoverguard Observer`,
+  `Long-Finned Skywhale`, `Rishadan Airship`, `Scrapskin Drake`,
+  `Skywinder Drake`, `Stratozeppelid`, `Stronghold Zeppelin`,
+  `Tattered Haunter`, `Vaporkin`, `Wanderlight Spirit`, and `Welkin Tern`.
+  Precheck found `18` target rows, `0` existing rule rows, and `0` shadow rows;
+  apply inserted/updated `18`; postcheck verified `18/18` promoted rows as
+  `verified`/`auto` with Oracle hashes.
+- Hermes sync refreshed PostgreSQL card metadata against
+  `127.0.0.1:15432/halder` and synced `18` PG rules into SQLite. The canonical
+  fallback export increased to `5574` rows.
+- PG421 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `18` selected cards. Generic
+  battle scenario count remained `0`; combat legality is covered by focused
+  runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26468` to `26450`, authoritative adapter-required count from `26154`
+  to `26136`, and the exact flying block-only-flying work unit to zero. The
+  post-PG421 exact split recheck produced `proposal_count=0`; the remaining
+  `314` identities are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -210,6 +210,67 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(assignments, [(attacker, [blocker])])
         self.assertTrue(blocker.get("blocking"))
 
+    def test_static_can_block_only_flying_rejects_nonflying_attacker(self) -> None:
+        defender = self.battle.Player("Defender", None, [])
+        attacker = {
+            "name": "Runeclaw Bear",
+            "type_line": "Creature - Bear",
+            "power": 1,
+            "toughness": 1,
+        }
+        blocker = {
+            "name": "Cloud Elemental",
+            "type_line": "Creature - Elemental",
+            "power": 2,
+            "toughness": 3,
+            "flying": True,
+            "can_block_only_flying": True,
+            "block_restriction": "creatures_with_flying_only",
+            "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+        }
+        defender.battlefield = [blocker]
+
+        assignments = self.battle.declare_blockers_step(
+            defender,
+            [attacker],
+            turn=4,
+            rng=random.Random(1),
+        )
+
+        self.assertEqual(assignments, [(attacker, [])])
+        self.assertNotIn("blocking", blocker)
+
+    def test_static_can_block_only_flying_allows_flying_attacker(self) -> None:
+        defender = self.battle.Player("Defender", None, [])
+        attacker = {
+            "name": "Wind Drake",
+            "type_line": "Creature - Drake",
+            "power": 1,
+            "toughness": 1,
+            "flying": True,
+        }
+        blocker = {
+            "name": "Cloud Elemental",
+            "type_line": "Creature - Elemental",
+            "power": 2,
+            "toughness": 3,
+            "flying": True,
+            "can_block_only_flying": True,
+            "block_restriction": "creatures_with_flying_only",
+            "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+        }
+        defender.battlefield = [blocker]
+
+        assignments = self.battle.declare_blockers_step(
+            defender,
+            [attacker],
+            turn=4,
+            rng=random.Random(1),
+        )
+
+        self.assertEqual(assignments, [(attacker, [blocker])])
+        self.assertTrue(blocker.get("blocking"))
+
     def test_static_play_lands_from_graveyard_uses_graveyard_land_when_no_hand_or_topdeck(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

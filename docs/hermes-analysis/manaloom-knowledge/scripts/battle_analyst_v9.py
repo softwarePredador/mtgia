@@ -54572,6 +54572,18 @@ def _player_controls_landwalk_land(player, land_type):
     return False
 
 
+def blocker_can_block_attacker(blocker, attacker):
+    if not isinstance(blocker, dict) or not isinstance(attacker, dict):
+        return False
+    if attacker.get("flying") and not (blocker.get("flying") or blocker.get("reach")):
+        return False
+    if blocker.get("can_block_only_flying") and not attacker.get("flying"):
+        return False
+    if blocker.get("block_restriction") == "creatures_with_flying_only" and not attacker.get("flying"):
+        return False
+    return True
+
+
 def attacker_cannot_be_blocked(creature, defending_player=None):
     if bool(
         creature.get("unblockable")
@@ -55730,11 +55742,7 @@ def declare_blockers_step(target, attackers, turn, rng):
             blocker
             for blocker in target.creatures_for_blocking()
             if blocker not in assigned_blockers
-            and (
-                not a.get("flying")
-                or blocker.get("flying")
-                or blocker.get("reach")
-            )
+            and blocker_can_block_attacker(blocker, a)
         ]
         lethal_attack = target.life <= a.get("power", 2)
         if not available or (not lethal_attack and rng.random() >= 0.35):

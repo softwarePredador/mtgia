@@ -180,6 +180,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "landwalk_keyword",
     "landwalk_land_type",
     "landwalk_land_types",
+    "can_block_only_flying",
+    "block_restriction",
     "static_power_toughness_source",
     "graveyard_count_scope",
     "graveyard_count_card_types",

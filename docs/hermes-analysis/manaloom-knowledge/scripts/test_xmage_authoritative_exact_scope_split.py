@@ -12667,6 +12667,60 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_keyword_not_creature")
 
+    def test_static_flying_can_block_only_flying_creature_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.FLYING_CAN_BLOCK_ONLY_FLYING_UNIT,
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["CanBlockOnlyFlyingAbility", "FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cloud Elemental",
+                type_line="Creature - Elemental",
+                oracle_text="Flying\nThis creature can block only creatures with flying.",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new CanBlockOnlyFlyingAbility());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(
+            effect["battle_model_scope"],
+            split.STATIC_FLYING_CAN_BLOCK_ONLY_FLYING_CREATURE_SCOPE,
+        )
+        self.assertEqual(effect["static_effect"], "self_flying_can_block_only_flying")
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["can_block_only_flying"])
+        self.assertEqual(effect["block_restriction"], "creatures_with_flying_only")
+
+    def test_static_flying_can_block_only_flying_blocks_nonexact_oracle(self) -> None:
+        row = queue_row(
+            split.FLYING_CAN_BLOCK_ONLY_FLYING_UNIT,
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["CanBlockOnlyFlyingAbility", "FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Drake",
+                type_line="Creature - Drake",
+                oracle_text="Flying\nThis creature can block only creatures with flying or reach.",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new CanBlockOnlyFlyingAbility());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_flying_block_restriction_oracle_not_exact")
+
     def test_report_summarizes_selected_and_blocked_rows(self) -> None:
         rows = [
             queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"], card_id="draw"),
