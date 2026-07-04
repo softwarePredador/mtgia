@@ -1,0 +1,1218 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-04T21:10:03.379698+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg432_xmage_simple_mana_source_new_server_manifest.json",
+  "package_id": "pg432_xmage_simple_mana_source_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 34
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Agent of Stromgald",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4",
+          "oracle_hash": "65769fe8e16d48a7ec023932d2e52ced",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Bog Initiate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4",
+          "oracle_hash": "9c6c2892bea942797a43ca0b6a7414c1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Charcoal Diamond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:137f44722691b418bf3fc4b94bf13ffa",
+          "oracle_hash": "f0a29c9b82aa807ef89a7daaa4690632",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Darksteel Ingot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3e016d8b3b1969d6445876eb6e10eebd",
+          "oracle_hash": "e5e3dc2dac0cf672f0edfcba77e27d94",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Deathbloom Gardener",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f9104dca7375ad6930430adcf52b5422",
+          "oracle_hash": "f98af3d17a8cff2f5144d7754f296dff",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Druid of the Anima",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f430130fc62b2877950277bbfd6560e3",
+          "oracle_hash": "435ababd4f473e2e72b617af4bae2927",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Fire Diamond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:84572dfd15e39a7559373116c8d6a76f",
+          "oracle_hash": "4350e47225e4592c891778fcaf676af4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Fire Sprites",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:289f7f0e0e69fa3f3bbb4d564cad35e9",
+          "oracle_hash": "2237bc817fffe10be3027d6f92ba92d7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Hedron Crawler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:12e2a50007013110a203e8bc1ace32de",
+          "oracle_hash": "0882122d6b80526a7ba6b1e2f6bba26a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Helionaut",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708",
+          "oracle_hash": "69e2cdb07b75b18579ce768170f274e7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Leyline Prowler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:431948af06659547eb9fc8ce628d5978",
+          "oracle_hash": "a622c5c8221ec7cdd9c70023909fbf82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Llanowar Envoy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+          "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Lotus Guardian",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c86ff289fc4270cd41aa1b30edcadef",
+          "oracle_hash": "2119fc1976cfab2480a9d86c57f1859b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Maraleaf Pixie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:70889c371b1bde8086338dbe3419bc50",
+          "oracle_hash": "737f3f1c72e0a9fc25c33ba0fc7a1707",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Marble Diamond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6f4935422826b2b8f7ff8d919a3cd037",
+          "oracle_hash": "1b3704c64d5815150629d97496e4f5d3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Moss Diamond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:229eed4bb006040c5956f0d0c8cdbd3e",
+          "oracle_hash": "00753d6404d132764a0917c7282e4e81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Nomadic Elf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+          "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Noxious Newt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:542a1d57b12d362cf9864691cc5247ba",
+          "oracle_hash": "9605b929a2447cadeab86cbde896c4a0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Obelisk of Bant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7c4937398bbd9523678d3f783da651cc",
+          "oracle_hash": "0ad0c4aeadf40e30b2d7812459b3859d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Obelisk of Esper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d2e7e5dd955d80e0a7fb9834a170f634",
+          "oracle_hash": "761bdf76365c5ff0a17b5ab8443721b1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Obelisk of Grixis",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3cae34e832d170109839cd69754c77e",
+          "oracle_hash": "2f156da54629a3a9c9fe1872446698b3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Obelisk of Jund",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8e950dd79a0d9d049925fbb6660589ee",
+          "oracle_hash": "ec252be44dc08cc5d1e62a76a41f447b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Obelisk of Naya",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a2f35d6b036f3a370dad1e4324e6bea9",
+          "oracle_hash": "435ababd4f473e2e72b617af4bae2927",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Orochi Leafcaller",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9",
+          "oracle_hash": "bbe66105c445b665906687869850951e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Prismite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5",
+          "oracle_hash": "87fc16872f2a927fc1135934d7482210",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Signpost Scarecrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a",
+          "oracle_hash": "ef749be7a1c4f2fdd418676c59548c40",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Sky Diamond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5e0d88668e726c0ba01fdfb6ea49749b",
+          "oracle_hash": "c218eb8086c5629e8d2f65f640e078f8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Steward of Valeron",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2a640fffa6d953d11ba4e6aaf3a8a787",
+          "oracle_hash": "2e653dd9f4d96f5b1d16c2e34400a3ab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Sylvan Caryatid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a6eaf10f9395ef4ca637704c06a173ee",
+          "oracle_hash": "6a96f1abe446b1047842e7d6fe3821d8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Timeless Lotus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:093a1163115c108f1bae49aac95551ba",
+          "oracle_hash": "69defee0ab51f15072ad0ca4d93fd35b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Urborg Elf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:caeec480b0890951c9213f477307e56c",
+          "oracle_hash": "fdcfcf11904348dc6904217ee0ba9b83",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Vine Trellis",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:52f7800385f63be1a216716d450aaa5d",
+          "oracle_hash": "7c62dd41f0f3bb3acda9444dfcf69992",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Viridian Acolyte",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857",
+          "oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Warden of Geometries",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:716cde42a8e9e6842956f4df706bb7b3",
+          "oracle_hash": "8ba30bcf644cdc08dc7c0fec26fe2065",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 34
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Agent of Stromgald",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4",
+          "oracle_hash": "65769fe8e16d48a7ec023932d2e52ced",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Bog Initiate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4",
+          "oracle_hash": "9c6c2892bea942797a43ca0b6a7414c1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Charcoal Diamond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:137f44722691b418bf3fc4b94bf13ffa",
+          "oracle_hash": "f0a29c9b82aa807ef89a7daaa4690632",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Darksteel Ingot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3e016d8b3b1969d6445876eb6e10eebd",
+          "oracle_hash": "e5e3dc2dac0cf672f0edfcba77e27d94",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Deathbloom Gardener",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f9104dca7375ad6930430adcf52b5422",
+          "oracle_hash": "f98af3d17a8cff2f5144d7754f296dff",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Druid of the Anima",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f430130fc62b2877950277bbfd6560e3",
+          "oracle_hash": "435ababd4f473e2e72b617af4bae2927",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Fire Diamond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:84572dfd15e39a7559373116c8d6a76f",
+          "oracle_hash": "4350e47225e4592c891778fcaf676af4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Fire Sprites",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:289f7f0e0e69fa3f3bbb4d564cad35e9",
+          "oracle_hash": "2237bc817fffe10be3027d6f92ba92d7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Hedron Crawler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:12e2a50007013110a203e8bc1ace32de",
+          "oracle_hash": "0882122d6b80526a7ba6b1e2f6bba26a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Helionaut",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708",
+          "oracle_hash": "69e2cdb07b75b18579ce768170f274e7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Leyline Prowler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:431948af06659547eb9fc8ce628d5978",
+          "oracle_hash": "a622c5c8221ec7cdd9c70023909fbf82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Llanowar Envoy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+          "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Lotus Guardian",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c86ff289fc4270cd41aa1b30edcadef",
+          "oracle_hash": "2119fc1976cfab2480a9d86c57f1859b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Maraleaf Pixie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:70889c371b1bde8086338dbe3419bc50",
+          "oracle_hash": "737f3f1c72e0a9fc25c33ba0fc7a1707",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Marble Diamond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6f4935422826b2b8f7ff8d919a3cd037",
+          "oracle_hash": "1b3704c64d5815150629d97496e4f5d3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Moss Diamond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:229eed4bb006040c5956f0d0c8cdbd3e",
+          "oracle_hash": "00753d6404d132764a0917c7282e4e81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Nomadic Elf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+          "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Noxious Newt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:542a1d57b12d362cf9864691cc5247ba",
+          "oracle_hash": "9605b929a2447cadeab86cbde896c4a0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Obelisk of Bant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7c4937398bbd9523678d3f783da651cc",
+          "oracle_hash": "0ad0c4aeadf40e30b2d7812459b3859d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Obelisk of Esper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d2e7e5dd955d80e0a7fb9834a170f634",
+          "oracle_hash": "761bdf76365c5ff0a17b5ab8443721b1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Obelisk of Grixis",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3cae34e832d170109839cd69754c77e",
+          "oracle_hash": "2f156da54629a3a9c9fe1872446698b3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Obelisk of Jund",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8e950dd79a0d9d049925fbb6660589ee",
+          "oracle_hash": "ec252be44dc08cc5d1e62a76a41f447b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Obelisk of Naya",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a2f35d6b036f3a370dad1e4324e6bea9",
+          "oracle_hash": "435ababd4f473e2e72b617af4bae2927",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Orochi Leafcaller",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9",
+          "oracle_hash": "bbe66105c445b665906687869850951e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Prismite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5",
+          "oracle_hash": "87fc16872f2a927fc1135934d7482210",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Signpost Scarecrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a",
+          "oracle_hash": "ef749be7a1c4f2fdd418676c59548c40",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Sky Diamond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5e0d88668e726c0ba01fdfb6ea49749b",
+          "oracle_hash": "c218eb8086c5629e8d2f65f640e078f8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Steward of Valeron",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2a640fffa6d953d11ba4e6aaf3a8a787",
+          "oracle_hash": "2e653dd9f4d96f5b1d16c2e34400a3ab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Sylvan Caryatid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a6eaf10f9395ef4ca637704c06a173ee",
+          "oracle_hash": "6a96f1abe446b1047842e7d6fe3821d8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Timeless Lotus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:093a1163115c108f1bae49aac95551ba",
+          "oracle_hash": "69defee0ab51f15072ad0ca4d93fd35b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Urborg Elf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:caeec480b0890951c9213f477307e56c",
+          "oracle_hash": "fdcfcf11904348dc6904217ee0ba9b83",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Vine Trellis",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:52f7800385f63be1a216716d450aaa5d",
+          "oracle_hash": "7c62dd41f0f3bb3acda9444dfcf69992",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Viridian Acolyte",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857",
+          "oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Warden of Geometries",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:716cde42a8e9e6842956f4df706bb7b3",
+          "oracle_hash": "8ba30bcf644cdc08dc7c0fec26fe2065",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 34
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Agent of Stromgald",
+          "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bog Initiate",
+          "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Charcoal Diamond",
+          "logical_rule_key": "battle_rule_v1:137f44722691b418bf3fc4b94bf13ffa"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Darksteel Ingot",
+          "logical_rule_key": "battle_rule_v1:3e016d8b3b1969d6445876eb6e10eebd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deathbloom Gardener",
+          "logical_rule_key": "battle_rule_v1:f9104dca7375ad6930430adcf52b5422"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Druid of the Anima",
+          "logical_rule_key": "battle_rule_v1:f430130fc62b2877950277bbfd6560e3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fire Diamond",
+          "logical_rule_key": "battle_rule_v1:84572dfd15e39a7559373116c8d6a76f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fire Sprites",
+          "logical_rule_key": "battle_rule_v1:289f7f0e0e69fa3f3bbb4d564cad35e9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hedron Crawler",
+          "logical_rule_key": "battle_rule_v1:12e2a50007013110a203e8bc1ace32de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Helionaut",
+          "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Leyline Prowler",
+          "logical_rule_key": "battle_rule_v1:431948af06659547eb9fc8ce628d5978"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Llanowar Envoy",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lotus Guardian",
+          "logical_rule_key": "battle_rule_v1:2c86ff289fc4270cd41aa1b30edcadef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Maraleaf Pixie",
+          "logical_rule_key": "battle_rule_v1:70889c371b1bde8086338dbe3419bc50"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Marble Diamond",
+          "logical_rule_key": "battle_rule_v1:6f4935422826b2b8f7ff8d919a3cd037"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Moss Diamond",
+          "logical_rule_key": "battle_rule_v1:229eed4bb006040c5956f0d0c8cdbd3e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nomadic Elf",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Noxious Newt",
+          "logical_rule_key": "battle_rule_v1:542a1d57b12d362cf9864691cc5247ba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Obelisk of Bant",
+          "logical_rule_key": "battle_rule_v1:7c4937398bbd9523678d3f783da651cc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Obelisk of Esper",
+          "logical_rule_key": "battle_rule_v1:d2e7e5dd955d80e0a7fb9834a170f634"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Obelisk of Grixis",
+          "logical_rule_key": "battle_rule_v1:e3cae34e832d170109839cd69754c77e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Obelisk of Jund",
+          "logical_rule_key": "battle_rule_v1:8e950dd79a0d9d049925fbb6660589ee"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Obelisk of Naya",
+          "logical_rule_key": "battle_rule_v1:a2f35d6b036f3a370dad1e4324e6bea9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Orochi Leafcaller",
+          "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Prismite",
+          "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Signpost Scarecrow",
+          "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sky Diamond",
+          "logical_rule_key": "battle_rule_v1:5e0d88668e726c0ba01fdfb6ea49749b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Steward of Valeron",
+          "logical_rule_key": "battle_rule_v1:2a640fffa6d953d11ba4e6aaf3a8a787"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sylvan Caryatid",
+          "logical_rule_key": "battle_rule_v1:a6eaf10f9395ef4ca637704c06a173ee"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Timeless Lotus",
+          "logical_rule_key": "battle_rule_v1:093a1163115c108f1bae49aac95551ba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Urborg Elf",
+          "logical_rule_key": "battle_rule_v1:caeec480b0890951c9213f477307e56c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vine Trellis",
+          "logical_rule_key": "battle_rule_v1:52f7800385f63be1a216716d450aaa5d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Viridian Acolyte",
+          "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Warden of Geometries",
+          "logical_rule_key": "battle_rule_v1:716cde42a8e9e6842956f4df706bb7b3"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 34
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Agent of Stromgald",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bog Initiate",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Charcoal Diamond",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:137f44722691b418bf3fc4b94bf13ffa"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Darksteel Ingot",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:3e016d8b3b1969d6445876eb6e10eebd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deathbloom Gardener",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:f9104dca7375ad6930430adcf52b5422"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Druid of the Anima",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:f430130fc62b2877950277bbfd6560e3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fire Diamond",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:84572dfd15e39a7559373116c8d6a76f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fire Sprites",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:289f7f0e0e69fa3f3bbb4d564cad35e9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hedron Crawler",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:12e2a50007013110a203e8bc1ace32de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Helionaut",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Leyline Prowler",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:431948af06659547eb9fc8ce628d5978"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Llanowar Envoy",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lotus Guardian",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:2c86ff289fc4270cd41aa1b30edcadef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Maraleaf Pixie",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:70889c371b1bde8086338dbe3419bc50"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Marble Diamond",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:6f4935422826b2b8f7ff8d919a3cd037"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Moss Diamond",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:229eed4bb006040c5956f0d0c8cdbd3e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nomadic Elf",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Noxious Newt",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:542a1d57b12d362cf9864691cc5247ba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Obelisk of Bant",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:7c4937398bbd9523678d3f783da651cc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Obelisk of Esper",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:d2e7e5dd955d80e0a7fb9834a170f634"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Obelisk of Grixis",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:e3cae34e832d170109839cd69754c77e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Obelisk of Jund",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:8e950dd79a0d9d049925fbb6660589ee"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Obelisk of Naya",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:a2f35d6b036f3a370dad1e4324e6bea9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Orochi Leafcaller",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Prismite",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Signpost Scarecrow",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sky Diamond",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:5e0d88668e726c0ba01fdfb6ea49749b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Steward of Valeron",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:2a640fffa6d953d11ba4e6aaf3a8a787"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sylvan Caryatid",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:a6eaf10f9395ef4ca637704c06a173ee"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Timeless Lotus",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:093a1163115c108f1bae49aac95551ba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Urborg Elf",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:caeec480b0890951c9213f477307e56c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vine Trellis",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:52f7800385f63be1a216716d450aaa5d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Viridian Acolyte",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Warden of Geometries",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:716cde42a8e9e6842956f4df706bb7b3"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

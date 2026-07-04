@@ -8907,6 +8907,45 @@ new server:
   `xmage_permanent_simple_activated_damage` and
   `xmage_static_self_combat_keyword_creature` with `33` cards each.
 
+## 2026-07-04 PG432 Simple Tap Mana Source Closure
+
+- Closed the exact XMage simple permanent mana-source family as ManaLoom scope
+  `xmage_simple_tap_mana_source_permanent_v1`.
+- The selected package accepted only simple tap mana-source permanents where
+  Oracle and local XMage source agree on produced mana. Most selected cards
+  generate `1` mana; `Timeless Lotus` generates `5`. Auxiliary, conditional,
+  and source-cost mana variants remain separate scopes/blockers.
+- Runtime behavior was already covered by focused tests for simple mana
+  refresh, fixed distinct symbols, enters-tapped skip, and blocked conditional
+  sources. PG432 reused the mapper/runtime tests and performed no code
+  mutation.
+- The PostgreSQL package promoted `34` cards. Precheck found `34` target rows,
+  `0` missing targets, `0` existing expected rows, and `16` shadow rows to
+  deprecate; apply/postcheck verified `34/34` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `544`
+  affected historical rows; `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4002` PostgreSQL runtime rows, wrote `3994` SQLite runtime
+  rows, and exported `3969` canonical fallback rows.
+- PG432 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `34` selected cards. Generic
+  battle scenario count remained `0`; actual mana behavior remains covered by
+  the focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26884`, `xmage_authoritative_source_count=26570`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26570`. This is an exact
+  reduction of `34` from the post-PG431 queue.
+- The post-PG432 exact split recheck reports `proposal_count=545` and
+  `safe_for_batch_pg_package_count=545`. The largest remaining exact families
+  are `xmage_permanent_simple_activated_damage` and
+  `xmage_static_self_combat_keyword_creature`, with `33` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

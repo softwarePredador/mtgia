@@ -1150,6 +1150,31 @@
     "battle_rule_logical_key": "battle_rule_v1:76e9323694b00b6306976685792c0d10",
     "battle_rule_oracle_hash": "af1a041d197bc91a562e38f80a2dfe7c"
   },
+  "Agent of Stromgald": {
+    "activation_mana_cost": "{R}",
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "B"
+    ],
+    "produces": "B",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4",
+    "battle_rule_oracle_hash": "65769fe8e16d48a7ec023932d2e52ced"
+  },
   "Aggressive Crag": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -7525,6 +7550,31 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "d7f00fbbdd23e665a72acc7fcc074462"
   },
+  "Bog Initiate": {
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "B"
+    ],
+    "produces": "B",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4",
+    "battle_rule_oracle_hash": "9c6c2892bea942797a43ca0b6a7414c1"
+  },
   "Bog Raiders": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
@@ -11469,6 +11519,32 @@
     "battle_rule_logical_key": "battle_rule_v1:0efac9a4b073d02f8b4dccce6d09d0f4",
     "battle_rule_oracle_hash": "588d09494c785ee10f8d9a5d640db691"
   },
+  "Charcoal Diamond": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "enters_tapped": true,
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "B"
+    ],
+    "produces": "B",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "BlackManaAbility",
+      "EntersBattlefieldTappedAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:137f44722691b418bf3fc4b94bf13ffa",
+    "battle_rule_oracle_hash": "f0a29c9b82aa807ef89a7daaa4690632"
+  },
   "Chardalyn Dragon": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -15359,6 +15435,31 @@
     "battle_rule_logical_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37",
     "battle_rule_oracle_hash": "c1c35491453d7994da7a573f25b937b3"
   },
+  "Darksteel Ingot": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "indestructible"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility",
+      "IndestructibleAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3e016d8b3b1969d6445876eb6e10eebd",
+    "battle_rule_oracle_hash": "e5e3dc2dac0cf672f0edfcba77e27d94"
+  },
   "Darksteel Myr": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -15881,6 +15982,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:5c5d2824b29526e5fac573ed337ca7f4",
     "battle_rule_oracle_hash": "eecf73eadb40281bfa698aeaa1ca6294"
+  },
+  "Deathbloom Gardener": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "deathtouch"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility",
+      "DeathtouchAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f9104dca7375ad6930430adcf52b5422",
+    "battle_rule_oracle_hash": "f98af3d17a8cff2f5144d7754f296dff"
   },
   "Deathcap Glade": {
     "effect": "land",
@@ -18952,6 +19078,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:e7049ecf012a134de9c3c1c9ccf67f75",
     "battle_rule_oracle_hash": "01b8b772db58352c0caabbc1bc88a7f7"
+  },
+  "Druid of the Anima": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "RGW",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "GreenManaAbility",
+      "RedManaAbility",
+      "WhiteManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f430130fc62b2877950277bbfd6560e3",
+    "battle_rule_oracle_hash": "435ababd4f473e2e72b617af4bae2927"
   },
   "Druid of the Cowl": {
     "activation_requires_tap": true,
@@ -23975,6 +24124,32 @@
     "battle_rule_logical_key": "battle_rule_v1:305c6defa16afe96c20667ebabde4177",
     "battle_rule_oracle_hash": "0e25cb1bf5d8be55def786469a364310"
   },
+  "Fire Diamond": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "enters_tapped": true,
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "R"
+    ],
+    "produces": "R",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "EntersBattlefieldTappedAbility",
+      "RedManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:84572dfd15e39a7559373116c8d6a76f",
+    "battle_rule_oracle_hash": "4350e47225e4592c891778fcaf676af4"
+  },
   "Fire Imp": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
@@ -24054,6 +24229,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:a97302af0fe4a11ba8832e28e46dda13",
     "battle_rule_oracle_hash": "b71064ba687c902897d42ed861260b04"
+  },
+  "Fire Sprites": {
+    "activation_mana_cost": "{G}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "flying"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "R"
+    ],
+    "produces": "R",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "FlyingAbility",
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:289f7f0e0e69fa3f3bbb4d564cad35e9",
+    "battle_rule_oracle_hash": "2237bc817fffe10be3027d6f92ba92d7"
   },
   "Fire-Lit Thicket": {
     "effect": "land",
@@ -32504,6 +32708,56 @@
     "battle_rule_logical_key": "battle_rule_v1:699a8966e4ddb5d8b8a54f57e243bf7f",
     "battle_rule_oracle_hash": "0b901e920cec79011b3c835d55d3c859"
   },
+  "Hedron Crawler": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "C"
+    ],
+    "produces": "C",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "ColorlessManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:12e2a50007013110a203e8bc1ace32de",
+    "battle_rule_oracle_hash": "0882122d6b80526a7ba6b1e2f6bba26a"
+  },
+  "Helionaut": {
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "flying"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708",
+    "battle_rule_oracle_hash": "69e2cdb07b75b18579ce768170f274e7"
+  },
   "HELIOS One": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -39253,6 +39507,33 @@
     "battle_rule_logical_key": "battle_rule_v1:f3c990ed2e762aaab17c617ac3a42941",
     "battle_rule_oracle_hash": "b6a4d37a3573a6e81a48bbac495f3e8b"
   },
+  "Leyline Prowler": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "deathtouch",
+      "lifelink"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility",
+      "DeathtouchAbility",
+      "LifelinkAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:431948af06659547eb9fc8ce628d5978",
+    "battle_rule_oracle_hash": "a622c5c8221ec7cdd9c70023909fbf82"
+  },
   "Library": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -39741,6 +40022,28 @@
     "battle_rule_logical_key": "battle_rule_v1:b4d210018767f5b0a4740adc889beb85",
     "battle_rule_oracle_hash": "fa07d150550fe544837233efd56086ac"
   },
+  "Llanowar Envoy": {
+    "activation_mana_cost": "{1}{G}",
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+    "battle_rule_oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e"
+  },
   "Llanowar Knight": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
@@ -40189,6 +40492,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "f4dfbb889a4c2444d1179c23fe268ff0"
+  },
+  "Lotus Guardian": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "flying"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2c86ff289fc4270cd41aa1b30edcadef",
+    "battle_rule_oracle_hash": "2119fc1976cfab2480a9d86c57f1859b"
   },
   "Lotus Petal": {
     "activation_cost": "tap_sacrifice_self",
@@ -41227,6 +41555,32 @@
     "battle_rule_logical_key": "battle_rule_v1:48f9bc644ca6723800b5f9d6d1b2b4ce",
     "battle_rule_oracle_hash": "53e75f5fb65e8f3636fb805f90ae3999"
   },
+  "Maraleaf Pixie": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "flying"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "GU",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "BlueManaAbility",
+      "FlyingAbility",
+      "GreenManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:70889c371b1bde8086338dbe3419bc50",
+    "battle_rule_oracle_hash": "737f3f1c72e0a9fc25c33ba0fc7a1707"
+  },
   "Marble Chalice": {
     "_activated_rule_effects": [
       {
@@ -41271,6 +41625,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c9a7cd0dde0c993a17681b7a470e11bd",
     "battle_rule_oracle_hash": "5b0e1e1aee6149f4cb795cd3b4cbbe9a"
+  },
+  "Marble Diamond": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "enters_tapped": true,
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "W"
+    ],
+    "produces": "W",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "EntersBattlefieldTappedAbility",
+      "WhiteManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6f4935422826b2b8f7ff8d919a3cd037",
+    "battle_rule_oracle_hash": "1b3704c64d5815150629d97496e4f5d3"
   },
   "March from the Tomb": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
@@ -44017,6 +44397,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "28de7e0ba5d20ec167637334fa868e42"
   },
+  "Moss Diamond": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "enters_tapped": true,
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "G"
+    ],
+    "produces": "G",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "EntersBattlefieldTappedAbility",
+      "GreenManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:229eed4bb006040c5956f0d0c8cdbd3e",
+    "battle_rule_oracle_hash": "00753d6404d132764a0917c7282e4e81"
+  },
   "Moss Kami": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -46080,6 +46486,28 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "ffb358cde000448fd92d596a1c61841e"
   },
+  "Nomadic Elf": {
+    "activation_mana_cost": "{1}{G}",
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+    "battle_rule_oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e"
+  },
   "Norn's Annex": {
     "attack_tax_per_creature": 1,
     "battle_model_scope": "norns_annex_phyrexian_attack_tax_generic_proxy_v1",
@@ -46225,6 +46653,34 @@
     "battle_rule_logical_key": "battle_rule_v1:2850ce96f84583b510eac2c0ad840fa3",
     "battle_rule_oracle_hash": "13cecae816b64406aa3f621ad48976b3"
   },
+  "Noxious Newt": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "deathtouch"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "G"
+    ],
+    "produces": "G",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "DeathtouchAbility",
+      "GreenManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:542a1d57b12d362cf9864691cc5247ba",
+    "battle_rule_oracle_hash": "9605b929a2447cadeab86cbde896c4a0"
+  },
   "Noxious Revival": {
     "battle_model_scope": "put_target_card_from_any_graveyard_on_top_of_owners_library_v1",
     "cmc": 1.0,
@@ -46308,6 +46764,121 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "441e15826b05b40f19b679869a34a0cf"
+  },
+  "Obelisk of Bant": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "GWU",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "BlueManaAbility",
+      "GreenManaAbility",
+      "WhiteManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7c4937398bbd9523678d3f783da651cc",
+    "battle_rule_oracle_hash": "0ad0c4aeadf40e30b2d7812459b3859d"
+  },
+  "Obelisk of Esper": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "WUB",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "BlackManaAbility",
+      "BlueManaAbility",
+      "WhiteManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d2e7e5dd955d80e0a7fb9834a170f634",
+    "battle_rule_oracle_hash": "761bdf76365c5ff0a17b5ab8443721b1"
+  },
+  "Obelisk of Grixis": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "UBR",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "BlackManaAbility",
+      "BlueManaAbility",
+      "RedManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e3cae34e832d170109839cd69754c77e",
+    "battle_rule_oracle_hash": "2f156da54629a3a9c9fe1872446698b3"
+  },
+  "Obelisk of Jund": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "BRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "BlackManaAbility",
+      "GreenManaAbility",
+      "RedManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8e950dd79a0d9d049925fbb6660589ee",
+    "battle_rule_oracle_hash": "ec252be44dc08cc5d1e62a76a41f447b"
+  },
+  "Obelisk of Naya": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "RGW",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "GreenManaAbility",
+      "RedManaAbility",
+      "WhiteManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a2f35d6b036f3a370dad1e4324e6bea9",
+    "battle_rule_oracle_hash": "435ababd4f473e2e72b617af4bae2927"
   },
   "Oboro Breezecaller": {
     "ability_kind": "activated",
@@ -46896,6 +47467,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b53dcfdbfec1cb264a830d9a4ad36c81",
     "battle_rule_oracle_hash": "2119fc1976cfab2480a9d86c57f1859b"
+  },
+  "Orochi Leafcaller": {
+    "activation_mana_cost": "{G}",
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9",
+    "battle_rule_oracle_hash": "bbe66105c445b665906687869850951e"
   },
   "Orochi Sustainer": {
     "activation_requires_tap": true,
@@ -50133,6 +50726,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "61126da5d1bfc96a6f0dbaf6bde70c46"
+  },
+  "Prismite": {
+    "activation_mana_cost": "{2}",
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5",
+    "battle_rule_oracle_hash": "87fc16872f2a927fc1135934d7482210"
   },
   "Prized Griffin": {
     "_keywords_are_self": true,
@@ -61552,6 +62167,32 @@
     "battle_rule_logical_key": "battle_rule_v1:b9536bcbbd85f20b8378e7de12d75f0a",
     "battle_rule_oracle_hash": "9d408a209761378f0e6775b2bc1ecaa8"
   },
+  "Signpost Scarecrow": {
+    "activation_mana_cost": "{2}",
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "vigilance"
+    ],
+    "mana_activation_requires_tap": false,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility",
+      "VigilanceAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a",
+    "battle_rule_oracle_hash": "ef749be7a1c4f2fdd418676c59548c40"
+  },
   "Silence": {
     "battle_model_scope": "silence_until_eot_v1",
     "cmc": 1.0,
@@ -62378,6 +63019,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93",
     "battle_rule_oracle_hash": "01408ac2502c74e39791c1779ab33833"
+  },
+  "Sky Diamond": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "enters_tapped": true,
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "U"
+    ],
+    "produces": "U",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "BlueManaAbility",
+      "EntersBattlefieldTappedAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5e0d88668e726c0ba01fdfb6ea49749b",
+    "battle_rule_oracle_hash": "c218eb8086c5629e8d2f65f640e078f8"
   },
   "Sky Ruin Drake": {
     "_keywords_are_self": true,
@@ -65676,6 +66343,34 @@
     "battle_rule_logical_key": "battle_rule_v1:77abcd8c66d449f52244c3b855923a0f",
     "battle_rule_oracle_hash": "7bf85f7e204292a138bd678b75078d5c"
   },
+  "Steward of Valeron": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "vigilance"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "G"
+    ],
+    "produces": "G",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "GreenManaAbility",
+      "VigilanceAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2a640fffa6d953d11ba4e6aaf3a8a787",
+    "battle_rule_oracle_hash": "2e653dd9f4d96f5b1d16c2e34400a3ab"
+  },
   "Sticky Fingers": {
     "aura": true,
     "draw_on_enchanted_death": 1,
@@ -67951,6 +68646,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
     "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
+  },
+  "Sylvan Caryatid": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "defender",
+      "hexproof"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility",
+      "DefenderAbility",
+      "HexproofAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a6eaf10f9395ef4ca637704c06a173ee",
+    "battle_rule_oracle_hash": "6a96f1abe446b1047842e7d6fe3821d8"
   },
   "Sylvan Library": {
     "effect": "passive",
@@ -71255,6 +71977,36 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "4b4003fb692765461b421fa340664340"
   },
+  "Timeless Lotus": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "enters_tapped": true,
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 5,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "W",
+      "U",
+      "B",
+      "R",
+      "G"
+    ],
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "EntersBattlefieldTappedAbility",
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:093a1163115c108f1bae49aac95551ba",
+    "battle_rule_oracle_hash": "69defee0ab51f15072ad0ca4d93fd35b"
+  },
   "Timetwister": {
     "count": 7,
     "effect": "draw_cards",
@@ -74375,6 +75127,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "948627b10d749a46f7d2538cecf4179c"
   },
+  "Urborg Elf": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "BGU",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "BlackManaAbility",
+      "BlueManaAbility",
+      "GreenManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:caeec480b0890951c9213f477307e56c",
+    "battle_rule_oracle_hash": "fdcfcf11904348dc6904217ee0ba9b83"
+  },
   "Urborg Volcano": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -75954,6 +76729,34 @@
     "battle_rule_logical_key": "battle_rule_v1:9b7e997dd751cbd96446201f24fb2ae2",
     "battle_rule_oracle_hash": "5d6d0af87e16292279a08a492e047713"
   },
+  "Vine Trellis": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "defender"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "G"
+    ],
+    "produces": "G",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "DefenderAbility",
+      "GreenManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:52f7800385f63be1a216716d450aaa5d",
+    "battle_rule_oracle_hash": "7c62dd41f0f3bb3acda9444dfcf69992"
+  },
   "Vineglimmer Snarl": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -75994,6 +76797,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "dbb91040b2349b40c18e32a3b4a45c02"
+  },
+  "Viridian Acolyte": {
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produces": "WUBRG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857",
+    "battle_rule_oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6"
   },
   "Viridian Scout": {
     "_activated_rule_effects": [
@@ -77679,6 +78504,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
     "battle_rule_oracle_hash": "b7ff43d67eacb32bbbaf40e2c63c2448"
+  },
+  "Warden of Geometries": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "keywords": [
+      "vigilance"
+    ],
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "C"
+    ],
+    "produces": "C",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "ColorlessManaAbility",
+      "VigilanceAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:716cde42a8e9e6842956f4df706bb7b3",
+    "battle_rule_oracle_hash": "8ba30bcf644cdc08dc7c0fec26fe2065"
   },
   "Warden of the Eye": {
     "ability_kind": "triggered",
