@@ -1,0 +1,640 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-04T22:37:23.002296+00:00",
+  "manifest": "../../master_optimizer_reports/pg443_xmage_mana_source_activated_draw_new_server_manifest.json",
+  "package_id": "pg443_xmage_mana_source_activated_draw_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 17
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Abzan Banner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:85212313c2211c41817801102d41afb8",
+          "oracle_hash": "ec03bbadf90bcef02c84811a5d3db526",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Azorius Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:441952312f2d6f7b3177d3ab66fe4240",
+          "oracle_hash": "a4b4efd970d8d67cc9c13f1eaa34aaaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Boros Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cdc85b56b14519d2a0032e095ff3d27e",
+          "oracle_hash": "07eadee3502d4be339e42db63126ca47",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Dimir Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1866d98b29bd5b3bb9cb9272fdf0af91",
+          "oracle_hash": "7c64ac60489fce2677282947484e6edd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Golgari Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dfbf6e95f3f384a5fbdf00409cb11019",
+          "oracle_hash": "df06f25688dd07b09a8ba20be81f9764",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Gruul Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4bcebebd6e5a1d6511e5e0b5727a075",
+          "oracle_hash": "aeba79348e406d5bccda739b06154f86",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Heart Warden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d0dd0a807e6e5792cf7937fb84ca8ed",
+          "oracle_hash": "42de036721f0f404800fcd7739c85a30",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Izzet Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:10adf5f12fd808b1c9ed003168e5965f",
+          "oracle_hash": "89d1b53c94e0bcabb4d391adfa000384",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Jeskai Banner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:87d0cd4c67b1a35e64e7801c1efc57e6",
+          "oracle_hash": "b47b6f42efd194958cc14355634e62a5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Letter of Acceptance",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:98e4c414b9cc60fc71f708052546c3ff",
+          "oracle_hash": "fd95212c755fb5ad2d76b7c7ed3e00f8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Mardu Banner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a373222d2290e964fea3a2144b7eab4e",
+          "oracle_hash": "2bb8b176635abec53ec909f9d8334a2a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Orzhov Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:15dcdaa4f480ac0b903c50dd6673c4d8",
+          "oracle_hash": "7a065b49fef4847057e8707d16ea48ae",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Rakdos Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:995c17e11f2af48b233f794373604230",
+          "oracle_hash": "2b454033e5083e6ab36383deb13cbeed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Selesnya Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5a49fc9f7bd4749e6f2f93d86ef7adbd",
+          "oracle_hash": "7c26f5f46bebe3755b3c62fbe9821928",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Simic Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3ee98e425f3fed1c194f60d9505ee131",
+          "oracle_hash": "1978300fb578c052c82a3430a1588874",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Sultai Banner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9db40bfdbdc7e1a6d3a8cb3526f8e853",
+          "oracle_hash": "86c8abb7a3d399985dc55b82de1e8fa2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Temur Banner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8668ceaacc2564da0a259c7012e88416",
+          "oracle_hash": "77fa02fad757ea256a213f37dc698611",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 17
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Abzan Banner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:85212313c2211c41817801102d41afb8",
+          "oracle_hash": "ec03bbadf90bcef02c84811a5d3db526",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Azorius Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:441952312f2d6f7b3177d3ab66fe4240",
+          "oracle_hash": "a4b4efd970d8d67cc9c13f1eaa34aaaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Boros Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cdc85b56b14519d2a0032e095ff3d27e",
+          "oracle_hash": "07eadee3502d4be339e42db63126ca47",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Dimir Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1866d98b29bd5b3bb9cb9272fdf0af91",
+          "oracle_hash": "7c64ac60489fce2677282947484e6edd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Golgari Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dfbf6e95f3f384a5fbdf00409cb11019",
+          "oracle_hash": "df06f25688dd07b09a8ba20be81f9764",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Gruul Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4bcebebd6e5a1d6511e5e0b5727a075",
+          "oracle_hash": "aeba79348e406d5bccda739b06154f86",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Heart Warden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d0dd0a807e6e5792cf7937fb84ca8ed",
+          "oracle_hash": "42de036721f0f404800fcd7739c85a30",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Izzet Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:10adf5f12fd808b1c9ed003168e5965f",
+          "oracle_hash": "89d1b53c94e0bcabb4d391adfa000384",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Jeskai Banner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:87d0cd4c67b1a35e64e7801c1efc57e6",
+          "oracle_hash": "b47b6f42efd194958cc14355634e62a5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Letter of Acceptance",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:98e4c414b9cc60fc71f708052546c3ff",
+          "oracle_hash": "fd95212c755fb5ad2d76b7c7ed3e00f8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Mardu Banner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a373222d2290e964fea3a2144b7eab4e",
+          "oracle_hash": "2bb8b176635abec53ec909f9d8334a2a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Orzhov Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:15dcdaa4f480ac0b903c50dd6673c4d8",
+          "oracle_hash": "7a065b49fef4847057e8707d16ea48ae",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Rakdos Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:995c17e11f2af48b233f794373604230",
+          "oracle_hash": "2b454033e5083e6ab36383deb13cbeed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Selesnya Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5a49fc9f7bd4749e6f2f93d86ef7adbd",
+          "oracle_hash": "7c26f5f46bebe3755b3c62fbe9821928",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Simic Cluestone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3ee98e425f3fed1c194f60d9505ee131",
+          "oracle_hash": "1978300fb578c052c82a3430a1588874",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Sultai Banner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9db40bfdbdc7e1a6d3a8cb3526f8e853",
+          "oracle_hash": "86c8abb7a3d399985dc55b82de1e8fa2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "card_name": "Temur Banner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8668ceaacc2564da0a259c7012e88416",
+          "oracle_hash": "77fa02fad757ea256a213f37dc698611",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 17
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Abzan Banner",
+          "logical_rule_key": "battle_rule_v1:85212313c2211c41817801102d41afb8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Azorius Cluestone",
+          "logical_rule_key": "battle_rule_v1:441952312f2d6f7b3177d3ab66fe4240"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Boros Cluestone",
+          "logical_rule_key": "battle_rule_v1:cdc85b56b14519d2a0032e095ff3d27e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dimir Cluestone",
+          "logical_rule_key": "battle_rule_v1:1866d98b29bd5b3bb9cb9272fdf0af91"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Golgari Cluestone",
+          "logical_rule_key": "battle_rule_v1:dfbf6e95f3f384a5fbdf00409cb11019"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gruul Cluestone",
+          "logical_rule_key": "battle_rule_v1:d4bcebebd6e5a1d6511e5e0b5727a075"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Heart Warden",
+          "logical_rule_key": "battle_rule_v1:5d0dd0a807e6e5792cf7937fb84ca8ed"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Izzet Cluestone",
+          "logical_rule_key": "battle_rule_v1:10adf5f12fd808b1c9ed003168e5965f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jeskai Banner",
+          "logical_rule_key": "battle_rule_v1:87d0cd4c67b1a35e64e7801c1efc57e6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Letter of Acceptance",
+          "logical_rule_key": "battle_rule_v1:98e4c414b9cc60fc71f708052546c3ff"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mardu Banner",
+          "logical_rule_key": "battle_rule_v1:a373222d2290e964fea3a2144b7eab4e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Orzhov Cluestone",
+          "logical_rule_key": "battle_rule_v1:15dcdaa4f480ac0b903c50dd6673c4d8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rakdos Cluestone",
+          "logical_rule_key": "battle_rule_v1:995c17e11f2af48b233f794373604230"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Selesnya Cluestone",
+          "logical_rule_key": "battle_rule_v1:5a49fc9f7bd4749e6f2f93d86ef7adbd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Simic Cluestone",
+          "logical_rule_key": "battle_rule_v1:3ee98e425f3fed1c194f60d9505ee131"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sultai Banner",
+          "logical_rule_key": "battle_rule_v1:9db40bfdbdc7e1a6d3a8cb3526f8e853"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Temur Banner",
+          "logical_rule_key": "battle_rule_v1:8668ceaacc2564da0a259c7012e88416"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 17
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Abzan Banner",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:85212313c2211c41817801102d41afb8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Azorius Cluestone",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:441952312f2d6f7b3177d3ab66fe4240"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Boros Cluestone",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:cdc85b56b14519d2a0032e095ff3d27e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dimir Cluestone",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:1866d98b29bd5b3bb9cb9272fdf0af91"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Golgari Cluestone",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:dfbf6e95f3f384a5fbdf00409cb11019"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gruul Cluestone",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:d4bcebebd6e5a1d6511e5e0b5727a075"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Heart Warden",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:5d0dd0a807e6e5792cf7937fb84ca8ed"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Izzet Cluestone",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:10adf5f12fd808b1c9ed003168e5965f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jeskai Banner",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:87d0cd4c67b1a35e64e7801c1efc57e6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Letter of Acceptance",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:98e4c414b9cc60fc71f708052546c3ff"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mardu Banner",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:a373222d2290e964fea3a2144b7eab4e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Orzhov Cluestone",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:15dcdaa4f480ac0b903c50dd6673c4d8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rakdos Cluestone",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:995c17e11f2af48b233f794373604230"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Selesnya Cluestone",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:5a49fc9f7bd4749e6f2f93d86ef7adbd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Simic Cluestone",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:3ee98e425f3fed1c194f60d9505ee131"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sultai Banner",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:9db40bfdbdc7e1a6d3a8cb3526f8e853"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Temur Banner",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:8668ceaacc2564da0a259c7012e88416"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

@@ -9413,6 +9413,54 @@ new server:
   `xmage_library_search_spell` with `14` cards, and
   `xmage_self_sacrifice_mana_source_permanent` with `13` cards.
 
+## 2026-07-04 PG443 Mana Source With Activated Draw Closure
+
+- Closed the exact XMage simple mana-source with activated draw family as
+  ManaLoom scope `xmage_simple_tap_mana_source_with_activated_draw_v1`.
+- The selected package accepted permanents with a simple tap mana ability plus a
+  separate activated draw ability whose cost and effect are supported by the
+  ManaLoom runtime. The scope covers mana rocks/banners/cluestones and Heart
+  Warden-style mana creatures where XMage/Oracle agree on mana production and
+  the activated draw/sacrifice behavior. Unsupported compound mana-source
+  abilities, unusual payment costs, or non-simple draw text remain blockers.
+- The batch covers `17` cards: Abzan Banner, Azorius Cluestone, Boros
+  Cluestone, Dimir Cluestone, Golgari Cluestone, Gruul Cluestone, Heart Warden,
+  Izzet Cluestone, Jeskai Banner, Letter of Acceptance, Mardu Banner, Orzhov
+  Cluestone, Rakdos Cluestone, Selesnya Cluestone, Simic Cluestone, Sultai
+  Banner, and Temur Banner.
+- Focused mapper/runtime tests covered the exact-scope split and static/runtime
+  support already present for tap mana plus activated draw; PG443 performed no
+  code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `17` cards. Precheck found `17` target rows,
+  `0` missing targets, `0` existing expected rows, and `2` shadow rows to
+  deprecate; apply/postcheck verified `17/17` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `2` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4258` PostgreSQL runtime rows, wrote `4250` SQLite runtime
+  rows, and exported `4225` canonical fallback rows.
+- PG443 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `17` selected cards. Generic
+  battle scenario count remained `0`; mana/draw behavior remains covered by
+  focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26628`, `xmage_authoritative_source_count=26314`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26314`. This is an exact
+  reduction of `17` from the post-PG442 queue.
+- The post-PG443 exact split recheck reports `proposal_count=289` and
+  `safe_for_batch_pg_package_count=289`. The largest remaining exact family is
+  `xmage_permanent_simple_activated_draw_discard` with `15` cards, followed by
+  `xmage_dynamic_count_boost_target_creature_until_eot_spell` with `14` cards,
+  `xmage_library_search_spell` with `14` cards,
+  `xmage_self_sacrifice_mana_source_permanent` with `13` cards, and
+  `xmage_static_self_cant_block_creature` with `13` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
