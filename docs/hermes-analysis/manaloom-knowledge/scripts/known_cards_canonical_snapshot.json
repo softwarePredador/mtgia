@@ -7105,6 +7105,32 @@
     "battle_rule_logical_key": "battle_rule_v1:807cdb2c6bd08602999fa89c4b4b712a",
     "battle_rule_oracle_hash": "ce8470713ccceb3b8c2f1a9db348790d"
   },
+  "Beskir Shieldmate": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "W"
+    ],
+    "dies_token_count": 1,
+    "dies_token_name": "Human Warrior Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Human Warrior",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 white Human Warrior creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "HumanWarriorToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7a5c752ef27017f2e75ce0f55ed0f24a",
+    "battle_rule_oracle_hash": "89fb793e3d183e1a3d352d759288d9d5"
+  },
   "Bestow Greatness": {
     "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
     "duration": "until_end_of_turn",
@@ -10287,6 +10313,32 @@
     "battle_rule_logical_key": "battle_rule_v1:6c8ea18c459b7af29f793cc1b2b1b329",
     "battle_rule_oracle_hash": "a456d827a6b768b9fb424fcda8c19f42"
   },
+  "Brindle Shoat": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "G"
+    ],
+    "dies_token_count": 1,
+    "dies_token_name": "Boar Token",
+    "dies_token_power": 3,
+    "dies_token_subtype": "Boar",
+    "dies_token_toughness": 3,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "3/3 green Boar creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "BoarToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:04e8494c0691cf7dd230789adf7bc286",
+    "battle_rule_oracle_hash": "62901a84db69b8edda50cd7f1a733533"
+  },
   "Bring Down": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -10370,6 +10422,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "b4fa1d16d4ccb554cf46fb1b7befb40f"
+  },
+  "Brood Weaver": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "G"
+    ],
+    "dies_token_count": 1,
+    "dies_token_keywords": [
+      "reach"
+    ],
+    "dies_token_name": "Spider Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Spider",
+    "dies_token_toughness": 2,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "keywords": [
+      "reach"
+    ],
+    "reach": true,
+    "token_description": "1/2 green Spider creature token with reach",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SpiderToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2dcd84e152f45572a05f9f8d43a2aae0",
+    "battle_rule_oracle_hash": "51e227a65f407ba62455d94b3a0695cc"
   },
   "Broodwarden": {
     "ability_kind": "static",
@@ -14631,6 +14717,30 @@
     "battle_rule_logical_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
     "battle_rule_oracle_hash": "91702377ce6d69cc19357882d3ac24de"
   },
+  "Conscripted Infantry": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_artifact_tokens": true,
+    "dies_token_count": 1,
+    "dies_token_name": "Soldier Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Soldier",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 colorless Soldier artifact creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SoldierArtifactToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2cce2e20c521add80e6cad078072c035",
+    "battle_rule_oracle_hash": "25e183b1dacc1be7f9da2f31818aa028"
+  },
   "Consecrated Sphinx": {
     "ability_kind": "triggered",
     "battle_model_scope": "flying_may_draw_two_when_opponent_draws_card_v1",
@@ -17479,6 +17589,32 @@
     "battle_rule_logical_key": "battle_rule_v1:f9104dca7375ad6930430adcf52b5422",
     "battle_rule_oracle_hash": "f98af3d17a8cff2f5144d7754f296dff"
   },
+  "Deathbloom Thallid": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "G"
+    ],
+    "dies_token_count": 1,
+    "dies_token_name": "Saproling Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Saproling",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 green Saproling creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SaprolingToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:508465079bb84a8a1e6be6b72cabd67b",
+    "battle_rule_oracle_hash": "6e0b562f99e80aa42fc539f44f400447"
+  },
   "Deathcap Glade": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -19072,6 +19208,32 @@
     "battle_rule_logical_key": "battle_rule_v1:ffdf833d17e0bd16f63882d13bbc3e2e",
     "battle_rule_oracle_hash": "ae730f1553235bf86c19b2f5a2a0d9eb"
   },
+  "Discordant Piper": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "W"
+    ],
+    "dies_token_count": 1,
+    "dies_token_name": "Goat Token",
+    "dies_token_power": 0,
+    "dies_token_subtype": "Goat",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "0/1 white Goat creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "GoatToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ad0e12aa20654aba517d10e9f36ba5b6",
+    "battle_rule_oracle_hash": "dd733152b1ce5fa027f45c97120115b1"
+  },
   "Disembowel": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -19697,6 +19859,32 @@
     "battle_rule_logical_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
     "battle_rule_oracle_hash": "9313d8a5001a2fa8e32f752a812e5ff3"
   },
+  "Doomed Dissenter": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "B"
+    ],
+    "dies_token_count": 1,
+    "dies_token_name": "Zombie Token",
+    "dies_token_power": 2,
+    "dies_token_subtype": "Zombie",
+    "dies_token_toughness": 2,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "2/2 black Zombie creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "ZombieToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:edebf7fc3cc9646f30387c314dcde94e",
+    "battle_rule_oracle_hash": "2ab448518057ad9b18d4e2a6a0341143"
+  },
   "Doomed Necromancer": {
     "_activated_rule_effects": [
       {
@@ -19778,6 +19966,36 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:69aa5c0d8ef05abc7839277c916ca703",
     "battle_rule_oracle_hash": "16f413bd06f6099af1b5f2edc8376ef8"
+  },
+  "Doomed Traveler": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "W"
+    ],
+    "dies_token_count": 1,
+    "dies_token_flying": true,
+    "dies_token_keywords": [
+      "flying"
+    ],
+    "dies_token_name": "Spirit Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Spirit",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 white Spirit creature token with flying",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SpiritWhiteToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ac86a2a29ae7c0cfdcf73ec9a713d3cb",
+    "battle_rule_oracle_hash": "de756341b6369b2f370f2cede1c9b5ed"
   },
   "Dormant Volcano": {
     "effect": "land",
@@ -21091,6 +21309,29 @@
     "battle_rule_logical_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
     "battle_rule_oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933"
   },
+  "Dwarven Castle Guard": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_count": 1,
+    "dies_token_name": "Hero Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Hero",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 colorless Hero creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "HeroToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:08b5f23d0ba3ececd41afd1c0b27e545",
+    "battle_rule_oracle_hash": "1d7cc43aa46a86937f63de92f8833319"
+  },
   "Dwarven Grunt": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
@@ -22144,6 +22385,41 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2c2a303057fec961fff5e174fdb42e48",
     "battle_rule_oracle_hash": "13a895bd831efbf8252816422af5f026"
+  },
+  "Elgaud Inquisitor": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "W"
+    ],
+    "dies_token_count": 1,
+    "dies_token_flying": true,
+    "dies_token_keywords": [
+      "flying"
+    ],
+    "dies_token_name": "Spirit Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Spirit",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "keywords": [
+      "lifelink"
+    ],
+    "lifelink": true,
+    "token_description": "1/1 white Spirit creature token with flying",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SpiritWhiteToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b27ac08efcdb59f9e5f79a2018068ab4",
+    "battle_rule_oracle_hash": "354b612167a8079d089953876e641763"
   },
   "Eliminate": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -25708,6 +25984,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
+  },
+  "Filigree Crawler": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_artifact_tokens": true,
+    "dies_token_count": 1,
+    "dies_token_flying": true,
+    "dies_token_keywords": [
+      "flying"
+    ],
+    "dies_token_name": "Thopter Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Thopter",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 colorless Thopter artifact creature token with flying",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "ThopterColorlessToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a096cd3aed03009497106c2db9f209bc",
+    "battle_rule_oracle_hash": "d59c39b39c79d4b53dabc2ab154fa89f"
   },
   "Final Death": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
@@ -29303,6 +29607,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "316d572b5b08762d4fb2ca45e9bfafc6"
+  },
+  "Garrison Cat": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "W"
+    ],
+    "dies_token_count": 1,
+    "dies_token_name": "Human Soldier Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Human Soldier",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 white Human Soldier creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "HumanSoldierToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4eb7dcd745a142cb45c4077db59687d3",
+    "battle_rule_oracle_hash": "29f1b4320917ca21c9997126f08eade8"
   },
   "Garruk's Companion": {
     "_keywords_are_self": true,
@@ -36124,6 +36454,35 @@
     "battle_rule_logical_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
     "battle_rule_oracle_hash": "91702377ce6d69cc19357882d3ac24de"
   },
+  "Hunted Witness": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "W"
+    ],
+    "dies_token_count": 1,
+    "dies_token_keywords": [
+      "lifelink"
+    ],
+    "dies_token_name": "Soldier Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Soldier",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 white Soldier creature token with lifelink",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SoldierLifelinkToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c01cfdd1141dc6552ff0253d15340f04",
+    "battle_rule_oracle_hash": "e255a06c0665c973118fe5b75e6d7502"
+  },
   "Hurler Cyclops": {
     "_activated_rule_effects": [
       {
@@ -37203,6 +37562,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2eb093a58537802466ff92c4713d5896",
     "battle_rule_oracle_hash": "730b2f1b26c49825e41f57766548e686"
+  },
+  "Infestation Sage": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "B",
+      "G"
+    ],
+    "dies_token_count": 1,
+    "dies_token_flying": true,
+    "dies_token_keywords": [
+      "flying"
+    ],
+    "dies_token_name": "Insect Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Insect",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 black and green Insect creature token with flying",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "InsectBlackGreenFlyingToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:063aea50108acb3ff8ff2d1642fa9de8",
+    "battle_rule_oracle_hash": "76d8a8b36d4d294e0bcf4fbf766cefb3"
   },
   "Infuriate": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
@@ -43404,6 +43794,32 @@
     "battle_rule_logical_key": "battle_rule_v1:88ff56cb3f42b4703d6d284b2761b4bd",
     "battle_rule_oracle_hash": "4f346d28a91eb946be80ea2dd4cec2e3"
   },
+  "Maalfeld Twins": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "B"
+    ],
+    "dies_token_count": 2,
+    "dies_token_name": "Zombie Token",
+    "dies_token_power": 2,
+    "dies_token_subtype": "Zombie",
+    "dies_token_toughness": 2,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "2/2 black Zombie creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "ZombieToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d3fde7fc16ae1aecd6c8b1c81a1c72d8",
+    "battle_rule_oracle_hash": "b93594a92bd90f13d7b557059a8d83b7"
+  },
   "Machine God's Effigy": {
     "battle_model_scope": "copy_artifact_mana_rock_partial_v1",
     "cmc": 4.0,
@@ -44632,6 +45048,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
     "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
+  "Martyr of Dusk": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "W"
+    ],
+    "dies_token_count": 1,
+    "dies_token_keywords": [
+      "lifelink"
+    ],
+    "dies_token_name": "Vampire Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Vampire",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 white Vampire creature token with lifelink",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "IxalanVampireToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:81a506711ed7bd57ddb4ab35d7f4a66c",
+    "battle_rule_oracle_hash": "22d93e92247d062d2373f43624d519f2"
   },
   "Maskwood Nexus": {
     "cmc": 4.0,
@@ -48097,6 +48542,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:4437ef138e8d93691f9e19eac9dc08f5",
     "battle_rule_oracle_hash": "29d416587cbec9bf97bdd4d20b730802"
+  },
+  "Myr Sire": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_artifact_tokens": true,
+    "dies_token_count": 1,
+    "dies_token_name": "Phyrexian Myr Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Phyrexian Myr",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 colorless Phyrexian Myr artifact creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "PhyrexianMyrToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:25584d7c86ac16ca719c188f2d571b31",
+    "battle_rule_oracle_hash": "b642f47076f215b5303fe8c37969d9c7"
   },
   "Myriad Landscape": {
     "effect": "land",
@@ -51884,6 +52353,126 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "1b5d108007bff5dda6c5d506eeba2257"
   },
+  "Penumbra Bobcat": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "B"
+    ],
+    "dies_token_count": 1,
+    "dies_token_name": "Cat Token",
+    "dies_token_power": 2,
+    "dies_token_subtype": "Cat",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "2/1 black Cat creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "PenumbraBobcatToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8773318eae9506eddbd72a0e453d6e4",
+    "battle_rule_oracle_hash": "bad2cbbacc9a7b4b1d2f00fef9d6e08e"
+  },
+  "Penumbra Kavu": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "B"
+    ],
+    "dies_token_count": 1,
+    "dies_token_name": "Kavu Token",
+    "dies_token_power": 3,
+    "dies_token_subtype": "Kavu",
+    "dies_token_toughness": 3,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "3/3 black Kavu creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "PenumbraKavuToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7f00bc2b1fc8cd4077131be5988136ed",
+    "battle_rule_oracle_hash": "914070971bf87a5967ce2081f0e373df"
+  },
+  "Penumbra Spider": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "B"
+    ],
+    "dies_token_count": 1,
+    "dies_token_keywords": [
+      "reach"
+    ],
+    "dies_token_name": "Spider Token",
+    "dies_token_power": 2,
+    "dies_token_subtype": "Spider",
+    "dies_token_toughness": 4,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "keywords": [
+      "reach"
+    ],
+    "reach": true,
+    "token_description": "2/4 black Spider creature token with reach",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "PenumbraSpiderToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:047d03e7a2c6714e3247741e81a41ff1",
+    "battle_rule_oracle_hash": "aafdabd85a3aa45ea3fdce5bae24b377"
+  },
+  "Penumbra Wurm": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "B"
+    ],
+    "dies_token_count": 1,
+    "dies_token_keywords": [
+      "trample"
+    ],
+    "dies_token_name": "Wurm Token",
+    "dies_token_power": 6,
+    "dies_token_subtype": "Wurm",
+    "dies_token_toughness": 6,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "keywords": [
+      "trample"
+    ],
+    "token_description": "6/6 black Wurm creature token with trample",
+    "trample": true,
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "PenumbraWurmToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c94157fd5bd2044ab43ba5e594a03bd5",
+    "battle_rule_oracle_hash": "7393d00a98736c334e374426d1f3a5d3"
+  },
   "Perch Protection": {
     "_composite_rule_components": [
       {
@@ -53734,6 +54323,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
     "battle_rule_oracle_hash": "e759ab086a019bc274394a4df42984f5"
+  },
+  "Pretending Poxbearers": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "W"
+    ],
+    "dies_token_count": 1,
+    "dies_token_name": "Ally Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Ally",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 white Ally creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "AllyToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dc87a61782aeec3e2b8dd1c0cf62ef59",
+    "battle_rule_oracle_hash": "83f29f4346f7420740944ed35b1e463c"
   },
   "Pride of the Perfect": {
     "ability_kind": "static",
@@ -78573,6 +79188,32 @@
     "battle_rule_logical_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de",
     "battle_rule_oracle_hash": "a9502f4a7f280da8508e3cdd3d59c0b2"
   },
+  "Tukatongue Thallid": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "G"
+    ],
+    "dies_token_count": 1,
+    "dies_token_name": "Saproling Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Saproling",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 green Saproling creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SaprolingToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:508465079bb84a8a1e6be6b72cabd67b",
+    "battle_rule_oracle_hash": "6e0b562f99e80aa42fc539f44f400447"
+  },
   "Tundra": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -86048,6 +86689,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "c838e16c55b5e4758d6aee95eebfbe86"
+  },
+  "Wriggling Grub": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+    "dies_token_colors": [
+      "B",
+      "G"
+    ],
+    "dies_token_count": 2,
+    "dies_token_name": "Worm Token",
+    "dies_token_power": 1,
+    "dies_token_subtype": "Worm",
+    "dies_token_toughness": 1,
+    "dies_trigger_effect": "token_maker",
+    "effect": "creature",
+    "token_description": "1/1 black and green Worm creature token",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "BlackGreenWormToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a989e9845f2222d86457d14990e48107",
+    "battle_rule_oracle_hash": "13d8c9254983dfaf4e6eb2e00dfec731"
   },
   "Wring Flesh": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",

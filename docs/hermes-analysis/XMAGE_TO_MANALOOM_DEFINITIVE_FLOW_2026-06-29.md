@@ -9124,6 +9124,53 @@ new server:
   `xmage_permanent_simple_activated_library_search_to_battlefield`, and
   `xmage_static_filtered_evasion_creature`, with `21` cards each.
 
+## 2026-07-04 PG437 Creature Dies Create Tokens Closure
+
+- Closed the exact XMage creature dies create-creature-tokens family as
+  ManaLoom scope `xmage_creature_dies_create_tokens_v1`.
+- The selected package accepted only creature permanents with
+  `DiesSourceTriggeredAbility` plus a single fixed `CreateTokenEffect`, no
+  condition class, no target class, fixed token count, and Oracle/XMage
+  agreement on token description, power/toughness, color, artifact flag,
+  subtype, and supported token keywords. Conditional death triggers, dynamic
+  token counts, non-creature tokens, unsupported token keywords, and multiple
+  distinct token bodies remain blockers.
+- The batch covers `24` cards creating fixed creature tokens on death,
+  including artifact creature tokens, flying/lifelink/reach/trample token
+  keywords, colorless tokens, multicolor tokens, and count-two token variants.
+- Focused mapper/runtime tests covered dies-token scope extraction, blockers
+  for non-creature/dynamic/conditional token sources, graveyard movement
+  triggering, token creation, event emission, and logical rule-key retention.
+  PG437 reused existing mapper/runtime support and performed no code mutation.
+  The focused test lane passed `718` tests.
+- The PostgreSQL package promoted `24` cards. Precheck found `24` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `24/24` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4141` PostgreSQL runtime rows, wrote `4133` SQLite runtime
+  rows, and exported `4108` canonical fallback rows.
+- PG437 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `24` selected cards. Generic
+  battle scenario count remained `0`; actual dies-token behavior remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26745`, `xmage_authoritative_source_count=26431`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26431`. This is an exact
+  reduction of `24` from the post-PG436 queue.
+- The post-PG437 exact split recheck reports `proposal_count=406` and
+  `safe_for_batch_pg_package_count=406`. The largest remaining exact families
+  are `xmage_dynamic_count_damage_spell`,
+  `xmage_permanent_simple_activated_library_search_to_battlefield`, and
+  `xmage_static_filtered_evasion_creature`, with `21` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
