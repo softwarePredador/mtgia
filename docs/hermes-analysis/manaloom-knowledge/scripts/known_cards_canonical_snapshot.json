@@ -4595,6 +4595,39 @@
     "battle_rule_logical_key": "battle_rule_v1:9c01fbb5ff66fc2094234a00587be33f",
     "battle_rule_oracle_hash": "8ef29e198bc7b9775331aba09a69ec16"
   },
+  "Armed Response": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "artifact"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "battlefield_count_subtypes": [
+      "equipment"
+    ],
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:964c0be779777f5c5fecbdea0b08422f",
+    "battle_rule_oracle_hash": "c0f8d5ade3d226309fedce277684ffa7"
+  },
   "Armored Griffin": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -4754,6 +4787,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b03ad22ee07402503a2f5d9209d44cea",
     "battle_rule_oracle_hash": "2f71833ab097a370cd7c333082ea00a9"
+  },
+  "Artillery Blast": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "damage": 0,
+    "damage_amount_source": "domain_basic_land_types",
+    "damage_base_amount": 1,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fea134519697a0e44a05ebc4c1bcf531",
+    "battle_rule_oracle_hash": "ac45406941112d77fd8e127672248b83"
   },
   "Artisan's Sorrow": {
     "_composite_rule_components": [
@@ -22507,6 +22566,37 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d37f5b6d39e91d4584e5a0e83b91b026"
   },
+  "Divine Retribution": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "creature"
+    ],
+    "battlefield_count_combat_state": "attacking",
+    "battlefield_count_scope": "all_battlefields",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4f7a1b46089f71c4afaecc924b54f7dc",
+    "battle_rule_oracle_hash": "652b68ea739d732487b674a1901d10a6"
+  },
   "Divine Verdict": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -22607,6 +22697,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0cca20ba9a9ac803894373bc1262e76d",
     "battle_rule_oracle_hash": "65e262f933832f63f3e3738ec5e9fb73"
+  },
+  "Dogpile": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "creature"
+    ],
+    "battlefield_count_combat_state": "attacking",
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5f156563e48c8f9af6e4b8201ebf0378",
+    "battle_rule_oracle_hash": "6fc0b0fa6d5d54d55a1a7ef2274093fe"
   },
   "Dolmen Gate": {
     "cmc": 2.0,
@@ -24641,6 +24759,36 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0b543efc21cb5ee532062e24929c6ae1",
     "battle_rule_oracle_hash": "260c783fe0fce6d4244d3449fef78339"
+  },
+  "Earth Tremor": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_or_planeswalker",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "planeswalker"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:975be8d35107468af5b5d7a130b3aa14",
+    "battle_rule_oracle_hash": "785eb5faab93e0d5ddf3f22807a64a97"
   },
   "Earthcraft": {
     "ability_kind": "activated",
@@ -29475,6 +29623,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d1c8657ceaf9fbdce91d7cf62b8b3011",
     "battle_rule_oracle_hash": "53ddf0d08d62816c1a3c978acfb1b33b"
+  },
+  "Feedback Bolt": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "artifact"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "player_or_planeswalker",
+    "target_constraints": {
+      "scope": "player_or_planeswalker"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9049794ec49e44015b321eae01df5473",
+    "battle_rule_oracle_hash": "542fa4c4a0d5b78f7c0034105eb313cc"
   },
   "Feeding Frenzy": {
     "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
@@ -36819,6 +36994,33 @@
     "battle_rule_logical_key": "battle_rule_v1:c68e635c5defec520b399779a409a08e",
     "battle_rule_oracle_hash": "d496299033167e64d1ba06610979c042"
   },
+  "Goblin War Strike": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_scope": "controller_battlefield",
+    "battlefield_count_subtypes": [
+      "goblin"
+    ],
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "player_or_planeswalker",
+    "target_constraints": {
+      "scope": "player_or_planeswalker"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:601c0777628b08a053c5a8bae4aba5b6",
+    "battle_rule_oracle_hash": "eb07a10609cec816737dc518f350ab69"
+  },
   "Goblin Welder": {
     "effect": "creature",
     "is_creature_permanent": true,
@@ -38606,6 +38808,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:83dd3e1b1938ed4752b2b6e08fe6beb4",
     "battle_rule_oracle_hash": "9b3dcad854df925a0c02f82c36d61776"
+  },
+  "Ground Assault": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8d8c14b57a733aaf0bc2629c32c83495",
+    "battle_rule_oracle_hash": "116e3c62a192d4a14b256aaaf4504b2a"
   },
   "Groundskeeper": {
     "_activated_rule_effects": [
@@ -52797,6 +53028,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:148909635213079cb97344100615f5c2"
   },
+  "Massive Raid": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "creature"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9e0115ea715e1d39643e7a89ee67ce1b",
+    "battle_rule_oracle_hash": "cf9dc19ff156865013d4b48ec1c4dc4b"
+  },
   "Master of Etherium": {
     "cmc": 3.0,
     "effect": "pump_all",
@@ -54750,6 +55008,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "6d14103616415d47df9842157ac38eec"
+  },
+  "Mob Justice": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "creature"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "player_or_planeswalker",
+    "target_constraints": {
+      "scope": "player_or_planeswalker"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:60911db52320a12267515c91743f0c5d",
+    "battle_rule_oracle_hash": "cb149f0819a39d2422ed010961a99479"
   },
   "Mobilized District": {
     "effect": "land",
@@ -59966,6 +60251,36 @@
     "battle_rule_logical_key": "battle_rule_v1:aeea4d9d5b81f866734a71f3d2e0450e",
     "battle_rule_oracle_hash": "892dac96b806675afaa11bc15c65e08c"
   },
+  "Outflank": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "creature"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:638f957f3112895b2a6cc27189622247",
+    "battle_rule_oracle_hash": "49fb6d49e5a8a163e308e64fd7a5fcea"
+  },
   "Outlaw Medic": {
     "_keywords_are_self": true,
     "ability_kind": "triggered",
@@ -59986,6 +60301,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:a1716618c3327adc32eff035e108b562",
     "battle_rule_oracle_hash": "5222cfc1c97ff774bd7ae4c29facbcb9"
+  },
+  "Outnumber": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "creature"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c279348c6f72b863bbf8a431958c3113",
+    "battle_rule_oracle_hash": "da4100eb9d9dcf471f88e43d5d590583"
   },
   "Outpost Siege": {
     "cmc": 4.0,
@@ -70783,6 +71127,38 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "d711911abc4d8b757ecada500b5e17da"
   },
+  "Rockslide Ambush": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "battlefield_count_subtypes": [
+      "mountain"
+    ],
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ffc307e687500df5c247b8dab74b7166",
+    "battle_rule_oracle_hash": "7fec069fec08c971101d13ae4743978d"
+  },
   "Rocky Roads": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -71680,6 +72056,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "389b640a474507c5ab6531627e925063"
+  },
+  "Rumbling Rockslide": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8d8c14b57a733aaf0bc2629c32c83495",
+    "battle_rule_oracle_hash": "34a148f0117448611aec7d14cc91398b"
   },
   "Rummaging Goblin": {
     "ability_kind": "activated",
@@ -75306,6 +75711,38 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
     "battle_rule_oracle_hash": "e1528476f4465cfb54a103159363cabe"
+  },
+  "Seismic Strike": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "battlefield_count_subtypes": [
+      "mountain"
+    ],
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b2c850db2839f68014005b2e9ba0669d",
+    "battle_rule_oracle_hash": "1d1b4c25486d4bb3d9a4597b916c3d17"
   },
   "Seize the Day": {
     "cmc": 4.0,
@@ -81336,6 +81773,59 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b7eae58cabb75c0339a682b3ddcf384e"
   },
+  "Spiraling Embers": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "damage": 0,
+    "damage_amount_source": "controller_hand_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8486ca123cd7f77d0aa02222a5b2f50d",
+    "battle_rule_oracle_hash": "be5f2d950012528e6cac509edd28c3bb"
+  },
+  "Spire Barrage": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "battlefield_count_subtypes": [
+      "mountain"
+    ],
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a554097253c28afad978fd2b01df654d",
+    "battle_rule_oracle_hash": "d233702d4c6d95c4ac6b01ac519dac9f"
+  },
   "Spire Garden": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -81482,6 +81972,38 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:148909635213079cb97344100615f5c2"
+  },
+  "Spitting Earth": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "battlefield_count_subtypes": [
+      "mountain"
+    ],
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ffc307e687500df5c247b8dab74b7166",
+    "battle_rule_oracle_hash": "a2dbb5aca973689b3da2f66b2e3707aa"
   },
   "Splendid Reclamation": {
     "effect": "land_recursion",
@@ -83022,6 +83544,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:91cb3509516103506e1bcf0a09169174",
     "battle_rule_oracle_hash": "01ec17ebaa612d8dc5a2bcf722d1298b"
+  },
+  "Stonefury": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7baa936f9f6c7e7f2f148593047b229c",
+    "battle_rule_oracle_hash": "d2e2d727222cd4aefdaad2daa059c86d"
   },
   "Stonespeaker Crystal": {
     "activated_exile_target_player_graveyards": true,
@@ -91602,6 +92153,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "73d52522b7400c02bf861c0802d9fe10"
   },
+  "Tribal Flames": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "damage": 0,
+    "damage_amount_source": "domain_basic_land_types",
+    "damage_base_amount": 0,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7f15c0c1ad804e531dfc659bf25a39b3",
+    "battle_rule_oracle_hash": "9ecfe01e2f527aa1c3d999ccf654d08f"
+  },
   "Tribute Mage": {
     "cmc": 3.0,
     "effect": "tutor",
@@ -98166,6 +98740,35 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:2f76bad97175d8bd361b3fd37840ffee"
+  },
+  "Welding Sparks": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+    "battlefield_count_card_types": [
+      "artifact"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "damage": 0,
+    "damage_amount_source": "battlefield_permanent_count",
+    "damage_base_amount": 3,
+    "damage_per_count": 1,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ce38e61e0d1e1e4800bf27643822100d",
+    "battle_rule_oracle_hash": "544ae9cd16365fa6f76f9356eae62e30"
   },
   "Well of Lost Dreams": {
     "cmc": 4.0,

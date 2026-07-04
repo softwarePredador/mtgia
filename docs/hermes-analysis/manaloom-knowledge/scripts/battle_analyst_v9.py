@@ -39832,7 +39832,7 @@ def trigger_white_instant_sorcery_lifegain_damage(
 
 
 def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, finish_spell=True, phase="resolution"):
-    dynamic_amount, dynamic_amount_fields = dynamic_graveyard_damage_amount(player, opponents, effect_data)
+    dynamic_amount, dynamic_amount_fields = dynamic_damage_amount(player, opponents, effect_data)
     if dynamic_amount is not None:
         amount = dynamic_amount
     else:
@@ -41853,6 +41853,13 @@ def _battlefield_count_card_matches(card, effect_data):
     ]
     if allowed_subtypes and not any(permanent_has_subtype(card, subtype) for subtype in allowed_subtypes):
         return False
+    combat_state = str(effect_data.get("battlefield_count_combat_state") or "").strip().lower()
+    if combat_state == "attacking" and not bool(card.get("attacking")):
+        return False
+    if combat_state == "blocking" and not bool(card.get("blocking")):
+        return False
+    if combat_state == "attacking_or_blocking" and not (bool(card.get("attacking")) or bool(card.get("blocking"))):
+        return False
     return bool(allowed_types or allowed_subtypes)
 
 
@@ -41879,6 +41886,7 @@ def _battlefield_count_for_stat_modifier(player, opponents, effect_data):
         "stat_modifier_amount_source": "battlefield_permanent_count",
         "battlefield_count_scope": scope,
         "battlefield_stat_modifier_count": count,
+        "battlefield_count_combat_state": str(effect_data.get("battlefield_count_combat_state") or "").strip().lower(),
     }
 
 
@@ -41971,42 +41979,77 @@ def dynamic_stat_modifier_deltas(player, opponents, effect_data):
     }
 
 
-def dynamic_graveyard_damage_amount(player, opponents, effect_data):
-    if str(effect_data.get("damage_amount_source") or "").lower() != "graveyard_card_count":
-        return None, {}
-    scope = str(effect_data.get("graveyard_count_scope") or "controller_graveyard").lower()
-    if scope == "controller_graveyard":
-        graveyard_players = [player]
-    elif scope == "all_graveyards":
-        graveyard_players = [player] + list(opponents or [])
-    elif scope == "opponents_graveyards":
-        graveyard_players = list(opponents or [])
-    else:
-        return None, {
+def _dynamic_damage_count_from_source(player, opponents, effect_data):
+    amount_source = str(effect_data.get("damage_amount_source") or "").lower()
+    if amount_source == "graveyard_card_count":
+        scope = str(effect_data.get("graveyard_count_scope") or "controller_graveyard").lower()
+        if scope == "controller_graveyard":
+            graveyard_players = [player]
+        elif scope == "all_graveyards":
+            graveyard_players = [player] + list(opponents or [])
+        elif scope == "opponents_graveyards":
+            graveyard_players = list(opponents or [])
+        else:
+            return None, {
+                "damage_amount_source": "graveyard_card_count",
+                "graveyard_count_scope": scope,
+                "graveyard_count_status": "unsupported_scope",
+            }
+        count = 0
+        for participant in graveyard_players:
+            for graveyard_card in getattr(participant, "graveyard", []) or []:
+                if _graveyard_damage_card_matches(graveyard_card, effect_data):
+                    count += 1
+        return count, {
             "damage_amount_source": "graveyard_card_count",
             "graveyard_count_scope": scope,
-            "graveyard_count_status": "unsupported_scope",
+            "graveyard_damage_count": count,
         }
-    count = 0
-    for participant in graveyard_players:
-        for graveyard_card in getattr(participant, "graveyard", []) or []:
-            if _graveyard_damage_card_matches(graveyard_card, effect_data):
-                count += 1
+    if amount_source in {
+        "battlefield_permanent_count",
+        "controller_hand_count",
+        "domain_basic_land_types",
+    }:
+        count_effect_data = {**effect_data, "stat_modifier_amount_source": amount_source}
+        count, replay_fields = _stat_modifier_count_from_source(player, opponents, count_effect_data)
+        if count is None:
+            return None, replay_fields
+        replay_fields = dict(replay_fields)
+        replay_fields.pop("stat_modifier_amount_source", None)
+        replay_fields["damage_amount_source"] = amount_source
+        if "battlefield_stat_modifier_count" in replay_fields:
+            replay_fields["battlefield_damage_count"] = replay_fields["battlefield_stat_modifier_count"]
+        if "hand_stat_modifier_count" in replay_fields:
+            replay_fields["hand_damage_count"] = replay_fields["hand_stat_modifier_count"]
+        return count, replay_fields
+    return None, {}
+
+
+def dynamic_damage_amount(player, opponents, effect_data):
+    if str(effect_data.get("damage_amount_source") or "").lower() not in {
+        "graveyard_card_count",
+        "battlefield_permanent_count",
+        "controller_hand_count",
+        "domain_basic_land_types",
+    }:
+        return None, {}
+    count, replay_fields = _dynamic_damage_count_from_source(player, opponents, effect_data)
+    if count is None:
+        return None, replay_fields
     try:
         base_amount = int(float(effect_data.get("damage_base_amount") or 0))
     except Exception:
         base_amount = 0
     try:
-        per_card = int(float(effect_data.get("damage_per_graveyard_count") or 1))
+        per_count = int(float(effect_data.get("damage_per_count") or effect_data.get("damage_per_graveyard_count") or 1))
     except Exception:
-        per_card = 1
-    amount = max(0, base_amount + (count * per_card))
+        per_count = 1
+    amount = max(0, base_amount + (count * per_count))
     return amount, {
-        "damage_amount_source": "graveyard_card_count",
-        "graveyard_count_scope": scope,
-        "graveyard_damage_count": count,
+        **replay_fields,
         "damage_base_amount": base_amount,
-        "damage_per_graveyard_count": per_card,
+        "damage_per_count": per_count,
+        "damage_per_graveyard_count": per_count,
     }
 
 

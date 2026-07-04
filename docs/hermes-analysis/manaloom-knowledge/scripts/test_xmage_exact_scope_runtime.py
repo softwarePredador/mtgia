@@ -3057,6 +3057,204 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dynamic_battlefield_count_damage_counts_controlled_lands(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Target Beast",
+            "type_line": "Creature - Beast",
+            "power": 4,
+            "toughness": 4,
+        }
+        opponent.battlefield = [target]
+        active.battlefield = [
+            {"name": "Mountain", "type_line": "Basic Land - Mountain"},
+            {"name": "Forest", "type_line": "Basic Land - Forest"},
+            {"name": "Plains", "type_line": "Basic Land - Plains"},
+            {"name": "Island", "type_line": "Basic Land - Island"},
+            {"name": "Signet", "type_line": "Artifact"},
+        ]
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+            "damage_base_amount": 0,
+            "damage_per_count": 1,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Earth Tremor",
+                "type_line": "Instant",
+                "oracle_text": "Earth Tremor deals damage to target creature equal to the number of lands you control.",
+            },
+            turn=2,
+            rng=random.Random(30),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Earth Tremor"
+                and data.get("amount") == 4
+                and data.get("battlefield_damage_count") == 4
+                and data.get("result") == "creature_destroyed"
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_battlefield_count_damage_counts_attacking_creatures(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 8
+        active.battlefield = [
+            {"name": "Attacker A", "type_line": "Creature - Goblin", "attacking": True},
+            {"name": "Attacker B", "type_line": "Creature - Goblin", "attacking": True},
+            {"name": "Backline", "type_line": "Creature - Goblin"},
+            {"name": "Equipment", "type_line": "Artifact - Equipment", "attacking": True},
+        ]
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+            "battlefield_count_combat_state": "attacking",
+            "damage_base_amount": 0,
+            "damage_per_count": 1,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Dogpile",
+                "type_line": "Instant",
+                "oracle_text": "Dogpile deals damage to any target equal to the number of attacking creatures you control.",
+            },
+            turn=2,
+            rng=random.Random(31),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 6)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Dogpile"
+                and data.get("amount") == 2
+                and data.get("battlefield_damage_count") == 2
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_domain_damage_counts_basic_land_types(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 12
+        active.battlefield = [
+            {"name": "Savannah", "type_line": "Land - Forest Plains"},
+            {"name": "Watery Grave", "type_line": "Land - Island Swamp"},
+            {"name": "Mountain", "type_line": "Basic Land - Mountain"},
+            {"name": "Duplicate Forest", "type_line": "Basic Land - Forest"},
+        ]
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+            "damage_amount_source": "domain_basic_land_types",
+            "damage_base_amount": 0,
+            "damage_per_count": 1,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Tribal Flames",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Domain — Tribal Flames deals X damage to any target, where X is the number "
+                    "of basic land types among lands you control."
+                ),
+            },
+            turn=2,
+            rng=random.Random(32),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 7)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Tribal Flames"
+                and data.get("amount") == 5
+                and data.get("domain_basic_land_type_count") == 5
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_controller_hand_count_damage_uses_current_hand_size(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 9
+        active.hand = [
+            {"name": "Card A", "type_line": "Instant"},
+            {"name": "Card B", "type_line": "Creature"},
+            {"name": "Card C", "type_line": "Land"},
+        ]
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+            "damage_amount_source": "controller_hand_count",
+            "damage_base_amount": 0,
+            "damage_per_count": 1,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Spiraling Embers",
+                "type_line": "Sorcery - Arcane",
+                "oracle_text": "Spiraling Embers deals damage to any target equal to the number of cards in your hand.",
+            },
+            turn=2,
+            rng=random.Random(33),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 6)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Spiraling Embers"
+                and data.get("amount") == 3
+                and data.get("hand_damage_count") == 3
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_spell_pays_creature_sacrifice_cost_before_damage(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

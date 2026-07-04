@@ -1,0 +1,32 @@
+{
+  "database_target": "127.0.0.1:15432/halder",
+  "deploy_id": "PG405_ORACLE_HASH_INTEGRITY_BACKFILL",
+  "generated_at": "2026-07-04T12:34:30Z",
+  "mutations_performed": [
+    "postgres_apply_pg405_oracle_hash_integrity_backfill_new_server",
+    "sqlite_sync_pg405_oracle_hash_integrity_backfill_new_server"
+  ],
+  "precheck": {
+    "trusted_executable_rules_missing_oracle_hash_before": 44,
+    "safely_resolved_unique_oracle_hash_rows": 44,
+    "ambiguous_hash_rows": 0,
+    "unresolved_rows": 0
+  },
+  "apply": {
+    "backup_table": "pg405_oracle_hash_integrity_backfill_backup",
+    "backup_rows": 44,
+    "updated_rows": 44,
+    "effect_json_changed": false,
+    "deck_role_json_changed": false
+  },
+  "postcheck": {
+    "trusted_executable_rules_missing_oracle_hash_after": 0,
+    "backfilled_rows_now_hash_backed": 44
+  },
+  "sync": {
+    "report": "docs/hermes-analysis/master_optimizer_reports/pg405_oracle_hash_integrity_backfill_new_server_pg_to_sqlite_sync.json",
+    "selected_card_count": 44,
+    "sqlite_inserted_or_updated": 66,
+    "canonical_snapshot_rows_exported": 5314
+  }
+}

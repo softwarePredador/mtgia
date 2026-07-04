@@ -1,0 +1,776 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T12:27:45.268922+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg405_dynamic_count_damage_new_server_package_manifest.json",
+  "package_id": "pg405_dynamic_count_damage_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 21
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Armed Response",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:964c0be779777f5c5fecbdea0b08422f",
+          "oracle_hash": "c0f8d5ade3d226309fedce277684ffa7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Artillery Blast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fea134519697a0e44a05ebc4c1bcf531",
+          "oracle_hash": "ac45406941112d77fd8e127672248b83",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Divine Retribution",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4f7a1b46089f71c4afaecc924b54f7dc",
+          "oracle_hash": "652b68ea739d732487b674a1901d10a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Dogpile",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f156563e48c8f9af6e4b8201ebf0378",
+          "oracle_hash": "6fc0b0fa6d5d54d55a1a7ef2274093fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Earth Tremor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:975be8d35107468af5b5d7a130b3aa14",
+          "oracle_hash": "785eb5faab93e0d5ddf3f22807a64a97",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Feedback Bolt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9049794ec49e44015b321eae01df5473",
+          "oracle_hash": "542fa4c4a0d5b78f7c0034105eb313cc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Goblin War Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:601c0777628b08a053c5a8bae4aba5b6",
+          "oracle_hash": "eb07a10609cec816737dc518f350ab69",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Ground Assault",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8d8c14b57a733aaf0bc2629c32c83495",
+          "oracle_hash": "116e3c62a192d4a14b256aaaf4504b2a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Massive Raid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9e0115ea715e1d39643e7a89ee67ce1b",
+          "oracle_hash": "cf9dc19ff156865013d4b48ec1c4dc4b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Mob Justice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:60911db52320a12267515c91743f0c5d",
+          "oracle_hash": "cb149f0819a39d2422ed010961a99479",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Outflank",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:638f957f3112895b2a6cc27189622247",
+          "oracle_hash": "49fb6d49e5a8a163e308e64fd7a5fcea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Outnumber",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c279348c6f72b863bbf8a431958c3113",
+          "oracle_hash": "da4100eb9d9dcf471f88e43d5d590583",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Rockslide Ambush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ffc307e687500df5c247b8dab74b7166",
+          "oracle_hash": "7fec069fec08c971101d13ae4743978d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Rumbling Rockslide",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8d8c14b57a733aaf0bc2629c32c83495",
+          "oracle_hash": "34a148f0117448611aec7d14cc91398b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Seismic Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b2c850db2839f68014005b2e9ba0669d",
+          "oracle_hash": "1d1b4c25486d4bb3d9a4597b916c3d17",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Spiraling Embers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8486ca123cd7f77d0aa02222a5b2f50d",
+          "oracle_hash": "be5f2d950012528e6cac509edd28c3bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Spire Barrage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a554097253c28afad978fd2b01df654d",
+          "oracle_hash": "d233702d4c6d95c4ac6b01ac519dac9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Spitting Earth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ffc307e687500df5c247b8dab74b7166",
+          "oracle_hash": "a2dbb5aca973689b3da2f66b2e3707aa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Stonefury",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7baa936f9f6c7e7f2f148593047b229c",
+          "oracle_hash": "d2e2d727222cd4aefdaad2daa059c86d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Tribal Flames",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f15c0c1ad804e531dfc659bf25a39b3",
+          "oracle_hash": "9ecfe01e2f527aa1c3d999ccf654d08f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Welding Sparks",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ce38e61e0d1e1e4800bf27643822100d",
+          "oracle_hash": "544ae9cd16365fa6f76f9356eae62e30",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 21
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Armed Response",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:964c0be779777f5c5fecbdea0b08422f",
+          "oracle_hash": "c0f8d5ade3d226309fedce277684ffa7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Artillery Blast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fea134519697a0e44a05ebc4c1bcf531",
+          "oracle_hash": "ac45406941112d77fd8e127672248b83",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Divine Retribution",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4f7a1b46089f71c4afaecc924b54f7dc",
+          "oracle_hash": "652b68ea739d732487b674a1901d10a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Dogpile",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f156563e48c8f9af6e4b8201ebf0378",
+          "oracle_hash": "6fc0b0fa6d5d54d55a1a7ef2274093fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Earth Tremor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:975be8d35107468af5b5d7a130b3aa14",
+          "oracle_hash": "785eb5faab93e0d5ddf3f22807a64a97",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Feedback Bolt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9049794ec49e44015b321eae01df5473",
+          "oracle_hash": "542fa4c4a0d5b78f7c0034105eb313cc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Goblin War Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:601c0777628b08a053c5a8bae4aba5b6",
+          "oracle_hash": "eb07a10609cec816737dc518f350ab69",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Ground Assault",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8d8c14b57a733aaf0bc2629c32c83495",
+          "oracle_hash": "116e3c62a192d4a14b256aaaf4504b2a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Massive Raid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9e0115ea715e1d39643e7a89ee67ce1b",
+          "oracle_hash": "cf9dc19ff156865013d4b48ec1c4dc4b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Mob Justice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:60911db52320a12267515c91743f0c5d",
+          "oracle_hash": "cb149f0819a39d2422ed010961a99479",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Outflank",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:638f957f3112895b2a6cc27189622247",
+          "oracle_hash": "49fb6d49e5a8a163e308e64fd7a5fcea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Outnumber",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c279348c6f72b863bbf8a431958c3113",
+          "oracle_hash": "da4100eb9d9dcf471f88e43d5d590583",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Rockslide Ambush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ffc307e687500df5c247b8dab74b7166",
+          "oracle_hash": "7fec069fec08c971101d13ae4743978d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Rumbling Rockslide",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8d8c14b57a733aaf0bc2629c32c83495",
+          "oracle_hash": "34a148f0117448611aec7d14cc91398b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Seismic Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b2c850db2839f68014005b2e9ba0669d",
+          "oracle_hash": "1d1b4c25486d4bb3d9a4597b916c3d17",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Spiraling Embers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8486ca123cd7f77d0aa02222a5b2f50d",
+          "oracle_hash": "be5f2d950012528e6cac509edd28c3bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Spire Barrage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a554097253c28afad978fd2b01df654d",
+          "oracle_hash": "d233702d4c6d95c4ac6b01ac519dac9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Spitting Earth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ffc307e687500df5c247b8dab74b7166",
+          "oracle_hash": "a2dbb5aca973689b3da2f66b2e3707aa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Stonefury",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7baa936f9f6c7e7f2f148593047b229c",
+          "oracle_hash": "d2e2d727222cd4aefdaad2daa059c86d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Tribal Flames",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f15c0c1ad804e531dfc659bf25a39b3",
+          "oracle_hash": "9ecfe01e2f527aa1c3d999ccf654d08f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "card_name": "Welding Sparks",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ce38e61e0d1e1e4800bf27643822100d",
+          "oracle_hash": "544ae9cd16365fa6f76f9356eae62e30",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 21
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Armed Response",
+          "logical_rule_key": "battle_rule_v1:964c0be779777f5c5fecbdea0b08422f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Artillery Blast",
+          "logical_rule_key": "battle_rule_v1:fea134519697a0e44a05ebc4c1bcf531"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Divine Retribution",
+          "logical_rule_key": "battle_rule_v1:4f7a1b46089f71c4afaecc924b54f7dc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dogpile",
+          "logical_rule_key": "battle_rule_v1:5f156563e48c8f9af6e4b8201ebf0378"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Earth Tremor",
+          "logical_rule_key": "battle_rule_v1:975be8d35107468af5b5d7a130b3aa14"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Feedback Bolt",
+          "logical_rule_key": "battle_rule_v1:9049794ec49e44015b321eae01df5473"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin War Strike",
+          "logical_rule_key": "battle_rule_v1:601c0777628b08a053c5a8bae4aba5b6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ground Assault",
+          "logical_rule_key": "battle_rule_v1:8d8c14b57a733aaf0bc2629c32c83495"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Massive Raid",
+          "logical_rule_key": "battle_rule_v1:9e0115ea715e1d39643e7a89ee67ce1b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mob Justice",
+          "logical_rule_key": "battle_rule_v1:60911db52320a12267515c91743f0c5d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Outflank",
+          "logical_rule_key": "battle_rule_v1:638f957f3112895b2a6cc27189622247"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Outnumber",
+          "logical_rule_key": "battle_rule_v1:c279348c6f72b863bbf8a431958c3113"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rockslide Ambush",
+          "logical_rule_key": "battle_rule_v1:ffc307e687500df5c247b8dab74b7166"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rumbling Rockslide",
+          "logical_rule_key": "battle_rule_v1:8d8c14b57a733aaf0bc2629c32c83495"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Seismic Strike",
+          "logical_rule_key": "battle_rule_v1:b2c850db2839f68014005b2e9ba0669d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spiraling Embers",
+          "logical_rule_key": "battle_rule_v1:8486ca123cd7f77d0aa02222a5b2f50d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spire Barrage",
+          "logical_rule_key": "battle_rule_v1:a554097253c28afad978fd2b01df654d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spitting Earth",
+          "logical_rule_key": "battle_rule_v1:ffc307e687500df5c247b8dab74b7166"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Stonefury",
+          "logical_rule_key": "battle_rule_v1:7baa936f9f6c7e7f2f148593047b229c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tribal Flames",
+          "logical_rule_key": "battle_rule_v1:7f15c0c1ad804e531dfc659bf25a39b3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Welding Sparks",
+          "logical_rule_key": "battle_rule_v1:ce38e61e0d1e1e4800bf27643822100d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 21
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Armed Response",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:964c0be779777f5c5fecbdea0b08422f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Artillery Blast",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:fea134519697a0e44a05ebc4c1bcf531"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Divine Retribution",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:4f7a1b46089f71c4afaecc924b54f7dc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dogpile",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:5f156563e48c8f9af6e4b8201ebf0378"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Earth Tremor",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:975be8d35107468af5b5d7a130b3aa14"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Feedback Bolt",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:9049794ec49e44015b321eae01df5473"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin War Strike",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:601c0777628b08a053c5a8bae4aba5b6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ground Assault",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:8d8c14b57a733aaf0bc2629c32c83495"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Massive Raid",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:9e0115ea715e1d39643e7a89ee67ce1b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mob Justice",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:60911db52320a12267515c91743f0c5d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Outflank",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:638f957f3112895b2a6cc27189622247"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Outnumber",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:c279348c6f72b863bbf8a431958c3113"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rockslide Ambush",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:ffc307e687500df5c247b8dab74b7166"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rumbling Rockslide",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:8d8c14b57a733aaf0bc2629c32c83495"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Seismic Strike",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:b2c850db2839f68014005b2e9ba0669d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spiraling Embers",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:8486ca123cd7f77d0aa02222a5b2f50d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spire Barrage",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:a554097253c28afad978fd2b01df654d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spitting Earth",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:ffc307e687500df5c247b8dab74b7166"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Stonefury",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:7baa936f9f6c7e7f2f148593047b229c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tribal Flames",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:7f15c0c1ad804e531dfc659bf25a39b3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Welding Sparks",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:ce38e61e0d1e1e4800bf27643822100d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

@@ -99,6 +99,7 @@ DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
 GRAVEYARD_COUNT_DAMAGE_SCOPE = "xmage_dynamic_graveyard_count_damage_spell_v1"
+DYNAMIC_COUNT_DAMAGE_SCOPE = "xmage_dynamic_count_damage_spell_v1"
 DESTROY_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_controller_gain_life_spell_v1"
 CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1"
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
@@ -3339,6 +3340,12 @@ def _controlled_battlefield_count_fields(filter_text: str) -> dict[str, Any] | N
             "battlefield_count_card_types": ["land"],
             "battlefield_count_subtypes": [token],
         }
+    if token == "equipment":
+        return {
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact"],
+            "battlefield_count_subtypes": ["equipment"],
+        }
     if token == "artifact":
         return {
             "battlefield_count_scope": "controller_battlefield",
@@ -3353,6 +3360,11 @@ def _controlled_battlefield_count_fields(filter_text: str) -> dict[str, Any] | N
         return {
             "battlefield_count_scope": "controller_battlefield",
             "battlefield_count_card_types": ["land"],
+        }
+    if token == "goblin":
+        return {
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_subtypes": ["goblin"],
         }
     return None
 
@@ -4920,6 +4932,286 @@ def graveyard_count_damage_from_source(source: str, metadata: dict[str, Any]) ->
             "damage_per_graveyard_count": 1,
         }
     return "graveyard_count_damage_source_dynamic_not_supported"
+
+
+def _dynamic_count_damage_dict(
+    amount_source: str,
+    *,
+    target: str,
+    base: int = 0,
+    per: int = 1,
+    **count_fields: Any,
+) -> dict[str, Any]:
+    return {
+        "target": target,
+        "damage_amount_source": amount_source,
+        "damage_base_amount": int(base),
+        "damage_per_count": int(per),
+        **count_fields,
+    }
+
+
+def _dynamic_damage_target_from_phrase(phrase: str) -> str | None:
+    token = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    if token == "any target":
+        return "any_target"
+    if token == "target attacking or blocking creature":
+        return "attacking_or_blocking_creature"
+    if token == "target attacking creature":
+        return "attacking_creature"
+    if token == "target blocking creature":
+        return "blocking_creature"
+    if token == "target tapped creature":
+        return "tapped_creature"
+    if token == "target creature or planeswalker":
+        return "creature_or_planeswalker"
+    if token == "target creature":
+        return "creature"
+    if token == "target player or planeswalker":
+        return "player_or_planeswalker"
+    if token == "target player":
+        return "player"
+    return None
+
+
+def _dynamic_damage_count_fields_from_filter(filter_text: str) -> dict[str, Any] | str | None:
+    token = re.sub(r"\s+", " ", str(filter_text or "").strip().lower())
+    if " plus " in token or " and/or " in token:
+        return "dynamic_count_damage_oracle_composite_count_not_supported"
+    if token == "basic land types among lands you control":
+        return {"damage_amount_source": "domain_basic_land_types"}
+    if token == "cards in your hand":
+        return {"damage_amount_source": "controller_hand_count"}
+    if token == "attacking creatures":
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "all_battlefields",
+            "battlefield_count_card_types": ["creature"],
+            "battlefield_count_combat_state": "attacking",
+        }
+    if token == "attacking creatures you control":
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+            "battlefield_count_combat_state": "attacking",
+        }
+    controlled = re.match(
+        r"^(?P<filter>equipment|artifact|artifacts|creature|creatures|land|lands|mountain|mountains|goblin|goblins) "
+        r"you control$",
+        token,
+    )
+    if controlled:
+        filter_name = controlled.group("filter").rstrip("s")
+        count_fields = _controlled_battlefield_count_fields(filter_name)
+        if count_fields is None:
+            return "dynamic_count_damage_oracle_filter_not_supported"
+        return {"damage_amount_source": "battlefield_permanent_count", **count_fields}
+    return None
+
+
+def dynamic_count_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    domain_match = re.match(
+        r"^(?:domain — )?.+ deals x damage to (?P<target>.+?), where x is "
+        r"(?:(?P<base>\d+) plus )?the number of basic land types among lands you control\.?$",
+        text,
+    )
+    if domain_match:
+        target = _dynamic_damage_target_from_phrase(domain_match.group("target"))
+        if target is None:
+            return "dynamic_count_damage_target_not_supported"
+        return _dynamic_count_damage_dict(
+            "domain_basic_land_types",
+            target=target,
+            base=int(domain_match.group("base") or 0),
+        )
+    where_match = re.match(
+        r"^.+ deals x damage to (?P<target>.+?), where x is "
+        r"(?:(?P<base>\d+) plus )?the number of (?P<filter>.+?)\.?$",
+        text,
+    )
+    if where_match:
+        target = _dynamic_damage_target_from_phrase(where_match.group("target"))
+        if target is None:
+            return "dynamic_count_damage_target_not_supported"
+        count_fields = _dynamic_damage_count_fields_from_filter(where_match.group("filter"))
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "dynamic_count_damage_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("damage_amount_source"))
+        return _dynamic_count_damage_dict(
+            amount_source,
+            target=target,
+            base=int(where_match.group("base") or 0),
+            **count_fields,
+        )
+    equal_match = re.match(
+        r"^.+ deals damage to (?P<target>.+?) equal to the number of (?P<filter>.+?)\.?$",
+        text,
+    )
+    if equal_match:
+        target = _dynamic_damage_target_from_phrase(equal_match.group("target"))
+        if target is None:
+            return "dynamic_count_damage_target_not_supported"
+        count_fields = _dynamic_damage_count_fields_from_filter(equal_match.group("filter"))
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "dynamic_count_damage_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("damage_amount_source"))
+        return _dynamic_count_damage_dict(amount_source, target=target, **count_fields)
+    reversed_equal_match = re.match(
+        r"^.+ deals damage equal to the number of (?P<filter>.+?) to (?P<target>.+?)\.?$",
+        text,
+    )
+    if reversed_equal_match:
+        target = _dynamic_damage_target_from_phrase(reversed_equal_match.group("target"))
+        if target is None:
+            return "dynamic_count_damage_target_not_supported"
+        count_fields = _dynamic_damage_count_fields_from_filter(reversed_equal_match.group("filter"))
+        if isinstance(count_fields, str):
+            return count_fields
+        if count_fields is None:
+            return "dynamic_count_damage_oracle_filter_not_supported"
+        amount_source = str(count_fields.pop("damage_amount_source"))
+        return _dynamic_count_damage_dict(amount_source, target=target, **count_fields)
+    return None
+
+
+def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    token = re.sub(r"\s+", " ", str(expr or "")).strip()
+    if "GetXValue" in token or "ManacostVariableValue" in token:
+        return "dynamic_count_damage_x_cost_not_supported"
+    if "CardsInTargetHandCount" in token or (token == "xValue" and "CardsInTargetHandCount" in text):
+        return "dynamic_count_damage_target_hand_not_supported"
+    if (
+        "GreatestAmongPermanentsValue" in token
+        or "GreatestPowerAmongControlledValue" in token
+        or (token == "xValue" and ("GreatestAmongPermanentsValue" in text or "GreatestPowerAmongControlledValue" in text))
+    ):
+        return "dynamic_count_damage_greatest_value_not_supported"
+    if "PartyCount" in token or (token == "xValue" and "PartyCount" in text):
+        return "dynamic_count_damage_party_count_not_supported"
+    if "ThunderSalvoValue" in token or (token == "xValue" and "ThunderSalvoValue" in text):
+        return "dynamic_count_damage_spell_count_not_supported"
+    if "ElectrostaticBoltDamageValue" in token:
+        return "dynamic_count_damage_conditional_target_state_not_supported"
+    if token == "xValue" and "AdditiveDynamicValue" in text:
+        return "dynamic_count_damage_composite_count_not_supported"
+    int_plus_args = extract_constructor_args(token, "IntPlusDynamicValue")
+    if int_plus_args is not None:
+        parts = split_top_level_args(int_plus_args)
+        if len(parts) != 2 or not parts[0].strip().isdigit():
+            return "dynamic_count_damage_int_plus_not_supported"
+        nested = _dynamic_count_damage_source_spec_from_expr(text, parts[1])
+        if isinstance(nested, str) or nested is None:
+            return nested
+        return {**nested, "damage_base_amount": int(parts[0].strip())}
+    if "DomainValue.REGULAR" in token or (token == "xValue" and "DomainValue.REGULAR" in text):
+        return {"damage_amount_source": "domain_basic_land_types"}
+    if "CardsInControllerHandCount.ANY" in token or (
+        token == "xValue" and "CardsInControllerHandCount.ANY" in text
+    ):
+        return {"damage_amount_source": "controller_hand_count"}
+    if "LandsYouControlCount.instance" in token or (
+        token == "xValue" and "FILTER_CONTROLLED_PERMANENT_LAND" in text
+    ):
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+        }
+    if "CreaturesYouControlCount" in token or (
+        token == "xValue" and "FILTER_CONTROLLED_CREATURE" in text
+    ):
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+        }
+    if "FilterControlledCreaturePermanent" in token:
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["creature"],
+        }
+    if "FilterControlledArtifactPermanent" in token or "FilterControlledArtifactPermanent" in text:
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact"],
+        }
+    if (
+        "FILTER_CONTROLLED_PERMANENT_EQUIPMENT" in token
+        or "SubType.EQUIPMENT" in token
+        or (token == "xValue" and ("FILTER_CONTROLLED_PERMANENT_EQUIPMENT" in text or "SubType.EQUIPMENT" in text))
+    ):
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["artifact"],
+            "battlefield_count_subtypes": ["equipment"],
+        }
+    if "FilterControlledLandPermanent" in token:
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_card_types": ["land"],
+        }
+    if "Predicates.or" in text and "PermanentsOnBattlefieldCount" in token:
+        return "dynamic_count_damage_composite_count_not_supported"
+    subtype_match = re.search(
+        r"FilterControlledPermanent\s*\(\s*SubType\.(MOUNTAIN|GOBLIN)",
+        text if token == "xValue" else token,
+    )
+    if subtype_match is None and "Predicates.or" not in text:
+        subtype_match = re.search(
+            r"SubType\.(MOUNTAIN|GOBLIN)\.getPredicate\(\)",
+            text if "PermanentsOnBattlefieldCount" in token or token == "xValue" else "",
+        )
+    if subtype_match:
+        subtype = subtype_match.group(1).lower()
+        card_types = ["land"] if subtype == "mountain" else []
+        fields = {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_subtypes": [subtype],
+        }
+        if card_types:
+            fields["battlefield_count_card_types"] = card_types
+        return fields
+    if "FilterAttackingCreature" in token or "FilterAttackingCreature" in text:
+        return {
+            "damage_amount_source": "battlefield_permanent_count",
+            "battlefield_count_scope": "controller_battlefield" if "TargetController.YOU" in text else "all_battlefields",
+            "battlefield_count_card_types": ["creature"],
+            "battlefield_count_combat_state": "attacking",
+        }
+    return "dynamic_count_damage_source_filter_not_supported"
+
+
+def dynamic_count_damage_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if "getSpellAbility().addCost" in text or "addCost(" in text:
+        return "dynamic_count_damage_additional_cost_not_supported"
+    if len(re.findall(r"new\s+DamageTargetEffect\s*\(", text)) != 1:
+        return "dynamic_count_damage_source_not_single"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "dynamic_count_damage_target_pointer_not_supported"
+    constructor_args = extract_constructor_args(text, "DamageTargetEffect")
+    if constructor_args is None:
+        return None
+    spec = _dynamic_count_damage_source_spec_from_expr(text, constructor_args)
+    if isinstance(spec, str) or spec is None:
+        return spec
+    return {
+        "damage_base_amount": int(spec.get("damage_base_amount") or 0),
+        "damage_per_count": 1,
+        **{key: value for key, value in spec.items() if key != "damage_base_amount"},
+    }
 
 
 def restricted_target_base(target: str) -> str:
@@ -12129,6 +12421,48 @@ def split_row(
         )
         if additional_cost_reason is not None:
             return None, additional_cost_reason
+        dynamic_damage = dynamic_count_damage_from_oracle(metadata)
+        if isinstance(dynamic_damage, str):
+            return None, dynamic_damage
+        if dynamic_damage is not None:
+            source_dynamic_damage = dynamic_count_damage_from_source(source_text)
+            if isinstance(source_dynamic_damage, str):
+                return None, source_dynamic_damage
+            if source_dynamic_damage is None:
+                return None, "dynamic_count_damage_source_not_supported"
+            for key in (
+                "damage_amount_source",
+                "damage_base_amount",
+                "damage_per_count",
+                "battlefield_count_scope",
+                "battlefield_count_card_types",
+                "battlefield_count_subtypes",
+                "battlefield_count_combat_state",
+            ):
+                if dynamic_damage.get(key) != source_dynamic_damage.get(key):
+                    return None, f"dynamic_count_damage_source_oracle_{key}_mismatch"
+            target = str(dynamic_damage["target"])
+            if not source_matches_target_constraint(source_text, target):
+                return None, "dynamic_count_damage_target_source_mismatch"
+            target_base = restricted_target_base(target)
+            dynamic_damage_fields = {key: value for key, value in dynamic_damage.items() if key != "target"}
+            effect_json = {
+                "effect": "direct_damage",
+                "battle_model_scope": DYNAMIC_COUNT_DAMAGE_SCOPE,
+                "amount": 0,
+                "damage": 0,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target),
+                "xmage_effect_class": "DamageTargetEffect",
+                **dynamic_damage_fields,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_dynamic_count_damage_spell",
+            ), "selected_exact_scope"
         amount = java_constructor_int(source_text, "DamageTargetEffect")
         if amount is None or amount <= 0:
             return None, "damage_amount_not_fixed"
@@ -13774,6 +14108,7 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, DiesSourceTriggeredAbility, exact fixed dies-damage Oracle/source agreement, and no auxiliary ability class",
+                "direct_damage::targeted_damage_variant_v1 rows with one-shot DamageTargetEffect whose amount is an exact supported battlefield/hand/domain count, optional fixed base amount, and supported target constraints",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",

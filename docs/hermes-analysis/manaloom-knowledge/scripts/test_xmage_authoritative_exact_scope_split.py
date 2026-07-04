@@ -279,6 +279,201 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "graveyard_count_damage_exile_x_graveyard_cost_not_supported")
 
+    def test_dynamic_count_damage_spells_map_to_runtime(self) -> None:
+        fixtures = [
+            {
+                "name": "Armed Response",
+                "oracle": (
+                    "Armed Response deals damage to target attacking creature equal to the number "
+                    "of Equipment you control."
+                ),
+                "source": """
+                    Effect effect = new DamageTargetEffect(new PermanentsOnBattlefieldCount(
+                        StaticFilters.FILTER_CONTROLLED_PERMANENT_EQUIPMENT));
+                    this.getSpellAbility().addTarget(new TargetAttackingCreature());
+                """,
+                "target": "creature",
+                "constraints": {"card_types": ["creature"], "combat_state": "attacking"},
+                "amount_source": "battlefield_permanent_count",
+                "count_fields": {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["artifact"],
+                    "battlefield_count_subtypes": ["equipment"],
+                },
+            },
+            {
+                "name": "Artillery Blast",
+                "oracle": (
+                    "Domain — Artillery Blast deals X damage to target tapped creature, where X is "
+                    "1 plus the number of basic land types among lands you control."
+                ),
+                "source": """
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(
+                        new IntPlusDynamicValue(1, DomainValue.REGULAR)));
+                    filter.add(TappedPredicate.TAPPED);
+                    this.getSpellAbility().addTarget(new TargetPermanent(filter));
+                """,
+                "target": "creature",
+                "constraints": {"card_types": ["creature"], "tapped_state": "tapped"},
+                "amount_source": "domain_basic_land_types",
+                "base": 1,
+                "count_fields": {},
+            },
+            {
+                "name": "Dogpile",
+                "oracle": "Dogpile deals damage to any target equal to the number of attacking creatures you control.",
+                "source": """
+                    private static final FilterAttackingCreature filter = new FilterAttackingCreature("attacking creatures you control");
+                    filter.add(TargetController.YOU.getControllerPredicate());
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(new PermanentsOnBattlefieldCount(filter)));
+                    this.getSpellAbility().addTarget(new TargetAnyTarget());
+                """,
+                "target": "any_target",
+                "constraints": {"scope": "any_target"},
+                "amount_source": "battlefield_permanent_count",
+                "count_fields": {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["creature"],
+                    "battlefield_count_combat_state": "attacking",
+                },
+            },
+            {
+                "name": "Earth Tremor",
+                "oracle": (
+                    "Earth Tremor deals damage to target creature or planeswalker equal to the number "
+                    "of lands you control."
+                ),
+                "source": """
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(LandsYouControlCount.instance));
+                    this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());
+                """,
+                "target": "creature_or_planeswalker",
+                "constraints": {"card_types": ["creature", "planeswalker"]},
+                "amount_source": "battlefield_permanent_count",
+                "count_fields": {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["land"],
+                },
+            },
+            {
+                "name": "Goblin War Strike",
+                "oracle": (
+                    "Goblin War Strike deals damage to target player or planeswalker equal to the number "
+                    "of Goblins you control."
+                ),
+                "source": """
+                    private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(
+                        new FilterControlledPermanent(SubType.GOBLIN, "Goblins you control"), null);
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(xValue));
+                    this.getSpellAbility().addTarget(new TargetPlayerOrPlaneswalker());
+                """,
+                "target": "player_or_planeswalker",
+                "constraints": {"scope": "player_or_planeswalker"},
+                "amount_source": "battlefield_permanent_count",
+                "count_fields": {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_subtypes": ["goblin"],
+                },
+            },
+            {
+                "name": "Spiraling Embers",
+                "oracle": "Spiraling Embers deals damage to any target equal to the number of cards in your hand.",
+                "source": """
+                    Effect effect = new DamageTargetEffect(CardsInControllerHandCount.ANY);
+                    this.getSpellAbility().addTarget(new TargetAnyTarget());
+                """,
+                "target": "any_target",
+                "constraints": {"scope": "any_target"},
+                "amount_source": "controller_hand_count",
+                "count_fields": {},
+            },
+            {
+                "name": "Welding Sparks",
+                "oracle": (
+                    "Welding Sparks deals X damage to target creature, where X is 3 plus the number "
+                    "of artifacts you control."
+                ),
+                "source": """
+                    Effect effect = new DamageTargetEffect(new IntPlusDynamicValue(
+                        3, new PermanentsOnBattlefieldCount(new FilterControlledArtifactPermanent("artifacts you control"))));
+                    this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                """,
+                "target": "creature",
+                "constraints": {"card_types": ["creature"]},
+                "amount_source": "battlefield_permanent_count",
+                "base": 3,
+                "count_fields": {
+                    "battlefield_count_scope": "controller_battlefield",
+                    "battlefield_count_card_types": ["artifact"],
+                },
+            },
+        ]
+
+        for fixture in fixtures:
+            with self.subTest(card=fixture["name"]):
+                row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=fixture["name"],
+                        type_line="Instant",
+                        oracle_text=fixture["oracle"],
+                    ),
+                    source_text=fixture["source"],
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_COUNT_DAMAGE_SCOPE)
+                self.assertEqual(effect["target"], fixture["target"])
+                self.assertEqual(effect["target_constraints"], fixture["constraints"])
+                self.assertEqual(effect["damage_amount_source"], fixture["amount_source"])
+                self.assertEqual(effect["damage_base_amount"], fixture.get("base", 0))
+                self.assertEqual(effect["damage_per_count"], 1)
+                for key, expected in fixture["count_fields"].items():
+                    self.assertEqual(effect.get(key), expected)
+
+    def test_dynamic_count_damage_blocks_x_cost_and_composite_counts(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Blaze",
+                type_line="Sorcery",
+                oracle_text="Blaze deals X damage to any target.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DamageTargetEffect(GetXValue.instance));
+                this.getSpellAbility().addTarget(new TargetAnyTarget());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_amount_not_fixed")
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hobbit's Sting",
+                type_line="Instant",
+                oracle_text=(
+                    "Hobbit's Sting deals X damage to target creature, where X is the number of "
+                    "creatures you control plus the number of Foods you control."
+                ),
+            ),
+            source_text="""
+                private static final DynamicValue xValue = new AdditiveDynamicValue(
+                    CreaturesYouControlCount.PLURAL,
+                    new PermanentsOnBattlefieldCount(new FilterControlledPermanent(SubType.FOOD))
+                );
+                this.getSpellAbility().addEffect(new DamageTargetEffect(xValue));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dynamic_count_damage_oracle_composite_count_not_supported")
+
     def test_return_all_graveyard_enchantments_to_battlefield_spell_maps_to_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
