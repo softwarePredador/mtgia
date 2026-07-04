@@ -389,6 +389,15 @@ patterns:
   controller battlefield permanent counts by type/subtype, attacking-creature
   battlefield counts, controller hand count, and domain basic land type count,
   with optional fixed base amount.
+- `direct_damage::targeted_damage_variant_v1` with one-shot
+  `DamageTargetEffect(GetXValue.instance)` or
+  `DamageTargetEffect(ManacostVariableValue.instance)`, exact "deals X damage"
+  Oracle/source agreement, and no auxiliary ability class ->
+  `xmage_x_damage_target_spell_v1`. This scope reads the chosen cast `x_value`
+  at runtime. It deliberately blocks X-damage cards with buyback, alternative
+  cast timing such as pay-more-as-flash, "where X is ..." game-state counts,
+  divided damage, or additional costs until those families have their own
+  adapters.
 - `draw_cards::xmage_draw_card_variant_review_v1` with exact supported spell
   additional costs remains in `xmage_fixed_source_controller_draw_spell_v1`
   when the runtime pays that cost before drawing.
@@ -7856,13 +7865,13 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG406 queue on the new server, the next exact runtime-backed work should
+post-PG407 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1809`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1610`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
-4. `direct_damage::targeted_damage_variant_v1` - `830`
+4. `direct_damage::targeted_damage_variant_v1` - `827`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `728`
 7. `removal_destroy::targeted_destroy_variant_v1` - `612`
@@ -7884,32 +7893,37 @@ Selection rule:
 
 ## Latest Cycle Evidence
 
-PG406 closed the exact `SearchLibraryPutInHandEffect` tutor-to-hand subpattern
-on the new server:
+PG407 closed the exact X-cost direct-damage subpattern on the new server:
 
-- Runtime/split support added for `xmage_library_search_to_hand_spell_v1` and
-  `xmage_creature_etb_library_search_to_hand_v1`.
+- Runtime/split support added for `xmage_x_damage_target_spell_v1`, using the
+  cast context `x_value` as `damage_amount_source`.
 - Focused tests passed:
-  `test_xmage_authoritative_exact_scope_split.py` (`394` tests) and
-  `test_xmage_exact_scope_runtime.py` (`230` tests).
+  `test_xmage_authoritative_exact_scope_split.py` (`399` tests) and
+  `test_xmage_exact_scope_runtime.py` (`231` tests).
 - Exact split:
-  `xmage_authoritative_exact_scope_split_20260704_pg406_tutor_to_hand_new_server`
-  produced `35` safe candidates (`14` spell tutor-to-hand, `21` ETB creature
-  tutor-to-hand).
-- PostgreSQL package `PG406` applied on the new server:
-  `35` upserted rows, `14` deprecated shadow rows, postcheck `35/35`
+  `xmage_authoritative_exact_scope_split_20260704_pg407_x_damage_new_server`
+  produced `3` safe candidates: `Blaze`, `Heat Ray`, and `Volcanic Geyser`.
+- Safety blockers were recorded for near misses: `Fanning the Flames` remains
+  blocked by `x_damage_buyback_not_supported`; `Ghitu Fire` remains blocked by
+  `x_damage_alternative_timing_not_supported`.
+- PostgreSQL package `PG407` applied on the new server:
+  `3` upserted rows, `0` deprecated shadow rows, postcheck `3/3`
   `verified`/`auto` rows with Oracle hashes.
-- PG -> SQLite sync loaded `35` PostgreSQL rows, updated `49` SQLite rows, and
-  exported `5342` canonical snapshot rows.
+- PG -> SQLite sync loaded `3` PostgreSQL rows, updated `3` SQLite rows, and
+  exported `5345` canonical snapshot rows.
 - E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
   and runtime `get_card_effect`.
-- Final governance audits passed:
+- The final PG/Hermes/SQLite audit found `44` old trusted executable rows
+  missing `oracle_hash`; the PG407 integrity backfill filled all `44` from
+  current PostgreSQL `cards.oracle_text`, synced those rows to SQLite, and
+  reduced `trusted_executable_rules_missing_oracle_hash` to `0`.
+- Final governance audits passed after the hash backfill:
   XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
   (`51/51`), and legacy contamination.
 - Post-sync queue rebuild reduced the Commander-legal target identity queue
-  from `26718` to `26683` and authoritative adapter-required count from
-  `26404` to `26369`. The post-PG406 exact split recheck produced
-  `proposal_count=0`.
+  from `26683` to `26680`, authoritative adapter-required count from `26369`
+  to `26366`, and `direct_damage::targeted_damage_variant_v1` from `830` to
+  `827`. The post-PG407 exact split recheck produced `proposal_count=0`.
 
 ## Required Artifacts Per Cycle
 

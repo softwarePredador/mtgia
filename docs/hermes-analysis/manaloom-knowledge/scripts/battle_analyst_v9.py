@@ -42096,7 +42096,14 @@ def _dynamic_damage_count_from_source(player, opponents, effect_data):
 
 
 def dynamic_damage_amount(player, opponents, effect_data):
-    if str(effect_data.get("damage_amount_source") or "").lower() not in {
+    amount_source = str(effect_data.get("damage_amount_source") or "").lower()
+    if amount_source == "x_value":
+        amount = damage_amount_from_x_context(effect_data)
+        return amount, {
+            "damage_amount_source": "x_value",
+            "x_value": amount,
+        }
+    if amount_source not in {
         "graveyard_card_count",
         "battlefield_permanent_count",
         "controller_hand_count",

@@ -100,6 +100,7 @@ DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
+X_DAMAGE_SCOPE = "xmage_x_damage_target_spell_v1"
 DAMAGE_EXILE_IF_DIES_SCOPE = "xmage_fixed_damage_target_exile_if_dies_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
 GRAVEYARD_COUNT_DAMAGE_SCOPE = "xmage_dynamic_graveyard_count_damage_spell_v1"
@@ -5232,6 +5233,53 @@ def dynamic_count_damage_from_source(source: str) -> dict[str, Any] | str | None
         "damage_per_count": 1,
         **{key: value for key, value in spec.items() if key != "damage_base_amount"},
     }
+
+
+def x_damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
+    text = oracle_text(metadata)
+    if "where x is" in text or "additional cost" in text or "divided as you choose" in text:
+        return None
+    match = re.match(
+        r"^.+ deals x damage to (?P<target>any target|target creature or planeswalker|target creature|target player|target opponent)\.?$",
+        text,
+    )
+    if not match:
+        return None
+    return {
+        "any target": "any_target",
+        "target creature or planeswalker": "creature_or_planeswalker",
+        "target creature": "creature",
+        "target player": "player",
+        "target opponent": "opponent",
+    }[match.group("target")]
+
+
+def x_damage_source_blocker(source: str) -> str | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return "x_damage_additional_cost_not_supported"
+    if "BuybackAbility" in text:
+        return "x_damage_buyback_not_supported"
+    if "PayMoreToCastAsThoughtItHadFlashAbility" in text:
+        return "x_damage_alternative_timing_not_supported"
+    if re.search(r"\baddAbility\s*\(", text):
+        return "x_damage_auxiliary_ability_not_supported"
+    if len(re.findall(r"new\s+DamageTargetEffect\s*\(", text)) != 1:
+        return "x_damage_source_not_single"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "x_damage_target_pointer_not_supported"
+    constructor_args = extract_constructor_args(text, "DamageTargetEffect")
+    if not constructor_args:
+        return "x_damage_source_not_supported"
+    normalized_args = re.sub(r"\s+", "", constructor_args)
+    if normalized_args in {"GetXValue.instance", "ManacostVariableValue.instance"}:
+        return None
+    if normalized_args == "xValue" and re.search(
+        r"(?:DynamicValue\s+)?xValue\s*=\s*(?:GetXValue|ManacostVariableValue)\.instance",
+        text,
+    ):
+        return None
+    return "x_damage_source_not_supported"
 
 
 def restricted_target_base(target: str) -> str:
@@ -12833,6 +12881,26 @@ def split_row(
                 effect_json,
                 family_id="xmage_dynamic_count_damage_spell",
             ), "selected_exact_scope"
+        x_damage_target = x_damage_target_from_oracle(metadata)
+        if x_damage_target is not None:
+            source_blocker = x_damage_source_blocker(source_text)
+            if source_blocker is not None:
+                return None, source_blocker
+            if not source_matches_target_constraint(source_text, x_damage_target):
+                return None, "x_damage_target_source_mismatch"
+            target_base = restricted_target_base(x_damage_target)
+            effect_json = {
+                "effect": "direct_damage",
+                "battle_model_scope": X_DAMAGE_SCOPE,
+                "amount": 0,
+                "damage": 0,
+                "target": target_base,
+                "target_constraints": target_constraints_for(x_damage_target),
+                "damage_amount_source": "x_value",
+                "xmage_effect_class": "DamageTargetEffect",
+                **flags,
+            }
+            return build_proposal(row, metadata, effect_json, family_id="xmage_x_damage_spell"), "selected_exact_scope"
         amount = java_constructor_int(source_text, "DamageTargetEffect")
         if amount is None or amount <= 0:
             return None, "damage_amount_not_fixed"

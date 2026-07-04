@@ -3255,6 +3255,48 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_x_damage_uses_cast_context_x_value(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 9
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_x_damage_target_spell_v1",
+            "damage_amount_source": "x_value",
+            "amount": 0,
+            "damage": 0,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "_cast_context": {"x_value": 4},
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Blaze",
+                "type_line": "Sorcery",
+                "oracle_text": "Blaze deals X damage to any target.",
+            },
+            turn=2,
+            rng=random.Random(34),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 5)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Blaze"
+                and data.get("amount") == 4
+                and data.get("damage_amount_source") == "x_value"
+                and data.get("x_value") == 4
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_spell_pays_creature_sacrifice_cost_before_damage(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

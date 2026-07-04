@@ -433,7 +433,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 for key, expected in fixture["count_fields"].items():
                     self.assertEqual(effect.get(key), expected)
 
-    def test_dynamic_count_damage_blocks_x_cost_and_composite_counts(self) -> None:
+    def test_x_damage_spells_map_to_runtime_x_value(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
         proposal, reason = split.split_row(
             row,
@@ -448,8 +448,80 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.X_DAMAGE_SCOPE)
+        self.assertEqual(effect["damage_amount_source"], "x_value")
+        self.assertEqual(effect["amount"], 0)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["target_constraints"], {"scope": "any_target"})
+
+    def test_x_damage_spell_with_buyback_stays_blocked_until_auxiliary_model_exists(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fanning the Flames",
+                type_line="Sorcery",
+                oracle_text="Buyback {3}\nFanning the Flames deals X damage to any target.",
+            ),
+            source_text="""
+                this.addAbility(new BuybackAbility("{3}"));
+                this.getSpellAbility().addEffect(new DamageTargetEffect(GetXValue.instance));
+                this.getSpellAbility().addTarget(new TargetAnyTarget());
+            """,
+        )
+
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "damage_amount_not_fixed")
+        self.assertEqual(reason, "x_damage_buyback_not_supported")
+
+    def test_x_damage_spell_with_alternative_timing_stays_blocked(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ghitu Fire",
+                type_line="Sorcery",
+                oracle_text=(
+                    "You may cast this spell as though it had flash if you pay {2} more to cast it.\n"
+                    "Ghitu Fire deals X damage to any target."
+                ),
+            ),
+            source_text="""
+                Effect effect = new DamageTargetEffect(GetXValue.instance);
+                Ability ability = new PayMoreToCastAsThoughtItHadFlashAbility(this, new ManaCostsImpl<>("{2}"));
+                ability.addEffect(effect);
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+                this.getSpellAbility().addEffect(effect);
+                this.getSpellAbility().addTarget(new TargetAnyTarget());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "x_damage_alternative_timing_not_supported")
+
+    def test_x_damage_spell_with_unknown_auxiliary_ability_stays_blocked(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Auxiliary Fixture",
+                type_line="Sorcery",
+                oracle_text="Auxiliary Fixture deals X damage to any target.",
+            ),
+            source_text="""
+                this.addAbility(new FixtureAuxiliaryAbility());
+                this.getSpellAbility().addEffect(new DamageTargetEffect(GetXValue.instance));
+                this.getSpellAbility().addTarget(new TargetAnyTarget());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "x_damage_auxiliary_ability_not_supported")
+
+    def test_dynamic_count_damage_blocks_x_cost_and_composite_counts(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
 
         proposal, reason = split.split_row(
             row,
@@ -3825,7 +3897,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "bounce_draw_oracle_not_exact_fixed")
 
-    def test_damage_spell_with_variable_x_stays_blocked(self) -> None:
+    def test_damage_spell_with_mana_variable_x_maps_to_runtime(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(
             row,
@@ -3833,8 +3905,21 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             source_text="this.getSpellAbility().addEffect(new DamageTargetEffect(ManacostVariableValue.instance));",
         )
 
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.X_DAMAGE_SCOPE)
+        self.assertEqual(effect["damage_amount_source"], "x_value")
+
+    def test_damage_spell_with_custom_variable_x_stays_blocked(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Fixture Spell deals X damage to any target."),
+            source_text="this.getSpellAbility().addEffect(new DamageTargetEffect(FixtureDynamicValue.instance));",
+        )
+
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "damage_amount_not_fixed")
+        self.assertEqual(reason, "x_damage_source_not_supported")
 
     def test_damage_spell_maps_attacking_or_blocking_creature_constraint(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
@@ -11319,12 +11404,12 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             source_reader=lambda row: (
                 "new DrawCardSourceControllerEffect(1)"
                 if row["card_id"] == "draw"
-                else "new DamageTargetEffect(ManacostVariableValue.instance)"
+                else "new DamageTargetEffect(FixtureDynamicValue.instance)"
             ),
         )
 
         self.assertEqual(report["summary"]["proposal_count"], 1)
-        self.assertEqual(report["summary"]["blocked_reason_counts"], {"damage_amount_not_fixed": 1})
+        self.assertEqual(report["summary"]["blocked_reason_counts"], {"x_damage_source_not_supported": 1})
 
 
 if __name__ == "__main__":
