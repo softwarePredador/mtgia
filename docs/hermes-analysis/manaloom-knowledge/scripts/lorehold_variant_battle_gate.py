@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 import battle_analyst_v9 as battle
-from master_optimizer_common import resolve_default_knowledge_db
+from master_optimizer_common import resolve_default_knowledge_db, safe_cmc_from_card
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -386,7 +386,7 @@ def fixed_opponent_profile_from_deck(db: Path, deck_id: int) -> dict[str, Any]:
         "removal": sum(1 for card in deck if battle.card_has_functional_tag(card, "removal", "board_wipe")),
         "counters": sum(1 for card in deck if battle.card_has_functional_tag(card, "counter", "protection")),
         "creatures": sum(1 for card in deck if "Creature" in card.get("type_line", "")),
-        "avg_cmc": sum(float(card.get("cmc") or 0) for card in deck) / max(1, len(deck)),
+        "avg_cmc": sum(safe_cmc_from_card(card, unknown_nonland_fallback=0.0) for card in deck) / max(1, len(deck)),
         "is_real": True,
         "is_fixed_opponent": True,
         "construction_report": construction_report,

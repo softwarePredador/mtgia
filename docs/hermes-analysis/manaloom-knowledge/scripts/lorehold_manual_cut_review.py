@@ -18,7 +18,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from master_optimizer_common import resolve_default_knowledge_db
+from master_optimizer_common import (
+    resolve_default_knowledge_db,
+    safe_cmc_from_card,
+    sqlite_connection_has_table,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -254,11 +258,23 @@ def load_deck_presence(conn: sqlite3.Connection, names: Iterable[str]) -> dict[s
     presence: dict[str, list[dict[str, Any]]] = {key: [] for key in wanted}
     if not wanted:
         return {}
-    rows = conn.execute(
+    if sqlite_connection_has_table(conn, "card_oracle_cache"):
+        from_sql = """
+        FROM deck_cards dc
+        LEFT JOIN card_oracle_cache coc
+          ON coc.normalized_name = lower(dc.card_name)
         """
-        SELECT deck_id, card_name, quantity, functional_tag, cmc, type_line, functional_tags_json
-        FROM deck_cards
-        ORDER BY deck_id, card_name
+        mana_cost_sql = "coc.mana_cost AS mana_cost"
+    else:
+        from_sql = "FROM deck_cards dc"
+        mana_cost_sql = "'' AS mana_cost"
+    rows = conn.execute(
+        f"""
+        SELECT dc.deck_id, dc.card_name, dc.quantity, dc.functional_tag,
+               dc.cmc, dc.type_line, dc.functional_tags_json,
+               {mana_cost_sql}
+        {from_sql}
+        ORDER BY dc.deck_id, dc.card_name
         """
     ).fetchall()
     for row in rows:
@@ -271,7 +287,7 @@ def load_deck_presence(conn: sqlite3.Connection, names: Iterable[str]) -> dict[s
                 "card_name": row["card_name"],
                 "quantity": int(row["quantity"] or 1),
                 "functional_tag": row["functional_tag"],
-                "cmc": row["cmc"],
+                "cmc": safe_cmc_from_card(row),
                 "type_line": row["type_line"],
                 "functional_tags_json": row["functional_tags_json"],
             }
@@ -306,9 +322,23 @@ def load_current_deck_cards(
         select_sql.append(column if column in columns else f"NULL AS {column}")
     for column, fallback in optional.items():
         select_sql.append(column if column in columns else fallback)
+    has_oracle_cache = sqlite_connection_has_table(conn, "card_oracle_cache")
+    mana_cost_sql = (
+        """
+               (
+                 SELECT mana_cost
+                 FROM card_oracle_cache coc
+                 WHERE coc.normalized_name = lower(deck_cards.card_name)
+                 LIMIT 1
+               ) AS mana_cost
+        """
+        if has_oracle_cache
+        else "'' AS mana_cost"
+    )
     rows = conn.execute(
         f"""
-        SELECT {", ".join(select_sql)}
+        SELECT {", ".join(select_sql)},
+               {mana_cost_sql}
         FROM deck_cards
         WHERE deck_id=?
         ORDER BY is_commander DESC, card_name
@@ -323,7 +353,7 @@ def load_current_deck_cards(
                 "card_name": row["card_name"],
                 "quantity": int(row["quantity"] or 1),
                 "functional_tag": row["functional_tag"],
-                "cmc": float(row["cmc"] or 0),
+                "cmc": safe_cmc_from_card(row),
                 "type_line": row["type_line"],
                 "is_commander": bool(row["is_commander"]),
                 "functional_tags_json": row["functional_tags_json"],

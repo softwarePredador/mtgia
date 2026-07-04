@@ -31,7 +31,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from master_optimizer_common import resolve_default_knowledge_db
+from master_optimizer_common import (
+    resolve_default_knowledge_db,
+    safe_cmc_from_card,
+    sqlite_connection_has_table,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -350,12 +354,22 @@ def _roles_from_deck_row(row: sqlite3.Row) -> set[str]:
 
 def load_deck_cards(conn: sqlite3.Connection, deck_ids: list[int]) -> dict[str, dict[str, Any]]:
     placeholders = ",".join("?" for _ in deck_ids)
+    if sqlite_connection_has_table(conn, "card_oracle_cache"):
+        from_sql = """
+        FROM deck_cards dc
+        LEFT JOIN card_oracle_cache coc
+          ON coc.normalized_name = lower(dc.card_name)
+        """
+        mana_cost_sql = "coc.mana_cost AS mana_cost"
+    else:
+        from_sql = "FROM deck_cards dc"
+        mana_cost_sql = "'' AS mana_cost"
     rows = conn.execute(
         f"""
-        SELECT *
-        FROM deck_cards
-        WHERE deck_id IN ({placeholders})
-        ORDER BY deck_id, is_commander DESC, card_name
+        SELECT dc.*, {mana_cost_sql}
+        {from_sql}
+        WHERE dc.deck_id IN ({placeholders})
+        ORDER BY dc.deck_id, dc.is_commander DESC, dc.card_name
         """,
         tuple(deck_ids),
     ).fetchall()
@@ -375,6 +389,7 @@ def load_deck_cards(conn: sqlite3.Connection, deck_ids: list[int]) -> dict[str, 
                 "roles": set(),
                 "is_commander": False,
                 "cmc": None,
+                "mana_cost": "",
                 "type_line": "",
                 "oracle_text": "",
                 "card_id": "",
@@ -385,8 +400,8 @@ def load_deck_cards(conn: sqlite3.Connection, deck_ids: list[int]) -> dict[str, 
         item["roles"].update(_roles_from_deck_row(row))
         item["is_commander"] = bool(item["is_commander"] or int(row["is_commander"] or 0))
         if item["cmc"] is None and row_has(row, "cmc"):
-            item["cmc"] = row["cmc"]
-        for column in ("type_line", "oracle_text", "card_id"):
+            item["cmc"] = safe_cmc_from_card(row)
+        for column in ("mana_cost", "type_line", "oracle_text", "card_id"):
             if row_has(row, column) and not item[column] and row[column]:
                 item[column] = str(row[column])
     for item in cards.values():

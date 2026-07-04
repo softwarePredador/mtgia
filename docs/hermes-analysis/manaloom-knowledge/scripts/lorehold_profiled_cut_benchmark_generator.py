@@ -20,7 +20,11 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import lorehold_synergy_package_gate as package_gate
-from master_optimizer_common import resolve_default_knowledge_db
+from master_optimizer_common import (
+    resolve_default_knowledge_db,
+    safe_cmc_from_card,
+    sqlite_connection_has_table,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -222,12 +226,23 @@ def current_deck_names(conn: sqlite3.Connection, deck_id: int) -> set[str]:
 
 
 def current_deck_metadata(conn: sqlite3.Connection, deck_id: int) -> dict[str, dict[str, Any]]:
-    rows = conn.execute(
+    if sqlite_connection_has_table(conn, "card_oracle_cache"):
+        from_sql = """
+        FROM deck_cards dc
+        LEFT JOIN card_oracle_cache coc
+          ON coc.normalized_name = lower(dc.card_name)
         """
-        SELECT card_name, functional_tag, functional_tags_json, cmc, type_line, oracle_text
-        FROM deck_cards
-        WHERE deck_id=?
-        ORDER BY card_name
+        mana_cost_sql = "coc.mana_cost AS mana_cost"
+    else:
+        from_sql = "FROM deck_cards dc"
+        mana_cost_sql = "'' AS mana_cost"
+    rows = conn.execute(
+        f"""
+        SELECT dc.card_name, dc.functional_tag, dc.functional_tags_json,
+               dc.cmc, dc.type_line, dc.oracle_text, {mana_cost_sql}
+        {from_sql}
+        WHERE dc.deck_id=?
+        ORDER BY dc.card_name
         """,
         (deck_id,),
     ).fetchall()
@@ -236,7 +251,7 @@ def current_deck_metadata(conn: sqlite3.Connection, deck_id: int) -> dict[str, d
             "card_name": row["card_name"],
             "functional_tag": row["functional_tag"],
             "functional_tags": json_list(row["functional_tags_json"]),
-            "cmc": float(row["cmc"] or 0),
+            "cmc": safe_cmc_from_card(row),
             "type_line": row["type_line"],
             "oracle_text": row["oracle_text"],
         }

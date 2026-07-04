@@ -19,7 +19,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from master_optimizer_common import resolve_default_knowledge_db
+from master_optimizer_common import (
+    resolve_default_knowledge_db,
+    safe_cmc_from_card,
+    sqlite_connection_has_table,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -150,13 +154,24 @@ def oracle_lane_override(row: dict[str, Any]) -> str | None:
 
 
 def load_deck_cards(conn: sqlite3.Connection, deck_id: int) -> list[dict[str, Any]]:
-    rows = conn.execute(
+    if sqlite_connection_has_table(conn, "card_oracle_cache"):
+        from_sql = """
+        FROM deck_cards dc
+        LEFT JOIN card_oracle_cache coc
+          ON coc.normalized_name = lower(dc.card_name)
         """
-        SELECT card_name, quantity, functional_tag, functional_tags_json,
-               type_line, oracle_text, cmc, is_commander
-        FROM deck_cards
-        WHERE deck_id=?
-        ORDER BY is_commander DESC, functional_tag, card_name
+        mana_cost_sql = "coc.mana_cost AS mana_cost"
+    else:
+        from_sql = "FROM deck_cards dc"
+        mana_cost_sql = "'' AS mana_cost"
+    rows = conn.execute(
+        f"""
+        SELECT dc.card_name, dc.quantity, dc.functional_tag, dc.functional_tags_json,
+               dc.type_line, dc.oracle_text, dc.cmc, dc.is_commander,
+               {mana_cost_sql}
+        {from_sql}
+        WHERE dc.deck_id=?
+        ORDER BY dc.is_commander DESC, dc.functional_tag, dc.card_name
         """,
         (deck_id,),
     ).fetchall()
@@ -168,7 +183,7 @@ def load_deck_cards(conn: sqlite3.Connection, deck_id: int) -> list[dict[str, An
             "functional_tags": json_list(row["functional_tags_json"]),
             "type_line": row["type_line"],
             "oracle_text": row["oracle_text"],
-            "cmc": float(row["cmc"] or 0),
+            "cmc": safe_cmc_from_card(row),
             "is_commander": bool(row["is_commander"]),
         }
         for row in rows

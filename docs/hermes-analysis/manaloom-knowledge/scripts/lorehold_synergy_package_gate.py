@@ -24,7 +24,12 @@ from pathlib import Path
 from typing import Any
 
 import battle_rule_registry
-from master_optimizer_common import normalize_name, resolve_default_knowledge_db
+from master_optimizer_common import (
+    normalize_name,
+    resolve_default_knowledge_db,
+    safe_cmc_from_card,
+    sqlite_connection_has_table,
+)
 from reviewed_battle_card_rules import DEFAULT_REVIEWED_RULES_PATH, load_reviewed_rule_rows
 
 
@@ -1744,8 +1749,23 @@ def tags_from_rules(rules: list[dict[str, Any]]) -> list[str]:
 
 
 def deck_cards(conn: sqlite3.Connection, deck_id: int) -> list[sqlite3.Row]:
+    if sqlite_connection_has_table(conn, "card_oracle_cache"):
+        from_sql = """
+        FROM deck_cards dc
+        LEFT JOIN card_oracle_cache coc
+          ON coc.normalized_name = lower(dc.card_name)
+        """
+        mana_cost_sql = "coc.mana_cost AS mana_cost"
+    else:
+        from_sql = "FROM deck_cards dc"
+        mana_cost_sql = "'' AS mana_cost"
     return conn.execute(
-        "SELECT * FROM deck_cards WHERE deck_id=? ORDER BY is_commander DESC, card_name",
+        f"""
+        SELECT dc.*, {mana_cost_sql}
+        {from_sql}
+        WHERE dc.deck_id=?
+        ORDER BY dc.is_commander DESC, dc.card_name
+        """,
         (deck_id,),
     ).fetchall()
 
@@ -1898,7 +1918,7 @@ def is_miracle_core_cut(row: sqlite3.Row) -> bool:
     type_line = str(row["type_line"] or "")
     oracle_text = str(row["oracle_text"] or "").lower()
     tag = str(row["functional_tag"] or "").lower()
-    cmc = float(row["cmc"] or 0)
+    cmc = safe_cmc_from_card(row)
     if name in MIRACLE_CORE_NAMES:
         return True
     if ("Instant" in type_line or "Sorcery" in type_line) and cmc >= 4:

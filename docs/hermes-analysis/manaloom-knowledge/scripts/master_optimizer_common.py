@@ -49,6 +49,17 @@ def sqlite_has_table(path: Path, table_name: str) -> bool:
     return bool(row)
 
 
+def sqlite_connection_has_table(conn: sqlite3.Connection, table_name: str) -> bool:
+    try:
+        row = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
+            (table_name,),
+        ).fetchone()
+    except sqlite3.Error:
+        return False
+    return bool(row)
+
+
 def resolve_default_knowledge_db() -> Path:
     env_path = os.environ.get("MANALOOM_KNOWLEDGE_DB")
     if env_path:
@@ -170,6 +181,68 @@ def utc_now() -> str:
 
 def normalize_name(name: str | None) -> str:
     return re.sub(r"\s+", " ", str(name or "").strip().lower())
+
+
+def parse_mana_cost_cmc(mana_cost: object) -> float | None:
+    value = str(mana_cost or "").strip()
+    if not value:
+        return None
+    total = 0.0
+    saw_symbol = False
+    for raw_symbol in re.findall(r"\{([^}]+)\}", value.upper()):
+        symbol = raw_symbol.strip()
+        if not symbol:
+            continue
+        saw_symbol = True
+        if symbol.isdigit():
+            total += int(symbol)
+            continue
+        if symbol in {"X", "Y", "Z"}:
+            continue
+        if symbol.startswith("2/"):
+            total += 2
+            continue
+        if "/" in symbol:
+            total += 1
+            continue
+        total += 1
+    return total if saw_symbol else None
+
+
+def _mapping_value(card: Any, key: str) -> Any:
+    if isinstance(card, dict):
+        return card.get(key)
+    try:
+        if hasattr(card, "keys") and key in card.keys():
+            return card[key]
+    except Exception:
+        return None
+    return None
+
+
+def raw_cmc_value(raw_cmc: object) -> float | None:
+    if raw_cmc is None:
+        return None
+    try:
+        parsed = float(raw_cmc)
+    except Exception:
+        return None
+    if parsed < 0:
+        return 0.0
+    return min(parsed, 999.0)
+
+
+def safe_cmc_from_card(card: Any, *, unknown_nonland_fallback: float = 99.0) -> float:
+    type_line = str(_mapping_value(card, "type_line") or "")
+    if "land" in type_line.lower():
+        return 0.0
+    parsed_cmc = raw_cmc_value(_mapping_value(card, "cmc"))
+    mana_cost_cmc = parse_mana_cost_cmc(_mapping_value(card, "mana_cost"))
+    if parsed_cmc is None:
+        return mana_cost_cmc if mana_cost_cmc is not None else unknown_nonland_fallback
+    if parsed_cmc == 0 and mana_cost_cmc is not None and mana_cost_cmc > 0:
+        return mana_cost_cmc
+    return parsed_cmc
 
 
 def load_dynamic_protected_cards(
