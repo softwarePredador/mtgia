@@ -1,0 +1,242 @@
+{
+  "artifact_type": "lorehold_pressure_micro_package_planner",
+  "blocked_cut_context": {
+    "protected_anchor_cuts": [
+      "Bender's Waterskin",
+      "Creative Technique",
+      "Molecule Man",
+      "The Mind Stone",
+      "The Scarlet Witch",
+      "Victory Chimes"
+    ],
+    "same_lane_only_cut_cards": [
+      "Bender's Waterskin",
+      "Creative Technique"
+    ],
+    "seed_safe_cuts": []
+  },
+  "candidate_cards": [
+    {
+      "card_name": "Guttersnipe",
+      "decision": "hypothesis_natural_trigger_signal_no_seed_safe_cut",
+      "lane": "pressure_payoff",
+      "natural_accessed_games": 2,
+      "natural_event_count": 9,
+      "natural_near_access_games": 1,
+      "natural_trigger_count": 7
+    },
+    {
+      "card_name": "Young Pyromancer",
+      "decision": "hypothesis_natural_trigger_signal_no_seed_safe_cut",
+      "lane": "pressure_payoff",
+      "natural_accessed_games": 1,
+      "natural_event_count": 10,
+      "natural_near_access_games": 1,
+      "natural_trigger_count": 6
+    },
+    {
+      "card_name": "Monastery Mentor",
+      "decision": "blocked_near_access_only_no_seed_safe_cut",
+      "lane": "pressure_payoff",
+      "natural_accessed_games": 0,
+      "natural_event_count": 0,
+      "natural_near_access_games": 1,
+      "natural_trigger_count": 0
+    },
+    {
+      "card_name": "Storm-Kiln Artist",
+      "decision": "hypothesis_natural_cast_signal_no_seed_safe_cut",
+      "lane": "pressure_payoff",
+      "natural_accessed_games": 2,
+      "natural_event_count": 2,
+      "natural_near_access_games": 2,
+      "natural_trigger_count": 0
+    }
+  ],
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "next_actions": [
+      "do_not_stage_or_battle_the_micro_package_until_seed_safe_cuts_exist",
+      "treat Guttersnipe and Young Pyromancer as the current smallest pressure hypothesis",
+      "preserve Bender's Waterskin and Creative Technique despite same-lane-only status",
+      "mine failed and winning 607 traces for a genuinely low-risk nonpressure cut slot"
+    ],
+    "promotion_allowed": false,
+    "reason": "The natural trigger signal is real for Guttersnipe and Young Pyromancer, but the active 607 cut model still has zero seed-safe cuts. The next valid work is cut-safety expansion or a separate full-shell contract, not a natural battle gate."
+  },
+  "deck_607_mutated": false,
+  "external_support": [
+    {
+      "learning": "Monastery Mentor, Young Pyromancer, Guttersnipe, and Storm-Kiln Artist are pressure payoffs for spell-heavy Lorehold shells, but this supports testing pressure lanes rather than overriding 607's protected miracle engine.",
+      "source": "GameTyrant Lorehold deck tech",
+      "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech"
+    },
+    {
+      "learning": "The current public commander page frames Lorehold through topdeck, spellslinger, discard, and burn tags. Pressure payoffs fit only if the topdeck and miracle axis is preserved.",
+      "source": "EDHREC Lorehold Commander page",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian"
+    },
+    {
+      "learning": "Lorehold's miracle plan depends on avoiding too many non-instant/sorcery duds and protecting topdeck manipulation, which makes creature pressure packages expensive unless cuts are proven safe.",
+      "source": "EDHREC Boros Miracles budget article",
+      "url": "https://edhrec.com/articles/lorehold-the-historian-boros-miracles-on-a-budget"
+    }
+  ],
+  "generated_at": "2026-07-04T22:30:27Z",
+  "micro_package_queue": [
+    {
+      "adds": [
+        "Guttersnipe",
+        "Young Pyromancer"
+      ],
+      "available_seed_safe_cut_count": 0,
+      "available_seed_safe_cuts": [],
+      "card_evidence": [
+        {
+          "card_name": "Guttersnipe",
+          "decision": "hypothesis_natural_trigger_signal_but_full_package_regressed_miracle",
+          "lane": "pressure_payoff",
+          "natural_accessed_games": 2,
+          "natural_cast_count": 0,
+          "natural_cost_count": 2,
+          "natural_event_counts": {
+            "cost_paid:Guttersnipe": 2,
+            "trigger_resolved:Guttersnipe": 7
+          },
+          "natural_near_access_games": 1,
+          "natural_trigger_count": 7
+        },
+        {
+          "card_name": "Young Pyromancer",
+          "decision": "hypothesis_natural_trigger_signal_but_full_package_regressed_miracle",
+          "lane": "pressure_payoff",
+          "natural_accessed_games": 1,
+          "natural_cast_count": 1,
+          "natural_cost_count": 2,
+          "natural_event_counts": {
+            "cost_paid:Young Pyromancer": 2,
+            "spell_cast:Young Pyromancer": 1,
+            "spell_resolved:Young Pyromancer": 1,
+            "trigger_resolved:Young Pyromancer": 6
+          },
+          "natural_near_access_games": 1,
+          "natural_trigger_count": 6
+        }
+      ],
+      "gate_ready": false,
+      "natural_event_count": 19,
+      "natural_trigger_count": 13,
+      "package_key": "pressure_natural_trigger_pair_guttersnipe_young_pyromancer",
+      "priority": 1,
+      "required_cut_count": 2,
+      "status": "blocked_no_seed_safe_cut"
+    },
+    {
+      "adds": [
+        "Guttersnipe"
+      ],
+      "available_seed_safe_cut_count": 0,
+      "available_seed_safe_cuts": [],
+      "card_evidence": [
+        {
+          "card_name": "Guttersnipe",
+          "decision": "hypothesis_natural_trigger_signal_but_full_package_regressed_miracle",
+          "lane": "pressure_payoff",
+          "natural_accessed_games": 2,
+          "natural_cast_count": 0,
+          "natural_cost_count": 2,
+          "natural_event_counts": {
+            "cost_paid:Guttersnipe": 2,
+            "trigger_resolved:Guttersnipe": 7
+          },
+          "natural_near_access_games": 1,
+          "natural_trigger_count": 7
+        }
+      ],
+      "gate_ready": false,
+      "natural_event_count": 9,
+      "natural_trigger_count": 7,
+      "package_key": "pressure_single_guttersnipe",
+      "priority": 2,
+      "required_cut_count": 1,
+      "status": "blocked_no_seed_safe_cut"
+    },
+    {
+      "adds": [
+        "Young Pyromancer"
+      ],
+      "available_seed_safe_cut_count": 0,
+      "available_seed_safe_cuts": [],
+      "card_evidence": [
+        {
+          "card_name": "Young Pyromancer",
+          "decision": "hypothesis_natural_trigger_signal_but_full_package_regressed_miracle",
+          "lane": "pressure_payoff",
+          "natural_accessed_games": 1,
+          "natural_cast_count": 1,
+          "natural_cost_count": 2,
+          "natural_event_counts": {
+            "cost_paid:Young Pyromancer": 2,
+            "spell_cast:Young Pyromancer": 1,
+            "spell_resolved:Young Pyromancer": 1,
+            "trigger_resolved:Young Pyromancer": 6
+          },
+          "natural_near_access_games": 1,
+          "natural_trigger_count": 6
+        }
+      ],
+      "gate_ready": false,
+      "natural_event_count": 10,
+      "natural_trigger_count": 6,
+      "package_key": "pressure_single_young_pyromancer",
+      "priority": 3,
+      "required_cut_count": 1,
+      "status": "blocked_no_seed_safe_cut"
+    },
+    {
+      "adds": [
+        "Monastery Mentor"
+      ],
+      "available_seed_safe_cut_count": 0,
+      "available_seed_safe_cuts": [],
+      "card_evidence": [
+        {
+          "card_name": "Monastery Mentor",
+          "decision": "hypothesis_natural_access_only_needs_smaller_package_or_safe_cut",
+          "lane": "pressure_payoff",
+          "natural_accessed_games": 0,
+          "natural_cast_count": 0,
+          "natural_cost_count": 0,
+          "natural_event_counts": {},
+          "natural_near_access_games": 1,
+          "natural_trigger_count": 0
+        }
+      ],
+      "gate_ready": false,
+      "natural_event_count": 0,
+      "natural_trigger_count": 0,
+      "package_key": "pressure_single_monastery_mentor_probe_only",
+      "priority": 4,
+      "required_cut_count": 1,
+      "status": "blocked_no_seed_safe_cut"
+    }
+  ],
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_reports": {
+    "pressure_decision": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_tradeoff_decision_synthesis_20260704_current.json",
+    "seed_safe_cut_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260704_role_tag_repair.json"
+  },
+  "status": "pressure_micro_package_no_gate_ready_keep_607",
+  "summary": {
+    "gate_ready_package_count": 0,
+    "natural_trigger_cards": [
+      "Guttersnipe",
+      "Young Pyromancer"
+    ],
+    "package_count": 4,
+    "promotion_allowed": false,
+    "same_lane_only_cut_count": 2,
+    "seed_safe_cut_ready_count": 0
+  }
+}

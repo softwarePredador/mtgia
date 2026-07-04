@@ -220,3 +220,14 @@ def test_markdown_surfaces_learning_model_and_sources(tmp_path):
     assert "Mana Vault is not blocked by Commander legality" in markdown
     assert "Pressure payoffs are valid hypotheses" in markdown
     assert "Scryfall The One Ring API" in markdown
+
+
+def test_default_pressure_report_prefers_micro_package_planner(tmp_path, monkeypatch):
+    report_dir = tmp_path
+    tradeoff = report_dir / "lorehold_pressure_tradeoff_decision_synthesis_20260704_current.json"
+    micro = report_dir / "lorehold_pressure_micro_package_planner_20260704_current.json"
+    tradeoff.write_text("{}\n", encoding="utf-8")
+    micro.write_text("{}\n", encoding="utf-8")
+    monkeypatch.setattr(synth, "REPORT_DIR", report_dir)
+
+    assert synth.default_pressure_report() == micro

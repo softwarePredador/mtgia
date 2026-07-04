@@ -155,7 +155,8 @@ def rel(path: Path) -> str:
         return str(path)
 
 
-def newest_report(pattern: str, fallback: Path, *, report_dir: Path = REPORT_DIR) -> Path:
+def newest_report(pattern: str, fallback: Path, *, report_dir: Path | None = None) -> Path:
+    report_dir = report_dir or REPORT_DIR
     matches = sorted(
         report_dir.glob(pattern),
         key=lambda path: (path.stat().st_mtime, path.name),
@@ -207,6 +208,12 @@ def default_payoff_report() -> Path:
 
 
 def default_pressure_report() -> Path:
+    micro = newest_report(
+        "lorehold_pressure_micro_package_planner_20260704*.json",
+        REPORT_DIR / "lorehold_pressure_micro_package_planner_20260704_current.json",
+    )
+    if micro.exists():
+        return micro
     return newest_report(
         "lorehold_pressure_tradeoff_decision_synthesis_20260704*.json",
         REPORT_DIR / "lorehold_pressure_tradeoff_decision_synthesis_20260704_current.json",
