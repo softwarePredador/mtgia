@@ -1,0 +1,225 @@
+{
+  "artifact_type": "lorehold_miracle_access_first_preflight",
+  "candidate_preflight_assessments": [
+    {
+      "anchor_access_delta_to_floor": {
+        "Land Tax": -1,
+        "Library of Leng": 1,
+        "Lorehold, the Historian": 1,
+        "Scroll Rack": 0,
+        "Sensei's Divining Top": -1,
+        "The Mind Stone": -1,
+        "Urza's Saga": 0
+      },
+      "blockers": [
+        "aggregate_topdeck_anchor_access_regressed",
+        "head_to_head_vs_607_not_won_or_tied",
+        "land_tax_access_below_607_floor",
+        "lorehold_cost_paid_below_607_floor",
+        "lorehold_spell_cast_below_607_floor",
+        "pressure_card_use_not_observed",
+        "pressure_causality_unproven",
+        "pressure_conversion_not_proven",
+        "senseis_divining_top_access_below_607_floor",
+        "the_mind_stone_access_below_607_floor",
+        "topdeck_manipulation_activated_below_607_floor"
+      ],
+      "candidate_key": "challenger_lorehold_spell_pressure_mana_conversion_deoverfill_v1",
+      "candidate_record": {
+        "games": 4,
+        "losses": 3,
+        "stalls": 0,
+        "wins": 1
+      },
+      "fast_pressure_slice": {
+        "games": 1,
+        "losses": 0,
+        "stalls": 0,
+        "wins": 1
+      },
+      "head_to_head_vs_607": {
+        "games": 1,
+        "losses": 1,
+        "stalls": 0,
+        "wins": 0
+      },
+      "preflight_status": "blocked_before_next_gate",
+      "ready_for_next_gate": false,
+      "source_gate": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260704_spell_pressure_mana_conversion_deoverfill_fixed607_gate.json",
+      "strategic_delta_to_floor": {
+        "lorehold_cost_paid": -2,
+        "lorehold_spell_cast": -1,
+        "lorehold_upkeep_rummage": 8,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": -1
+      },
+      "warnings": []
+    },
+    {
+      "anchor_access_delta_to_floor": {
+        "Land Tax": -1,
+        "Library of Leng": 1,
+        "Lorehold, the Historian": 0,
+        "Scroll Rack": -1,
+        "Sensei's Divining Top": -1,
+        "The Mind Stone": -1,
+        "Urza's Saga": -1
+      },
+      "blockers": [
+        "aggregate_topdeck_anchor_access_regressed",
+        "fast_pressure_slice_regressed",
+        "head_to_head_vs_607_not_won_or_tied",
+        "land_tax_access_below_607_floor",
+        "lorehold_cost_paid_below_607_floor",
+        "lorehold_spell_cast_below_607_floor",
+        "lorehold_upkeep_rummage_below_607_floor",
+        "miracle_cast_below_607_floor",
+        "miracle_trace_missing",
+        "pressure_card_use_not_observed",
+        "pressure_causality_unproven",
+        "scroll_rack_access_below_607_floor",
+        "senseis_divining_top_access_below_607_floor",
+        "the_mind_stone_access_below_607_floor",
+        "topdeck_activation_missing",
+        "topdeck_manipulation_activated_below_607_floor",
+        "urzas_saga_access_below_607_floor"
+      ],
+      "candidate_key": "challenger_lorehold_spell_volume_access_depressure_v1",
+      "candidate_record": {
+        "games": 4,
+        "losses": 4,
+        "stalls": 0,
+        "wins": 0
+      },
+      "fast_pressure_slice": {
+        "games": 1,
+        "losses": 1,
+        "stalls": 0,
+        "wins": 0
+      },
+      "head_to_head_vs_607": {
+        "games": 1,
+        "losses": 1,
+        "stalls": 0,
+        "wins": 0
+      },
+      "preflight_status": "blocked_before_next_gate",
+      "ready_for_next_gate": false,
+      "source_gate": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260704_spell_volume_access_depressure_fixed607_gate.json",
+      "strategic_delta_to_floor": {
+        "lorehold_cost_paid": -8,
+        "lorehold_spell_cast": -9,
+        "lorehold_upkeep_rummage": -1,
+        "miracle_cast": -4,
+        "topdeck_manipulation_activated": -5
+      },
+      "warnings": []
+    }
+  ],
+  "contract": {
+    "protected_anchors_not_negotiable_without_proof": [
+      "Bender's Waterskin",
+      "Creative Technique",
+      "Land Tax",
+      "Library of Leng",
+      "Lorehold, the Historian",
+      "Mizzix's Mastery",
+      "Molecule Man",
+      "Scroll Rack",
+      "Sensei's Divining Top",
+      "Storm Herd",
+      "The Mind Stone",
+      "The Scarlet Witch",
+      "Victory Chimes"
+    ],
+    "required_before_next_natural_gate": [
+      "declare the repaired failure mode before building the shell",
+      "retain protected anchors or provide same-lane replacement proof before battle",
+      "meet or exceed the current 607 miracle/topdeck strategic floors in the same seed window",
+      "meet or exceed current 607 natural access to topdeck anchors",
+      "show pressure or mana conversion only after the miracle/topdeck floor is preserved",
+      "tie or beat fixed deck_607 head-to-head and avoid fast-pressure regression"
+    ],
+    "why_this_exists": "Recent shells looked coherent structurally but either lost the fixed-607 head-to-head, regressed topdeck anchor access, or failed to prove pressure causality. This preflight prevents another natural gate from repeating the same unproven premise."
+  },
+  "decision": {
+    "allow_new_natural_gate_now": false,
+    "keep_607_as_protected_baseline": true,
+    "next_action": "design_new_shell_or_package_that_first_satisfies_miracle_access_floors"
+  },
+  "deck_607_mutated": false,
+  "external_research_refresh": [
+    {
+      "preflight_use": "Legality, singleton, and color identity are prerequisite gates only.",
+      "source": "Wizards Commander format",
+      "url": "https://magic.wizards.com/en/formats/commander"
+    },
+    {
+      "preflight_use": "Current public Lorehold lists are tagged around Topdeck and Spellslinger, so the next shell must preserve that plan before adding pressure.",
+      "source": "EDHREC optimized Topdeck Lorehold page",
+      "url": "https://edhrec.com/decks/lorehold-the-historian/optimized/topdeck"
+    },
+    {
+      "preflight_use": "Lorehold's opponent-upkeep rummage creates first-draw miracle windows; top-library setup is the engine floor.",
+      "source": "EDHREC Miracles Every Turn with Lorehold",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander"
+    },
+    {
+      "preflight_use": "Instant/sorcery density and non-dud first draws matter more than generic value-card insertion.",
+      "source": "EDHREC Boros Miracles on a Budget",
+      "url": "https://edhrec.com/articles/lorehold-the-historian-boros-miracles-on-a-budget"
+    }
+  ],
+  "generated_at": "2026-07-04T23:55:14Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_trace_failure_miner_20260704_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260704_spell_pressure_mana_conversion_deoverfill_fixed607_gate.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260704_spell_volume_access_depressure_fixed607_gate.json"
+  ],
+  "status": "no_current_candidate_passes_miracle_access_first_preflight",
+  "summary": {
+    "anchor_access_floors_from_607": {
+      "Land Tax": 1,
+      "Library of Leng": 0,
+      "Lorehold, the Historian": 3,
+      "Scroll Rack": 1,
+      "Sensei's Divining Top": 2,
+      "The Mind Stone": 2,
+      "Urza's Saga": 1
+    },
+    "blocking_reasons": [
+      "aggregate_topdeck_anchor_access_regressed",
+      "fast_pressure_slice_regressed",
+      "head_to_head_vs_607_not_won_or_tied",
+      "land_tax_access_below_607_floor",
+      "lorehold_cost_paid_below_607_floor",
+      "lorehold_spell_cast_below_607_floor",
+      "lorehold_upkeep_rummage_below_607_floor",
+      "miracle_cast_below_607_floor",
+      "miracle_trace_missing",
+      "pressure_card_use_not_observed",
+      "pressure_causality_unproven",
+      "pressure_conversion_not_proven",
+      "scroll_rack_access_below_607_floor",
+      "senseis_divining_top_access_below_607_floor",
+      "the_mind_stone_access_below_607_floor",
+      "topdeck_activation_missing",
+      "topdeck_manipulation_activated_below_607_floor",
+      "urzas_saga_access_below_607_floor"
+    ],
+    "candidate_count": 2,
+    "gate_ready_now_count": 0,
+    "keep_607_as_protected_baseline": true,
+    "preflight_contract": "miracle_access_first_shell_v1",
+    "promotion_allowed": false,
+    "strategic_floors_from_607": {
+      "lorehold_cost_paid": 27,
+      "lorehold_spell_cast": 22,
+      "lorehold_upkeep_rummage": 5,
+      "miracle_cast": 4,
+      "topdeck_manipulation_activated": 5
+    }
+  }
+}
