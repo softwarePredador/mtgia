@@ -309,10 +309,69 @@ Post-PG379 update:
   returned `proposal_count=0` over `7731` considered supported rows.
 - delta since post-PG378: `5` identities promoted.
 
+Post-PG380 update:
+
+- source artifacts:
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_pg380_activated_draw_discard_new_server.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg380_activated_draw_discard_new_server_package_package.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg380_activated_draw_discard_new_server_e2e.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg380_activated_draw_discard_new_server_commander_legal.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg380_activated_draw_discard_new_server_supported_recheck.md`
+- promoted family:
+  - `xmage_permanent_simple_activated_draw_discard_v1` for `15` exact
+    `DrawDiscardControllerEffect + SimpleActivatedAbility` permanents:
+    `Bloodfire Mentor`, `Captain of Umbar`, `Dragonborn Looter`,
+    `Emmessi Tome`, `Erratic Visionary`, `Facet Reader`,
+    `Hapless Researcher`, `Jalum Tome`, `Magus of the Bazaar`,
+    `Merfolk Looter`, `Research Assistant`, `Soothsayer Adept`,
+    `Teferi's Protege`, `Thought Courier`, and `Unfulfilled Desires`.
+- implementation change:
+  - the runtime now executes generic `activated_draw_discard` permanents,
+    including cost payment, draw, discard, discard-trigger resolution, and
+    source self-sacrifice.
+  - the exact-scope splitter now admits only fixed draw/discard counts with
+    supported mana/tap/life/source-sacrifice activation costs; `Maestros
+    Initiate` remains blocked as
+    `activated_draw_discard_oracle_cost_not_supported`.
+  - package E2E expected-field checks now include activated ability fields, so
+    runtime validation checks counts/cost/tap/sacrifice semantics, not only
+    scope.
+- target battle-gap identities in authoritative queue: `26959`
+- XMage authoritative source resolved: `26645`
+- XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26645`
+- adapter work-unit keys: `11429`
+- final supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg380_activated_draw_discard_new_server_supported_recheck.md`
+  returned `proposal_count=0` over `7732` considered supported rows.
+- final audits:
+  - strategy consistency:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg380_activated_draw_discard_new_server.md`
+    -> `status=pass`, `26/26` pass.
+  - operational surface alignment:
+    `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg380_activated_draw_discard_new_server.md`
+    -> `status=pass`.
+  - legacy contamination:
+    `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg380_activated_draw_discard_new_server.md`
+    -> `status=pass`.
+  - PG-Hermes-SQLite contract:
+    `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg380_clean_new_server.md`
+    -> `status=pass`, `50/50` pass.
+- contract cleanup:
+  - backfilled missing `oracle_hash` on the new PostgreSQL target for the
+    trusted executable curated rules of `Angel's Grace` and `Seething Song`
+    from `cards.oracle_text`.
+  - synced those rules back to Hermes/SQLite.
+  - linked SQLite deck `607` to PostgreSQL deck
+    `8938b746-1a9e-46ce-b0d9-c2ec932ddddd` after exact 94-row/100-card parity
+    comparison.
+- delta since post-PG379: `15` identities promoted.
+
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG379 queue above.
+historical only. The active execution baseline is the post-PG380 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -320,13 +379,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG379 control numbers:
+Current post-PG380 control numbers:
 
-- target battle-gap identities: `26974`
-- XMage-resolved authoritative source identities: `26660`
+- target battle-gap identities: `26959`
+- XMage-resolved authoritative source identities: `26645`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26660`
+- XMage authoritative adapter required: `26645`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -346,13 +405,13 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG379, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg380_activated_draw_discard_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG380, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
    `recursion::xmage_graveyard_return_variant_review_v1` (`1822`),
-   `draw_engine::xmage_draw_card_variant_review_v1` (`1634`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
    `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
    (`1114`), `direct_damage::targeted_damage_variant_v1` (`901`), and
    `add_counters::source_add_counters_variant_v1` (`795`).
@@ -486,6 +545,26 @@ PG379 completion and PG380 starting hypothesis:
 5. The largest remaining work units are now:
    `recursion::xmage_graveyard_return_variant_review_v1` (`1822`),
    `draw_engine::xmage_draw_card_variant_review_v1` (`1634`),
+   `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`901`), and
+   `add_counters::source_add_counters_variant_v1` (`795`).
+
+PG380 completion and PG381 starting hypothesis:
+
+1. PG380 promoted `15` exact permanent activated draw-discard rules on the new
+   server after adding
+   `xmage_permanent_simple_activated_draw_discard_v1` to mapper/runtime/tests.
+2. Tests passed: splitter `309`, exact runtime `183`, package builder,
+   py_compile, and E2E package validation `status=pass`.
+3. Post-PG380 governance passed with strategy consistency `26/26`,
+   operational surface `pass`, legacy contamination `pass`, and
+   PG-Hermes-SQLite contract `50/50` pass against the new server.
+4. The post-PG380 supported splitter returns `0` batch-safe proposals, so PG381
+   must implement another narrow subpattern before PostgreSQL package
+   generation.
+5. The largest remaining work units are now:
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1822`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
    `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
    (`1114`), `direct_damage::targeted_damage_variant_v1` (`901`), and
    `add_counters::source_add_counters_variant_v1` (`795`).
@@ -778,12 +857,12 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG368 authoritative queue unless a newer queue exists:
+Use the post-PG380 authoritative queue unless a newer queue exists:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1826`
-2. `draw_engine::xmage_draw_card_variant_review_v1` - `1634`
-3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
-4. `direct_damage::targeted_damage_variant_v1` - `906`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1822`
+2. `draw_engine::xmage_draw_card_variant_review_v1` - `1619`
+3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
+4. `direct_damage::targeted_damage_variant_v1` - `901`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `740`
 7. `draw_cards::xmage_draw_card_variant_review_v1` - `676`

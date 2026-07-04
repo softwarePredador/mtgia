@@ -145,6 +145,7 @@ STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_gra
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
 STATIC_GRAVEYARD_COUNT_BOOST_SCOPE = "xmage_static_source_boost_equal_graveyard_count_v1"
 PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
+PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE = "xmage_permanent_simple_activated_draw_discard_v1"
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
@@ -3623,6 +3624,16 @@ def is_permanent_activated_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_draw_discard_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DrawDiscardControllerEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "activated_ability" in set(row.get("xmage_signals") or [])
+    )
+
+
 def is_permanent_activated_damage_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DAMAGE_UNIT:
         return False
@@ -4298,6 +4309,76 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
     if activation.get("activation_requires_sacrifice") and sacrifice_target:
         return "activated_draw_oracle_cost_not_supported"
     activation["count"] = count
+    if life_cost:
+        activation["activation_life_cost"] = life_cost
+    if sacrifice_target:
+        activation["activation_sacrifice_target"] = sacrifice_target
+        activation["activation_requires_sacrifice_target"] = True
+    return activation
+
+
+def number_word_to_int(value: str) -> int:
+    normalized = str(value or "").strip().lower()
+    words = {"a": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5}
+    return words.get(normalized, int(normalized) if normalized.isdigit() else 0)
+
+
+def activated_draw_discard_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return "activated_draw_discard_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    match = re.fullmatch(
+        r"draw (a|one|two|three|four|five|\d+) cards?, then discard "
+        r"(a|one|two|three|four|five|\d+) cards?\.?",
+        effect_text,
+    )
+    if not match:
+        return "activated_draw_discard_oracle_not_simple"
+    draw_count = number_word_to_int(match.group(1))
+    discard_count = number_word_to_int(match.group(2))
+    if draw_count <= 0 or discard_count <= 0:
+        return "activated_draw_discard_oracle_not_simple"
+
+    normalized_cost = cost_text
+    life_cost = 0
+    life_pattern = r"(?:^|,\s*)pay (?P<life>\d+) life(?:\s*,?|$)"
+    life_matches = list(re.finditer(life_pattern, normalized_cost))
+    if len(life_matches) > 1:
+        return "activated_draw_discard_oracle_cost_not_supported"
+    if life_matches:
+        life_cost = int(life_matches[0].group("life"))
+        normalized_cost = re.sub(life_pattern, ",", normalized_cost).strip(" ,")
+
+    sacrifice_target = None
+    sacrifice_pattern = (
+        r"(?:^|,\s*)sacrifice (?P<phrase>"
+        r"(?:an?|another) (?:artifact or creature|artifact or land|creature or land|"
+        r"nontoken permanent|non-token permanent|token|creature|artifact|enchantment|land|permanent)"
+        r")(?:\s*,?|$)"
+    )
+    sacrifice_matches = list(re.finditer(sacrifice_pattern, normalized_cost))
+    if len(sacrifice_matches) > 1:
+        return "activated_draw_discard_oracle_cost_not_supported"
+    if sacrifice_matches:
+        sacrifice_target = activation_sacrifice_target_from_phrase(sacrifice_matches[0].group("phrase"))
+        if sacrifice_target is None:
+            return "activated_draw_discard_oracle_cost_not_supported"
+        normalized_cost = re.sub(sacrifice_pattern, ",", normalized_cost).strip(" ,")
+
+    source_name = str(metadata.get("name") or "").split("//", 1)[0].strip().lower()
+    if source_name:
+        source_name_pattern = re.escape(source_name)
+        if re.fullmatch(rf"sacrifice {source_name_pattern}", normalized_cost):
+            normalized_cost = "sacrifice this permanent"
+
+    activation = activation_cost_from_oracle_prefix(normalized_cost, allow_source_sacrifice=True)
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_draw_discard")
+    if activation.get("activation_requires_sacrifice") and sacrifice_target:
+        return "activated_draw_discard_oracle_cost_not_supported"
+    activation["draw_count"] = draw_count
+    activation["discard_count"] = discard_count
     if life_cost:
         activation["activation_life_cost"] = life_cost
     if sacrifice_target:
@@ -5555,6 +5636,112 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
         return "activated_draw_source_cost_not_supported"
     return {
         "count": count,
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": requires_tap,
+        "activation_requires_sacrifice": requires_sacrifice,
+        **({"activation_life_cost": life_cost} if life_cost else {}),
+        **(
+            {
+                "activation_sacrifice_target": sacrifice_target,
+                "activation_requires_sacrifice_target": True,
+            }
+            if sacrifice_target
+            else {}
+        ),
+    }
+
+
+def draw_discard_counts_from_source(source: str) -> tuple[int, int] | str:
+    matches = re.findall(r"DrawDiscardControllerEffect\s*\(([^)]*)\)", source or "")
+    if len(matches) != 1:
+        return "activated_draw_discard_source_count_not_fixed"
+    raw_args = [part.strip() for part in matches[0].split(",") if part.strip()]
+    if not raw_args:
+        return 1, 1
+    if len(raw_args) == 1:
+        if raw_args[0].lower() == "false":
+            return 1, 1
+        return "activated_draw_discard_source_optional_not_supported"
+    if len(raw_args) == 2 and all(arg.isdigit() for arg in raw_args):
+        draw_count = int(raw_args[0])
+        discard_count = int(raw_args[1])
+    elif (
+        len(raw_args) == 3
+        and raw_args[0].isdigit()
+        and raw_args[1].isdigit()
+        and raw_args[2].lower() in {"true", "false"}
+    ):
+        if raw_args[2].lower() == "true":
+            return "activated_draw_discard_source_optional_not_supported"
+        draw_count = int(raw_args[0])
+        discard_count = int(raw_args[1])
+    else:
+        return "activated_draw_discard_source_count_not_fixed"
+    if draw_count <= 0 or discard_count <= 0:
+        return "activated_draw_discard_source_count_not_fixed"
+    return draw_count, discard_count
+
+
+def activated_draw_discard_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "Zone.GRAVEYARD" in text:
+        return "activated_draw_discard_source_not_battlefield"
+    counts = draw_discard_counts_from_source(text)
+    if isinstance(counts, str):
+        return counts
+    draw_count, discard_count = counts
+    effect_index = text.find("DrawDiscardControllerEffect")
+    window = text[max(0, effect_index - 500) : effect_index + 1800]
+    risky_cost_classes = {
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+        "TapTargetCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_draw_discard_source_cost_not_supported"
+    if "SimpleActivatedAbility" not in window:
+        return "activated_draw_discard_source_not_simple_activated"
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    if mana_match:
+        cost_text = mana_match.group(1)
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_draw_discard_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    requires_tap = "TapSourceCost" in window
+    requires_sacrifice = "SacrificeSourceCost" in window
+    life_cost = None
+    life_matches = re.findall(r"PayLifeCost\s*\(\s*(\d+)\s*\)", window)
+    if len(life_matches) > 1:
+        return "activated_draw_discard_source_cost_not_supported"
+    if life_matches:
+        life_cost = int(life_matches[0])
+    sacrifice_target = None
+    if "SacrificeTargetCost" in window:
+        sacrifice_cost_constructors = re.findall(r"new\s+SacrificeTargetCost\s*\(", window)
+        if len(sacrifice_cost_constructors) > 1:
+            return "activated_draw_discard_source_cost_not_supported"
+        sacrifice_target = activation_sacrifice_target_from_source(text, window)
+        if sacrifice_target is None:
+            return "activated_draw_discard_source_cost_not_supported"
+    if requires_sacrifice and sacrifice_target:
+        return "activated_draw_discard_source_cost_not_supported"
+    return {
+        "draw_count": draw_count,
+        "discard_count": discard_count,
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
@@ -7015,6 +7202,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated destroy-target ability"
     elif scope == PERMANENT_ACTIVATED_DRAW_SCOPE:
         scope_kind = "permanent with a simple activated draw ability"
+    elif scope == PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE:
+        scope_kind = "permanent with a simple activated draw-then-discard ability"
     elif scope == SPELL_CAST_DRAW_ENGINE_SCOPE:
         scope_kind = "permanent with a triggered draw ability on casting matching spells"
     elif scope == RECURSION_BATTLEFIELD_ALL_SCOPE:
@@ -7096,6 +7285,7 @@ def split_row(
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
     dies_draw_creature_unit = is_creature_dies_draw_unit(row)
     spell_cast_draw_engine_unit = is_spell_cast_draw_engine_unit(row)
+    permanent_activated_draw_discard_unit = is_permanent_activated_draw_discard_unit(row)
     dies_recursion_creature_unit = is_creature_dies_recursion_unit(row)
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
@@ -7143,6 +7333,7 @@ def split_row(
         and not etb_draw_creature_unit
         and not dies_draw_creature_unit
         and not spell_cast_draw_engine_unit
+        and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
@@ -7183,6 +7374,7 @@ def split_row(
         and not etb_draw_creature_unit
         and not dies_draw_creature_unit
         and not spell_cast_draw_engine_unit
+        and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
@@ -7276,6 +7468,65 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_draw",
+        ), "selected_exact_scope"
+
+    if permanent_activated_draw_discard_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_draw_discard_not_permanent"
+        oracle_activation = activated_draw_discard_from_oracle(metadata)
+        if isinstance(oracle_activation, str):
+            return None, oracle_activation
+        parsed_activation = activated_draw_discard_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        for key in (
+            "draw_count",
+            "discard_count",
+            "activation_cost_mana",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "activation_requires_tap",
+            "activation_requires_sacrifice",
+            "activation_life_cost",
+            "activation_sacrifice_target",
+        ):
+            if parsed_activation.get(key) != oracle_activation.get(key):
+                return None, "activated_draw_discard_source_oracle_mismatch"
+        draw_count = int(oracle_activation["draw_count"])
+        discard_count = int(oracle_activation["discard_count"])
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_type = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": "draw_engine",
+            "battle_model_scope": PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "draw_discard",
+            "activated_draw_discard": True,
+            "activated_draw_count": draw_count,
+            "activated_discard_count": discard_count,
+            "draw_count": draw_count,
+            "discard_count": discard_count,
+            "count": draw_count,
+            "permanent_type": permanent_type,
+            "xmage_effect_class": "DrawDiscardControllerEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **parsed_activation,
+        }
+        if parsed_activation.get("activation_requires_sacrifice"):
+            effect_json["activated_self_sacrifice_draw_discard"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_draw_discard",
         ), "selected_exact_scope"
 
     if spell_cast_draw_engine_unit:
@@ -10856,6 +11107,7 @@ def build_exact_split_report(
             and not is_creature_etb_draw_unit(row)
             and not is_creature_dies_draw_unit(row)
             and not is_spell_cast_draw_engine_unit(row)
+            and not is_permanent_activated_draw_discard_unit(row)
             and not is_creature_etb_damage_unit(row)
             and not is_creature_etb_graveyard_to_library_unit(row)
             and not is_creature_etb_library_pick_unit(row)
@@ -10919,6 +11171,7 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and SpellCastControllerTriggeredAbility, exact draw count, and supported spell filters",
+                "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",

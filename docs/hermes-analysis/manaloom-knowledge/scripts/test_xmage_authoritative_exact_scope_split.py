@@ -1536,6 +1536,119 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_draw_oracle_not_simple")
 
+    def test_permanent_activated_draw_discard_maps_simple_tap_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawDiscardControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Looter",
+                type_line="Creature - Merfolk Rogue",
+                oracle_text="{T}: Draw a card, then discard a card.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleActivatedAbility(
+                    new DrawDiscardControllerEffect(), new TapSourceCost()));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE)
+        self.assertTrue(effect["activated_draw_discard"])
+        self.assertEqual(effect["activated_draw_count"], 1)
+        self.assertEqual(effect["activated_discard_count"], 1)
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_draw_discard_maps_fixed_counts_and_life_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawDiscardControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Desires",
+                type_line="Enchantment",
+                oracle_text="{1}, Pay 1 life: Draw two cards, then discard three cards.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DrawDiscardControllerEffect(2, 3), new ManaCostsImpl<>("{1}")
+                );
+                ability.addCost(new PayLifeCost(1));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE)
+        self.assertEqual(effect["activated_draw_count"], 2)
+        self.assertEqual(effect["activated_discard_count"], 3)
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_life_cost"], 1)
+
+    def test_permanent_activated_draw_discard_maps_self_sacrifice_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawDiscardControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Researcher",
+                type_line="Creature - Human Wizard",
+                oracle_text="Sacrifice Fixture Researcher: Draw a card, then discard a card.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleActivatedAbility(
+                    new DrawDiscardControllerEffect(), new SacrificeSourceCost()));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE)
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertTrue(effect["activated_self_sacrifice_draw_discard"])
+
+    def test_permanent_activated_draw_discard_blocks_optional_effect(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawDiscardControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Optional Looter",
+                type_line="Creature - Wizard",
+                oracle_text="{T}: You may draw a card. If you do, discard a card.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleActivatedAbility(
+                    new DrawDiscardControllerEffect(true), new TapSourceCost()));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_draw_discard_oracle_not_simple")
+
     def test_spell_cast_draw_engine_maps_creature_spell_filter(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

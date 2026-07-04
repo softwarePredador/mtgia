@@ -187,21 +187,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg378_target_keyword_constraints_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg380_activated_draw_discard_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg380_activated_draw_discard_new_server.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26974`
-- XMage authoritative source resolved: `26660`
+- target all-card battle-gap identities: `26959`
+- XMage authoritative source resolved: `26645`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26660`
+- XMage authoritative adapter required: `26645`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26660` identities, card semantics are accepted from XMage; work is now
+- For `26645` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -220,10 +222,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG379 Exact Adapter Waves
+## PG283-PG380 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG379 all-card exact adapter waves are applied and
-synced. PG375-PG379 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG380 all-card exact adapter waves are applied and
+synced. PG375-PG380 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -5857,6 +5859,48 @@ PG379 measured result:
   `proposal_count=0` over `7731` considered supported rows. The next cycle must
   implement another exact mapper/runtime subpattern before package generation.
 
+PG380 measured result:
+
+- PG380 promoted `15` permanent activated draw-then-discard rules with exact
+  local XMage `DrawDiscardControllerEffect + SimpleActivatedAbility` support on
+  the new server: `Bloodfire Mentor`, `Captain of Umbar`, `Dragonborn Looter`,
+  `Emmessi Tome`, `Erratic Visionary`, `Facet Reader`, `Hapless Researcher`,
+  `Jalum Tome`, `Magus of the Bazaar`, `Merfolk Looter`,
+  `Research Assistant`, `Soothsayer Adept`, `Teferi's Protege`,
+  `Thought Courier`, and `Unfulfilled Desires`.
+- The splitter now admits only exact permanent activated draw-discard rows with
+  fixed draw/discard counts and supported mana, tap, life, or source
+  self-sacrifice costs. `Maestros Initiate` remains blocked as
+  `activated_draw_discard_oracle_cost_not_supported`.
+- The runtime now executes generic `activated_draw_discard` permanents by
+  paying costs, drawing, discarding, resolving discard triggers, and emitting
+  `simple_activated_draw_discard`.
+- Focused splitter tests passed with `309` tests; focused exact runtime tests
+  passed with `183` tests; package-builder tests and py_compile passed.
+- PostgreSQL precheck matched `15/15` target card rows on the new server; apply
+  upserted `15` rows and deprecated `0` shadows; postcheck verified `15/15`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `3932` PostgreSQL rows from the new target,
+  updated `4933` SQLite rows, and exported `5091` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `15/15` cards.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `50/50` pass.
+- Contract cleanup in the same closeout backfilled missing `oracle_hash` for
+  the trusted executable curated rules of `Angel's Grace` and `Seething Song`
+  from `cards.oracle_text`, synced those rows back to Hermes/SQLite, and linked
+  SQLite deck `607` to PostgreSQL deck
+  `8938b746-1a9e-46ce-b0d9-c2ec932ddddd` after exact 94-row/100-card parity
+  comparison.
+- Global all-card authoritative queue after PG380:
+  `target_identity_count=26959`, `xmage_authoritative_source_count=26645`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26645`.
+- Running the exact splitter after PG380 on supported units returned
+  `proposal_count=0` over `7732` considered supported rows. The next cycle must
+  implement another exact mapper/runtime subpattern before package generation.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -6487,11 +6531,11 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG379 queue on the new server, the next exact runtime-backed work should
+post-PG380 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1822`
-2. `draw_engine::xmage_draw_card_variant_review_v1` - `1634`
+2. `draw_engine::xmage_draw_card_variant_review_v1` - `1619`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `901`
 5. `add_counters::source_add_counters_variant_v1` - `795`

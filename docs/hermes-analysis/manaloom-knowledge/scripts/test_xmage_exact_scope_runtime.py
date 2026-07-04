@@ -1541,6 +1541,159 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_draw_discard_permanent_draws_then_discards(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Fresh Card", "cmc": 2}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand.append({"name": "Expensive Spell", "cmc": 7, "type_line": "Sorcery"})
+        active.mana_pool.add("blue", 1)
+        permanent = {
+            "name": "Fixture Looter",
+            "type_line": "Creature - Merfolk Rogue",
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+            "activated_draw_discard": True,
+            "activated_draw_count": 1,
+            "activated_discard_count": 1,
+            "activation_cost_mana": "{U}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["U"],
+            "activation_requires_tap": True,
+            "summoning_sick": False,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=7,
+            rng=random.Random(7),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertEqual(len(active.hand), 1)
+        self.assertEqual(len(active.library), 0)
+        self.assertEqual(len(active.graveyard), 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "utility_artifact_activated"
+                and data.get("activation_kind") == "simple_activated_draw_discard"
+                and data.get("card") == "Fixture Looter"
+                and data.get("cards_drawn") == 1
+                and data.get("cards_discarded") == 1
+                and data.get("activation_cost") == "{U}"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_draw_discard_can_discard_drawn_card_with_empty_hand(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Fresh Card", "cmc": 2}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("blue", 1)
+        permanent = {
+            "name": "Fixture Looter",
+            "type_line": "Creature - Merfolk Rogue",
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+            "activated_draw_discard": True,
+            "activated_draw_count": 1,
+            "activated_discard_count": 1,
+            "activation_cost_mana": "{U}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["U"],
+            "activation_requires_tap": True,
+            "summoning_sick": False,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=7,
+            rng=random.Random(17),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(len(active.hand), 0)
+        self.assertEqual(len(active.library), 0)
+        self.assertEqual([card.get("name") for card in active.graveyard], ["Fresh Card"])
+        self.assertTrue(permanent.get("tapped"))
+        self.assertTrue(
+            any(
+                event == "utility_artifact_activated"
+                and data.get("activation_kind") == "simple_activated_draw_discard"
+                and data.get("cards_drawn") == 1
+                and data.get("cards_discarded") == 1
+                and data.get("discarded") == ["Fresh Card"]
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_draw_discard_self_sacrifice_moves_source_to_graveyard(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Fresh Card", "cmc": 2}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand.append({"name": "Spare Land", "type_line": "Land"})
+        permanent = {
+            "name": "Fixture Researcher",
+            "type_line": "Creature - Human Wizard",
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+            "activated_draw_discard": True,
+            "activated_draw_count": 1,
+            "activated_discard_count": 1,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": True,
+            "summoning_sick": False,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=8,
+            rng=random.Random(8),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertEqual(len(active.hand), 1)
+        self.assertEqual(len(active.library), 0)
+        self.assertEqual(len(active.graveyard), 2)
+        self.assertTrue(
+            any(
+                event == "utility_artifact_activated"
+                and data.get("activation_kind") == "simple_activated_draw_discard"
+                and data.get("card") == "Fixture Researcher"
+                and data.get("source_sacrificed") is True
+                and data.get("cards_drawn") == 1
+                and data.get("cards_discarded") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_spell_cast_draw_engine_draws_for_matching_creature_spell(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
         opponent = self.battle.Player("Opponent", None, [])
