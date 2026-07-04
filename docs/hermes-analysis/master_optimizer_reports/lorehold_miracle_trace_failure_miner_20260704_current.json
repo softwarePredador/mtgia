@@ -1,0 +1,894 @@
+{
+  "artifact_type": "lorehold_miracle_trace_failure_miner",
+  "candidate_summaries": [
+    {
+      "baseline_key": "deck_607",
+      "baseline_record": {
+        "games": 4,
+        "losses": 4,
+        "stalls": 0,
+        "wins": 0
+      },
+      "baseline_strategic_counts": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 0,
+        "lorehold_cost_paid": 27,
+        "lorehold_rummage_discard_to_top": 0,
+        "lorehold_spell_cast": 22,
+        "lorehold_upkeep_rummage": 5,
+        "miracle_cast": 4,
+        "spell_cast_mana_trigger": 0,
+        "static_cost_reduction_total": 2,
+        "topdeck_manipulation_activated": 5
+      },
+      "baseline_strategic_game_counts": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 0,
+        "hand_to_topdeck_activation": 0,
+        "lorehold_cost_paid": 4,
+        "lorehold_rummage_discard_to_top": 0,
+        "lorehold_spell_cast": 4,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 2,
+        "spell_cast_mana_trigger": 0,
+        "static_cost_reduction_casts": 1,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 1
+      },
+      "candidate_key": "challenger_lorehold_spell_pressure_mana_conversion_deoverfill_v1",
+      "candidate_record": {
+        "games": 4,
+        "losses": 3,
+        "stalls": 0,
+        "wins": 1
+      },
+      "decision": "do_not_promote_pressure_unproven",
+      "failure_flags": [
+        "head_to_head_not_won",
+        "pressure_causality_unproven",
+        "pressure_conversion_unproven",
+        "topdeck_activation_regressed",
+        "topdeck_anchor_access_regressed"
+      ],
+      "fast_pressure_slice": {
+        "games": 1,
+        "losses": 0,
+        "stalls": 0,
+        "wins": 1
+      },
+      "focus_access_delta": {
+        "Land Tax": {
+          "baseline_accessed_games": 1,
+          "baseline_drawn_games": 1,
+          "baseline_library_only_games": 2,
+          "baseline_near_access_games": 2,
+          "candidate_accessed_games": 0,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 4,
+          "candidate_near_access_games": 0,
+          "delta_accessed_games": -1,
+          "delta_drawn_games": -1,
+          "delta_library_only_games": 2,
+          "delta_near_access_games": -2
+        },
+        "Library of Leng": {
+          "baseline_accessed_games": 0,
+          "baseline_drawn_games": 0,
+          "baseline_library_only_games": 3,
+          "baseline_near_access_games": 1,
+          "candidate_accessed_games": 1,
+          "candidate_drawn_games": 1,
+          "candidate_library_only_games": 3,
+          "candidate_near_access_games": 1,
+          "delta_accessed_games": 1,
+          "delta_drawn_games": 1,
+          "delta_library_only_games": 0,
+          "delta_near_access_games": 0
+        },
+        "Lorehold, the Historian": {
+          "baseline_accessed_games": 3,
+          "baseline_drawn_games": 0,
+          "baseline_library_only_games": 0,
+          "baseline_near_access_games": 0,
+          "candidate_accessed_games": 4,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 0,
+          "candidate_near_access_games": 0,
+          "delta_accessed_games": 1,
+          "delta_drawn_games": 0,
+          "delta_library_only_games": 0,
+          "delta_near_access_games": 0
+        },
+        "Scroll Rack": {
+          "baseline_accessed_games": 1,
+          "baseline_drawn_games": 0,
+          "baseline_library_only_games": 3,
+          "baseline_near_access_games": 0,
+          "candidate_accessed_games": 1,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 2,
+          "candidate_near_access_games": 1,
+          "delta_accessed_games": 0,
+          "delta_drawn_games": 0,
+          "delta_library_only_games": -1,
+          "delta_near_access_games": 1
+        },
+        "Sensei's Divining Top": {
+          "baseline_accessed_games": 2,
+          "baseline_drawn_games": 0,
+          "baseline_library_only_games": 2,
+          "baseline_near_access_games": 1,
+          "candidate_accessed_games": 1,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 3,
+          "candidate_near_access_games": 0,
+          "delta_accessed_games": -1,
+          "delta_drawn_games": 0,
+          "delta_library_only_games": 1,
+          "delta_near_access_games": -1
+        },
+        "The Mind Stone": {
+          "baseline_accessed_games": 2,
+          "baseline_drawn_games": 1,
+          "baseline_library_only_games": 2,
+          "baseline_near_access_games": 2,
+          "candidate_accessed_games": 1,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 2,
+          "candidate_near_access_games": 2,
+          "delta_accessed_games": -1,
+          "delta_drawn_games": -1,
+          "delta_library_only_games": 0,
+          "delta_near_access_games": 0
+        },
+        "Urza's Saga": {
+          "baseline_accessed_games": 1,
+          "baseline_drawn_games": 1,
+          "baseline_library_only_games": 3,
+          "baseline_near_access_games": 1,
+          "candidate_accessed_games": 1,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 2,
+          "candidate_near_access_games": 2,
+          "delta_accessed_games": 0,
+          "delta_drawn_games": -1,
+          "delta_library_only_games": -1,
+          "delta_near_access_games": 1
+        }
+      },
+      "gate_status": "ready",
+      "head_to_head_vs_607": {
+        "games": 1,
+        "losses": 1,
+        "stalls": 0,
+        "wins": 0
+      },
+      "pressure_card_event_counts": {},
+      "pressure_card_event_total": 0,
+      "pressure_conversion_event_counts": {},
+      "pressure_conversion_event_total": 0,
+      "promotion_allowed": false,
+      "source_gate": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260704_spell_pressure_mana_conversion_deoverfill_fixed607_gate.json",
+      "strategic_count_delta": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 2,
+        "lorehold_cost_paid": -2,
+        "lorehold_rummage_discard_to_top": 2,
+        "lorehold_spell_cast": -1,
+        "lorehold_upkeep_rummage": 8,
+        "miracle_cast": 4,
+        "spell_cast_mana_trigger": 0,
+        "static_cost_reduction_total": -2,
+        "topdeck_manipulation_activated": -1
+      },
+      "strategic_counts": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 2,
+        "lorehold_cost_paid": 25,
+        "lorehold_rummage_discard_to_top": 2,
+        "lorehold_spell_cast": 21,
+        "lorehold_upkeep_rummage": 13,
+        "miracle_cast": 8,
+        "spell_cast_mana_trigger": 0,
+        "static_cost_reduction_total": 0,
+        "topdeck_manipulation_activated": 4
+      },
+      "strategic_game_counts": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 1,
+        "hand_to_topdeck_activation": 0,
+        "lorehold_cost_paid": 4,
+        "lorehold_rummage_discard_to_top": 1,
+        "lorehold_spell_cast": 4,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 4,
+        "miracle_cast": 3,
+        "spell_cast_mana_trigger": 0,
+        "static_cost_reduction_casts": 0,
+        "static_cost_reduction_total": 0,
+        "topdeck_manipulation_activated": 1
+      },
+      "strategic_game_delta": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 1,
+        "hand_to_topdeck_activation": 0,
+        "lorehold_cost_paid": 0,
+        "lorehold_rummage_discard_to_top": 1,
+        "lorehold_spell_cast": 0,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 1,
+        "spell_cast_mana_trigger": 0,
+        "static_cost_reduction_casts": -1,
+        "static_cost_reduction_total": -1,
+        "topdeck_manipulation_activated": 0
+      },
+      "topdeck_anchor_access_delta_total": -2
+    },
+    {
+      "baseline_key": "deck_607",
+      "baseline_record": {
+        "games": 4,
+        "losses": 4,
+        "stalls": 0,
+        "wins": 0
+      },
+      "baseline_strategic_counts": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 0,
+        "lorehold_cost_paid": 27,
+        "lorehold_rummage_discard_to_top": 0,
+        "lorehold_spell_cast": 22,
+        "lorehold_upkeep_rummage": 5,
+        "miracle_cast": 4,
+        "spell_cast_mana_trigger": 0,
+        "static_cost_reduction_total": 2,
+        "topdeck_manipulation_activated": 5
+      },
+      "baseline_strategic_game_counts": {
+        "birgi_spell_cast_mana": 0,
+        "discard_to_top_replacement": 0,
+        "hand_to_topdeck_activation": 0,
+        "lorehold_cost_paid": 4,
+        "lorehold_rummage_discard_to_top": 0,
+        "lorehold_spell_cast": 4,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 2,
+        "spell_cast_mana_trigger": 0,
+        "static_cost_reduction_casts": 1,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 1
+      },
+      "candidate_key": "challenger_lorehold_spell_volume_access_depressure_v1",
+      "candidate_record": {
+        "games": 4,
+        "losses": 4,
+        "stalls": 0,
+        "wins": 0
+      },
+      "decision": "reject_current_depressure_shell",
+      "failure_flags": [
+        "fast_pressure_slice_not_protected",
+        "head_to_head_not_won",
+        "mana_event_without_conversion_to_wins",
+        "miracle_trace_missing",
+        "miracle_volume_regressed",
+        "pressure_causality_unproven",
+        "topdeck_activation_missing",
+        "topdeck_activation_regressed",
+        "topdeck_anchor_access_regressed"
+      ],
+      "fast_pressure_slice": {
+        "games": 1,
+        "losses": 1,
+        "stalls": 0,
+        "wins": 0
+      },
+      "focus_access_delta": {
+        "Land Tax": {
+          "baseline_accessed_games": 1,
+          "baseline_drawn_games": 1,
+          "baseline_library_only_games": 2,
+          "baseline_near_access_games": 2,
+          "candidate_accessed_games": 0,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 4,
+          "candidate_near_access_games": 0,
+          "delta_accessed_games": -1,
+          "delta_drawn_games": -1,
+          "delta_library_only_games": 2,
+          "delta_near_access_games": -2
+        },
+        "Library of Leng": {
+          "baseline_accessed_games": 0,
+          "baseline_drawn_games": 0,
+          "baseline_library_only_games": 3,
+          "baseline_near_access_games": 1,
+          "candidate_accessed_games": 1,
+          "candidate_drawn_games": 1,
+          "candidate_library_only_games": 2,
+          "candidate_near_access_games": 2,
+          "delta_accessed_games": 1,
+          "delta_drawn_games": 1,
+          "delta_library_only_games": -1,
+          "delta_near_access_games": 1
+        },
+        "Lorehold, the Historian": {
+          "baseline_accessed_games": 3,
+          "baseline_drawn_games": 0,
+          "baseline_library_only_games": 0,
+          "baseline_near_access_games": 0,
+          "candidate_accessed_games": 3,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 0,
+          "candidate_near_access_games": 0,
+          "delta_accessed_games": 0,
+          "delta_drawn_games": 0,
+          "delta_library_only_games": 0,
+          "delta_near_access_games": 0
+        },
+        "Scroll Rack": {
+          "baseline_accessed_games": 1,
+          "baseline_drawn_games": 0,
+          "baseline_library_only_games": 3,
+          "baseline_near_access_games": 0,
+          "candidate_accessed_games": 0,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 4,
+          "candidate_near_access_games": 0,
+          "delta_accessed_games": -1,
+          "delta_drawn_games": 0,
+          "delta_library_only_games": 1,
+          "delta_near_access_games": 0
+        },
+        "Sensei's Divining Top": {
+          "baseline_accessed_games": 2,
+          "baseline_drawn_games": 0,
+          "baseline_library_only_games": 2,
+          "baseline_near_access_games": 1,
+          "candidate_accessed_games": 1,
+          "candidate_drawn_games": 1,
+          "candidate_library_only_games": 3,
+          "candidate_near_access_games": 1,
+          "delta_accessed_games": -1,
+          "delta_drawn_games": 1,
+          "delta_library_only_games": 1,
+          "delta_near_access_games": 0
+        },
+        "The Mind Stone": {
+          "baseline_accessed_games": 2,
+          "baseline_drawn_games": 1,
+          "baseline_library_only_games": 2,
+          "baseline_near_access_games": 2,
+          "candidate_accessed_games": 1,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 3,
+          "candidate_near_access_games": 0,
+          "delta_accessed_games": -1,
+          "delta_drawn_games": -1,
+          "delta_library_only_games": 1,
+          "delta_near_access_games": -2
+        },
+        "Urza's Saga": {
+          "baseline_accessed_games": 1,
+          "baseline_drawn_games": 1,
+          "baseline_library_only_games": 3,
+          "baseline_near_access_games": 1,
+          "candidate_accessed_games": 0,
+          "candidate_drawn_games": 0,
+          "candidate_library_only_games": 4,
+          "candidate_near_access_games": 0,
+          "delta_accessed_games": -1,
+          "delta_drawn_games": -1,
+          "delta_library_only_games": 1,
+          "delta_near_access_games": -1
+        }
+      },
+      "gate_status": "ready",
+      "head_to_head_vs_607": {
+        "games": 1,
+        "losses": 1,
+        "stalls": 0,
+        "wins": 0
+      },
+      "pressure_card_event_counts": {},
+      "pressure_card_event_total": 0,
+      "pressure_conversion_event_counts": {
+        "birgi_spell_cast_mana": 3,
+        "spell_cast_mana_trigger": 3
+      },
+      "pressure_conversion_event_total": 6,
+      "promotion_allowed": false,
+      "source_gate": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260704_spell_volume_access_depressure_fixed607_gate.json",
+      "strategic_count_delta": {
+        "birgi_spell_cast_mana": 3,
+        "discard_to_top_replacement": 1,
+        "lorehold_cost_paid": -8,
+        "lorehold_rummage_discard_to_top": 1,
+        "lorehold_spell_cast": -9,
+        "lorehold_upkeep_rummage": -1,
+        "miracle_cast": -4,
+        "spell_cast_mana_trigger": 3,
+        "static_cost_reduction_total": -2,
+        "topdeck_manipulation_activated": -5
+      },
+      "strategic_counts": {
+        "birgi_spell_cast_mana": 3,
+        "discard_to_top_replacement": 1,
+        "lorehold_cost_paid": 19,
+        "lorehold_rummage_discard_to_top": 1,
+        "lorehold_spell_cast": 13,
+        "lorehold_upkeep_rummage": 4,
+        "miracle_cast": 0,
+        "spell_cast_mana_trigger": 3,
+        "static_cost_reduction_total": 0,
+        "topdeck_manipulation_activated": 0
+      },
+      "strategic_game_counts": {
+        "birgi_spell_cast_mana": 1,
+        "discard_to_top_replacement": 1,
+        "hand_to_topdeck_activation": 0,
+        "lorehold_cost_paid": 3,
+        "lorehold_rummage_discard_to_top": 1,
+        "lorehold_spell_cast": 3,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 3,
+        "miracle_cast": 0,
+        "spell_cast_mana_trigger": 1,
+        "static_cost_reduction_casts": 0,
+        "static_cost_reduction_total": 0,
+        "topdeck_manipulation_activated": 0
+      },
+      "strategic_game_delta": {
+        "birgi_spell_cast_mana": 1,
+        "discard_to_top_replacement": 1,
+        "hand_to_topdeck_activation": 0,
+        "lorehold_cost_paid": -1,
+        "lorehold_rummage_discard_to_top": 1,
+        "lorehold_spell_cast": -1,
+        "lorehold_spell_rummage": 0,
+        "lorehold_upkeep_rummage": 1,
+        "miracle_cast": -2,
+        "spell_cast_mana_trigger": 1,
+        "static_cost_reduction_casts": -1,
+        "static_cost_reduction_total": -1,
+        "topdeck_manipulation_activated": -1
+      },
+      "topdeck_anchor_access_delta_total": -4
+    }
+  ],
+  "decision": {
+    "do_not_expand_pressure_or_mana_without_miracle_trace": true,
+    "keep_607_as_protected_baseline": true,
+    "promotion_allowed": false,
+    "recommended_next_actions": [
+      "treat_mana_vault_and_the_one_ring_as_external_legal_staples_but_internal_unproven",
+      "predeclare_anchor_access_floors_for_land_tax_scroll_rack_top_library_mind_stone_urzas_saga",
+      "require_nonzero_miracle_cast_and_topdeck_activation_before_confirm_gate",
+      "reject_any_candidate_that_loses_head_to_head_to_fixed_607_even_if_structural_matrix_ranks_high"
+    ]
+  },
+  "deck_607_mutated": false,
+  "external_card_legality_snapshot": {
+    "Mana Vault": {
+      "color_identity": [],
+      "commander": "legal",
+      "edhrec_rank": 145,
+      "game_changer": true,
+      "interpretation": "Externally legal and powerful. In the current ManaLoom corpus it is also internally available and runtime-modeled, so the 607 blocker is safe-cut plus equal battle proof, not color identity.",
+      "produced_mana": [
+        "C"
+      ],
+      "source": "https://scryfall.com/card/2x2/308/mana-vault"
+    },
+    "The One Ring": {
+      "color_identity": [],
+      "commander": "legal",
+      "edhrec_rank": 90,
+      "game_changer": true,
+      "interpretation": "Externally legal and colorless. In the current ManaLoom corpus it is also internally available and runtime-modeled, but a generic protection/draw staple is not automatically better than a Lorehold miracle/topdeck anchor.",
+      "source": "https://scryfall.com/card/ltr/246/the-one-ring"
+    }
+  },
+  "external_learning": [
+    {
+      "learning": "Color identity and singleton legality are entry gates only; colorless cards can be legal, but legality does not prove deck value.",
+      "source": "Wizards Commander format",
+      "url": "https://magic.wizards.com/en/formats/commander"
+    },
+    {
+      "learning": "The current public Lorehold surface is tagged around Topdeck, Spellslinger, Discard, and Burn; high-synergy cards include Library of Leng, Storm Herd, Sensei's Divining Top, Approach of the Second Sun, and Scroll Rack.",
+      "source": "EDHREC Lorehold commander page",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian"
+    },
+    {
+      "learning": "Lorehold's upkeep rummage creates first-draw miracle windows on opponents' turns; top-library tools and Library of Leng are core engine cards, not replaceable generic utility.",
+      "source": "EDHREC Miracles Every Turn article",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander"
+    },
+    {
+      "learning": "The deck wants a high instant/sorcery density and spell-lands so the first draw each turn is not a dud for miracle.",
+      "source": "EDHREC Boros Miracles budget article",
+      "url": "https://edhrec.com/articles/lorehold-the-historian-boros-miracles-on-a-budget"
+    }
+  ],
+  "generated_at": "2026-07-04T23:49:39Z",
+  "internal_accessibility_snapshot": {
+    "cards": {
+      "Mana Vault": {
+        "battle_rules": [
+          {
+            "card_name": "Mana Vault",
+            "effect_json": "{\"battle_model_scope\": \"fast_mana_artifact_partial_v1\", \"cmc\": 1.0, \"does_not_untap_normally\": true, \"effect\": \"ramp_permanent\", \"mana_produced\": 3, \"produces\": \"C\", \"tapped_upkeep_damage\": 1, \"upkeep_optional_untap_cost_generic\": 4}",
+            "execution_status": "auto",
+            "logical_rule_key": "battle_rule_v1:5a2533694ffd19223d3cde1e25d258ff",
+            "normalized_name": "mana vault",
+            "review_status": "active",
+            "rule_version": 2,
+            "source": "curated"
+          }
+        ],
+        "deck_presence": [
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 6,
+            "functional_tag": "combo_piece",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 31,
+            "functional_tag": "draw",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 54,
+            "functional_tag": "draw",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 58,
+            "functional_tag": "draw",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 62,
+            "functional_tag": "draw",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 74,
+            "functional_tag": "draw",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 83,
+            "functional_tag": "draw",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 84,
+            "functional_tag": "draw",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 104,
+            "functional_tag": "draw",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 105,
+            "functional_tag": "draw",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 606,
+            "functional_tag": "ramp",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 612,
+            "functional_tag": "ramp",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 613,
+            "functional_tag": "ramp",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 615,
+            "functional_tag": "ramp",
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 619,
+            "functional_tag": null,
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          },
+          {
+            "card_name": "Mana Vault",
+            "cmc": 1.0,
+            "deck_id": 621,
+            "functional_tag": null,
+            "normalized_name": "mana vault",
+            "quantity": 1,
+            "type_line": "Artifact"
+          }
+        ],
+        "format_staples": [
+          {
+            "archetype": "ramp",
+            "card_name": "Mana Vault",
+            "category": "",
+            "color_identity": "",
+            "edhrec_rank": 144,
+            "format": "commander",
+            "is_banned": 0,
+            "normalized_name": "mana vault"
+          }
+        ],
+        "oracle_cache": [
+          {
+            "card_id": "d2f38c20-79e2-4330-b6ae-ded990a465e4",
+            "cmc": 1.0,
+            "color_identity_json": "[]",
+            "mana_cost": "{1}",
+            "name": "Mana Vault",
+            "normalized_name": "mana vault",
+            "source": "postgres_cards",
+            "type_line": "Artifact"
+          }
+        ],
+        "summary": {
+          "blocker_for_607": "not_in_protected_607_and_prior_cut_battle_evidence_rejected",
+          "has_executable_runtime_rule": true,
+          "in_card_oracle_cache": true,
+          "known_deck_ids": [
+            6,
+            31,
+            54,
+            58,
+            62,
+            74,
+            83,
+            84,
+            104,
+            105,
+            606,
+            612,
+            613,
+            615,
+            619,
+            621
+          ],
+          "present_in_deck_615_challenger": true,
+          "present_in_legacy_deck_6": true,
+          "present_in_protected_607": false
+        }
+      },
+      "The One Ring": {
+        "battle_rules": [
+          {
+            "card_name": "The One Ring",
+            "effect_json": "{\"activated_burden_draw\": true, \"activation_requires_tap\": true, \"battle_model_scope\": \"the_one_ring_etb_protection_burden_draw_v1\", \"burden\": true, \"draw_on_enter\": false, \"effect\": \"draw_engine\", \"oracle_runtime_scope\": \"indestructible_cast_etb_protection_upkeep_burden_tap_draw_v1\", \"protection_from_everything_on_enter\": true}",
+            "execution_status": "auto",
+            "logical_rule_key": "battle_rule_v1:a71907ee296b5801e92e8d7f1940dba1",
+            "normalized_name": "the one ring",
+            "review_status": "verified",
+            "rule_version": 2,
+            "source": "curated"
+          }
+        ],
+        "deck_presence": [
+          {
+            "card_name": "The One Ring",
+            "cmc": 4.0,
+            "deck_id": 6,
+            "functional_tag": "engine",
+            "normalized_name": "the one ring",
+            "quantity": 1,
+            "type_line": "Legendary Artifact"
+          },
+          {
+            "card_name": "The One Ring",
+            "cmc": 4.0,
+            "deck_id": 84,
+            "functional_tag": "draw",
+            "normalized_name": "the one ring",
+            "quantity": 1,
+            "type_line": "Legendary Artifact"
+          },
+          {
+            "card_name": "The One Ring",
+            "cmc": 4.0,
+            "deck_id": 608,
+            "functional_tag": "draw",
+            "normalized_name": "the one ring",
+            "quantity": 1,
+            "type_line": "Legendary Artifact"
+          },
+          {
+            "card_name": "The One Ring",
+            "cmc": 4.0,
+            "deck_id": 613,
+            "functional_tag": "draw",
+            "normalized_name": "the one ring",
+            "quantity": 1,
+            "type_line": "Legendary Artifact"
+          },
+          {
+            "card_name": "The One Ring",
+            "cmc": 4.0,
+            "deck_id": 615,
+            "functional_tag": "draw",
+            "normalized_name": "the one ring",
+            "quantity": 1,
+            "type_line": "Legendary Artifact"
+          },
+          {
+            "card_name": "The One Ring",
+            "cmc": 4.0,
+            "deck_id": 619,
+            "functional_tag": null,
+            "normalized_name": "the one ring",
+            "quantity": 1,
+            "type_line": "Legendary Artifact"
+          },
+          {
+            "card_name": "The One Ring",
+            "cmc": 4.0,
+            "deck_id": 620,
+            "functional_tag": null,
+            "normalized_name": "the one ring",
+            "quantity": 1,
+            "type_line": "Legendary Artifact"
+          },
+          {
+            "card_name": "The One Ring",
+            "cmc": 4.0,
+            "deck_id": 621,
+            "functional_tag": null,
+            "normalized_name": "the one ring",
+            "quantity": 1,
+            "type_line": "Legendary Artifact"
+          }
+        ],
+        "format_staples": [],
+        "oracle_cache": [
+          {
+            "card_id": "fa104244-acef-466c-a63a-9119d873ff19",
+            "cmc": 4.0,
+            "color_identity_json": "[]",
+            "mana_cost": "{4}",
+            "name": "The One Ring",
+            "normalized_name": "the one ring",
+            "source": "postgres_cards",
+            "type_line": "Legendary Artifact"
+          }
+        ],
+        "summary": {
+          "blocker_for_607": "not_in_protected_607_and_prior_cut_battle_evidence_rejected",
+          "has_executable_runtime_rule": true,
+          "in_card_oracle_cache": true,
+          "known_deck_ids": [
+            6,
+            84,
+            608,
+            613,
+            615,
+            619,
+            620,
+            621
+          ],
+          "present_in_deck_615_challenger": true,
+          "present_in_legacy_deck_6": true,
+          "present_in_protected_607": false
+        }
+      }
+    },
+    "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260704_spell_pressure_mana_conversion_deoverfill_fixed607_gate.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260704_spell_volume_access_depressure_fixed607_gate.json"
+  ],
+  "status": "lorehold_miracle_trace_failure_learning_ready",
+  "summary": {
+    "blocking_failure_flags": [
+      "head_to_head_not_won",
+      "miracle_trace_missing",
+      "topdeck_activation_missing",
+      "topdeck_anchor_access_regressed",
+      "pressure_causality_unproven",
+      "pressure_conversion_unproven",
+      "fast_pressure_slice_not_protected"
+    ],
+    "candidate_count": 2,
+    "failure_flag_counts": {
+      "fast_pressure_slice_not_protected": 1,
+      "head_to_head_not_won": 2,
+      "mana_event_without_conversion_to_wins": 1,
+      "miracle_trace_missing": 1,
+      "miracle_volume_regressed": 1,
+      "pressure_causality_unproven": 2,
+      "pressure_conversion_unproven": 1,
+      "topdeck_activation_missing": 1,
+      "topdeck_activation_regressed": 2,
+      "topdeck_anchor_access_regressed": 2
+    },
+    "keep_607_as_protected_baseline": true,
+    "learned_priority_order": [
+      "legal_identity_and_card_availability",
+      "commander_intent_and_topdeck_miracle_density",
+      "natural_access_to_topdeck_anchors",
+      "trace_proof_that_miracle_window_executes",
+      "pressure_or_mana_conversion_after_engine_floor_is_preserved",
+      "same_seed_battle_gate_ties_or_beats_607"
+    ],
+    "next_shell_contract": "miracle_access_first_shell",
+    "promotion_allowed": false
+  }
+}
