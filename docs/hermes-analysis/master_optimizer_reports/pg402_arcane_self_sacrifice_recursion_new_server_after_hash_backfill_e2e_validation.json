@@ -1,0 +1,96 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T11:28:53.702965+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg402_arcane_self_sacrifice_recursion_new_server_package_manifest.json",
+  "package_id": "pg402_arcane_self_sacrifice_recursion_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "card_name": "Hana Kami",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42fe7c13f0150f5f2563678a7512c43d",
+          "oracle_hash": "8611a25874ac2a52c45bcdabda208bf9",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "card_name": "Hana Kami",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42fe7c13f0150f5f2563678a7512c43d",
+          "oracle_hash": "8611a25874ac2a52c45bcdabda208bf9",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hana Kami",
+          "logical_rule_key": "battle_rule_v1:42fe7c13f0150f5f2563678a7512c43d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Hana Kami",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:42fe7c13f0150f5f2563678a7512c43d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

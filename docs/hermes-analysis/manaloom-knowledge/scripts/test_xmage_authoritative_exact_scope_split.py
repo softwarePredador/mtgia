@@ -6699,6 +6699,47 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_recursion_oracle_not_simple")
 
+    def test_permanent_activated_recursion_maps_hana_kami_arcane_self_sacrifice(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hana Kami",
+                type_line="Creature - Spirit",
+                oracle_text="{1}{G}, Sacrifice this creature: Return target Arcane card from your graveyard to your hand.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnFromGraveyardToHandTargetEffect(),
+                    new ManaCostsImpl<>("{1}{G}")
+                );
+                ability.addCost(new SacrificeSourceCost());
+                FilterCard filter = new FilterCard("Arcane card from your graveyard");
+                filter.add(SubType.ARCANE.getPredicate());
+                ability.addTarget(new TargetCardInYourGraveyard(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertIsNotNone(proposal)
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE)
+        self.assertEqual(effect["graveyard_to_hand_target"], "arcane_card")
+        self.assertEqual(effect["target_constraints"], {"zone": "graveyard", "controller": "self", "subtypes": ["arcane"]})
+        self.assertEqual(effect["graveyard_to_hand_activation_cost_mana"], "{1}{G}")
+        self.assertEqual(effect["graveyard_to_hand_activation_cost_generic"], 1)
+        self.assertEqual(effect["graveyard_to_hand_activation_cost_colors"], ["G"])
+        self.assertFalse(effect["graveyard_to_hand_activation_requires_tap"])
+        self.assertTrue(effect["graveyard_to_hand_activation_requires_sacrifice"])
+        self.assertTrue(effect["activated_self_sacrifice_recursion"])
+
     def test_permanent_activated_recursion_to_battlefield_maps_doomed_necromancer(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

@@ -39269,6 +39269,87 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "eaa0351505b6bd4630ddb51bd5d22ca3"
   },
+  "Hana Kami": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "recursion",
+        "activated_self_sacrifice_recursion": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_discard_count": 0,
+        "activation_discard_target": null,
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "recursion",
+        "graveyard_to_hand_destination": "hand",
+        "graveyard_to_hand_target": "arcane_card",
+        "graveyard_to_hand_target_count": 1,
+        "target": "arcane_card",
+        "target_constraints": {
+          "controller": "self",
+          "subtypes": [
+            "arcane"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+    "activated_effect": "recursion",
+    "activated_self_sacrifice_recursion": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{G}",
+    "activation_discard_count": 0,
+    "activation_discard_target": null,
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+    "effect": "creature",
+    "graveyard_to_hand_activation_cost_colors": [
+      "G"
+    ],
+    "graveyard_to_hand_activation_cost_generic": 1,
+    "graveyard_to_hand_activation_cost_mana": "{1}{G}",
+    "graveyard_to_hand_activation_discard_count": 0,
+    "graveyard_to_hand_activation_discard_target": null,
+    "graveyard_to_hand_activation_requires_sacrifice": true,
+    "graveyard_to_hand_activation_requires_tap": false,
+    "graveyard_to_hand_destination": "hand",
+    "graveyard_to_hand_target": "arcane_card",
+    "graveyard_to_hand_target_count": 1,
+    "target": "arcane_card",
+    "target_constraints": {
+      "controller": "self",
+      "subtypes": [
+        "arcane"
+      ],
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:42fe7c13f0150f5f2563678a7512c43d",
+    "battle_rule_oracle_hash": "8611a25874ac2a52c45bcdabda208bf9"
+  },
   "Hand of Death": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",

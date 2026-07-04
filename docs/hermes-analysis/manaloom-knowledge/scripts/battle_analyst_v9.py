@@ -37608,6 +37608,8 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return len(_spell_color_symbols(card)) >= 2
     if target in ("goblin_card", "goblin"):
         return "goblin" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("arcane_card", "arcane"):
+        return "arcane" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("zombie_card", "zombie"):
         return "zombie" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("pirate_card", "pirate"):

@@ -9335,6 +9335,59 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_recursion_self_sacrifice_returns_arcane_card(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        active.mana_pool.add("green", 1)
+        wrong_instant = {"name": "Wrong Instant", "type_line": "Instant", "cmc": 1}
+        arcane_spell = {"name": "Target Ritual", "type_line": "Instant - Arcane", "cmc": 2}
+        active.graveyard.extend([wrong_instant, arcane_spell])
+        permanent = {
+            "name": "Hana Kami",
+            "type_line": "Creature - Spirit",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "activated_effect": "recursion",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "graveyard_to_hand_target": "arcane_card",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "hand",
+            "graveyard_to_hand_activation_cost_mana": "{1}{G}",
+            "graveyard_to_hand_activation_cost_generic": 1,
+            "graveyard_to_hand_activation_cost_colors": ["G"],
+            "graveyard_to_hand_activation_requires_tap": False,
+            "graveyard_to_hand_activation_requires_sacrifice": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_hana_kami",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=15,
+            rng=random.Random(15),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertEqual([card["name"] for card in active.hand], ["Target Ritual"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Wrong Instant", "Hana Kami"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Hana Kami"
+                and data.get("activation_kind") == "simple_activated_graveyard_to_hand"
+                and data.get("target_type") == "arcane_card"
+                and data.get("recovered") == ["Target Ritual"]
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_recursion_to_battlefield_sacrifices_source_and_returns_target(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

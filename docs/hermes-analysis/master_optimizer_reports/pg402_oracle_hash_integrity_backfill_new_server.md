@@ -1,0 +1,55 @@
+# PG402 Oracle Hash Integrity Backfill
+
+- Generated at: `2026-07-04T11:25:56.849128+00:00`
+- Status: `pass`
+- PostgreSQL target: `127.0.0.1:15432/halder`
+- Precheck missing trusted executable oracle hashes: `44`
+- Backup rows: `44`
+- Updated rows: `44`
+- Postcheck missing trusted executable oracle hashes: `0`
+
+Updated cards:
+- `Angel's Grace`
+- `Seething Song`
+- `Dismember`
+- `Worldfire`
+- `Zuran Orb`
+- `Akroma's Will`
+- `Ancient Den`
+- `Ancient Tomb`
+- `Basking Broodscale`
+- `Chromatic Star`
+- `Entomb`
+- `Everflowing Chalice`
+- `Fellwar Stone`
+- `Formidable Speaker`
+- `Gemstone Caverns`
+- `Great Furnace`
+- `Hall of Heliod's Generosity`
+- `Inventors' Fair`
+- `Library of Leng`
+- `Lumra, Bellow of the Woods`
+- `Mana Vault`
+- `Mox Amber`
+- `Natural Order`
+- `Rampant Growth`
+- `Reanimate`
+- `Sami's Curiosity`
+- `Scavenging Ooze`
+- `Scroll Rack`
+- `Skullclamp`
+- `Soul-Guide Lantern`
+- `Splendid Reclamation`
+- `Staff of Compleation`
+- `Sunbaked Canyon`
+- `Talisman of Conviction`
+- `Unexpected Windfall`
+- `Urza's Saga`
+- `Valakut Awakening // Valakut Stoneforge`
+- `Vexing Bauble`
+- `Wall of Omens`
+- `War Room`
+- `Wayfarer's Bauble`
+- `Valakut Awakening`
+- `Runaway Steam-Kin`
+- `Silence`

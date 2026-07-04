@@ -255,21 +255,36 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_pg402_arcane_self_sacrifice_recursion_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg402_arcane_self_sacrifice_recursion_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg402_arcane_self_sacrifice_recursion_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg402_arcane_self_sacrifice_recursion_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg402_arcane_self_sacrifice_recursion_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg402_oracle_hash_integrity_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg402_arcane_self_sacrifice_recursion_new_server_after_hash_backfill_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg402_arcane_self_sacrifice_recursion_new_server_after_hash_backfill_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_after_docs_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_after_docs_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_after_docs_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg402_arcane_self_sacrifice_recursion_new_server_after_hash_backfill_final.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26756`
-- XMage authoritative source resolved: `26442`
+- target all-card battle-gap identities: `26755`
+- XMage authoritative source resolved: `26441`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26442`
+- XMage authoritative adapter required: `26441`
 - ManaLoom adapter work-unit keys: `11427`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26442` identities, card semantics are accepted from XMage; work is now
+- For `26441` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -288,10 +303,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG401 Exact Adapter And Integrity Waves
+## PG283-PG402 Exact Adapter And Integrity Waves
 
-As of 2026-07-04, the PG283-PG401 all-card exact adapter waves are applied and
-synced. PG375-PG401 and the PG399b/PG399c integrity backfills were applied
+As of 2026-07-04, the PG283-PG402 all-card exact adapter waves are applied and
+synced. PG375-PG402 and the PG399b/PG399c/PG402 integrity backfills were applied
 against the new EasyPanel PostgreSQL target via the new-server tunnel and
 validated with `database_target=127.0.0.1:15432/halder`.
 
@@ -513,8 +528,8 @@ patterns:
   self-sacrifice costs only, exact `DiscardCardCost` or creature-card discard
   cost only when source and Oracle agree, no exile/OrCost/CompositeCost, and
   supported graveyard targets including creature, artifact, enchantment,
-  artifact creature, basic land, permanent, instant/sorcery, artifact or
-  enchantment, and any card when source and Oracle agree ->
+  artifact creature, basic land, permanent, instant/sorcery, Arcane subtype
+  cards, artifact or enchantment, and any card when source and Oracle agree ->
   `xmage_permanent_simple_activated_graveyard_to_hand_v1`
 - `recursion::xmage_graveyard_return_variant_review_v1` with
   `ReturnFromGraveyardToBattlefieldTargetEffect + SimpleActivatedAbility` on
@@ -6933,6 +6948,53 @@ PG401 measured result:
   graveyard-count damage subpattern is therefore closed for currently safe
   exact scopes.
 
+PG402 measured result:
+
+- PG402 promoted `1` exact Arcane self-sacrifice graveyard-to-hand recursion
+  rule on the new server: `Hana Kami`.
+- The row uses `xmage_permanent_simple_activated_graveyard_to_hand_v1`,
+  sourced from local XMage `ReturnFromGraveyardToHandTargetEffect` plus
+  `SimpleActivatedAbility`, `ManaCostsImpl("{1}{G}")`,
+  `SacrificeSourceCost`, and `SubType.ARCANE.getPredicate()`.
+- The splitter deliberately left unsupported neighbors blocked:
+  `Bonebind Orator` remains blocked by graveyard-zone source exile,
+  `Cabal Surgeon` by graveyard-exile activation cost, `Restoration Specialist`
+  by multiple distinct targets, `Salvager of Ruin` by "put there this turn"
+  watcher requirements, and `Skeleton Shard` by `OrCost`.
+- Runtime now matches `arcane_card` graveyard recursion targets, pays `{1}{G}`,
+  sacrifices the source, and returns only a matching Arcane card to hand.
+- Focused runtime tests passed for the new Arcane self-sacrifice case and the
+  existing activated recursion variants; `py_compile` passed for the changed
+  splitter, runtime, and test files.
+- PostgreSQL precheck matched `1` Oracle-hash-backed target row on the new
+  server. Apply backed up `0` existing rows, deprecated `0` shadow rows, and
+  upserted `1` verified/auto rule. Postcheck verified `1/1` promoted rows as
+  `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync used `database_target=127.0.0.1:15432/halder`,
+  first updated the `Hana Kami` rule and then, after the integrity backfill,
+  loaded `4136` PostgreSQL rows, updated `4131` SQLite rows, and exported
+  `5278` canonical snapshot rows. Metadata sync used the same new-server
+  target, matched `6283` PostgreSQL cards from `6088` unique requested names,
+  wrote `6210` SQLite alias rows, and backfilled `2699/2699` deck-card cache
+  rows with `108` local `card_id` updates.
+- PG402 also backfilled `44` old trusted executable PostgreSQL rows with
+  `oracle_hash` from `cards.oracle_text`; postcheck left `0` trusted
+  executable rules missing hashes.
+- E2E validation passed PostgreSQL source-of-truth, SQLite/Hermes cache,
+  canonical snapshot fallback, runtime `get_card_effect`, and no-override
+  stages for `Hana Kami` against `database_target=127.0.0.1:15432/halder`.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `51/51` after the hash backfill.
+- Global all-card authoritative queue after PG402:
+  `target_identity_count=26755`, `xmage_authoritative_source_count=26441`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26441`.
+- Running the exact splitter after PG402 on supported units returned
+  `proposal_count=0` over `7595` considered supported rows. The Arcane
+  self-sacrifice recursion subpattern is therefore closed for currently safe
+  exact scopes.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -7563,10 +7625,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG401 queue on the new server, the next exact runtime-backed work should
+post-PG402 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1812`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1811`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1610`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `851`

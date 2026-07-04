@@ -1308,6 +1308,8 @@ def recursion_target_constraints_for(
         constraints["min_colors"] = 2
     elif target == "goblin_card":
         constraints["subtypes"] = ["goblin"]
+    elif target == "arcane_card":
+        constraints["subtypes"] = ["arcane"]
     elif target == "zombie_card":
         constraints["subtypes"] = ["zombie"]
     elif target == "pirate_card":
@@ -1740,6 +1742,10 @@ def recursion_to_hand_from_text(text: str) -> tuple[str, int, bool] | None:
         (
             r"^return target instant or sorcery card from your graveyard to your hand\.?$",
             ("instant_or_sorcery", 1, False),
+        ),
+        (
+            r"^return target arcane card from your graveyard to your hand\.?$",
+            ("arcane_card", 1, False),
         ),
         (
             r"^return target artifact or enchantment card from your graveyard to your hand\.?$",
@@ -7054,9 +7060,9 @@ def spell_cast_draw_specs_match(oracle_spec: dict[str, Any], source_spec: dict[s
 
 def activated_recursion_to_hand_target_from_source(text: str) -> tuple[str, int, bool] | str:
     lowered = str(text or "").lower()
-    if "arcan" in lowered:
-        return "activated_recursion_source_target_not_supported"
-    if "basic land card" in lowered or "FILTER_CARD_BASIC_LAND" in text:
+    if "arcane card" in lowered or "SubType.ARCANE.getPredicate()" in text:
+        target = "arcane_card"
+    elif "basic land card" in lowered or "FILTER_CARD_BASIC_LAND" in text:
         target = "basic_land"
     elif "instant or sorcery card" in lowered or "FilterInstantOrSorceryCard" in text:
         target = "instant_or_sorcery"
