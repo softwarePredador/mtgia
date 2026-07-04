@@ -227,21 +227,24 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg397_activated_damage_keywords_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg398_mana_source_activated_draw_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg398_mana_source_activated_draw_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg399c_hash_backfill_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg399c_hash_backfill_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg399c_hash_backfill_new_server_final.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26770`
-- XMage authoritative source resolved: `26456`
+- target all-card battle-gap identities: `26762`
+- XMage authoritative source resolved: `26448`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26456`
+- XMage authoritative adapter required: `26448`
 - ManaLoom adapter work-unit keys: `11427`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26456` identities, card semantics are accepted from XMage; work is now
+- For `26448` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -260,12 +263,12 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG398 Exact Adapter Waves
+## PG283-PG399c Exact Adapter And Integrity Waves
 
-As of 2026-07-04, the PG283-PG398 all-card exact adapter waves are applied and
-synced. PG375-PG398 were applied against the new EasyPanel PostgreSQL target
-via the new-server tunnel and validated with
-`database_target=127.0.0.1:15432/halder`.
+As of 2026-07-04, the PG283-PG399 all-card exact adapter waves are applied and
+synced. PG375-PG399 and the PG399b/PG399c integrity backfills were applied
+against the new EasyPanel PostgreSQL target via the new-server tunnel and
+validated with `database_target=127.0.0.1:15432/halder`.
 
 Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py`
@@ -277,6 +280,17 @@ patterns:
 
 - `draw_cards::xmage_draw_card_variant_review_v1` ->
   `xmage_fixed_source_controller_draw_spell_v1`
+- `draw_cards::xmage_draw_card_variant_review_v1` with fixed
+  `DrawCardTargetEffect`, exact "Target player draws N cards" Oracle/source
+  text, and player target metadata ->
+  `xmage_fixed_target_player_draw_spell_v1`.
+- `draw_cards::xmage_draw_card_variant_review_v1` with fixed
+  `DrawCardSourceControllerEffect + SpellCostReductionSourceEffect`, generic
+  self-spell cost reduction only, and a runtime-measurable condition such as
+  controlled subtype, controlled creature keyword, opponent graveyard count,
+  opponent poison counters, delirium, or controlled Human plus non-Human
+  creature ->
+  `xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1`.
 - `direct_damage::targeted_damage_variant_v1` ->
   `xmage_fixed_damage_target_spell_v1`
 - `direct_damage::targeted_damage_variant_v1` with fixed `DamageTargetEffect`
@@ -6734,6 +6748,59 @@ PG398 measured result:
   non-simple Oracle, missing tap-cost, source-cost, or auxiliary-ability
   blockers.
 
+PG399 measured result:
+
+- PG399 promoted `8` exact draw rules on the new server: `Distorted Curiosity`,
+  `Draconic Lore`, `Into the Story`, `Of One Mind`, `Overflowing Insight`,
+  `Pearl of Wisdom`, `Scour the Laboratory`, and `Winged Words`.
+- Seven rows use
+  `xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1` for fixed
+  draw spells with generic self-spell cost reduction and runtime-measurable
+  conditions: controlled subtype, controlled creature keyword, opponent
+  graveyard count, opponent poison counters, delirium, and controlled Human
+  plus non-Human creature. `Overflowing Insight` uses the already supported
+  `xmage_fixed_target_player_draw_spell_v1` target-player draw scope.
+- The splitter still blocks unsafe neighbors: `Seize the Secrets` remains
+  blocked by `draw_self_cost_reduction_condition_not_supported`, and
+  `Even the Score` remains blocked by
+  `draw_self_cost_reduction_oracle_not_exact_fixed`.
+- Full exact splitter tests passed `368/368`, exact runtime tests passed
+  `210/210`, package-builder tests passed `6/6`, and `py_compile` passed for
+  the changed scripts.
+- PostgreSQL precheck matched `8/8` target card rows on the new server; apply
+  upserted `8` rows; postcheck verified `8/8` promoted rows as `verified`,
+  `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync used `database_target=127.0.0.1:15432/halder`,
+  loaded `4129` PostgreSQL rows, updated `5220` SQLite rows, and exported
+  `5272` canonical snapshot rows. Full metadata sync used the same new-server
+  target, matched `6277` PostgreSQL cards from `6082` unique requested names,
+  wrote `6204` SQLite alias rows, and backfilled `2699/2699` deck-card cache
+  rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, runtime
+  `get_card_effect`, and no-override battle checks for all `8` promoted cards
+  against `database_target=127.0.0.1:15432/halder`.
+- PG399b and PG399c were metadata-only integrity backfills, not new card-rule
+  semantics. PG399b backfilled `2` PostgreSQL `oracle_hash` values first
+  identified through the SQLite audit. PG399c then widened the source-of-truth
+  check and backfilled `42` trusted executable PostgreSQL rows with
+  `oracle_hash` from current `cards.oracle_text`, without changing any
+  executable `effect_json`.
+- The PG/Hermes/SQLite contract audit now includes a PostgreSQL-side
+  `pg_integrity.battle_rules_trusted_oracle_hash_coverage` check. After
+  PG399c and PG -> SQLite sync, the contract audit passed with `51/51` checks
+  and no warnings.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `pass`.
+- Global all-card authoritative queue after PG399c:
+  `target_identity_count=26762`, `xmage_authoritative_source_count=26448`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26448`.
+- Running the exact splitter after PG399c on supported units returned
+  `proposal_count=0` over `7602` considered supported rows. The fixed draw
+  self-cost-reduction and fixed target-player draw spillover are therefore
+  closed for currently supported exact scopes.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -7364,7 +7431,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG398 queue on the new server, the next exact runtime-backed work should
+post-PG399c queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1818`
@@ -7374,8 +7441,8 @@ be selected from these largest reusable work units, not from deck intuition:
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `728`
 7. `removal_destroy::targeted_destroy_variant_v1` - `612`
-8. `draw_cards::xmage_draw_card_variant_review_v1` - `605`
-9. `tutor::xmage_library_search_variant_review_v1` - `605`
+8. `tutor::xmage_library_search_variant_review_v1` - `605`
+9. `draw_cards::xmage_draw_card_variant_review_v1` - `597`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
 Selection rule:

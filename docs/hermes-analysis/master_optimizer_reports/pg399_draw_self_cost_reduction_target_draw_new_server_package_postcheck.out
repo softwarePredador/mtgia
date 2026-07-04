@@ -1,0 +1,11 @@
+      card_name       |   normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+----------------------+----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Distorted Curiosity  | distorted curiosity  | battle_rule_v1:72bb59188e2df380602ed08f4ee5b827 |                  1 |                           1 |                         1 |           0
+ Draconic Lore        | draconic lore        | battle_rule_v1:551a3b4152b9cd2bca57277a77c3badf |                  1 |                           1 |                         1 |           0
+ Into the Story       | into the story       | battle_rule_v1:7b86830fddab9090f6dba403cd83f0cc |                  1 |                           1 |                         1 |           0
+ Of One Mind          | of one mind          | battle_rule_v1:3ed1545be6ac150e060339d3f48b6046 |                  1 |                           1 |                         1 |           0
+ Overflowing Insight  | overflowing insight  | battle_rule_v1:c878698b39e28187811f320886f31235 |                  1 |                           1 |                         1 |           0
+ Pearl of Wisdom      | pearl of wisdom      | battle_rule_v1:849932e4bd730d18b792e48b51206cac |                  1 |                           1 |                         1 |           0
+ Scour the Laboratory | scour the laboratory | battle_rule_v1:f8a458643963c242d23d2ca55cded5cb |                  1 |                           1 |                         1 |           0
+ Winged Words         | winged words         | battle_rule_v1:1b0b5f6d4f1ab34821f2b3b326e6c684 |                  1 |                           1 |                         1 |           0
+(8 rows)

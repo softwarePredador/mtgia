@@ -1503,16 +1503,98 @@ def _source_static_cost_reduction_effect(source):
     return {}
 
 
+def _controlled_permanent_has_subtype(permanent, subtype):
+    if not isinstance(permanent, dict) or not subtype:
+        return False
+    type_line = str(permanent.get("type_line") or "").lower()
+    return bool(re.search(rf"\b{re.escape(str(subtype).lower())}\b", type_line))
+
+
+def _controlled_creature_has_keyword(permanent, keyword):
+    if not isinstance(permanent, dict) or not keyword or not is_battlefield_creature(permanent):
+        return False
+    normalized_keyword = str(keyword).strip().lower().replace(" ", "_")
+    if bool(permanent.get(normalized_keyword)):
+        return True
+    return normalized_keyword in _keyword_values(permanent)
+
+
+def _graveyard_card_type_count(player):
+    card_types = {
+        "artifact",
+        "battle",
+        "creature",
+        "enchantment",
+        "instant",
+        "land",
+        "planeswalker",
+        "sorcery",
+        "tribal",
+    }
+    seen = set()
+    for card in getattr(player, "graveyard", []) or []:
+        if not isinstance(card, dict):
+            continue
+        type_line = str(card.get("type_line") or "").lower()
+        for card_type in card_types:
+            if re.search(rf"\b{re.escape(card_type)}\b", type_line):
+                seen.add(card_type)
+    return len(seen)
+
+
 def _cost_reduction_condition_satisfied(effect_data, controller):
     condition = str(effect_data.get("cost_reduction_condition") or "").strip().lower()
     if not condition:
         return True
     battlefield = getattr(controller, "battlefield", []) or []
+    opponents = list(getattr(controller, "_current_opponents", []) or [])
     if condition == "control_wizard":
         return any(
             isinstance(permanent, dict) and "wizard" in str(permanent.get("type_line") or "").lower()
             for permanent in battlefield
         )
+    if condition == "control_subtype":
+        subtype = str(effect_data.get("cost_reduction_required_subtype") or "").strip().lower()
+        return any(_controlled_permanent_has_subtype(permanent, subtype) for permanent in battlefield)
+    if condition == "control_creature_with_keyword":
+        keyword = str(effect_data.get("cost_reduction_required_keyword") or "").strip().lower()
+        return any(_controlled_creature_has_keyword(permanent, keyword) for permanent in battlefield)
+    if condition == "control_human_and_nonhuman_creature":
+        controls_human = False
+        controls_nonhuman = False
+        for permanent in battlefield:
+            if not isinstance(permanent, dict) or not is_battlefield_creature(permanent):
+                continue
+            if _controlled_permanent_has_subtype(permanent, "human"):
+                controls_human = True
+            else:
+                controls_nonhuman = True
+        return controls_human and controls_nonhuman
+    if condition == "opponent_graveyard_cards_at_least":
+        try:
+            threshold = max(0, int(effect_data.get("cost_reduction_opponent_graveyard_cards_min") or 0))
+        except (TypeError, ValueError):
+            threshold = 0
+        return any(len(getattr(opponent, "graveyard", []) or []) >= threshold for opponent in opponents)
+    if condition == "opponent_poison_counters_at_least":
+        try:
+            threshold = max(0, int(effect_data.get("cost_reduction_opponent_poison_counters_min") or 0))
+        except (TypeError, ValueError):
+            threshold = 0
+        for opponent in opponents:
+            try:
+                poison_count = int(getattr(opponent, "poison", getattr(opponent, "poison_counters", 0)) or 0)
+            except (TypeError, ValueError):
+                poison_count = 0
+            if poison_count >= threshold:
+                return True
+        return False
+    if condition == "delirium":
+        try:
+            threshold = max(0, int(effect_data.get("cost_reduction_graveyard_card_types_min") or 4))
+        except (TypeError, ValueError):
+            threshold = 4
+        return _graveyard_card_type_count(controller) >= threshold
     if condition in {"control_creature_power_4_or_greater", "ferocious"}:
         for permanent in battlefield:
             if not isinstance(permanent, dict):

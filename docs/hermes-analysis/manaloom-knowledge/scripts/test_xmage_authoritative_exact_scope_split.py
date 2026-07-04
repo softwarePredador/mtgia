@@ -1304,6 +1304,65 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 2)
         self.assertTrue(proposal["safe_for_batch_pg_package"])
 
+    def test_fixed_draw_spell_with_self_cost_reduction_maps(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "SpellCostReductionSourceEffect"],
+            ability_classes=["SimpleStaticAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Into the Story",
+                type_line="Instant",
+                oracle_text=(
+                    "This spell costs {3} less to cast if an opponent has seven or more "
+                    "cards in their graveyard.\nDraw four cards."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility("
+                "Zone.ALL, new SpellCostReductionSourceEffect(3, CardsInOpponentGraveyardCondition.SEVEN)"
+                ").setRuleAtTheTop(true));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(4));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_SELF_COST_REDUCTION_SCOPE)
+        self.assertEqual(effect["effect"], "draw_cards")
+        self.assertEqual(effect["draw_count"], 4)
+        self.assertEqual(effect["cost_reduction_applies_to"], "this_spell")
+        self.assertEqual(effect["cost_reduction_generic"], 3)
+        self.assertEqual(effect["cost_reduction_condition"], "opponent_graveyard_cards_at_least")
+        self.assertEqual(effect["cost_reduction_opponent_graveyard_cards_min"], 7)
+
+    def test_fixed_draw_spell_with_colored_or_x_cost_reduction_stays_blocked(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "SpellCostReductionSourceEffect"],
+            ability_classes=["SimpleStaticAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Even the Score",
+                type_line="Instant",
+                oracle_text=(
+                    "This spell costs {U}{U}{U} less to cast if an opponent has drawn four "
+                    "or more cards this turn.\nDraw X cards."
+                ),
+            ),
+            source_text=(
+                "new SpellCostReductionSourceEffect(new ManaCostsImpl<>(\"{U}{U}{U}\"), condition);"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(GetXValue.instance));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "draw_self_cost_reduction_oracle_not_exact_fixed")
+
     def test_fixed_draw_discard_spell_maps_draw_discard_controller_effect(self) -> None:
         row = queue_row(split.DRAW_UNIT, effect_classes=["DrawDiscardControllerEffect"])
         proposal, reason = split.split_row(

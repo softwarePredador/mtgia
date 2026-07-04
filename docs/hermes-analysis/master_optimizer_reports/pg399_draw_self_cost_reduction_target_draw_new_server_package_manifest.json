@@ -1,0 +1,486 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg399_draw_self_cost_reduction_target_draw_new_server_20",
+  "deploy_id": "PG399",
+  "expected_rules": [
+    {
+      "card_name": "Distorted Curiosity",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:72bb59188e2df380602ed08f4ee5b827",
+      "min_rule_version": 2,
+      "normalized_name": "distorted curiosity",
+      "oracle_hash": "96125603ad98c8ef33157389b9d59b62",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "opponent_poison_counters_at_least",
+        "cost_reduction_generic": 2,
+        "cost_reduction_opponent_poison_counters_min": 3,
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Draconic Lore",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:551a3b4152b9cd2bca57277a77c3badf",
+      "min_rule_version": 2,
+      "normalized_name": "draconic lore",
+      "oracle_hash": "d784b8e5790077cba8973240f5308d82",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "control_subtype",
+        "cost_reduction_generic": 2,
+        "cost_reduction_required_subtype": "dragon",
+        "count": 3,
+        "draw_count": 3,
+        "effect": "draw_cards"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Into the Story",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7b86830fddab9090f6dba403cd83f0cc",
+      "min_rule_version": 2,
+      "normalized_name": "into the story",
+      "oracle_hash": "787c2d6c52861f77978fd3b030799117",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "opponent_graveyard_cards_at_least",
+        "cost_reduction_generic": 3,
+        "cost_reduction_opponent_graveyard_cards_min": 7,
+        "count": 4,
+        "draw_count": 4,
+        "effect": "draw_cards"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Of One Mind",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3ed1545be6ac150e060339d3f48b6046",
+      "min_rule_version": 2,
+      "normalized_name": "of one mind",
+      "oracle_hash": "bb572f4c4e508141df09f5da47bfbf80",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "control_human_and_nonhuman_creature",
+        "cost_reduction_generic": 2,
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Overflowing Insight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c878698b39e28187811f320886f31235",
+      "min_rule_version": 2,
+      "normalized_name": "overflowing insight",
+      "oracle_hash": "4cc7bb709182a575326945bd43982048",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+        "count": 7,
+        "draw_count": 7,
+        "effect": "draw_cards",
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_player_draw": true,
+        "target_preference": "self",
+        "xmage_effect_class": "DrawCardTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pearl of Wisdom",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:849932e4bd730d18b792e48b51206cac",
+      "min_rule_version": 2,
+      "normalized_name": "pearl of wisdom",
+      "oracle_hash": "37e7cbe4070b00405cdfa36e31691483",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "control_subtype",
+        "cost_reduction_generic": 1,
+        "cost_reduction_required_subtype": "otter",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scour the Laboratory",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f8a458643963c242d23d2ca55cded5cb",
+      "min_rule_version": 2,
+      "normalized_name": "scour the laboratory",
+      "oracle_hash": "a9dc24ac34e23e7ee0c1b9715a510dc0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "delirium",
+        "cost_reduction_generic": 2,
+        "cost_reduction_graveyard_card_types_min": 4,
+        "count": 3,
+        "draw_count": 3,
+        "effect": "draw_cards"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Winged Words",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1b0b5f6d4f1ab34821f2b3b326e6c684",
+      "min_rule_version": 2,
+      "normalized_name": "winged words",
+      "oracle_hash": "8f9b430fe2bee3d386c04f85799806a5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "control_creature_with_keyword",
+        "cost_reduction_generic": 1,
+        "cost_reduction_required_keyword": "flying",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_draw_spell_self_cost_reduction": 7,
+    "xmage_fixed_target_player_draw_spell": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg399_draw_self_cost_reduction_target_draw_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg399_draw_self_cost_reduction_target_draw_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg399_draw_self_cost_reduction_target_draw_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg399_draw_self_cost_reduction_target_draw_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg399_draw_self_cost_reduction_target_draw_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg399_draw_self_cost_reduction_target_draw_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-04T10:16:45+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Distorted Curiosity"
+      },
+      "card_name": "Distorted Curiosity",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:72bb59188e2df380602ed08f4ee5b827",
+      "normalized_name": "distorted curiosity",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "opponent_poison_counters_at_least",
+        "cost_reduction_generic": 2,
+        "cost_reduction_opponent_poison_counters_min": 3,
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards"
+      }
+    },
+    {
+      "card": {
+        "name": "Draconic Lore"
+      },
+      "card_name": "Draconic Lore",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:551a3b4152b9cd2bca57277a77c3badf",
+      "normalized_name": "draconic lore",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "control_subtype",
+        "cost_reduction_generic": 2,
+        "cost_reduction_required_subtype": "dragon",
+        "count": 3,
+        "draw_count": 3,
+        "effect": "draw_cards"
+      }
+    },
+    {
+      "card": {
+        "name": "Into the Story"
+      },
+      "card_name": "Into the Story",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7b86830fddab9090f6dba403cd83f0cc",
+      "normalized_name": "into the story",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "opponent_graveyard_cards_at_least",
+        "cost_reduction_generic": 3,
+        "cost_reduction_opponent_graveyard_cards_min": 7,
+        "count": 4,
+        "draw_count": 4,
+        "effect": "draw_cards"
+      }
+    },
+    {
+      "card": {
+        "name": "Of One Mind"
+      },
+      "card_name": "Of One Mind",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3ed1545be6ac150e060339d3f48b6046",
+      "normalized_name": "of one mind",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "control_human_and_nonhuman_creature",
+        "cost_reduction_generic": 2,
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards"
+      }
+    },
+    {
+      "card": {
+        "name": "Overflowing Insight"
+      },
+      "card_name": "Overflowing Insight",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c878698b39e28187811f320886f31235",
+      "normalized_name": "overflowing insight",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+        "count": 7,
+        "draw_count": 7,
+        "effect": "draw_cards",
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_player_draw": true,
+        "target_preference": "self",
+        "xmage_effect_class": "DrawCardTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Pearl of Wisdom"
+      },
+      "card_name": "Pearl of Wisdom",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:849932e4bd730d18b792e48b51206cac",
+      "normalized_name": "pearl of wisdom",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "control_subtype",
+        "cost_reduction_generic": 1,
+        "cost_reduction_required_subtype": "otter",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards"
+      }
+    },
+    {
+      "card": {
+        "name": "Scour the Laboratory"
+      },
+      "card_name": "Scour the Laboratory",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f8a458643963c242d23d2ca55cded5cb",
+      "normalized_name": "scour the laboratory",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "delirium",
+        "cost_reduction_generic": 2,
+        "cost_reduction_graveyard_card_types_min": 4,
+        "count": 3,
+        "draw_count": 3,
+        "effect": "draw_cards"
+      }
+    },
+    {
+      "card": {
+        "name": "Winged Words"
+      },
+      "card_name": "Winged Words",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1b0b5f6d4f1ab34821f2b3b326e6c684",
+      "normalized_name": "winged words",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_condition": "control_creature_with_keyword",
+        "cost_reduction_generic": 1,
+        "cost_reduction_required_keyword": "flying",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Distorted Curiosity",
+    "Draconic Lore",
+    "Into the Story",
+    "Of One Mind",
+    "Overflowing Insight",
+    "Pearl of Wisdom",
+    "Scour the Laboratory",
+    "Winged Words"
+  ],
+  "selected_count": 8,
+  "slug": "draw_self_cost_reduction_target_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Distorted Curiosity",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:72bb59188e2df380602ed08f4ee5b827",
+      "min_rule_version": 2,
+      "normalized_name": "distorted curiosity",
+      "oracle_hash": "96125603ad98c8ef33157389b9d59b62",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Draconic Lore",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:551a3b4152b9cd2bca57277a77c3badf",
+      "min_rule_version": 2,
+      "normalized_name": "draconic lore",
+      "oracle_hash": "d784b8e5790077cba8973240f5308d82",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Into the Story",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7b86830fddab9090f6dba403cd83f0cc",
+      "min_rule_version": 2,
+      "normalized_name": "into the story",
+      "oracle_hash": "787c2d6c52861f77978fd3b030799117",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Of One Mind",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3ed1545be6ac150e060339d3f48b6046",
+      "min_rule_version": 2,
+      "normalized_name": "of one mind",
+      "oracle_hash": "bb572f4c4e508141df09f5da47bfbf80",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Overflowing Insight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c878698b39e28187811f320886f31235",
+      "min_rule_version": 2,
+      "normalized_name": "overflowing insight",
+      "oracle_hash": "4cc7bb709182a575326945bd43982048",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pearl of Wisdom",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:849932e4bd730d18b792e48b51206cac",
+      "min_rule_version": 2,
+      "normalized_name": "pearl of wisdom",
+      "oracle_hash": "37e7cbe4070b00405cdfa36e31691483",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scour the Laboratory",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f8a458643963c242d23d2ca55cded5cb",
+      "min_rule_version": 2,
+      "normalized_name": "scour the laboratory",
+      "oracle_hash": "a9dc24ac34e23e7ee0c1b9715a510dc0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Winged Words",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1b0b5f6d4f1ab34821f2b3b326e6c684",
+      "min_rule_version": 2,
+      "normalized_name": "winged words",
+      "oracle_hash": "8f9b430fe2bee3d386c04f85799806a5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

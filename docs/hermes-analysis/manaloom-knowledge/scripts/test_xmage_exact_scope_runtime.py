@@ -5937,6 +5937,54 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_self_spell_cost_reduction_uses_opponent_graveyard_condition(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active._current_opponents = [opponent]
+        draw_spell = {
+            "name": "Fixture Into the Story",
+            "type_line": "Instant",
+            "mana_cost": "{5}{U}{U}",
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+            "cost_reduction_applies_to": "this_spell",
+            "cost_reduction_amount_source": "fixed",
+            "cost_reduction_generic": 3,
+            "cost_reduction_condition": "opponent_graveyard_cards_at_least",
+            "cost_reduction_opponent_graveyard_cards_min": 7,
+        }
+
+        unreduced = self.battle.card_cost_for_player_state(active, draw_spell)
+        opponent.graveyard.extend({"name": f"Card {i}", "type_line": "Creature"} for i in range(7))
+        reduced = self.battle.card_cost_for_player_state(active, draw_spell)
+
+        self.assertEqual(unreduced["generic"], 5)
+        self.assertEqual(reduced["generic"], 2)
+        self.assertEqual(reduced["static_cost_reduction_total"], 3)
+
+    def test_self_spell_cost_reduction_uses_controlled_subtype_condition(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        draw_spell = {
+            "name": "Fixture Draconic Lore",
+            "type_line": "Instant",
+            "mana_cost": "{5}{U}",
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+            "cost_reduction_applies_to": "this_spell",
+            "cost_reduction_amount_source": "fixed",
+            "cost_reduction_generic": 2,
+            "cost_reduction_condition": "control_subtype",
+            "cost_reduction_required_subtype": "dragon",
+        }
+
+        unreduced = self.battle.card_cost_for_player_state(active, draw_spell)
+        active.battlefield.append({"name": "Dragon Ally", "type_line": "Creature - Dragon", "power": 4, "toughness": 4})
+        reduced = self.battle.card_cost_for_player_state(active, draw_spell)
+
+        self.assertEqual(unreduced["generic"], 5)
+        self.assertEqual(reduced["generic"], 3)
+        self.assertEqual(reduced["static_cost_reductions"][0]["source"], "Fixture Draconic Lore")
+
     def test_counter_target_creature_spell_filters_stack_target_type(self) -> None:
         opponent = self.battle.Player("Opponent", None, [])
         counter_effect = {

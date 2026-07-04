@@ -90,6 +90,7 @@ SUPPORTED_UNITS = {
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
+DRAW_SELF_COST_REDUCTION_SCOPE = "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
 TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
 DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
@@ -4780,7 +4781,19 @@ def activated_draw_from_mana_source_oracle(metadata: dict[str, Any]) -> dict[str
 
 def number_word_to_int(value: str) -> int:
     normalized = str(value or "").strip().lower()
-    words = {"a": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5}
+    words = {
+        "a": 1,
+        "one": 1,
+        "two": 2,
+        "three": 3,
+        "four": 4,
+        "five": 5,
+        "six": 6,
+        "seven": 7,
+        "eight": 8,
+        "nine": 9,
+        "ten": 10,
+    }
     return words.get(normalized, int(normalized) if normalized.isdigit() else 0)
 
 
@@ -4932,6 +4945,127 @@ def fixed_target_player_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict
     if draw_count <= 0:
         return "target_player_draw_spell_count_not_fixed"
     return {"draw_count": draw_count}
+
+
+def self_cost_reduction_condition_from_oracle(condition_text: str) -> dict[str, Any] | str:
+    condition = re.sub(r"\([^)]*\)", "", condition_text)
+    condition = re.sub(r"\s+", " ", condition).strip().strip(".").lower()
+    subtype_match = re.fullmatch(r"you control an? ([a-z][a-z -]+)", condition)
+    if subtype_match and " creature with " not in condition:
+        subtype = subtype_match.group(1).replace("-", " ").strip()
+        if subtype and " and " not in subtype:
+            return {
+                "cost_reduction_condition": "control_subtype",
+                "cost_reduction_required_subtype": subtype,
+            }
+    keyword_match = re.fullmatch(r"you control a creature with ([a-z ]+)", condition)
+    if keyword_match:
+        keyword = keyword_match.group(1).strip().replace(" ", "_")
+        if keyword:
+            return {
+                "cost_reduction_condition": "control_creature_with_keyword",
+                "cost_reduction_required_keyword": keyword,
+            }
+    graveyard_match = re.fullmatch(
+        r"an opponent has (?P<count>\w+|\d+) or more cards in their graveyard",
+        condition,
+    )
+    if graveyard_match:
+        count = number_word_to_int(graveyard_match.group("count"))
+        if count > 0:
+            return {
+                "cost_reduction_condition": "opponent_graveyard_cards_at_least",
+                "cost_reduction_opponent_graveyard_cards_min": count,
+            }
+    poison_match = re.fullmatch(
+        r"an opponent has (?P<count>\w+|\d+) or more poison counters",
+        condition,
+    )
+    if poison_match:
+        count = number_word_to_int(poison_match.group("count"))
+        if count > 0:
+            return {
+                "cost_reduction_condition": "opponent_poison_counters_at_least",
+                "cost_reduction_opponent_poison_counters_min": count,
+            }
+    if condition == "there are four or more card types among cards in your graveyard":
+        return {
+            "cost_reduction_condition": "delirium",
+            "cost_reduction_graveyard_card_types_min": 4,
+        }
+    if condition == "you control a human creature and a non-human creature":
+        return {
+            "cost_reduction_condition": "control_human_and_nonhuman_creature",
+        }
+    return "draw_self_cost_reduction_condition_not_supported"
+
+
+def fixed_draw_self_cost_reduction_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
+    text_no_reminder = re.sub(r"\([^)]*\)", "", text)
+    pattern = re.compile(
+        r"(?:[^.]*?\s+[—-]\s+)?this spell costs \{(?P<reduction>\d+)\} less to cast if (?P<condition>[^.]+)\.\s*draw (?P<count>a|one|two|three|four|five|six|seven|\d+) cards?\.?",
+        re.I,
+    )
+    match = pattern.fullmatch(text_no_reminder.strip())
+    if not match:
+        return "draw_self_cost_reduction_oracle_not_exact_fixed"
+    reduction = int(match.group("reduction"))
+    draw_count = number_word_to_int(match.group("count"))
+    if reduction <= 0 or draw_count <= 0:
+        return "draw_self_cost_reduction_oracle_not_exact_fixed"
+    condition = self_cost_reduction_condition_from_oracle(match.group("condition"))
+    if isinstance(condition, str):
+        return condition
+    return {
+        "draw_count": draw_count,
+        "count": draw_count,
+        "cost_reduction_generic": reduction,
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_amount_source": "fixed",
+        **condition,
+    }
+
+
+def fixed_draw_self_cost_reduction_from_source(source_text: str) -> dict[str, Any] | str:
+    reduction_matches = re.findall(
+        r"SpellCostReductionSourceEffect\s*\(\s*(\d+)\s*,",
+        source_text or "",
+    )
+    if len(reduction_matches) != 1:
+        return "draw_self_cost_reduction_source_cost_not_supported"
+    draw_count = java_constructor_int(source_text, "DrawCardSourceControllerEffect")
+    if draw_count is None or draw_count <= 0:
+        return "draw_self_cost_reduction_source_draw_not_fixed"
+    return {
+        "draw_count": draw_count,
+        "count": draw_count,
+        "cost_reduction_generic": int(reduction_matches[0]),
+        "cost_reduction_applies_to": "this_spell",
+        "cost_reduction_amount_source": "fixed",
+    }
+
+
+def source_supports_self_cost_reduction_condition(source_text: str, condition_fields: dict[str, Any]) -> bool:
+    condition = str(condition_fields.get("cost_reduction_condition") or "")
+    source = source_text or ""
+    if condition == "control_subtype":
+        subtype = str(condition_fields.get("cost_reduction_required_subtype") or "").strip().upper()
+        subtype = re.sub(r"[^A-Z0-9]+", "_", subtype).strip("_")
+        return bool(subtype and f"SubType.{subtype}" in source)
+    if condition == "control_creature_with_keyword":
+        keyword = str(condition_fields.get("cost_reduction_required_keyword") or "").strip().lower()
+        class_name = "".join(part.capitalize() for part in keyword.split("_")) + "Ability"
+        return class_name in source and "AbilityPredicate" in source
+    if condition == "opponent_graveyard_cards_at_least":
+        return "CardsInOpponentGraveyardCondition" in source
+    if condition == "opponent_poison_counters_at_least":
+        return "CorruptedCondition" in source
+    if condition == "delirium":
+        return "DeliriumCondition" in source
+    if condition == "control_human_and_nonhuman_creature":
+        return "SubType.HUMAN" in source and "CompoundCondition" in source
+    return False
 
 
 def activated_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
@@ -8314,6 +8448,11 @@ def split_row(
     )
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
+    draw_self_cost_reduction_spell_unit = (
+        unit == DRAW_UNIT
+        and effect_classes(row) == {"DrawCardSourceControllerEffect", "SpellCostReductionSourceEffect"}
+        and "SimpleStaticAbility" in ability_classes(row)
+    )
     if (
         unit not in SUPPORTED_UNITS
         and not keyword_creature_unit
@@ -8398,6 +8537,7 @@ def split_row(
         and not permanent_activated_graveyard_exile_unit
         and not permanent_activated_graveyard_to_library_unit
         and not graveyard_self_return_unit
+        and not draw_self_cost_reduction_spell_unit
     ):
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
@@ -11356,6 +11496,51 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_fixed_draw_discard_spell",
+            ), "selected_exact_scope"
+
+        if classes == {"DrawCardSourceControllerEffect", "SpellCostReductionSourceEffect"}:
+            if not is_spell(metadata):
+                return None, "not_instant_or_sorcery_spell"
+            abilities = ability_classes(row)
+            oracle_reduction = fixed_draw_self_cost_reduction_from_oracle(metadata)
+            if isinstance(oracle_reduction, str):
+                return None, oracle_reduction
+            allowed_abilities = {"SimpleStaticAbility"}
+            if oracle_reduction.get("cost_reduction_condition") == "control_creature_with_keyword":
+                allowed_abilities.add(
+                    "".join(
+                        part.capitalize()
+                        for part in str(oracle_reduction.get("cost_reduction_required_keyword") or "").split("_")
+                    )
+                    + "Ability"
+                )
+            if abilities - allowed_abilities:
+                return None, "draw_self_cost_reduction_ability_class_not_supported"
+            source_reduction = fixed_draw_self_cost_reduction_from_source(source_text)
+            if isinstance(source_reduction, str):
+                return None, source_reduction
+            for key in ("draw_count", "count", "cost_reduction_generic"):
+                if int(source_reduction.get(key) or 0) != int(oracle_reduction.get(key) or 0):
+                    return None, "draw_self_cost_reduction_source_oracle_mismatch"
+            if not source_supports_self_cost_reduction_condition(source_text, oracle_reduction):
+                return None, "draw_self_cost_reduction_source_condition_mismatch"
+            effect_json = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SELF_COST_REDUCTION_SCOPE,
+                "count": int(oracle_reduction["draw_count"]),
+                "draw_count": int(oracle_reduction["draw_count"]),
+                "xmage_effect_classes": [
+                    "DrawCardSourceControllerEffect",
+                    "SpellCostReductionSourceEffect",
+                ],
+                **oracle_reduction,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_draw_spell_self_cost_reduction",
             ), "selected_exact_scope"
 
         if classes != {"DrawCardSourceControllerEffect"}:

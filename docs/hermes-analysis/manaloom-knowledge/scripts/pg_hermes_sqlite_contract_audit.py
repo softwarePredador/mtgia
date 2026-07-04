@@ -602,6 +602,57 @@ def pg_schema_checks(columns: dict[str, set[str]], counts: dict[str, int]) -> li
     return checks
 
 
+def pg_integrity_checks() -> list[Check]:
+    checks: list[Check] = []
+    with connect() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT COUNT(*)
+                FROM card_battle_rules
+                WHERE source IN ('curated', 'manual')
+                  AND review_status IN ('verified', 'active')
+                  AND execution_status IN ('auto', 'executable')
+                  AND COALESCE(oracle_hash, '') = ''
+                """
+            )
+            missing_hash = int(cur.fetchone()[0] or 0)
+            cur.execute(
+                """
+                SELECT card_name, normalized_name, logical_rule_key, source,
+                       review_status, execution_status, rule_version
+                FROM card_battle_rules
+                WHERE source IN ('curated', 'manual')
+                  AND review_status IN ('verified', 'active')
+                  AND execution_status IN ('auto', 'executable')
+                  AND COALESCE(oracle_hash, '') = ''
+                ORDER BY card_name, logical_rule_key
+                LIMIT 20
+                """
+            )
+            sample = [
+                {
+                    "card_name": row[0],
+                    "normalized_name": row[1],
+                    "logical_rule_key": row[2],
+                    "source": row[3],
+                    "review_status": row[4],
+                    "execution_status": row[5],
+                    "rule_version": row[6],
+                }
+                for row in cur.fetchall()
+            ]
+    checks.append(
+        Check(
+            "pg_integrity.battle_rules_trusted_oracle_hash_coverage",
+            "pass" if missing_hash == 0 else "fail",
+            f"trusted_executable_rules_missing_oracle_hash={missing_hash}",
+            {"sample": sample},
+        )
+    )
+    return checks
+
+
 def reviewed_runtime_keys() -> set[tuple[str, str]]:
     keys: set[tuple[str, str]] = set()
     for row in load_reviewed_rule_rows():
@@ -771,6 +822,7 @@ def build_report(sqlite_db: Path, *, skip_pg: bool = False) -> dict[str, Any]:
         else:
             checks.append(Check("pg_connection", "pass", pg_target))
             checks.extend(pg_schema_checks(pg_columns, pg_counts))
+            checks.extend(pg_integrity_checks())
 
     status_counts: dict[str, int] = {}
     for check in checks:

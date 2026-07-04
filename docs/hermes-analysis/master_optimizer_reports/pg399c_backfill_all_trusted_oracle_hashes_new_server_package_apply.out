@@ -1,0 +1,10 @@
+BEGIN
+CREATE SCHEMA
+DO
+SELECT 42
+ updated_rows
+--------------
+           42
+(1 row)
+
+COMMIT
