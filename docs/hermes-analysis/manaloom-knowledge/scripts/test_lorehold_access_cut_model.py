@@ -404,6 +404,9 @@ def test_access_model_records_squee_access_density_context():
     assert payload["summary"]["squee_probe_status"] == "squee_route_modeled_but_access_gap_remains"
     assert payload["summary"]["weak_access_seeds"] == ["7", "20260625"]
     assert "Squee, Goblin Nabob" in payload["summary"]["target_access_cards"]
+    assert "Squee, Goblin Nabob" in payload["summary"]["nonbaseline_target_access_cards"]
+    assert "Squee, Goblin Nabob" not in payload["summary"]["current_target_access_cards"]
     by_card = {row["card_name"]: row for row in payload["candidates"]}
     assert "Squee, Goblin Nabob" not in by_card["Enlightened Tutor"]["access_targets"]
-    assert "Squee, Goblin Nabob" in by_card["Gamble"]["access_targets"]
+    assert "Squee, Goblin Nabob" not in by_card["Gamble"]["access_targets"]
+    assert "Squee, Goblin Nabob" in by_card["Gamble"]["nonbaseline_access_targets"]

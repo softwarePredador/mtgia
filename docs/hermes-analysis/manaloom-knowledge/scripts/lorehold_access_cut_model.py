@@ -241,6 +241,34 @@ def candidate_access_targets(card_name: str) -> list[str]:
     return targets.get(card_name, [])
 
 
+def split_current_access_targets(deck_cards_by_name: dict[str, dict[str, Any]]) -> dict[str, list[str]]:
+    current = [
+        card
+        for card in ACCESS_TARGETS
+        if normalize_key(card) in deck_cards_by_name
+    ]
+    nonbaseline = [
+        card
+        for card in ACCESS_TARGETS
+        if normalize_key(card) not in deck_cards_by_name
+    ]
+    return {
+        "current_target_access_cards": current,
+        "nonbaseline_target_access_cards": nonbaseline,
+    }
+
+
+def current_candidate_access_targets(
+    card_name: str,
+    deck_cards_by_name: dict[str, dict[str, Any]],
+) -> list[str]:
+    return [
+        card
+        for card in candidate_access_targets(card_name)
+        if normalize_key(card) in deck_cards_by_name
+    ]
+
+
 def squee_probe_summary(squee_probe_report: dict[str, Any] | None) -> dict[str, Any]:
     summary = (squee_probe_report or {}).get("summary") or {}
     return {
@@ -675,6 +703,7 @@ def build_model(
     squee_probe_path = squee_probe_path or default_squee_probe()
     deck_cards = load_deck_cards(conn, deck_id)
     deck_cards_by_name = {normalize_key(row["card_name"]): row for row in deck_cards}
+    access_targets = split_current_access_targets(deck_cards_by_name)
     all_names = sorted({*candidates, *(row["card_name"] for row in deck_cards)})
     proposal_paths = list(runtime_package_proposal_reports or [])
     local_rules = rule_summary(conn, all_names)
@@ -712,7 +741,12 @@ def build_model(
                 "status": status,
                 "score": score,
                 "lane": candidate_lane(candidate),
-                "access_targets": candidate_access_targets(candidate),
+                "access_targets": current_candidate_access_targets(candidate, deck_cards_by_name),
+                "nonbaseline_access_targets": [
+                    card
+                    for card in candidate_access_targets(candidate)
+                    if normalize_key(card) not in deck_cards_by_name
+                ],
                 "target_failure_modes": [
                     "seed7_missing_engine_access",
                     "seed20260625_conversion_under_pressure",
@@ -784,6 +818,8 @@ def build_model(
             "squee_probe_status": squee_summary.get("status", ""),
             "weak_access_seeds": squee_summary.get("weak_material_missing_squee_seeds") or [],
             "target_access_cards": list(ACCESS_TARGETS),
+            "current_target_access_cards": access_targets["current_target_access_cards"],
+            "nonbaseline_target_access_cards": access_targets["nonbaseline_target_access_cards"],
             "recommended_next_action": (
                 f"gate_{preflight_rows[0]['candidate']}_over_{preflight_rows[0]['cut']}"
                 if preflight_rows
@@ -811,10 +847,13 @@ def build_model(
         },
         "access_density_context": {
             "target_access_cards": list(ACCESS_TARGETS),
+            "current_target_access_cards": access_targets["current_target_access_cards"],
+            "nonbaseline_target_access_cards": access_targets["nonbaseline_target_access_cards"],
             "squee_probe": squee_summary,
             "package_constraint": (
-                "Any access package must improve reach to Squee/Top/Rack/Library while preserving "
-                "seed-42 Squee, miracle, and topdeck telemetry."
+                "Any access package must improve reach to current 607 access anchors while preserving "
+                "seed-42 miracle and topdeck telemetry. Nonbaseline targets require an explicit "
+                "package that reintroduces them before they can drive 607 cut decisions."
             ),
         },
         "candidates": candidate_rows,
@@ -866,6 +905,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- access_density_status: `{payload['summary']['access_density_status']}`",
         f"- squee_probe_status: `{payload['summary'].get('squee_probe_status') or '-'}`",
         f"- target_access_cards: `{', '.join(payload['summary']['target_access_cards'])}`",
+        f"- current_target_access_cards: `{', '.join(payload['summary'].get('current_target_access_cards') or []) or '-'}`",
+        f"- nonbaseline_target_access_cards: `{', '.join(payload['summary'].get('nonbaseline_target_access_cards') or []) or '-'}`",
         f"- recommended_next_action: `{payload['summary']['recommended_next_action']}`",
         f"- hidden_retreat_package_status: `{payload['summary'].get('hidden_retreat_package_status') or '-'}`",
         f"- hidden_retreat_runtime_model_status: `{payload['summary'].get('hidden_retreat_runtime_model_status') or '-'}`",

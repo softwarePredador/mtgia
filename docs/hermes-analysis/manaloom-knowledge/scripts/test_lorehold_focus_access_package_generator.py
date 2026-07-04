@@ -263,6 +263,57 @@ def test_completed_squee_probe_routes_to_access_density_model():
     assert "squee_graveyard_entry_probe" not in {row["work_key"] for row in required}
 
 
+def test_nonbaseline_squee_target_blocks_current_baseline_package_route():
+    pairing = {
+        "candidate": "Brainstone",
+        "candidate_status": "runtime_ready_unexplored",
+        "candidate_score": 71,
+        "lane": "graveyard_recursion",
+        "cut_options": [ready_cut("Loose Spell")],
+    }
+    access_model = {
+        "summary": {
+            "access_density_status": "squee_route_modeled_access_density_needed",
+            "preflight_access_candidate_ready_count": 0,
+            "recommended_next_action": "no_access_swap_ready; build_new_seed_safe_cut",
+            "current_target_access_cards": [
+                "Sensei's Divining Top",
+                "Scroll Rack",
+                "Library of Leng",
+            ],
+            "nonbaseline_target_access_cards": ["Squee, Goblin Nabob"],
+        }
+    }
+
+    report = gen.build_report(
+        planner_payload=planner_payload(),
+        trace_audit=trace_audit(),
+        miner_report=miner_with_pairing(pairing),
+        squee_probe={
+            "summary": {
+                "status": "squee_route_modeled_but_access_gap_remains",
+                "modeled_when_accessed": True,
+                "weak_material_missing_squee_seeds": ["7", "20260625"],
+            }
+        },
+        access_model=access_model,
+    )
+
+    row = report["package_candidates"][0]
+    assert row["target_failure_mode"] == "squee_graveyard_entry_route"
+    assert row["status"] == "blocked_nonbaseline_target"
+    assert "nonbaseline_target_not_in_current_baseline" in row["blockers"]
+    assert report["summary"]["current_target_access_cards"] == [
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Library of Leng",
+    ]
+    assert report["summary"]["nonbaseline_target_access_cards"] == ["Squee, Goblin Nabob"]
+    assert report["summary"]["nonbaseline_failure_modes"] == ["squee_graveyard_entry_route"]
+    assert "Squee, Goblin Nabob" not in report["guardrail_contract"]["protected_cards"]
+    assert "not in the current deck-607 baseline" in report["instrumentation_route"]["required_work"][0]["reason"]
+
+
 def test_squee_access_density_work_does_not_count_generic_recursion_packages():
     rows = [
         {

@@ -146,8 +146,52 @@ def package_key(add_card: str, cut_card: str) -> str:
     return f"{slug(add_card)}_cut_{slug(cut_card)}"
 
 
-def protected_card_keys() -> set[str]:
-    return {card_key(card) for card in PROTECTED_CARDS}
+def protected_card_keys(cards: set[str] | list[str] | tuple[str, ...] | None = None) -> set[str]:
+    return {card_key(card) for card in (cards or PROTECTED_CARDS)}
+
+
+def access_target_context(access_model: dict[str, Any] | None) -> dict[str, list[str]]:
+    summary = (access_model or {}).get("summary") or {}
+    current_targets = [
+        str(card)
+        for card in summary.get("current_target_access_cards") or []
+        if str(card).strip()
+    ]
+    nonbaseline_targets = [
+        str(card)
+        for card in summary.get("nonbaseline_target_access_cards") or []
+        if str(card).strip()
+    ]
+    if not current_targets and not nonbaseline_targets:
+        current_targets = [
+            str(card)
+            for card in summary.get("target_access_cards") or []
+            if str(card).strip()
+        ]
+    return {
+        "current_target_access_cards": current_targets,
+        "nonbaseline_target_access_cards": nonbaseline_targets,
+    }
+
+
+def squee_is_nonbaseline_access_target(access_model: dict[str, Any] | None) -> bool:
+    context = access_target_context(access_model)
+    return card_key("Squee, Goblin Nabob") in {
+        card_key(card) for card in context["nonbaseline_target_access_cards"]
+    }
+
+
+def nonbaseline_failure_modes(access_model: dict[str, Any] | None) -> set[str]:
+    if squee_is_nonbaseline_access_target(access_model):
+        return {"squee_graveyard_entry_route"}
+    return set()
+
+
+def effective_protected_cards(access_model: dict[str, Any] | None) -> list[str]:
+    cards = set(PROTECTED_CARDS)
+    if squee_is_nonbaseline_access_target(access_model):
+        cards.discard("Squee, Goblin Nabob")
+    return sorted(cards)
 
 
 def prior_rejected_keys(planner_payload: dict[str, Any]) -> set[str]:
@@ -272,6 +316,7 @@ def status_from_blockers(blockers: list[str]) -> str:
     priority = [
         ("blocked_prior_negative_exact", "prior_negative_exact_match"),
         ("blocked_protected_cut", "protected_cut"),
+        ("blocked_nonbaseline_target", "nonbaseline_target_not_in_current_baseline"),
         ("blocked_runtime_rule_gap", "runtime_status_not_active_or_materialized"),
         ("blocked_no_target_failure_mode", "missing_target_failure_mode"),
         ("blocked_seed42_anchor_missing", "missing_seed42_anchor"),
@@ -291,18 +336,23 @@ def evaluate_cut_option(
     rejected_keys: set[str],
     rejected_pairs: dict[tuple[str, str], dict[str, Any]],
     seed_42_available: bool,
+    protected_cards: set[str] | None = None,
+    nonbaseline_modes: set[str] | None = None,
 ) -> dict[str, Any]:
     add_card = str(pairing.get("candidate") or "")
     cut_card = str(cut_option.get("card_name") or "")
     key = package_key(add_card, cut_card)
     pair_key = (card_key(add_card), card_key(cut_card))
     prior_negative = key in rejected_keys or pair_key in rejected_pairs
-    protected_cut = card_key(cut_card) in protected_card_keys()
+    protected_cut = card_key(cut_card) in protected_card_keys(protected_cards)
     candidate_runtime_status = runtime_status(str(pairing.get("candidate_status") or ""))
     target_failure = target_failure_for_pairing(pairing, modes)
+    nonbaseline_target = target_failure in (nonbaseline_modes or set())
     blockers: list[str] = []
     if not target_failure:
         blockers.append("missing_target_failure_mode")
+    if nonbaseline_target:
+        blockers.append("nonbaseline_target_not_in_current_baseline")
     if protected_cut:
         blockers.append("protected_cut")
     if prior_negative:
@@ -327,6 +377,7 @@ def evaluate_cut_option(
         "cut_gate_readiness": cut_option.get("gate_readiness"),
         "cut_readiness_reason": cut_option.get("readiness_reason"),
         "target_failure_mode": target_failure,
+        "nonbaseline_target_not_in_current_baseline": nonbaseline_target,
         "target_failure_evidence": modes.get(target_failure or "", {}),
         "protected_cards_avoided": not protected_cut,
         "prior_negative_exact_match": prior_negative,
@@ -349,12 +400,16 @@ def evaluate_pairing_without_cut(
     pairing: dict[str, Any],
     modes: dict[str, dict[str, Any]],
     seed_42_available: bool,
+    nonbaseline_modes: set[str] | None = None,
 ) -> dict[str, Any]:
     candidate_runtime_status = runtime_status(str(pairing.get("candidate_status") or ""))
     target_failure = target_failure_for_pairing(pairing, modes)
+    nonbaseline_target = target_failure in (nonbaseline_modes or set())
     blockers = ["no_cut_option_from_miner"]
     if not target_failure:
         blockers.append("missing_target_failure_mode")
+    if nonbaseline_target:
+        blockers.append("nonbaseline_target_not_in_current_baseline")
     if candidate_runtime_status != "active_or_materialized":
         blockers.append("runtime_status_not_active_or_materialized")
     if not seed_42_available:
@@ -369,6 +424,7 @@ def evaluate_pairing_without_cut(
         "candidate_status": pairing.get("candidate_status"),
         "runtime_status": candidate_runtime_status,
         "target_failure_mode": target_failure,
+        "nonbaseline_target_not_in_current_baseline": nonbaseline_target,
         "target_failure_evidence": modes.get(target_failure or "", {}),
         "protected_cards_avoided": True,
         "prior_negative_exact_match": False,
@@ -390,9 +446,12 @@ def evaluate_pairings(
     miner_report: dict[str, Any],
     trace_audit: dict[str, Any],
     planner_payload: dict[str, Any],
+    access_model: dict[str, Any] | None = None,
+    protected_cards: set[str] | None = None,
 ) -> list[dict[str, Any]]:
     modes = focus_failure_modes(trace_audit)
     seed_42_available = seed_42_anchor_available(trace_audit)
+    nonbaseline_modes = nonbaseline_failure_modes(access_model)
     rejected_keys, rejected_pairs = prior_negative_pairs(
         planner_payload=planner_payload,
         miner_report=miner_report,
@@ -406,6 +465,7 @@ def evaluate_pairings(
                     pairing=pairing,
                     modes=modes,
                     seed_42_available=seed_42_available,
+                    nonbaseline_modes=nonbaseline_modes,
                 )
             )
             continue
@@ -418,6 +478,8 @@ def evaluate_pairings(
                     rejected_keys=rejected_keys,
                     rejected_pairs=rejected_pairs,
                     seed_42_available=seed_42_available,
+                    protected_cards=protected_cards,
+                    nonbaseline_modes=nonbaseline_modes,
                 )
             )
     rows.sort(
@@ -458,6 +520,9 @@ def squee_work_item(
     access_model_path: Path | None = None,
 ) -> dict[str, Any]:
     mode = modes.get("squee_graveyard_entry_route") or {}
+    access_context = access_target_context(access_model)
+    current_targets = access_context["current_target_access_cards"]
+    nonbaseline_targets = access_context["nonbaseline_target_access_cards"]
     if squee_route_modeled(squee_probe):
         summary = (squee_probe or {}).get("summary") or {}
         access_summary = (access_model or {}).get("summary") or {}
@@ -468,7 +533,15 @@ def squee_work_item(
                 access_summary.get("hidden_retreat_runtime_model_status") or ""
             )
             hidden_package_status = str(access_summary.get("hidden_retreat_package_status") or "")
-            if hidden_runtime_status == "runtime_proposal_overlay_active" and ready_count == 0:
+            if squee_is_nonbaseline_access_target(access_model):
+                target_phrase = ", ".join(current_targets) or "current deck-607 access anchors"
+                reason = (
+                    "Squee discard/return is modeled when accessed, but Squee is not in the "
+                    "current deck-607 baseline access package. Current access work must improve "
+                    f"{target_phrase}; Squee can drive cuts again only through an explicit "
+                    "reintroduction package with equal-gate battle proof."
+                )
+            elif hidden_runtime_status == "runtime_proposal_overlay_active" and ready_count == 0:
                 reason = (
                     "Squee discard/return is modeled when accessed; Hidden Retreat is modeled "
                     "and PG271-synced, but access model found 0 preflight-ready access swaps. "
@@ -498,6 +571,8 @@ def squee_work_item(
             "preflight_access_candidate_ready_count": int(
                 access_summary.get("preflight_access_candidate_ready_count") or 0
             ),
+            "current_target_access_cards": current_targets,
+            "nonbaseline_target_access_cards": nonbaseline_targets,
             "status": summary.get("status"),
         }
     return {
@@ -624,7 +699,8 @@ def blocked_rows_for_work(work_key: str, package_candidates: list[dict[str, Any]
             for row in package_candidates
             if row.get("target_failure_mode") == "squee_graveyard_entry_route"
             and card_key(row.get("add_card")) in ACCESS_DENSITY_CANDIDATE_KEYS
-            and row.get("status") in {"blocked_no_safe_cut", "blocked_protected_cut"}
+            and row.get("status")
+            in {"blocked_no_safe_cut", "blocked_protected_cut", "blocked_nonbaseline_target"}
         ]
     return []
 
@@ -655,8 +731,9 @@ def next_command_for_work(work_key: str) -> str:
 def promotion_criteria_for_work(work_key: str) -> list[str]:
     criteria = {
         "squee_access_density_model": [
-            "Find a non-protected access package that improves Squee/Top/Rack/Library reach.",
-            "Preserve seed-42 Squee, miracle, and topdeck telemetry before broader gates.",
+            "Find a non-protected access package that improves current deck-607 access anchors.",
+            "Treat Squee as a separate reintroduction package when it is not in the current baseline.",
+            "Preserve seed-42 miracle and topdeck telemetry before broader gates.",
             "Use Hidden Retreat as PG271-synced if selected; do not rerun its PostgreSQL apply.",
         ],
         "contextual_tutor_cut_model": [
@@ -883,10 +960,14 @@ def build_report(
     trace_path = trace_path or default_trace_audit()
     squee_probe_path = squee_probe_path or default_squee_probe()
     modes = focus_failure_modes(trace_audit)
+    access_context = access_target_context(access_model)
+    effective_protected = effective_protected_cards(access_model)
     package_candidates = evaluate_pairings(
         miner_report=miner_report,
         trace_audit=trace_audit,
         planner_payload=planner_payload,
+        access_model=access_model,
+        protected_cards=set(effective_protected),
     )
     status_counts = Counter(row["status"] for row in package_candidates)
     gate_ready = [
@@ -943,7 +1024,10 @@ def build_report(
             "package_candidate_count": len(package_candidates),
             "gate_ready_package_count": len(gate_ready),
             "package_status_counts": dict(sorted(status_counts.items())),
-            "protected_card_count": len(PROTECTED_CARDS),
+            "protected_card_count": len(effective_protected),
+            "current_target_access_cards": access_context["current_target_access_cards"],
+            "nonbaseline_target_access_cards": access_context["nonbaseline_target_access_cards"],
+            "nonbaseline_failure_modes": sorted(nonbaseline_failure_modes(access_model)),
             "prior_rejected_package_count": int(
                 (planner_payload.get("summary") or {}).get("prior_rejected_package_count") or 0
             ),
@@ -969,7 +1053,9 @@ def build_report(
         },
         "guardrail_contract": {
             "target_failure_mode_required": True,
-            "protected_cards": sorted(PROTECTED_CARDS),
+            "protected_cards": effective_protected,
+            "nonbaseline_target_access_cards": access_context["nonbaseline_target_access_cards"],
+            "nonbaseline_failure_modes": sorted(nonbaseline_failure_modes(access_model)),
             "prior_negative_exact_match_must_be_false": True,
             "runtime_status_required": "active_or_materialized",
             "seed_42_anchor_requirement": {
@@ -1012,6 +1098,15 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Seed-42 anchor available: `{str(summary['seed_42_anchor_available']).lower()}`",
         f"- Squee probe status: `{summary.get('squee_probe_status') or '-'}`",
         f"- Access model status: `{summary.get('access_model_status') or '-'}`",
+        "- Current access targets: `"
+        + ", ".join(summary.get("current_target_access_cards") or [])
+        + "`",
+        "- Nonbaseline access targets: `"
+        + (", ".join(summary.get("nonbaseline_target_access_cards") or []) or "-")
+        + "`",
+        "- Nonbaseline failure modes: `"
+        + (", ".join(summary.get("nonbaseline_failure_modes") or []) or "-")
+        + "`",
         f"- Operational work items: `{summary.get('operational_work_count') or 0}`",
         f"- Active operational work items: `{summary.get('active_operational_work_count') or 0}`",
         f"- Top operational work: `{summary.get('top_operational_work_key') or '-'}`",
@@ -1109,6 +1204,11 @@ def render_markdown(payload: dict[str, Any]) -> str:
     guardrails = payload["guardrail_contract"]
     lines.append("- Target failure mode required before any package.")
     lines.append("- Protected cards cannot be cut: " + ", ".join(f"`{card}`" for card in guardrails["protected_cards"]))
+    if guardrails.get("nonbaseline_target_access_cards"):
+        lines.append(
+            "- Nonbaseline access targets require explicit reintroduction before driving current-baseline cuts: "
+            + ", ".join(f"`{card}`" for card in guardrails["nonbaseline_target_access_cards"])
+        )
     lines.append("- Prior negative exact matches are blocked.")
     lines.append("- Runtime status must be `active_or_materialized`.")
     lines.append("- Seed 42 is the first anchor gate before broader testing.")
