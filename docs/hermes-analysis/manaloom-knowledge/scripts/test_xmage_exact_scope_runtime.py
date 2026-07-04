@@ -308,6 +308,42 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertNotIn("blocking", cant_blocker)
         self.assertTrue(legal_blocker.get("blocking"))
 
+    def test_static_horsemanship_restricts_blockers_to_horsemanship(self) -> None:
+        attacker = {
+            "name": "Barbarian General",
+            "type_line": "Creature - Human Barbarian Soldier",
+            "power": 3,
+            "toughness": 2,
+            "keywords": ["horsemanship"],
+            "_keywords_are_self": True,
+            "horsemanship": True,
+            "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        }
+        normal_blocker = {
+            "name": "Grizzly Bears",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        horsemanship_blocker = {
+            "name": "Wu Light Cavalry",
+            "type_line": "Creature - Human Soldier",
+            "power": 1,
+            "toughness": 2,
+            "keywords": ["horsemanship"],
+            "_keywords_are_self": True,
+        }
+        normal_attacker = {
+            "name": "Runeclaw Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+
+        self.assertFalse(self.battle.blocker_can_block_attacker(normal_blocker, attacker))
+        self.assertTrue(self.battle.blocker_can_block_attacker(horsemanship_blocker, attacker))
+        self.assertTrue(self.battle.blocker_can_block_attacker(normal_blocker, normal_attacker))
+
     def test_static_filtered_evasion_rejects_matching_color_blocker(self) -> None:
         attacker = {
             "name": "Barrenton Cragtreads",

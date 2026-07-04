@@ -8566,6 +8566,49 @@ new server:
   split recheck produced `proposal_count=0`; the remaining `314` identities
   are still explicit missing-source exceptions.
 
+## 2026-07-04 PG424 Static Horsemanship Creature Closure
+
+- Closed the exact XMage no-effect/no-signal unit `HorsemanshipAbility` as
+  ManaLoom scope `xmage_static_self_horsemanship_creature_v1`.
+- The mapper accepts only creature permanents whose Oracle text reduces to
+  `Horsemanship` after reminder removal and whose local XMage source contains
+  direct `HorsemanshipAbility` without gain-ability, simple-evasion, landwalk,
+  or cant-be-blocked companion behavior. Temporary-grant and horsemanship
+  filter cases remain blocked for separate adapters.
+- Runtime behavior now treats horsemanship as a self keyword and extends
+  `blocker_can_block_attacker`: an attacker with horsemanship can be blocked
+  only by a blocker with horsemanship. Focused tests cover mapper acceptance,
+  source rejection, legal horsemanship blockers, illegal ordinary blockers,
+  and ordinary attackers that do not require horsemanship blockers.
+- The PostgreSQL package promoted `10` cards:
+  `Barbarian General`, `Lady Zhurong, Warrior Queen`,
+  `Lu Meng, Wu General`, `Shu Cavalry`, `Shu Elite Companions`,
+  `Wei Elite Companions`, `Wei Scout`, `Wei Strike Force`,
+  `Wu Elite Cavalry`, and `Wu Light Cavalry`. Precheck found `10` target rows,
+  `0` existing rule rows, and `0` shadow rows; apply inserted/updated `10`;
+  postcheck verified `10/10` promoted rows as `verified`/`auto` with Oracle
+  hashes.
+- Hermes sync refreshed PostgreSQL card metadata against
+  `127.0.0.1:15432/halder` and synced `10` PG rules into SQLite. The canonical
+  fallback export increased to `5618` rows.
+- PG424 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `10` selected cards. Generic
+  battle scenario count remained `0`; combat legality is covered by focused
+  runtime tests.
+- PG424b fixed a PostgreSQL-only contract drift discovered by the final
+  PG/Hermes/SQLite audit: `44` older trusted executable PostgreSQL rules
+  lacked `oracle_hash`. The backfill used `cards.id = card_battle_rules.card_id`
+  and `cards.oracle_text`, updated `44`, preserved rule behavior, and reduced
+  trusted executable missing-hash rows to `0`.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`) after PG424b.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26416` to `26406`, authoritative adapter-required count from `26102`
+  to `26092`, and the exact horsemanship work unit to zero. The post-PG424
+  exact split recheck produced `proposal_count=0`; the remaining `314`
+  identities are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

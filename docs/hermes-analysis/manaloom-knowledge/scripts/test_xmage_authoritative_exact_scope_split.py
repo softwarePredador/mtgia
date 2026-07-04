@@ -243,6 +243,65 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_cant_block_source_not_exact")
 
+    def test_static_horsemanship_creature_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.HORSEMANSHIP_SOURCE_UNIT,
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["HorsemanshipAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Barbarian General",
+                type_line="Creature - Human Barbarian Soldier",
+                oracle_text=(
+                    "Horsemanship (This creature can't be blocked except by "
+                    "creatures with horsemanship.)"
+                ),
+            ),
+            source_text="""
+                import mage.abilities.keyword.HorsemanshipAbility;
+                this.addAbility(HorsemanshipAbility.getInstance());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_HORSEMANSHIP_CREATURE_SCOPE)
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["static_effect"], "self_horsemanship")
+        self.assertEqual(effect["keywords"], ["horsemanship"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertTrue(effect["horsemanship"])
+        self.assertEqual(effect["xmage_ability_class"], "HorsemanshipAbility")
+
+    def test_static_horsemanship_creature_blocks_nonexact_source(self) -> None:
+        row = queue_row(
+            split.HORSEMANSHIP_SOURCE_UNIT,
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["HorsemanshipAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Riding Fixture",
+                type_line="Creature - Human Soldier",
+                oracle_text=(
+                    "Horsemanship (This creature can't be blocked except by "
+                    "creatures with horsemanship.)"
+                ),
+            ),
+            source_text="""
+                Effect effect = new GainAbilityTargetEffect(
+                    HorsemanshipAbility.getInstance(), Duration.EndOfTurn);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_horsemanship_source_not_exact")
+
     def test_static_filtered_evasion_creature_maps_color_filter(self) -> None:
         row = queue_row(
             split.FILTERED_EVASION_UNIT,

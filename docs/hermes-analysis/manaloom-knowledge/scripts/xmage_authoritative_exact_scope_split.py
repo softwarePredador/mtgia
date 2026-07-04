@@ -203,6 +203,7 @@ STATIC_FILTERED_EVASION_CREATURE_SCOPE = "xmage_static_filtered_evasion_creature
 STATIC_FLYING_CAN_BLOCK_ONLY_FLYING_CREATURE_SCOPE = (
     "xmage_static_flying_can_block_only_flying_creature_v1"
 )
+STATIC_HORSEMANSHIP_CREATURE_SCOPE = "xmage_static_self_horsemanship_creature_v1"
 STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
@@ -490,6 +491,10 @@ FILTERED_EVASION_UNIT = (
 )
 FLYING_CAN_BLOCK_ONLY_FLYING_UNIT = (
     "xmage_signature::no_effect_class::CanBlockOnlyFlyingAbility,FlyingAbility::"
+    "no_target_class::no_condition_class::no_signal"
+)
+HORSEMANSHIP_SOURCE_UNIT = (
+    "xmage_signature::no_effect_class::HorsemanshipAbility::"
     "no_target_class::no_condition_class::no_signal"
 )
 BASIC_LANDWALK_ABILITY_TO_TYPE = {
@@ -4648,6 +4653,15 @@ def is_static_flying_can_block_only_flying_creature_unit(row: dict[str, Any]) ->
     )
 
 
+def is_static_horsemanship_creature_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == HORSEMANSHIP_SOURCE_UNIT
+        and not effect_classes(row)
+        and ability_classes(row) == {"HorsemanshipAbility"}
+        and not (row.get("xmage_signals") or [])
+    )
+
+
 def is_creature_etb_life_gain_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
         return False
@@ -5529,6 +5543,23 @@ def source_is_static_flying_can_block_only_flying(source: str) -> bool:
         and "CanBlockOnlyFlyingAbility" in text
         and "CantBeBlocked" not in text
         and "SimpleEvasionAbility" not in text
+        and "LandwalkAbility" not in text
+    )
+
+
+def oracle_is_static_horsemanship(metadata: dict[str, Any]) -> bool:
+    text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    text = re.sub(r"\s+", " ", text).strip().lower().rstrip(".")
+    return text == "horsemanship"
+
+
+def source_is_static_horsemanship(source: str) -> bool:
+    text = source or ""
+    return (
+        "HorsemanshipAbility" in text
+        and "GainAbility" not in text
+        and "SimpleEvasionAbility" not in text
+        and "CantBeBlocked" not in text
         and "LandwalkAbility" not in text
     )
 
@@ -11096,6 +11127,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature static filtered blocker legality evasion"
     elif scope == STATIC_FLYING_CAN_BLOCK_ONLY_FLYING_CREATURE_SCOPE:
         scope_kind = "creature static flying with block-only-flying restriction"
+    elif scope == STATIC_HORSEMANSHIP_CREATURE_SCOPE:
+        scope_kind = "creature static self horsemanship evasion"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
@@ -11220,6 +11253,7 @@ def split_row(
     static_flying_can_block_only_flying_creature_unit = (
         is_static_flying_can_block_only_flying_creature_unit(row)
     )
+    static_horsemanship_creature_unit = is_static_horsemanship_creature_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     dies_life_gain_creature_unit = is_creature_dies_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
@@ -11302,6 +11336,7 @@ def split_row(
         and not static_basic_landwalk_creature_unit
         and not static_filtered_evasion_creature_unit
         and not static_flying_can_block_only_flying_creature_unit
+        and not static_horsemanship_creature_unit
         and not etb_life_gain_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
@@ -11364,6 +11399,7 @@ def split_row(
         and not static_basic_landwalk_creature_unit
         and not static_filtered_evasion_creature_unit
         and not static_flying_can_block_only_flying_creature_unit
+        and not static_horsemanship_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not etb_draw_lose_life_creature_unit
@@ -11631,6 +11667,32 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_flying_can_block_only_flying_creature",
+        ), "selected_exact_scope"
+
+    if static_horsemanship_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_horsemanship_not_creature"
+        if not oracle_is_static_horsemanship(metadata):
+            return None, "static_horsemanship_oracle_not_exact"
+        if not source_is_static_horsemanship(source_text):
+            return None, "static_horsemanship_source_not_exact"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_HORSEMANSHIP_CREATURE_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "self_horsemanship",
+            "target": "self",
+            "target_controller": "self",
+            "keywords": ["horsemanship"],
+            "_keywords_are_self": True,
+            "horsemanship": True,
+            "xmage_ability_class": "HorsemanshipAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_self_horsemanship_creature",
         ), "selected_exact_scope"
 
     if permanent_activated_tutor_battlefield_unit:
@@ -16987,6 +17049,7 @@ def build_exact_split_report(
             and not is_static_basic_landwalk_creature_unit(row)
             and not is_static_filtered_evasion_creature_unit(row)
             and not is_static_flying_can_block_only_flying_creature_unit(row)
+            and not is_static_horsemanship_creature_unit(row)
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_dies_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
@@ -17064,6 +17127,7 @@ def build_exact_split_report(
                 "no-effect/no-signal CantBeBlockedSourceAbility creature rows with exact Oracle/XMage self can't-be-blocked evasion",
                 "no-effect/no-signal basic landwalk creature rows with exact Oracle/XMage self landwalk evasion",
                 "no-effect/no-signal FlyingAbility plus CanBlockOnlyFlyingAbility creature rows with exact Oracle/XMage block-only-flying restriction",
+                "no-effect/no-signal HorsemanshipAbility creature rows with exact Oracle/XMage self horsemanship evasion",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",

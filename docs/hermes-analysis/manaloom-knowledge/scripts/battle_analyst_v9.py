@@ -3613,6 +3613,7 @@ SELF_KEYWORD_ABILITIES = {
     "flash",
     "menace",
     "infect",
+    "horsemanship",
 }
 
 
@@ -54638,6 +54639,8 @@ def blocker_can_block_attacker(blocker, attacker):
     if not isinstance(blocker, dict) or not isinstance(attacker, dict):
         return False
     if attacker.get("flying") and not (blocker.get("flying") or blocker.get("reach")):
+        return False
+    if card_has_keyword(attacker, "horsemanship") and not card_has_keyword(blocker, "horsemanship"):
         return False
     if blocker.get("can_block_only_flying") and not attacker.get("flying"):
         return False

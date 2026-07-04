@@ -1,0 +1,649 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg424_xmage_static_horsemanship_new_server_20260704_1920",
+  "deploy_id": "pg424",
+  "expected_rules": [
+    {
+      "card_name": "Barbarian General",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "barbarian general",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lady Zhurong, Warrior Queen",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "lady zhurong, warrior queen",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lu Meng, Wu General",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "lu meng, wu general",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shu Cavalry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "shu cavalry",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shu Elite Companions",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "shu elite companions",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wei Elite Companions",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "wei elite companions",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wei Scout",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "wei scout",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wei Strike Force",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "wei strike force",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wu Elite Cavalry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "wu elite cavalry",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wu Light Cavalry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "wu light cavalry",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_self_horsemanship_creature": 10
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg424_xmage_static_horsemanship_new_server_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg424_xmage_static_horsemanship_new_server_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg424_xmage_static_horsemanship_new_server_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg424_xmage_static_horsemanship_new_server_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg424_xmage_static_horsemanship_new_server_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg424_xmage_static_horsemanship_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-04T19:20:14+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Barbarian General"
+      },
+      "card_name": "Barbarian General",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "normalized_name": "barbarian general",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Lady Zhurong, Warrior Queen"
+      },
+      "card_name": "Lady Zhurong, Warrior Queen",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "normalized_name": "lady zhurong, warrior queen",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Lu Meng, Wu General"
+      },
+      "card_name": "Lu Meng, Wu General",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "normalized_name": "lu meng, wu general",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Shu Cavalry"
+      },
+      "card_name": "Shu Cavalry",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "normalized_name": "shu cavalry",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Shu Elite Companions"
+      },
+      "card_name": "Shu Elite Companions",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "normalized_name": "shu elite companions",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Wei Elite Companions"
+      },
+      "card_name": "Wei Elite Companions",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "normalized_name": "wei elite companions",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Wei Scout"
+      },
+      "card_name": "Wei Scout",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "normalized_name": "wei scout",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Wei Strike Force"
+      },
+      "card_name": "Wei Strike Force",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "normalized_name": "wei strike force",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Wu Elite Cavalry"
+      },
+      "card_name": "Wu Elite Cavalry",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "normalized_name": "wu elite cavalry",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Wu Light Cavalry"
+      },
+      "card_name": "Wu Light Cavalry",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "normalized_name": "wu light cavalry",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+        "effect": "creature",
+        "horsemanship": true,
+        "keywords": [
+          "horsemanship"
+        ],
+        "static_effect": "self_horsemanship",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "HorsemanshipAbility"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Barbarian General",
+    "Lady Zhurong, Warrior Queen",
+    "Lu Meng, Wu General",
+    "Shu Cavalry",
+    "Shu Elite Companions",
+    "Wei Elite Companions",
+    "Wei Scout",
+    "Wei Strike Force",
+    "Wu Elite Cavalry",
+    "Wu Light Cavalry"
+  ],
+  "selected_count": 10,
+  "slug": "xmage_static_horsemanship_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Barbarian General",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "barbarian general",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lady Zhurong, Warrior Queen",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "lady zhurong, warrior queen",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lu Meng, Wu General",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "lu meng, wu general",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shu Cavalry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "shu cavalry",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shu Elite Companions",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "shu elite companions",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wei Elite Companions",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "wei elite companions",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wei Scout",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "wei scout",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wei Strike Force",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "wei strike force",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wu Elite Cavalry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "wu elite cavalry",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wu Light Cavalry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+      "min_rule_version": 2,
+      "normalized_name": "wu light cavalry",
+      "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_horsemanship_creature_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
