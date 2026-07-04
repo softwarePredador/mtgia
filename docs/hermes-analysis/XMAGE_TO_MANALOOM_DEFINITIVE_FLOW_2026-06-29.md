@@ -9741,6 +9741,54 @@ new server:
   followed by `xmage_creature_attack_target_keyword_until_eot` and
   `xmage_fixed_damage_spell` with `10` cards each.
 
+## 2026-07-04 PG450 Fixed Draw Spell Closure
+
+- Closed the exact XMage fixed source-controller draw spell family as ManaLoom
+  scope `xmage_fixed_source_controller_draw_spell_v1`.
+- The selected package accepted local XMage spells whose source uses
+  `DrawCardSourceControllerEffect`, including supported additional costs for
+  sacrificing a creature, sacrificing an artifact or creature, discarding a
+  card, or discarding a land.
+- The batch covers `12` cards: Altar's Reap, Blood Divination, Corrupted
+  Conviction, Costly Plunder, Eviscerator's Insight, Magmatic Insight, Morbid
+  Curiosity, Skulltap, Tormenting Voice, Village Rites, Vivisection, and Wild
+  Guess.
+- Focused mapper/runtime tests covered fixed source-controller draw, target
+  player draw separation, supported sacrifice/discard costs, unsupported
+  additional-cost blocking, and draw resolution. PG450 performed no code
+  mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `12` cards. Precheck found `12` target rows,
+  `0` missing targets, `0` existing expected rows, and `8` shadow rows to
+  deprecate. Those shadow rows were old `generated`, `needs_review`,
+  `review_only` rows for Corrupted Conviction, Magmatic Insight, Tormenting
+  Voice, and Village Rites, without Oracle hashes or additional-cost modeling.
+  Apply/postcheck verified `12/12` promoted rows as `verified`/`auto` with
+  Oracle hashes. The apply backup captured `8` rows; `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4351` PostgreSQL runtime rows, wrote `4343` SQLite runtime
+  rows, and exported `4318` canonical fallback rows.
+- PG450 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `12` selected cards. Generic
+  battle scenario count remained `0`; draw count and supported additional-cost
+  behavior remain covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26535`, `xmage_authoritative_source_count=26221`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26221`. This is an exact
+  reduction of `12` from the post-PG449 queue.
+- The post-PG450 exact split recheck reports `proposal_count=196` and
+  `safe_for_batch_pg_package_count=196`. The largest remaining exact families
+  are `xmage_static_self_cant_be_blocked_creature` and
+  `xmage_static_self_protection_from_card_types_creature` with `11` cards each,
+  followed by `xmage_creature_attack_target_keyword_until_eot`,
+  `xmage_fixed_damage_spell`, and `xmage_static_self_horsemanship_creature`
+  with `10` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
