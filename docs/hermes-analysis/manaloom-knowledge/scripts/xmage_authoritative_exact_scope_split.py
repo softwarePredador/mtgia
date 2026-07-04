@@ -87,6 +87,8 @@ SUPPORTED_UNITS = {
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
 DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
+DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
+TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
 DESTROY_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_controller_gain_life_spell_v1"
@@ -4570,6 +4572,42 @@ def fixed_draw_discard_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, 
     return "draw_discard_spell_oracle_not_exact_fixed"
 
 
+def fixed_draw_lose_life_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if has_oracle_complexity(metadata):
+        return "draw_lose_life_spell_oracle_not_simple"
+    number_pattern = r"(a|one|two|three|four|five|\d+)"
+    controller_match = re.fullmatch(
+        rf"you draw {number_pattern} cards? and (?:you )?lose (?P<life>\d+) life\.?",
+        text,
+    )
+    if controller_match:
+        draw_count = number_word_to_int(controller_match.group(1))
+        life_loss = int(controller_match.group("life"))
+        if draw_count <= 0 or life_loss <= 0:
+            return "draw_lose_life_spell_count_not_fixed"
+        return {
+            "draw_count": draw_count,
+            "life_loss": life_loss,
+            "target_controller": "self",
+        }
+    target_match = re.fullmatch(
+        rf"target player draws {number_pattern} cards? and loses (?P<life>\d+) life\.?",
+        text,
+    )
+    if target_match:
+        draw_count = number_word_to_int(target_match.group(1))
+        life_loss = int(target_match.group("life"))
+        if draw_count <= 0 or life_loss <= 0:
+            return "draw_lose_life_spell_count_not_fixed"
+        return {
+            "draw_count": draw_count,
+            "life_loss": life_loss,
+            "target_controller": "target_player",
+        }
+    return "draw_lose_life_spell_oracle_not_exact_fixed"
+
+
 def activated_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     if text.count(":") != 1:
@@ -5940,6 +5978,52 @@ def fixed_draw_discard_spell_from_source(source: str, classes: set[str]) -> dict
             "xmage_effect_classes": ["DrawCardSourceControllerEffect", "DiscardControllerEffect"],
         }
     return "draw_discard_spell_source_effect_class_not_supported"
+
+
+def fixed_draw_lose_life_spell_from_source(source: str, classes: set[str]) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "draw_lose_life_spell_source_additional_cost_not_supported"
+    unsupported_markers = {
+        "ConditionalOneShotEffect",
+        "DoIfCostPaid",
+        "Mode",
+        "Modes",
+        "TargetPointer",
+        ".setTargetPointer",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "draw_lose_life_spell_source_not_simple"
+    if classes == {"DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"}:
+        draw_count = java_constructor_int_or_noarg_default(
+            text,
+            "DrawCardSourceControllerEffect",
+            noarg_default=1,
+        )
+        life_loss = java_constructor_int(text, "LoseLifeSourceControllerEffect")
+        target_controller = "self"
+        effect_classes = ["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"]
+    elif classes == {"DrawCardTargetEffect", "LoseLifeTargetEffect"}:
+        if "TargetPlayer" not in text:
+            return "draw_lose_life_spell_source_target_not_supported"
+        draw_count = java_constructor_int_or_noarg_default(
+            text,
+            "DrawCardTargetEffect",
+            noarg_default=1,
+        )
+        life_loss = java_constructor_int(text, "LoseLifeTargetEffect")
+        target_controller = "target_player"
+        effect_classes = ["DrawCardTargetEffect", "LoseLifeTargetEffect"]
+    else:
+        return "draw_lose_life_spell_source_effect_class_not_supported"
+    if draw_count is None or life_loss is None or draw_count <= 0 or life_loss <= 0:
+        return "draw_lose_life_spell_source_count_not_fixed"
+    return {
+        "draw_count": int(draw_count),
+        "life_loss": int(life_loss),
+        "target_controller": target_controller,
+        "xmage_effect_classes": effect_classes,
+    }
 
 
 def activated_draw_discard_from_source(source: str) -> dict[str, Any] | str:
@@ -10374,6 +10458,52 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_counter_target_draw_card_spell",
+            ), "selected_exact_scope"
+
+        if classes in (
+            {"DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"},
+            {"DrawCardTargetEffect", "LoseLifeTargetEffect"},
+        ):
+            if ability_classes(row):
+                return None, "draw_lose_life_spell_ability_class_not_simple"
+            oracle_draw_life = fixed_draw_lose_life_spell_from_oracle(metadata)
+            if isinstance(oracle_draw_life, str):
+                return None, oracle_draw_life
+            source_draw_life = fixed_draw_lose_life_spell_from_source(source_text, classes)
+            if isinstance(source_draw_life, str):
+                return None, source_draw_life
+            comparison_keys = ("draw_count", "life_loss", "target_controller")
+            if any(
+                oracle_draw_life.get(key) != source_draw_life.get(key)
+                for key in comparison_keys
+            ):
+                return None, "draw_lose_life_spell_source_oracle_mismatch"
+            target_controller = str(oracle_draw_life["target_controller"])
+            scope = (
+                DRAW_LOSE_LIFE_SPELL_SCOPE
+                if target_controller == "self"
+                else TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE
+            )
+            effect_json = {
+                "effect": "draw_cards",
+                "battle_model_scope": scope,
+                "count": int(oracle_draw_life["draw_count"]),
+                "draw_count": int(oracle_draw_life["draw_count"]),
+                "life_loss": int(oracle_draw_life["life_loss"]),
+                "target_controller": target_controller,
+                "draw_lose_life_spell": True,
+                "xmage_effect_classes": list(source_draw_life["xmage_effect_classes"]),
+                **flags,
+            }
+            if target_controller == "target_player":
+                effect_json["target"] = "player"
+                effect_json["target_constraints"] = {"players": ["any"]}
+                effect_json["target_preference"] = "self"
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_draw_lose_life_spell",
             ), "selected_exact_scope"
 
         if classes in (

@@ -1181,6 +1181,70 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["draw_discard_order"], "draw_then_discard")
         self.assertFalse(effect["discard_random"])
 
+    def test_fixed_controller_draw_lose_life_spell_maps(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="You draw three cards and you lose 3 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(3, true));"
+                "this.getSpellAbility().addEffect(new LoseLifeSourceControllerEffect(3).concatBy(\"and\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_LOSE_LIFE_SPELL_SCOPE)
+        self.assertTrue(effect["draw_lose_life_spell"])
+        self.assertEqual(effect["draw_count"], 3)
+        self.assertEqual(effect["life_loss"], 3)
+        self.assertEqual(effect["target_controller"], "self")
+
+    def test_fixed_target_player_draw_lose_life_spell_maps(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardTargetEffect", "LoseLifeTargetEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target player draws two cards and loses 2 life."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new DrawCardTargetEffect(2));"
+                "this.getSpellAbility().addEffect(new LoseLifeTargetEffect(2).withTargetDescription(\"and\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE)
+        self.assertEqual(effect["target_controller"], "target_player")
+        self.assertEqual(effect["target"], "player")
+        self.assertEqual(effect["target_preference"], "self")
+        self.assertEqual(effect["draw_count"], 2)
+        self.assertEqual(effect["life_loss"], 2)
+
+    def test_fixed_draw_lose_life_spell_blocks_dynamic_source_count(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="You draw three cards and you lose 3 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(BlackDevotionCount.instance));"
+                "this.getSpellAbility().addEffect(new LoseLifeSourceControllerEffect(BlackDevotionCount.instance));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "draw_lose_life_spell_source_count_not_fixed")
+
     def test_fixed_draw_discard_spell_maps_random_discard_pair(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

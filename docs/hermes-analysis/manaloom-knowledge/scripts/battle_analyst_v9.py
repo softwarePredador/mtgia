@@ -49355,6 +49355,89 @@ def resolve_draw_discard_spell(
     )
 
 
+def _draw_lose_life_target_player(player, opponents, effect_data):
+    candidates = [player] + [
+        opponent for opponent in (opponents or []) if getattr(opponent, "is_alive", lambda: True)()
+    ]
+    declared_names = []
+    for entry in effect_data.get("declared_targets") or []:
+        if isinstance(entry, dict):
+            name = entry.get("target_player") or entry.get("player") or entry.get("name")
+            if name:
+                declared_names.append(str(name))
+        elif entry:
+            declared_names.append(str(entry))
+    for declared_name in declared_names:
+        for candidate in candidates:
+            if getattr(candidate, "name", None) == declared_name:
+                return candidate, "declared_target"
+
+    life_loss = max(0, int(effect_data.get("life_loss") or 0))
+    lethal_opponents = [
+        opponent
+        for opponent in (opponents or [])
+        if getattr(opponent, "is_alive", lambda: True)()
+        and int(getattr(opponent, "life", 0) or 0) <= life_loss
+    ]
+    if lethal_opponents:
+        lethal_opponents.sort(key=lambda opponent: (int(getattr(opponent, "life", 0) or 0), opponent.name))
+        return lethal_opponents[0], "lethal_opponent"
+    return player, "self_draw_preferred"
+
+
+def resolve_draw_lose_life_spell(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    phase=None,
+    all_players=None,
+    stack=None,
+):
+    draw_count = max(0, int(effect_data.get("draw_count") or effect_data.get("count") or 0))
+    life_loss = max(0, int(effect_data.get("life_loss") or 0))
+    target_controller = str(effect_data.get("target_controller") or "self")
+    if target_controller == "target_player":
+        target_player, target_reason = _draw_lose_life_target_player(player, opponents, effect_data)
+    else:
+        target_player, target_reason = player, "self_fixed"
+
+    drawn_cards = target_player.draw(draw_count, rng)
+    process_player_draw_triggers(
+        target_player,
+        len(drawn_cards),
+        turn,
+        phase or "resolution",
+        all_players or [player] + list(opponents or []),
+        stack=stack,
+        turn_player=player,
+    )
+    life_before = int(getattr(target_player, "life", 0) or 0)
+    if life_loss:
+        change_life(target_player, -life_loss)
+    life_after = int(getattr(target_player, "life", life_before) or 0)
+    emit_replay_event(
+        "draw_lose_life_spell_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_player=getattr(target_player, "name", "?"),
+        target_reason=target_reason,
+        target_controller=target_controller,
+        cards_drawn=len(drawn_cards),
+        requested_draw_count=draw_count,
+        life_lost=life_loss,
+        life_before=life_before,
+        life_after=life_after,
+        library_remaining=len(target_player.library),
+        hand_size=len(target_player.hand),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+
+
 def apply_effect_immediate(
     player,
     opponents,
@@ -50205,6 +50288,20 @@ def apply_effect_immediate(
         n = effect_data.get("count", 2)
         if effect_data.get("draw_discard_spell"):
             resolve_draw_discard_spell(
+                player,
+                opponents,
+                card,
+                effect_data,
+                turn,
+                rng,
+                phase=phase or "resolution",
+                all_players=all_players_for_entry,
+                stack=stack,
+            )
+            finish_resolved_spell(player, card, turn=turn)
+            return
+        if effect_data.get("draw_lose_life_spell"):
+            resolve_draw_lose_life_spell(
                 player,
                 opponents,
                 card,

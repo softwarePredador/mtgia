@@ -573,7 +573,7 @@ Post-PG384 update:
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG384 queue above.
+historical only. The active execution baseline is the post-PG386 queue below.
 
 ## General Goal Contract - 2026-07-02
 
@@ -581,13 +581,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG384 control numbers:
+Current post-PG386 control numbers:
 
-- target battle-gap identities: `26918`
-- XMage-resolved authoritative source identities: `26604`
+- target battle-gap identities: `26901`
+- XMage-resolved authoritative source identities: `26587`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26604`
+- XMage authoritative adapter required: `26587`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -607,8 +607,8 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg384_additional_cost_spell_runtime_new_server_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG384, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg386_draw_lose_life_spell_runtime_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG386, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
@@ -616,7 +616,11 @@ Next executable cycle:
    `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
    `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
    (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`), and
-   `add_counters::source_add_counters_variant_v1` (`795`).
+   `add_counters::source_add_counters_variant_v1` (`795`), followed by
+   `life_gain::xmage_life_gain_variant_review_v1` (`735`),
+   `tutor::xmage_library_search_variant_review_v1` (`613`),
+   `removal_destroy::targeted_destroy_variant_v1` (`612`), and
+   `draw_cards::xmage_draw_card_variant_review_v1` (`607`).
 4. Promote only a narrow subpattern whose ManaLoom runtime behavior is already
    implemented or implemented in the same cycle.
 5. If a proposed lane cannot prove Oracle/source/runtime agreement, record the
@@ -900,15 +904,54 @@ PG385 completion and PG386 starting hypothesis:
    `removal_destroy::targeted_destroy_variant_v1` (`612`), and
    `tutor::xmage_library_search_variant_review_v1` (`613`).
 
+PG386 completion and PG387 starting hypothesis:
+
+1. PG386 promoted `8` fixed draw plus life-loss spells on the new server:
+   `Ambition's Cost`, `Ancient Craving`, `Blood Pact`, `Harrowing Journey`,
+   `Night's Whisper`, `Painful Lesson`, `Sign in Blood`, and
+   `Succumb to Temptation`.
+2. The implementation added exact
+   `xmage_fixed_controller_draw_lose_life_spell_v1` and
+   `xmage_fixed_target_player_draw_lose_life_spell_v1` mapping for fixed
+   `DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect` and fixed
+   `DrawCardTargetEffect + LoseLifeTargetEffect` spell pairs, requiring
+   Oracle/source agreement on draw count, life loss, and target model.
+3. Runtime now resolves `draw_lose_life_spell`, emits
+   `draw_lose_life_spell_resolved`, prefers self-targeting for normal
+   target-player draw, and targets an opponent only when the life loss is
+   lethal unless replay targets are declared.
+4. Tests passed: splitter `330`, exact runtime `193`, sync selection `19`,
+   py_compile, and E2E package validation `status=pass`.
+5. PostgreSQL on the new server applied `8` upserts with `4` stale shadow rows
+   deprecated; postcheck verified `8/8`; Hermes/SQLite sync loaded `12` PG
+   rows, updated `12` SQLite rows, and exported `5143` canonical snapshot rows.
+6. Post-PG386 governance passed with strategy consistency `26/26`,
+   operational surface `pass`, legacy contamination `pass`, and
+   PG-Hermes-SQLite contract `50/50` pass against
+   `127.0.0.1:15432/halder`.
+7. The post-PG386 supported splitter returns `0` batch-safe proposals over
+   `7674` considered supported rows, so PG387 must implement another narrow
+   subpattern before PostgreSQL package generation.
+8. The largest remaining work units are now:
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1820`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
+   `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`),
+   `add_counters::source_add_counters_variant_v1` (`795`),
+   `life_gain::xmage_life_gain_variant_review_v1` (`735`),
+   `tutor::xmage_library_search_variant_review_v1` (`613`),
+   `removal_destroy::targeted_destroy_variant_v1` (`612`), and
+   `draw_cards::xmage_draw_card_variant_review_v1` (`607`).
+
 Fresh alignment evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_pg385_draw_discard_spell_runtime_new_server_docs_after_update.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_pg386_draw_lose_life_spell_runtime_new_server_docs_after_update.md`
   passed with `50/50`.
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_pg385_draw_discard_spell_runtime_new_server_docs_after_update.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_pg386_draw_lose_life_spell_runtime_new_server_docs_after_update.md`
   passed with `26/26` checks.
-- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_pg385_draw_discard_spell_runtime_new_server_docs_after_update.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_pg386_draw_lose_life_spell_runtime_new_server_docs_after_update.md`
   passed.
-- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_docs_after_update.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_pg386_draw_lose_life_spell_runtime_new_server_docs_after_update.md`
   passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
   passed with `49` pass and `1` inherited warning.
@@ -1188,7 +1231,7 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG385 authoritative queue unless a newer queue exists:
+Use the post-PG386 authoritative queue unless a newer queue exists:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1820`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1619`
@@ -1196,9 +1239,9 @@ Use the post-PG385 authoritative queue unless a newer queue exists:
 4. `direct_damage::targeted_damage_variant_v1` - `888`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
-7. `draw_cards::xmage_draw_card_variant_review_v1` - `615`
+7. `tutor::xmage_library_search_variant_review_v1` - `613`
 8. `removal_destroy::targeted_destroy_variant_v1` - `612`
-9. `tutor::xmage_library_search_variant_review_v1` - `613`
+9. `draw_cards::xmage_draw_card_variant_review_v1` - `607`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
 Immediate checkpoint after PG361:
@@ -1589,7 +1632,7 @@ Immediate checkpoint after PG361:
     adding supported creature/land sacrifice additional costs to the exact
     mapper and battle runtime. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_e2e.md`.
-76. Continue from the fresh post-PG379 queue. Since the exact splitter is now
+76. Continue from the fresh post-PG386 queue. Since the exact splitter is now
     empty again, the next cycle must implement a new mapper/runtime subpattern
     before any PostgreSQL package can be generated.
 

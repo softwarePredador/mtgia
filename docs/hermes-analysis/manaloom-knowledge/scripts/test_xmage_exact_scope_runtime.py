@@ -1788,6 +1788,102 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_draw_lose_life_spell_draws_then_loses_life(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Card A", "cmc": 2},
+                {"name": "Fresh Card B", "cmc": 3},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        spell = {"name": "Fixture Ambition", "type_line": "Sorcery", "cmc": 4}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+            "draw_lose_life_spell": True,
+            "count": 2,
+            "draw_count": 2,
+            "life_loss": 3,
+            "target_controller": "self",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=6,
+            rng=random.Random(6),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 2)
+        self.assertEqual(active.life, 17)
+        self.assertTrue(
+            any(
+                event == "draw_lose_life_spell_resolved"
+                and data.get("card") == "Fixture Ambition"
+                and data.get("target_player") == "Active"
+                and data.get("cards_drawn") == 2
+                and data.get("life_lost") == 3
+                and data.get("life_after") == 17
+                for event, data in self.events
+            )
+        )
+
+    def test_target_player_draw_lose_life_spell_targets_lethal_opponent(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Active Card"}])
+        opponent = self.battle.Player(
+            "Opponent",
+            None,
+            [
+                {"name": "Opponent Card A", "cmc": 1},
+                {"name": "Opponent Card B", "cmc": 2},
+            ],
+        )
+        active.life = 20
+        opponent.life = 2
+        spell = {"name": "Fixture Sign", "type_line": "Sorcery", "cmc": 2}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+            "draw_lose_life_spell": True,
+            "count": 2,
+            "draw_count": 2,
+            "life_loss": 2,
+            "target_controller": "target_player",
+            "target": "player",
+            "target_preference": "self",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=7,
+            rng=random.Random(7),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 0)
+        self.assertEqual(len(opponent.hand), 2)
+        self.assertEqual(opponent.life, 0)
+        self.assertTrue(
+            any(
+                event == "draw_lose_life_spell_resolved"
+                and data.get("card") == "Fixture Sign"
+                and data.get("target_player") == "Opponent"
+                and data.get("target_reason") == "lethal_opponent"
+                and data.get("cards_drawn") == 2
+                and data.get("life_after") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_draw_discard_can_discard_drawn_card_with_empty_hand(self) -> None:
         active = self.battle.Player(
             "Active",

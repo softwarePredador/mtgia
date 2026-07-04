@@ -2442,6 +2442,28 @@
     "battle_rule_logical_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300",
     "battle_rule_oracle_hash": "e5437547a6018bfc26aaeb197668d86e"
   },
+  "Ambition's Cost": {
+    "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+    "count": 3,
+    "draw_count": 3,
+    "draw_lose_life_spell": true,
+    "effect": "draw_cards",
+    "instant": false,
+    "life_loss": 3,
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "LoseLifeSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3b2afd0214c6776da9b668598d824795",
+    "battle_rule_oracle_hash": "2a807c1035d7b1ce49ba9281a02e946e"
+  },
   "Ambush Party": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -2725,6 +2747,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e2ac43c9f6e03e11e9fab994a5c15258",
     "battle_rule_oracle_hash": "776a45094149ed3e1cc8c1a408fb6318"
+  },
+  "Ancient Craving": {
+    "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+    "count": 3,
+    "draw_count": 3,
+    "draw_lose_life_spell": true,
+    "effect": "draw_cards",
+    "instant": false,
+    "life_loss": 3,
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "LoseLifeSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3b2afd0214c6776da9b668598d824795",
+    "battle_rule_oracle_hash": "2a807c1035d7b1ce49ba9281a02e946e"
   },
   "Ancient Den": {
     "effect": "land",
@@ -8607,6 +8651,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:544a658a2c0bc182ebfeb88ace95dc64",
     "battle_rule_oracle_hash": "f9b52f264dbb36074c8c151ad47331cb"
+  },
+  "Blood Pact": {
+    "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+    "count": 2,
+    "draw_count": 2,
+    "draw_lose_life_spell": true,
+    "effect": "draw_cards",
+    "instant": true,
+    "life_loss": 2,
+    "sorcery": false,
+    "target": "player",
+    "target_constraints": {
+      "players": [
+        "any"
+      ]
+    },
+    "target_controller": "target_player",
+    "target_preference": "self",
+    "xmage_effect_classes": [
+      "DrawCardTargetEffect",
+      "LoseLifeTargetEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e849896e6ab7822b604314a9842236f5",
+    "battle_rule_oracle_hash": "0e1cca8ed574f916efa7634f28cd7de4"
   },
   "Blood Sun": {
     "ability_kind": "triggered",
@@ -37788,6 +37861,35 @@
     "battle_rule_logical_key": "battle_rule_v1:f710a1cdf12e2bec5bdf05b3adb582ba",
     "battle_rule_oracle_hash": "96890e020945b740cad4a119e2deacc1"
   },
+  "Harrowing Journey": {
+    "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+    "count": 3,
+    "draw_count": 3,
+    "draw_lose_life_spell": true,
+    "effect": "draw_cards",
+    "instant": false,
+    "life_loss": 3,
+    "sorcery": true,
+    "target": "player",
+    "target_constraints": {
+      "players": [
+        "any"
+      ]
+    },
+    "target_controller": "target_player",
+    "target_preference": "self",
+    "xmage_effect_classes": [
+      "DrawCardTargetEffect",
+      "LoseLifeTargetEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e42886e5607833d64538053de3d5de82",
+    "battle_rule_oracle_hash": "1fee8ed9c8875ba33f2972741b6a3e25"
+  },
   "Harvester of Souls": {
     "cmc": 6.0,
     "effect": "draw_cards",
@@ -54482,14 +54584,26 @@
     "battle_rule_logical_key": "battle_rule_v1:e90b582e4b128b4c890db8959fb6005c"
   },
   "Night's Whisper": {
-    "cmc": 2.0,
+    "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+    "count": 2,
+    "draw_count": 2,
+    "draw_lose_life_spell": true,
     "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
+    "instant": false,
+    "life_loss": 2,
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "LoseLifeSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4149f6570b19de0fc58fef7eb6736e40",
+    "battle_rule_oracle_hash": "99f77dc3d03da6660ecb413593fe23e7"
   },
   "Nightguard Patrol": {
     "_keywords_are_self": true,
@@ -56573,6 +56687,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:571c3abf102d2745eceba55bb9a9098a",
     "battle_rule_oracle_hash": "c353bc2df4f93bccd015304640d5ed83"
+  },
+  "Painful Lesson": {
+    "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+    "count": 2,
+    "draw_count": 2,
+    "draw_lose_life_spell": true,
+    "effect": "draw_cards",
+    "instant": false,
+    "life_loss": 2,
+    "sorcery": true,
+    "target": "player",
+    "target_constraints": {
+      "players": [
+        "any"
+      ]
+    },
+    "target_controller": "target_player",
+    "target_preference": "self",
+    "xmage_effect_classes": [
+      "DrawCardTargetEffect",
+      "LoseLifeTargetEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3b5e4090931830427bc375568e4786ed",
+    "battle_rule_oracle_hash": "0e1cca8ed574f916efa7634f28cd7de4"
   },
   "Painful Quandary": {
     "cmc": 5.0,
@@ -72714,15 +72857,33 @@
     "battle_rule_logical_key": "battle_rule_v1:f1a99e76647a37f9bc0f202822a2c126"
   },
   "Sign in Blood": {
-    "cmc": 2.0,
-    "count": 1,
+    "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+    "count": 2,
+    "draw_count": 2,
+    "draw_lose_life_spell": true,
     "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d3402dff750bf6369a6e50379066870b"
+    "instant": false,
+    "life_loss": 2,
+    "sorcery": true,
+    "target": "player",
+    "target_constraints": {
+      "players": [
+        "any"
+      ]
+    },
+    "target_controller": "target_player",
+    "target_preference": "self",
+    "xmage_effect_classes": [
+      "DrawCardTargetEffect",
+      "LoseLifeTargetEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3b5e4090931830427bc375568e4786ed",
+    "battle_rule_oracle_hash": "0e1cca8ed574f916efa7634f28cd7de4"
   },
   "Silence": {
     "battle_model_scope": "silence_until_eot_v1",
@@ -78846,6 +79007,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "7b1a9cacecad16b33f9e168b8e001b90"
+  },
+  "Succumb to Temptation": {
+    "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+    "count": 2,
+    "draw_count": 2,
+    "draw_lose_life_spell": true,
+    "effect": "draw_cards",
+    "instant": true,
+    "life_loss": 2,
+    "sorcery": false,
+    "target_controller": "self",
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "LoseLifeSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:96b2d3623c4036f44092a07cd0feebbd",
+    "battle_rule_oracle_hash": "c0b258f641e17da5b9ffc3ea28cd6a10"
   },
   "Sudden Disappearance": {
     "cmc": 6.0,
