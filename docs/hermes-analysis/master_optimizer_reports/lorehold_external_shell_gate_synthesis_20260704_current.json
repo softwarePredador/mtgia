@@ -1,0 +1,1535 @@
+{
+  "artifact_type": "lorehold_external_shell_gate_synthesis",
+  "external_reconciliation": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_evidence_reconciler_20260704_current.json",
+  "generated_at": "2026-07-04T21:45:06Z",
+  "learning_model": [
+    "Legality and external popularity are input lanes, not promotion proof.",
+    "For Lorehold, card value is measured by role fit in miracle/topdeck timing, early mana floor, pressure survival, and conversion window.",
+    "A staple only becomes a candidate when it has a named cut or a declared full-shell contract.",
+    "A shell that ranks below 607 structurally or loses the equal gate remains learning evidence, not a deck replacement.",
+    "Winota/fast-pressure regression is a hard guardrail even when aggregate wins improve."
+  ],
+  "method_notes": [
+    "The script reads existing 2026-07-03 shell matrices, decklists, fixed-607 gates, and confirm gates when present.",
+    "Smoke-only positives are not promotion proof.",
+    "Exact card coverage means the shell contained every non-607 add card from the external signal; it does not prove that the shell executed that package well.",
+    "This script does not mutate PostgreSQL, SQLite, deck rows, or generated decklists."
+  ],
+  "postgres_writes": false,
+  "shells": [
+    {
+      "baseline_rank": 1,
+      "baseline_role_counts": {
+        "approach": 1,
+        "board_wipe": 6,
+        "creature": 4,
+        "draw": 13,
+        "engine": 3,
+        "equipment_haste_shroud": 1,
+        "equipment_static_attachment": 1,
+        "exile_value": 1,
+        "land": 34,
+        "land_tax": 1,
+        "mana_development": 1,
+        "overload_recursion": 1,
+        "passive": 4,
+        "protection": 10,
+        "pump_all": 1,
+        "ramp": 18,
+        "redirect_removal": 1,
+        "removal": 10,
+        "steal_all_creatures": 1,
+        "token_maker": 4,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "best_structural_deck": "deck_607",
+      "candidate_commander_intent_score": 93.656,
+      "candidate_key": "challenger_lorehold_access_density_control_v1",
+      "candidate_primary_risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "candidate_rank": 4,
+      "candidate_role_counts": {
+        "aetherflux_reservoir": 1,
+        "approach": 1,
+        "board_wipe": 3,
+        "cannot_lose_turn": 1,
+        "composite_resolution": 1,
+        "cost_reduction": 1,
+        "creature": 6,
+        "deal_damage": 1,
+        "discard_trigger_modal_draw_treasure_opponent_life_loss": 1,
+        "draw": 18,
+        "draw_filter": 1,
+        "dynamic_damage_wipe": 1,
+        "engine": 5,
+        "exile_value": 1,
+        "gift_hexproof_indestructible": 1,
+        "interaction": 3,
+        "land": 34,
+        "land_tax": 1,
+        "loot": 1,
+        "mana_development": 1,
+        "manual_review": 1,
+        "modal_boros_charm": 1,
+        "overload_recursion": 1,
+        "passive": 6,
+        "payoff": 1,
+        "protection": 14,
+        "ramp": 19,
+        "redirect_removal": 2,
+        "removal": 10,
+        "silence_spell": 1,
+        "stax": 1,
+        "token_maker": 2,
+        "tutor": 3,
+        "vow_counter_each_player_sacrifice_rest": 1,
+        "wincon": 7
+      },
+      "candidate_strategy_package_counts": {
+        "deterministic_finisher": 8,
+        "early_plan": 41,
+        "graveyard_recursion": 12,
+        "hand_filter": 21,
+        "pressure_absorber": 17,
+        "protection_window": 19,
+        "spell_chain_conversion": 47,
+        "topdeck_miracle_setup": 19
+      },
+      "candidate_strategy_score": 130.875,
+      "card_count_from_decklist": 96,
+      "confirm_gate": null,
+      "decision": "not_promotable_structure_below_607",
+      "decklist": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_access_density_control.decklist.txt",
+      "matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_access_density_control_matrix.json",
+      "shell_slug": "access_density_control",
+      "smoke_gate": {
+        "candidate_key": "challenger_lorehold_access_density_control_v1",
+        "candidate_minus_607_winota_wins": 1,
+        "candidate_minus_607_wins": 1,
+        "games_per_opponent": 1,
+        "opponent_seed": 20260626,
+        "opponents": [
+          "Fixed Lorehold deck 607",
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_access_density_control_fixed607_gate.json",
+        "rows": {
+          "challenger_lorehold_access_density_control_v1": {
+            "avg_win_turn": 25.0,
+            "battle_rank": 1,
+            "counts": {
+              "loss": 3,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 1
+            },
+            "deck_key": "challenger_lorehold_access_density_control_v1",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 0,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 1
+            }
+          },
+          "deck_607": {
+            "avg_win_turn": 0,
+            "battle_rank": 2,
+            "counts": {
+              "loss": 4,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 0
+            },
+            "deck_key": "deck_607",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            }
+          }
+        },
+        "simulation_seed": 42,
+        "status": "ready"
+      }
+    },
+    {
+      "baseline_rank": 1,
+      "baseline_role_counts": {
+        "approach": 1,
+        "board_wipe": 6,
+        "creature": 4,
+        "draw": 13,
+        "engine": 3,
+        "equipment_haste_shroud": 1,
+        "equipment_static_attachment": 1,
+        "exile_value": 1,
+        "land": 34,
+        "land_tax": 1,
+        "mana_development": 1,
+        "overload_recursion": 1,
+        "passive": 4,
+        "protection": 10,
+        "pump_all": 1,
+        "ramp": 18,
+        "redirect_removal": 1,
+        "removal": 10,
+        "steal_all_creatures": 1,
+        "token_maker": 4,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "best_structural_deck": "deck_607",
+      "candidate_commander_intent_score": 99.008,
+      "candidate_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+      "candidate_primary_risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "candidate_rank": 2,
+      "candidate_role_counts": {
+        "aetherflux_reservoir": 1,
+        "approach": 1,
+        "board_development": 1,
+        "board_wipe": 5,
+        "composite_resolution": 1,
+        "cost_reduction": 1,
+        "creature": 4,
+        "demonstrate_top_nonland_free_cast": 1,
+        "discard_trigger_modal_draw_treasure_opponent_life_loss": 1,
+        "draw": 15,
+        "draw_filter": 1,
+        "dynamic_damage_wipe": 1,
+        "engine": 7,
+        "equipment_haste_shroud": 1,
+        "equipment_static_attachment": 1,
+        "exile_top_nonland_free_cast": 1,
+        "exile_value": 1,
+        "gift_destroy_all_creatures_return_own_destroyed_creature": 1,
+        "gift_hexproof_indestructible": 1,
+        "interaction": 3,
+        "land": 34,
+        "land_tax": 1,
+        "loot": 1,
+        "mana_development": 1,
+        "manual_review": 1,
+        "modal_boros_charm": 1,
+        "overload_recursion": 1,
+        "passive": 5,
+        "protection": 12,
+        "pump_all": 1,
+        "ramp": 19,
+        "redirect_removal": 2,
+        "removal": 10,
+        "silence_spell": 1,
+        "steal_all_creatures": 1,
+        "support": 1,
+        "token_maker": 2,
+        "tutor": 1,
+        "vow_counter_each_player_sacrifice_rest": 1,
+        "wincon": 7
+      },
+      "candidate_strategy_package_counts": {
+        "deterministic_finisher": 7,
+        "early_plan": 39,
+        "graveyard_recursion": 10,
+        "hand_filter": 18,
+        "pressure_absorber": 17,
+        "protection_window": 17,
+        "spell_chain_conversion": 46,
+        "topdeck_miracle_setup": 12
+      },
+      "candidate_strategy_score": 138.604,
+      "card_count_from_decklist": 94,
+      "confirm_gate": null,
+      "decision": "not_promotable_structure_below_607",
+      "decklist": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_miracle_pressure_conversion.decklist.txt",
+      "matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_miracle_pressure_conversion_matrix.json",
+      "shell_slug": "miracle_pressure_conversion",
+      "smoke_gate": {
+        "candidate_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+        "candidate_minus_607_winota_wins": 0,
+        "candidate_minus_607_wins": 0,
+        "games_per_opponent": 1,
+        "opponent_seed": 20260626,
+        "opponents": [
+          "Fixed Lorehold deck 607",
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_miracle_pressure_conversion_fixed607_gate.json",
+        "rows": {
+          "challenger_lorehold_miracle_pressure_conversion_v1": {
+            "avg_win_turn": 0,
+            "battle_rank": 1,
+            "counts": {
+              "loss": 4,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 0
+            },
+            "deck_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            }
+          },
+          "deck_607": {
+            "avg_win_turn": 0,
+            "battle_rank": 2,
+            "counts": {
+              "loss": 4,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 0
+            },
+            "deck_key": "deck_607",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            }
+          }
+        },
+        "simulation_seed": 42,
+        "status": "ready"
+      }
+    },
+    {
+      "baseline_rank": 1,
+      "baseline_role_counts": {
+        "approach": 1,
+        "board_wipe": 6,
+        "creature": 4,
+        "draw": 13,
+        "engine": 3,
+        "equipment_haste_shroud": 1,
+        "equipment_static_attachment": 1,
+        "exile_value": 1,
+        "land": 34,
+        "land_tax": 1,
+        "mana_development": 1,
+        "overload_recursion": 1,
+        "passive": 4,
+        "protection": 10,
+        "pump_all": 1,
+        "ramp": 18,
+        "redirect_removal": 1,
+        "removal": 10,
+        "steal_all_creatures": 1,
+        "token_maker": 4,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "best_structural_deck": "deck_607",
+      "candidate_commander_intent_score": 94.212,
+      "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+      "candidate_primary_risks": [
+        "recursion_role"
+      ],
+      "candidate_rank": 3,
+      "candidate_role_counts": {
+        "aetherflux_reservoir": 1,
+        "approach": 1,
+        "board_wipe": 3,
+        "cannot_lose_turn": 1,
+        "composite_resolution": 1,
+        "cost_reduction": 1,
+        "creature": 7,
+        "direct_damage": 1,
+        "discard_trigger_modal_draw_treasure_opponent_life_loss": 1,
+        "draw": 18,
+        "dynamic_damage_wipe": 1,
+        "engine": 4,
+        "exile_value": 2,
+        "gift_hexproof_indestructible": 1,
+        "interaction": 3,
+        "land": 34,
+        "land_tax": 1,
+        "mana_development": 1,
+        "manual_review": 1,
+        "modal_boros_charm": 1,
+        "overload_recursion": 1,
+        "passive": 5,
+        "payoff": 1,
+        "protection": 14,
+        "pump_all": 1,
+        "ramp": 20,
+        "redirect_removal": 2,
+        "removal": 9,
+        "silence_spell": 1,
+        "stax": 1,
+        "token_maker": 2,
+        "tutor": 4,
+        "wincon": 8
+      },
+      "candidate_strategy_package_counts": {
+        "deterministic_finisher": 9,
+        "early_plan": 43,
+        "graveyard_recursion": 11,
+        "hand_filter": 21,
+        "pressure_absorber": 15,
+        "protection_window": 19,
+        "spell_chain_conversion": 47,
+        "topdeck_miracle_setup": 19
+      },
+      "candidate_strategy_score": 131.623,
+      "card_count_from_decklist": 96,
+      "confirm_gate": null,
+      "decision": "not_promotable_structure_below_607",
+      "decklist": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_miracle_topdeck_control.decklist.txt",
+      "matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_miracle_topdeck_control_matrix.json",
+      "shell_slug": "miracle_topdeck_control",
+      "smoke_gate": {
+        "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+        "candidate_minus_607_winota_wins": 0,
+        "candidate_minus_607_wins": 1,
+        "games_per_opponent": 1,
+        "opponent_seed": 20260626,
+        "opponents": [
+          "Fixed Lorehold deck 607",
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_miracle_topdeck_control_fixed607_gate.json",
+        "rows": {
+          "challenger_lorehold_miracle_topdeck_control_v1": {
+            "avg_win_turn": 16.0,
+            "battle_rank": 1,
+            "counts": {
+              "loss": 3,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 1
+            },
+            "deck_key": "challenger_lorehold_miracle_topdeck_control_v1",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            }
+          },
+          "deck_607": {
+            "avg_win_turn": 0,
+            "battle_rank": 2,
+            "counts": {
+              "loss": 4,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 0
+            },
+            "deck_key": "deck_607",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            }
+          }
+        },
+        "simulation_seed": 42,
+        "status": "ready"
+      }
+    },
+    {
+      "baseline_rank": 1,
+      "baseline_role_counts": {
+        "approach": 1,
+        "board_wipe": 6,
+        "creature": 4,
+        "draw": 13,
+        "engine": 3,
+        "equipment_haste_shroud": 1,
+        "equipment_static_attachment": 1,
+        "exile_value": 1,
+        "land": 34,
+        "land_tax": 1,
+        "mana_development": 1,
+        "overload_recursion": 1,
+        "passive": 4,
+        "protection": 10,
+        "pump_all": 1,
+        "ramp": 18,
+        "redirect_removal": 1,
+        "removal": 10,
+        "steal_all_creatures": 1,
+        "token_maker": 4,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "best_structural_deck": "deck_607",
+      "candidate_commander_intent_score": 91.99,
+      "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+      "candidate_primary_risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "candidate_rank": 4,
+      "candidate_role_counts": {
+        "aetherflux_reservoir": 1,
+        "approach": 1,
+        "board_wipe": 2,
+        "cannot_lose_turn": 1,
+        "composite_resolution": 1,
+        "cost_reduction": 1,
+        "creature": 5,
+        "deal_damage": 1,
+        "discard_trigger_modal_draw_treasure_opponent_life_loss": 1,
+        "draw": 18,
+        "draw_filter": 1,
+        "dynamic_damage_wipe": 1,
+        "engine": 7,
+        "exile_value": 1,
+        "gift_hexproof_indestructible": 1,
+        "graveyard_flashback_grant": 1,
+        "interaction": 2,
+        "land": 34,
+        "land_tax": 1,
+        "loot": 1,
+        "mana_development": 1,
+        "manual_review": 1,
+        "modal_boros_charm": 1,
+        "overload_recursion": 1,
+        "passive": 6,
+        "payoff": 1,
+        "protection": 14,
+        "pump_all": 1,
+        "ramp": 21,
+        "redirect_removal": 2,
+        "removal": 8,
+        "silence_spell": 1,
+        "token_maker": 2,
+        "tutor": 3,
+        "wincon": 8
+      },
+      "candidate_strategy_package_counts": {
+        "deterministic_finisher": 9,
+        "early_plan": 42,
+        "graveyard_recursion": 15,
+        "hand_filter": 21,
+        "pressure_absorber": 12,
+        "protection_window": 19,
+        "spell_chain_conversion": 47,
+        "topdeck_miracle_setup": 19
+      },
+      "candidate_strategy_score": 129.137,
+      "card_count_from_decklist": 96,
+      "confirm_gate": null,
+      "decision": "not_promotable_structure_below_607",
+      "decklist": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_recursion_discard_engine.decklist.txt",
+      "matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_recursion_discard_engine_matrix.json",
+      "shell_slug": "recursion_discard_engine",
+      "smoke_gate": {
+        "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+        "candidate_minus_607_winota_wins": 1,
+        "candidate_minus_607_wins": 1,
+        "games_per_opponent": 1,
+        "opponent_seed": 20260626,
+        "opponents": [
+          "Fixed Lorehold deck 607",
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_recursion_discard_engine_fixed607_gate.json",
+        "rows": {
+          "challenger_lorehold_recursion_discard_engine_v1": {
+            "avg_win_turn": 15.0,
+            "battle_rank": 1,
+            "counts": {
+              "loss": 3,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 1
+            },
+            "deck_key": "challenger_lorehold_recursion_discard_engine_v1",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 0,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 1
+            }
+          },
+          "deck_607": {
+            "avg_win_turn": 0,
+            "battle_rank": 2,
+            "counts": {
+              "loss": 4,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 0
+            },
+            "deck_key": "deck_607",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            }
+          }
+        },
+        "simulation_seed": 42,
+        "status": "ready"
+      }
+    },
+    {
+      "baseline_rank": 1,
+      "baseline_role_counts": {
+        "approach": 1,
+        "board_wipe": 6,
+        "creature": 4,
+        "draw": 13,
+        "engine": 3,
+        "equipment_haste_shroud": 1,
+        "equipment_static_attachment": 1,
+        "exile_value": 1,
+        "land": 34,
+        "land_tax": 1,
+        "mana_development": 1,
+        "overload_recursion": 1,
+        "passive": 4,
+        "protection": 10,
+        "pump_all": 1,
+        "ramp": 18,
+        "redirect_removal": 1,
+        "removal": 10,
+        "steal_all_creatures": 1,
+        "token_maker": 4,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "best_structural_deck": "deck_607",
+      "candidate_commander_intent_score": 93.614,
+      "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+      "candidate_primary_risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "candidate_rank": 4,
+      "candidate_role_counts": {
+        "aetherflux_reservoir": 1,
+        "approach": 1,
+        "board_wipe": 3,
+        "cannot_lose_turn": 1,
+        "composite_resolution": 1,
+        "cost_reduction": 1,
+        "creature": 6,
+        "deal_damage": 1,
+        "discard_trigger_modal_draw_treasure_opponent_life_loss": 1,
+        "draw": 18,
+        "draw_filter": 1,
+        "dynamic_damage_wipe": 1,
+        "engine": 7,
+        "exile_value": 1,
+        "gift_hexproof_indestructible": 1,
+        "graveyard_flashback_grant": 1,
+        "interaction": 3,
+        "land": 34,
+        "land_tax": 1,
+        "loot": 1,
+        "mana_development": 1,
+        "manual_review": 1,
+        "modal_boros_charm": 1,
+        "overload_recursion": 1,
+        "passive": 6,
+        "payoff": 1,
+        "protection": 14,
+        "ramp": 17,
+        "redirect_removal": 2,
+        "removal": 11,
+        "silence_spell": 1,
+        "stax": 1,
+        "token_maker": 2,
+        "tutor": 3,
+        "vow_counter_each_player_sacrifice_rest": 1,
+        "wincon": 7
+      },
+      "candidate_strategy_package_counts": {
+        "deterministic_finisher": 8,
+        "early_plan": 39,
+        "graveyard_recursion": 13,
+        "hand_filter": 21,
+        "pressure_absorber": 18,
+        "protection_window": 19,
+        "spell_chain_conversion": 48,
+        "topdeck_miracle_setup": 18
+      },
+      "candidate_strategy_score": 130.841,
+      "card_count_from_decklist": 96,
+      "confirm_gate": null,
+      "decision": "not_promotable_structure_below_607",
+      "decklist": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_recursion_discard_pressure_repair.decklist.txt",
+      "matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_recursion_discard_pressure_repair_matrix.json",
+      "shell_slug": "recursion_discard_pressure_repair",
+      "smoke_gate": {
+        "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+        "candidate_minus_607_winota_wins": 0,
+        "candidate_minus_607_wins": 0,
+        "games_per_opponent": 1,
+        "opponent_seed": 20260626,
+        "opponents": [
+          "Fixed Lorehold deck 607",
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_recursion_discard_pressure_repair_fixed607_gate.json",
+        "rows": {
+          "challenger_lorehold_recursion_discard_pressure_repair_v1": {
+            "avg_win_turn": 0,
+            "battle_rank": 1,
+            "counts": {
+              "loss": 4,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 0
+            },
+            "deck_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            }
+          },
+          "deck_607": {
+            "avg_win_turn": 0,
+            "battle_rank": 2,
+            "counts": {
+              "loss": 4,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 0
+            },
+            "deck_key": "deck_607",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            }
+          }
+        },
+        "simulation_seed": 42,
+        "status": "ready"
+      }
+    },
+    {
+      "baseline_rank": 1,
+      "baseline_role_counts": {
+        "approach": 1,
+        "board_wipe": 6,
+        "creature": 4,
+        "draw": 13,
+        "engine": 3,
+        "equipment_haste_shroud": 1,
+        "equipment_static_attachment": 1,
+        "exile_value": 1,
+        "land": 34,
+        "land_tax": 1,
+        "mana_development": 1,
+        "overload_recursion": 1,
+        "passive": 4,
+        "protection": 10,
+        "pump_all": 1,
+        "ramp": 18,
+        "redirect_removal": 1,
+        "removal": 10,
+        "steal_all_creatures": 1,
+        "token_maker": 4,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "best_structural_deck": "deck_607",
+      "candidate_commander_intent_score": 94.394,
+      "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+      "candidate_primary_risks": [
+        "recursion_role",
+        "tutor_role"
+      ],
+      "candidate_rank": 4,
+      "candidate_role_counts": {
+        "aetherflux_reservoir": 1,
+        "approach": 1,
+        "board_wipe": 3,
+        "combo": 1,
+        "composite_resolution": 1,
+        "copy_creature_token": 2,
+        "cost_reduction": 1,
+        "creature": 6,
+        "deal_damage": 1,
+        "direct_damage": 1,
+        "discard_trigger_modal_draw_treasure_opponent_life_loss": 1,
+        "draw": 18,
+        "draw_filter": 1,
+        "dynamic_damage_wipe": 1,
+        "engine": 6,
+        "exile_value": 1,
+        "gift_destroy_all_creatures_return_own_destroyed_creature": 1,
+        "gift_hexproof_indestructible": 1,
+        "interaction": 6,
+        "land": 33,
+        "land_tax": 1,
+        "loot": 1,
+        "mana_development": 1,
+        "manual_review": 1,
+        "modal_boros_charm": 1,
+        "overload_recursion": 1,
+        "passive": 5,
+        "payoff": 1,
+        "protection": 14,
+        "ramp": 21,
+        "redirect_removal": 2,
+        "removal": 8,
+        "silence_spell": 1,
+        "stax": 1,
+        "threat": 1,
+        "token_maker": 4,
+        "tutor": 3,
+        "wincon": 9
+      },
+      "candidate_strategy_package_counts": {
+        "deterministic_finisher": 11,
+        "early_plan": 44,
+        "graveyard_recursion": 12,
+        "hand_filter": 21,
+        "pressure_absorber": 13,
+        "protection_window": 18,
+        "spell_chain_conversion": 47,
+        "topdeck_miracle_setup": 18
+      },
+      "candidate_strategy_score": 131.223,
+      "card_count_from_decklist": 97,
+      "confirm_gate": {
+        "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+        "candidate_minus_607_winota_wins": -1,
+        "candidate_minus_607_wins": -5,
+        "games_per_opponent": 3,
+        "opponent_seed": 20260626,
+        "opponents": [
+          "Fixed Lorehold deck 607",
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)",
+          "Kenrith, the Returned King #113 (real)",
+          "Aang, at the Crossroads #106 (real)",
+          "Umbris, Fear Manifest #114 (real)",
+          "Rograkh, Son of Rohgahh #62 (real)"
+        ],
+        "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_spellchain_big_sorcery_confirm_seed42.json",
+        "rows": {
+          "challenger_lorehold_spellchain_big_sorcery_v1": {
+            "avg_win_turn": 23.0,
+            "battle_rank": 2,
+            "counts": {
+              "loss": 21,
+              "stall": 0,
+              "total": 24,
+              "unknown": 0,
+              "win": 3
+            },
+            "deck_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+            "fixed_607_counts": {
+              "loss": 3,
+              "stall": 0,
+              "total": 3,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 3,
+              "stall": 0,
+              "total": 3,
+              "unknown": 0,
+              "win": 0
+            }
+          },
+          "deck_607": {
+            "avg_win_turn": 19.5,
+            "battle_rank": 1,
+            "counts": {
+              "loss": 16,
+              "stall": 0,
+              "total": 24,
+              "unknown": 0,
+              "win": 8
+            },
+            "deck_key": "deck_607",
+            "fixed_607_counts": {
+              "loss": 3,
+              "stall": 0,
+              "total": 3,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 2,
+              "stall": 0,
+              "total": 3,
+              "unknown": 0,
+              "win": 1
+            }
+          }
+        },
+        "simulation_seed": 42,
+        "status": "ready"
+      },
+      "decision": "reject_confirmed_lost_to_607",
+      "decklist": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_spellchain_big_sorcery.decklist.txt",
+      "matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_spellchain_big_sorcery_matrix.json",
+      "shell_slug": "spellchain_big_sorcery",
+      "smoke_gate": {
+        "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+        "candidate_minus_607_winota_wins": 1,
+        "candidate_minus_607_wins": 2,
+        "games_per_opponent": 1,
+        "opponent_seed": 20260626,
+        "opponents": [
+          "Fixed Lorehold deck 607",
+          "Vivi Ornitier #99 (real)",
+          "Sisay, Weatherlight Captain #61 (real)",
+          "Winota, Joiner of Forces #39 (real)"
+        ],
+        "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260703_current_spellchain_big_sorcery_fixed607_gate.json",
+        "rows": {
+          "challenger_lorehold_spellchain_big_sorcery_v1": {
+            "avg_win_turn": 21.0,
+            "battle_rank": 1,
+            "counts": {
+              "loss": 2,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 2
+            },
+            "deck_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 0,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 1
+            }
+          },
+          "deck_607": {
+            "avg_win_turn": 0,
+            "battle_rank": 2,
+            "counts": {
+              "loss": 4,
+              "stall": 0,
+              "total": 4,
+              "unknown": 0,
+              "win": 0
+            },
+            "deck_key": "deck_607",
+            "fixed_607_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            },
+            "winota_counts": {
+              "loss": 1,
+              "stall": 0,
+              "total": 1,
+              "unknown": 0,
+              "win": 0
+            }
+          }
+        },
+        "simulation_seed": 42,
+        "status": "ready"
+      }
+    }
+  ],
+  "signals": [
+    {
+      "best_coverages": [
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_access_density_control_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "access_density_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+          "candidate_rank": 2,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_pressure_conversion"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+          "candidate_rank": 3,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_topdeck_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_engine"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_pressure_repair"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "reject_confirmed_lost_to_607",
+          "shell_slug": "spellchain_big_sorcery"
+        }
+      ],
+      "cards_checked": [],
+      "contract_path": "support_existing_607",
+      "exact_coverage_count": 6,
+      "known_internal_decisions": [],
+      "lane": "topdeck_miracle_setup",
+      "original_status": "already_represented_by_current_607",
+      "package_key": "external_topdeck_miracle_anchor_floor",
+      "recommended_action": "keep_current_anchor",
+      "rejected_exact_coverage_count": 6,
+      "signal_key": "external_topdeck_miracle_anchor_floor",
+      "synthesis_status": "supports_current_607"
+    },
+    {
+      "best_coverages": [],
+      "cards_checked": [
+        "Brainstone",
+        "Planetarium of Wan Shi Tong"
+      ],
+      "contract_path": "same_lane_package",
+      "exact_coverage_count": 0,
+      "known_internal_decisions": [
+        "Brainstone deck-6 path was invalid for protected deck 607 in the current contract.",
+        "Planetarium of Wan Shi Tong over Creative Technique lost a natural gate and did not override 607."
+      ],
+      "lane": "topdeck_miracle_setup",
+      "original_status": "blocked_by_cut_safety",
+      "package_key": "external_brainstone_planetarium_topdeck_extension",
+      "recommended_action": "do_not_gate_until_cut_safety_changes",
+      "rejected_exact_coverage_count": 0,
+      "signal_key": "external_brainstone_planetarium_topdeck_extension",
+      "synthesis_status": "blocked_by_cut_safety"
+    },
+    {
+      "best_coverages": [],
+      "cards_checked": [
+        "Lapse of Certainty"
+      ],
+      "contract_path": "same_lane_package",
+      "exact_coverage_count": 0,
+      "known_internal_decisions": [],
+      "lane": "deterministic_finisher",
+      "original_status": "blocked_no_named_cut",
+      "package_key": "external_approach_lapse_deterministic_line",
+      "recommended_action": "name_cut_or_model_as_diagnostic_only",
+      "rejected_exact_coverage_count": 0,
+      "signal_key": "external_approach_lapse_deterministic_line",
+      "synthesis_status": "blocked_no_named_cut"
+    },
+    {
+      "best_coverages": [
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+          "candidate_rank": 3,
+          "coverage_ratio": 0.167,
+          "matched_cards": [
+            "Mana Vault"
+          ],
+          "missing_cards": [
+            "Chrome Mox",
+            "Grim Monolith",
+            "Lion's Eye Diamond",
+            "Lotus Petal",
+            "Mox Diamond"
+          ],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_topdeck_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 0.167,
+          "matched_cards": [
+            "Mana Vault"
+          ],
+          "missing_cards": [
+            "Chrome Mox",
+            "Grim Monolith",
+            "Lion's Eye Diamond",
+            "Lotus Petal",
+            "Mox Diamond"
+          ],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_engine"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 0.167,
+          "matched_cards": [
+            "Mana Vault"
+          ],
+          "missing_cards": [
+            "Chrome Mox",
+            "Grim Monolith",
+            "Lion's Eye Diamond",
+            "Lotus Petal",
+            "Mox Diamond"
+          ],
+          "shell_decision": "reject_confirmed_lost_to_607",
+          "shell_slug": "spellchain_big_sorcery"
+        }
+      ],
+      "cards_checked": [
+        "Chrome Mox",
+        "Mana Vault",
+        "Grim Monolith",
+        "Mox Diamond",
+        "Lion's Eye Diamond",
+        "Lotus Petal"
+      ],
+      "contract_path": "full_shell",
+      "exact_coverage_count": 0,
+      "known_internal_decisions": [
+        "Mana Vault over Bender's Waterskin lost the confirmed 607 gate.",
+        "Fast-mana variants must not cut the 607 miracle-timing floor without pressure-safe proof."
+      ],
+      "lane": "early_plan",
+      "original_status": "requires_separate_full_shell_contract",
+      "package_key": "external_cedh_fast_mana_engine",
+      "recommended_action": "define_smaller_named_shell_contract_before_battle",
+      "rejected_exact_coverage_count": 0,
+      "signal_key": "external_cedh_fast_mana_engine",
+      "synthesis_status": "partial_or_uncovered_full_shell"
+    },
+    {
+      "best_coverages": [],
+      "cards_checked": [
+        "The One Ring"
+      ],
+      "contract_path": "same_lane_package",
+      "exact_coverage_count": 0,
+      "known_internal_decisions": [
+        "The One Ring was accessed and used in current 607 tests, but tested cuts lost to 607."
+      ],
+      "lane": "card_draw_selection",
+      "original_status": "blocked_by_cut_safety",
+      "package_key": "external_one_ring_value_engine",
+      "recommended_action": "do_not_gate_until_cut_safety_changes",
+      "rejected_exact_coverage_count": 0,
+      "signal_key": "external_one_ring_value_engine",
+      "synthesis_status": "blocked_by_cut_safety"
+    },
+    {
+      "best_coverages": [
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+          "candidate_rank": 3,
+          "coverage_ratio": 0.25,
+          "matched_cards": [
+            "Storm-Kiln Artist"
+          ],
+          "missing_cards": [
+            "Guttersnipe",
+            "Monastery Mentor",
+            "Young Pyromancer"
+          ],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_topdeck_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 0.25,
+          "matched_cards": [
+            "Storm-Kiln Artist"
+          ],
+          "missing_cards": [
+            "Guttersnipe",
+            "Monastery Mentor",
+            "Young Pyromancer"
+          ],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_engine"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 0.25,
+          "matched_cards": [
+            "Storm-Kiln Artist"
+          ],
+          "missing_cards": [
+            "Guttersnipe",
+            "Monastery Mentor",
+            "Young Pyromancer"
+          ],
+          "shell_decision": "reject_confirmed_lost_to_607",
+          "shell_slug": "spellchain_big_sorcery"
+        }
+      ],
+      "cards_checked": [
+        "Monastery Mentor",
+        "Young Pyromancer",
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "contract_path": "full_shell",
+      "exact_coverage_count": 0,
+      "known_internal_decisions": [
+        "Storm-Kiln Artist showed real strategic signal after runtime correction but regressed Winota when tested over Arcane Signet."
+      ],
+      "lane": "pressure_absorber",
+      "original_status": "requires_separate_full_shell_contract",
+      "package_key": "external_spell_pressure_creature_package",
+      "recommended_action": "define_smaller_named_shell_contract_before_battle",
+      "rejected_exact_coverage_count": 0,
+      "signal_key": "external_spell_pressure_creature_package",
+      "synthesis_status": "partial_or_uncovered_full_shell"
+    },
+    {
+      "best_coverages": [
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_access_density_control_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Underworld Breach",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "access_density_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+          "candidate_rank": 2,
+          "coverage_ratio": 1.0,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Underworld Breach",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_pressure_conversion"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Underworld Breach",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_engine"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Underworld Breach",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_pressure_repair"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+          "candidate_rank": 3,
+          "coverage_ratio": 0.75,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [
+            "Underworld Breach"
+          ],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_topdeck_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 0.75,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [
+            "Underworld Breach"
+          ],
+          "shell_decision": "reject_confirmed_lost_to_607",
+          "shell_slug": "spellchain_big_sorcery"
+        }
+      ],
+      "cards_checked": [
+        "Underworld Breach",
+        "Wheel of Fortune",
+        "Aetherflux Reservoir",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "contract_path": "full_shell",
+      "exact_coverage_count": 4,
+      "known_internal_decisions": [
+        "Prior miracle-pressure-conversion and recursion-discard shells produced useful telemetry but did not beat 607."
+      ],
+      "lane": "spell_chain_conversion",
+      "original_status": "requires_separate_full_shell_contract",
+      "package_key": "external_breach_wheel_aetherflux_conversion_shell",
+      "recommended_action": "do_not_repeat_full_shell_without_new_contract_change",
+      "rejected_exact_coverage_count": 4,
+      "signal_key": "external_breach_wheel_aetherflux_conversion_shell",
+      "synthesis_status": "covered_by_existing_nonpromotable_shell"
+    },
+    {
+      "best_coverages": [],
+      "cards_checked": [
+        "Storm of Souls",
+        "Late to Dinner",
+        "Karmic Guide"
+      ],
+      "contract_path": "full_shell",
+      "exact_coverage_count": 0,
+      "known_internal_decisions": [],
+      "lane": "graveyard_recursion",
+      "original_status": "requires_separate_full_shell_contract",
+      "package_key": "external_discard_reanimator_alt_shell",
+      "recommended_action": "define_smaller_named_shell_contract_before_battle",
+      "rejected_exact_coverage_count": 0,
+      "signal_key": "external_discard_reanimator_alt_shell",
+      "synthesis_status": "partial_or_uncovered_full_shell"
+    }
+  ],
+  "source_db_mutated": false,
+  "sources": [
+    {
+      "observed_signal": "Commander uses 99 plus 1 deck construction, singleton rules, commander color identity, and allows colorless legal cards.",
+      "source_key": "wizards_commander_format",
+      "source_type": "official_rules",
+      "url": "https://magic.wizards.com/en/formats/commander"
+    },
+    {
+      "observed_signal": "Scryfall API checks on 2026-07-04 showed Lorehold, Mana Vault, The One Ring, Lapse of Certainty, Brainstone, Planetarium of Wan Shi Tong, fast mana, and listed pressure cards as Commander legal in Lorehold color identity where relevant. Mana Vault, The One Ring, Chrome Mox, Grim Monolith, Mox Diamond, Lion's Eye Diamond, and Underworld Breach were game_changer=true.",
+      "source_key": "scryfall_lorehold_mana_vault_one_ring",
+      "source_type": "oracle_legality_game_changer",
+      "url": "https://scryfall.com/"
+    },
+    {
+      "observed_signal": "Lorehold wants topdeck control; Sensei's Divining Top, Scroll Rack, Library of Leng, Brainstone, Planetarium of Wan Shi Tong, Elegant Parlor, and Tocasia's Dig Site are cited as setup options.",
+      "source_key": "edhrec_miracles_every_turn",
+      "source_type": "public_strategy_article",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander"
+    },
+    {
+      "observed_signal": "Approach of the Second Sun plus Lapse of Certainty is presented as a Lorehold line that can set Approach on top and miracle it during an opponent upkeep.",
+      "source_key": "draftsim_approach_lapse_combo",
+      "source_type": "public_combo_article",
+      "url": "https://draftsim.com/lorehold-approach-combo/"
+    },
+    {
+      "observed_signal": "The cEDH average deck lane includes fast mana, one-ring/value, tutor, protection, storm, Breach/Wheel, and compact artifact acceleration signals.",
+      "source_key": "edhrec_cedh_average_deck",
+      "source_type": "public_average_deck",
+      "url": "https://edhrec.com/average-decks/lorehold-the-historian/cedh"
+    },
+    {
+      "observed_signal": "Lorehold is described as a big instant/sorcery and control shell where Approach, Surge to Victory, Mizzix's Mastery, Storm Herd, and setup cards are central.",
+      "source_key": "draftsim_lorehold_deck_guide",
+      "source_type": "public_strategy_article",
+      "url": "https://draftsim.com/lorehold-the-historian-edh-deck/"
+    },
+    {
+      "observed_signal": "Public strategy groups Lorehold cards into topdeck manipulation, big Miracle spells, discard payoffs, and aggressive spell support such as Monastery Mentor, Young Pyromancer, and Guttersnipe.",
+      "source_key": "gametyrant_lorehold_deck_tech",
+      "source_type": "public_strategy_article",
+      "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech"
+    },
+    {
+      "observed_signal": "Library of Leng is highlighted as a key replacement-effect synergy with Lorehold discard/draw. The article also points to reanimator shells using high-cost white recursion spells and Karmic Guide.",
+      "source_key": "cardkingdom_lorehold_synergy",
+      "source_type": "public_strategy_article",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/"
+    }
+  ],
+  "summary": {
+    "current_champion": "deck_607",
+    "external_signal_count": 8,
+    "promotable_shell_count": 0,
+    "recommended_next_action": "promote_no_shell_keep_607_and_define_smaller_diagnostics",
+    "shell_count": 6,
+    "shell_decision_counts": {
+      "not_promotable_structure_below_607": 5,
+      "reject_confirmed_lost_to_607": 1
+    },
+    "signal_synthesis_status_counts": {
+      "blocked_by_cut_safety": 2,
+      "blocked_no_named_cut": 1,
+      "covered_by_existing_nonpromotable_shell": 1,
+      "partial_or_uncovered_full_shell": 3,
+      "supports_current_607": 1
+    }
+  }
+}
