@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG388
+thread goal remains active, but execution must use the current post-PG389
 baseline and the stop criteria below.
 
 This is the global control plane for the remaining card-rule work. Individual
@@ -573,7 +573,7 @@ Post-PG384 update:
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions older baselines. That is historical
-only. The active execution baseline is the post-PG388 queue below.
+only. The active execution baseline is the post-PG389 queue below.
 
 ## General Goal Contract - 2026-07-02
 
@@ -581,13 +581,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG388 control numbers:
+Current post-PG389 control numbers:
 
-- target battle-gap identities: `26889`
-- XMage-resolved authoritative source identities: `26575`
+- target battle-gap identities: `26887`
+- XMage-resolved authoritative source identities: `26573`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26575`
+- XMage authoritative adapter required: `26573`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -607,12 +607,12 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg388_etb_tutor_battlefield_new_server_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG388, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg389_multi_zone_recursion_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG389, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
-   `recursion::xmage_graveyard_return_variant_review_v1` (`1820`),
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1818`),
    `draw_engine::xmage_draw_card_variant_review_v1` (`1615`),
    `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
    (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`), and
@@ -1306,11 +1306,46 @@ PG388 completion and PG389 starting hypothesis:
    `draw_cards::xmage_draw_card_variant_review_v1` (`607`), and
    `tutor::xmage_library_search_variant_review_v1` (`605`).
 
+PG389 completion and PG390 starting hypothesis:
+
+1. PG389 promoted `2` exact multi-zone graveyard recursion spells on the new
+   server: `Badlands Revival` and `Pull Through the Weft`.
+2. The implementation added exact
+   `xmage_return_multi_zone_graveyard_cards_spell_v1` mapping for
+   `ReturnFromGraveyardToBattlefieldTargetEffect +
+   ReturnFromGraveyardToHandTargetEffect`, restricted to two self-graveyard
+   components with Oracle/source agreement on target type, count,
+   destination, `up to` semantics, and tapped battlefield entry.
+3. Runtime uses the existing recursion component executor for mixed
+   hand/battlefield destinations and tapped entry; threshold/conditional
+   wrappers and unsupported component shapes remain blocked.
+4. Tests passed: exact splitter `339`, exact runtime `196`, builder/sync `23`,
+   py_compile, and E2E package validation `status=pass`.
+5. PostgreSQL on the new server applied `2` upserts and deprecated `0`
+   shadows; postcheck verified `2/2`; Hermes/SQLite sync loaded `2` PG rows,
+   updated `2` SQLite rows, and exported `5156` canonical snapshot rows.
+6. Final alignment audits passed on the new server: strategy consistency
+   `26/26`, operational surface `pass`, legacy contamination `pass`, and
+   PG-Hermes-SQLite contract `50/50`.
+7. The post-PG389 supported splitter returns `0` batch-safe proposals over
+   `7665` considered supported rows, so PG390 must implement another narrow
+   subpattern before PostgreSQL package generation.
+8. The largest remaining work units are now:
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1818`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1615`),
+   `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`),
+   `add_counters::source_add_counters_variant_v1` (`795`),
+   `life_gain::xmage_life_gain_variant_review_v1` (`735`),
+   `removal_destroy::targeted_destroy_variant_v1` (`612`),
+   `draw_cards::xmage_draw_card_variant_review_v1` (`607`), and
+   `tutor::xmage_library_search_variant_review_v1` (`605`).
+
 ## Current Priority Order
 
-Use the post-PG388 authoritative queue unless a newer queue exists:
+Use the post-PG389 authoritative queue unless a newer queue exists:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1820`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1818`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1615`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `888`
@@ -1721,6 +1756,13 @@ Immediate checkpoint after PG361:
     the fresh post-PG388 queue. Since the exact splitter is now empty again,
     the next cycle must implement a new mapper/runtime subpattern before any
     PostgreSQL package can be generated.
+78. PG389 promoted `2` exact multi-zone graveyard recursion rows on the new
+    server for `Badlands Revival` and `Pull Through the Weft`, and the
+    post-PG389 supported splitter recheck returned `proposal_count=0` over
+    `7665` considered supported rows. Continue from the fresh post-PG389 queue.
+    Since the exact splitter is now empty again, the next cycle must implement
+    a new mapper/runtime subpattern before any PostgreSQL package can be
+    generated.
 
 ## Non-Goals
 

@@ -125,6 +125,7 @@ BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_MILL_RETURN_SCOPE = "xmage_mill_then_return_graveyard_card_to_hand_spell_v1"
 RECURSION_BATTLEFIELD_SCOPE = "xmage_return_target_graveyard_card_to_battlefield_spell_v1"
+RECURSION_MULTI_ZONE_SCOPE = "xmage_return_multi_zone_graveyard_cards_spell_v1"
 RECURSION_BATTLEFIELD_ALL_SCOPE = "xmage_return_all_matching_graveyard_cards_to_battlefield_spell_v1"
 GRAVEYARD_EXILE_SPELL_SCOPE = "xmage_exile_target_graveyard_card_spell_v1"
 RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
@@ -2062,6 +2063,131 @@ def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, 
                 result[flag] = True
         return result
     return None
+
+
+def recursion_multi_zone_target_from_phrase(phrase: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    mapping = {
+        "creature": "creature",
+        "permanent": "permanent",
+        "nonland permanent": "nonland_permanent",
+        "land": "land",
+    }
+    return mapping.get(normalized)
+
+
+def recursion_multi_zone_destination_from_phrase(phrase: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    if normalized == "your hand":
+        return "hand"
+    if normalized == "the battlefield":
+        return "battlefield"
+    return None
+
+
+def recursion_multi_zone_component(
+    target: str,
+    count: int,
+    destination: str,
+    *,
+    enters_tapped: bool = False,
+) -> dict[str, Any]:
+    component = {
+        "target": target,
+        "target_constraints": recursion_target_constraints_for(target),
+        "count": count,
+        "up_to_count": True,
+        "destination": destination,
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+    }
+    if destination == "battlefield":
+        component["battlefield_controller"] = "self"
+    if enters_tapped:
+        component["enters_tapped"] = True
+    return component
+
+
+def recursion_multi_zone_components_from_oracle(metadata: dict[str, Any]) -> list[dict[str, Any]] | None:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    pattern = (
+        r"^return up to (?P<count_a>one|two|\d+) target (?P<target_a>creature|permanent|nonland permanent|land) "
+        r"cards? from your graveyard to (?P<destination_a>your hand|the battlefield)(?P<tapped_a> tapped)?"
+        r"(?:, then return|\. return) up to (?P<count_b>one|two|\d+) target "
+        r"(?P<target_b>creature|permanent|nonland permanent|land) cards? from your graveyard to "
+        r"(?P<destination_b>your hand|the battlefield)(?P<tapped_b> tapped)?\.?$"
+    )
+    match = re.match(pattern, text)
+    if not match:
+        return None
+    components: list[dict[str, Any]] = []
+    for suffix in ("a", "b"):
+        count = _count_word_to_int(match.group(f"count_{suffix}"))
+        target = recursion_multi_zone_target_from_phrase(match.group(f"target_{suffix}"))
+        destination = recursion_multi_zone_destination_from_phrase(match.group(f"destination_{suffix}"))
+        if count is None or count <= 0 or target is None or destination is None:
+            return None
+        components.append(
+            recursion_multi_zone_component(
+                target,
+                count,
+                destination,
+                enters_tapped=bool(match.groupdict().get(f"tapped_{suffix}")),
+            )
+        )
+    if {component["destination"] for component in components} != {"hand", "battlefield"}:
+        return None
+    return components
+
+
+def _source_has_recursion_multi_zone_target(source_text: str, target: str) -> bool:
+    text = str(source_text or "")
+    if target == "creature":
+        return "FILTER_CARD_CREATURE_YOUR_GRAVEYARD" in text or "FilterCreatureCard" in text
+    if target == "permanent":
+        return "FilterPermanentCard" in text or "permanent card from your graveyard" in text.lower()
+    if target == "nonland_permanent":
+        return "FilterNonlandCard" in text and "PermanentPredicate.instance" in text
+    if target == "land":
+        return "FILTER_CARD_LAND_FROM_YOUR_GRAVEYARD" in text or "FilterLandCard" in text
+    return False
+
+
+def source_supports_recursion_multi_zone_components(
+    source_text: str,
+    components: list[dict[str, Any]],
+) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    if len(components) != 2:
+        return "recursion_multi_zone_component_count_not_supported"
+    if has_additional_cost(text):
+        return "recursion_multi_zone_additional_cost_not_supported"
+    effect_order = [
+        "battlefield" if class_name == "ReturnFromGraveyardToBattlefieldTargetEffect" else "hand"
+        for class_name in re.findall(
+            r"new\s+(ReturnFromGraveyardToBattlefieldTargetEffect|ReturnFromGraveyardToHandTargetEffect)\s*\(",
+            text,
+        )
+    ]
+    expected_order = [str(component.get("destination")) for component in components]
+    if effect_order != expected_order:
+        return "recursion_multi_zone_source_effect_order_mismatch"
+    if "SecondTargetPointer" not in text:
+        return "recursion_multi_zone_source_target_pointer_not_supported"
+    for component in components:
+        target = str(component.get("target") or "")
+        count = int(component.get("count") or 0)
+        if not _source_has_recursion_multi_zone_target(text, target):
+            return "recursion_multi_zone_source_target_not_supported"
+        if not re.search(rf"TargetCardInYourGraveyard\s*\(\s*0\s*,\s*{count}\s*,", text, re.S):
+            return "recursion_multi_zone_source_count_not_supported"
+        if component.get("enters_tapped") and not re.search(
+            r"ReturnFromGraveyardToBattlefieldTargetEffect\s*\(\s*true\s*\)",
+            text,
+            re.S,
+        ):
+            return "recursion_multi_zone_source_tapped_not_supported"
+    return {"recursion_components": components}
 
 
 def recursion_all_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -11310,6 +11436,37 @@ def split_row(
         auxiliary_recursion_spell = bool(auxiliary_recursion_abilities) and (
             auxiliary_recursion_abilities <= AUXILIARY_RECURSION_SPELL_ABILITY_CLASSES
         )
+        multi_zone_recursion_classes = {
+            "ReturnFromGraveyardToBattlefieldTargetEffect",
+            "ReturnFromGraveyardToHandTargetEffect",
+        }
+        if classes == multi_zone_recursion_classes:
+            if ability_classes(row):
+                return None, "recursion_multi_zone_ability_class_not_simple"
+            components = recursion_multi_zone_components_from_oracle(metadata)
+            if components is None:
+                return None, "recursion_multi_zone_oracle_not_supported"
+            source_components = source_supports_recursion_multi_zone_components(source_text, components)
+            if isinstance(source_components, str):
+                return None, source_components
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": RECURSION_MULTI_ZONE_SCOPE,
+                "target": "multi_zone_graveyard_cards",
+                "mode_selection": "all_components",
+                "recursion_components": components,
+                "destination": "mixed_zones",
+                "target_controller": "self",
+                "target_graveyard_controller": "self",
+                "xmage_effect_classes": sorted(multi_zone_recursion_classes),
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_multi_zone_recursion_spell",
+            ), "selected_exact_scope"
         if classes == {"ReturnFromGraveyardToBattlefieldTargetEffect"} and auxiliary_recursion_spell:
             effect_text = recursion_effect_text_from_oracle(metadata)
             if effect_text is None:

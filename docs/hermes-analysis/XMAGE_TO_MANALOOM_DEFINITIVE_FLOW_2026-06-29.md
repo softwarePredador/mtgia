@@ -205,21 +205,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg387_etb_draw_lose_life_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg388_etb_tutor_battlefield_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg388_etb_tutor_battlefield_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg389_multi_zone_recursion_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg389_multi_zone_recursion_new_server.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26889`
-- XMage authoritative source resolved: `26575`
+- target all-card battle-gap identities: `26887`
+- XMage authoritative source resolved: `26573`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26575`
+- XMage authoritative adapter required: `26573`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26575` identities, card semantics are accepted from XMage; work is now
+- For `26573` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -238,10 +240,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG388 Exact Adapter Waves
+## PG283-PG389 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG388 all-card exact adapter waves are applied and
-synced. PG375-PG388 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG389 all-card exact adapter waves are applied and
+synced. PG375-PG389 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -569,6 +571,13 @@ patterns:
   or choose-one-or-both creature/Aura battlefield recursion components ->
   `xmage_return_target_graveyard_card_to_battlefield_spell_v1` or
   `xmage_return_one_or_both_graveyard_cards_to_battlefield_spell_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` with exact
+  `ReturnFromGraveyardToBattlefieldTargetEffect +
+  ReturnFromGraveyardToHandTargetEffect`, no ability class, no additional
+  cost, exact two-component self-graveyard Oracle/source agreement, and
+  supported `up to` targets for creature/permanent/nonland permanent/land
+  cards moving to hand or battlefield, including tapped battlefield entry ->
+  `xmage_return_multi_zone_graveyard_cards_spell_v1`
 - `recursion::xmage_graveyard_return_variant_review_v1` with
   `ReturnFromGraveyardToBattlefieldTargetEffect + SimpleActivatedAbility` on
   battlefield permanents, exact Oracle/source agreement, mana/tap costs only,
@@ -6246,6 +6255,46 @@ PG388 measured result:
   `proposal_count=0` over `7667` considered supported rows. The next cycle must
   implement another exact mapper/runtime subpattern before package generation.
 
+PG389 measured result:
+
+- PG389 promoted `2` exact multi-zone graveyard recursion spells on the new
+  server: `Badlands Revival` and `Pull Through the Weft`.
+- The splitter now maps exact
+  `ReturnFromGraveyardToBattlefieldTargetEffect +
+  ReturnFromGraveyardToHandTargetEffect` spells into
+  `xmage_return_multi_zone_graveyard_cards_spell_v1`, only when Oracle and
+  XMage agree on exactly two self-graveyard components, destination order,
+  target count, `up to` semantics, and tapped battlefield entry. Supported
+  targets are `creature`, `permanent`, `nonland_permanent`, and `land`.
+- Conditional effects, threshold-style wrappers, additional costs, auxiliary
+  ability classes, unsupported target classes, and non-two-component recursion
+  remain blocked by the splitter instead of being promoted.
+- Runtime coverage reuses the existing recursion-component executor, including
+  mixed hand/battlefield destinations and tapped battlefield entry.
+- Full exact splitter tests passed `339/339`, full exact runtime tests passed
+  `196/196`, package builder/sync tests passed `23/23`, and `py_compile`
+  passed for the changed scripts.
+- PostgreSQL precheck matched `2/2` target card rows on the new server; apply
+  upserted `2` rows and deprecated `0` shadows; postcheck verified `2/2`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `2` PostgreSQL rows, updated `2` SQLite rows,
+  and exported `5156` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `2/2` cards.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `50/50` pass.
+- Global readiness after PG389: `battle_and_oracle_ready=4020`,
+  `battle_family_mapper_required=29810`, and
+  `snapshot_has_verified_rule=3885`.
+- Global all-card authoritative queue after PG389:
+  `target_identity_count=26887`, `xmage_authoritative_source_count=26573`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26573`.
+- Running the exact splitter after PG389 on supported units returned
+  `proposal_count=0` over `7665` considered supported rows. The next cycle must
+  implement another exact mapper/runtime subpattern before package generation.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -6876,10 +6925,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG388 queue on the new server, the next exact runtime-backed work should
+post-PG389 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1820`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1818`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1615`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `888`

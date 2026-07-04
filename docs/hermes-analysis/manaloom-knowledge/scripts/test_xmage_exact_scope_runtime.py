@@ -9550,6 +9550,100 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.graveyard, [target])
         self.assertFalse(any(event == "graveyard_to_library_activated" for event, _ in self.events))
 
+    def test_multi_zone_graveyard_recursion_spell_resolves_all_components(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Buried Relic", "type_line": "Artifact", "cmc": 2},
+                {"name": "Forgotten Forest", "type_line": "Land - Forest", "cmc": 0},
+                {"name": "Buried Bear", "type_line": "Creature - Bear", "cmc": 2},
+                {"name": "Forgotten Island", "type_line": "Land - Island", "cmc": 0},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_multi_zone_graveyard_cards_spell_v1",
+            "mode_selection": "all_components",
+            "destination": "mixed_zones",
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "recursion_components": [
+                {
+                    "target": "nonland_permanent",
+                    "count": 2,
+                    "up_to_count": True,
+                    "destination": "hand",
+                    "target_controller": "self",
+                    "target_graveyard_controller": "self",
+                },
+                {
+                    "target": "land",
+                    "count": 2,
+                    "up_to_count": True,
+                    "destination": "battlefield",
+                    "target_controller": "self",
+                    "target_graveyard_controller": "self",
+                    "battlefield_controller": "self",
+                    "enters_tapped": True,
+                },
+            ],
+            "_rule_logical_key": "battle_rule_v1:fixture_pull_through_the_weft",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Pull Through the Weft",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Return up to two target nonland permanent cards from your graveyard to your hand, "
+                    "then return up to two target land cards from your graveyard to the battlefield tapped."
+                ),
+            },
+            turn=24,
+            rng=random.Random(24),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Buried Relic", "Buried Bear"])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Forgotten Forest", "Forgotten Island"])
+        self.assertTrue(all(card.get("tapped") for card in active.battlefield))
+        self.assertEqual([card["name"] for card in active.graveyard], ["Pull Through the Weft"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Pull Through the Weft"
+                and data.get("mode_selection") == "all_components"
+                and data.get("recovered") == [
+                    "Buried Relic",
+                    "Buried Bear",
+                    "Forgotten Forest",
+                    "Forgotten Island",
+                ]
+                and data.get("recovered_by_component") == [
+                    {
+                        "index": 0,
+                        "target_type": "nonland_permanent",
+                        "target_graveyard_controller": "self",
+                        "destination": "hand",
+                        "battlefield_controller": None,
+                        "recovered": ["Buried Relic", "Buried Bear"],
+                    },
+                    {
+                        "index": 1,
+                        "target_type": "land",
+                        "target_graveyard_controller": "self",
+                        "destination": "battlefield",
+                        "battlefield_controller": "self",
+                        "recovered": ["Forgotten Forest", "Forgotten Island"],
+                    },
+                ]
+                for event, data in self.events
+            )
+        )
+
     def test_enchantment_effect_enters_battlefield_with_activated_rule_effects(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

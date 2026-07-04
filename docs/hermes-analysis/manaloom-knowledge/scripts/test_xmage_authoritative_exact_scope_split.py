@@ -4118,6 +4118,112 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "graveyard", "controller": "self", "card_types": ["instant", "sorcery"]},
         )
 
+    def test_multi_zone_graveyard_recursion_spell_maps_battlefield_then_hand(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=[
+                "ReturnFromGraveyardToBattlefieldTargetEffect",
+                "ReturnFromGraveyardToHandTargetEffect",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Badlands Revival",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return up to one target creature card from your graveyard to the battlefield. "
+                    "Return up to one target permanent card from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect().setTargetPointer(new SecondTargetPointer()));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 1, StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 1, filter));
+                private static final FilterCard filter = new FilterPermanentCard("permanent card from your graveyard");
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "recursion")
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_MULTI_ZONE_SCOPE)
+        self.assertEqual(effect["mode_selection"], "all_components")
+        self.assertEqual(
+            [(component["target"], component["destination"], component["count"]) for component in effect["recursion_components"]],
+            [("creature", "battlefield", 1), ("permanent", "hand", 1)],
+        )
+        self.assertTrue(all(component["up_to_count"] for component in effect["recursion_components"]))
+
+    def test_multi_zone_graveyard_recursion_spell_maps_hand_then_tapped_battlefield(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=[
+                "ReturnFromGraveyardToBattlefieldTargetEffect",
+                "ReturnFromGraveyardToHandTargetEffect",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Pull Through the Weft",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return up to two target nonland permanent cards from your graveyard to your hand, "
+                    "then return up to two target land cards from your graveyard to the battlefield tapped."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterNonlandCard("nonland permanent cards from your graveyard");
+                static { filter.add(PermanentPredicate.instance); }
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 2, filter));
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect(true)
+                    .setTargetPointer(new SecondTargetPointer()));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 2, StaticFilters.FILTER_CARD_LAND_FROM_YOUR_GRAVEYARD));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_MULTI_ZONE_SCOPE)
+        self.assertEqual(
+            [(component["target"], component["destination"], component["count"]) for component in effect["recursion_components"]],
+            [("nonland_permanent", "hand", 2), ("land", "battlefield", 2)],
+        )
+        self.assertTrue(effect["recursion_components"][1]["enters_tapped"])
+
+    def test_multi_zone_graveyard_recursion_blocks_threshold_conditional(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=[
+                "ConditionalOneShotEffect",
+                "ReturnFromGraveyardToBattlefieldTargetEffect",
+                "ReturnFromGraveyardToHandTargetEffect",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Stitch Together",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return target creature card from your graveyard to your hand. "
+                    "Threshold - Return that card from your graveyard to the battlefield instead "
+                    "if seven or more cards are in your graveyard."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ConditionalOneShotEffect(
+                    new ReturnFromGraveyardToBattlefieldTargetEffect(), new ReturnFromGraveyardToHandTargetEffect(),
+                    ThresholdCondition.instance));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_effect_class_not_pure")
+
     def test_mill_then_return_creature_spell_maps_to_recursion_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

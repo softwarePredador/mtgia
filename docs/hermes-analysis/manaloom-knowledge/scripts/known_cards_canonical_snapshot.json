@@ -6062,6 +6062,66 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "bb350cc03d387a5d204c86e6d75423ea"
   },
+  "Badlands Revival": {
+    "battle_model_scope": "xmage_return_multi_zone_graveyard_cards_spell_v1",
+    "destination": "mixed_zones",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "all_components",
+    "recursion_components": [
+      {
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "battle",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "up_to_count": true
+      }
+    ],
+    "sorcery": true,
+    "target": "multi_zone_graveyard_cards",
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_effect_classes": [
+      "ReturnFromGraveyardToBattlefieldTargetEffect",
+      "ReturnFromGraveyardToHandTargetEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cad5ffc686cc6c1e970b5fb45aa6eb1b",
+    "battle_rule_oracle_hash": "6c4a338d9da9a4035afc7786d92d8cfa"
+  },
   "Bag of Holding": {
     "cmc": 1.0,
     "count": 1,
@@ -60597,6 +60657,69 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eb04bb80a47324c44cea5835eba5bea7"
+  },
+  "Pull Through the Weft": {
+    "battle_model_scope": "xmage_return_multi_zone_graveyard_cards_spell_v1",
+    "destination": "mixed_zones",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "all_components",
+    "recursion_components": [
+      {
+        "count": 2,
+        "destination": "hand",
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "battle"
+          ],
+          "controller": "self",
+          "exclude_card_types": [
+            "land"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "battlefield_controller": "self",
+        "count": 2,
+        "destination": "battlefield",
+        "enters_tapped": true,
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "up_to_count": true
+      }
+    ],
+    "sorcery": true,
+    "target": "multi_zone_graveyard_cards",
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_effect_classes": [
+      "ReturnFromGraveyardToBattlefieldTargetEffect",
+      "ReturnFromGraveyardToHandTargetEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1c4754386a55d72baa2366482ab859a3",
+    "battle_rule_oracle_hash": "e0c0356a12d42dc554b125ae70234895"
   },
   "Pull Under": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
