@@ -9650,6 +9650,51 @@ new server:
   `12` cards each, and `xmage_static_self_cant_be_blocked_creature` and
   `xmage_static_self_protection_from_card_types_creature` with `11` cards each.
 
+## 2026-07-04 PG448 Static Can't Block Closure
+
+- Closed the exact XMage static self can't-block creature family as ManaLoom
+  scope `xmage_static_self_cant_block_creature_v1`.
+- The selected package accepted local XMage creatures with exact
+  `CantBlockAbility` source and Oracle text matching the self restriction
+  "can't block". Runtime behavior excludes those creatures from blocker
+  assignment while leaving other legal blockers available.
+- The batch covers `13` cards: Ashenmoor Gouger, Craven Giant, Craven Knight,
+  Goblin Raider, Hulking Cyclops, Hulking Goblin, Hulking Ogre, Jungle Lion,
+  Ogre Taskmaster, Scavenging Scarab, Spineless Thug, Yellow Scarves Troops,
+  and Young Wei Recruits.
+- Focused mapper/runtime tests covered exact static source selection,
+  non-exact source blocking, and blocker-assignment exclusion; PG448 performed
+  no code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `13` cards. Precheck found `13` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `13/13` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4327` PostgreSQL runtime rows, wrote `4319` SQLite runtime
+  rows, and exported `4294` canonical fallback rows.
+- PG448 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `13` selected cards. Generic
+  battle scenario count remained `0`; static can't-block behavior remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26559`, `xmage_authoritative_source_count=26245`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26245`. This is an exact
+  reduction of `13` from the post-PG447 queue.
+- The post-PG448 exact split recheck reports `proposal_count=220` and
+  `safe_for_batch_pg_package_count=220`. The largest remaining exact families
+  are `xmage_fixed_damage_exile_if_dies_spell` and `xmage_fixed_draw_spell`
+  with `12` cards each, followed by
+  `xmage_static_self_cant_be_blocked_creature` and
+  `xmage_static_self_protection_from_card_types_creature` with `11` cards each,
+  and `xmage_creature_attack_target_keyword_until_eot` with `10` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
