@@ -190,3 +190,35 @@ def test_seed_safe_builder_reports_zero_when_only_protected_or_same_lane_slots_e
     by_card = {row["card_name"]: row for row in payload["cut_slots"]}
     assert "structural_dependency" in by_card["Quiet Study"]["blockers"]
     assert "prior_rejected_cut" in by_card["Quiet Study"]["blockers"]
+
+
+def test_default_input_paths_exist_for_current_builder_contract():
+    assert builder.DEFAULT_MANUAL_REVIEW.exists()
+    assert builder.DEFAULT_SAFE_CUT_REPLANNER.exists()
+    assert builder.DEFAULT_STRATEGY_AUDIT.exists()
+    assert builder.DEFAULT_EXPOSURE_PROFILE.exists()
+
+
+def test_seed_safe_builder_reports_missing_inputs_instead_of_traceback():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp = Path(tmpdir)
+        source_db = tmp / "knowledge.db"
+        build_source_db(source_db)
+
+        payload = builder.build_report(
+            source_db=source_db,
+            deck_id=607,
+            manual_review_path=tmp / "missing_manual.json",
+            strategy_audit_path=tmp / "missing_strategy.json",
+            exposure_profile_path=tmp / "missing_exposure.json",
+            safe_cut_replanner_path=tmp / "missing_replanner.json",
+        )
+
+    assert payload["summary"]["missing_inputs"] == [
+        "manual_review",
+        "strategy_audit",
+        "exposure_profile",
+    ]
+    assert payload["summary"]["seed_safe_cut_ready_count"] == 0
+    assert payload["summary"]["recommended_next_action"] == "rerun_with_current_cut_evidence_inputs"
+    assert payload["manifest"]["cut_slots"] == []

@@ -27,16 +27,16 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_BASELINE_DECK_ID = 607
 DEFAULT_MANUAL_REVIEW = (
-    REPORT_DIR / "lorehold_manual_cut_review_20260630_goal_learning_new_seed_safe_cut.json"
+    REPORT_DIR / "lorehold_manual_cut_review_20260704_role_tag_repair.json"
 )
 DEFAULT_SAFE_CUT_REPLANNER = (
-    REPORT_DIR / "lorehold_safe_cut_replanner_20260630_goal_learning_new_seed_safe_cut.json"
+    REPORT_DIR / "lorehold_safe_cut_replanner_20260704_role_tag_repair.json"
 )
 DEFAULT_STRATEGY_AUDIT = (
     REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 )
 DEFAULT_EXPOSURE_PROFILE = (
-    REPORT_DIR / "lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json"
+    REPORT_DIR / "lorehold_card_exposure_profile_20260704_role_tag_repair_deck607.json"
 )
 
 SAFE_CUT_DECISIONS = {"engine_flex", "manual_review", "support_flex", "seed_safe_flex"}
@@ -353,10 +353,19 @@ def build_report(
     exposure_profile_path: Path,
     safe_cut_replanner_path: Path | None,
 ) -> dict[str, Any]:
-    manual_review = read_json(manual_review_path)
-    strategy_audit = read_json(strategy_audit_path)
-    exposure_profile = read_json(exposure_profile_path)
+    manual_review = read_optional_json(manual_review_path)
+    strategy_audit = read_optional_json(strategy_audit_path)
+    exposure_profile = read_optional_json(exposure_profile_path)
     safe_cut_replanner = read_optional_json(safe_cut_replanner_path)
+    missing_inputs = [
+        name
+        for name, payload in {
+            "manual_review": manual_review,
+            "strategy_audit": strategy_audit,
+            "exposure_profile": exposure_profile,
+        }.items()
+        if not payload
+    ]
     manual_by_card = manual_cut_rows(manual_review)
     safety_by_card = cut_safety_rows(strategy_audit)
     exposure_by_card = exposure_rows(exposure_profile)
@@ -387,6 +396,9 @@ def build_report(
     status_counts = Counter(row["status"] for row in rows)
     lane_counts = Counter(row["lane"] for row in rows)
     recommended = (
+        "rerun_with_current_cut_evidence_inputs"
+        if missing_inputs
+        else
         "build_failure_targeted_packages_from_seed_safe_cuts"
         if ready
         else "expand_cut_safety_model_or_multi_card_shell_before_gate"
@@ -418,6 +430,7 @@ def build_report(
         "exposure_profile": str(exposure_profile_path),
         "safe_cut_replanner": str(safe_cut_replanner_path or ""),
         "summary": {
+            "missing_inputs": missing_inputs,
             "deck_card_count": len(rows),
             "seed_safe_cut_ready_count": len(ready),
             "same_lane_only_count": len(same_lane),
@@ -452,6 +465,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- source_db_mutated: `{payload['source_db_mutated']}`",
         f"- deck_id: `{payload['deck_id']}`",
         f"- deck_card_count: `{summary['deck_card_count']}`",
+        f"- missing_inputs: `{json.dumps(summary.get('missing_inputs') or [])}`",
         f"- seed_safe_cut_ready_count: `{summary['seed_safe_cut_ready_count']}`",
         f"- same_lane_only_count: `{summary['same_lane_only_count']}`",
         f"- blocked_count: `{summary['blocked_count']}`",
