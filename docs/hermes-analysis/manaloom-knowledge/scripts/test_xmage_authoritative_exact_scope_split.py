@@ -11887,7 +11887,103 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_remove_target"], "artifact_or_enchantment")
         self.assertEqual(effect["trigger"], "enters_battlefield")
 
-    def test_creature_etb_destroy_blocks_restricted_target_text(self) -> None:
+    def test_creature_etb_destroy_maps_restricted_target_constraints(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        cases = [
+            (
+                "Bala Ged Scorpion",
+                "When Bala Ged Scorpion enters the battlefield, you may destroy target creature with power 1 or less.",
+                (
+                    "FilterCreaturePermanent filter = new FilterCreaturePermanent(\"creature with power 1 or less\");"
+                    "filter.add(new PowerPredicate(ComparisonType.FEWER_THAN, 2));"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), true);"
+                    "ability.addTarget(new TargetPermanent(filter));"
+                ),
+                "creature",
+                {"card_types": ["creature"], "power_max": 1},
+                None,
+            ),
+            (
+                "Dakmor Lancer",
+                "When Dakmor Lancer enters the battlefield, you may destroy target nonblack creature.",
+                (
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), true);"
+                    "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_CREATURE_NON_BLACK));"
+                ),
+                "creature",
+                {"card_types": ["creature"], "exclude_colors": ["B"]},
+                None,
+            ),
+            (
+                "Ravenous Baboons",
+                "When Ravenous Baboons enters the battlefield, destroy target nonbasic land.",
+                (
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect());"
+                    "ability.addTarget(new TargetNonBasicLandPermanent());"
+                ),
+                "land",
+                {"card_types": ["land"], "exclude_supertypes": ["basic"]},
+                "any",
+            ),
+            (
+                "Setessan Starbreaker",
+                "When Setessan Starbreaker enters the battlefield, you may destroy target Aura.",
+                (
+                    "FilterEnchantmentPermanent filter = new FilterEnchantmentPermanent(\"Aura\");"
+                    "filter.add(SubType.AURA.getPredicate());"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), true);"
+                    "ability.addTarget(new TargetPermanent(filter));"
+                ),
+                "enchantment",
+                {"card_types": ["enchantment"], "required_subtypes": ["aura"]},
+                "any",
+            ),
+            (
+                "Slayer of the Wicked",
+                "When Slayer of the Wicked enters the battlefield, you may destroy target Vampire, Werewolf, or Zombie.",
+                (
+                    "FilterCreaturePermanent filter = new FilterCreaturePermanent(\"Vampire, Werewolf, or Zombie\");"
+                    "filter.add(Predicates.or(SubType.VAMPIRE.getPredicate(), SubType.WEREWOLF.getPredicate(), "
+                    "SubType.ZOMBIE.getPredicate()));"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), true);"
+                    "ability.addTarget(new TargetPermanent(filter));"
+                ),
+                "creature",
+                {"card_types": ["creature"], "required_subtypes": ["vampire", "werewolf", "zombie"]},
+                None,
+            ),
+        ]
+
+        for name, oracle_text, source_text, target, constraints, controller in cases:
+            with self.subTest(name=name):
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=name,
+                        type_line="Creature - Fixture",
+                        oracle_text=oracle_text,
+                    ),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["effect"], "creature")
+                self.assertEqual(effect["battle_model_scope"], split.ETB_DESTROY_CREATURE_SCOPE)
+                self.assertEqual(effect["etb_remove_target"], target)
+                self.assertEqual(effect["target_constraints"], constraints)
+                if controller:
+                    self.assertEqual(effect["target_controller"], controller)
+                else:
+                    self.assertNotIn("target_controller", effect)
+
+    def test_creature_etb_destroy_blocks_damage_this_turn_target(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,
             effect_classes=["DestroyTargetEffect"],
@@ -11898,11 +11994,17 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(
-                name="Fixture Scorpion",
-                type_line="Creature - Scorpion",
-                oracle_text="When this creature enters, you may destroy target creature with power 1 or less.",
+                name="Fathom Fleet Cutthroat",
+                type_line="Creature - Human Pirate",
+                oracle_text=(
+                    "When Fathom Fleet Cutthroat enters the battlefield, destroy target creature "
+                    "an opponent controls that was dealt damage this turn."
+                ),
             ),
-            source_text="new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), true)",
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect());"
+                "ability.addTarget(new TargetPermanent(FILTER_OPPONENTS_CREATURE_DAMAGED_THIS_TURN));"
+            ),
         )
 
         self.assertIsNone(proposal)

@@ -12457,6 +12457,8 @@ def prepare_declared_removal_targets(player, opponents, card, effect_data):
     target_controller_scope = str((effect_data or {}).get("target_controller") or "opponent").lower()
     if target_controller_scope in {"self", "you", "controller", "controlled"}:
         target_controllers = [player]
+    elif target_controller_scope in {"any", "any_player", "all"}:
+        target_controllers = prioritize_evaluation_target_opponents(player, opponents) + [player]
     else:
         target_controllers = prioritize_evaluation_target_opponents(player, opponents)
     for target_controller in target_controllers:

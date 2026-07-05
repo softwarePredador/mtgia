@@ -6882,6 +6882,30 @@
     "battle_rule_logical_key": "battle_rule_v1:cad5ffc686cc6c1e970b5fb45aa6eb1b",
     "battle_rule_oracle_hash": "6c4a338d9da9a4035afc7786d92d8cfa"
   },
+  "Bala Ged Scorpion": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "power_max": 1
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:163002bd7915bcab4834fd782fd8716a",
+    "battle_rule_oracle_hash": "bee7a1e5e6aca5a2a0e4d597ab4562cf"
+  },
   "Balamb Garden, SeeD Academy // Balamb Garden, Airborne": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -20766,6 +20790,32 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Dakmor Lancer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_colors": [
+        "B"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2ad4e6f6ec0366e22c3da5c31c477882",
+    "battle_rule_oracle_hash": "9f7cadf6cd9b3f37181b77e6da45d189"
+  },
   "Dakmor Salvage": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -34221,6 +34271,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "031038073a4927e66020d1bb7e72f092"
+  },
+  "Fleshpulper Giant": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "toughness_max": 2
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a618a4a5790d05d5ce1ed03e9f943b4c",
+    "battle_rule_oracle_hash": "8662178b88cb0ec7b256a9f0f9382ff7"
   },
   "Flood of Recollection": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
@@ -56712,6 +56786,34 @@
     "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
     "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
   },
+  "Marshdrinker Giant": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ],
+      "required_subtypes": [
+        "island",
+        "swamp"
+      ]
+    },
+    "target_controller": "opponent",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e3f21c7f2952a0e3d620000788073ff9",
+    "battle_rule_oracle_hash": "43ca3cf785a420933b916a72c7d4f486"
+  },
   "Martyr of Dusk": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
@@ -61104,6 +61206,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "83402d93e46be2bdb35e2e22497498a3"
+  },
+  "Myconid Spore Tender": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+    "battle_rule_oracle_hash": "4f752ab676dccfdcdc035ea46db28e86"
   },
   "Myr Battlesphere": {
     "effect": "creature",
@@ -72856,6 +72982,33 @@
     "battle_rule_logical_key": "battle_rule_v1:5dbcbe3d8a12ebf95368fa48717425a8",
     "battle_rule_oracle_hash": "9fb236f92fd9d4c0e99d041befa6e6c2"
   },
+  "Ravenous Baboons": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ],
+      "exclude_supertypes": [
+        "basic"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b62f77f5b31d6f27e42d060684f3030c",
+    "battle_rule_oracle_hash": "6973e2542972949d4f36c8d5e5b53cdb"
+  },
   "Ravenous Chupacabra": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
@@ -77012,6 +77165,32 @@
     "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
     "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
   },
+  "Rock Soldiers": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "exclude_card_types": [
+        "creature"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2bce2fa059694f09637ce5c391853ae8",
+    "battle_rule_oracle_hash": "93bfbdf0cfaffd8d220f3bdbd3e8c4ee"
+  },
   "Rockface Village": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -78346,6 +78525,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "070f5f5a33ef38ba671f66ca0cc69e65"
+  },
+  "Rustspore Ram": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "required_subtypes": [
+        "equipment"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d126150f90f188306bfe7b1db3f709ce",
+    "battle_rule_oracle_hash": "01ad533164a532a0ed04fe877603bc5c"
   },
   "Rustvale Bridge": {
     "effect": "land",
@@ -82675,6 +82881,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "9db603e98768b4a128befa6842f353c5"
   },
+  "Serpent Assassin": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_colors": [
+        "B"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2ad4e6f6ec0366e22c3da5c31c477882",
+    "battle_rule_oracle_hash": "bbc834da9ce668a06403439485939dcc"
+  },
   "Serpent's Pass": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -82828,6 +83060,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3672976f55360ae7e7d98412801098e2",
     "battle_rule_oracle_hash": "b7221a769af9d2b428fb7d01e6a3aa00"
+  },
+  "Setessan Starbreaker": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ],
+      "required_subtypes": [
+        "aura"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:171ad18614c8ffda05203572c1e26dc2",
+    "battle_rule_oracle_hash": "0c28822ce6d1305a497d437b3b626552"
   },
   "Seton's Scout": {
     "_keywords_are_self": true,
@@ -86505,6 +86764,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:d0d3e82d35510640d9e051cdd229c095",
     "battle_rule_oracle_hash": "339fc20a2fc178d079d97f42f75601bf"
+  },
+  "Slayer of the Wicked": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "required_subtypes": [
+        "vampire",
+        "werewolf",
+        "zombie"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:733cfeedb34f2197d637b51bcb1ba041",
+    "battle_rule_oracle_hash": "2ca4b1124bf0119a6135276c00aad830"
   },
   "Slayers' Stronghold": {
     "effect": "land",

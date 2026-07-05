@@ -1,0 +1,436 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T08:25:41.476506+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg493_etb_destroy_target_vocabulary_new_server_manifest.json",
+  "package_id": "xmage_pg493_etb_destroy_target_vocabulary_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 11
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Bala Ged Scorpion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:163002bd7915bcab4834fd782fd8716a",
+          "oracle_hash": "bee7a1e5e6aca5a2a0e4d597ab4562cf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Dakmor Lancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2ad4e6f6ec0366e22c3da5c31c477882",
+          "oracle_hash": "9f7cadf6cd9b3f37181b77e6da45d189",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Fleshpulper Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a618a4a5790d05d5ce1ed03e9f943b4c",
+          "oracle_hash": "8662178b88cb0ec7b256a9f0f9382ff7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Marshdrinker Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3f21c7f2952a0e3d620000788073ff9",
+          "oracle_hash": "43ca3cf785a420933b916a72c7d4f486",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Myconid Spore Tender",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+          "oracle_hash": "4f752ab676dccfdcdc035ea46db28e86",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Ravenous Baboons",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b62f77f5b31d6f27e42d060684f3030c",
+          "oracle_hash": "6973e2542972949d4f36c8d5e5b53cdb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Rock Soldiers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2bce2fa059694f09637ce5c391853ae8",
+          "oracle_hash": "93bfbdf0cfaffd8d220f3bdbd3e8c4ee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Rustspore Ram",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d126150f90f188306bfe7b1db3f709ce",
+          "oracle_hash": "01ad533164a532a0ed04fe877603bc5c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Serpent Assassin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2ad4e6f6ec0366e22c3da5c31c477882",
+          "oracle_hash": "bbc834da9ce668a06403439485939dcc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Setessan Starbreaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:171ad18614c8ffda05203572c1e26dc2",
+          "oracle_hash": "0c28822ce6d1305a497d437b3b626552",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Slayer of the Wicked",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:733cfeedb34f2197d637b51bcb1ba041",
+          "oracle_hash": "2ca4b1124bf0119a6135276c00aad830",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 11
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Bala Ged Scorpion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:163002bd7915bcab4834fd782fd8716a",
+          "oracle_hash": "bee7a1e5e6aca5a2a0e4d597ab4562cf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Dakmor Lancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2ad4e6f6ec0366e22c3da5c31c477882",
+          "oracle_hash": "9f7cadf6cd9b3f37181b77e6da45d189",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Fleshpulper Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a618a4a5790d05d5ce1ed03e9f943b4c",
+          "oracle_hash": "8662178b88cb0ec7b256a9f0f9382ff7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Marshdrinker Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3f21c7f2952a0e3d620000788073ff9",
+          "oracle_hash": "43ca3cf785a420933b916a72c7d4f486",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Myconid Spore Tender",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+          "oracle_hash": "4f752ab676dccfdcdc035ea46db28e86",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Ravenous Baboons",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b62f77f5b31d6f27e42d060684f3030c",
+          "oracle_hash": "6973e2542972949d4f36c8d5e5b53cdb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Rock Soldiers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2bce2fa059694f09637ce5c391853ae8",
+          "oracle_hash": "93bfbdf0cfaffd8d220f3bdbd3e8c4ee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Rustspore Ram",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d126150f90f188306bfe7b1db3f709ce",
+          "oracle_hash": "01ad533164a532a0ed04fe877603bc5c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Serpent Assassin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2ad4e6f6ec0366e22c3da5c31c477882",
+          "oracle_hash": "bbc834da9ce668a06403439485939dcc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Setessan Starbreaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:171ad18614c8ffda05203572c1e26dc2",
+          "oracle_hash": "0c28822ce6d1305a497d437b3b626552",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Slayer of the Wicked",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:733cfeedb34f2197d637b51bcb1ba041",
+          "oracle_hash": "2ca4b1124bf0119a6135276c00aad830",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 11
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bala Ged Scorpion",
+          "logical_rule_key": "battle_rule_v1:163002bd7915bcab4834fd782fd8716a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dakmor Lancer",
+          "logical_rule_key": "battle_rule_v1:2ad4e6f6ec0366e22c3da5c31c477882"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fleshpulper Giant",
+          "logical_rule_key": "battle_rule_v1:a618a4a5790d05d5ce1ed03e9f943b4c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Marshdrinker Giant",
+          "logical_rule_key": "battle_rule_v1:e3f21c7f2952a0e3d620000788073ff9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Myconid Spore Tender",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ravenous Baboons",
+          "logical_rule_key": "battle_rule_v1:b62f77f5b31d6f27e42d060684f3030c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rock Soldiers",
+          "logical_rule_key": "battle_rule_v1:2bce2fa059694f09637ce5c391853ae8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rustspore Ram",
+          "logical_rule_key": "battle_rule_v1:d126150f90f188306bfe7b1db3f709ce"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Serpent Assassin",
+          "logical_rule_key": "battle_rule_v1:2ad4e6f6ec0366e22c3da5c31c477882"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Setessan Starbreaker",
+          "logical_rule_key": "battle_rule_v1:171ad18614c8ffda05203572c1e26dc2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Slayer of the Wicked",
+          "logical_rule_key": "battle_rule_v1:733cfeedb34f2197d637b51bcb1ba041"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 11
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Bala Ged Scorpion",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:163002bd7915bcab4834fd782fd8716a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dakmor Lancer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2ad4e6f6ec0366e22c3da5c31c477882"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fleshpulper Giant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a618a4a5790d05d5ce1ed03e9f943b4c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Marshdrinker Giant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e3f21c7f2952a0e3d620000788073ff9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Myconid Spore Tender",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ravenous Baboons",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b62f77f5b31d6f27e42d060684f3030c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rock Soldiers",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2bce2fa059694f09637ce5c391853ae8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rustspore Ram",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d126150f90f188306bfe7b1db3f709ce"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Serpent Assassin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2ad4e6f6ec0366e22c3da5c31c477882"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Setessan Starbreaker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:171ad18614c8ffda05203572c1e26dc2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Slayer of the Wicked",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:733cfeedb34f2197d637b51bcb1ba041"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

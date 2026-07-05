@@ -560,7 +560,7 @@ patterns:
   `xmage_creature_etb_fixed_damage_target_v1`
 - `removal_destroy::targeted_destroy_variant_v1` with
   `DestroyTargetEffect + EntersBattlefieldTriggeredAbility` on creatures and
-  exact unrestricted ETB destroy Oracle text ->
+  exact ETB destroy Oracle/source target constraints ->
   `xmage_creature_etb_destroy_target_v1`
 - `recursion::xmage_graveyard_return_variant_review_v1` with
   `ReturnFromGraveyardToHandTargetEffect + EntersBattlefieldTriggeredAbility`
@@ -1331,10 +1331,12 @@ PG297 measured result:
 - Runtime already had the generic ETB removal executor; the focused runtime
   test now proves the creature remains on battlefield while the ETB trigger
   destroys a legal opponent permanent and moves it to graveyard.
-- The splitter requires complete unrestricted ETB destroy Oracle text and
+- At the PG297 cutoff, the splitter required complete unrestricted ETB destroy Oracle text and
   blocks restricted clauses such as power/toughness limits, subtype filters,
   nonblack filters, Equipment/Aura-only filters, and dealt-damage-this-turn
-  conditions.
+  conditions. PG493 later expanded the current contract for XMage-verified
+  restricted target vocabulary while still blocking dealt-damage-this-turn
+  target state.
 - PostgreSQL postcheck: `19/19` promoted rows, `19/19` verified/auto,
   `19/19` matching Oracle hash, with `4` backup rows.
 - PG -> Hermes/SQLite sync loaded `19` PostgreSQL rows, inserted/updated `23`
@@ -12060,6 +12062,64 @@ new server:
   bounce, and Venser, Shaper Savant needs a stack-or-permanent target model.
 - Post-sync global readiness is now `34331` known cards, `4817`
   `battle_and_oracle_ready`, `29056` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
+## 2026-07-05 PG493 ETB Destroy Target Vocabulary Closure
+
+- PG493 extends the creature ETB destroy mapper from the old unrestricted
+  target vocabulary to XMage-verified restricted targets. The accepted source
+  shape is still deliberately narrow: exactly one `DestroyTargetEffect`, an
+  `EntersBattlefieldTriggeredAbility`, no target pointer/adjuster, no
+  intervening-if condition, and Oracle text whose target phrase has a matching
+  Java filter in the local XMage source.
+- The new target constraints promoted in this batch are:
+  `power_max=1`, `toughness_max=2`, `exclude_colors=["B"]`, opponent
+  Island/Swamp land, nonbasic land, noncreature artifact, Equipment, Aura,
+  artifact-or-enchantment with "up to one" text, and
+  Vampire/Werewolf/Zombie subtype targeting. The runtime change teaches
+  targeted removal with `target_controller=any` to check opponents first and
+  then the controller, which is required for legal "destroy target nonbasic
+  land"/Aura/Equipment behavior.
+- The batch covers `11` cards: Bala Ged Scorpion, Dakmor Lancer,
+  Fleshpulper Giant, Marshdrinker Giant, Myconid Spore Tender, Ravenous
+  Baboons, Rock Soldiers, Rustspore Ram, Serpent Assassin, Setessan
+  Starbreaker, and Slayer of the Wicked. The complete list lives in
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg493_etb_destroy_target_vocabulary_new_server_manifest.json`
+  under `selected_card_names`.
+- The exact split left `2` neighboring ETB-destroy cards blocked on purpose:
+  Fathom Fleet Cutthroat and Vraska's Finisher both require "creature dealt
+  damage this turn" target state, which the current target selector does not
+  model yet.
+- Validation passed: `py_compile` for touched parser/runtime/test files,
+  `492` full exact-scope splitter tests, the focused PG493 runtime test, and
+  the full `test_battle_analyst_v10_3.py` suite with live PostgreSQL
+  environment loaded.
+- PostgreSQL package PG493 applied against `143.198.230.247:5433/halder` and
+  promoted `11/11` selected cards as verified/auto rows with matching Oracle
+  hashes. The initial apply upserted `11` rows and deprecated `0` shadow rows.
+- Hermes metadata sync matched `5920` PostgreSQL cards, wrote `5831` SQLite
+  cache aliases, updated `108` deck-card ids, and left the known
+  `unresolved=1` residual unchanged. The targeted battle-rule sync loaded
+  `11` PostgreSQL rows, wrote `11` SQLite rows, exported `4735` canonical
+  fallback rows, and refreshed the tracked default canonical snapshot.
+- Generic E2E validation passed across PostgreSQL, SQLite
+  `battle_card_rules`, the default canonical snapshot, and runtime
+  `get_card_effect` for all `11` selected cards. The manifest does not define
+  battle-execution scenarios for this generic family, so scenario execution
+  remains `0`; concrete target-constraint behavior is covered by the focused
+  PG493 runtime test.
+- Final governance audits passed: operational surface, deckbuilding contract
+  surface, legacy contamination, and PG/Hermes/SQLite contract with live
+  PostgreSQL connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26122`, `xmage_authoritative_source_count=25808`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25808`. This is an exact
+  reduction of `11` from the post-PG492 queue. The destroy work unit fell from
+  `596` before PG493 to `585` after PG493.
+- Post-sync global readiness is now `34331` known cards, `4828`
+  `battle_and_oracle_ready`, `29045` `battle_family_mapper_required`, `360`
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 

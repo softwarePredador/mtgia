@@ -8092,6 +8092,190 @@ def register_tests(battle, player):
         assert historic not in active.battlefield
         assert historic in active.hand
 
+    def test_pg493_etb_destroy_respects_extended_target_constraints():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Bala Ged Scorpion",
+                "type_line": "Creature - Scorpion",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 3,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            strong = {
+                "name": "Strong Creature",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            weak = {
+                "name": "Weak Creature",
+                "type_line": "Creature - Goblin",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 2,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [strong, weak]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_creature",
+                    "etb_remove_target": "creature",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"], "power_max": 1},
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg493-power-max",
+                    "_rule_oracle_hash": "pg493-power-max-hash",
+                },
+                11,
+                random.Random(493),
+                all_players=[active, opponent],
+            )
+
+            assert strong in opponent.battlefield
+            assert weak not in opponent.battlefield
+            assert weak in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Ravenous Baboons",
+                "type_line": "Creature - Ape",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            active_nonbasic = {
+                "name": "Command Tower",
+                "type_line": "Land",
+                "effect": "land",
+                "controller": "Active",
+                "owner": "Active",
+            }
+            opponent_basic = {
+                "name": "Island",
+                "type_line": "Basic Land - Island",
+                "effect": "land",
+                "basic": True,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            active.battlefield = [active_nonbasic]
+            opponent.battlefield = [opponent_basic]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_permanent",
+                    "etb_remove_target": "land",
+                    "target": "land",
+                    "target_controller": "any",
+                    "target_constraints": {"card_types": ["land"], "exclude_supertypes": ["basic"]},
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg493-nonbasic-any",
+                    "_rule_oracle_hash": "pg493-nonbasic-any-hash",
+                },
+                12,
+                random.Random(493),
+                all_players=[active, opponent],
+            )
+
+            assert opponent_basic in opponent.battlefield
+            assert active_nonbasic not in active.battlefield
+            assert active_nonbasic in active.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Slayer of the Wicked",
+                "type_line": "Creature - Human Soldier",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            elf = {
+                "name": "Elvish Mystic",
+                "type_line": "Creature - Elf Druid",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            zombie = {
+                "name": "Diregraf Ghoul",
+                "type_line": "Creature - Zombie",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [elf, zombie]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_creature",
+                    "etb_remove_target": "creature",
+                    "target": "creature",
+                    "target_constraints": {
+                        "card_types": ["creature"],
+                        "required_subtypes": ["vampire", "werewolf", "zombie"],
+                    },
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg493-tribal",
+                    "_rule_oracle_hash": "pg493-tribal-hash",
+                },
+                13,
+                random.Random(493),
+                all_players=[active, opponent],
+            )
+
+            assert elf in opponent.battlefield
+            assert zombie not in opponent.battlefield
+            assert zombie in opponent.graveyard
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        resolved_targets = [
+            data.get("target")
+            for event, data in events
+            if event == "etb_removal_resolved"
+        ]
+        assert resolved_targets == ["Weak Creature", "Command Tower", "Diregraf Ghoul"]
+
     def test_pg086_removal_targets_filter_nontoken_and_mana_value_max():
         active = player("Active")
         opponent = player("Opponent")
@@ -22527,6 +22711,7 @@ def register_tests(battle, player):
         test_pg490_creature_etb_bounce_returns_opponent_creature_to_hand,
         test_pg491_self_etb_bounce_respects_controller_and_exclude_source,
         test_pg492_etb_bounce_respects_subtype_and_historic_constraints,
+        test_pg493_etb_destroy_respects_extended_target_constraints,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
         test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,

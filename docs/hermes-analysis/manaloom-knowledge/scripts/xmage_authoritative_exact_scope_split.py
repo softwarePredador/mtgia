@@ -7074,12 +7074,15 @@ def restricted_target_base(target: str) -> str:
         "blue_or_black_flying_creature",
         "creature_power_3_or_greater",
         "creature_power_4_or_greater",
+        "creature_power_1_or_less",
+        "creature_toughness_2_or_less",
         "creature_mana_value_3_or_greater",
         "non_angel_demon_devil_dragon_creature",
         "non_elf_creature",
         "non_merfolk_creature",
         "non_spirit_creature",
         "non_vampire_werewolf_zombie_creature",
+        "vampire_werewolf_or_zombie_creature",
         "human_creature",
         "spirit_creature",
         "wall_creature",
@@ -7087,8 +7090,12 @@ def restricted_target_base(target: str) -> str:
         return "creature"
     if target in {"black_or_red_permanent", "nonwhite_permanent", "noncreature_permanent"}:
         return "permanent"
-    if target == "noncreature_artifact":
+    if target in {"noncreature_artifact", "equipment"}:
         return "artifact"
+    if target == "aura":
+        return "enchantment"
+    if target in {"island_or_swamp_opponent_controls", "nonbasic_land"}:
+        return "land"
     if target == "spirit_or_enchantment":
         return "permanent"
     return target
@@ -10930,36 +10937,114 @@ def dies_source_trigger_is_optional(source: str) -> bool:
 
 
 def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
-    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"^[a-z0-9' -]+\s+[—-]\s+", "", text)
+    etb_subject = r"(?:this creature|.+?)"
     patterns: list[tuple[str, tuple[str, str]]] = [
         (
-            r"^when this creature enters, (?:you may )?destroy target artifact\.?$",
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target creature with power 1 or less\.?$",
+            ("remove_creature", "creature_power_1_or_less"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target creature with toughness 2 or less\.?$",
+            ("remove_creature", "creature_toughness_2_or_less"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target nonblack creature\.?$",
+            ("remove_creature", "nonblack_creature"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target island or swamp an opponent controls\.?$",
+            ("remove_permanent", "island_or_swamp_opponent_controls"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target nonbasic land\.?$",
+            ("remove_permanent", "nonbasic_land"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy up to one target noncreature artifact\.?$",
+            ("remove_permanent", "noncreature_artifact"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target equipment\.?$",
+            ("remove_permanent", "equipment"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target aura\.?$",
+            ("remove_permanent", "aura"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target vampire, werewolf, or zombie\.?$",
+            ("remove_creature", "vampire_werewolf_or_zombie_creature"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target artifact\.?$",
             ("remove_permanent", "artifact"),
         ),
         (
-            r"^when this creature enters, (?:you may )?destroy target enchantment\.?$",
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target enchantment\.?$",
             ("remove_permanent", "enchantment"),
         ),
         (
-            r"^when this creature enters, (?:you may )?destroy target artifact or enchantment(?: an opponent controls)?\.?$",
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy (?:up to one )?target artifact or enchantment(?: an opponent controls)?\.?$",
             ("remove_permanent", "artifact_or_enchantment"),
         ),
         (
-            r"^when this creature enters, (?:you may )?destroy target land\.?$",
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target land\.?$",
             ("remove_permanent", "land"),
         ),
         (
-            r"^when this creature enters, (?:you may )?destroy target nonland permanent an opponent controls\.?$",
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target nonland permanent an opponent controls\.?$",
             ("remove_permanent", "nonland_permanent"),
         ),
         (
-            r"^when this creature enters, (?:you may )?destroy target creature an opponent controls\.?$",
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target creature an opponent controls\.?$",
             ("remove_creature", "creature"),
         ),
     ]
     for pattern, result in patterns:
         if re.match(pattern, text):
             return result
+    return None
+
+
+def etb_destroy_source_supported(source: str, target: str) -> str | None:
+    text = source or ""
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(", text)) != 1:
+        return "etb_destroy_source_effect_count_not_supported"
+    if "TargetPointer" in text or ".setTargetPointer" in text or "TargetAdjuster" in text:
+        return "etb_destroy_source_multi_target_not_supported"
+    if ".withInterveningIf" in text or "InterveningIf" in text:
+        return "etb_destroy_source_condition_not_supported"
+    checks: dict[str, Callable[[str], bool]] = {
+        "creature_power_1_or_less": lambda value: "PowerPredicate" in value and "ComparisonType.FEWER_THAN, 2" in value,
+        "creature_toughness_2_or_less": lambda value: "ToughnessPredicate" in value and "ComparisonType.FEWER_THAN, 3" in value,
+        "nonblack_creature": lambda value: "FILTER_PERMANENT_CREATURE_NON_BLACK" in value,
+        "island_or_swamp_opponent_controls": lambda value: (
+            "SubType.ISLAND" in value
+            and "SubType.SWAMP" in value
+            and "TargetController.OPPONENT" in value
+        ),
+        "nonbasic_land": lambda value: "TargetNonBasicLandPermanent" in value,
+        "noncreature_artifact": lambda value: "FILTER_ARTIFACT_NON_CREATURE" in value,
+        "equipment": lambda value: "FILTER_PERMANENT_EQUIPMENT" in value,
+        "aura": lambda value: "SubType.AURA" in value,
+        "vampire_werewolf_or_zombie_creature": lambda value: (
+            "SubType.VAMPIRE" in value
+            and "SubType.WEREWOLF" in value
+            and "SubType.ZOMBIE" in value
+        ),
+        "artifact_or_enchantment": lambda value: "FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT" in value,
+        "artifact": lambda value: "TargetArtifactPermanent" in value or "FilterArtifactPermanent" in value,
+        "enchantment": lambda value: "TargetEnchantmentPermanent" in value or "FilterEnchantmentPermanent" in value,
+        "land": lambda value: "TargetLandPermanent" in value or "FilterLandPermanent" in value,
+        "nonland_permanent": lambda value: "TargetNonlandPermanent" in value or "FilterNonlandPermanent" in value,
+        "creature": lambda value: "TargetCreaturePermanent" in value or "FILTER_PERMANENT_CREATURE" in value,
+    }
+    checker = checks.get(target)
+    if checker is None or not checker(text):
+        return "etb_destroy_source_target_not_supported"
     return None
 
 
@@ -12325,8 +12410,12 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_subtypes": ["spirit"]}
     if target == "non_vampire_werewolf_zombie_creature":
         return {"card_types": ["creature"], "exclude_subtypes": ["vampire", "werewolf", "zombie"]}
-    if target == "non_spirit_creature":
-        return {"card_types": ["creature"], "exclude_subtypes": ["spirit"]}
+    if target == "creature_power_1_or_less":
+        return {"card_types": ["creature"], "power_max": 1}
+    if target == "creature_toughness_2_or_less":
+        return {"card_types": ["creature"], "toughness_max": 2}
+    if target == "vampire_werewolf_or_zombie_creature":
+        return {"card_types": ["creature"], "required_subtypes": ["vampire", "werewolf", "zombie"]}
     if target == "human_creature":
         return {"card_types": ["creature"], "required_subtypes": ["human"]}
     if target == "spirit_creature":
@@ -12360,6 +12449,14 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["permanent"], "exclude_card_types": ["creature"]}
     if target == "noncreature_artifact":
         return {"card_types": ["artifact"], "exclude_card_types": ["creature"]}
+    if target == "island_or_swamp_opponent_controls":
+        return {"card_types": ["land"], "required_subtypes": ["island", "swamp"]}
+    if target == "nonbasic_land":
+        return {"card_types": ["land"], "exclude_supertypes": ["basic"]}
+    if target == "equipment":
+        return {"card_types": ["artifact"], "required_subtypes": ["equipment"]}
+    if target == "aura":
+        return {"card_types": ["enchantment"], "required_subtypes": ["aura"]}
     if target == "creature_power_4_or_greater":
         return {"card_types": ["creature"], "power_min": 4}
     if target == "creature_power_3_or_greater":
@@ -15563,18 +15660,26 @@ def split_row(
         if target is None:
             return None, "etb_destroy_target_not_supported"
         effect, target_type = target
+        source_blocker = etb_destroy_source_supported(source_text, target_type)
+        if source_blocker:
+            return None, source_blocker
+        target_base = restricted_target_base(target_type)
         effect_json = {
             "effect": "creature",
             "battle_model_scope": ETB_DESTROY_CREATURE_SCOPE,
             "ability_kind": "triggered",
             "trigger": "enters_battlefield",
             "etb_remove_effect": effect,
-            "etb_remove_target": target_type,
+            "etb_remove_target": target_base,
             "target_constraints": target_constraints_for(target_type),
             "destination": "graveyard",
             "xmage_effect_class": "DestroyTargetEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
         }
+        if target_type in {"nonbasic_land", "aura", "equipment"}:
+            effect_json["target_controller"] = "any"
+        if target_type == "island_or_swamp_opponent_controls":
+            effect_json["target_controller"] = "opponent"
         return build_proposal(
             row,
             metadata,
@@ -18941,7 +19046,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, DiesSourceTriggeredAbility, exact fixed dies-damage Oracle/source agreement, and no auxiliary ability class",
                 "direct_damage::targeted_damage_variant_v1 rows with one-shot DamageTargetEffect whose amount is an exact supported battlefield/hand/domain count, optional fixed base amount, and supported target constraints",
-                "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
+                "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact ETB destroy Oracle/source target constraints",
                 "bounce::targeted_return_to_hand_variant_v1 rows with ReturnToHandTargetEffect, EntersBattlefieldTriggeredAbility, exact ETB return-target-to-hand Oracle text, no condition, and no multi-target adjuster",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect, SimpleActivatedAbility, exact self-counter Oracle text, and mana/tap source costs only",
