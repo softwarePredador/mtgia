@@ -1,0 +1,644 @@
+{
+  "artifact_type": "lorehold_named_same_lane_cut_frontier",
+  "blocked_staple_policy": [
+    {
+      "card": "Mana Vault",
+      "current_policy": "learning_only_not_607_change",
+      "lane": "early_mana_and_spell_chain_conversion",
+      "reason": "Fast mana is valuable, but current evidence has no same-lane cut that preserves the 607 opponent-turn mana and miracle cadence floors."
+    },
+    {
+      "card": "The One Ring",
+      "current_policy": "learning_only_not_607_change",
+      "lane": "draw_and_resource_density",
+      "reason": "Generic draw is valuable, but prior 607 retests did not beat the protected shell and no current cut model repairs the floor risk."
+    }
+  ],
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "forced_access_allowed_now": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_materialize_decks_from_review_only_cut_probes",
+      "do_not_retest_exact_plateau_pairs_without_new_mana_trace_evidence",
+      "collect new low-exposure topdeck cut evidence or a distinct mana trace before structure matrix"
+    ],
+    "promotion_allowed": false,
+    "reason": "All current named same-lane topdeck and mana cut probes are blocked by material exposure, mana-floor risk, non-anchor cut absence, or exact rejected Plateau pair evidence.",
+    "structure_matrix_allowed_now": false,
+    "structure_matrix_contract_allowed_now": false
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T07:45:31Z",
+  "mana_frontier": {
+    "annotated_model_ready_pair_count": 2,
+    "eligible_pair_count": 0,
+    "eligible_pairs": [],
+    "exact_rejected_pair_count": 2,
+    "exact_rejected_pairs": [
+      {
+        "add": "Plateau",
+        "candidate_profile": {
+          "colorless_only": false,
+          "enters_tapped_profile": "reliably_untapped",
+          "typed_mountain_plains": true,
+          "utility_roles": []
+        },
+        "candidate_source_quality_score": 121,
+        "cut": "Radiant Summit",
+        "cut_profile": {
+          "enters_tapped_profile": "conditional_tapped",
+          "protected_utility_reason": null,
+          "typed_mountain_plains": true,
+          "utility_roles": [
+            "typed_fetch_target"
+          ]
+        },
+        "cut_risk_score": 69,
+        "decision_blockers": [
+          "forced_opening_hand_diagnostic_lost_to_607",
+          "natural_smoke_did_not_access_plateau",
+          "natural_smoke_lost_to_607"
+        ],
+        "decision_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_radiant_decision_20260705_current.json",
+        "decision_status": "reject_promotion_keep_607_current_baseline",
+        "learning_status": "blocked_exact_tested_decision",
+        "next_action": "do_not_retest_exact_pair_without_new_mana_trace_evidence",
+        "pair_score": 52,
+        "reasons": [
+          "tempo_upgrade_preserves_color_and_fetch_target_type"
+        ],
+        "status": "model_ready_for_candidate_materialization"
+      },
+      {
+        "add": "Plateau",
+        "candidate_profile": {
+          "colorless_only": false,
+          "enters_tapped_profile": "reliably_untapped",
+          "typed_mountain_plains": true,
+          "utility_roles": []
+        },
+        "candidate_source_quality_score": 121,
+        "cut": "Turbulent Steppe",
+        "cut_profile": {
+          "enters_tapped_profile": "conditional_tapped",
+          "protected_utility_reason": null,
+          "typed_mountain_plains": true,
+          "utility_roles": [
+            "typed_fetch_target"
+          ]
+        },
+        "cut_risk_score": 69,
+        "decision_blockers": [
+          "forced_opening_hand_diagnostic_lost_to_607"
+        ],
+        "decision_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_steppe_decision_20260705_current.json",
+        "decision_status": "reject_promotion_keep_607_current_baseline",
+        "learning_status": "blocked_exact_tested_decision",
+        "next_action": "do_not_retest_exact_pair_without_new_mana_trace_evidence",
+        "pair_score": 52,
+        "reasons": [
+          "tempo_upgrade_preserves_color_and_fetch_target_type"
+        ],
+        "status": "model_ready_for_candidate_materialization"
+      }
+    ],
+    "frontier_status": "mana_route_closed_by_exact_decisions",
+    "generic_probe_count": 28,
+    "generic_probe_status_counts": {
+      "blocked_generic_mana_probe_not_pair_safe": 28
+    },
+    "next_action": "do_not_retest_exact_plateau_pairs_without_new_mana_trace_evidence"
+  },
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "mana_decision_integrator_summary": {
+      "allow_natural_gate_now": false,
+      "eligible_model_ready_pair_count": 0,
+      "exact_rejected_pair_count": 2,
+      "keep_607_as_protected_baseline": true,
+      "loaded_decision_count": 2,
+      "promotion_allowed": false,
+      "safe_model_ready_pair_count": 2
+    },
+    "nonanchor_cut_model_summary": {
+      "candidate_deck_materialization_allowed_now": false,
+      "clean_prior_blocked_target_count": 1,
+      "clean_prior_blocked_targets": [
+        "Dragon's Rage Channeler"
+      ],
+      "decision_status": "topdeck_nonanchor_cut_model_none_found_keep_607",
+      "forced_access_allowed_now": false,
+      "microbenchmark_runnable_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "primary_target": "Dragon's Rage Channeler",
+      "primary_target_model_status": "clean_prior_target_blocked_no_nonanchor_cut",
+      "primary_target_same_lane_slot_count": 6,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "collect_new_cut_evidence_or_define_new_shell_contract_before_execution",
+      "reviewable_nonanchor_gap_count": 0,
+      "seed_safe_nonanchor_count": 0,
+      "status_counts": {
+        "clean_prior_target_blocked_no_nonanchor_cut": 1,
+        "prior_reject_target_blocked_no_nonanchor_cut": 4
+      },
+      "structure_matrix_allowed_now": false,
+      "target_card_count": 5
+    },
+    "probe_evidence_summary": {
+      "blocked_exposed_topdeck_role_probe_count": 20,
+      "blocked_generic_mana_probe_count": 28,
+      "blocker_counts": {
+        "basic_land_floor_not_safe_from_probe": 14,
+        "colored_source_floor_requires_pair_model": 7,
+        "fast_mana_utility_land_not_safe_from_probe": 7,
+        "mana_source_floor_equivalence_required": 28,
+        "miracle_topdeck_floor_equivalence_required": 20,
+        "probe_cut_has_material_exposure": 20,
+        "probe_cut_role_not_low_impact:draw_filter_value": 15,
+        "probe_cut_role_not_low_impact:recursion_engine": 5,
+        "requires_exposure_trace_before_safe_cut": 48,
+        "safe_cut_miner_zero_current_ready": 48,
+        "structural_floor_equivalence_required": 28,
+        "use_dedicated_mana_base_model_before_generic_probe": 28
+      },
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_sidecar_probe_evidence_no_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "mana_model_eligible_pair_count": 0,
+      "mana_model_exact_rejected_pair_count": 2,
+      "mana_model_ready_pair_count": 2,
+      "mana_route_status": "mana_route_closed_by_exact_decisions",
+      "matrix_candidate_row_eligible_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "probe_row_count": 48,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "collect_new_mana_evidence_or_topdeck_floor_traces_before_any_matrix_row",
+      "safe_cut_ready_count": 0,
+      "status_counts": {
+        "blocked_exposed_topdeck_role_probe": 20,
+        "blocked_generic_mana_probe_not_pair_safe": 28
+      }
+    },
+    "sidecar_contract_summary": {
+      "candidate_deck_materialization_allowed_now": false,
+      "contract_key": "topdeck_access_first_sidecar_shell_contract",
+      "contract_written": true,
+      "decision_status": "topdeck_access_first_sidecar_contract_written_no_matrix_rows_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "land_quantity_floor": 34,
+      "mana_sources_land_plus_ramp_floor": 49,
+      "matrix_candidate_row_eligible_count": 0,
+      "microbenchmark_runnable_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "nonanchor_primary_target": "Dragon's Rage Channeler",
+      "nonanchor_primary_target_status": "clean_prior_target_blocked_no_nonanchor_cut",
+      "nonanchor_reviewable_gap_count": 0,
+      "nonanchor_seed_safe_count": 0,
+      "promotion_allowed_now": false,
+      "queue_row_count": 40,
+      "ramp_quantity_floor": 15,
+      "recommended_next_action": "build_named_same_lane_cut_models_for_topdeck_and_mana_rows_before_structure_matrix",
+      "selected_route": "topdeck_access_first_sidecar_shell",
+      "shell_key": "topdeck_access_first_sidecar_shell",
+      "sidecar_shell_contract_required": true,
+      "structure_matrix_allowed_now": false,
+      "structure_matrix_contract_allowed_now": false,
+      "topdeck_target_row_count": 5,
+      "trace_collection_allowed_count": 5
+    }
+  },
+  "source_reports": {
+    "mana_decision_integrator": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current.json",
+    "nonanchor_cut_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.json",
+    "probe_evidence": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_probe_evidence_miner_20260705_current.json",
+    "sidecar_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_access_first_sidecar_shell_contract_20260705_current.json"
+  },
+  "status": "named_same_lane_cut_frontier_closed_no_safe_cut_keep_607",
+  "structure_matrix_requirements": [
+    "named_add_and_named_cut_pair",
+    "safe_cut_ready_now_or_eligible_mana_pair_after_decision_filter",
+    "no_exact_prior_reject_for_the_add_cut_signature",
+    "protected_607_anchor_not_cut_without_same_lane_battle_proof",
+    "topdeck_miracle_or_mana_floor_equivalence_declared",
+    "direct_trace_plan_for_added_card_and_cut_floor",
+    "same_seed_equal_gate_stays_closed_until_structure_matrix_passes"
+  ],
+  "summary": {
+    "blocked_staple_count": 2,
+    "candidate_deck_materialization_allowed_now": false,
+    "contract_key": "topdeck_access_first_sidecar_shell_contract",
+    "contract_status": "topdeck_access_first_sidecar_contract_written_no_matrix_rows_keep_607",
+    "decision_status": "named_same_lane_cut_frontier_closed_no_safe_cut_keep_607",
+    "deck_action_allowed_now": false,
+    "forced_access_allowed_now": false,
+    "mana_eligible_pair_count": 0,
+    "mana_exact_rejected_pair_count": 2,
+    "mana_generic_probe_count": 28,
+    "missing_inputs": [],
+    "natural_battle_gate_allowed_now": false,
+    "probe_row_count": 48,
+    "promotion_allowed_now": false,
+    "recommended_next_action": "collect_new_topdeck_floor_or_mana_trace_evidence_before_structure_matrix",
+    "structure_matrix_allowed_now": false,
+    "structure_matrix_contract_allowed_now": false,
+    "topdeck_frontier_target_count": 5,
+    "topdeck_matrix_ready_probe_count": 0
+  },
+  "topdeck_frontier": [
+    {
+      "add_card": "Dragon's Rage Channeler",
+      "blocker_counts": {
+        "miracle_topdeck_floor_equivalence_required": 4,
+        "probe_cut_has_material_exposure": 4,
+        "probe_cut_role_not_low_impact:draw_filter_value": 3,
+        "probe_cut_role_not_low_impact:recursion_engine": 1,
+        "requires_exposure_trace_before_safe_cut": 4,
+        "safe_cut_miner_zero_current_ready": 4
+      },
+      "frontier_status": "blocked_exposed_or_floor_sensitive_topdeck_cuts",
+      "lowest_exposure_probe_cuts": [
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:recursion_engine",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Pinnacle Monk // Mystic Peak",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "recursion_engine",
+          "unique_exposure_count": 8
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Reforge the Soul",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 23
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Improvisation Capstone",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 59
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Artist's Talent",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 535
+        }
+      ],
+      "matrix_ready_probe_count": 0,
+      "next_action": "collect_new_low_exposure_cut_or_floor_trace_before_matrix",
+      "nonanchor_model_status": "clean_prior_target_blocked_no_nonanchor_cut",
+      "nonanchor_reviewable_gap_count": 0,
+      "nonanchor_same_lane_slot_count": 6,
+      "nonanchor_seed_safe_count": 0,
+      "prior_reject_count": 0,
+      "probe_count": 4,
+      "status_counts": {
+        "blocked_exposed_topdeck_role_probe": 4
+      }
+    },
+    {
+      "add_card": "Galvanoth",
+      "blocker_counts": {
+        "miracle_topdeck_floor_equivalence_required": 4,
+        "probe_cut_has_material_exposure": 4,
+        "probe_cut_role_not_low_impact:draw_filter_value": 3,
+        "probe_cut_role_not_low_impact:recursion_engine": 1,
+        "requires_exposure_trace_before_safe_cut": 4,
+        "safe_cut_miner_zero_current_ready": 4
+      },
+      "frontier_status": "blocked_exposed_or_floor_sensitive_topdeck_cuts",
+      "lowest_exposure_probe_cuts": [
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:recursion_engine",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Pinnacle Monk // Mystic Peak",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "recursion_engine",
+          "unique_exposure_count": 8
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Reforge the Soul",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 23
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Improvisation Capstone",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 59
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Artist's Talent",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 535
+        }
+      ],
+      "matrix_ready_probe_count": 0,
+      "next_action": "collect_new_low_exposure_cut_or_floor_trace_before_matrix",
+      "nonanchor_model_status": "prior_reject_target_blocked_no_nonanchor_cut",
+      "nonanchor_reviewable_gap_count": 0,
+      "nonanchor_same_lane_slot_count": 8,
+      "nonanchor_seed_safe_count": 0,
+      "prior_reject_count": 4,
+      "probe_count": 4,
+      "status_counts": {
+        "blocked_exposed_topdeck_role_probe": 4
+      }
+    },
+    {
+      "add_card": "Penance",
+      "blocker_counts": {
+        "miracle_topdeck_floor_equivalence_required": 4,
+        "probe_cut_has_material_exposure": 4,
+        "probe_cut_role_not_low_impact:draw_filter_value": 3,
+        "probe_cut_role_not_low_impact:recursion_engine": 1,
+        "requires_exposure_trace_before_safe_cut": 4,
+        "safe_cut_miner_zero_current_ready": 4
+      },
+      "frontier_status": "blocked_exposed_or_floor_sensitive_topdeck_cuts",
+      "lowest_exposure_probe_cuts": [
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:recursion_engine",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Pinnacle Monk // Mystic Peak",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "recursion_engine",
+          "unique_exposure_count": 8
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Reforge the Soul",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 23
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Improvisation Capstone",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 59
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Artist's Talent",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 535
+        }
+      ],
+      "matrix_ready_probe_count": 0,
+      "next_action": "collect_new_low_exposure_cut_or_floor_trace_before_matrix",
+      "nonanchor_model_status": "prior_reject_target_blocked_no_nonanchor_cut",
+      "nonanchor_reviewable_gap_count": 0,
+      "nonanchor_same_lane_slot_count": 20,
+      "nonanchor_seed_safe_count": 0,
+      "prior_reject_count": 2,
+      "probe_count": 4,
+      "status_counts": {
+        "blocked_exposed_topdeck_role_probe": 4
+      }
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "blocker_counts": {
+        "miracle_topdeck_floor_equivalence_required": 4,
+        "probe_cut_has_material_exposure": 4,
+        "probe_cut_role_not_low_impact:draw_filter_value": 3,
+        "probe_cut_role_not_low_impact:recursion_engine": 1,
+        "requires_exposure_trace_before_safe_cut": 4,
+        "safe_cut_miner_zero_current_ready": 4
+      },
+      "frontier_status": "blocked_exposed_or_floor_sensitive_topdeck_cuts",
+      "lowest_exposure_probe_cuts": [
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:recursion_engine",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Pinnacle Monk // Mystic Peak",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "recursion_engine",
+          "unique_exposure_count": 8
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Reforge the Soul",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 23
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Improvisation Capstone",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 59
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Artist's Talent",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 535
+        }
+      ],
+      "matrix_ready_probe_count": 0,
+      "next_action": "collect_new_low_exposure_cut_or_floor_trace_before_matrix",
+      "nonanchor_model_status": "prior_reject_target_blocked_no_nonanchor_cut",
+      "nonanchor_reviewable_gap_count": 0,
+      "nonanchor_same_lane_slot_count": 13,
+      "nonanchor_seed_safe_count": 0,
+      "prior_reject_count": 1,
+      "probe_count": 4,
+      "status_counts": {
+        "blocked_exposed_topdeck_role_probe": 4
+      }
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "blocker_counts": {
+        "miracle_topdeck_floor_equivalence_required": 4,
+        "probe_cut_has_material_exposure": 4,
+        "probe_cut_role_not_low_impact:draw_filter_value": 3,
+        "probe_cut_role_not_low_impact:recursion_engine": 1,
+        "requires_exposure_trace_before_safe_cut": 4,
+        "safe_cut_miner_zero_current_ready": 4
+      },
+      "frontier_status": "blocked_exposed_or_floor_sensitive_topdeck_cuts",
+      "lowest_exposure_probe_cuts": [
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:recursion_engine",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Pinnacle Monk // Mystic Peak",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "recursion_engine",
+          "unique_exposure_count": 8
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Reforge the Soul",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 23
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Improvisation Capstone",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 59
+        },
+        {
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "probe_cut_has_material_exposure",
+            "probe_cut_role_not_low_impact:draw_filter_value",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Artist's Talent",
+          "evidence_status": "blocked_exposed_topdeck_role_probe",
+          "inferred_role": "draw_filter_value",
+          "unique_exposure_count": 535
+        }
+      ],
+      "matrix_ready_probe_count": 0,
+      "next_action": "collect_new_low_exposure_cut_or_floor_trace_before_matrix",
+      "nonanchor_model_status": "prior_reject_target_blocked_no_nonanchor_cut",
+      "nonanchor_reviewable_gap_count": 0,
+      "nonanchor_same_lane_slot_count": 13,
+      "nonanchor_seed_safe_count": 0,
+      "prior_reject_count": 1,
+      "probe_count": 4,
+      "status_counts": {
+        "blocked_exposed_topdeck_role_probe": 4
+      }
+    }
+  ]
+}

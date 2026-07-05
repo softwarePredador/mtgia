@@ -1430,5 +1430,38 @@ Operational lesson:
   system learns which non-anchor cuts could possibly open a fair topdeck
   challenger.
 
+Named same-lane cut frontier generated on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_named_same_lane_cut_frontier_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_named_same_lane_cut_frontier_20260705_current.json`.
+- Status:
+  `named_same_lane_cut_frontier_closed_no_safe_cut_keep_607`.
+- Scope: consume the sidecar shell contract, sidecar probe evidence miner,
+  non-anchor cut model, and mana-base decision integrator.
+- Current counts: `probe_row_count=48`,
+  `topdeck_frontier_target_count=5`, `topdeck_matrix_ready_probe_count=0`,
+  `mana_generic_probe_count=28`, `mana_eligible_pair_count=0`, and
+  `mana_exact_rejected_pair_count=2`.
+- Interpretation: the system has now named the same-lane probes, but none are
+  safe cuts. Topdeck probes are blocked by material exposure or
+  miracle/topdeck floor risk; generic mana probes are blocked by mana-floor
+  equivalence; and the dedicated Plateau lines are exact tested rejects unless
+  new mana trace evidence changes them.
+- Structure-matrix contract allowed now: `false`; structure-matrix scoring:
+  `false`; candidate deck materialization: `false`; forced access: `false`;
+  natural battle gate: `false`; promotion: `false`.
+- Next allowed work:
+  `collect_new_topdeck_floor_or_mana_trace_evidence_before_structure_matrix`.
+
+Operational lesson:
+
+- A named cut is only an addressable hypothesis. It becomes usable only after
+  exposure, floor-equivalence, prior-reject, and trace checks pass.
+- This prevents the deckbuilder from cycling back into already rejected
+  `Plateau` pairs or turning exposed topdeck role cards into cuts merely
+  because an added card is attractive.
+
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

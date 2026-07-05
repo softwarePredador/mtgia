@@ -565,6 +565,33 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertFalse(classification.canonical_summary["deck_607_mutated"])
 
+    def test_named_same_lane_cut_frontier_is_recognized(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_named_same_lane_cut_frontier",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "deck_607_mutated": False,
+            "summary": {
+                "decision_status": "named_same_lane_cut_frontier_closed_no_safe_cut_keep_607",
+                "structure_matrix_contract_allowed_now": False,
+            },
+            "topdeck_frontier": [{"add_card": "Dragon's Rage Channeler"}],
+            "mana_frontier": {"frontier_status": "mana_route_closed_by_exact_decisions"},
+            "decision": {"keep_607_as_protected_baseline": True},
+            "source_evidence": {"probe_evidence_summary": {}},
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "named_cut_frontier.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(
+            classification.artifact_kind,
+            "lorehold_named_same_lane_cut_frontier",
+        )
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+
     def test_unknown_schema_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "unknown.json"

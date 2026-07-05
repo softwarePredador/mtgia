@@ -3143,3 +3143,57 @@ Deckbuilding lesson captured by the contract:
   `build_named_same_lane_cut_models_for_topdeck_and_mana_rows_before_structure_matrix`.
 
 Deck `607` remains untouched and protected.
+
+## Named Same-Lane Cut Frontier - 2026-07-05
+
+The named same-lane cut frontier is now consolidated:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_named_same_lane_cut_frontier_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_named_same_lane_cut_frontier_20260705_current.json`
+
+It consumes:
+
+- `lorehold_topdeck_access_first_sidecar_shell_contract_20260705_current`;
+- `lorehold_topdeck_sidecar_probe_evidence_miner_20260705_current`;
+- `lorehold_topdeck_nonanchor_cut_model_miner_20260705_current`;
+- `lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current`.
+
+Current result:
+
+- status:
+  `named_same_lane_cut_frontier_closed_no_safe_cut_keep_607`;
+- probe rows: `48`;
+- topdeck frontier targets: `5`;
+- topdeck matrix-ready probes: `0`;
+- mana generic probes: `28`;
+- mana eligible pairs: `0`;
+- exact rejected mana pairs: `2`;
+- blocked staple policies carried forward: `2`;
+- structure-matrix contract allowed now: `false`;
+- structure-matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- forced access allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`.
+
+What was learned:
+
+- The system has moved past "no cut named" into named hypotheses, but every
+  named hypothesis is still blocked.
+- Topdeck probes are not safe because the candidate cuts have material exposure
+  or protect draw/filter/recursion roles that feed the current `607` plan.
+- Generic mana probes are not safe because they require the dedicated
+  mana-base model and floor equivalence, not a generic sidecar cut.
+- The dedicated Plateau pairs over `Radiant Summit` and `Turbulent Steppe`
+  are exact tested rejects from current evidence. Do not retest those exact
+  pairs without new mana trace evidence.
+- `Mana Vault` and `The One Ring` remain learning-only under the sidecar
+  contract.
+
+Next allowed work:
+
+- `collect_new_topdeck_floor_or_mana_trace_evidence_before_structure_matrix`.
+- Do not mutate deck `607`, do not materialize a candidate deck, and do not
+  open forced-access or natural battle gates from the current frontier.
+
+Deck `607` remains untouched and protected.
