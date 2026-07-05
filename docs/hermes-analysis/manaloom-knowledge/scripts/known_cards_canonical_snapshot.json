@@ -6370,6 +6370,27 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "41c129ed4aa2f42c5cc4546c32ec5976"
   },
+  "Barbarian General": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+    "effect": "creature",
+    "horsemanship": true,
+    "keywords": [
+      "horsemanship"
+    ],
+    "static_effect": "self_horsemanship",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "HorsemanshipAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+    "battle_rule_oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53"
+  },
   "Barbarian Lunatic": {
     "_activated_rule_effects": [
       {
@@ -45734,6 +45755,27 @@
     "battle_rule_logical_key": "battle_rule_v1:5bcd5d422cc0b0569f056df6e45c3b8e",
     "battle_rule_oracle_hash": "8601ca13e729e145c6592714db1b1a92"
   },
+  "Lady Zhurong, Warrior Queen": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+    "effect": "creature",
+    "horsemanship": true,
+    "keywords": [
+      "horsemanship"
+    ],
+    "static_effect": "self_horsemanship",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "HorsemanshipAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+    "battle_rule_oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53"
+  },
   "Lair of the Hydra": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -47869,6 +47911,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b715ee06c86326668eb29b42a2951b1a",
     "battle_rule_oracle_hash": "f3badebe4bde0bfb318ff7280777c8e7"
+  },
+  "Lu Meng, Wu General": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+    "effect": "creature",
+    "horsemanship": true,
+    "keywords": [
+      "horsemanship"
+    ],
+    "static_effect": "self_horsemanship",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "HorsemanshipAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+    "battle_rule_oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53"
   },
   "Lucent Liminid": {
     "_keywords_are_self": true,
@@ -73397,6 +73460,48 @@
     "battle_rule_logical_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c",
     "battle_rule_oracle_hash": "3221cbc8b99391337488bb0a4d40175d"
   },
+  "Shu Cavalry": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+    "effect": "creature",
+    "horsemanship": true,
+    "keywords": [
+      "horsemanship"
+    ],
+    "static_effect": "self_horsemanship",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "HorsemanshipAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+    "battle_rule_oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53"
+  },
+  "Shu Elite Companions": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+    "effect": "creature",
+    "horsemanship": true,
+    "keywords": [
+      "horsemanship"
+    ],
+    "static_effect": "self_horsemanship",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "HorsemanshipAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+    "battle_rule_oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53"
+  },
   "Shu Grain Caravan": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_gain_life_v1",
@@ -93184,6 +93289,69 @@
     "battle_rule_logical_key": "battle_rule_v1:f05e0e32ce2dcd0fbe64c9ca8d7a5b43",
     "battle_rule_oracle_hash": "0b5ece713c73d94756c590d3c5d934fa"
   },
+  "Wei Elite Companions": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+    "effect": "creature",
+    "horsemanship": true,
+    "keywords": [
+      "horsemanship"
+    ],
+    "static_effect": "self_horsemanship",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "HorsemanshipAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+    "battle_rule_oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53"
+  },
+  "Wei Scout": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+    "effect": "creature",
+    "horsemanship": true,
+    "keywords": [
+      "horsemanship"
+    ],
+    "static_effect": "self_horsemanship",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "HorsemanshipAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+    "battle_rule_oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53"
+  },
+  "Wei Strike Force": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+    "effect": "creature",
+    "horsemanship": true,
+    "keywords": [
+      "horsemanship"
+    ],
+    "static_effect": "self_horsemanship",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "HorsemanshipAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+    "battle_rule_oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53"
+  },
   "Welding Sparks": {
     "amount": 0,
     "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
@@ -95101,6 +95269,48 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:37ec6c176f6d2af36efe4276b05ce742",
     "battle_rule_oracle_hash": "c3701dd9ec054ecd4ce778a6f9b5b7c6"
+  },
+  "Wu Elite Cavalry": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+    "effect": "creature",
+    "horsemanship": true,
+    "keywords": [
+      "horsemanship"
+    ],
+    "static_effect": "self_horsemanship",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "HorsemanshipAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+    "battle_rule_oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53"
+  },
+  "Wu Light Cavalry": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+    "effect": "creature",
+    "horsemanship": true,
+    "keywords": [
+      "horsemanship"
+    ],
+    "static_effect": "self_horsemanship",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "HorsemanshipAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+    "battle_rule_oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53"
   },
   "Wyluli Wolf": {
     "_activated_rule_effects": [

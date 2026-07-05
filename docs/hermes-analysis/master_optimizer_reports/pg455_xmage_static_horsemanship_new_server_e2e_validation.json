@@ -1,0 +1,402 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T00:07:25.541131+00:00",
+  "manifest": "../../master_optimizer_reports/pg455_xmage_static_horsemanship_new_server_manifest.json",
+  "package_id": "pg455_xmage_static_horsemanship_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Barbarian General",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Lady Zhurong, Warrior Queen",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Lu Meng, Wu General",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Shu Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Shu Elite Companions",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Wei Elite Companions",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Wei Scout",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Wei Strike Force",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Wu Elite Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Wu Light Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Barbarian General",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Lady Zhurong, Warrior Queen",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Lu Meng, Wu General",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Shu Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Shu Elite Companions",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Wei Elite Companions",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Wei Scout",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Wei Strike Force",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Wu Elite Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "card_name": "Wu Light Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd",
+          "oracle_hash": "6f10a2a07dbc67283d061eeaaded1b53",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Barbarian General",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lady Zhurong, Warrior Queen",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lu Meng, Wu General",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shu Cavalry",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shu Elite Companions",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wei Elite Companions",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wei Scout",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wei Strike Force",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wu Elite Cavalry",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_horsemanship_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wu Light Cavalry",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Barbarian General",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lady Zhurong, Warrior Queen",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lu Meng, Wu General",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shu Cavalry",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shu Elite Companions",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wei Elite Companions",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wei Scout",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wei Strike Force",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wu Elite Cavalry",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wu Light Cavalry",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d208ac6a5625631cd5f858097f64cdd"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

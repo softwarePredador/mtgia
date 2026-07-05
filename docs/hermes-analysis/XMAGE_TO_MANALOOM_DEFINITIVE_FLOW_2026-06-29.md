@@ -9970,6 +9970,54 @@ new server:
   `9` cards each, and `xmage_creature_dies_fixed_damage_target` and
   `xmage_destroy_target_scry_spell` with `8` cards each.
 
+## 2026-07-05 PG455 Static Horsemanship Closure
+
+- Closed the exact XMage static self horsemanship creature family as ManaLoom
+  scope `xmage_static_self_horsemanship_creature_v1`.
+- The selected package accepted local XMage creatures with exact
+  `HorsemanshipAbility.getInstance()` source and exact Oracle text
+  `Horsemanship`.
+- The batch covers `10` cards: Barbarian General, Lady Zhurong, Warrior Queen,
+  Lu Meng, Wu General, Shu Cavalry, Shu Elite Companions, Wei Elite Companions,
+  Wei Scout, Wei Strike Force, Wu Elite Cavalry, and Wu Light Cavalry.
+- Focused mapper/runtime tests covered exact horsemanship extraction and
+  blocker legality where only creatures with horsemanship can block
+  horsemanship attackers; PG455 performed no code mutation. The focused test
+  lane passed `718` checks.
+- The PostgreSQL package promoted `10` cards. Precheck found `10` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `10/10` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `10` rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, set
+  `static_effect=self_horsemanship`, and expose `keywords=["horsemanship"]`
+  plus `horsemanship=true`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4403` PostgreSQL runtime rows, wrote `4395` SQLite runtime
+  rows, and exported `4370` canonical fallback rows.
+- PG455 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `10` selected cards. Generic
+  battle scenario count remained `0`; horsemanship blocker legality remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26483`, `xmage_authoritative_source_count=26169`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26169`. This is an exact
+  reduction of `10` from the post-PG454 queue.
+- The post-PG455 exact split recheck reports `proposal_count=144` and
+  `safe_for_batch_pg_package_count=144`. The largest remaining exact families
+  are `xmage_fixed_draw_discard_spell` and
+  `xmage_fixed_scry_draw_card_spell` with `9` cards each, followed by
+  `xmage_creature_dies_fixed_damage_target`,
+  `xmage_destroy_target_scry_spell`, and `xmage_fixed_damage_scry_spell` with
+  `8` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
