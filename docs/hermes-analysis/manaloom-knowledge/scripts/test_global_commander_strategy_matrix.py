@@ -93,6 +93,30 @@ class GlobalCommanderStrategyMatrixTests(unittest.TestCase):
         self.assertEqual(row["blocked_product_deck_count"], 1)
         self.assertEqual(row["blocked_issue_counts"], {"quantity_not_100": 1})
 
+    def test_build_matrix_records_skipped_source_lane_mode(self) -> None:
+        payload = build_matrix(
+            [
+                {
+                    "source": "hermes",
+                    "scope": "hermes_lorehold_variant",
+                    "status": "structure_ready",
+                    "issues": [],
+                    "deck_id": "607",
+                    "deck_name": "VARIANT Lorehold",
+                    "commander": "Lorehold, the Historian",
+                    "commander_key": "lorehold, the historian",
+                    "quantity": 100,
+                    "commander_count": 1,
+                }
+            ],
+            {"lorehold, the historian": empty_source_signals()},
+            source_lane_mode="skipped_postgres_source_lanes",
+        )
+
+        self.assertEqual(payload["method"]["source_lane_mode"], "skipped_postgres_source_lanes")
+        self.assertFalse(payload["method"]["source_lanes_available"])
+        self.assertEqual(payload["commanders"][0]["status"], "structure_ready_source_missing")
+
 
 if __name__ == "__main__":
     unittest.main()

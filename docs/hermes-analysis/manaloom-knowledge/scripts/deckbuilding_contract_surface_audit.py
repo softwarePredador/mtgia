@@ -115,6 +115,8 @@ def build_audit() -> dict[str, Any]:
                 "lorehold_promotion_gate_decision_audit.py",
                 "candidate_607_v615_mana_engine_v1",
                 "Global Commander Rollout - 2026-07-01",
+                "Global Commander Core Pivot - 2026-07-05",
+                "benchmark/regression deck",
                 "global_commander_deck_contract_audit.py",
                 "global_commander_strategy_matrix.py",
             ],
@@ -227,6 +229,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_strategy_matrix.py",
                 "global_commander_deck_contract_audit_20260701_post_scope_legalities.md",
                 "global_commander_strategy_matrix_20260701_current.md",
+                "global_commander_deck_contract_audit_20260705_global_core_pivot_hermes_only.md",
+                "global_commander_strategy_matrix_20260705_global_core_pivot_hermes_only.md",
             ],
         )
     )

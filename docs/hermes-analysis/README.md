@@ -4,7 +4,7 @@
 > Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
 > tarefas Hermes.
 
-Updated: 2026-07-01
+Updated: 2026-07-05
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
@@ -197,6 +197,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Lorehold`, `Kaalia`, `Kefka` e `Y'shtola` ja podem seguir para matriz
     estrategica especifica, enquanto comandantes sem fonte/perfil ficam
     bloqueados antes de battle/otimizacao.
+  - Pivot operacional de 2026-07-05: o foco do aprendizado passa a ser o core
+    global de montagem Commander; `607` fica como benchmark/regressao, nao como
+    objetivo principal nem template universal. Evidencia local degradada sem
+    PostgreSQL: `master_optimizer_reports/global_commander_deck_contract_audit_20260705_global_core_pivot_hermes_only.md`
+    e `master_optimizer_reports/global_commander_strategy_matrix_20260705_global_core_pivot_hermes_only.md`.
+    Esses relatorios validam Hermes/lab, mas source lanes ficam indisponiveis;
+    portanto nao substituem a matriz com PostgreSQL para readiness de produto.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

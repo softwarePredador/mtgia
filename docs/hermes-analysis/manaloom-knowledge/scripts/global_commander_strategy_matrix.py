@@ -207,7 +207,12 @@ def fetch_source_signals(commander_keys: set[str]) -> dict[str, dict[str, int]]:
     return signals
 
 
-def build_matrix(deck_rows: list[dict[str, Any]], source_signals: dict[str, dict[str, int]]) -> dict[str, Any]:
+def build_matrix(
+    deck_rows: list[dict[str, Any]],
+    source_signals: dict[str, dict[str, int]],
+    *,
+    source_lane_mode: str = "postgres",
+) -> dict[str, Any]:
     by_commander: dict[str, list[dict[str, Any]]] = defaultdict(list)
     skipped_no_commander = 0
     for row in deck_rows:
@@ -292,6 +297,8 @@ def build_matrix(deck_rows: list[dict[str, Any]], source_signals: dict[str, dict
             "postgres_is_product_truth": True,
             "hermes_is_lab_cache": True,
             "eligible_scopes": sorted(READY_SCOPES),
+            "source_lane_mode": source_lane_mode,
+            "source_lanes_available": source_lane_mode == "postgres",
             "battle_or_optimization_performed": False,
         },
         "totals": {
@@ -408,6 +415,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-postgres", action="store_true")
     parser.add_argument("--skip-hermes", action="store_true")
     parser.add_argument(
+        "--skip-source-signals",
+        action="store_true",
+        help="Do not query PostgreSQL reference/learned source lanes; rows will be routed as source-missing.",
+    )
+    parser.add_argument(
         "--out-prefix",
         type=Path,
         default=REPORT_DIR / "global_commander_strategy_matrix_20260701",
@@ -423,8 +435,13 @@ def main() -> int:
         skip_hermes=args.skip_hermes,
     )
     commander_keys = {row["commander_key"] for row in deck_rows if row["commander_key"]}
-    source_signals = fetch_source_signals(commander_keys)
-    payload = build_matrix(deck_rows, source_signals)
+    source_lane_mode = "postgres"
+    if args.skip_source_signals or args.skip_postgres:
+        source_lane_mode = "skipped_postgres_source_lanes"
+        source_signals = {key: empty_source_signals() for key in commander_keys}
+    else:
+        source_signals = fetch_source_signals(commander_keys)
+    payload = build_matrix(deck_rows, source_signals, source_lane_mode=source_lane_mode)
     args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")
