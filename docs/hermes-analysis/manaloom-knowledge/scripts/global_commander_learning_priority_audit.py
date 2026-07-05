@@ -20,6 +20,7 @@ COMMANDER_CONTRACT = REPO_ROOT / "docs/hermes-analysis/COMMANDER_DECKBUILDING_CO
 DEFAULT_CORE_REPORT = REPORT_DIR / "global_commander_core_role_audit_20260705_global_goal_hermes_only.json"
 DEFAULT_STRATEGY_REPORT = REPORT_DIR / "global_commander_strategy_matrix_20260705_global_core_pivot_hermes_only.json"
 DEFAULT_LAND_CUT_REPORT = REPORT_DIR / "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.json"
+DEFAULT_NONLAND_REPORT = REPORT_DIR / "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.json"
 BRACKET_POLICY_FILE = REPO_ROOT / "server/lib/edh_bracket_policy.dart"
 
 EXTERNAL_RESEARCH_SNAPSHOT = [
@@ -176,25 +177,78 @@ def land_cut_pools_by_deck(land_cut_payload: dict[str, Any]) -> dict[str, dict[s
     }
 
 
-def repair_gate_state(core_row: dict[str, Any], land_cut_pool: dict[str, Any] | None) -> str:
+def nonland_pools_by_deck(nonland_payload: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    pools: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in nonland_payload.get("nonland_pools", []):
+        deck_id = str(row.get("deck_id") or "")
+        if deck_id:
+            pools[deck_id].append(row)
+    return pools
+
+
+def preferred_nonland_pool(core_row: dict[str, Any], pools: list[dict[str, Any]]) -> dict[str, Any] | None:
+    missing = {row.get("role") for row in role_rows_by_status(core_row, "below_floor")} - {"land"}
+    if not missing:
+        return None
+    status_rank = {
+        "review_nonland_add_cut_pool_ready": 3,
+        "needs_commander_specific_source_lane": 2,
+        "needs_candidate_or_cut_source_lane": 1,
+    }
+    matching = [row for row in pools if row.get("role") in missing]
+    if not matching:
+        return None
+    return max(
+        matching,
+        key=lambda row: (
+            status_rank.get(str(row.get("status") or ""), 0),
+            int(row.get("candidate_count") or 0),
+            int(row.get("cut_candidate_count") or 0),
+        ),
+    )
+
+
+def repair_gate_state(
+    core_row: dict[str, Any],
+    land_cut_pool: dict[str, Any] | None,
+    nonland_pool: dict[str, Any] | None = None,
+) -> str:
     missing = {row.get("role") for row in role_rows_by_status(core_row, "below_floor")}
+    missing_nonland = missing - {"land"}
     if "land" in missing:
         if land_cut_pool and land_cut_pool.get("status") == "review_cut_pool_ready":
             return "land_add_cut_pool_ready_review_only"
         return "needs_land_candidate_and_cut_model"
-    if missing:
+    if missing_nonland:
+        if nonland_pool:
+            status = str(nonland_pool.get("status") or "")
+            if status == "review_nonland_add_cut_pool_ready":
+                return "nonland_add_cut_pool_ready_review_only"
+            if status == "needs_commander_specific_source_lane":
+                return "needs_commander_specific_source_lane"
+            if status == "needs_candidate_or_cut_source_lane":
+                return "needs_candidate_or_cut_source_lane"
         return "needs_nonland_core_repair_hypothesis"
     if land_cut_pool and land_cut_pool.get("status") == "review_cut_pool_ready":
         return "land_cut_pool_available_for_review"
     return "not_applicable"
 
 
-def next_action_for_deck(stage: str, core_row: dict[str, Any], land_cut_pool: dict[str, Any] | None) -> str:
-    if (
-        stage == "core_floor_repair"
-        and repair_gate_state(core_row, land_cut_pool) == "land_add_cut_pool_ready_review_only"
-    ):
+def next_action_for_deck(
+    stage: str,
+    core_row: dict[str, Any],
+    land_cut_pool: dict[str, Any] | None,
+    nonland_pool: dict[str, Any] | None = None,
+) -> str:
+    gate_state = repair_gate_state(core_row, land_cut_pool, nonland_pool)
+    if stage == "core_floor_repair" and gate_state == "land_add_cut_pool_ready_review_only":
         return "review_top_land_add_cut_pair_then_candidate_copy_after_commander_source_lane"
+    if stage == "core_floor_repair" and gate_state == "nonland_add_cut_pool_ready_review_only":
+        return "review_top_nonland_add_cut_pair_then_candidate_copy_after_commander_source_lane"
+    if stage == "core_floor_repair" and gate_state == "needs_commander_specific_source_lane":
+        return "build_commander_specific_win_plan_source_lane_before_named_nonland_cards"
+    if stage == "core_floor_repair" and gate_state == "needs_candidate_or_cut_source_lane":
+        return "backfill_nonland_candidate_or_cut_source_lane_before_candidate_copy"
     return next_action_for_stage(stage)
 
 
@@ -213,6 +267,7 @@ def build_deck_priorities(
     core_payload: dict[str, Any],
     strategy_payload: dict[str, Any],
     land_cut_payload: dict[str, Any] | None = None,
+    nonland_payload: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     commander_rows = {
         row["commander_key"]: row
@@ -220,12 +275,18 @@ def build_deck_priorities(
         if row.get("commander_key")
     }
     cut_pools = land_cut_pools_by_deck(land_cut_payload or {})
+    nonland_pools = nonland_pools_by_deck(nonland_payload or {})
     priorities = []
     for core_row in core_payload.get("decks", []):
         commander_key = normalize_commander(str(core_row.get("commander") or ""))
         commander_row = commander_rows.get(commander_key)
         stage = stage_for_deck(core_row, commander_row)
         land_cut_pool = cut_pools.get(str(core_row.get("deck_id") or ""))
+        nonland_pool = preferred_nonland_pool(
+            core_row,
+            nonland_pools.get(str(core_row.get("deck_id") or ""), []),
+        )
+        gate_state = repair_gate_state(core_row, land_cut_pool, nonland_pool)
         below = role_rows_by_status(core_row, "below_floor")
         above = role_rows_by_status(core_row, "above_range_review")
         priorities.append(
@@ -242,10 +303,15 @@ def build_deck_priorities(
                 "critical_gap_count": critical_gap_count(core_row),
                 "below_floor_roles": [role_label(row) for row in below],
                 "above_range_roles": [role_label(row) for row in above],
-                "repair_gate_state": repair_gate_state(core_row, land_cut_pool),
+                "repair_gate_state": gate_state,
                 "land_cut_candidate_count": int((land_cut_pool or {}).get("cut_candidate_count") or 0),
                 "land_pair_hypothesis_count": len((land_cut_pool or {}).get("pair_hypotheses") or []),
-                "next_action": next_action_for_deck(stage, core_row, land_cut_pool),
+                "nonland_pool_role": (nonland_pool or {}).get("role"),
+                "nonland_pool_status": (nonland_pool or {}).get("status"),
+                "nonland_candidate_count": int((nonland_pool or {}).get("candidate_count") or 0),
+                "nonland_cut_candidate_count": int((nonland_pool or {}).get("cut_candidate_count") or 0),
+                "nonland_pair_hypothesis_count": len((nonland_pool or {}).get("pair_hypotheses") or []),
+                "next_action": next_action_for_deck(stage, core_row, land_cut_pool, nonland_pool),
             }
         )
     priorities.sort(
@@ -300,13 +366,16 @@ def build_report(
     core_payload: dict[str, Any],
     strategy_payload: dict[str, Any],
     land_cut_payload: dict[str, Any] | None = None,
+    nonland_payload: dict[str, Any] | None = None,
     bracket_status: dict[str, Any],
     core_report_path: Path,
     strategy_report_path: Path,
     land_cut_report_path: Path | None = None,
+    nonland_report_path: Path | None = None,
 ) -> dict[str, Any]:
     land_cut_payload = land_cut_payload or {}
-    deck_priorities = build_deck_priorities(core_payload, strategy_payload, land_cut_payload)
+    nonland_payload = nonland_payload or {}
+    deck_priorities = build_deck_priorities(core_payload, strategy_payload, land_cut_payload, nonland_payload)
     commander_queue = build_commander_queue(deck_priorities)
     stage_counts = Counter(row["stage"] for row in deck_priorities)
     repair_gate_counts = Counter(row["repair_gate_state"] for row in deck_priorities)
@@ -316,6 +385,8 @@ def build_report(
     }
     if land_cut_report_path is not None:
         input_artifacts["land_cut_candidate_model"] = artifact_rel(land_cut_report_path)
+    if nonland_report_path is not None:
+        input_artifacts["nonland_core_candidate_model"] = artifact_rel(nonland_report_path)
     return {
         "generated_at": utc_now(),
         "status": "pass",
@@ -334,6 +405,7 @@ def build_report(
                 "shape_and_legality",
                 "role_data_and_core_floor",
                 "land_candidate_pool_and_cut_model",
+                "nonland_candidate_pool_and_cut_model",
                 "role_extreme_review",
                 "commander_profile_and_source_lanes",
                 "commander_specific_strategy_matrix",
@@ -427,6 +499,7 @@ def main() -> int:
     parser.add_argument("--core-report", type=Path, default=DEFAULT_CORE_REPORT)
     parser.add_argument("--strategy-report", type=Path, default=DEFAULT_STRATEGY_REPORT)
     parser.add_argument("--land-cut-report", type=Path, default=DEFAULT_LAND_CUT_REPORT)
+    parser.add_argument("--nonland-report", type=Path, default=DEFAULT_NONLAND_REPORT)
     parser.add_argument(
         "--out-prefix",
         type=Path,
@@ -437,10 +510,12 @@ def main() -> int:
         core_payload=load_json(args.core_report),
         strategy_payload=load_json(args.strategy_report),
         land_cut_payload=load_optional_json(args.land_cut_report),
+        nonland_payload=load_optional_json(args.nonland_report),
         bracket_status=bracket_policy_status(),
         core_report_path=args.core_report,
         strategy_report_path=args.strategy_report,
         land_cut_report_path=args.land_cut_report,
+        nonland_report_path=args.nonland_report,
     )
     args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
     json_path = args.out_prefix.with_suffix(".json")

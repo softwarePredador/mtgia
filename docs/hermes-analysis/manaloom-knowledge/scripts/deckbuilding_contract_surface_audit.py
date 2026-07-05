@@ -31,6 +31,7 @@ GLOBAL_COMMANDER_CORE_REPAIR_HYPOTHESIS = SCRIPT_DIR / "global_commander_core_re
 GLOBAL_COMMANDER_MANA_BASE_PROFILE = SCRIPT_DIR / "global_commander_mana_base_profile.py"
 GLOBAL_COMMANDER_NAMED_LAND_CANDIDATE_POOL = SCRIPT_DIR / "global_commander_named_land_candidate_pool.py"
 GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_land_cut_candidate_model.py"
+GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_nonland_core_candidate_model.py"
 GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT = SCRIPT_DIR / "global_commander_learning_priority_audit.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
@@ -81,6 +82,10 @@ GLOBAL_COMMANDER_NAMED_LAND_CANDIDATE_POOL_REPORT = (
 GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md"
+)
+GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md"
 )
 GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
     REPO_ROOT
@@ -159,6 +164,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md",
                 "global_commander_land_cut_candidate_model.py",
                 "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md",
+                "global_commander_nonland_core_candidate_model.py",
+                "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md",
                 "global_commander_learning_priority_audit.py",
                 "global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md",
                 "five Commander",
@@ -284,6 +291,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md",
                 "global_commander_land_cut_candidate_model.py",
                 "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md",
+                "global_commander_nonland_core_candidate_model.py",
+                "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md",
             ],
         )
     )
@@ -418,12 +427,27 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL,
+            [
+                "global_commander_nonland_core_candidate_model",
+                "format_staples_expanded_role_pool",
+                "review_only_nonland_add_cut_pair",
+                "review_nonland_add_cut_pool_ready",
+                "needs_commander_specific_source_lane",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT,
             [
                 "global_commander_learning_priority_audit",
                 "EXTERNAL_RESEARCH_SNAPSHOT",
                 "land_add_cut_pool_ready_review_only",
+                "nonland_add_cut_pool_ready_review_only",
                 "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only",
+                "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only",
                 "current_official_bracket_model_has_five_brackets_and_game_changers",
                 "benchmark_regression_only_not_global_template",
                 "battle_or_optimization_performed",
@@ -492,6 +516,16 @@ def build_audit() -> dict[str, Any]:
             "missing": []
             if GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL_REPORT.exists()
             else ["global_commander_land_cut_candidate_model_report"],
+        }
+    )
+    checks.append(
+        {
+            "path": rel(GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT),
+            "exists": GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT.exists(),
+            "status": "pass" if GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT.exists() else "fail",
+            "missing": []
+            if GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT.exists()
+            else ["global_commander_nonland_core_candidate_model_report"],
         }
     )
     checks.append(

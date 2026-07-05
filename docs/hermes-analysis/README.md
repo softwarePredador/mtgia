@@ -229,6 +229,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     add/cut review-only, bloqueando cartas que carregam roles ainda faltantes.
     Evidencia local atual:
     `master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md`.
+    Para gaps nonland, rode
+    `manaloom-knowledge/scripts/global_commander_nonland_core_candidate_model.py`
+    depois das hipoteses de reparo: ele expande pools locais de `format_staples`
+    para roles suportados, filtra por identidade de cor, legalidade Commander,
+    cartas ja no deck, tipo nonland e texto Oracle que confirme a funcao. Gaps
+    de wincon continuam bloqueados ate existir source-lane/plano de vitoria do
+    comandante. Evidencia local atual:
+    `master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`.
     Para ordenar o proximo aprendizado global sem voltar a focar no `607`,
     rode `manaloom-knowledge/scripts/global_commander_learning_priority_audit.py`;
     evidencia local atual:

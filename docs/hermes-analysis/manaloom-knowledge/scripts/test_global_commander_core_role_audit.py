@@ -121,6 +121,30 @@ class GlobalCommanderCoreRoleAuditTests(unittest.TestCase):
                 "Abilities you activate that aren't mana abilities cost {2} less to activate.",
                 {"engine"},
             ),
+            (
+                "Sheoldred, the Apocalypse",
+                "Legendary Creature — Phyrexian Praetor",
+                "Whenever an opponent draws a card, they lose 2 life.",
+                {"wincon"},
+            ),
+            (
+                "Master of Cruelties",
+                "Creature — Demon",
+                "Whenever this creature attacks a player and isn't blocked, that player's life total becomes 1.",
+                {"wincon"},
+            ),
+            (
+                "Rise of the Dark Realms",
+                "Sorcery",
+                "Put all creature cards from all graveyards onto the battlefield under your control.",
+                {"wincon", "recursion"},
+            ),
+            (
+                "Blightsteel Colossus",
+                "Artifact Creature — Phyrexian Golem",
+                "Trample, infect, indestructible.",
+                {"wincon"},
+            ),
         ]
 
         for name, type_line, oracle_text, expected_roles in cases:

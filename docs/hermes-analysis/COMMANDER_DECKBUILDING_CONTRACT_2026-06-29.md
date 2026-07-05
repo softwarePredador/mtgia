@@ -172,11 +172,15 @@ Operational priority after this pivot:
 8. run `global_commander_land_cut_candidate_model.py` to convert named land
    candidates and excess-role pressure into review-only add/cut hypotheses while
    blocking cards that carry missing core roles or protected package signals;
-9. run `global_commander_learning_priority_audit.py` to combine core gaps,
+9. run `global_commander_nonland_core_candidate_model.py` for nonland core gaps
+   after repair hypotheses; it can expand trusted local staple pools for roles
+   such as removal, but win plans remain commander-specific source-lane work
+   before named cards;
+10. run `global_commander_learning_priority_audit.py` to combine core gaps,
    source-lane availability, current external research, staple/bracket
    guardrails, and the Lorehold benchmark rule into one global next-action
    queue;
-10. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+11. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -190,6 +194,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_mana_base_profile_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
@@ -223,6 +228,11 @@ Current external refresh on 2026-07-05:
   to name nonland cut candidates, blocks cards carrying missing core roles, and
   flags multi-copy/package and topdeck-engine signals as requiring commander
   source-lane review before any candidate copy.
+- Current nonland core candidate output is read-only. It expands compatible
+  `format_staples` pools for supported roles, filters by commander color
+  identity, Commander legality, current deck membership, nonland type, and
+  role-confirming Oracle text, then emits add/cut hypotheses only. Wincon gaps
+  stay blocked on commander-specific win-plan/source evidence.
 
 ## Global Commander Rollout - 2026-07-01
 

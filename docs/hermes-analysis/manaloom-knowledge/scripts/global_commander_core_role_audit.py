@@ -203,12 +203,25 @@ def infer_roles_from_text(row: Mapping[str, Any]) -> set[str]:
         "you win the game",
         "loses the game",
         "opponent loses",
+        "they lose",
+        "that player loses",
         "each opponent loses",
+        "each player loses",
+        "life total becomes",
+        "loses half",
         "extra combat",
         "extra turn",
         "double that damage",
         "twice that much",
+        "double all damage",
+        "infect",
+        "poison counter",
+        "deals damage to each opponent",
+        "put all creature cards from all graveyards onto the battlefield",
+        "put all cards they exiled this way onto the battlefield",
     ):
+        roles.add("wincon")
+    if re.search(r"deals? (?:that much|x|damage equal to) .*damage", text):
         roles.add("wincon")
     if text_contains(
         text,
