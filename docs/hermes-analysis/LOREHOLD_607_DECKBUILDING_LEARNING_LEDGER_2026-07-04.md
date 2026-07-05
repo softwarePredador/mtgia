@@ -130,6 +130,28 @@ improve the actual battle window. The current mana-base model-ready queue is
 closed until new material evidence changes the safe-cut pool or proposes a
 different land package, not another exact retest of these pairs.
 
+## Post-Mana-Base Route - 2026-07-05
+
+After closing the simple mana-base queue, the current router says the next
+valid learning route is `build_pressure_safe_cut_expansion_model`.
+
+Current facts:
+
+- mana-base eligible pairs: `0`;
+- natural gate-ready watchlist cards: `0`;
+- pressure package gate-ready count: `0`;
+- seed-safe cut-ready count: `0`;
+- promotable external shell count: `0`.
+
+External evidence continues to support Lorehold as a spellslinger/topdeck/
+miracle commander, with pressure/treasure signals such as `Storm-Kiln Artist`,
+but that does not create a deck change by itself. The active blocker is cut
+safety: before testing more pressure, Treasure, or combo packages, ManaLoom must
+find a named cut plan that preserves the protected `607` miracle/topdeck floor.
+
+Do not run another natural battle gate from the current watchlist until a
+candidate has safe-cut proof and miracle-access preflight.
+
 Current conclusion: protected deck `607` remains the Lorehold champion under
 the active contract. The learning task stays open because a better deck may
 exist, but it has not been proven by the current evidence.

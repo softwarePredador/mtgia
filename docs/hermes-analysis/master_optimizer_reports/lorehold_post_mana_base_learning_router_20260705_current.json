@@ -1,0 +1,163 @@
+{
+  "artifact_type": "lorehold_post_mana_base_learning_router",
+  "decision": {
+    "blocked_actions": [
+      "do_not_retest_exact_plateau_pairs",
+      "do_not_run_natural_gate_without_safe_cut_and_miracle_access_preflight",
+      "do_not_promote_full_shell_smoke_results",
+      "do_not_cut_protected_607_anchors_for_global_staples"
+    ],
+    "current_best_baseline": "deck_607",
+    "next_action": "build_pressure_safe_cut_expansion_model",
+    "promotion_allowed": false,
+    "reason": "Current internal evidence has no gate-ready candidate after mana-base closure. External evidence supports pressure/treasure and combo-package research, but the active blocker is still cut safety and protected-anchor preservation."
+  },
+  "deck_607_mutated": false,
+  "external_source_snapshot": [
+    {
+      "learning": "Current EDHREC bracket-filtered Lorehold optimized discard page keeps the commander framed as spellslinger, topdeck, combo, and discard.",
+      "route_effect": "supports_607_plan_and_pressure_package_research",
+      "source_key": "edhrec_lorehold_optimized_discard_20260705",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian/optimized/discard"
+    },
+    {
+      "learning": "The Treasure page surfaces Scroll Rack, Library of Leng, Storm-Kiln Artist, Smothering Tithe, Teferi's Protection, and Jeska's Will as relevant signals, which supports pressure/treasure research without making any one card automatic.",
+      "route_effect": "supports_storm_kiln_pressure_treasure_research",
+      "source_key": "edhrec_lorehold_treasure_20260705",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian/treasure"
+    },
+    {
+      "learning": "The budget miracle article emphasizes high instant/sorcery density, spell-lands/MDFCs, topdeck setup, protection, and Storm-Kiln Artist.",
+      "route_effect": "supports_miracle_density_and_topdeck_floor_protection",
+      "source_key": "edhrec_lorehold_budget_miracles_20260705",
+      "url": "https://edhrec.com/articles/lorehold-the-historian-boros-miracles-on-a-budget"
+    },
+    {
+      "learning": "The article flags the need for topdeck manipulation, protection, and actual closing pressure; it treats token/combat and combo as alternate directions rather than generic upgrades.",
+      "route_effect": "supports_pressure_closure_but_requires_separate_intent_or_safe_cuts",
+      "source_key": "coolstuffinc_lorehold_pressure_closure_20260705",
+      "url": "https://www.coolstuffinc.com/a/stephenjohnson-04202026-lorehold-the-historian-commander"
+    },
+    {
+      "learning": "Storm-Kiln Artist plus Haze of Rage is a red legal combo lane with infinite Treasure/storm/magecraft implications, but it is package research until runtime, cut, and battle evidence exist.",
+      "route_effect": "opens_combo_package_research_not_current_607_promotion",
+      "source_key": "commander_spellbook_storm_kiln_haze_20260705",
+      "url": "https://commanderspellbook.com/combo/3940-5195/"
+    }
+  ],
+  "generated_at": "2026-07-05T01:01:21Z",
+  "internal_status_counts": {
+    "lorehold_hypothesis_queue_ready_no_natural_gate": 1,
+    "mana_base_model_ready_queue_exhausted_by_decisions": 1,
+    "pressure_micro_package_no_gate_ready_keep_607": 1,
+    "pressure_tradeoff_diagnostic_only_keep_607": 1,
+    "promotion_readiness_keep_607_no_candidate_ready": 1,
+    "spell_pressure_smoke_positive_but_not_confirmable": 1
+  },
+  "postgres_writes": false,
+  "routes": [
+    {
+      "allowed_now": false,
+      "natural_battle_allowed": false,
+      "priority": "P0_blocked",
+      "reason": "The current mana-base model-ready queue has no eligible pair left.",
+      "required_evidence_before_reopen": [
+        "new material external or trace evidence changes the safe-cut pool",
+        "candidate is materially different from the two rejected Plateau pairs",
+        "preflight proves a copied candidate DB, not source DB mutation"
+      ],
+      "route_key": "close_simple_mana_base_swaps"
+    },
+    {
+      "allowed_now": true,
+      "natural_battle_allowed": false,
+      "priority": "P1_next",
+      "reason": "External sources and internal traces both support pressure/treasure learning, but the current resolver has zero seed-safe cuts. The next valid work is to expand cut evidence, not to battle a new package.",
+      "required_evidence_before_battle": [
+        "named same-lane or package-level cut plan",
+        "protected 607 anchors unchanged",
+        "miracle/topdeck floor preflight",
+        "direct pressure card access/cast/trigger evidence"
+      ],
+      "route_key": "build_pressure_safe_cut_expansion_model",
+      "supporting_internal_facts": {
+        "diagnostic_tradeoff_plan_available": true,
+        "gate_ready_package_count": 0,
+        "natural_trigger_cards": [
+          "Guttersnipe",
+          "Young Pyromancer"
+        ],
+        "seed_safe_cut_ready_count": 0
+      }
+    },
+    {
+      "allowed_now": true,
+      "natural_battle_allowed": false,
+      "priority": "P2_research",
+      "reason": "Current external combo evidence makes Storm-Kiln plus Haze of Rage worth researching, but it must be treated as a package lane with runtime and cut checks, not as an automatic add.",
+      "required_evidence_before_battle": [
+        "Scryfall/backend legality for all package cards",
+        "runtime support or focused rule proof for the combo pieces",
+        "safe cut plan that does not remove Bender's Waterskin or topdeck/miracle anchors",
+        "structure matrix showing the shell still matches Lorehold's plan"
+      ],
+      "route_key": "storm_kiln_haze_combo_research"
+    },
+    {
+      "allowed_now": true,
+      "natural_battle_allowed": false,
+      "priority": "P2_research",
+      "reason": "Some from-scratch pressure shells produced smoke wins when 607 also failed, but the decision reports block promotion because structural rank, head-to-head, miracle floor, pressure exposure, or cut safety were insufficient.",
+      "required_evidence_before_battle": [
+        "new shell must declare archetype contract",
+        "compare against 607 with equal opponents and seeds",
+        "show pressure package was actually exercised",
+        "no regression in miracle/topdeck/Lorehold floor"
+      ],
+      "route_key": "full_shell_smoke_positive_followup",
+      "supporting_internal_facts": {
+        "pressure_tradeoff_promotion_allowed": false,
+        "promotable_shell_count": 0,
+        "spell_pressure_aggregate_delta_wins": 1
+      }
+    },
+    {
+      "allowed_now": false,
+      "natural_battle_allowed": false,
+      "priority": "P0_blocked",
+      "reason": "No current hypothesis has both safe-cut proof and miracle-access floor proof.",
+      "required_evidence_before_battle": [
+        "safe-cut model says gate-ready",
+        "miracle-access-first preflight passes",
+        "exact prior rejects do not block the add/cut signature"
+      ],
+      "route_key": "natural_gate_any_watchlist_card"
+    }
+  ],
+  "source_db_mutated": false,
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_hypothesis_queue_from_value_model_20260705_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_diagnostic_contract_planner_20260704_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_micro_package_planner_20260704_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_cut_pool_resolver_20260704_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_external_shell_gate_synthesis_20260704_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_tradeoff_decision_synthesis_20260704_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_pressure_topdeck_decision_20260704_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_readiness_synthesis_20260704_pressure_micro_current.json"
+  ],
+  "status": "post_mana_base_route_cut_safety_expansion_required",
+  "summary": {
+    "current_best_baseline": "deck_607",
+    "mana_base_eligible_pair_count": 0,
+    "natural_battle_allowed_now": false,
+    "natural_gate_ready_count": 0,
+    "pressure_gate_ready_package_count": 0,
+    "promotable_external_shell_count": 0,
+    "promotion_allowed": false,
+    "ready_deck_change_count": 0,
+    "recommended_next_artifact": "lorehold_pressure_safe_cut_expansion_model",
+    "recommended_next_route": "build_pressure_safe_cut_expansion_model",
+    "seed_safe_cut_ready_count": 0
+  }
+}
