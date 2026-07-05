@@ -3323,6 +3323,77 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(cast_plan["locked_cost"]["generic"], 4)
         self.assertEqual(dict(cast_plan["locked_cost"]["colored"]), {"white": 3})
 
+    def test_native_x_miracle_create_creature_tokens_uses_xww_cost(self) -> None:
+        active = self.battle.Player("Active", None, [], is_human=True)
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("white", 2)
+        active.mana_pool.add("generic", 4)
+        card = {
+            "name": "Entreat the Angels",
+            "type_line": "Sorcery",
+            "mana_cost": "{X}{X}{W}{W}{W}",
+            "cmc": 3,
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_x_create_creature_tokens_spell_v1",
+            "ability_kind": "one_shot",
+            "token_count_source": "x_value",
+            "token_count_per_x": 1,
+            "token_name": "Angel Token",
+            "token_subtype": "Angel",
+            "token_power": 4,
+            "token_toughness": 4,
+            "token_flying": True,
+            "token_colors": ["W"],
+            "native_miracle": True,
+            "miracle": True,
+            "native_miracle_cost": "{X}{W}{W}",
+            "miracle_cost": "{X}{W}{W}",
+            "sorcery": True,
+        }
+        active.hand = [card]
+        active.cards_drawn_this_turn = 1
+
+        cast = self.battle.try_lorehold_miracle_cast(
+            active,
+            [card],
+            turn=4,
+            phase="draw_step",
+            all_players=[active, opponent],
+            rng=random.Random(56),
+            stack=self.battle.Stack(),
+            source="draw_step",
+            miracle_candidate=card,
+        )
+
+        self.assertTrue(cast)
+        tokens = [permanent for permanent in active.battlefield if permanent.get("name") == "Angel Token"]
+        self.assertEqual(len(tokens), 4)
+        self.assertEqual(active.mana_pool.total(), 0)
+        self.assertTrue(any(card_in_zone.get("name") == "Entreat the Angels" for card_in_zone in active.graveyard))
+        self.assertTrue(
+            any(
+                event == "miracle_cast"
+                and data.get("card") == "Entreat the Angels"
+                and data.get("miracle_cost") == "{X}{W}{W}"
+                and data.get("alternative_cost_kind") == "native_miracle"
+                and data.get("native_miracle") is True
+                and data.get("x_value") == 4
+                and data.get("locked_cost", {}).get("generic") == 4
+                and data.get("locked_cost", {}).get("colored", {}).get("white") == 2
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "tokens_created"
+                and data.get("card") == "Entreat the Angels"
+                and data.get("tokens_created") == 4
+                and data.get("token_count_source") == "x_value"
+                and data.get("x_value") == 4
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_create_tokens_preserves_token_model(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

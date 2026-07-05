@@ -1,6 +1,6 @@
 # Lorehold Entreat X-Token Runtime Preflight
 
-- Generated at: `2026-07-05T02:18:41Z`
+- Generated at: `2026-07-05T02:31:14Z`
 - Status: `entreat_x_token_runtime_primitive_ready_rule_still_blocked_keep_607`
 - Current baseline: `deck_607`
 - Source DB mutated: `False`
@@ -25,6 +25,7 @@
 | `token_count_uses_x_value` | `True` |
 | `token_count_per_x_guard` | `True` |
 | `cast_planner_uses_x_token_count` | `True` |
+| `native_x_miracle_cast_plan` | `True` |
 | `tokens_created_replay_source` | `True` |
 | `tokens_created_replay_x_value` | `True` |
 
@@ -37,6 +38,7 @@
 | `x_value_fixture` | `True` |
 | `angel_token_model` | `True` |
 | `xx_cost_plan_test` | `True` |
+| `native_x_miracle_test` | `True` |
 | `replay_assertion` | `True` |
 
 ## Decision
@@ -44,5 +46,5 @@
 - Keep 607 as protected baseline: `True`
 - Natural battle allowed now: `False`
 - Promotion allowed: `False`
-- Recommended next action: `draft_reviewed_entreat_card_rule_package_without_apply_then_gate`
+- Recommended next action: `apply_entreat_rule_only_after_pg_precheck_then_run_607_battle_gate`
 - Reason: The generic X token runtime primitive is now present and covered by a focused Entreat-style fixture, but Entreat still has no reviewed active card rule and has not passed a natural battle gate against protected deck 607.

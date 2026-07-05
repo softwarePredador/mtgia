@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T02:18:41Z",
+  "generated_at": "2026-07-05T02:31:14Z",
   "artifact_type": "lorehold_entreat_x_token_runtime_preflight",
   "postgres_writes": false,
   "source_db_mutated": false,
@@ -19,7 +19,7 @@
     "battle_ready_now_count": 0,
     "natural_battle_allowed_now": false,
     "promotion_allowed": false,
-    "recommended_next_action": "draft_reviewed_entreat_card_rule_package_without_apply_then_gate"
+    "recommended_next_action": "apply_entreat_rule_only_after_pg_precheck_then_run_607_battle_gate"
   },
   "prior_contract_status": "runtime_contracts_drafted_no_battle_ready_keep_607",
   "prior_contract_best_first": "Entreat the Angels",
@@ -28,6 +28,7 @@
     "token_count_uses_x_value": true,
     "token_count_per_x_guard": true,
     "cast_planner_uses_x_token_count": true,
+    "native_x_miracle_cast_plan": true,
     "tokens_created_replay_source": true,
     "tokens_created_replay_x_value": true
   },
@@ -37,6 +38,7 @@
     "x_value_fixture": true,
     "angel_token_model": true,
     "xx_cost_plan_test": true,
+    "native_x_miracle_test": true,
     "replay_assertion": true
   },
   "entreat_active_rules": [],

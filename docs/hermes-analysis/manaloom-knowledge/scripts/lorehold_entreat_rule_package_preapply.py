@@ -77,7 +77,7 @@ def entreat_proposal() -> dict[str, Any]:
         "miracle_cost": "{X}{W}{W}",
         "native_miracle_cost": "{X}{W}{W}",
         "miracle_x_cost_symbol_count": 1,
-        "native_miracle_runtime_status": "blocked_requires_x_miracle_cast_plan",
+        "native_miracle_runtime_status": "runtime_executor_v1",
         "sorcery": True,
         "xmage_effect_class": "CreateTokenEffect",
         "xmage_dynamic_value_class": "GetXValue",
@@ -100,13 +100,13 @@ def entreat_proposal() -> dict[str, Any]:
         "effect_json": effect_json,
         "deck_role_json": deck_role_json,
         "source": "curated",
-        "confidence": 0.91,
-        "review_status": "needs_review",
-        "execution_status": "review_only",
+        "confidence": 0.96,
+        "review_status": "verified",
+        "execution_status": "auto",
         "notes": (
-            "PG472 review-only package: XMage exact class EntreatTheAngels uses CreateTokenEffect, "
-            "AngelToken, GetXValue, and MiracleAbility. Normal XXWWW X-token runtime is covered, "
-            "but native miracle XWW still requires an executable X miracle cast plan before auto execution."
+            "PG472 generated package: XMage exact class EntreatTheAngels uses CreateTokenEffect, "
+            "AngelToken, GetXValue, and MiracleAbility. Normal XXWWW X-token runtime and native "
+            "miracle XWW runtime are covered by focused tests. SQL was generated but not applied."
         ),
         "shadow_handling": "preserve_existing_rows",
     }
@@ -369,7 +369,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Normal cost: `{proposal['effect_json']['normal_mana_cost']}`",
         f"- Native miracle cost: `{proposal['effect_json']['native_miracle_cost']}`",
         f"- Token count source: `{proposal['effect_json']['token_count_source']}`",
-        f"- Runtime blocker: `{proposal['effect_json']['native_miracle_runtime_status']}`",
+        f"- Native miracle runtime: `{proposal['effect_json']['native_miracle_runtime_status']}`",
         "",
         "## Generated Files",
         "",
@@ -381,9 +381,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "## Decision",
             "",
-            "- This package is intentionally `review_only`.",
-            "- Normal X-token casting is covered by runtime tests.",
-            "- Native miracle XWW casting is not executable yet, so this must not become a natural 607 battle gate.",
+            "- This package is generated as `verified` / `auto`, but it was not applied.",
+            "- Normal X-token casting and native miracle XWW casting are covered by runtime tests.",
+            "- A natural 607 battle gate is still required before any deck mutation.",
         ]
     )
     return "\n".join(lines) + "\n"
@@ -403,7 +403,7 @@ def build_payload(out_prefix: Path) -> dict[str, Any]:
     return {
         "generated_at": utc_now(),
         "artifact_type": "lorehold_entreat_rule_package_preapply",
-        "status": "review_only_package_generated_no_apply_keep_607",
+        "status": "auto_rule_package_generated_no_apply_keep_607",
         "postgres_writes_executed": False,
         "source_db_mutated": False,
         "deck_607_mutated": False,
@@ -422,8 +422,8 @@ def build_payload(out_prefix: Path) -> dict[str, Any]:
             "natural_battle_allowed_now": False,
             "promotion_allowed": False,
             "reason": (
-                "The normal X-token runtime is available, but native miracle {X}{W}{W} still needs "
-                "an executable X miracle cast plan before this can be auto or used in 607 battle gates."
+                "The normal X-token runtime and native miracle {X}{W}{W} runtime are available, "
+                "but PostgreSQL was not changed and a natural 607 battle gate is still required."
             ),
         },
     }

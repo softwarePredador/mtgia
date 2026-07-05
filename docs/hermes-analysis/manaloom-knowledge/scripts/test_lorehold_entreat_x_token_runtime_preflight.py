@@ -29,7 +29,12 @@ def test_build_payload_marks_x_token_runtime_ready_but_not_promotable(tmp_path: 
     runtime.write_text(
         """
         def x_value_from_effect_context(effect_data): return 3
-        uses_x_cast_value = any(("count_from_x",)) or str(effect_data.get("token_count_source") or "").lower() == "x_value"
+        def effect_uses_x_cast_value(effect_data):
+            return str(effect_data.get("token_count_source") or "").strip().lower() == "x_value"
+        uses_x_cast_value = effect_uses_x_cast_value(effect_data)
+        def native_miracle_cost_for_effect(effect_data): return "{X}{W}{W}"
+        def miracle_cast_plan_for_card(player, card, effect_data):
+            return {"alternative_cost_kind": "native_miracle"}
         def token_count_for_effect(player, effect_data):
             if effect_data.get("token_count_source") == "x_value":
                 token_count_per_x = 1
@@ -48,6 +53,8 @@ def test_build_payload_marks_x_token_runtime_ready_but_not_promotable(tmp_path: 
             assert "tokens_requested"
             assert "token_count_source"
         def test_x_create_creature_tokens_spell_cast_plan_uses_xx_cost():
+            assert True
+        def test_native_x_miracle_create_creature_tokens_uses_xww_cost():
             assert True
         """,
         encoding="utf-8",

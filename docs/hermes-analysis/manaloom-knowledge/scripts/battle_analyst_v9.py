@@ -1993,6 +1993,24 @@ def build_variable_self_spell_cost_reduction_cast_plan(
     return None
 
 
+def effect_uses_x_cast_value(effect_data):
+    if not isinstance(effect_data, dict):
+        return False
+    if str(effect_data.get("token_count_source") or "").strip().lower() == "x_value":
+        return True
+    if str(effect_data.get("treasure_count_source") or "").strip().lower() == "x_value":
+        return True
+    return any(
+        effect_data.get(key)
+        for key in (
+            "target_mana_value_max_from_x",
+            "count_from_x",
+            "target_count_from_x",
+            "recursion_count_from_x",
+        )
+    )
+
+
 def runtime_cast_plan_for_card(player, card, effect_data, *, additional_generic=0):
     variable_plan = build_variable_self_spell_cost_reduction_cast_plan(
         player,
@@ -2017,15 +2035,7 @@ def runtime_cast_plan_for_card(player, card, effect_data, *, additional_generic=
         x_value = int(blight_plan.get("x_value") or 0)
         cost_context["blight"] = blight_plan
         additional_costs.append(f"blight:{x_value}")
-    uses_x_cast_value = any(
-        effect_data.get(key)
-        for key in (
-            "target_mana_value_max_from_x",
-            "count_from_x",
-            "target_count_from_x",
-            "recursion_count_from_x",
-        )
-    ) or str(effect_data.get("token_count_source") or "").lower() == "x_value"
+    uses_x_cast_value = effect_uses_x_cast_value(effect_data)
     if uses_x_cast_value:
         max_candidate_x = max(0, int(player.available_mana() or 0))
         chosen_x = None
@@ -32324,6 +32334,74 @@ def miracle_card_scope_allows(player, card):
     return is_instant_or_sorcery_spell(card)
 
 
+def native_miracle_cost_for_effect(effect_data):
+    if not isinstance(effect_data, dict):
+        return None
+    if not (effect_data.get("native_miracle") or effect_data.get("miracle")):
+        return None
+    cost = str(effect_data.get("native_miracle_cost") or effect_data.get("miracle_cost") or "").strip()
+    return cost or None
+
+
+def miracle_cast_plan_for_card(player, card, effect_data):
+    if not isinstance(card, dict) or is_effective_land(card):
+        return None
+    plans = []
+    x_sensitive = effect_uses_x_cast_value(effect_data)
+    engine_cost = lorehold_miracle_cost(player)
+    if engine_cost is not None and miracle_card_scope_allows(player, card):
+        alternative_cost = f"{{{engine_cost}}}"
+        locked_cost = card_cost_for_player_state(
+            player,
+            card,
+            alternative_cost=alternative_cost,
+            x_value=0,
+        )
+        if player.can_pay(locked_cost):
+            plans.append(
+                {
+                    "alternative_cost": alternative_cost,
+                    "alternative_cost_kind": "miracle",
+                    "miracle_cost": engine_cost,
+                    "miracle_engine": miracle_engine_permanent(player),
+                    "native_miracle": False,
+                    "x_value": 0,
+                    "locked_cost": locked_cost,
+                    "score": 10 if not x_sensitive else 0,
+                }
+            )
+    native_cost = native_miracle_cost_for_effect(effect_data)
+    if native_cost:
+        candidate_x_values = [0]
+        if x_sensitive and variable_mana_symbol_count(native_cost):
+            candidate_x_values = range(max(0, int(player.available_mana() or 0)), -1, -1)
+        for candidate_x in candidate_x_values:
+            locked_cost = card_cost_for_player_state(
+                player,
+                card,
+                alternative_cost=native_cost,
+                x_value=candidate_x,
+            )
+            if not player.can_pay(locked_cost):
+                continue
+            plans.append(
+                {
+                    "alternative_cost": native_cost,
+                    "alternative_cost_kind": "native_miracle",
+                    "miracle_cost": native_cost,
+                    "miracle_engine": miracle_engine_permanent(player),
+                    "native_miracle": True,
+                    "x_value": candidate_x,
+                    "locked_cost": locked_cost,
+                    "score": (candidate_x * 100) + 50 if x_sensitive else 5,
+                }
+            )
+            break
+    if not plans:
+        return None
+    return max(plans, key=lambda plan: (plan["score"], plan["x_value"]))
+
+
 def lorehold_draw_priority(card, player):
     if not isinstance(card, dict):
         return -999
@@ -33684,16 +33762,15 @@ def try_lorehold_miracle_cast(
         return False
     if miracle_candidate is not None and drawn_for_turn[0] is not miracle_candidate:
         return False
-    miracle_cost = lorehold_miracle_cost(player)
-    if miracle_cost is None:
-        return False
-    miracle_engine = miracle_engine_permanent(player)
     last_drawn = miracle_candidate or drawn_for_turn[-1]
-    if not last_drawn or not miracle_card_scope_allows(player, last_drawn):
+    if not last_drawn:
         return False
-    if player.available_mana() < miracle_cost:
+    eff = last_drawn if isinstance(last_drawn, dict) and last_drawn.get("battle_model_scope") else get_card_effect(last_drawn)
+    miracle_plan = miracle_cast_plan_for_card(player, last_drawn, eff)
+    if miracle_plan is None:
         return False
-    eff = get_card_effect(last_drawn)
+    miracle_cost = miracle_plan["miracle_cost"]
+    miracle_engine = miracle_plan.get("miracle_engine")
     if str(eff.get("effect") or "").lower() in COUNTERLIKE_EFFECTS:
         return False
     miracle_can_use_modal_boros_charm = (
@@ -33728,7 +33805,7 @@ def try_lorehold_miracle_cast(
     if missing_required_declared_removal_target(eff, declared_targets):
         return False
     miracle_locked_cost = replay_cost_snapshot(
-        card_mana_cost(last_drawn, alternative_cost=f"{{{miracle_cost}}}")
+        miracle_plan["locked_cost"]
     )
     miracle_context = {
         "phase": phase,
@@ -33737,8 +33814,10 @@ def try_lorehold_miracle_cast(
         "targets": list(declared_targets),
         "role": "miracle",
         "source_zone": "hand",
-        "alternative_cost": f"{{{miracle_cost}}}",
-        "alternative_cost_kind": "miracle",
+        "alternative_cost": miracle_plan["alternative_cost"],
+        "alternative_cost_kind": miracle_plan["alternative_cost_kind"],
+        "native_miracle": bool(miracle_plan.get("native_miracle")),
+        "x_value": int(miracle_plan.get("x_value") or 0),
     }
     miracle_context.update(replay_primary_target_fields(declared_targets))
     store_cast_context_fields(eff, miracle_context)
@@ -33746,7 +33825,9 @@ def try_lorehold_miracle_cast(
         declared_targets
     ) if declared_targets else {}
     player.hand.remove(last_drawn)
-    player.spend_mana(miracle_cost)
+    if not player.spend_mana(miracle_plan["locked_cost"]):
+        player.hand.append(last_drawn)
+        return False
     record_approach_cast_from_hand(player, last_drawn, eff, phase=phase)
     emit_replay_event(
         "miracle_cast",
@@ -33757,6 +33838,11 @@ def try_lorehold_miracle_cast(
         cmc=last_drawn.get("cmc", 0),
         miracle_cost=miracle_cost,
         miracle_engine=miracle_engine.get("name", "?") if isinstance(miracle_engine, dict) else None,
+        alternative_cost=miracle_plan["alternative_cost"],
+        alternative_cost_kind=miracle_plan["alternative_cost_kind"],
+        native_miracle=bool(miracle_plan.get("native_miracle")),
+        x_value=int(miracle_plan.get("x_value") or 0),
+        locked_cost=miracle_locked_cost,
         lorehold_on_board=lorehold_miracle_engine_permanent(player) is not None,
         cards_drawn_this_turn=player.cards_drawn_this_turn,
         first_draw_miracle_candidate=miracle_candidate is not None,

@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-05T02:22:35Z",
+  "generated_at": "2026-07-05T02:31:34Z",
   "artifact_type": "lorehold_entreat_rule_package_preapply",
-  "status": "review_only_package_generated_no_apply_keep_607",
+  "status": "auto_rule_package_generated_no_apply_keep_607",
   "postgres_writes_executed": false,
   "source_db_mutated": false,
   "deck_607_mutated": false,
@@ -34,7 +34,7 @@
       "miracle_cost": "{X}{W}{W}",
       "native_miracle_cost": "{X}{W}{W}",
       "miracle_x_cost_symbol_count": 1,
-      "native_miracle_runtime_status": "blocked_requires_x_miracle_cast_plan",
+      "native_miracle_runtime_status": "runtime_executor_v1",
       "sorcery": true,
       "xmage_effect_class": "CreateTokenEffect",
       "xmage_dynamic_value_class": "GetXValue",
@@ -48,10 +48,10 @@
       "lane": "miracle_finisher"
     },
     "source": "curated",
-    "confidence": 0.91,
-    "review_status": "needs_review",
-    "execution_status": "review_only",
-    "notes": "PG472 review-only package: XMage exact class EntreatTheAngels uses CreateTokenEffect, AngelToken, GetXValue, and MiracleAbility. Normal XXWWW X-token runtime is covered, but native miracle XWW still requires an executable X miracle cast plan before auto execution.",
+    "confidence": 0.96,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "notes": "PG472 generated package: XMage exact class EntreatTheAngels uses CreateTokenEffect, AngelToken, GetXValue, and MiracleAbility. Normal XXWWW X-token runtime and native miracle XWW runtime are covered by focused tests. SQL was generated but not applied.",
     "shadow_handling": "preserve_existing_rows"
   },
   "source_evidence": {
@@ -74,6 +74,6 @@
     "keep_607_as_protected_baseline": true,
     "natural_battle_allowed_now": false,
     "promotion_allowed": false,
-    "reason": "The normal X-token runtime is available, but native miracle {X}{W}{W} still needs an executable X miracle cast plan before this can be auto or used in 607 battle gates."
+    "reason": "The normal X-token runtime and native miracle {X}{W}{W} runtime are available, but PostgreSQL was not changed and a natural 607 battle gate is still required."
   }
 }

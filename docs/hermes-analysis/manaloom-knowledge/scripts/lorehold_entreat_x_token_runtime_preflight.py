@@ -84,8 +84,14 @@ def runtime_checks(runtime_text: str) -> dict[str, bool]:
         "token_count_uses_x_value": "token_count_source" in runtime_text and "x_value_from_effect_context(effect_data)" in runtime_text,
         "token_count_per_x_guard": "token_count_per_x" in runtime_text,
         "cast_planner_uses_x_token_count": (
-            "uses_x_cast_value = any(" in runtime_text
-            and "str(effect_data.get(\"token_count_source\") or \"\").lower() == \"x_value\"" in runtime_text
+            "def effect_uses_x_cast_value" in runtime_text
+            and "uses_x_cast_value = effect_uses_x_cast_value(effect_data)" in runtime_text
+            and "str(effect_data.get(\"token_count_source\") or \"\").strip().lower() == \"x_value\"" in runtime_text
+        ),
+        "native_x_miracle_cast_plan": (
+            "def miracle_cast_plan_for_card" in runtime_text
+            and "def native_miracle_cost_for_effect" in runtime_text
+            and "\"alternative_cost_kind\": \"native_miracle\"" in runtime_text
         ),
         "tokens_created_replay_source": "token_count_source=effect_data.get(\"token_count_source\")" in runtime_text,
         "tokens_created_replay_x_value": "x_value_from_effect_context(effect_data)" in runtime_text and "tokens_created" in runtime_text,
@@ -99,6 +105,7 @@ def test_checks(test_text: str) -> dict[str, bool]:
         "x_value_fixture": "\"_cast_context\": {\"x_value\": 3}" in test_text,
         "angel_token_model": "Angel Token" in test_text and "token_flying" in test_text,
         "xx_cost_plan_test": "test_x_create_creature_tokens_spell_cast_plan_uses_xx_cost" in test_text,
+        "native_x_miracle_test": "test_native_x_miracle_create_creature_tokens_uses_xww_cost" in test_text,
         "replay_assertion": "tokens_requested" in test_text and "token_count_source" in test_text,
     }
 
@@ -143,7 +150,7 @@ def build_payload(
             "battle_ready_now_count": 0,
             "natural_battle_allowed_now": False,
             "promotion_allowed": False,
-            "recommended_next_action": "draft_reviewed_entreat_card_rule_package_without_apply_then_gate",
+            "recommended_next_action": "apply_entreat_rule_only_after_pg_precheck_then_run_607_battle_gate",
         },
         "prior_contract_status": contract_report.get("status"),
         "prior_contract_best_first": (contract_report.get("summary") or {}).get("best_first_runtime_contract"),

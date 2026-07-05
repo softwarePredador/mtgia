@@ -1,11 +1,11 @@
 # PG472 Lorehold Entreat X-Token Rule Package
 
-- Generated at: `2026-07-05T02:22:35Z`
-- Status: `review_only_package_generated_no_apply_keep_607`
+- Generated at: `2026-07-05T02:31:34Z`
+- Status: `auto_rule_package_generated_no_apply_keep_607`
 - PostgreSQL writes executed: `False`
 - Deck 607 mutated: `False`
-- Proposed review status: `needs_review`
-- Proposed execution status: `review_only`
+- Proposed review status: `verified`
+- Proposed execution status: `auto`
 - Logical rule key: `battle_rule_v1:0ce4d97cb4f226cd2df5f9bdbdebc04e`
 
 ## Rule Shape
@@ -15,7 +15,7 @@
 - Normal cost: `{X}{X}{W}{W}{W}`
 - Native miracle cost: `{X}{W}{W}`
 - Token count source: `x_value`
-- Runtime blocker: `blocked_requires_x_miracle_cast_plan`
+- Native miracle runtime: `runtime_executor_v1`
 
 ## Generated Files
 
@@ -28,6 +28,6 @@
 
 ## Decision
 
-- This package is intentionally `review_only`.
-- Normal X-token casting is covered by runtime tests.
-- Native miracle XWW casting is not executable yet, so this must not become a natural 607 battle gate.
+- This package is generated as `verified` / `auto`, but it was not applied.
+- Normal X-token casting and native miracle XWW casting are covered by runtime tests.
+- A natural 607 battle gate is still required before any deck mutation.
