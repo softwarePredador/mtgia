@@ -1,0 +1,241 @@
+{
+  "artifact_type": "lorehold_mana_base_plateau_radiant_decision",
+  "decision": {
+    "candidate": "+Plateau / -Radiant Summit",
+    "current_best_baseline": "deck_607",
+    "next_action": "keep_607_and_move_to_next_learning_hypothesis_or_revisit_only_with_new_mana_trace_evidence",
+    "promotion_allowed": false,
+    "reason": "The candidate passed structural/preflight checks, but lost both the natural smoke and the opening-hand forced diagnostic against protected 607. Natural smoke did not access Plateau, so this is not card-level proof that Plateau is bad; it is enough to keep promotion and larger confirmation closed for this exact isolated swap."
+  },
+  "deck_607_mutated": false,
+  "forced_opening_hand_diagnostic": {
+    "baseline": {
+      "deck_key": "deck_607",
+      "plateau_access": {
+        "accessed_games": 0,
+        "dominant_zone": "absent",
+        "drawn_games": 0,
+        "library_only_games": 0,
+        "near_access_games": 0,
+        "opening_hand_games": 0,
+        "trace_count": 147,
+        "trace_games": 3,
+        "zone_counts": {
+          "absent": 147
+        }
+      },
+      "radiant_summit_access": {
+        "accessed_games": 3,
+        "dominant_zone": "battlefield",
+        "drawn_games": 0,
+        "library_only_games": 0,
+        "near_access_games": 0,
+        "opening_hand_games": 3,
+        "trace_count": 147,
+        "trace_games": 3,
+        "zone_counts": {
+          "battlefield": 105,
+          "hand": 42
+        }
+      },
+      "record": {
+        "avg_win_turn": 10.0,
+        "games": 3,
+        "losses": 1,
+        "stalls": 0,
+        "win_rate": 66.67,
+        "wins": 2
+      },
+      "strategic_games": {
+        "discard_to_top_replacement": 0,
+        "lorehold_cost_paid": 3,
+        "lorehold_spell_cast": 3,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 2,
+        "topdeck_manipulation_activated": 1
+      }
+    },
+    "candidate": {
+      "deck_key": "candidate_607_plateau_radiant_mana_base_v1",
+      "plateau_access": {
+        "accessed_games": 3,
+        "dominant_zone": "battlefield",
+        "drawn_games": 0,
+        "library_only_games": 0,
+        "near_access_games": 0,
+        "opening_hand_games": 3,
+        "trace_count": 169,
+        "trace_games": 3,
+        "zone_counts": {
+          "battlefield": 127,
+          "hand": 42
+        }
+      },
+      "radiant_summit_access": {
+        "accessed_games": 0,
+        "dominant_zone": "absent",
+        "drawn_games": 0,
+        "library_only_games": 0,
+        "near_access_games": 0,
+        "opening_hand_games": 0,
+        "trace_count": 169,
+        "trace_games": 3,
+        "zone_counts": {
+          "absent": 169
+        }
+      },
+      "record": {
+        "avg_win_turn": 14.0,
+        "games": 3,
+        "losses": 2,
+        "stalls": 0,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "strategic_games": {
+        "discard_to_top_replacement": 0,
+        "lorehold_cost_paid": 3,
+        "lorehold_spell_cast": 3,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 2,
+        "topdeck_manipulation_activated": 1
+      }
+    },
+    "forced_access_mode": "opening_hand",
+    "games_per_opponent": 3,
+    "opponents": [
+      "Fixed Lorehold deck 607"
+    ]
+  },
+  "generated_at": "2026-07-05T00:35:04Z",
+  "natural_smoke": {
+    "baseline": {
+      "deck_key": "deck_607",
+      "plateau_access": {
+        "accessed_games": 0,
+        "dominant_zone": "absent",
+        "drawn_games": 0,
+        "library_only_games": 0,
+        "near_access_games": 0,
+        "opening_hand_games": 0,
+        "trace_count": 152,
+        "trace_games": 3,
+        "zone_counts": {
+          "absent": 152
+        }
+      },
+      "radiant_summit_access": {
+        "accessed_games": 1,
+        "dominant_zone": "library",
+        "drawn_games": 0,
+        "library_only_games": 1,
+        "near_access_games": 1,
+        "opening_hand_games": 1,
+        "trace_count": 152,
+        "trace_games": 3,
+        "zone_counts": {
+          "battlefield": 32,
+          "hand": 14,
+          "library": 106
+        }
+      },
+      "record": {
+        "avg_win_turn": 10.5,
+        "games": 3,
+        "losses": 1,
+        "stalls": 0,
+        "win_rate": 66.67,
+        "wins": 2
+      },
+      "strategic_games": {
+        "discard_to_top_replacement": 0,
+        "lorehold_cost_paid": 3,
+        "lorehold_spell_cast": 3,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 2,
+        "topdeck_manipulation_activated": 1
+      }
+    },
+    "candidate": {
+      "deck_key": "candidate_607_plateau_radiant_mana_base_v1",
+      "plateau_access": {
+        "accessed_games": 0,
+        "dominant_zone": "library",
+        "drawn_games": 0,
+        "library_only_games": 2,
+        "near_access_games": 1,
+        "opening_hand_games": 0,
+        "trace_count": 134,
+        "trace_games": 3,
+        "zone_counts": {
+          "library": 134
+        }
+      },
+      "radiant_summit_access": {
+        "accessed_games": 0,
+        "dominant_zone": "absent",
+        "drawn_games": 0,
+        "library_only_games": 0,
+        "near_access_games": 0,
+        "opening_hand_games": 0,
+        "trace_count": 134,
+        "trace_games": 3,
+        "zone_counts": {
+          "absent": 134
+        }
+      },
+      "record": {
+        "avg_win_turn": 12.0,
+        "games": 3,
+        "losses": 2,
+        "stalls": 0,
+        "win_rate": 33.33,
+        "wins": 1
+      },
+      "strategic_games": {
+        "discard_to_top_replacement": 0,
+        "lorehold_cost_paid": 3,
+        "lorehold_spell_cast": 2,
+        "lorehold_upkeep_rummage": 1,
+        "miracle_cast": 1,
+        "topdeck_manipulation_activated": 1
+      }
+    },
+    "forced_access_mode": "none",
+    "games_per_opponent": 3,
+    "opponents": [
+      "Fixed Lorehold deck 607"
+    ]
+  },
+  "postgres_writes": false,
+  "preflight_summary": {
+    "add": "Plateau",
+    "allow_promotion_gate": false,
+    "allow_smoke_battle_gate": true,
+    "cut": "Radiant Summit",
+    "deck_id": 607,
+    "keep_607_as_protected_baseline": true,
+    "promotion_allowed": false
+  },
+  "source_db_mutated": false,
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_candidate_preflight_20260705_plateau_radiant_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_radiant_smoke_20260705_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_radiant_forced_opening_20260705_current.json"
+  ],
+  "status": "reject_promotion_keep_607_current_baseline",
+  "summary": {
+    "blockers": [
+      "forced_opening_hand_diagnostic_lost_to_607",
+      "natural_smoke_did_not_access_plateau",
+      "natural_smoke_lost_to_607"
+    ],
+    "candidate": "+Plateau / -Radiant Summit",
+    "forced_candidate_tied_or_beat_607": false,
+    "full_confirmation_allowed_now": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_candidate_tied_or_beat_607": false,
+    "preflight_ready": true,
+    "promotion_allowed": false
+  }
+}

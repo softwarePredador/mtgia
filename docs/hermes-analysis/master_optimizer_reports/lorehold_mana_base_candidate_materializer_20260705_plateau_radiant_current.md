@@ -1,6 +1,6 @@
 # Lorehold Mana Base Candidate Materializer
 
-- generated_at: `2026-07-05T00:24:19Z`
+- generated_at: `2026-07-05T00:31:29Z`
 - status: `candidate_materialized_structure_ready_battle_gate_closed`
 - postgres_writes: `false`
 - source_db_mutated: `false`
@@ -17,7 +17,7 @@
 ## Structure Validation
 
 - status: `pass`
-- deck_summary: `{"avg_cmc": 3.576, "cards": 100, "deck_id": 607, "hash": "5f592c700c3f78b76f84e3a3ba475b353e7b5f2c7feb223419fe6ae048314709", "lands": 34, "nonlands": 66, "ruleset_hash": "3e20c3ecd3828653d6c7b6aac9f9ce8e09a1f0d6736c2d0d93c292873d71ba5e", "semantics_hash": "cbd37a6ce23bdcb22ef291b174c2b27e9d1872f7095d3aed4134f2dadf562648"}`
+- deck_summary: `{"avg_cmc": 3.576, "cards": 100, "deck_id": 607, "hash": "c7dbc308694ec898b5302ccaf588966a1c88e31ee5908561cafa6b7751182f99", "lands": 34, "nonlands": 66, "ruleset_hash": "a213ce6392fcbcbeee970435a39b90f8daa1fbf5c3f89568ba9071fb39b2dbb3", "semantics_hash": "ca32aa1b7f565b5f9bd198c8023395f4cfa924688c25623209bdf79a0e26fc6d"}`
 
 | Check | Pass |
 | --- | --- |

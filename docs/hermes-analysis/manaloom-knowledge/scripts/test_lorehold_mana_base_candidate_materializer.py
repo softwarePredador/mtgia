@@ -157,6 +157,28 @@ def create_fixture_db(path: Path, *, include_cut: bool = True) -> None:
         is_commander=1,
         card_id="commander-id",
     )
+    protected_anchor_rows = [
+        ("Bender's Waterskin", "ramp", "Artifact"),
+        ("Creative Technique", "draw", "Sorcery"),
+        ("Land Tax", "tutor", "Enchantment"),
+        ("Library of Leng", "engine", "Artifact"),
+        ("Mizzix's Mastery", "wincon", "Sorcery"),
+        ("Molecule Man", "draw", "Legendary Creature - Mutant Hero"),
+        ("Scroll Rack", "draw", "Artifact"),
+        ("Sensei's Divining Top", "draw", "Artifact"),
+        ("Storm Herd", "wincon", "Sorcery"),
+        ("The Mind Stone", "ramp", "Artifact"),
+        ("The Scarlet Witch", "creature", "Legendary Creature - Human Warlock Hero"),
+        ("Victory Chimes", "ramp", "Artifact"),
+    ]
+    for name, tag, type_line in protected_anchor_rows:
+        insert_card(
+            607,
+            name,
+            tag,
+            type_line,
+            "Fixture protected anchor.",
+        )
     if include_cut:
         insert_card(
             607,
@@ -175,7 +197,7 @@ def create_fixture_db(path: Path, *, include_cut: bool = True) -> None:
             "Basic Land - Plains",
             "({T}: Add {W}.)",
         )
-    for index in range(65):
+    for index in range(53):
         insert_card(
             607,
             f"Spell {index}",

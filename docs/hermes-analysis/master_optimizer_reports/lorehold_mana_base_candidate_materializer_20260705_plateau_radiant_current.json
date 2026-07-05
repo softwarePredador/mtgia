@@ -9,7 +9,7 @@
     "reason": "The candidate preserves 100 cards, 34 lands, one commander, and source DB immutability, but has not passed battle or replay evidence."
   },
   "deck_607_mutated": false,
-  "generated_at": "2026-07-05T00:24:19Z",
+  "generated_at": "2026-07-05T00:31:29Z",
   "mana_base_counts": {
     "candidate": {
       "always_tapped_rows": 2,
@@ -109,21 +109,21 @@
     "avg_cmc": 3.576,
     "cards": 100,
     "deck_id": 607,
-    "hash": "a8b97be7b57ce25b1fb94d60ce4d1af43b35c5373cf51877fcfd37d01a4d68bf",
+    "hash": "ca4c6ef3fdee91bbba59083704a7b8e4e809d8c7bb1b1a43bde5d57e2892b220",
     "lands": 34,
     "nonlands": 66,
-    "ruleset_hash": "a45d00ad5a50da77c1e21659471cc09568727cbd5f50c4b22427ca3d7626eaf2",
-    "semantics_hash": "e4fff4daacbed4f0693dc306f63882a37592c448d3216fce690ef78148fbabe9"
+    "ruleset_hash": "d1f10940b8a5ed6c13578f474e1a1b8ef63c45aace1505463f864a0fb4733f3b",
+    "semantics_hash": "e9d1cfefcf08721b37f2666d313f7a9a64bd9f99147aa0e9c38394dfd808defe"
   },
   "source_deck_summary_before": {
     "avg_cmc": 3.576,
     "cards": 100,
     "deck_id": 607,
-    "hash": "a8b97be7b57ce25b1fb94d60ce4d1af43b35c5373cf51877fcfd37d01a4d68bf",
+    "hash": "ca4c6ef3fdee91bbba59083704a7b8e4e809d8c7bb1b1a43bde5d57e2892b220",
     "lands": 34,
     "nonlands": 66,
-    "ruleset_hash": "a45d00ad5a50da77c1e21659471cc09568727cbd5f50c4b22427ca3d7626eaf2",
-    "semantics_hash": "e4fff4daacbed4f0693dc306f63882a37592c448d3216fce690ef78148fbabe9"
+    "ruleset_hash": "d1f10940b8a5ed6c13578f474e1a1b8ef63c45aace1505463f864a0fb4733f3b",
+    "semantics_hash": "e9d1cfefcf08721b37f2666d313f7a9a64bd9f99147aa0e9c38394dfd808defe"
   },
   "source_reports": [
     "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_safe_cut_model_20260705_current.json"
@@ -144,11 +144,11 @@
       "avg_cmc": 3.576,
       "cards": 100,
       "deck_id": 607,
-      "hash": "5f592c700c3f78b76f84e3a3ba475b353e7b5f2c7feb223419fe6ae048314709",
+      "hash": "c7dbc308694ec898b5302ccaf588966a1c88e31ee5908561cafa6b7751182f99",
       "lands": 34,
       "nonlands": 66,
-      "ruleset_hash": "3e20c3ecd3828653d6c7b6aac9f9ce8e09a1f0d6736c2d0d93c292873d71ba5e",
-      "semantics_hash": "cbd37a6ce23bdcb22ef291b174c2b27e9d1872f7095d3aed4134f2dadf562648"
+      "ruleset_hash": "a213ce6392fcbcbeee970435a39b90f8daa1fbf5c3f89568ba9071fb39b2dbb3",
+      "semantics_hash": "ca32aa1b7f565b5f9bd198c8023395f4cfa924688c25623209bdf79a0e26fc6d"
     },
     "nonbasic_singleton_violations": [],
     "status": "pass",
@@ -158,13 +158,13 @@
     "add": "Plateau",
     "allow_battle_gate_now": false,
     "allow_next_preflight": true,
-    "candidate_deck_hash": "5f592c700c3f78b76f84e3a3ba475b353e7b5f2c7feb223419fe6ae048314709",
+    "candidate_deck_hash": "c7dbc308694ec898b5302ccaf588966a1c88e31ee5908561cafa6b7751182f99",
     "cut": "Radiant Summit",
     "deck_id": 607,
     "promotion_allowed": false,
     "source_candidate_hash_differs": true,
-    "source_deck_hash_after": "a8b97be7b57ce25b1fb94d60ce4d1af43b35c5373cf51877fcfd37d01a4d68bf",
-    "source_deck_hash_before": "a8b97be7b57ce25b1fb94d60ce4d1af43b35c5373cf51877fcfd37d01a4d68bf",
+    "source_deck_hash_after": "ca4c6ef3fdee91bbba59083704a7b8e4e809d8c7bb1b1a43bde5d57e2892b220",
+    "source_deck_hash_before": "ca4c6ef3fdee91bbba59083704a7b8e4e809d8c7bb1b1a43bde5d57e2892b220",
     "source_unchanged": true
   }
 }

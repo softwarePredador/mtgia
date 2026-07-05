@@ -1,0 +1,225 @@
+{
+  "artifact_type": "lorehold_mana_base_candidate_preflight",
+  "candidate_db": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_candidate_materializer_20260705_plateau_radiant_current_candidate/knowledge_candidate.db",
+  "decision": {
+    "candidate": "+Plateau / -Radiant Summit",
+    "current_best_baseline": "deck_607",
+    "next_action": "run_diagnostic_smoke_battle",
+    "promotion_allowed": false
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T00:31:33Z",
+  "policy": {
+    "allowed_gate": "diagnostic smoke battle only",
+    "card_level_claim": "a battle aggregate is not enough; Plateau/Radiant access must be inspected in telemetry or focused traces",
+    "promotion_gate": "closed until same-opponent/seed confirmation, fast-pressure guard, and replay trace evidence pass"
+  },
+  "postgres_writes": false,
+  "preflight_validation": {
+    "added_card_runtime": {
+      "active_rule_count": 1,
+      "card_id": "2fe01212-cbd4-44a4-a5b2-cb0402c86db0",
+      "card_name": "Plateau",
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    "candidate_deck_summary": {
+      "avg_cmc": 3.576,
+      "cards": 100,
+      "deck_id": 607,
+      "hash": "c7dbc308694ec898b5302ccaf588966a1c88e31ee5908561cafa6b7751182f99",
+      "lands": 34,
+      "nonlands": 66,
+      "ruleset_hash": "a213ce6392fcbcbeee970435a39b90f8daa1fbf5c3f89568ba9071fb39b2dbb3",
+      "semantics_hash": "ca32aa1b7f565b5f9bd198c8023395f4cfa924688c25623209bdf79a0e26fc6d"
+    },
+    "checks": {
+      "add_has_active_land_rule": true,
+      "add_has_card_id": true,
+      "add_has_oracle_text": true,
+      "candidate_hash_differs_from_source": true,
+      "candidate_land_quantity_34": true,
+      "candidate_total_cards_100": true,
+      "expected_add_only": true,
+      "expected_cut_only": true,
+      "nonland_role_counts_unchanged": true,
+      "protected_anchors_unchanged": true,
+      "same_lane_land_swap": true,
+      "single_add_single_cut": true,
+      "source_land_quantity_34": true,
+      "source_total_cards_100": true
+    },
+    "diff": {
+      "added": [
+        {
+          "normalized_name": "plateau",
+          "quantity_delta": 1
+        }
+      ],
+      "removed": [
+        {
+          "normalized_name": "radiant summit",
+          "quantity_delta": 1
+        }
+      ]
+    },
+    "nonland_role_counts": {
+      "candidate": {
+        "board_wipe": 8,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "source": {
+        "board_wipe": 8,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "tutor": 1,
+        "wincon": 9
+      }
+    },
+    "protected_anchor_status": {
+      "anchor_count": 13,
+      "anchors": [
+        {
+          "card_name": "Bender's Waterskin",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Creative Technique",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Land Tax",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Library of Leng",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Lorehold, the Historian",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Mizzix's Mastery",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Molecule Man",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Storm Herd",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "The Mind Stone",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "The Scarlet Witch",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Victory Chimes",
+          "field_deltas": {},
+          "status": "unchanged"
+        }
+      ],
+      "changed": [],
+      "missing": [],
+      "status": "pass"
+    },
+    "source_deck_summary": {
+      "avg_cmc": 3.576,
+      "cards": 100,
+      "deck_id": 607,
+      "hash": "ca4c6ef3fdee91bbba59083704a7b8e4e809d8c7bb1b1a43bde5d57e2892b220",
+      "lands": 34,
+      "nonlands": 66,
+      "ruleset_hash": "d1f10940b8a5ed6c13578f474e1a1b8ef63c45aace1505463f864a0fb4733f3b",
+      "semantics_hash": "e9d1cfefcf08721b37f2666d313f7a9a64bd9f99147aa0e9c38394dfd808defe"
+    },
+    "status": "pass"
+  },
+  "recommended_battle_command": [
+    "MANALOOM_FOCUS_ACCESS_CARDS='[\"Plateau\",\"Radiant Summit\"]'",
+    "python3",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_battle_gate.py",
+    "--db",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    "--deck-ids",
+    "607",
+    "--candidate-db",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_candidate_materializer_20260705_plateau_radiant_current_candidate/knowledge_candidate.db",
+    "--candidate-key",
+    "candidate_607_plateau_radiant_mana_base_v1",
+    "--candidate-name",
+    "Lorehold 607 mana base: Plateau over Radiant Summit",
+    "--candidate-archetype",
+    "mana-base-diagnostic",
+    "--candidate-deck-id",
+    "607",
+    "--fixed-opponent-deck-ids",
+    "607",
+    "--games",
+    "1",
+    "--opponent-limit",
+    "1",
+    "--opponent-seed",
+    "20260705",
+    "--simulation-seed",
+    "20260705",
+    "--game-timeout-seconds",
+    "30",
+    "--deck-process-timeout-seconds",
+    "240",
+    "--isolate-deck-process",
+    "--stem",
+    "lorehold_mana_base_plateau_radiant_smoke_20260705_current"
+  ],
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_candidate_materializer_20260705_plateau_radiant_current.json"
+  ],
+  "status": "battle_smoke_preflight_ready",
+  "summary": {
+    "add": "Plateau",
+    "allow_promotion_gate": false,
+    "allow_smoke_battle_gate": true,
+    "cut": "Radiant Summit",
+    "deck_id": 607,
+    "keep_607_as_protected_baseline": true,
+    "promotion_allowed": false
+  }
+}
