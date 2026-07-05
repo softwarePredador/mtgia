@@ -22562,29 +22562,107 @@ def _permanent_type_line(permanent):
     return str(permanent or "").lower()
 
 
-def _permanent_matches_destroy_card_types(permanent, destroy_card_types):
+def _permanent_has_any_subtype(permanent, subtypes):
+    if not subtypes:
+        return True
+    type_line = _permanent_type_line(permanent)
+    return any(
+        re.search(rf"\b{re.escape(str(subtype).strip().lower())}\b", type_line)
+        for subtype in subtypes
+        if str(subtype).strip()
+    )
+
+
+def _permanent_matches_destroy_card_types(permanent, destroy_card_types, effect_data=None):
     requested = {str(card_type or "").lower() for card_type in (destroy_card_types or ["creature"])}
     type_line = _permanent_type_line(permanent)
+    type_matches = False
     if "creature" in requested and is_battlefield_creature(permanent):
-        return True
+        type_matches = True
     if "land" in requested and (
         permanent == "land"
         or type_line == "land"
         or " land" in f" {type_line}"
         or (isinstance(permanent, dict) and is_effective_land(permanent))
     ):
-        return True
+        type_matches = True
     if "artifact" in requested and "artifact" in type_line:
-        return True
+        type_matches = True
     if "enchantment" in requested and "enchantment" in type_line:
-        return True
+        type_matches = True
     if "planeswalker" in requested and "planeswalker" in type_line:
-        return True
+        type_matches = True
     if "battle" in requested and "battle" in type_line:
-        return True
+        type_matches = True
     if "permanent" in requested and is_permanent_card(permanent):
-        return True
-    return False
+        type_matches = True
+    if not type_matches:
+        return False
+    effect_data = effect_data or {}
+    excluded_types = {
+        str(value or "").strip().lower()
+        for value in _as_list(effect_data.get("destroy_exclude_card_types"))
+        if str(value or "").strip()
+    }
+    if excluded_types and any(target_matches_type(permanent, excluded) for excluded in excluded_types):
+        return False
+    required_colors = [
+        value
+        for value in _as_list(effect_data.get("destroy_required_colors"))
+        if str(value or "").strip()
+    ]
+    if required_colors and not any(card_has_color(permanent, color) for color in required_colors):
+        return False
+    excluded_colors = [
+        value
+        for value in _as_list(effect_data.get("destroy_excluded_colors"))
+        if str(value or "").strip()
+    ]
+    if excluded_colors and any(card_has_color(permanent, color) for color in excluded_colors):
+        return False
+    required_subtypes = [
+        str(value or "").replace("_", " ").strip().lower()
+        for value in _as_list(effect_data.get("destroy_required_subtypes"))
+        if str(value or "").strip()
+    ]
+    if required_subtypes and not _permanent_has_any_subtype(permanent, required_subtypes):
+        return False
+    excluded_subtypes = [
+        str(value or "").replace("_", " ").strip().lower()
+        for value in _as_list(effect_data.get("destroy_excluded_subtypes"))
+        if str(value or "").strip()
+    ]
+    if excluded_subtypes and _permanent_has_any_subtype(permanent, excluded_subtypes):
+        return False
+    tapped_state = str(effect_data.get("destroy_tapped_state") or "").strip().lower()
+    if tapped_state == "tapped" and not bool(isinstance(permanent, dict) and permanent.get("tapped")):
+        return False
+    if tapped_state == "untapped" and bool(isinstance(permanent, dict) and permanent.get("tapped")):
+        return False
+    for field, stat in (
+        ("destroy_mana_value_lte", "cmc"),
+        ("destroy_mana_value_gte", "cmc"),
+        ("destroy_power_lte", "power"),
+        ("destroy_power_gte", "power"),
+        ("destroy_toughness_lte", "toughness"),
+        ("destroy_toughness_gte", "toughness"),
+    ):
+        if effect_data.get(field) in (None, ""):
+            continue
+        value = card_mana_value(permanent) if stat == "cmc" else _numeric_card_stat(permanent, stat)
+        threshold = int(float(effect_data.get(field) or 0))
+        if field.endswith("_lte") and value > threshold:
+            return False
+        if field.endswith("_gte") and value < threshold:
+            return False
+    if effect_data.get("destroy_nonbasic_lands"):
+        if not target_matches_type(permanent, "land"):
+            return False
+        if isinstance(permanent, dict) and (
+            bool(permanent.get("basic")) or "basic" in _permanent_type_line(permanent)
+        ):
+            return False
+    return True
 
 
 def turn_ended_by_effect(player):
@@ -44891,6 +44969,16 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
             if is_battlefield_creature(permanent):
                 if damage_scope == "each_untapped_creature" and bool(permanent.get("tapped")):
                     continue
+                if damage_scope == "each_tapped_creature" and not bool(permanent.get("tapped")):
+                    continue
+                if damage_scope == "each_flying_creature" and not card_has_keyword(permanent, "flying"):
+                    continue
+                if damage_scope in {"each_nonflying_creature", "each_creature_without_flying"} and card_has_keyword(permanent, "flying"):
+                    continue
+                if damage_scope == "each_attacking_creature" and not bool(permanent.get("attacking")):
+                    continue
+                if damage_scope == "each_nonartifact_creature" and "artifact" in _permanent_type_line(permanent):
+                    continue
                 creatures_seen += 1
                 permanent_amount = apply_static_damage_replacements(
                     player,
@@ -53951,6 +54039,7 @@ def apply_effect_immediate(
             emit_events=True,
         )
         destroy_card_types = list(effect_data.get("destroy_card_types") or ["creature"])
+        destroy_controller = str(effect_data.get("destroy_controller") or "any").strip().lower()
         context = board_wipe_decision_context(player, opponents)
         destroyed = 0
         protected = 0
@@ -53971,10 +54060,14 @@ def apply_effect_immediate(
         live_opponent_creatures_seen = 0
         for p in [player] + list(opponents):
             is_self = p is player
+            if destroy_controller in {"opponent", "opponents", "opponents_control"} and is_self:
+                continue
+            if destroy_controller in {"self", "you", "controller"} and not is_self:
+                continue
             is_live_opponent = (not is_self) and p.is_alive()
             destroyed_cards = []
             for c in list(p.battlefield):
-                if not _permanent_matches_destroy_card_types(c, destroy_card_types):
+                if not _permanent_matches_destroy_card_types(c, destroy_card_types, effect_data):
                     continue
                 permanents_seen += 1
                 type_flags = _destroyed_permanent_type_flags(c)
@@ -54049,6 +54142,14 @@ def apply_effect_immediate(
             "pre_resolution_timing_justified": context["timing_justified"],
             "timing_justified": resolution_timing_justified,
             "destroy_card_types": destroy_card_types,
+            "destroy_controller": destroy_controller,
+            "destroy_required_colors": effect_data.get("destroy_required_colors") or [],
+            "destroy_excluded_colors": effect_data.get("destroy_excluded_colors") or [],
+            "destroy_required_subtypes": effect_data.get("destroy_required_subtypes") or [],
+            "destroy_excluded_subtypes": effect_data.get("destroy_excluded_subtypes") or [],
+            "destroy_exclude_card_types": effect_data.get("destroy_exclude_card_types") or [],
+            "destroy_tapped_state": effect_data.get("destroy_tapped_state"),
+            "destroy_nonbasic_lands": bool(effect_data.get("destroy_nonbasic_lands")),
             "permanents_seen": permanents_seen,
             "creatures_seen": creatures_seen,
             "unprotected_seen": unprotected_seen,
@@ -54128,6 +54229,14 @@ def apply_effect_immediate(
             player=player.name,
             card=card.get("name", "?"),
             destroy_card_types=destroy_card_types,
+            destroy_controller=destroy_controller,
+            destroy_required_colors=effect_data.get("destroy_required_colors") or [],
+            destroy_excluded_colors=effect_data.get("destroy_excluded_colors") or [],
+            destroy_required_subtypes=effect_data.get("destroy_required_subtypes") or [],
+            destroy_excluded_subtypes=effect_data.get("destroy_excluded_subtypes") or [],
+            destroy_exclude_card_types=effect_data.get("destroy_exclude_card_types") or [],
+            destroy_tapped_state=effect_data.get("destroy_tapped_state"),
+            destroy_nonbasic_lands=bool(effect_data.get("destroy_nonbasic_lands")),
             destroyed=destroyed,
             protected=protected,
             permanents_seen=permanents_seen,

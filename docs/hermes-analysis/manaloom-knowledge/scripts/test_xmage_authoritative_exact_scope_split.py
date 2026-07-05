@@ -9288,7 +9288,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "board_wipe_oracle_not_simple")
 
-    def test_board_wipe_selective_scope_stays_blocked(self) -> None:
+    def test_board_wipe_selective_toughness_scope_maps_to_constraints(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
         proposal, reason = split.split_row(
             row,
@@ -9296,8 +9296,87 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             source_text="this.getSpellAbility().addEffect(new DestroyAllEffect(filter));",
         )
 
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "board_wipe")
+        self.assertEqual(effect["destroy_card_types"], ["creature"])
+        self.assertEqual(effect["destroy_toughness_gte"], 4)
+
+    def test_board_wipe_land_subtype_scope_maps_to_constraints(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy all Islands."),
+            source_text="this.getSpellAbility().addEffect(new DestroyAllEffect(filter));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["destroy_card_types"], ["land"])
+        self.assertEqual(effect["destroy_required_subtypes"], ["island"])
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy all Plains."),
+            source_text="this.getSpellAbility().addEffect(new DestroyAllEffect(filter));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["destroy_required_subtypes"], ["plains"])
+
+    def test_board_wipe_color_and_controller_scopes_map_to_constraints(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy all green creatures."),
+            source_text="this.getSpellAbility().addEffect(new DestroyAllEffect(filter));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["destroy_required_colors"], ["G"])
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy all creatures you don't control."),
+            source_text="this.getSpellAbility().addEffect(new DestroyAllEffect(filter, true));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["destroy_controller"], "opponents_control")
+
+    def test_board_wipe_source_modal_stays_blocked(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy all creatures."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyAllEffect(filter));"
+                "this.getSpellAbility().addMode(new Mode(new DestroyAllEffect(filter2)));"
+            ),
+        )
+
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "board_wipe_destroy_scope_not_supported")
+        self.assertEqual(reason, "board_wipe_source_multiple_destroy_all_effects")
+
+    def test_damage_wipe_flying_scope_maps_and_dynamic_source_blocks(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Gale Force deals 5 damage to each creature with flying."),
+            source_text="this.getSpellAbility().addEffect(new DamageAllEffect(5, StaticFilters.FILTER_CREATURE_FLYING));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["damage_scope"], "each_flying_creature")
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Windstorm deals X damage to each creature with flying."),
+            source_text="this.getSpellAbility().addEffect(new DamageAllEffect(GetXValue.instance, StaticFilters.FILTER_CREATURE_FLYING));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "board_wipe_damage_amount_not_fixed")
 
     def test_fixed_plus_one_counter_target_creature_maps_to_add_counters_runtime(self) -> None:
         row = queue_row(split.ADD_COUNTERS_TARGET_UNIT, effect_classes=["AddCountersTargetEffect"])

@@ -11548,6 +11548,65 @@ new server:
   new subpattern from the remaining blocked families, led by recursion,
   draw-engine, protection, direct damage, and residual add-counter scopes.
 
+## 2026-07-05 PG484 Extended Board Wipe Closure
+
+- Closed the extended exact XMage `DestroyAllEffect` and `DamageAllEffect`
+  board-wipe family as ManaLoom scopes
+  `xmage_destroy_all_matching_permanents_spell_v1` and
+  `xmage_fixed_damage_all_matching_permanents_spell_v1`.
+- The selected scope accepts only single-effect, non-modal, fixed-source
+  one-shot spells. It now supports destroy filters for controller, card type
+  exclusions, required/excluded colors, required/excluded subtypes, tapped
+  state, nonbasic lands, mana value, power, and toughness thresholds. It also
+  supports damage-wipe scopes for flying, nonflying, attacking, tapped,
+  untapped, and nonartifact creatures.
+- The batch covers `26` cards: Acid Rain, Anarchy, Boil, Boiling Seas,
+  Citywide Bust, Flashfires, Gale Force, Guan Yu's 1,000-Li March, Marrow
+  Shards, Mass Calcify, Nature's Ruin, Perish, Plague Wind, Planar Cleansing,
+  Rain of Blades, Retribution of the Meek, Ritual of Soot, Ruination,
+  Sandstorm, Shatterstorm, Soulscour, Squall, Their Name Is Death, Tsunami,
+  Virtue's Ruin, and Whipflare.
+- The runtime now applies structured board-wipe constraints during permanent
+  matching and records those constraints in the board-wipe decision trace and
+  replay event. Damage wipes now respect the supported per-creature scopes
+  before applying fixed damage.
+- The parser deliberately blocks unsafe neighbors: multiple `DestroyAllEffect`
+  or `DamageAllEffect` sources, modal sources, dynamic damage values such as X,
+  battlefield-count/color-spent/devotion counts, death replacement side effects,
+  additional damage text, unsupported ability classes, unsupported target
+  shapes, and non-simple Oracle text.
+- Focused validation passed `475` exact-split tests, `281` runtime tests, and
+  `15` package-builder tests. `py_compile` and `git diff --check` also passed.
+- PostgreSQL package PG484 applied against `143.198.230.247:5433/halder` and
+  promoted `26/26` selected cards as verified/auto rule-version `2` rows with
+  matching Oracle hashes. The apply deprecated `8` older shadow rows from the
+  selected cards.
+- Hermes metadata sync matched `6737` PostgreSQL cards, wrote `6665` SQLite
+  cache aliases, and left the known `unresolved=1` residual unchanged. The
+  battle-rule sync loaded `4629` PostgreSQL rows, wrote `4621` SQLite rows, and
+  exported `4600` canonical fallback rows.
+- Generic E2E validation passed across PostgreSQL, SQLite `battle_card_rules`,
+  canonical snapshot, and runtime `get_card_effect` for all `26` selected
+  cards. The manifest does not define battle-execution scenarios for this
+  generic family, so scenario execution remains `0` and concrete behavior proof
+  is provided by the focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy
+  contamination (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL
+  connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26257`, `xmage_authoritative_source_count=25943`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25943`. This reduces the
+  `board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1` work unit
+  from `433` to `407`.
+- The post-PG484 exact split recheck reports `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`. The next work should continue with the
+  highest-impact remaining work units, currently led by recursion,
+  draw-engine, protection, direct damage, residual add-counter variants, life
+  gain, targeted removal, draw cards, tutor, and the remaining board-wipe
+  blockers.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

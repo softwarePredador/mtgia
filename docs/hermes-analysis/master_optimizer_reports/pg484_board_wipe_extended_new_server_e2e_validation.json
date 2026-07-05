@@ -1,0 +1,946 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T05:39:36.135156+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg484_board_wipe_extended_new_server_manifest.json",
+  "package_id": "xmage_pg484_board_wipe_extended_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/card_intelligence_snapshot_pg484_board_wipe_extended_new_server.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 26
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Acid Rain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3830c547b8577a6f6ad0ad66e30165c",
+          "oracle_hash": "2330f7f77263034b6528af521abcd965",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Anarchy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:623a77cbcbdebb2edaaf7c467ece546b",
+          "oracle_hash": "05ec73e676cfa5bcd17def40ea340749",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Boil",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8d5b5b606f30fd2b81f2191c0bb1ffdd",
+          "oracle_hash": "61b1633da62aa3ee606bcac9f5d1d967",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Boiling Seas",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fa64bbe017b5682bd199bb2efc28f45c",
+          "oracle_hash": "61b1633da62aa3ee606bcac9f5d1d967",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Citywide Bust",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1ec350f21adf9af8db17fdaf0b9710aa",
+          "oracle_hash": "41d546a5d45ab686a7cae7fe33103913",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Flashfires",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:58ec521613d70df5f7b79b6cbc2b32c1",
+          "oracle_hash": "b98455d25c208a3be3b31d671d3f0e66",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Gale Force",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6c4dabcea7cf3106bbdd75d3d390abc",
+          "oracle_hash": "2821318e58277b038a75cd6ba97e2578",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Guan Yu's 1,000-Li March",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:706e9c5d6b2103067e78c6b205d27d14",
+          "oracle_hash": "3e581284b939c8c7d6fe4b02056bb118",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Marrow Shards",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975",
+          "oracle_hash": "b7f4fdab8ac8c1286adb13391fa45275",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Mass Calcify",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c5b8e90a9a636d2e294ceec536dbb552",
+          "oracle_hash": "2a7f66b0fccae2c0482cedbd16365b1a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Nature's Ruin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:93e5d43e981967d617ff749da8d3763a",
+          "oracle_hash": "c0435cf1f108bcefb43b1f41912f441b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Perish",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:93e5d43e981967d617ff749da8d3763a",
+          "oracle_hash": "74f65aa0348a3a6a9ffa56cf5ad9c398",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Plague Wind",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3ef8b793bfc2e71ccd0e0c668b4f9bc1",
+          "oracle_hash": "0191a05917e1781eb5044f660341780d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Planar Cleansing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d2c7cae85ba2ad9aaba460f82dc8f8c3",
+          "oracle_hash": "b60f294f3269b1ca28cfb83c7708cf14",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Rain of Blades",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975",
+          "oracle_hash": "ae096f5e3661d822d30d52c18d8bb5bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Retribution of the Meek",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cb6438edc95276afe14d1296d3e4e2fc",
+          "oracle_hash": "41e998a1fad0ebb3bf3c61febbdcd099",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Ritual of Soot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5b1499437b3584a0c1ec4364787d223b",
+          "oracle_hash": "d8e00ae4079496bc8432a7f71f9cdefa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Ruination",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6a483b71b3aff2704da226cbe3b5cc00",
+          "oracle_hash": "9440d8ae1139baa0400f63abd3c4787e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Sandstorm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975",
+          "oracle_hash": "ae818410faec8016c854df4bb8b3038c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Shatterstorm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8f5c34e1b9985fb3a0a991f08cad1cda",
+          "oracle_hash": "af23f181abecb296488e0231e201fa57",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Soulscour",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c8089cf93553cedaafaac6e22bef6d5d",
+          "oracle_hash": "f876fa52adf3e29ca06f5a0d09ab64f0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Squall",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:33b7a20268069a6b5c3217886dd442b5",
+          "oracle_hash": "9e33d8be739baf6ecb956508d107e5f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Their Name Is Death",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a67c2abbd7c5b3c2c0ab3f7c2151930",
+          "oracle_hash": "412e8a99a11731c903701e78870b9878",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Tsunami",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fa64bbe017b5682bd199bb2efc28f45c",
+          "oracle_hash": "61b1633da62aa3ee606bcac9f5d1d967",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Virtue's Ruin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcdd84aebd20d34f865c496ecc5163ed",
+          "oracle_hash": "aed63fef577a32a83366ef63c596678a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Whipflare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7c37d57cae732dcbed7d6bcfef2ffa8f",
+          "oracle_hash": "612a9102f73cc393cb0fd200ed988ad8",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 26
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Acid Rain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3830c547b8577a6f6ad0ad66e30165c",
+          "oracle_hash": "2330f7f77263034b6528af521abcd965",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Anarchy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:623a77cbcbdebb2edaaf7c467ece546b",
+          "oracle_hash": "05ec73e676cfa5bcd17def40ea340749",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Boil",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8d5b5b606f30fd2b81f2191c0bb1ffdd",
+          "oracle_hash": "61b1633da62aa3ee606bcac9f5d1d967",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Boiling Seas",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fa64bbe017b5682bd199bb2efc28f45c",
+          "oracle_hash": "61b1633da62aa3ee606bcac9f5d1d967",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Citywide Bust",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1ec350f21adf9af8db17fdaf0b9710aa",
+          "oracle_hash": "41d546a5d45ab686a7cae7fe33103913",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Flashfires",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:58ec521613d70df5f7b79b6cbc2b32c1",
+          "oracle_hash": "b98455d25c208a3be3b31d671d3f0e66",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Gale Force",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6c4dabcea7cf3106bbdd75d3d390abc",
+          "oracle_hash": "2821318e58277b038a75cd6ba97e2578",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Guan Yu's 1,000-Li March",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:706e9c5d6b2103067e78c6b205d27d14",
+          "oracle_hash": "3e581284b939c8c7d6fe4b02056bb118",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Marrow Shards",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975",
+          "oracle_hash": "b7f4fdab8ac8c1286adb13391fa45275",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Mass Calcify",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c5b8e90a9a636d2e294ceec536dbb552",
+          "oracle_hash": "2a7f66b0fccae2c0482cedbd16365b1a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Nature's Ruin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:93e5d43e981967d617ff749da8d3763a",
+          "oracle_hash": "c0435cf1f108bcefb43b1f41912f441b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Perish",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:93e5d43e981967d617ff749da8d3763a",
+          "oracle_hash": "74f65aa0348a3a6a9ffa56cf5ad9c398",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Plague Wind",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3ef8b793bfc2e71ccd0e0c668b4f9bc1",
+          "oracle_hash": "0191a05917e1781eb5044f660341780d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Planar Cleansing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d2c7cae85ba2ad9aaba460f82dc8f8c3",
+          "oracle_hash": "b60f294f3269b1ca28cfb83c7708cf14",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Rain of Blades",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975",
+          "oracle_hash": "ae096f5e3661d822d30d52c18d8bb5bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Retribution of the Meek",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cb6438edc95276afe14d1296d3e4e2fc",
+          "oracle_hash": "41e998a1fad0ebb3bf3c61febbdcd099",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Ritual of Soot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5b1499437b3584a0c1ec4364787d223b",
+          "oracle_hash": "d8e00ae4079496bc8432a7f71f9cdefa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Ruination",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6a483b71b3aff2704da226cbe3b5cc00",
+          "oracle_hash": "9440d8ae1139baa0400f63abd3c4787e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Sandstorm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975",
+          "oracle_hash": "ae818410faec8016c854df4bb8b3038c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Shatterstorm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8f5c34e1b9985fb3a0a991f08cad1cda",
+          "oracle_hash": "af23f181abecb296488e0231e201fa57",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Soulscour",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c8089cf93553cedaafaac6e22bef6d5d",
+          "oracle_hash": "f876fa52adf3e29ca06f5a0d09ab64f0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Squall",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:33b7a20268069a6b5c3217886dd442b5",
+          "oracle_hash": "9e33d8be739baf6ecb956508d107e5f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Their Name Is Death",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a67c2abbd7c5b3c2c0ab3f7c2151930",
+          "oracle_hash": "412e8a99a11731c903701e78870b9878",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Tsunami",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fa64bbe017b5682bd199bb2efc28f45c",
+          "oracle_hash": "61b1633da62aa3ee606bcac9f5d1d967",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "card_name": "Virtue's Ruin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcdd84aebd20d34f865c496ecc5163ed",
+          "oracle_hash": "aed63fef577a32a83366ef63c596678a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "card_name": "Whipflare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7c37d57cae732dcbed7d6bcfef2ffa8f",
+          "oracle_hash": "612a9102f73cc393cb0fd200ed988ad8",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 26
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Acid Rain",
+          "logical_rule_key": "battle_rule_v1:b3830c547b8577a6f6ad0ad66e30165c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Anarchy",
+          "logical_rule_key": "battle_rule_v1:623a77cbcbdebb2edaaf7c467ece546b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Boil",
+          "logical_rule_key": "battle_rule_v1:8d5b5b606f30fd2b81f2191c0bb1ffdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Boiling Seas",
+          "logical_rule_key": "battle_rule_v1:fa64bbe017b5682bd199bb2efc28f45c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Citywide Bust",
+          "logical_rule_key": "battle_rule_v1:1ec350f21adf9af8db17fdaf0b9710aa"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Flashfires",
+          "logical_rule_key": "battle_rule_v1:58ec521613d70df5f7b79b6cbc2b32c1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gale Force",
+          "logical_rule_key": "battle_rule_v1:e6c4dabcea7cf3106bbdd75d3d390abc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Guan Yu's 1,000-Li March",
+          "logical_rule_key": "battle_rule_v1:706e9c5d6b2103067e78c6b205d27d14"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Marrow Shards",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mass Calcify",
+          "logical_rule_key": "battle_rule_v1:c5b8e90a9a636d2e294ceec536dbb552"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nature's Ruin",
+          "logical_rule_key": "battle_rule_v1:93e5d43e981967d617ff749da8d3763a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Perish",
+          "logical_rule_key": "battle_rule_v1:93e5d43e981967d617ff749da8d3763a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Plague Wind",
+          "logical_rule_key": "battle_rule_v1:3ef8b793bfc2e71ccd0e0c668b4f9bc1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Planar Cleansing",
+          "logical_rule_key": "battle_rule_v1:d2c7cae85ba2ad9aaba460f82dc8f8c3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rain of Blades",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Retribution of the Meek",
+          "logical_rule_key": "battle_rule_v1:cb6438edc95276afe14d1296d3e4e2fc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ritual of Soot",
+          "logical_rule_key": "battle_rule_v1:5b1499437b3584a0c1ec4364787d223b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ruination",
+          "logical_rule_key": "battle_rule_v1:6a483b71b3aff2704da226cbe3b5cc00"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sandstorm",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shatterstorm",
+          "logical_rule_key": "battle_rule_v1:8f5c34e1b9985fb3a0a991f08cad1cda"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Soulscour",
+          "logical_rule_key": "battle_rule_v1:c8089cf93553cedaafaac6e22bef6d5d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Squall",
+          "logical_rule_key": "battle_rule_v1:33b7a20268069a6b5c3217886dd442b5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Their Name Is Death",
+          "logical_rule_key": "battle_rule_v1:8a67c2abbd7c5b3c2c0ab3f7c2151930"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tsunami",
+          "logical_rule_key": "battle_rule_v1:fa64bbe017b5682bd199bb2efc28f45c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Virtue's Ruin",
+          "logical_rule_key": "battle_rule_v1:dcdd84aebd20d34f865c496ecc5163ed"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Whipflare",
+          "logical_rule_key": "battle_rule_v1:7c37d57cae732dcbed7d6bcfef2ffa8f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 26
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Acid Rain",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:b3830c547b8577a6f6ad0ad66e30165c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Anarchy",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:623a77cbcbdebb2edaaf7c467ece546b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Boil",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:8d5b5b606f30fd2b81f2191c0bb1ffdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Boiling Seas",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:fa64bbe017b5682bd199bb2efc28f45c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Citywide Bust",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:1ec350f21adf9af8db17fdaf0b9710aa"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Flashfires",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:58ec521613d70df5f7b79b6cbc2b32c1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gale Force",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:e6c4dabcea7cf3106bbdd75d3d390abc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Guan Yu's 1,000-Li March",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:706e9c5d6b2103067e78c6b205d27d14"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Marrow Shards",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mass Calcify",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:c5b8e90a9a636d2e294ceec536dbb552"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nature's Ruin",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:93e5d43e981967d617ff749da8d3763a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Perish",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:93e5d43e981967d617ff749da8d3763a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Plague Wind",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:3ef8b793bfc2e71ccd0e0c668b4f9bc1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Planar Cleansing",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:d2c7cae85ba2ad9aaba460f82dc8f8c3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rain of Blades",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Retribution of the Meek",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:cb6438edc95276afe14d1296d3e4e2fc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ritual of Soot",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:5b1499437b3584a0c1ec4364787d223b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ruination",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:6a483b71b3aff2704da226cbe3b5cc00"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sandstorm",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:1e7c958da5d8f24db3fafca06a108975"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shatterstorm",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:8f5c34e1b9985fb3a0a991f08cad1cda"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Soulscour",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:c8089cf93553cedaafaac6e22bef6d5d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Squall",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:33b7a20268069a6b5c3217886dd442b5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Their Name Is Death",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:8a67c2abbd7c5b3c2c0ab3f7c2151930"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tsunami",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:fa64bbe017b5682bd199bb2efc28f45c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Virtue's Ruin",
+          "component_keys": [],
+          "effect": "board_wipe",
+          "logical_rule_key": "battle_rule_v1:dcdd84aebd20d34f865c496ecc5163ed"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Whipflare",
+          "component_keys": [],
+          "effect": "damage_wipe",
+          "logical_rule_key": "battle_rule_v1:7c37d57cae732dcbed7d6bcfef2ffa8f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

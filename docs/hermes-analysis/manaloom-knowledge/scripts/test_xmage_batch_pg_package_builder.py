@@ -514,6 +514,57 @@ def test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields
     assert expected["required_effect_fields"]["xmage_additional_cost_target"] == "creature"
 
 
+def test_manifest_expected_rule_preserves_extended_board_wipe_fields() -> None:
+    proposal = {
+        "normalized_name": "planar cleansing",
+        "card_name": "Planar Cleansing",
+        "oracle_hash": "hash-planar-cleansing",
+        "logical_rule_key": "battle_rule_v1:hash-planar-cleansing",
+        "effect_json": {
+            "effect": "board_wipe",
+            "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+            "destroy_card_types": ["permanent"],
+            "destroy_controller": "opponents_control",
+            "destroy_required_colors": ["W"],
+            "destroy_excluded_colors": ["G"],
+            "destroy_required_subtypes": ["plains"],
+            "destroy_excluded_subtypes": ["aura"],
+            "destroy_exclude_card_types": ["land"],
+            "destroy_tapped_state": "tapped",
+            "destroy_nonbasic_lands": True,
+            "destroy_mana_value_lte": 3,
+            "destroy_power_gte": 4,
+            "destroy_toughness_gte": 4,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["destroy_card_types"] == ["permanent"]
+    assert required["destroy_controller"] == "opponents_control"
+    assert required["destroy_required_colors"] == ["W"]
+    assert required["destroy_excluded_colors"] == ["G"]
+    assert required["destroy_required_subtypes"] == ["plains"]
+    assert required["destroy_excluded_subtypes"] == ["aura"]
+    assert required["destroy_exclude_card_types"] == ["land"]
+    assert required["destroy_tapped_state"] == "tapped"
+    assert required["destroy_nonbasic_lands"] is True
+    assert required["destroy_mana_value_lte"] == 3
+    assert required["destroy_power_gte"] == 4
+    assert required["destroy_toughness_gte"] == 4
+
+    proposal["effect_json"] = {
+        "effect": "damage_wipe",
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "amount": 2,
+        "damage": 2,
+        "damage_scope": "each_nonartifact_creature",
+    }
+    expected = builder.expected_rule_from_proposal(proposal)
+    assert expected["required_effect_fields"]["damage_scope"] == "each_nonartifact_creature"
+
+
 def test_manifest_expected_rule_preserves_dynamic_graveyard_damage_fields() -> None:
     proposal = {
         "normalized_name": "kindle",

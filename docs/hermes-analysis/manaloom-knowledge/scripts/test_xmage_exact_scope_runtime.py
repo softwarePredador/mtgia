@@ -11827,6 +11827,70 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_board_wipe_respects_subtype_color_and_controller_constraints(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.extend(
+            [
+                {"name": "Own Forest", "type_line": "Basic Land - Forest", "basic": True},
+                {"name": "Own Green Bear", "type_line": "Creature - Bear", "colors": ["G"], "toughness": 2},
+            ]
+        )
+        opponent.battlefield.extend(
+            [
+                {"name": "Target Forest", "type_line": "Land - Forest"},
+                {"name": "Target Island", "type_line": "Land - Island"},
+                {"name": "Target Green Elf", "type_line": "Creature - Elf", "colors": ["G"], "toughness": 2},
+                {"name": "Target Red Goblin", "type_line": "Creature - Goblin", "colors": ["R"], "toughness": 1},
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Acid Rain", "type_line": "Sorcery", "oracle_text": "Destroy all Forests."},
+            turn=9,
+            rng=random.Random(9),
+            effect_data_override={
+                "effect": "board_wipe",
+                "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+                "destroy_card_types": ["land"],
+                "destroy_required_subtypes": ["forest"],
+                "destination": "graveyard",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Own Green Bear"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Target Island", "Target Green Elf", "Target Red Goblin"])
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Plague Wind", "type_line": "Sorcery", "oracle_text": "Destroy all creatures you don't control."},
+            turn=10,
+            rng=random.Random(10),
+            effect_data_override={
+                "effect": "board_wipe",
+                "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+                "destroy_card_types": ["creature"],
+                "destroy_controller": "opponents_control",
+                "destroy_required_colors": ["G"],
+                "destination": "graveyard",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Own Green Bear"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Target Island", "Target Red Goblin"])
+        self.assertTrue(
+            any(
+                event == "board_wipe_resolved"
+                and data.get("card") == "Fixture Plague Wind"
+                and data.get("destroy_controller") == "opponents_control"
+                and data.get("destroy_required_colors") == ["G"]
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_wipe_opponent_creatures_scope(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
@@ -11865,6 +11929,67 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 and data.get("card") == "Fixture Volley"
                 and data.get("damage") == 1
                 and data.get("damage_scope") == "each_creature_opponents_control"
+                and data.get("opponent_creatures_destroyed") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_damage_wipe_respects_flying_and_attacking_scopes(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.extend(
+            [
+                {"name": "Own Flier", "type_line": "Creature - Bird", "flying": True, "toughness": 1},
+                {"name": "Own Ground", "type_line": "Creature - Bear", "toughness": 1},
+            ]
+        )
+        opponent.battlefield.extend(
+            [
+                {"name": "Opp Flier", "type_line": "Creature - Bird", "keywords": ["flying"], "toughness": 1},
+                {"name": "Opp Attacker", "type_line": "Creature - Goblin", "attacking": True, "toughness": 1},
+                {"name": "Opp Ground", "type_line": "Creature - Bear", "toughness": 1},
+            ]
+        )
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Gale", "type_line": "Sorcery", "oracle_text": "Fixture Gale deals 1 damage to each creature with flying."},
+            turn=11,
+            rng=random.Random(11),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 1,
+                "damage": 1,
+                "damage_scope": "each_flying_creature",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Own Ground"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opp Attacker", "Opp Ground"])
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Blades", "type_line": "Instant", "oracle_text": "Fixture Blades deals 1 damage to each attacking creature."},
+            turn=12,
+            rng=random.Random(12),
+            effect_data_override={
+                "effect": "damage_wipe",
+                "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+                "amount": 1,
+                "damage": 1,
+                "damage_scope": "each_attacking_creature",
+            },
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Opp Ground"])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Blades"
+                and data.get("damage_scope") == "each_attacking_creature"
                 and data.get("opponent_creatures_destroyed") == 1
                 for event, data in self.events
             )
