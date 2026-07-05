@@ -1,0 +1,144 @@
+{
+  "artifact_type": "lorehold_pressure_safe_cut_pool_resolver",
+  "contract_gate_context": {
+    "contract_blocks_natural_gate": true,
+    "contract_decision_status": "preflight_pass_cut_pool_required",
+    "contract_diagnostic_only": true,
+    "contract_diagnostic_status": "pressure_safe_diagnostic_contract_ready_no_battle",
+    "contract_natural_gate_ready_from_hypothesis_queue": 0,
+    "primary_package_matched_in_hypothesis_queue": 1,
+    "primary_package_missing_from_hypothesis_queue": 3
+  },
+  "contract_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_spell_payoff_contract_20260705_current_relearn.json",
+  "current_champion": "deck_607",
+  "deck_607_mutated": false,
+  "diagnostic_tradeoff_cut_plan": {
+    "blocked_reason_counts": {
+      "commander_never_cut": 1,
+      "cut_is_early_mana_floor_support": 14,
+      "cut_is_miracle_core_big_spell": 25,
+      "cut_is_protection_shell": 14,
+      "diagnostic_lane_excluded:big_spell_value": 2,
+      "diagnostic_lane_excluded:commander": 1,
+      "diagnostic_lane_excluded:draw": 6,
+      "diagnostic_lane_excluded:early_mana": 18,
+      "diagnostic_lane_excluded:graveyard_recursion": 1,
+      "diagnostic_lane_excluded:hand_filter": 1,
+      "diagnostic_lane_excluded:mana_base": 28,
+      "diagnostic_lane_excluded:protection": 13,
+      "diagnostic_status_excluded:blocked_by_cut_safety": 8,
+      "diagnostic_status_excluded:blocked_by_prior_rejection": 24,
+      "diagnostic_status_excluded:measured_high_cut_exposure": 7,
+      "diagnostic_status_excluded:never_cut": 29,
+      "diagnostic_status_excluded:same_lane_only": 2,
+      "diagnostic_status_excluded:structural_dependency": 24,
+      "early_mana_floor_support": 18,
+      "mana_base_never_cut": 28,
+      "manual_review_cut_safety_block": 8,
+      "measured_high_cut_exposure": 34,
+      "miracle_or_finisher_core": 24,
+      "never_cut_lane": 29,
+      "never_cut_or_mana_base": 29,
+      "prior_rejected_cut": 37,
+      "prior_rejected_cut_slot": 24,
+      "prior_rejected_signature": 4,
+      "protected_cut": 22,
+      "protection_shell": 14,
+      "same_lane_only_requires_concrete_same_lane_add": 2,
+      "structural_dependency": 24
+    },
+    "cut_plan_validation": {
+      "named_cut_count": 0,
+      "required_cut_count": 4,
+      "safe": false,
+      "violations": [
+        {
+          "card_name": "",
+          "protected_anchor": "",
+          "violation": "cut_count_must_match_add_count_before_legal_deck_generation"
+        }
+      ]
+    },
+    "eligible_diagnostic_cut_count": 0,
+    "natural_battle_gate_allowed": false,
+    "promotion_eligible": false,
+    "required_cut_count": 4,
+    "selected_cuts": [],
+    "status": "not_available"
+  },
+  "gate_ready_cut_plan": {
+    "blocked_seed_safe_rows": [],
+    "cut_plan_validation": {
+      "named_cut_count": 0,
+      "required_cut_count": 4,
+      "safe": false,
+      "violations": [
+        {
+          "card_name": "",
+          "protected_anchor": "",
+          "violation": "cut_count_must_match_add_count_before_legal_deck_generation"
+        }
+      ]
+    },
+    "ready_cut_count": 0,
+    "required_cut_count": 4,
+    "selected_cuts": [],
+    "status": "not_ready"
+  },
+  "generated_at": "2026-07-05T03:33:27Z",
+  "hard_stop_rules": [
+    {
+      "action": "diagnostic_only_keep_607_protected",
+      "condition": "natural_gate_ready_from_hypothesis_queue == 0",
+      "rule": "no_natural_gate_when_queue_has_zero_ready_candidates"
+    },
+    {
+      "action": "reject_cut_plan_before_variant_generation",
+      "condition": "cut plan contains Molecule Man, Bender's Waterskin, Creative Technique, or another protected anchor",
+      "rule": "protected_anchor_generic_cuts_forbidden"
+    },
+    {
+      "action": "reject_as_prior_reject_retest",
+      "condition": "Storm-Kiln Artist is tested as a generic Arcane Signet or Bender's Waterskin replacement without a new trace hypothesis",
+      "rule": "do_not_repeat_storm_kiln_generic_mana_swap"
+    },
+    {
+      "action": "reject_battle_gate_plan",
+      "condition": "test plan omits Winota or fast-pressure regression checks",
+      "rule": "winota_fast_pressure_floor_required"
+    },
+    {
+      "action": "allow_learning_only_no_promotion_claim",
+      "condition": "pressure cards lack draw, cast, trigger, or use events in the candidate traces",
+      "rule": "card_level_claims_need_direct_events"
+    }
+  ],
+  "method_notes": [
+    "Gate-ready cuts require the seed-safe report to provide four unblocked cut slots.",
+    "Diagnostic tradeoff cuts are not promotion evidence; they require reviewable noncore cut status and cannot use structural dependencies or protected anchors.",
+    "Deck 607 remains unchanged. Any diagnostic deck must be a separate copy and must not be promoted from forced or diagnostic evidence alone.",
+    "If the pressure contract reports zero natural gate-ready hypotheses, this resolver cannot open a natural battle gate."
+  ],
+  "postgres_writes": false,
+  "primary_adds": [
+    "Monastery Mentor",
+    "Young Pyromancer",
+    "Guttersnipe",
+    "Storm-Kiln Artist"
+  ],
+  "seed_safe_cut_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260704_role_tag_repair.json",
+  "source_db_mutated": false,
+  "summary": {
+    "contract_blocks_natural_gate": true,
+    "contract_natural_gate_ready_from_hypothesis_queue": 0,
+    "decision_status": "no_seed_safe_cut_plan_no_diagnostic_tradeoff_current_607",
+    "diagnostic_tradeoff_plan_available": false,
+    "gate_ready_cut_count": 0,
+    "gate_ready_plan_complete": false,
+    "natural_battle_gate_allowed_now": false,
+    "primary_add_count": 4,
+    "promotion_allowed_now": false,
+    "ready_deck_change_count": 0,
+    "recommended_next_action": "build_smaller_pressure_package_or_new_cut_safety_model_before_any_battle"
+  }
+}

@@ -1159,3 +1159,66 @@ Operational lesson:
   matrix. Natural battle remains closed until that preflight changes.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Pressure-Safe Cut-Pool Resolver Relearn - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_cut_pool_resolver_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_cut_pool_resolver_20260705_current_relearn.json`
+
+The cut-pool resolver now consumes the current pressure-safe spell-payoff
+contract. It also tightens diagnostic eligibility: a four-cut diagnostic plan
+cannot use cards marked as structural dependencies, miracle/finisher core,
+protected anchors, prior rejects, high-exposure cards, mana-base cards,
+early-mana floor cards, or protection-shell cards.
+
+Current result:
+
+- decision status: `no_seed_safe_cut_plan_no_diagnostic_tradeoff_current_607`;
+- primary pressure adds considered: `4`;
+- gate-ready cut count: `0`;
+- gate-ready plan complete: `false`;
+- diagnostic tradeoff plan available: `false`;
+- ready deck changes: `0`;
+- promotion allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- contract natural gate-ready rows from hypothesis queue: `0`;
+- contract blocks natural gate: `true`;
+- recommended next action:
+  `build_smaller_pressure_package_or_new_cut_safety_model_before_any_battle`.
+
+Primary pressure adds checked by the resolver:
+
+- `Monastery Mentor`;
+- `Young Pyromancer`;
+- `Guttersnipe`;
+- `Storm-Kiln Artist`.
+
+Why no four-card pressure variant exists now:
+
+- the seed-safe cut report has `0` gate-ready cuts;
+- the previous loose diagnostic-only four-cut plan depended on structurally
+  blocked cards such as miracle/finisher core slots;
+- current blockers include `cut_is_miracle_core_big_spell=25`,
+  `miracle_or_finisher_core=24`, `structural_dependency=24`,
+  `protected_cut=22`, `measured_high_cut_exposure=34`,
+  `prior_rejected_cut=37`, `mana_base_never_cut=28`, and
+  `early_mana_floor_support=18`;
+- therefore a four-card pressure package cannot be turned into a legal
+  promotion candidate or even a clean diagnostic variant under the current
+  protected-`607` contract.
+
+Operational lesson:
+
+- Preflight-ready pressure payoffs are not enough. The add side and cut side
+  must both be valid.
+- The current four-card pressure package is too expensive for the protected
+  `607` shell because it needs four cuts and the current shell has zero
+  safe/reviewable noncore cut slots.
+- The next learning step must be smaller or deeper: either evaluate a one- or
+  two-card pressure package with a new cut-safety model, or build a separate
+  full-shell contract that preserves the `607` mana, topdeck, miracle,
+  protection, and fast-pressure floors before any battle.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.

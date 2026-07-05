@@ -24,12 +24,12 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_CONTRACT = (
-    REPORT_DIR / "lorehold_pressure_safe_spell_payoff_contract_20260704_current.json"
+    REPORT_DIR / "lorehold_pressure_safe_spell_payoff_contract_20260705_current_relearn.json"
 )
 DEFAULT_SEED_SAFE = (
     REPORT_DIR / "lorehold_seed_safe_cut_hypothesis_20260704_role_tag_repair.json"
 )
-DEFAULT_STEM = "lorehold_pressure_safe_cut_pool_resolver_20260704_current"
+DEFAULT_STEM = "lorehold_pressure_safe_cut_pool_resolver_20260705_current_relearn"
 
 HARD_EXCLUDE_LANES = {"commander", "mana_base", "early_mana", "protection"}
 PROMOTION_BLOCKERS = {
@@ -49,11 +49,14 @@ PROMOTION_BLOCKERS = {
 }
 DIAGNOSTIC_EXCLUDE_BLOCKERS = {
     "commander_never_cut",
+    "cut_is_miracle_core_big_spell",
     "cut_is_early_mana_floor_support",
     "cut_is_protection_shell",
     "early_mana_floor_support",
     "mana_base_never_cut",
+    "manual_review_cut_safety_block",
     "measured_high_cut_exposure",
+    "miracle_or_finisher_core",
     "never_cut_lane",
     "never_cut_or_mana_base",
     "prior_rejected_cut",
@@ -61,8 +64,16 @@ DIAGNOSTIC_EXCLUDE_BLOCKERS = {
     "prior_rejected_signature",
     "protected_cut",
     "protection_shell",
+    "same_lane_only_requires_concrete_same_lane_add",
+    "structural_dependency",
 }
 DIAGNOSTIC_ALLOWED_LANES = {"spell_velocity", "wincon", "removal", "contextual", "misc"}
+DIAGNOSTIC_ALLOWED_STATUSES = {
+    "diagnostic_candidate",
+    "reviewable_evidence_gap",
+    "low_exposure_noncore",
+    "flex_review",
+}
 
 
 def utc_now() -> str:
@@ -115,6 +126,13 @@ def diagnostic_cut_blockers(row: Mapping[str, Any]) -> list[str]:
     lane = str(row.get("lane") or "")
     if lane not in DIAGNOSTIC_ALLOWED_LANES:
         reasons.add(f"diagnostic_lane_excluded:{lane}")
+    manual_status = str(row.get("manual_status") or "")
+    status = str(row.get("status") or "")
+    if (
+        manual_status not in DIAGNOSTIC_ALLOWED_STATUSES
+        and status not in DIAGNOSTIC_ALLOWED_STATUSES
+    ):
+        reasons.add(f"diagnostic_status_excluded:{manual_status or status or 'unknown'}")
     return sorted(reasons)
 
 
@@ -182,7 +200,7 @@ def build_diagnostic_tradeoff_plan(
                 "unique_exposure_count": row.get("unique_exposure_count"),
                 "direct_event_count": row.get("direct_event_count"),
                 "diagnostic_reason": (
-                    "Least-blocked non-mana, non-protection pressure tradeoff slot; "
+                    "Reviewable non-mana, non-protection pressure tradeoff slot; "
                     "diagnostic-only because active seed-safe evidence still says blocked."
                 ),
             }
@@ -224,6 +242,13 @@ def build_report(
     )
     gate_ready = gate_plan["status"] == "ready"
     diagnostic_available = diagnostic_plan["status"] == "diagnostic_plan_available"
+    contract_summary = contract_report.get("summary") or {}
+    contract_blocks_natural_gate = bool(
+        contract_summary.get("natural_gate_blocked_by_hypothesis_queue")
+    )
+    natural_gate_ready_from_hypothesis_queue = int(
+        contract_summary.get("natural_gate_ready_from_hypothesis_queue") or 0
+    )
     if gate_ready:
         decision_status = "seed_safe_cut_plan_ready"
         next_action = "generate_legal_pressure_variant_and_structure_matrix"
@@ -231,8 +256,8 @@ def build_report(
         decision_status = "no_seed_safe_cut_plan_diagnostic_only_tradeoff_available"
         next_action = "stage_diagnostic_only_pressure_tradeoff_copy_if_learning_needs_it"
     else:
-        decision_status = "no_viable_cut_plan"
-        next_action = "expand_cut_safety_model_or_try_smaller_package"
+        decision_status = "no_seed_safe_cut_plan_no_diagnostic_tradeoff_current_607"
+        next_action = "build_smaller_pressure_package_or_new_cut_safety_model_before_any_battle"
     return {
         "generated_at": utc_now(),
         "artifact_type": "lorehold_pressure_safe_cut_pool_resolver",
@@ -250,15 +275,33 @@ def build_report(
             "diagnostic_tradeoff_plan_available": diagnostic_available,
             "ready_deck_change_count": 0,
             "natural_battle_gate_allowed_now": False,
+            "promotion_allowed_now": False,
+            "contract_natural_gate_ready_from_hypothesis_queue": natural_gate_ready_from_hypothesis_queue,
+            "contract_blocks_natural_gate": contract_blocks_natural_gate,
             "recommended_next_action": next_action,
         },
         "primary_adds": adds,
+        "contract_gate_context": {
+            "contract_decision_status": contract_summary.get("decision_status") or "",
+            "contract_diagnostic_status": contract_summary.get("diagnostic_contract_status") or "",
+            "contract_diagnostic_only": bool(contract_summary.get("diagnostic_only")),
+            "contract_natural_gate_ready_from_hypothesis_queue": natural_gate_ready_from_hypothesis_queue,
+            "contract_blocks_natural_gate": contract_blocks_natural_gate,
+            "primary_package_missing_from_hypothesis_queue": contract_summary.get(
+                "primary_package_missing_from_hypothesis_queue"
+            ),
+            "primary_package_matched_in_hypothesis_queue": contract_summary.get(
+                "primary_package_matched_in_hypothesis_queue"
+            ),
+        },
         "gate_ready_cut_plan": gate_plan,
         "diagnostic_tradeoff_cut_plan": diagnostic_plan,
+        "hard_stop_rules": contract_report.get("hard_stop_rules") or [],
         "method_notes": [
             "Gate-ready cuts require the seed-safe report to provide four unblocked cut slots.",
-            "Diagnostic tradeoff cuts are not promotion evidence; they are only a way to learn how much pressure payoffs cost the miracle shell.",
+            "Diagnostic tradeoff cuts are not promotion evidence; they require reviewable noncore cut status and cannot use structural dependencies or protected anchors.",
             "Deck 607 remains unchanged. Any diagnostic deck must be a separate copy and must not be promoted from forced or diagnostic evidence alone.",
+            "If the pressure contract reports zero natural gate-ready hypotheses, this resolver cannot open a natural battle gate.",
         ],
     }
 
@@ -279,6 +322,8 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Gate-ready plan complete: `{str(summary['gate_ready_plan_complete']).lower()}`",
         f"- Diagnostic tradeoff plan available: `{str(summary['diagnostic_tradeoff_plan_available']).lower()}`",
         f"- Natural battle gate allowed now: `{str(summary['natural_battle_gate_allowed_now']).lower()}`",
+        f"- Contract natural gate-ready from hypothesis queue: `{summary['contract_natural_gate_ready_from_hypothesis_queue']}`",
+        f"- Contract blocks natural gate: `{str(summary['contract_blocks_natural_gate']).lower()}`",
         f"- Recommended next action: `{summary['recommended_next_action']}`",
         "",
         "## Primary Adds",
@@ -313,6 +358,22 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
     lines.append(
         f"`{json.dumps(diagnostic.get('blocked_reason_counts') or {}, sort_keys=True)}`"
     )
+    lines.extend(["", "## Contract Gate Context", ""])
+    lines.append(
+        f"`{json.dumps(payload.get('contract_gate_context') or {}, sort_keys=True)}`"
+    )
+    lines.extend(["", "## Hard Stop Rules", ""])
+    if not payload.get("hard_stop_rules"):
+        lines.append("- None loaded.")
+    else:
+        for item in payload.get("hard_stop_rules") or []:
+            lines.append(
+                "- `{rule}`: if {condition}, {action}.".format(
+                    rule=item.get("rule") or "",
+                    condition=item.get("condition") or "",
+                    action=item.get("action") or "",
+                )
+            )
     lines.extend(["", "## Method Notes", ""])
     for note in payload.get("method_notes") or []:
         lines.append(f"- {note}")
