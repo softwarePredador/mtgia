@@ -31,6 +31,13 @@ def materializer_payload(add: str, cut: str, *, source_clean: bool = True) -> di
     }
 
 
+def chained_materializer_payload(add: str, cut: str) -> dict[str, object]:
+    payload = materializer_payload(add, cut, source_clean=True)
+    payload["summary"]["source_matches_pair_report"] = False
+    payload["source_pair_guard"] = {"allow_chained_source": True}
+    return payload
+
+
 def stage_materializer_payload() -> dict[str, object]:
     payload = materializer_payload("Arena of Glory", "Archaeomancer's Map")
     payload["candidate_db"] = "stage1_candidate.db"
@@ -151,6 +158,28 @@ class GlobalCommanderCandidatePackageChainAuditTests(unittest.TestCase):
         self.assertEqual(report["summary"]["package_adds"], ["Arena of Glory", "Despark"])
         self.assertEqual(report["summary"]["package_cuts"], ["Archaeomancer's Map", "Smuggler's Share"])
         self.assertEqual(report["summary"]["final_candidate_db"], "stage1_candidate.db")
+
+    def test_explicit_chained_source_can_pass_when_source_is_unchanged(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        materializers = [
+            self._write(root, "step1.json", materializer_payload("Path to Exile", "Old Engine")),
+            self._write(root, "step2.json", chained_materializer_payload("Goldspan Dragon", "Old Ritual")),
+        ]
+        core = self._write(root, "core.json", core_payload(repaired=True))
+        strategy = self._write(root, "strategy.json", strategy_payload())
+
+        report = audit.build_report(
+            materializer_reports=materializers,
+            final_core_report=core,
+            final_strategy_report=strategy,
+        )
+
+        self.assertEqual(report["status"], "pass")
+        self.assertTrue(report["summary"]["materializer_chain_pass"])
+        self.assertTrue(report["materializer_steps"][1]["allow_chained_source"])
+        self.assertTrue(report["materializer_steps"][1]["source_reference_accepted"])
 
 
 if __name__ == "__main__":

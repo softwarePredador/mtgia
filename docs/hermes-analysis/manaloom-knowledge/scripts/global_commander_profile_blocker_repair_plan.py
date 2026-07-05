@@ -79,6 +79,38 @@ ROLE_SOURCE_LANES = {
     ],
 }
 
+CORE_ROLE_MINIMUMS = {
+    "land": 34,
+    "ramp": 8,
+    "draw": 8,
+    "removal": 6,
+    "board_wipe": 2,
+    "protection": 3,
+    "recursion": 1,
+    "wincon": 3,
+    "engine": 4,
+}
+
+CORE_ROLE_REPAIR_SOURCE_LANES = {
+    "removal": ROLE_SOURCE_LANES["spot_interaction"],
+    "land": ROLE_SOURCE_LANES["lands"],
+    "draw": ROLE_SOURCE_LANES["card_draw_selection"],
+    "board_wipe": ROLE_SOURCE_LANES["board_wipes_resets"],
+    "protection": ROLE_SOURCE_LANES["haste_protection_silence"],
+    "recursion": ROLE_SOURCE_LANES["reanimation_plan_b"],
+    "wincon": ROLE_SOURCE_LANES["dedicated_win_conditions"],
+}
+
+CORE_ROLE_TO_PACKAGE_ROLE = {
+    "removal": "spot_interaction",
+    "land": "lands",
+    "draw": "card_draw_selection",
+    "board_wipe": "board_wipes_resets",
+    "protection": "haste_protection_silence",
+    "recursion": "reanimation_plan_b",
+    "wincon": "dedicated_win_conditions",
+}
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -94,6 +126,22 @@ def rel(path: Path) -> str:
 def load_json(path: Path) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     return payload if isinstance(payload, dict) else {}
+
+
+def repo_path(path: str | Path) -> Path:
+    candidate = Path(path)
+    return candidate if candidate.is_absolute() else REPO_ROOT / candidate
+
+
+def package_chain_payload(strategy_matrix: Mapping[str, Any]) -> dict[str, Any]:
+    input_artifacts = strategy_matrix.get("input_artifacts") or {}
+    package_chain_report = input_artifacts.get("package_chain_report")
+    if not package_chain_report:
+        return {}
+    path = repo_path(str(package_chain_report))
+    if not path.exists():
+        return {}
+    return load_json(path)
 
 
 def target_by_role(strategy_matrix: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
@@ -187,9 +235,50 @@ def missing_expected_cards_for_package(strategy_matrix: Mapping[str, Any], packa
     return [str(card) for card in payload.get("missing_cards") or []]
 
 
+def package_core_floor_repair_actions(
+    strategy_matrix: Mapping[str, Any],
+    package_chain: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    summary = package_chain.get("summary") or {}
+    role_counts = summary.get("final_role_counts") or {}
+    role_statuses = summary.get("final_role_statuses") or {}
+    actions = []
+    for role, status in sorted(role_statuses.items()):
+        if status != "below_floor":
+            continue
+        count = int(role_counts.get(role) or 0)
+        target_min = int(CORE_ROLE_MINIMUMS.get(str(role), 0))
+        package_role = CORE_ROLE_TO_PACKAGE_ROLE.get(str(role), str(role))
+        actions.append(
+            {
+                "blocker": "package_core_floor_not_repaired",
+                "repair_axis": f"core_{role}_floor",
+                "core_role": role,
+                "candidate_count": count,
+                "target_min": target_min,
+                "target_max": "-",
+                "shortfall_to_min": max(0, target_min - count),
+                "source_lanes": CORE_ROLE_REPAIR_SOURCE_LANES.get(
+                    str(role),
+                    ["manual_core_floor_source_lane_review"],
+                ),
+                "missing_expected_package_cards": missing_expected_cards(strategy_matrix, package_role),
+                "battle_policy": "repair core role floor and rerun package strategy matrix before any equal battle probe",
+                "cut_policy": "use same-lane or proven excess cuts only; do not cut hard-floor, attack-window, or source-anchor cards",
+            }
+        )
+    return actions
+
+
 def repair_sequence(actions: list[dict[str, Any]]) -> list[str]:
     blockers = {str(action.get("blocker")) for action in actions}
     sequence = []
+    if any(
+        action.get("blocker") == "package_core_floor_not_repaired"
+        and action.get("repair_axis") == "core_removal_floor"
+        for action in actions
+    ):
+        sequence.append("repair_core_removal_floor_with_spot_interaction_source_lane")
     if "attack_window_cut_without_replacement" in blockers:
         sequence.append("repair_or_restore_commander_attack_window_before_more_interaction")
     if "profile_lands_below_target" in blockers:
@@ -204,6 +293,7 @@ def repair_sequence(actions: list[dict[str, Any]]) -> list[str]:
         if str(action.get("blocker"))
         not in {
             "attack_window_cut_without_replacement",
+            "package_core_floor_not_repaired",
             "profile_lands_below_target",
             "profile_angels_demons_dragons_payoffs_below_target",
             "profile_spot_interaction_below_target",
@@ -219,6 +309,7 @@ def repair_sequence(actions: list[dict[str, Any]]) -> list[str]:
 
 def build_report(*, strategy_matrix_report: Path) -> dict[str, Any]:
     strategy_matrix = load_json(strategy_matrix_report)
+    package_chain = package_chain_payload(strategy_matrix)
     blockers = [str(blocker) for blocker in strategy_matrix.get("blocker_reasons") or []]
     targets = target_by_role(strategy_matrix)
     actions: list[dict[str, Any]] = []
@@ -240,6 +331,20 @@ def build_report(*, strategy_matrix_report: Path) -> dict[str, Any]:
                 )
         elif blocker == "attack_window_cut_without_replacement":
             actions.append(attack_window_repair_action(strategy_matrix))
+        elif blocker == "package_core_floor_not_repaired":
+            core_actions = package_core_floor_repair_actions(strategy_matrix, package_chain)
+            if core_actions:
+                actions.extend(core_actions)
+            else:
+                actions.append(
+                    {
+                        "blocker": blocker,
+                        "repair_axis": "unclassified_core_floor_blocker",
+                        "source_lanes": ["manual_core_floor_source_lane_review"],
+                        "battle_policy": "resolve core floor blocker before battle",
+                        "cut_policy": "do not promote or battle unclassified core-floor blockers",
+                    }
+                )
         else:
             actions.append(
                 {

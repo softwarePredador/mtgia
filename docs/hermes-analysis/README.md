@@ -424,6 +424,33 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `profile_angels_demons_dragons_payoffs_below_target` e
     `profile_spot_interaction_below_target`. Proximo gate:
     `repair_commander_profile_blockers_before_battle`.
+    A sequencia de reparo encadeada aplicou mais dois stages em copias
+    isoladas:
+    `master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_stage1.md`
+    e
+    `master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_stage2.md`.
+    O segundo stage usa `allow_chained_source=true`; isso so e aceito porque a
+    fonte permaneceu imutavel e a promocao continuou fechada. A cadeia
+    consolidada em
+    `master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+    ficou `pass`, com `core_floor_repaired=true`, `final_core_status=core_review_ready`,
+    `removal=8`, `land=35` e `ramp=16`. Mesmo assim, a matriz especifica
+    `master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+    bloqueia batalha por `profile_angels_demons_dragons_payoffs_below_target`
+    e `profile_reanimation_plan_b_below_target`.
+    Aprendizado aplicado: `package_core_floor_not_repaired` precisa virar eixo
+    concreto (`core_removal_floor` -> `spot_interaction`), `reanimation_plan_b`
+    precisa entrar no candidate model/synthesizer, `Birgi` fica bloqueado por
+    feedback global de batalha, e staples estruturais como `Demonic Tutor`,
+    `Vampiric Tutor`, `Enlightened Tutor`, `Smothering Tithe`, `Mana Vault`,
+    `Arcane Signet` e `Sol Ring` nao podem ser cortes automaticos. Com essas
+    protecoes, o pacote final em
+    `master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+    fica corretamente bloqueado: `7` reparos, `6` cuts seguros, `Necromancy`
+    sem par. O cut expander
+    `master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+    confirma `value_safe_cut_shortfall:required_7_ready_1`. Proximo gate:
+    `backfill_value_safe_cuts_or_reduce_package_scope`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

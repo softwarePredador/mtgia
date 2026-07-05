@@ -66,6 +66,44 @@ class GlobalCommanderProfileBlockerRepairPlanTests(unittest.TestCase):
         path.write_text(json.dumps(payload), encoding="utf-8")
         return path
 
+    def test_core_floor_blocker_maps_to_specific_role_from_package_chain(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        chain = root / "chain.json"
+        chain.write_text(
+            json.dumps(
+                {
+                    "summary": {
+                        "final_role_counts": {"removal": 3, "draw": 10},
+                        "final_role_statuses": {"removal": "below_floor", "draw": "in_range"},
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        payload = matrix_payload(blockers=["package_core_floor_not_repaired"])
+        payload["input_artifacts"] = {"package_chain_report": str(chain)}
+        matrix = root / "matrix.json"
+        matrix.write_text(json.dumps(payload), encoding="utf-8")
+
+        report = repair.build_report(strategy_matrix_report=matrix)
+
+        self.assertEqual(report["status"], "profile_blocker_repair_plan_ready")
+        self.assertEqual(report["summary"]["repair_action_count"], 1)
+        action = report["repair_actions"][0]
+        self.assertEqual(action["blocker"], "package_core_floor_not_repaired")
+        self.assertEqual(action["repair_axis"], "core_removal_floor")
+        self.assertEqual(action["candidate_count"], 3)
+        self.assertEqual(action["target_min"], 6)
+        self.assertEqual(action["shortfall_to_min"], 3)
+        self.assertIn("oracle_targeted_interaction_filter", action["source_lanes"])
+        self.assertIn("Anguished Unmaking", action["missing_expected_package_cards"])
+        self.assertIn(
+            "repair_core_removal_floor_with_spot_interaction_source_lane",
+            report["recommended_repair_sequence"],
+        )
+
     def test_blocks_battle_and_maps_profile_and_attack_window_repairs(self) -> None:
         path = self._report_path(
             matrix_payload(

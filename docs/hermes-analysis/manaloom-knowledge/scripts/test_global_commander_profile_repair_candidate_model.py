@@ -28,6 +28,9 @@ def strategy_payload(*, blockers: list[str]) -> dict[str, object]:
             "commander_attack_enablers": {
                 "missing_cards": ["Arena of Glory"],
             },
+            "reanimation_plan_b": {
+                "missing_cards": ["Reanimate"],
+            },
         },
         "package_delta": [
             {
@@ -66,10 +69,26 @@ def repair_payload(*, add_payoff_shortfall: int = 18, axes: list[str] | None = N
             "target_max": 12,
             "shortfall_to_min": 1,
         },
+        "core_removal_floor": {
+            "blocker": "package_core_floor_not_repaired",
+            "repair_axis": "core_removal_floor",
+            "candidate_count": 3,
+            "target_min": 6,
+            "target_max": "-",
+            "shortfall_to_min": 3,
+        },
         "commander_attack_window": {
             "blocker": "attack_window_cut_without_replacement",
             "repair_axis": "commander_attack_window",
             "shortfall_to_min": 0,
+        },
+        "reanimation_plan_b": {
+            "blocker": "profile_reanimation_plan_b_below_target",
+            "repair_axis": "reanimation_plan_b",
+            "candidate_count": 2,
+            "target_min": 3,
+            "target_max": 6,
+            "shortfall_to_min": 1,
         },
     }
     return {
@@ -143,6 +162,30 @@ class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
                 0,
                 "vamp",
             ),
+            (
+                "619",
+                "Scheming Symmetry",
+                1,
+                "",
+                "[]",
+                "Sorcery",
+                "Search your library for a card, then shuffle and put that card on top.",
+                1,
+                0,
+                "scheming",
+            ),
+            (
+                "619",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                1,
+                "",
+                "[]",
+                "Legendary Creature - God",
+                "Whenever you cast a spell, add {R}.",
+                3,
+                0,
+                "birgi",
+            ),
         ]
         conn.executemany("INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", deck_rows)
         oracle_rows = [
@@ -207,9 +250,21 @@ class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
                 "",
                 "vamp",
             ),
+            (
+                "Reanimate",
+                "reanimate",
+                "{B}",
+                '["B"]',
+                '["B"]',
+                "Sorcery",
+                "Put target creature card from a graveyard onto the battlefield under your control. You lose life equal to its mana value.",
+                1,
+                "",
+                "reanimate",
+            ),
         ]
         conn.executemany("INSERT INTO card_oracle_cache VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", oracle_rows)
-        for name in ["City of Brass", "Arena of Glory", "Ancient Copper Dragon", "Despark", "Vampiric Tutor"]:
+        for name in ["City of Brass", "Arena of Glory", "Ancient Copper Dragon", "Despark", "Vampiric Tutor", "Reanimate"]:
             conn.execute("INSERT INTO card_legalities VALUES (?, 'commander', 'legal')", (name,))
         conn.commit()
         conn.close()
@@ -251,7 +306,9 @@ class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
         self.assertEqual(attack_pool["top_add_candidates"][0]["card_name"], "Arena of Glory")
         self.assertIn("lands", attack_pool["top_add_candidates"][0]["profile_roles"])
         cut_names = {row["card_name"] for row in report["global_cut_review_pool"]}
-        self.assertIn("Vampiric Tutor", cut_names)
+        self.assertIn("Scheming Symmetry", cut_names)
+        blocked_names = {row["card_name"] for row in report["blocked_cut_review_pool"]}
+        self.assertIn("Vampiric Tutor", blocked_names)
 
     def test_all_axes_ready_can_open_candidate_copy_gate_without_battle(self) -> None:
         tmp = tempfile.TemporaryDirectory()
@@ -276,6 +333,85 @@ class GlobalCommanderProfileRepairCandidateModelTests(unittest.TestCase):
         self.assertFalse(report["battle_gate_allowed_now"])
         spot_pool = report["repair_axis_pools"][0]
         self.assertEqual(spot_pool["top_add_candidates"][0]["card_name"], "Despark")
+
+    def test_core_removal_floor_uses_spot_interaction_source_lane(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        db = self._db(root)
+        strategy = self._json(
+            root,
+            "strategy.json",
+            strategy_payload(blockers=["package_core_floor_not_repaired"]),
+        )
+        repair = self._json(
+            root,
+            "repair.json",
+            repair_payload(axes=["core_removal_floor"]),
+        )
+
+        report = model.build_report(repair_plan_report=repair, strategy_report=strategy, sqlite_db=db)
+
+        self.assertEqual(report["status"], "profile_repair_candidate_model_ready_for_candidate_copy")
+        self.assertTrue(report["candidate_copy_allowed_now"])
+        pool = report["repair_axis_pools"][0]
+        self.assertEqual(pool["repair_axis"], "core_removal_floor")
+        self.assertEqual(pool["candidate_source_axis"], "spot_interaction")
+        self.assertEqual(pool["top_add_candidates"][0]["card_name"], "Despark")
+
+    def test_reanimation_plan_b_uses_expected_package_source_lane(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        db = self._db(root)
+        strategy = self._json(
+            root,
+            "strategy.json",
+            strategy_payload(blockers=["profile_reanimation_plan_b_below_target"]),
+        )
+        repair = self._json(
+            root,
+            "repair.json",
+            repair_payload(axes=["reanimation_plan_b"]),
+        )
+
+        report = model.build_report(repair_plan_report=repair, strategy_report=strategy, sqlite_db=db)
+
+        self.assertEqual(report["status"], "profile_repair_candidate_model_ready_for_candidate_copy")
+        pool = report["repair_axis_pools"][0]
+        self.assertEqual(pool["repair_axis"], "reanimation_plan_b")
+        self.assertEqual(pool["top_add_candidates"][0]["card_name"], "Reanimate")
+        self.assertIn("reanimation_plan_b", pool["top_add_candidates"][0]["profile_roles"])
+
+    def test_global_feedback_cut_stays_blocked_in_profile_repair_pool(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        db = self._db(root)
+        strategy = self._json(
+            root,
+            "strategy.json",
+            strategy_payload(blockers=["profile_spot_interaction_below_target"]),
+        )
+        repair_payload_with_mana_pressure = repair_payload(axes=["spot_interaction"])
+        repair_payload_with_mana_pressure["over_target_review_roles"] = [
+            {"role": "mana_acceleration", "candidate_count": 16, "max": 14}
+        ]
+        repair = self._json(root, "repair.json", repair_payload_with_mana_pressure)
+
+        report = model.build_report(repair_plan_report=repair, strategy_report=strategy, sqlite_db=db)
+
+        cut_names = {row["card_name"] for row in report["global_cut_review_pool"]}
+        blocked = {
+            row["card_name"]: row["block_reasons"]
+            for row in report["blocked_cut_review_pool"]
+        }
+        self.assertNotIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", cut_names)
+        self.assertIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", blocked)
+        self.assertIn(
+            "global_battle_feedback_requires_new_same_lane_or_gate",
+            blocked["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+        )
 
 
 if __name__ == "__main__":

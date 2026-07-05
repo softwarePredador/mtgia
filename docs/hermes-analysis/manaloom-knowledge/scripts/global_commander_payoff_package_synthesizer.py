@@ -36,7 +36,8 @@ PAYOFF_AXIS = "angels_demons_dragons_payoffs"
 ATTACK_AXIS = "commander_attack_window"
 LAND_AXIS = "lands"
 SPOT_AXIS = "spot_interaction"
-AXIS_ORDER = (ATTACK_AXIS, LAND_AXIS, SPOT_AXIS, PAYOFF_AXIS)
+REANIMATION_AXIS = "reanimation_plan_b"
+AXIS_ORDER = (ATTACK_AXIS, LAND_AXIS, SPOT_AXIS, PAYOFF_AXIS, REANIMATION_AXIS)
 READY_ADD_STATUSES = {
     "review_only_profile_repair_add_candidate",
     "review_only_named_land_candidate",
@@ -116,7 +117,7 @@ def ready_cut_candidates(profile_payload: Mapping[str, Any]) -> list[dict[str, A
 
 def initial_requirements(profile_payload: Mapping[str, Any]) -> dict[str, int]:
     requirements = {axis: 0 for axis in AXIS_ORDER}
-    for axis in (LAND_AXIS, SPOT_AXIS, PAYOFF_AXIS):
+    for axis in (LAND_AXIS, SPOT_AXIS, PAYOFF_AXIS, REANIMATION_AXIS):
         pool = axis_pool(profile_payload, axis)
         requirements[axis] = max(0, int(pool.get("shortfall_to_min") or 0))
     attack_pool = axis_pool(profile_payload, ATTACK_AXIS)
@@ -140,12 +141,20 @@ def covered_axes(*, row: Mapping[str, Any], selected_axis: str, remaining: Mappi
         covered.append(SPOT_AXIS)
     if PAYOFF_AXIS in roles and int(remaining.get(PAYOFF_AXIS) or 0) > 0:
         covered.append(PAYOFF_AXIS)
+    if REANIMATION_AXIS in roles and int(remaining.get(REANIMATION_AXIS) or 0) > 0:
+        covered.append(REANIMATION_AXIS)
     if selected_axis == LAND_AXIS and int(remaining.get(LAND_AXIS) or 0) > 0 and LAND_AXIS not in covered:
         covered.append(LAND_AXIS)
     if selected_axis == SPOT_AXIS and int(remaining.get(SPOT_AXIS) or 0) > 0 and SPOT_AXIS not in covered:
         covered.append(SPOT_AXIS)
     if selected_axis == PAYOFF_AXIS and int(remaining.get(PAYOFF_AXIS) or 0) > 0 and PAYOFF_AXIS not in covered:
         covered.append(PAYOFF_AXIS)
+    if (
+        selected_axis == REANIMATION_AXIS
+        and int(remaining.get(REANIMATION_AXIS) or 0) > 0
+        and REANIMATION_AXIS not in covered
+    ):
+        covered.append(REANIMATION_AXIS)
     return covered
 
 
@@ -163,6 +172,7 @@ def select_add_package(
         LAND_AXIS: axis_candidates(profile_payload, LAND_AXIS),
         SPOT_AXIS: axis_candidates(profile_payload, SPOT_AXIS),
         PAYOFF_AXIS: payoff_candidates(payoff_payload),
+        REANIMATION_AXIS: axis_candidates(profile_payload, REANIMATION_AXIS),
     }
     for axis in AXIS_ORDER:
         while remaining.get(axis, 0) > 0:

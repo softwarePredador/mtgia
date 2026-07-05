@@ -50,6 +50,10 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def materializer_steps(path: Path, payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     summary = payload.get("summary") or {}
+    source_pair_guard = payload.get("source_pair_guard") or {}
+    source_matches_pair_report = bool(summary.get("source_matches_pair_report"))
+    allow_chained_source = bool(source_pair_guard.get("allow_chained_source"))
+    source_reference_accepted = source_matches_pair_report or allow_chained_source
     model_pairs = payload.get("model_pairs") or []
     if not isinstance(model_pairs, list) or not model_pairs:
         model_pairs = [
@@ -75,7 +79,9 @@ def materializer_steps(path: Path, payload: Mapping[str, Any]) -> list[dict[str,
                 "role": pair.get("role") or summary.get("role"),
                 "candidate_db": payload.get("candidate_db"),
                 "source_unchanged": bool(summary.get("source_unchanged")),
-                "source_matches_pair_report": bool(summary.get("source_matches_pair_report")),
+                "source_matches_pair_report": source_matches_pair_report,
+                "allow_chained_source": allow_chained_source,
+                "source_reference_accepted": source_reference_accepted,
                 "source_candidate_hash_differs": bool(summary.get("source_candidate_hash_differs")),
                 "allow_next_strategy_matrix": bool(summary.get("allow_next_strategy_matrix")),
                 "allow_battle_gate_now": bool(summary.get("allow_battle_gate_now")),
@@ -127,7 +133,7 @@ def build_report(
     chain_pass = all(
         str(step.get("status") or "").startswith("candidate_materialized_structure_ready")
         and step.get("source_unchanged")
-        and step.get("source_matches_pair_report")
+        and step.get("source_reference_accepted")
         and not step.get("promotion_allowed")
         for step in steps
     )

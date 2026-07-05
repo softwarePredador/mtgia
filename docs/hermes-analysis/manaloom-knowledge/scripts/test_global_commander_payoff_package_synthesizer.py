@@ -85,6 +85,14 @@ def profile_payload(*, payoff_shortfall: int, spot_shortfall: int, cuts: int) ->
                     add("Swiftfoot Boots", synthesizer.ATTACK_AXIS, ["haste_protection_silence"], 120),
                 ],
             },
+            {
+                "repair_axis": synthesizer.REANIMATION_AXIS,
+                "blocker": "profile_reanimation_plan_b_below_target",
+                "shortfall_to_min": 0,
+                "top_add_candidates": [
+                    add("Reanimate", synthesizer.REANIMATION_AXIS, ["reanimation_plan_b"], 125),
+                ],
+            },
         ],
         "global_cut_review_pool": [cut(f"Cut {index}", score=60 - index) for index in range(cuts)],
     }
@@ -154,6 +162,31 @@ class GlobalCommanderPayoffPackageSynthesizerTests(unittest.TestCase):
         self.assertEqual(report["summary"]["selected_cut_count"], 3)
         self.assertEqual(report["candidate_copy_blockers"], [])
         self.assertEqual(report["summary"]["next_gate"], "materialize_synthesized_commander_package_chain_copy")
+
+    def test_reanimation_shortfall_is_selected_before_candidate_copy_ready(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        profile_payload_with_reanimation = profile_payload(payoff_shortfall=1, spot_shortfall=0, cuts=2)
+        for pool in profile_payload_with_reanimation["repair_axis_pools"]:
+            if pool["repair_axis"] == synthesizer.LAND_AXIS:
+                pool["shortfall_to_min"] = 0
+            if pool["repair_axis"] == synthesizer.ATTACK_AXIS:
+                pool["blocker"] = "no_attack_window_blocker"
+            if pool["repair_axis"] == synthesizer.REANIMATION_AXIS:
+                pool["shortfall_to_min"] = 1
+        profile = self._json(root, "profile.json", profile_payload_with_reanimation)
+        payoffs = self._json(root, "payoffs.json", payoff_payload(1))
+
+        report = synthesizer.build_report(
+            repair_candidate_model_report=profile,
+            payoff_source_lane_report=payoffs,
+        )
+
+        self.assertEqual(report["status"], "commander_payoff_package_synthesis_ready_for_candidate_copy")
+        self.assertEqual(report["summary"]["initial_axis_requirements"][synthesizer.REANIMATION_AXIS], 1)
+        selected_names = [row["card_name"] for row in report["selected_add_package"]]
+        self.assertIn("Reanimate", selected_names)
 
 
 if __name__ == "__main__":

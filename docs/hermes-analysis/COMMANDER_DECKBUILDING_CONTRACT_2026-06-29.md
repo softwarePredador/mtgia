@@ -500,6 +500,38 @@ Current external refresh on 2026-07-05:
   `profile_angels_demons_dragons_payoffs_below_target`, and
   `profile_spot_interaction_below_target`. The next gate is
   `repair_commander_profile_blockers_before_battle`, not battle or promotion.
+- Follow-up value-safe repair chaining kept the same copied-DB boundary. The
+  reports
+  `global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_stage1.md`
+  and
+  `global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+  add another `12` paired swaps on top of the stage 1 candidate. The second
+  chained copy uses explicit `allow_chained_source=true`; the chain audit must
+  treat that as accepted source lineage only when the source hash stays
+  unchanged and promotion remains closed. The consolidated chain report
+  `global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+  reaches `core_floor_repaired=true`, `final_core_status=core_review_ready`,
+  `removal=8`, `lands=35`, and `ramp=16`, but the commander-specific matrix
+  `global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+  still blocks battle on `profile_angels_demons_dragons_payoffs_below_target`
+  and `profile_reanimation_plan_b_below_target`.
+- Current learning from the repair loop: `package_core_floor_not_repaired` must
+  be resolved through the exact failed core role, currently
+  `core_removal_floor` mapped to the `spot_interaction` source lane; the
+  candidate model must also support `reanimation_plan_b`. Global battle
+  feedback keeps `Birgi, God of Storytelling // Harnfel, Horn of Bounty` out of
+  automatic profile-repair cuts, and structural staples such as `Demonic
+  Tutor`, `Vampiric Tutor`, `Enlightened Tutor`, `Smothering Tithe`, `Mana
+  Vault`, `Arcane Signet`, and `Sol Ring` stay protected unless a same-lane or
+  battle-backed gate explicitly clears them. After these protections, the
+  final repair package in
+  `global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+  is correctly blocked: it needs `7` repairs including `Necromancy`, has only
+  `6` safe reviewed cuts, and the expanded cut lane
+  `global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+  reports `value_safe_cut_shortfall:required_7_ready_1`. The next gate is
+  `backfill_value_safe_cuts_or_reduce_package_scope`; battle and promotion stay
+  closed.
 
 ## Global Commander Rollout - 2026-07-01
 

@@ -42,12 +42,32 @@ ROLE_TO_EXPECTED_PACKAGE = {
     "spot_interaction": "interaction_and_resets",
     "commander_attack_window": "commander_attack_enablers",
     "haste_protection_silence": "commander_attack_enablers",
+    "reanimation_plan_b": "reanimation_plan_b",
+}
+AXIS_SOURCE_ALIASES = {
+    "core_removal_floor": "spot_interaction",
+}
+GLOBAL_FEEDBACK_STAGE_ONLY_CUTS = {
+    normalize_name("Birgi, God of Storytelling // Harnfel, Horn of Bounty"),
+}
+STRUCTURAL_STAPLE_PROTECTED_CUTS = {
+    normalize_name(card)
+    for card in (
+        "Demonic Tutor",
+        "Vampiric Tutor",
+        "Enlightened Tutor",
+        "Smothering Tithe",
+        "Mana Vault",
+        "Arcane Signet",
+        "Sol Ring",
+    )
 }
 BLOCKED_HARD_ROLES = {
     "lands",
     "angels_demons_dragons_payoffs",
     "spot_interaction",
     "haste_protection_silence",
+    "reanimation_plan_b",
 }
 
 
@@ -217,6 +237,19 @@ def candidate_score(axis: str, card_name: str, oracle: Mapping[str, Any], roles:
         if "indestructible" in body or "protection" in body:
             score += 8
             reasons.append("protects_attack_window")
+    elif axis == "reanimation_plan_b":
+        if "reanimation_plan_b" in roles:
+            score += 35
+            reasons.append("role_confirms_reanimation_plan_b")
+        if cmc <= 3:
+            score += 10
+            reasons.append("cheap_reanimation")
+        if "from your graveyard" in body or "from a graveyard" in body:
+            score += 8
+            reasons.append("graveyard_to_battlefield_text")
+        if "return target creature card" in body:
+            score += 6
+            reasons.append("targeted_creature_reanimation")
     elif axis == "lands":
         if "land" in str(oracle.get("type_line") or "").lower():
             score += 30
@@ -261,6 +294,8 @@ def build_card_candidates(
             "haste_protection_silence" in roles or strategy_matrix.is_attack_window_card(role_row)
         ):
             status = "blocked_not_attack_window_role"
+        elif axis == "reanimation_plan_b" and "reanimation_plan_b" not in roles:
+            status = "blocked_not_reanimation_plan_b_role"
         else:
             status = "review_only_profile_repair_add_candidate"
         score, reasons = candidate_score(axis, card_name, oracle, roles, source)
@@ -369,6 +404,10 @@ def cut_review_candidates(
         core, source = core_roles.card_roles(row)
         risk_flags = strategy_matrix.cut_risk(row)
         blockers: list[str] = []
+        if normalize_name(card_name) in GLOBAL_FEEDBACK_STAGE_ONLY_CUTS:
+            blockers.append("global_battle_feedback_requires_new_same_lane_or_gate")
+        if normalize_name(card_name) in STRUCTURAL_STAPLE_PROTECTED_CUTS:
+            blockers.append("structural_foundation_staple_requires_same_lane_or_battle_proof")
         if roles & BLOCKED_HARD_ROLES:
             blockers.extend(f"carries_blocked_role_{role}" for role in sorted(roles & BLOCKED_HARD_ROLES))
         if "attack_window_or_extra_combat_cut" in risk_flags:
@@ -433,8 +472,9 @@ def build_axis_pool(
     limit: int,
 ) -> dict[str, Any]:
     axis = str(action.get("repair_axis") or "")
+    source_axis = AXIS_SOURCE_ALIASES.get(axis, axis)
     blocker = str(action.get("blocker") or "")
-    if axis == "lands":
+    if source_axis == "lands":
         adds = land_candidates_for_action(
             conn=conn,
             deck_id=deck_id,
@@ -443,10 +483,10 @@ def build_axis_pool(
             legalities=legalities,
             limit=limit,
         )
-    elif axis == "commander_attack_window":
+    elif source_axis == "commander_attack_window":
         restore = build_card_candidates(
             conn=conn,
-            axis=axis,
+            axis=source_axis,
             card_names=attack_restore_candidates(strategy_payload),
             source="restore_previous_attack_window_cut",
             existing_names=existing_names,
@@ -456,8 +496,8 @@ def build_axis_pool(
         )
         expected = build_card_candidates(
             conn=conn,
-            axis=axis,
-            card_names=expected_missing_cards(strategy_payload, ROLE_TO_EXPECTED_PACKAGE[axis]),
+            axis=source_axis,
+            card_names=expected_missing_cards(strategy_payload, ROLE_TO_EXPECTED_PACKAGE[source_axis]),
             source="commander_reference_profile_expected_package",
             existing_names=existing_names,
             legalities=legalities,
@@ -466,10 +506,10 @@ def build_axis_pool(
         )
         adds = sorted(restore + expected, key=lambda row: (row["status"] != "review_only_profile_repair_add_candidate", -int(row["score"]), row["card_name"]))[:limit]
     else:
-        package_name = ROLE_TO_EXPECTED_PACKAGE.get(axis)
+        package_name = ROLE_TO_EXPECTED_PACKAGE.get(source_axis)
         adds = build_card_candidates(
             conn=conn,
-            axis=axis,
+            axis=source_axis,
             card_names=expected_missing_cards(strategy_payload, package_name or ""),
             source="commander_reference_profile_expected_package",
             existing_names=existing_names,
@@ -490,6 +530,7 @@ def build_axis_pool(
     return {
         "blocker": blocker,
         "repair_axis": axis,
+        "candidate_source_axis": source_axis,
         "candidate_count": len(ready_adds),
         "shortfall_to_min": shortfall,
         "status": status,
