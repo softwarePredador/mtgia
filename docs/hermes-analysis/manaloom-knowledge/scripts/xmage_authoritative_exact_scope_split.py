@@ -275,6 +275,7 @@ ATTACK_RECURSION_PERMANENT_SCOPE = "xmage_permanent_attack_return_graveyard_card
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 DIES_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_dies_gain_life_v1"
 DIES_DAMAGE_CREATURE_SCOPE = "xmage_creature_dies_fixed_damage_target_v1"
+DIES_FIXED_MANA_PERMANENT_SCOPE = "xmage_permanent_dies_add_fixed_mana_v1"
 DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_hand_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
 X_TOKEN_SPELL_SCOPE = "xmage_x_create_creature_tokens_spell_v1"
@@ -13122,6 +13123,37 @@ def etb_fixed_mana_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any
     return None
 
 
+def dies_fixed_mana_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    candidates: list[dict[str, Any]] = []
+    for line in normalized_oracle_lines(metadata):
+        if " if " in line or "whenever " in line or "you may " in line:
+            if "dies" in line and "add " in line:
+                return None
+            continue
+        match = re.fullmatch(
+            r"when (?:(?:this|that) (?:creature|permanent|artifact creature)|[^,.]+) "
+            r"dies, add (?P<mana>(?:\{[wubrgc]\})+)\.?",
+            line,
+        )
+        if not match:
+            if "dies" in line and "add " in line:
+                return None
+            continue
+        produced_symbols = fixed_mana_symbols_from_braces(match.group("mana"))
+        if not produced_symbols:
+            return None
+        candidates.append(
+            {
+                "produces": _unique_mana_symbols(produced_symbols),
+                "mana_produced": len(produced_symbols),
+                "produced_mana_symbols": produced_symbols,
+            }
+        )
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
+
+
 JAVA_MANA_METHOD_SYMBOLS = {
     "White": "W",
     "Blue": "U",
@@ -13275,6 +13307,32 @@ def etb_fixed_mana_source_blocker(source_text: str, detail: dict[str, Any]) -> s
         return "etb_mana_source_output_not_fixed"
     if Counter(source_symbols) != Counter(expected_symbols):
         return "etb_mana_source_oracle_mismatch"
+    return None
+
+
+def dies_fixed_mana_source_blocker(source_text: str, detail: dict[str, Any]) -> str | None:
+    text = source_text or ""
+    if len(re.findall(r"new\s+DiesSourceTriggeredAbility\s*\(", text)) != 1:
+        return "dies_mana_source_not_single_dies_trigger"
+    if len(re.findall(r"new\s+BasicManaEffect\s*\(", text)) != 1:
+        return "dies_mana_source_not_single_basic_mana_effect"
+    unsupported_markers = {
+        ".withInterveningIf": "dies_mana_source_condition_not_supported",
+        "Conditional": "dies_mana_source_condition_not_supported",
+        "DynamicManaEffect": "dies_mana_source_dynamic_not_supported",
+        "Target": "dies_mana_source_target_not_supported",
+    }
+    for marker, reason in unsupported_markers.items():
+        if marker in text:
+            return reason
+    if dies_source_trigger_is_optional(text):
+        return "dies_mana_source_optional_not_supported"
+    source_symbols = java_simple_mana_symbols_from_source(text)
+    expected_symbols = list(detail.get("produced_mana_symbols") or [])
+    if source_symbols is None:
+        return "dies_mana_source_output_not_fixed"
+    if Counter(source_symbols) != Counter(expected_symbols):
+        return "dies_mana_source_oracle_mismatch"
     return None
 
 
@@ -14158,6 +14216,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "mana-source permanent with fixed enter-the-battlefield draw trigger"
     elif scope == ETB_FIXED_MANA_CREATURE_SCOPE:
         scope_kind = "creature with fixed enter-the-battlefield mana trigger"
+    elif scope == DIES_FIXED_MANA_PERMANENT_SCOPE:
+        scope_kind = "permanent with fixed dies mana trigger"
     elif scope == TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE:
         scope_kind = "tap mana-source permanent with separate self-sacrifice mana ability"
     elif str(row.get("adapter_work_unit") or "") in RAMP_UNITS:
@@ -14385,6 +14445,12 @@ def split_row(
     etb_tutor_battlefield_creature_unit = is_creature_etb_tutor_to_battlefield_unit(row)
     etb_tutor_hand_creature_unit = is_creature_etb_tutor_to_hand_unit(row)
     etb_fixed_mana_creature_unit = is_creature_etb_fixed_mana_unit(row)
+    dies_fixed_mana_permanent_unit = (
+        unit in RAMP_UNITS
+        and effect_classes(row) == {"BasicManaEffect"}
+        and ability_classes(row) == {"DiesSourceTriggeredAbility"}
+        and set(row.get("xmage_signals") or []).issubset({"triggered_ability"})
+    )
     etb_token_creature_unit = is_creature_etb_token_unit(row)
     dies_token_creature_unit = is_creature_dies_token_unit(row)
     permanent_activated_token_unit = is_permanent_activated_token_unit(row)
@@ -14493,6 +14559,7 @@ def split_row(
         and not etb_tutor_battlefield_creature_unit
         and not etb_tutor_hand_creature_unit
         and not etb_fixed_mana_creature_unit
+        and not dies_fixed_mana_permanent_unit
         and not etb_token_creature_unit
         and not dies_token_creature_unit
         and not permanent_activated_token_unit
@@ -14564,6 +14631,7 @@ def split_row(
         and not etb_tutor_battlefield_creature_unit
         and not etb_tutor_hand_creature_unit
         and not etb_fixed_mana_creature_unit
+        and not dies_fixed_mana_permanent_unit
         and not etb_token_creature_unit
         and not dies_token_creature_unit
         and not permanent_activated_token_unit
@@ -14644,6 +14712,46 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_add_fixed_mana",
+        ), "selected_exact_scope"
+
+    if dies_fixed_mana_permanent_unit:
+        if not is_permanent_metadata(metadata):
+            return None, "dies_mana_not_permanent"
+        mana_detail = dies_fixed_mana_detail_from_oracle(metadata)
+        if mana_detail is None:
+            return None, "dies_mana_oracle_not_simple_fixed"
+        source_blocker = dies_fixed_mana_source_blocker(source_text, mana_detail)
+        if source_blocker:
+            return None, source_blocker
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_type = (
+            "artifact_creature"
+            if "artifact" in type_line and "creature" in type_line
+            else "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": "creature" if "creature" in type_line else "passive",
+            "battle_model_scope": DIES_FIXED_MANA_PERMANENT_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "trigger_effect": "add_mana",
+            "permanent_type": permanent_type,
+            "dies_mana_produced": int(mana_detail["mana_produced"]),
+            "dies_produces": str(mana_detail["produces"]),
+            "dies_produced_mana_symbols": list(mana_detail["produced_mana_symbols"]),
+            "xmage_effect_class": "BasicManaEffect",
+            "xmage_ability_class": "DiesSourceTriggeredAbility",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_dies_add_fixed_mana",
         ), "selected_exact_scope"
 
     if static_cast_as_flash_permission_unit:

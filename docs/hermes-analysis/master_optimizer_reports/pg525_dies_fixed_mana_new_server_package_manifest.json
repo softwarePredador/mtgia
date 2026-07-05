@@ -1,0 +1,231 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg525_dies_fixed_mana_new_server_p_20260705_192227",
+  "deploy_id": "xmage_pg525_dies_fixed_mana_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Cathodion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:99e2345f9e2822ce6c5f437fa28dbfe4",
+      "min_rule_version": 2,
+      "normalized_name": "cathodion",
+      "oracle_hash": "8eee9f6f80a8f71952699262b53de665",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1",
+        "dies_mana_produced": 3,
+        "dies_produced_mana_symbols": [
+          "C",
+          "C",
+          "C"
+        ],
+        "dies_produces": "C",
+        "effect": "creature",
+        "permanent_type": "artifact_creature",
+        "trigger": "dies",
+        "trigger_effect": "add_mana",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "BasicManaEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Myr Moonvessel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d21552b190e879250ea80be10bbd88da",
+      "min_rule_version": 2,
+      "normalized_name": "myr moonvessel",
+      "oracle_hash": "bedc3ee1326649ad0f54b11502533026",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1",
+        "dies_mana_produced": 1,
+        "dies_produced_mana_symbols": [
+          "C"
+        ],
+        "dies_produces": "C",
+        "effect": "creature",
+        "permanent_type": "artifact_creature",
+        "trigger": "dies",
+        "trigger_effect": "add_mana",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "BasicManaEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Su-Chi",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50e81199eb12ebc399f9655afa70bd0c",
+      "min_rule_version": 2,
+      "normalized_name": "su-chi",
+      "oracle_hash": "304214b937f688ed7bf116c9d7a9bb68",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1",
+        "dies_mana_produced": 4,
+        "dies_produced_mana_symbols": [
+          "C",
+          "C",
+          "C",
+          "C"
+        ],
+        "dies_produces": "C",
+        "effect": "creature",
+        "permanent_type": "artifact_creature",
+        "trigger": "dies",
+        "trigger_effect": "add_mana",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "BasicManaEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_dies_add_fixed_mana": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg525_dies_fixed_mana_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg525_dies_fixed_mana_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg525_dies_fixed_mana_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg525_dies_fixed_mana_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg525_dies_fixed_mana_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg525_dies_fixed_mana_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-05T19:22:27+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Cathodion"
+      },
+      "card_name": "Cathodion",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:99e2345f9e2822ce6c5f437fa28dbfe4",
+      "normalized_name": "cathodion",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1",
+        "dies_mana_produced": 3,
+        "dies_produced_mana_symbols": [
+          "C",
+          "C",
+          "C"
+        ],
+        "dies_produces": "C",
+        "effect": "creature",
+        "permanent_type": "artifact_creature",
+        "trigger": "dies",
+        "trigger_effect": "add_mana",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "BasicManaEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Myr Moonvessel"
+      },
+      "card_name": "Myr Moonvessel",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d21552b190e879250ea80be10bbd88da",
+      "normalized_name": "myr moonvessel",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1",
+        "dies_mana_produced": 1,
+        "dies_produced_mana_symbols": [
+          "C"
+        ],
+        "dies_produces": "C",
+        "effect": "creature",
+        "permanent_type": "artifact_creature",
+        "trigger": "dies",
+        "trigger_effect": "add_mana",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "BasicManaEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Su-Chi"
+      },
+      "card_name": "Su-Chi",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50e81199eb12ebc399f9655afa70bd0c",
+      "normalized_name": "su-chi",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1",
+        "dies_mana_produced": 4,
+        "dies_produced_mana_symbols": [
+          "C",
+          "C",
+          "C",
+          "C"
+        ],
+        "dies_produces": "C",
+        "effect": "creature",
+        "permanent_type": "artifact_creature",
+        "trigger": "dies",
+        "trigger_effect": "add_mana",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "BasicManaEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Cathodion",
+    "Myr Moonvessel",
+    "Su-Chi"
+  ],
+  "selected_count": 3,
+  "slug": "pg525_dies_fixed_mana_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Cathodion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:99e2345f9e2822ce6c5f437fa28dbfe4",
+      "min_rule_version": 2,
+      "normalized_name": "cathodion",
+      "oracle_hash": "8eee9f6f80a8f71952699262b53de665",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Myr Moonvessel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d21552b190e879250ea80be10bbd88da",
+      "min_rule_version": 2,
+      "normalized_name": "myr moonvessel",
+      "oracle_hash": "bedc3ee1326649ad0f54b11502533026",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Su-Chi",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50e81199eb12ebc399f9655afa70bd0c",
+      "min_rule_version": 2,
+      "normalized_name": "su-chi",
+      "oracle_hash": "304214b937f688ed7bf116c9d7a9bb68",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

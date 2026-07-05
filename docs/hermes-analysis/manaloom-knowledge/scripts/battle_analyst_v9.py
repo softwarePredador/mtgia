@@ -18821,6 +18821,37 @@ def resolve_permanent_dies_life_gain(owner, permanent, *, destination=None, reas
     return gained
 
 
+def resolve_permanent_dies_add_mana(owner, permanent, *, destination=None, reason=None, source=None):
+    if destination != "graveyard" or not isinstance(permanent, dict):
+        return 0
+    produced = max(0, int(permanent.get("dies_mana_produced") or 0))
+    if produced <= 0:
+        return 0
+    mana_payload = {
+        "mana_produced": produced,
+        "produced_mana_symbols": list(permanent.get("dies_produced_mana_symbols") or []),
+    }
+    mana_before = owner.mana_pool.snapshot()
+    if not add_fixed_produced_mana_symbols_to_pool(owner, mana_payload, produced):
+        return 0
+    mana_after = owner.mana_pool.snapshot()
+    emit_replay_event(
+        "dies_mana_resolved",
+        player=getattr(owner, "name", "?"),
+        card=permanent.get("name", "?"),
+        mana_produced=produced,
+        produces=permanent.get("dies_produces"),
+        produced_mana_symbols=list(permanent.get("dies_produced_mana_symbols") or []),
+        mana_pool_before=mana_before,
+        mana_pool_after=mana_after,
+        reason=reason,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        turn=CURRENT_REPLAY_TURN,
+        **replay_rule_fields(permanent),
+    )
+    return produced
+
+
 def resolve_permanent_dies_damage(
     owner,
     permanent,
@@ -19047,6 +19078,13 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         reason=reason,
         source=source,
     )
+    resolve_permanent_dies_add_mana(
+        owner,
+        creature,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
     resolve_permanent_dies_damage(
         owner,
         creature,
@@ -19127,6 +19165,13 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         source=source,
     )
     resolve_permanent_dies_life_gain(
+        owner,
+        permanent,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
+    resolve_permanent_dies_add_mana(
         owner,
         permanent,
         destination=destination,

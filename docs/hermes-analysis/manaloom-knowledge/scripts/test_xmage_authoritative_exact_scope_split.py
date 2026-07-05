@@ -13544,6 +13544,60 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["trigger"], "dies")
         self.assertEqual(effect["gain_life_when_this_dies"], 3)
 
+    def test_permanent_dies_fixed_mana_maps_to_triggered_scope(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Cathodion",
+                type_line="Artifact Creature - Construct",
+                oracle_text="When Fixture Cathodion dies, add {C}{C}{C}.",
+            ),
+            source_text=(
+                "this.addAbility(new DiesSourceTriggeredAbility("
+                "new BasicManaEffect(Mana.ColorlessMana(3)), false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_FIXED_MANA_PERMANENT_SCOPE)
+        self.assertEqual(effect["trigger"], "dies")
+        self.assertEqual(effect["trigger_effect"], "add_mana")
+        self.assertEqual(effect["dies_mana_produced"], 3)
+        self.assertEqual(effect["dies_produces"], "C")
+        self.assertEqual(effect["dies_produced_mana_symbols"], ["C", "C", "C"])
+
+    def test_permanent_dies_fixed_mana_blocks_conditional_trigger(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Conditional Battery",
+                type_line="Artifact Creature - Construct",
+                oracle_text="When Fixture Conditional Battery dies, if you control a Mountain, add {R}.",
+            ),
+            source_text=(
+                "this.addAbility(new DiesSourceTriggeredAbility(new BasicManaEffect(Mana.RedMana(1)))"
+                ".withInterveningIf(ControlsMountainCondition.instance));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dies_mana_oracle_not_simple_fixed")
+
     def test_creature_dies_gain_life_preserves_static_keywords(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,

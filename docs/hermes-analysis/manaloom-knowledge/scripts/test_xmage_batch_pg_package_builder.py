@@ -810,6 +810,40 @@ def test_manifest_expected_rule_preserves_tap_and_sacrifice_mana_fields() -> Non
     }
 
 
+def test_manifest_expected_rule_preserves_dies_mana_fields() -> None:
+    proposal = {
+        "normalized_name": "cathodion",
+        "card_name": "Cathodion",
+        "oracle_hash": "hash-cathodion",
+        "logical_rule_key": "battle_rule_v1:hash-cathodion",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1",
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "trigger_effect": "add_mana",
+            "permanent_type": "artifact_creature",
+            "dies_mana_produced": 3,
+            "dies_produces": "C",
+            "dies_produced_mana_symbols": ["C", "C", "C"],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"] == {
+        "effect": "creature",
+        "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1",
+        "ability_kind": "triggered",
+        "trigger": "dies",
+        "trigger_effect": "add_mana",
+        "permanent_type": "artifact_creature",
+        "dies_mana_produced": 3,
+        "dies_produces": "C",
+        "dies_produced_mana_symbols": ["C", "C", "C"],
+    }
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",

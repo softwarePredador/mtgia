@@ -30,6 +30,64 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
     def tearDown(self) -> None:
         self.battle.REPLAY_EVENT_HANDLER = self.previous_handler
 
+    def test_permanent_dies_fixed_mana_adds_colorless_on_graveyard_move(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        self.battle.CURRENT_REPLAY_TURN = 5
+        cathodion = {
+            "name": "Cathodion",
+            "type_line": "Artifact Creature - Construct",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_dies_add_fixed_mana_v1",
+            "trigger": "dies",
+            "trigger_effect": "add_mana",
+            "dies_mana_produced": 3,
+            "dies_produces": "C",
+            "dies_produced_mana_symbols": ["C", "C", "C"],
+        }
+        active.battlefield = [cathodion]
+
+        destination = self.battle.move_permanent_from_battlefield(
+            active,
+            cathodion,
+            reason="destroyed",
+            all_players=[active],
+        )
+
+        self.assertEqual(destination, "graveyard")
+        self.assertEqual(active.mana_pool.colorless, 3)
+        self.assertEqual(active.mana_pool.total(), 3)
+        self.assertEqual(active.battlefield, [])
+        self.assertIn(cathodion, active.graveyard)
+        self.assertTrue(
+            any(
+                event == "dies_mana_resolved"
+                and data.get("card") == "Cathodion"
+                and data.get("mana_produced") == 3
+                and data.get("produced_mana_symbols") == ["C", "C", "C"]
+                for event, data in self.events
+            )
+        )
+
+    def test_permanent_dies_fixed_mana_does_not_add_mana_outside_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        permanent = {
+            "name": "Fixture Battery",
+            "type_line": "Artifact Creature - Construct",
+            "dies_mana_produced": 2,
+            "dies_produced_mana_symbols": ["C", "C"],
+        }
+
+        produced = self.battle.resolve_permanent_dies_add_mana(
+            active,
+            permanent,
+            destination="exile",
+            reason="exiled",
+        )
+
+        self.assertEqual(produced, 0)
+        self.assertEqual(active.mana_pool.total(), 0)
+        self.assertFalse(any(event == "dies_mana_resolved" for event, _data in self.events))
+
     def test_static_flash_permission_artifact_filter_only_allows_artifacts(self) -> None:
         active = self.battle.Player("Active", None, [])
         artifact = {"name": "Mind Stone", "type_line": "Artifact", "mana_cost": "{2}"}
