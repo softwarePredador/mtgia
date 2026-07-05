@@ -11882,6 +11882,66 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG490 Creature ETB Bounce Closure
+
+- PG490 adds an exact creature ETB bounce mapper for XMage rows whose source is
+  a pure `ReturnToHandTargetEffect` on `EntersBattlefieldTriggeredAbility`.
+  The executable ManaLoom scope is
+  `xmage_creature_etb_return_target_to_hand_v1`.
+- The accepted shape is intentionally narrow: exact ETB Oracle/source
+  agreement, one return-to-hand target effect, no target pointer or target
+  adjuster, no intervening-if condition, no multi-target behavior, no
+  self-controller bounce, and only static self keyword abilities beside the
+  ETB trigger. `other target` and `another target` are normalized to
+  `exclude_source` target constraints.
+- Runtime execution is handled by the generic permanent ETB removal path:
+  `resolve_generic_permanent_etb` routes `destination=hand` through
+  `resolve_etb_removal`. The focused PG490 runtime test proves an opponent
+  battlefield creature is moved to its owner's hand with an
+  `etb_removal_resolved` trace and no manual override.
+- The batch covers `17` cards: Aether Adept, Angler Drake, Aven Fogbringer,
+  Bigfin Bouncer, Dispersal Technician, Exclusion Mage, Glowing Anemone,
+  Iceridge Serpent, Man-o'-War, Mist Raven, Peerless Ropemaster, Riddlemaster
+  Sphinx, Separatist Voidmage, Spider-Byte, Web Warden, Stern Proctor,
+  Surrakar Banisher, and Voidwielder. The complete list lives in
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg490_creature_etb_bounce_new_server_manifest.json`
+  under `selected_card_names`.
+- Focused validation passed `770` parser/runtime/package-builder tests,
+  `py_compile` passed for the touched parser/runtime-test files, the focused
+  PG490 ETB-bounce runtime test passed, and the full
+  `test_battle_analyst_v10_3.py` suite passed with the live PostgreSQL
+  environment loaded.
+- PostgreSQL package PG490 applied against `143.198.230.247:5433/halder` and
+  promoted `17/17` selected cards as verified/auto rule-version `2` rows with
+  matching Oracle hashes. The apply upserted `17` rows and deprecated `0`
+  shadow rows.
+- Hermes metadata sync matched `5893` PostgreSQL cards, wrote `5804` SQLite
+  cache aliases, updated `108` deck-card ids, and left the known
+  `unresolved=1` residual unchanged. The targeted battle-rule sync loaded `17`
+  PostgreSQL rows, wrote `17` SQLite rows, exported `4714` canonical fallback
+  rows, and refreshed the tracked default canonical snapshot.
+- Generic E2E validation passed across PostgreSQL, SQLite
+  `battle_card_rules`, the default canonical snapshot, and runtime
+  `get_card_effect` for all `17` selected cards. The manifest does not define
+  battle-execution scenarios for this generic family, so scenario execution
+  remains `0`; concrete ETB destination behavior is covered by the focused
+  PG490 runtime test.
+- Final governance audits passed: XMage strategy (`26/26`), operational
+  surface (`39/39`), deckbuilding contract surface, legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26143`, `xmage_authoritative_source_count=25829`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25829`. This is an exact
+  reduction of `17` from the post-PG489 queue. The bounce work unit fell from
+  `262` before PG490 to `245` after PG490, and the post-PG490 exact split
+  recheck reports `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+- Post-sync global readiness is now `34331` known cards, `4807`
+  `battle_and_oracle_ready`, `29066` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

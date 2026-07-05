@@ -11908,6 +11908,155 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_destroy_target_not_supported")
 
+    def test_creature_etb_bounce_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aether Adept",
+                type_line="Creature - Human Wizard",
+                oracle_text="When Aether Adept enters the battlefield, return target creature to its owner's hand.",
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnToHandTargetEffect());"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_BOUNCE_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_remove_effect"], "remove_creature")
+        self.assertEqual(effect["etb_remove_target"], "creature")
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+
+    def test_creature_etb_bounce_maps_opponent_and_keyword_constraints(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Riddlemaster Sphinx",
+                type_line="Creature - Sphinx",
+                oracle_text=(
+                    "Flying\n"
+                    "When Riddlemaster Sphinx enters the battlefield, you may return target creature "
+                    "an opponent controls to its owner's hand."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnToHandTargetEffect(), true);"
+                "ability.addTarget(new TargetPermanent(FILTER_OPPONENTS_PERMANENT_CREATURE));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_controller"], "opponent")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "controller_scope": "opponent"},
+        )
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["etb_bounce_optional"])
+
+    def test_creature_etb_bounce_marks_another_target_as_exclude_source(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Voidmage",
+                type_line="Creature - Wizard",
+                oracle_text=(
+                    "When Fixture Voidmage enters the battlefield, "
+                    "return another target creature to its owner's hand."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnToHandTargetEffect());"
+                "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_ANOTHER_CREATURE));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["exclude_source"])
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "exclude_source": True})
+
+    def test_creature_etb_bounce_blocks_condition_and_self_controller(self) -> None:
+        conditional_row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "condition", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            conditional_row,
+            metadata(
+                name="Deadeye Rig-Hauler",
+                type_line="Creature - Human Pirate",
+                oracle_text=(
+                    "Raid - When Deadeye Rig-Hauler enters the battlefield, if you attacked this turn, "
+                    "you may return target creature to its owner's hand."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnToHandTargetEffect(), true)"
+                ".withInterveningIf(RaidCondition.instance);"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+        self.assertIsNone(proposal)
+        self.assertNotEqual(reason, "selected_exact_scope")
+
+        self_row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlashAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            self_row,
+            metadata(
+                name="Deputy of Acquittals",
+                type_line="Creature - Human Wizard",
+                oracle_text=(
+                    "Flash\n"
+                    "When Deputy of Acquittals enters the battlefield, you may return another target "
+                    "creature you control to its owner's hand."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(FlashAbility.getInstance());"
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnToHandTargetEffect(), true);"
+                "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_ANOTHER_TARGET_CREATURE_YOU_CONTROL));"
+            ),
+        )
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_bounce_target_controller_not_supported")
+
     def test_creature_etb_recursion_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

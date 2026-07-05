@@ -1280,6 +1280,32 @@
     "battle_rule_logical_key": "battle_rule_v1:870cdb829025cc62b3c7ad1d4f0c24e1",
     "battle_rule_oracle_hash": "52867dcd21d356ae0525c0c3eeb3679a"
   },
+  "Aether Adept": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d8d9647e557e324a29e260afaf2e51fe",
+    "battle_rule_oracle_hash": "80dffbcb668db400babd48af1e4e9667"
+  },
   "Aether Channeler": {
     "battle_model_scope": "modal_etb_creature_draw_default_v1",
     "cmc": 3.0,
@@ -3504,6 +3530,38 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7",
     "battle_rule_oracle_hash": "0c5de3314a56ec9848ad8de98f85e5f5"
+  },
+  "Angler Drake": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_optional": true,
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:24fd20f36e87387e5e087563f3be1e90",
+    "battle_rule_oracle_hash": "b1bb06eaf6d1a0a9c943d686a1d50a01"
   },
   "Animal Sanctuary": {
     "effect": "land",
@@ -6008,6 +6066,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c47a8875ba2037b7b1104e195c024dd6",
     "battle_rule_oracle_hash": "0e89241e7c79870ddca3b1725dc9e8be"
+  },
+  "Aven Fogbringer": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "land",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "land",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:10d8fac1e5b63846033d7839bab6e48e",
+    "battle_rule_oracle_hash": "407bd126b7ba242429ecbc6416b939db"
   },
   "Aven Interrupter": {
     "cmc": 3.0,
@@ -8690,6 +8779,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:af9f14d18cc283719be2ef2680b6f1ed",
     "battle_rule_oracle_hash": "9c4fbe06104051a2e8b1d295d307b26a"
+  },
+  "Bigfin Bouncer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller_scope": "opponent"
+    },
+    "target_controller": "opponent",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1a9f0a479dede202f08453d8e9294789",
+    "battle_rule_oracle_hash": "dfcf28d5e43894395491c58dcbe280c2"
   },
   "Billiard Room": {
     "effect": "land",
@@ -23970,6 +24086,33 @@
     "battle_rule_logical_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a",
     "battle_rule_oracle_hash": "6db9533f63d7d41a56e586b27e46ae52"
   },
+  "Dispersal Technician": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_optional": true,
+    "etb_bounce_target": "artifact",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact",
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eb5271e3e1214d5399abd013e7879111",
+    "battle_rule_oracle_hash": "71a9f2b3e26dac021c5392799a75ed84"
+  },
   "Disperse": {
     "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
     "destination": "hand",
@@ -29847,6 +29990,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3ddee6c0c459a32293a14e0e08d67e1b",
     "battle_rule_oracle_hash": "92b12b3ba4600b216c658e32352b3dee"
+  },
+  "Exclusion Mage": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller_scope": "opponent"
+    },
+    "target_controller": "opponent",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1a9f0a479dede202f08453d8e9294789",
+    "battle_rule_oracle_hash": "dfcf28d5e43894395491c58dcbe280c2"
   },
   "Excoriate": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
@@ -39094,6 +39264,33 @@
     "battle_rule_logical_key": "battle_rule_v1:824ba0de681326e26cd769c161748b0e",
     "battle_rule_oracle_hash": "1f548fec2889bc73409f43f067ec3367"
   },
+  "Glowing Anemone": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_optional": true,
+    "etb_bounce_target": "land",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "land",
+    "target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:46f72af38480db246db05647ca909365",
+    "battle_rule_oracle_hash": "3b901f8a7d868cc2c471766c3fc0a077"
+  },
   "Gnottvold Recluse": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -46124,6 +46321,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:96c08a0582c9ddf638096214e8d1b198",
     "battle_rule_oracle_hash": "e0253b4de895117932243da89ed7b37f"
+  },
+  "Iceridge Serpent": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller_scope": "opponent"
+    },
+    "target_controller": "opponent",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1a9f0a479dede202f08453d8e9294789",
+    "battle_rule_oracle_hash": "dfcf28d5e43894395491c58dcbe280c2"
   },
   "Ichor Elixir": {
     "battle_model_scope": "two_colorless_mana_rock_planar_dice_annotation_v1",
@@ -55463,6 +55687,32 @@
     "battle_rule_logical_key": "battle_rule_v1:ba65c75fe72d2fdfad569fa0096f1972",
     "battle_rule_oracle_hash": "b2f28fd30e7447849076c50e188370ed"
   },
+  "Man-o'-War": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d8d9647e557e324a29e260afaf2e51fe",
+    "battle_rule_oracle_hash": "80dffbcb668db400babd48af1e4e9667"
+  },
   "Mana Conference": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -58335,6 +58585,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
     "battle_rule_oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f"
+  },
+  "Mist Raven": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f38ecdc92c12a16c51a4bcb6c709ecd3",
+    "battle_rule_oracle_hash": "9d19914ae2c408659fabca985c80f7ee"
   },
   "Mist-Cloaked Herald": {
     "ability_kind": "static",
@@ -65657,6 +65938,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:cfa78947191c91113d861739af161471",
     "battle_rule_oracle_hash": "f93aca7734c0ae2f7393b04ea2dc5754"
+  },
+  "Peerless Ropemaster": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "tapped_creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "tapped_creature",
+    "target": "tapped_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "target_controller": "any",
+    "target_count": 1,
+    "trigger": "enters_battlefield",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b7bcb54f51fa900014a1503e9a901c69",
+    "battle_rule_oracle_hash": "28e22b0ca1e5320c2bd775ae39efa76b"
   },
   "Pegasus Charger": {
     "_keywords_are_self": true,
@@ -75276,6 +75586,39 @@
     "battle_rule_logical_key": "battle_rule_v1:1dc787546713b8ba46fd75acf55c2668",
     "battle_rule_oracle_hash": "df94e75b6056501242aa391d3c6250a2"
   },
+  "Riddlemaster Sphinx": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_optional": true,
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller_scope": "opponent"
+    },
+    "target_controller": "opponent",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4b8d5305977a9d45866ef2aa13fbedc0",
+    "battle_rule_oracle_hash": "5486c89cfd56ff67762468ac78e76c07"
+  },
   "Ridgeline Rager": {
     "_activated_rule_effects": [
       {
@@ -81921,6 +82264,33 @@
     "battle_rule_logical_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
     "battle_rule_oracle_hash": "3baebb06100722ec034bcfe15b534fb7"
   },
+  "Separatist Voidmage": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_optional": true,
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:295f6d55ea5bc08f0e80a60ecf4e1ea3",
+    "battle_rule_oracle_hash": "08a159153816185848d470ebe16c22d9"
+  },
   "Sephiroth's Intervention": {
     "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
     "controller_gains_life": 2,
@@ -87917,6 +88287,34 @@
     "battle_rule_logical_key": "battle_rule_v1:33d4310583c8b21efaafe4ed44856472",
     "battle_rule_oracle_hash": "7fc39f6207b73f09374e0318ad4e5985"
   },
+  "Spider-Byte, Web Warden": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "nonland_permanent",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "nonland_permanent",
+    "target": "nonland_permanent",
+    "target_constraints": {
+      "card_types": [
+        "nonland_permanent"
+      ]
+    },
+    "target_controller": "any",
+    "target_count": 1,
+    "trigger": "enters_battlefield",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6e46258de4dabcd3395dbf2dee1e2368",
+    "battle_rule_oracle_hash": "196787a37dabfb3760dd252f2ab94c10"
+  },
   "Spider-Punk": {
     "effect": "creature",
     "is_creature_permanent": true,
@@ -89524,6 +89922,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:77abcd8c66d449f52244c3b855923a0f",
     "battle_rule_oracle_hash": "7bf85f7e204292a138bd678b75078d5c"
+  },
+  "Stern Proctor": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "artifact_or_enchantment",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact_or_enchantment",
+    "target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c172fa7ff58746e04d6b4f8971377d4a",
+    "battle_rule_oracle_hash": "415f5023face93de34ffc21dd349f183"
   },
   "Steward of Valeron": {
     "activation_requires_tap": true,
@@ -91923,6 +92348,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:a4b42e4cef8bbab31819346e7b68a263",
     "battle_rule_oracle_hash": "14e07cfa7107a44732b5631f2136be3e"
+  },
+  "Surrakar Banisher": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_optional": true,
+    "etb_bounce_target": "tapped_creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "tapped_creature",
+    "target": "tapped_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5a0ca4eb4bfd1921c6e830c26749eaff",
+    "battle_rule_oracle_hash": "a6fa2bc7f23f9732e426b634020f05df"
   },
   "Surtland Frostpyre": {
     "effect": "land",
@@ -103141,6 +103594,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:45be913b2a550d0ade45b3d034532330",
     "battle_rule_oracle_hash": "4051670871d0fa08e186d4dcdc7fe854"
+  },
+  "Voidwielder": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_optional": true,
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:295f6d55ea5bc08f0e80a60ecf4e1ea3",
+    "battle_rule_oracle_hash": "08a159153816185848d470ebe16c22d9"
   },
   "Volatile Fault": {
     "effect": "land",

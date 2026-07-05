@@ -7829,6 +7829,70 @@ def register_tests(battle, player):
         assert not battle.is_legal_target(combat_filter, large_attacker, controller, target_type="creature")
         assert not battle.is_legal_target(combat_filter, resting_small, controller, target_type="creature")
 
+    def test_pg490_creature_etb_bounce_returns_opponent_creature_to_hand():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            target = {
+                "name": "Opponent Engine",
+                "type_line": "Creature - Wizard",
+                "effect": "draw_engine",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [target]
+            adept = {
+                "name": "Aether Adept",
+                "type_line": "Creature - Human Wizard",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            effect_data = {
+                **adept,
+                "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "etb_remove_effect": "remove_creature",
+                "etb_remove_target": "creature",
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"]},
+                "destination": "hand",
+                "_rule_logical_key": "battle_rule_v1:pg490-etb-bounce-test",
+                "_rule_oracle_hash": "pg490-etb-bounce-test-hash",
+            }
+
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                adept,
+                effect_data,
+                9,
+                random.Random(490),
+                all_players=[active, opponent],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert target not in opponent.battlefield
+        assert target in opponent.hand
+        assert any(
+            event == "etb_removal_resolved"
+            and data.get("card") == "Aether Adept"
+            and data.get("trigger") == "enters_battlefield"
+            and data.get("target_type") == "creature"
+            and data.get("target") == "Opponent Engine"
+            and data.get("rule_logical_key") == "battle_rule_v1:pg490-etb-bounce-test"
+            for event, data in events
+        )
+
     def test_pg086_removal_targets_filter_nontoken_and_mana_value_max():
         active = player("Active")
         opponent = player("Opponent")
@@ -22261,6 +22325,7 @@ def register_tests(battle, player):
         test_removal_exile_stack_target_exiles_spell_instead_of_countering_to_graveyard,
         test_pg488_counter_target_filters_color_mana_value_and_alternative_spell_types,
         test_pg489_destroy_target_extended_static_target_filters_runtime,
+        test_pg490_creature_etb_bounce_returns_opponent_creature_to_hand,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
         test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,

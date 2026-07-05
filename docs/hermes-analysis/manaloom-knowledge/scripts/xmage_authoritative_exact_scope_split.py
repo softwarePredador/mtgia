@@ -242,6 +242,7 @@ ETB_GRAVEYARD_COUNT_DAMAGE_CREATURE_SCOPE = (
     "xmage_creature_etb_dynamic_graveyard_count_damage_v1"
 )
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
+ETB_BOUNCE_CREATURE_SCOPE = "xmage_creature_etb_return_target_to_hand_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
 ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_battlefield_v1"
 ETB_MILL_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_mill_then_return_graveyard_card_to_hand_v1"
@@ -1427,7 +1428,14 @@ def source_matches_bounce_target(source: str, target: str) -> bool:
         return source_matches_target_constraint(source, target)
     text = source or ""
     if target == "creature":
-        return "TargetCreaturePermanent" in text or "FilterCreaturePermanent" in text
+        return (
+            "TargetCreaturePermanent" in text
+            or "TargetOpponentsCreaturePermanent" in text
+            or "FilterCreaturePermanent" in text
+            or "FILTER_PERMANENT_CREATURE" in text
+            or "FILTER_OPPONENTS_PERMANENT_CREATURE" in text
+            or "FILTER_ANOTHER_CREATURE" in text
+        )
     if target == "nonland_permanent":
         return "TargetNonlandPermanent" in text or "FilterNonlandPermanent" in text or "nonland permanent" in text
     if target == "permanent":
@@ -1439,6 +1447,76 @@ def source_matches_bounce_target(source: str, target: str) -> bool:
     if target == "land":
         return "TargetLandPermanent" in text or "FilterLandPermanent" in text or "land" in text
     return source_matches_target_constraint(source, target)
+
+
+def etb_bounce_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    etb_subject = r"(?:this creature|.+?)"
+    if not re.match(rf"^when {etb_subject} enters(?: the battlefield)?, ", text):
+        return None
+    optional = " you may return " in text
+    up_to_one = " return up to one " in text
+    target_controller = "any"
+    if " you control " in text:
+        target_controller = "self"
+    elif " opponent controls" in text or " opponents control" in text:
+        target_controller = "opponent"
+    target_patterns: list[tuple[str, str, str]] = [
+        ("tapped_creature", "remove_creature", r"target tapped creature(?: an opponent controls| you control)?"),
+        ("untapped_creature", "remove_creature", r"target untapped creature(?: an opponent controls| you control)?"),
+        ("nonland_permanent", "remove_permanent", r"target nonland permanent(?: an opponent controls| you control)?"),
+        ("artifact_or_enchantment", "remove_permanent", r"target artifact or enchantment(?: an opponent controls| you control)?"),
+        ("creature_or_enchantment", "remove_permanent", r"target creature or enchantment(?: an opponent controls| you control)?"),
+        ("creature_or_planeswalker", "remove_permanent", r"target creature or planeswalker(?: an opponent controls| you control)?"),
+        ("permanent", "remove_permanent", r"target permanent(?: an opponent controls| you control)?"),
+        ("creature", "remove_creature", r"target creature(?: an opponent controls| you control)?"),
+        ("artifact", "remove_permanent", r"target artifact(?: an opponent controls| you control)?"),
+        ("enchantment", "remove_permanent", r"target enchantment(?: an opponent controls| you control)?"),
+        ("land", "remove_permanent", r"target land(?: an opponent controls| you control)?"),
+    ]
+    for target, effect, target_phrase in target_patterns:
+        pattern = (
+            rf"^when {etb_subject} enters(?: the battlefield)?, "
+            rf"(?:you may )?return (?:up to one )?(?:(?:other|another) )?{target_phrase} "
+            rf"to (?:its|their) owner's hand\.?$"
+        )
+        if not re.match(pattern, text):
+            continue
+        result: dict[str, Any] = {
+            "effect": effect,
+            "target": target,
+            "target_controller": target_controller,
+            "optional": optional,
+            "up_to_one": up_to_one,
+            "exclude_source": " other target " in text or " another target " in text,
+        }
+        return result
+    return None
+
+
+def etb_bounce_source_supported(source: str, oracle_spec: dict[str, Any]) -> str | None:
+    text = source or ""
+    if len(re.findall(r"new\s+ReturnToHandTargetEffect\s*\(", text)) != 1:
+        return "etb_bounce_source_effect_count_not_supported"
+    if "TargetPointer" in text or ".setTargetPointer" in text or "TargetAdjuster" in text:
+        return "etb_bounce_source_multi_target_not_supported"
+    if ".withInterveningIf" in text or "InterveningIf" in text:
+        return "etb_bounce_source_condition_not_supported"
+    if oracle_spec.get("target_controller") == "self":
+        return "etb_bounce_target_controller_not_supported"
+    target = str(oracle_spec.get("target") or "")
+    if not source_matches_bounce_target(text, target):
+        return "etb_bounce_source_target_not_supported"
+    if oracle_spec.get("up_to_one") and not re.search(r"\(\s*0\s*,\s*1\b", text):
+        return "etb_bounce_source_up_to_count_mismatch"
+    if oracle_spec.get("target_controller") == "opponent" and not (
+        "TargetOpponentsCreaturePermanent" in text
+        or "FILTER_OPPONENTS_PERMANENT_CREATURE" in text
+        or "TargetController.OPPONENT" in text
+        or "opponent controls" in text
+    ):
+        return "etb_bounce_source_controller_mismatch"
+    return None
 
 
 def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
@@ -5418,6 +5496,19 @@ def is_creature_etb_destroy_unit(row: dict[str, Any]) -> bool:
     return (
         effect_classes(row) == {"DestroyTargetEffect"}
         and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
+def is_creature_etb_bounce_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != BOUNCE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"ReturnToHandTargetEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
     )
 
@@ -12277,6 +12368,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "dynamic graveyard-count damage spell"
     elif scope == ETB_GRAVEYARD_COUNT_DAMAGE_CREATURE_SCOPE:
         scope_kind = "creature ETB dynamic graveyard-count damage trigger"
+    elif scope == ETB_BOUNCE_CREATURE_SCOPE:
+        scope_kind = "creature ETB return target permanent to hand trigger"
     elif scope == DESTROY_GAIN_LIFE_SCOPE:
         scope_kind = "fixed destroy-target plus controller life-gain spell"
     elif scope == LIFE_GAIN_DRAW_SCOPE:
@@ -12464,6 +12557,7 @@ def split_row(
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
     etb_graveyard_count_damage_creature_unit = is_creature_etb_graveyard_count_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
+    etb_bounce_creature_unit = is_creature_etb_bounce_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     etb_recursion_battlefield_creature_unit = is_creature_etb_recursion_battlefield_unit(row)
     etb_mill_recursion_creature_unit = is_creature_etb_mill_then_return_unit(row)
@@ -12553,6 +12647,7 @@ def split_row(
         and not etb_damage_creature_unit
         and not etb_graveyard_count_damage_creature_unit
         and not etb_destroy_creature_unit
+        and not etb_bounce_creature_unit
         and not etb_recursion_creature_unit
         and not etb_recursion_battlefield_creature_unit
         and not etb_mill_recursion_creature_unit
@@ -12619,6 +12714,7 @@ def split_row(
         and not etb_damage_creature_unit
         and not etb_graveyard_count_damage_creature_unit
         and not etb_destroy_creature_unit
+        and not etb_bounce_creature_unit
         and not etb_recursion_creature_unit
         and not etb_recursion_battlefield_creature_unit
         and not etb_mill_recursion_creature_unit
@@ -15445,6 +15541,56 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_destroy_target",
+        ), "selected_exact_scope"
+
+    if etb_bounce_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_bounce_not_creature"
+        oracle_bounce = etb_bounce_target_from_oracle(metadata)
+        if oracle_bounce is None:
+            return None, "etb_bounce_target_not_supported"
+        source_blocker = etb_bounce_source_supported(source_text, oracle_bounce)
+        if source_blocker:
+            return None, source_blocker
+        target_type = str(oracle_bounce["target"])
+        target_constraints = target_constraints_for(target_type)
+        if oracle_bounce.get("target_controller") == "opponent":
+            target_constraints["controller_scope"] = "opponent"
+        if oracle_bounce.get("exclude_source"):
+            target_constraints["exclude_source"] = True
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_BOUNCE_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_remove_effect": oracle_bounce["effect"],
+            "etb_remove_target": target_type,
+            "etb_bounce_target": target_type,
+            "target": target_type,
+            "target_controller": oracle_bounce["target_controller"],
+            "target_constraints": target_constraints,
+            "destination": "hand",
+            "xmage_effect_class": "ReturnToHandTargetEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        if oracle_bounce.get("optional"):
+            effect_json["etb_bounce_optional"] = True
+        if oracle_bounce.get("up_to_one"):
+            effect_json["up_to_count"] = True
+            effect_json["target_count"] = 1
+        if oracle_bounce.get("exclude_source"):
+            effect_json["exclude_source"] = True
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_return_target_to_hand",
         ), "selected_exact_scope"
 
     if etb_recursion_creature_unit:
@@ -18675,6 +18821,7 @@ def build_exact_split_report(
             and not is_creature_etb_graveyard_to_library_unit(row)
             and not is_creature_etb_library_pick_unit(row)
             and not is_creature_etb_tutor_to_hand_unit(row)
+            and not is_creature_etb_bounce_unit(row)
             and not is_creature_tap_damage_unit(row)
             and not is_creature_etb_token_unit(row)
             and not is_creature_dies_token_unit(row)
@@ -18756,6 +18903,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, DiesSourceTriggeredAbility, exact fixed dies-damage Oracle/source agreement, and no auxiliary ability class",
                 "direct_damage::targeted_damage_variant_v1 rows with one-shot DamageTargetEffect whose amount is an exact supported battlefield/hand/domain count, optional fixed base amount, and supported target constraints",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
+                "bounce::targeted_return_to_hand_variant_v1 rows with ReturnToHandTargetEffect, EntersBattlefieldTriggeredAbility, exact ETB return-target-to-hand Oracle text, no condition, and no multi-target adjuster",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect, SimpleActivatedAbility, exact self-counter Oracle text, and mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",
