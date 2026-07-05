@@ -1,0 +1,180 @@
+{
+  "generated_at": "2026-07-05T15:53:41Z",
+  "registry_kind": "compact_prior_package_decisions",
+  "baseline_deck_id": 607,
+  "notes": [
+    "Compact registry for 2026-07-05 Lorehold learning decisions.",
+    "This file is intentionally small so lorehold_synergy_package_gate.py can consume it as prior evidence without loading 20MB battle JSON artifacts.",
+    "All rows are read-only battle or preflight decisions; none mutate deck 607."
+  ],
+  "packages": [
+    {
+      "package_key": "birgi_spellchain_cut_jeskas_will",
+      "family": "spellchain_mana",
+      "adds": ["Birgi, God of Storytelling // Harnfel, Horn of Bounty"],
+      "cuts": ["Jeska's Will"],
+      "decision": "reject_regresses_critical_matchup",
+      "decision_basis": "Current-state broad gates were positive, but seed 2026070506 regressed Winota from 3W/5L to 2W/6L despite Birgi being used.",
+      "gate_summary": {
+        "delta_pp": 6.25,
+        "baseline": {
+          "wins": 12,
+          "losses": 20,
+          "stalls": 0,
+          "win_rate": 37.5,
+          "avg_win_turn": 15.08
+        },
+        "candidate": {
+          "wins": 14,
+          "losses": 18,
+          "stalls": 0,
+          "win_rate": 43.75,
+          "avg_win_turn": 16.0
+        }
+      },
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"games": 8, "wins": 3, "losses": 5, "stalls": 0},
+          "candidate": {"games": 8, "wins": 2, "losses": 6, "stalls": 0}
+        }
+      },
+      "exposure_summary": {
+        "status": "candidate_added_cards_used",
+        "low_candidate_added_card_use": false,
+        "candidate_added_cards": {
+          "total_recorded_use_count": 58,
+          "all_cards_used": true
+        },
+        "baseline_cut_cards": {
+          "total_recorded_use_count": 16,
+          "all_cards_used": true
+        }
+      },
+      "source_doc": "docs/hermes-analysis/LOREHOLD_BIRGI_JESKAS_REVALIDATION_2026-07-05.md"
+    },
+    {
+      "package_key": "one_ring_burden_reset",
+      "family": "draw_protection",
+      "adds": ["The One Ring"],
+      "cuts": ["Bender's Waterskin"],
+      "decision": "reject_regresses_critical_matchup",
+      "decision_basis": "Read-only no-cut-safety research gate tied aggregate wins but slowed the candidate and regressed Winota from 3W/5L to 2W/6L while The One Ring was used.",
+      "gate_summary": {
+        "delta_pp": 0.0,
+        "baseline": {
+          "wins": 12,
+          "losses": 20,
+          "stalls": 0,
+          "win_rate": 37.5,
+          "avg_win_turn": 15.08
+        },
+        "candidate": {
+          "wins": 12,
+          "losses": 20,
+          "stalls": 0,
+          "win_rate": 37.5,
+          "avg_win_turn": 18.83
+        }
+      },
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"games": 8, "wins": 3, "losses": 5, "stalls": 0},
+          "candidate": {"games": 8, "wins": 2, "losses": 6, "stalls": 0}
+        }
+      },
+      "exposure_summary": {
+        "status": "candidate_added_cards_used",
+        "low_candidate_added_card_use": false,
+        "candidate_added_cards": {
+          "total_recorded_use_count": 24,
+          "all_cards_used": true
+        },
+        "baseline_cut_cards": {
+          "total_recorded_use_count": 20,
+          "all_cards_used": true
+        }
+      },
+      "source_doc": "docs/hermes-analysis/LOREHOLD_607_POST_BIRGI_CANDIDATE_SWEEP_2026-07-05.md"
+    },
+    {
+      "package_key": "drc_hexing_squelcher_v1",
+      "family": "topdeck_access",
+      "adds": ["Dragon's Rage Channeler"],
+      "cuts": ["Hexing Squelcher"],
+      "decision": "reject_regresses_critical_matchup",
+      "decision_basis": "Pressure recheck seed 2026070506 fell from baseline 14W/18L to candidate 8W/24L and regressed Winota from 2W/6L to 0W/8L.",
+      "gate_summary": {
+        "delta_pp": -18.75,
+        "baseline": {
+          "wins": 14,
+          "losses": 18,
+          "stalls": 0,
+          "win_rate": 43.75,
+          "avg_win_turn": 15.5
+        },
+        "candidate": {
+          "wins": 8,
+          "losses": 24,
+          "stalls": 0,
+          "win_rate": 25.0,
+          "avg_win_turn": 20.0
+        }
+      },
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"games": 8, "wins": 2, "losses": 6, "stalls": 0},
+          "candidate": {"games": 8, "wins": 0, "losses": 8, "stalls": 0}
+        }
+      },
+      "exposure_summary": {
+        "status": "candidate_added_cards_used",
+        "low_candidate_added_card_use": false,
+        "candidate_added_cards": {
+          "total_recorded_use_count": 6,
+          "all_cards_used": true
+        }
+      },
+      "source_doc": "docs/hermes-analysis/LOREHOLD_607_POST_BIRGI_CANDIDATE_SWEEP_2026-07-05.md"
+    },
+    {
+      "package_key": "drc_call_forth_the_tempest_v1",
+      "family": "topdeck_access",
+      "adds": ["Dragon's Rage Channeler"],
+      "cuts": ["Call Forth the Tempest"],
+      "decision": "reject_regresses_critical_matchup",
+      "decision_basis": "Pressure recheck seed 2026070506 fell from baseline 14W/18L to candidate 7W/25L and regressed Winota from 2W/6L to 0W/8L.",
+      "gate_summary": {
+        "delta_pp": -21.87,
+        "baseline": {
+          "wins": 14,
+          "losses": 18,
+          "stalls": 0,
+          "win_rate": 43.75,
+          "avg_win_turn": 15.5
+        },
+        "candidate": {
+          "wins": 7,
+          "losses": 25,
+          "stalls": 0,
+          "win_rate": 21.88,
+          "avg_win_turn": 15.14
+        }
+      },
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"games": 8, "wins": 2, "losses": 6, "stalls": 0},
+          "candidate": {"games": 8, "wins": 0, "losses": 8, "stalls": 0}
+        }
+      },
+      "exposure_summary": {
+        "status": "candidate_added_cards_used",
+        "low_candidate_added_card_use": false,
+        "candidate_added_cards": {
+          "total_recorded_use_count": 14,
+          "all_cards_used": true
+        }
+      },
+      "source_doc": "docs/hermes-analysis/LOREHOLD_607_POST_BIRGI_CANDIDATE_SWEEP_2026-07-05.md"
+    }
+  ]
+}

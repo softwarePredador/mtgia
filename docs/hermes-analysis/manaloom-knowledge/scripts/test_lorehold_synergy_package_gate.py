@@ -1195,6 +1195,33 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
         }
         self.assertTrue(expected_profiled_history.issubset(default_names))
+        self.assertIn(
+            "lorehold_607_candidate_decision_registry_20260705.json",
+            default_names,
+        )
+
+    def test_20260705_candidate_decision_registry_blocks_current_rejects(self):
+        registry = gate.REPORT_DIR / "lorehold_607_candidate_decision_registry_20260705.json"
+        prior_results = gate.load_prior_package_results([registry])
+
+        for package_key in ("birgi_spellchain_cut_jeskas_will", "one_ring_burden_reset"):
+            with self.subTest(package_key=package_key):
+                classification = gate.classify_package_prior_evidence(
+                    package_key,
+                    gate.PACKAGE_DEFINITIONS[package_key],
+                    prior_results,
+                )
+                self.assertEqual(classification["status"], "blocked_prior_reject")
+                self.assertIn("reject_regresses_critical_matchup", classification["reason"])
+                self.assertTrue(classification["matches"][0]["source_report"].endswith(registry.name))
+
+        classification = gate.classify_package_prior_evidence(
+            "future_drc_hexing_package",
+            {"adds": ["Dragon's Rage Channeler"], "cuts": ["Hexing Squelcher"]},
+            prior_results,
+        )
+        self.assertEqual(classification["status"], "blocked_prior_reject")
+        self.assertEqual(classification["matches"][0]["package_key"], "drc_hexing_squelcher_v1")
 
     def test_prior_evidence_blocks_aggregate_matrix_reject(self):
         with tempfile.TemporaryDirectory() as tmp:
