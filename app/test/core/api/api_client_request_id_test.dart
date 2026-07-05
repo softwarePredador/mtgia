@@ -87,7 +87,7 @@ void main() {
     test('defaults to the public server when API_BASE_URL is absent', () {
       expect(
         ApiClient.baseUrl,
-        equals('https://evolution-cartinhas.8ktevp.easypanel.host'),
+        equals('https://evolution-cartinhas.2ta7qx.easypanel.host'),
       );
       expect(ApiClient.baseUrl, isNot(contains('127.0.0.1')));
       expect(ApiClient.baseUrl, isNot(contains('10.0.2.2')));
