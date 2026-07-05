@@ -273,6 +273,14 @@ Current external refresh on 2026-07-05:
   `Lorehold`; however the small equal-seed probe underperformed the base
   (`33.3%` versus `66.7%`) and none of the five added removal cards were
   exercised in replay events, so promotion remains blocked.
+- Current clean one-swap Kaalia candidate evidence is better but still not a
+  promotion. A guarded source copy with only `+Feed the Swarm / -Birgi, God of
+  Storytelling // Harnfel, Horn of Bounty` produced local
+  `battle_probe_ready_for_larger_gate` evidence on the same three real
+  opponents/seed: base `33.3%`, candidate `66.7%`, stale Lorehold mentions `0`.
+  Replay evidence shows `Demonic Tutor` selected `Feed the Swarm`, then `Feed
+  the Swarm` was cast/resolved and removed `Kinnan, Bonder Prodigy`. This
+  unlocks a larger equal battle/replay gate only; promotion remains closed.
 
 ## Global Commander Rollout - 2026-07-01
 

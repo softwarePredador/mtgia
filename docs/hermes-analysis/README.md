@@ -273,6 +273,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     base `66.7%`, e nenhuma das cinco remocoes adicionadas foi exercida nos
     eventos do replay:
     `master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md`.
+    A candidata limpa de uma troca (`+Feed the Swarm / -Birgi, God of
+    Storytelling // Harnfel, Horn of Bounty`) reabriu o proximo gate: base
+    `33.3%`, candidata `66.7%`, `battle_probe_ready_for_larger_gate`, sem
+    contaminacao `Lorehold`, e replay com `Demonic Tutor` buscando `Feed the
+    Swarm`; a carta foi conjurada/resolvida e removeu `Kinnan, Bonder Prodigy`.
+    Isso libera somente um gate maior equal-seed/equal-opponents, nao promocao.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em
