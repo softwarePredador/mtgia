@@ -2819,3 +2819,75 @@ Operational lesson:
   no-regression proof before any land swap can be considered.
 - `607` still remains the best protected Lorehold baseline because the planner
   found review targets, not a safe deck change.
+
+## Topdeck Sidecar Probe Evidence Miner - 2026-07-05
+
+The current probe-evidence artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_probe_evidence_miner_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_probe_evidence_miner_20260705_current.json`
+
+This miner consumes:
+
+- `lorehold_topdeck_sidecar_cut_model_planner_20260705_current`;
+- `lorehold_card_exposure_profile_20260704_role_tag_repair_deck607`;
+- `lorehold_mana_base_safe_cut_model_20260705_current`.
+
+Current result:
+
+- status:
+  `topdeck_sidecar_probe_evidence_no_safe_cut_keep_607`;
+- probe rows reviewed: `48`;
+- safe-cut ready rows: `0`;
+- matrix-candidate rows eligible now: `0`;
+- candidate deck materialization allowed now: `false`;
+- forced access allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- exposed topdeck-role probes blocked: `20`;
+- generic mana probes blocked: `28`;
+- dedicated mana-base model-ready pairs found: `2`;
+- recommended next action:
+  `use_dedicated_mana_model_ready_pairs_as_diagnostic_candidates_or_collect_topdeck_floor_traces`.
+
+Topdeck probe evidence:
+
+- `Artist's Talent` has `535` unique exposure records and is classified as
+  `draw_filter_value`;
+- `Improvisation Capstone` has `59` unique exposure records and is classified
+  as `draw_filter_value`;
+- `Pinnacle Monk // Mystic Peak` has `8` unique exposure records and is
+  classified as `recursion_engine`;
+- `Reforge the Soul` has `23` unique exposure records and is classified as
+  `draw_filter_value`;
+- therefore none of these topdeck probes is a low-impact cut from current
+  evidence.
+
+Mana probe evidence:
+
+- `Mountain // Mountain` has `402` unique exposure records and remains a basic
+  land floor probe, not a safe cut;
+- `Plains // Plains` has `244` unique exposure records and remains a basic land
+  floor probe, not a safe cut;
+- `Ancient Tomb` has `39` unique exposure records and remains too risky as a
+  fast-mana utility probe;
+- `Battlefield Forge` has `15` unique exposure records and needs pair-level
+  color-source equivalence proof.
+
+Corrected mana route:
+
+- the generic sidecar mana probes are weaker than the dedicated mana-base
+  model;
+- the dedicated model has exactly two current diagnostic pairs:
+  `+Plateau / -Radiant Summit` and `+Plateau / -Turbulent Steppe`;
+- these pairs are `model_ready_for_candidate_materialization`, but still have
+  deck materialization, matrix scoring, trace, battle, and promotion closed.
+
+Operational lesson:
+
+- The next safe movement is not to cut the named probes.
+- For topdeck, collect floor-equivalence traces before trying any candidate
+  row.
+- For mana, route through the dedicated `Plateau` pair model instead of generic
+  basic-land or utility-land probes.
+- Deck `607` remains untouched and protected.
