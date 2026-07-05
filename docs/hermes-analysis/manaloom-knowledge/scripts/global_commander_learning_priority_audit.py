@@ -239,11 +239,16 @@ def next_action_for_deck(
     core_row: dict[str, Any],
     land_cut_pool: dict[str, Any] | None,
     nonland_pool: dict[str, Any] | None = None,
+    has_commander_source_lane: bool = False,
 ) -> str:
     gate_state = repair_gate_state(core_row, land_cut_pool, nonland_pool)
     if stage == "core_floor_repair" and gate_state == "land_add_cut_pool_ready_review_only":
+        if has_commander_source_lane:
+            return "review_top_land_add_cut_pair_then_candidate_copy"
         return "review_top_land_add_cut_pair_then_candidate_copy_after_commander_source_lane"
     if stage == "core_floor_repair" and gate_state == "nonland_add_cut_pool_ready_review_only":
+        if has_commander_source_lane:
+            return "review_top_nonland_add_cut_pair_then_candidate_copy"
         return "review_top_nonland_add_cut_pair_then_candidate_copy_after_commander_source_lane"
     if stage == "core_floor_repair" and gate_state == "needs_commander_specific_source_lane":
         return "build_commander_specific_win_plan_source_lane_before_named_nonland_cards"
@@ -280,6 +285,7 @@ def build_deck_priorities(
     for core_row in core_payload.get("decks", []):
         commander_key = normalize_commander(str(core_row.get("commander") or ""))
         commander_row = commander_rows.get(commander_key)
+        has_commander_source_lane = int((commander_row or {}).get("source_lane_count") or 0) > 0
         stage = stage_for_deck(core_row, commander_row)
         land_cut_pool = cut_pools.get(str(core_row.get("deck_id") or ""))
         nonland_pool = preferred_nonland_pool(
@@ -311,7 +317,13 @@ def build_deck_priorities(
                 "nonland_candidate_count": int((nonland_pool or {}).get("candidate_count") or 0),
                 "nonland_cut_candidate_count": int((nonland_pool or {}).get("cut_candidate_count") or 0),
                 "nonland_pair_hypothesis_count": len((nonland_pool or {}).get("pair_hypotheses") or []),
-                "next_action": next_action_for_deck(stage, core_row, land_cut_pool, nonland_pool),
+                "next_action": next_action_for_deck(
+                    stage,
+                    core_row,
+                    land_cut_pool,
+                    nonland_pool,
+                    has_commander_source_lane=has_commander_source_lane,
+                ),
             }
         )
     priorities.sort(

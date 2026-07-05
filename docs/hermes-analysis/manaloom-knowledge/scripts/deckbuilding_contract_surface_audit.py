@@ -373,6 +373,8 @@ def build_audit() -> dict[str, Any]:
                 "hermes_is_lab_cache",
                 "ready_for_strategy_matrix",
                 "structure_ready_source_missing",
+                "local_runtime_reference_profiles",
+                "local_runtime_profile_count",
             ],
         )
     )

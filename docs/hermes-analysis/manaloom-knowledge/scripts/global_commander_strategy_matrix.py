@@ -49,7 +49,12 @@ SOURCE_LANE_FIELDS = (
     "reference_deck_analysis_count",
     "learned_deck_count",
     "card_usage_count",
+    "local_runtime_profile_count",
 )
+LOCAL_RUNTIME_REFERENCE_PROFILE_KEYS = {
+    "kaalia of the vast": "server/lib/ai/commander_reference_profile_support.dart",
+    "lorehold, the historian": "server/lib/ai/commander_reference_profile_support.dart",
+}
 
 
 def utc_now() -> str:
@@ -66,6 +71,13 @@ def empty_source_signals() -> dict[str, int]:
 
 def source_lane_count(signals: dict[str, int]) -> int:
     return sum(1 for field in SOURCE_LANE_FIELDS if int(signals.get(field) or 0) > 0)
+
+
+def merge_local_runtime_source_signal(commander_key: str, signals: dict[str, int]) -> dict[str, int]:
+    merged = {**empty_source_signals(), **signals}
+    if commander_key in LOCAL_RUNTIME_REFERENCE_PROFILE_KEYS:
+        merged["local_runtime_profile_count"] = 1
+    return merged
 
 
 def readiness_status(*, ready_count: int, product_ready_count: int, source_lanes: int, blocked_count: int) -> str:
@@ -230,7 +242,10 @@ def build_matrix(
         scope_counts = Counter(row["scope"] for row in rows)
         ready_scope_counts = Counter(row["scope"] for row in ready_rows)
         issue_counts = Counter(issue for row in blocked_rows for issue in row["issues"])
-        signals = source_signals.get(commander_key, empty_source_signals())
+        signals = merge_local_runtime_source_signal(
+            commander_key,
+            source_signals.get(commander_key, empty_source_signals()),
+        )
         lanes = source_lane_count(signals)
         product_ready_count = sum(1 for row in ready_rows if row["scope"] in PRODUCT_SCOPES)
         lab_ready_count = sum(1 for row in ready_rows if row["scope"] in LAB_SCOPES)
@@ -298,7 +313,9 @@ def build_matrix(
             "hermes_is_lab_cache": True,
             "eligible_scopes": sorted(READY_SCOPES),
             "source_lane_mode": source_lane_mode,
-            "source_lanes_available": source_lane_mode == "postgres",
+            "source_lanes_available": source_lane_mode == "postgres"
+            or any(row["source_lane_count"] > 0 for row in commanders),
+            "local_runtime_reference_profiles": dict(sorted(LOCAL_RUNTIME_REFERENCE_PROFILE_KEYS.items())),
             "battle_or_optimization_performed": False,
         },
         "totals": {

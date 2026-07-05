@@ -250,6 +250,65 @@ class GlobalCommanderLearningPriorityAuditTests(unittest.TestCase):
         self.assertIn("review_top_nonland_add_cut_pair", row["next_action"])
         self.assertEqual(report["summary"]["repair_gate_counts"]["nonland_add_cut_pool_ready_review_only"], 1)
 
+    def test_nonland_pool_ready_with_source_lane_can_move_to_candidate_copy(self) -> None:
+        core_payload = {
+            "decks": [
+                {
+                    "deck_id": "619",
+                    "deck_name": "Kaalia Variant",
+                    "commander": "Kaalia of the Vast",
+                    "scope": "hermes_registered_variant",
+                    "shape_status": "structure_ready",
+                    "core_status": "core_role_gap",
+                    "role_bands": [
+                        {
+                            "role": "removal",
+                            "count": 1,
+                            "min": 6,
+                            "max": 14,
+                            "severity": "critical",
+                            "status": "below_floor",
+                        }
+                    ],
+                }
+            ]
+        }
+        strategy_payload = {
+            "commanders": [
+                {
+                    "commander_key": "kaalia of the vast",
+                    "status": "ready_for_strategy_matrix",
+                    "source_lane_count": 1,
+                }
+            ]
+        }
+        nonland_payload = {
+            "nonland_pools": [
+                {
+                    "deck_id": "619",
+                    "role": "removal",
+                    "status": "review_nonland_add_cut_pool_ready",
+                    "candidate_count": 12,
+                    "cut_candidate_count": 12,
+                    "pair_hypotheses": [{"add": "Feed the Swarm", "cut": "Birgi"}],
+                }
+            ]
+        }
+
+        report = audit.build_report(
+            core_payload=core_payload,
+            strategy_payload=strategy_payload,
+            nonland_payload=nonland_payload,
+            bracket_status=audit.bracket_policy_status_from_text(""),
+            core_report_path=Path("docs/hermes-analysis/master_optimizer_reports/core.json"),
+            strategy_report_path=Path("docs/hermes-analysis/master_optimizer_reports/strategy.json"),
+            nonland_report_path=Path("docs/hermes-analysis/master_optimizer_reports/nonland.json"),
+        )
+
+        [row] = report["deck_priorities"]
+        self.assertEqual(row["repair_gate_state"], "nonland_add_cut_pool_ready_review_only")
+        self.assertEqual(row["next_action"], "review_top_nonland_add_cut_pair_then_candidate_copy")
+
 
 if __name__ == "__main__":
     unittest.main()

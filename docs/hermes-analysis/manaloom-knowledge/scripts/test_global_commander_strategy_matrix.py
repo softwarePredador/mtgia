@@ -93,29 +93,56 @@ class GlobalCommanderStrategyMatrixTests(unittest.TestCase):
         self.assertEqual(row["blocked_product_deck_count"], 1)
         self.assertEqual(row["blocked_issue_counts"], {"quantity_not_100": 1})
 
-    def test_build_matrix_records_skipped_source_lane_mode(self) -> None:
+    def test_build_matrix_records_skipped_source_lane_mode_for_commander_without_local_profile(self) -> None:
         payload = build_matrix(
             [
                 {
                     "source": "hermes",
-                    "scope": "hermes_lorehold_variant",
+                    "scope": "hermes_registered_variant",
                     "status": "structure_ready",
                     "issues": [],
-                    "deck_id": "607",
-                    "deck_name": "VARIANT Lorehold",
-                    "commander": "Lorehold, the Historian",
-                    "commander_key": "lorehold, the historian",
+                    "deck_id": "617",
+                    "deck_name": "VARIANT Kefka",
+                    "commander": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+                    "commander_key": "kefka, court mage // kefka, ruler of ruin",
                     "quantity": 100,
                     "commander_count": 1,
                 }
             ],
-            {"lorehold, the historian": empty_source_signals()},
+            {"kefka, court mage // kefka, ruler of ruin": empty_source_signals()},
             source_lane_mode="skipped_postgres_source_lanes",
         )
 
         self.assertEqual(payload["method"]["source_lane_mode"], "skipped_postgres_source_lanes")
         self.assertFalse(payload["method"]["source_lanes_available"])
         self.assertEqual(payload["commanders"][0]["status"], "structure_ready_source_missing")
+
+    def test_local_runtime_profile_counts_as_source_lane_when_postgres_is_skipped(self) -> None:
+        payload = build_matrix(
+            [
+                {
+                    "source": "hermes",
+                    "scope": "hermes_registered_variant",
+                    "status": "structure_ready",
+                    "issues": [],
+                    "deck_id": "619",
+                    "deck_name": "VARIANT Kaalia",
+                    "commander": "Kaalia of the Vast",
+                    "commander_key": "kaalia of the vast",
+                    "quantity": 100,
+                    "commander_count": 1,
+                }
+            ],
+            {"kaalia of the vast": empty_source_signals()},
+            source_lane_mode="skipped_postgres_source_lanes",
+        )
+
+        row = payload["commanders"][0]
+        self.assertEqual(row["status"], "ready_for_strategy_matrix")
+        self.assertEqual(row["source_lane_count"], 1)
+        self.assertEqual(row["source_signals"]["local_runtime_profile_count"], 1)
+        self.assertTrue(payload["method"]["source_lanes_available"])
+        self.assertIn("kaalia of the vast", payload["method"]["local_runtime_reference_profiles"])
 
 
 if __name__ == "__main__":
