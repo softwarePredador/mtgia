@@ -168,6 +168,12 @@ GLOBAL_COMMANDER_EXTERNAL_CORPUS_CUT_POLICY_MAPPER = (
 GLOBAL_COMMANDER_EXTERNAL_CORPUS_CUT_POLICY_MAPPER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_corpus_cut_policy_mapper.py"
 )
+GLOBAL_COMMANDER_PACKAGE_AXIS_BROADENING_PLAN = (
+    SCRIPT_DIR / "global_commander_package_axis_broadening_plan.py"
+)
+GLOBAL_COMMANDER_PACKAGE_AXIS_BROADENING_PLAN_TEST = (
+    SCRIPT_DIR / "test_global_commander_package_axis_broadening_plan.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -393,6 +399,10 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_REFERENCE_CORPUS_COLLECTOR_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_CORPUS_CUT_POLICY_MAPPER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_PACKAGE_AXIS_BROADENING_PLAN_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_package_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -725,6 +735,11 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md",
                 "external_policy_exclusion_count=8",
                 "broaden_commander_package_axis_or_external_cut_research",
+                "global_commander_package_axis_broadening_plan.py",
+                "global_commander_package_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md",
+                "commander_package_axis_broadening_plan_ready_no_deck_action",
+                "package_axis_mismatch_with_exhausted_cut_lanes",
+                "resynthesize_package_with_same_lane_axis_requirements",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -999,6 +1014,10 @@ def build_audit() -> dict[str, Any]:
                 "value_safe_cut_source_mining_blocks_package_resynthesis",
                 "external_policy_exclusion_count=8",
                 "hypothesis_count=0",
+                "global_commander_package_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md",
+                "commander_package_axis_broadening_plan_ready_no_deck_action",
+                "lane_alignment_status=package_axis_mismatch_with_exhausted_cut_lanes",
+                "resynthesize_package_with_same_lane_axis_requirements",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1564,6 +1583,36 @@ def build_audit() -> dict[str, Any]:
                 "collect_usage_trace_for_new_cut_source_hypotheses",
                 "test_external_policy_exclusion_blocks_reusing_fresh_hypothesis",
                 "external_corpus_policy:exclude_from_rerun_miner_until_new_internal_evidence",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PACKAGE_AXIS_BROADENING_PLAN,
+            [
+                "global_commander_package_axis_broadening_plan",
+                "commander_package_axis_broadening_plan_ready_no_deck_action",
+                "package_axis_broadening_not_ready_hypotheses_need_trace",
+                "package_axis_mismatch_with_exhausted_cut_lanes",
+                "resynthesize_package_with_same_lane_axis_requirements",
+                "collect_external_nonpayoff_cut_lane_corpus",
+                "incidental_payload_is_not_same_lane_cut_proof",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PACKAGE_AXIS_BROADENING_PLAN_TEST,
+            [
+                "test_mismatched_package_axis_routes_to_same_lane_resynthesis",
+                "test_fresh_hypotheses_block_axis_broadening_until_trace",
+                "test_same_lane_axis_still_requires_value_safe_cut_pair",
+                "package_axis_mismatch_with_exhausted_cut_lanes",
+                "resynthesize_package_with_same_lane_axis_requirements",
+                "collect_external_nonpayoff_cut_lane_corpus",
+                "same_lane_axis_still_needs_value_safe_cut_proof",
             ],
         )
     )
@@ -2543,6 +2592,28 @@ def build_audit() -> dict[str, Any]:
                 "broaden_commander_package_axis_or_external_cut_research",
                 "external_policy_exclusions_consumed:8",
                 "external_policy_boundary",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_PACKAGE_AXIS_BROADENING_PLAN_REPORT,
+            [
+                "Global Commander Package Axis Broadening Plan",
+                "commander_package_axis_broadening_plan_ready_no_deck_action",
+                "selected_add_count: `6`",
+                "selected_cut_count: `5`",
+                "value_safe_cut_count: `0`",
+                "fresh_hypothesis_count: `0`",
+                "external_policy_exclusion_count: `8`",
+                "lane_alignment_status: `package_axis_mismatch_with_exhausted_cut_lanes`",
+                "package_axes: `angels_demons_dragons_payoffs`",
+                "unmatched_cut_roles: `haste_protection_silence, mana_acceleration, tutors_access`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "resynthesize_package_with_same_lane_axis_requirements",
+                "collect_external_nonpayoff_cut_lane_corpus",
+                "incidental_payload_is_not_same_lane_cut_proof",
             ],
         )
     )

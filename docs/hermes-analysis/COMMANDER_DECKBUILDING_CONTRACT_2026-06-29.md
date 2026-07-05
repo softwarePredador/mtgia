@@ -321,7 +321,14 @@ Operational priority after this pivot:
     all current hypotheses and no fresh value-safe cut source remains, the route
     must broaden the package axis or external cut research rather than opening
     candidate copy, battle, or promotion;
-39. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+39. run `global_commander_package_axis_broadening_plan.py` after policy-aware
+    mining exhausts the current cut lane; it must compare current package add
+    axes with target cut roles, treat secondary text on payoff cards as
+    incidental rather than same-lane proof, and route to package resynthesis
+    with same-lane axis requirements or external nonpayoff cut-lane corpus
+    research without opening candidate copy, battle, promotion, or value-safe
+    reclassification;
+40. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -378,6 +385,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_package_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -838,6 +846,15 @@ Current external refresh on 2026-07-05:
   with `hypothesis_count=0`, `blocked_hypothesis_count=88`, and
   `external_policy_exclusion_count=8`. The current cut lane is exhausted; the
   next gate is `broaden_commander_package_axis_or_external_cut_research`.
+- Current package-axis broadening plan returns
+  `commander_package_axis_broadening_plan_ready_no_deck_action` with
+  `selected_add_count=6`, `selected_cut_count=5`, `value_safe_cut_count=0`,
+  and `lane_alignment_status=package_axis_mismatch_with_exhausted_cut_lanes`.
+  The selected add package is `angels_demons_dragons_payoffs`, while exhausted
+  cut roles are `haste_protection_silence`, `mana_acceleration`, and
+  `tutors_access`. Secondary text on payoffs such as haste, treasure, draw, or
+  protection is incidental and does not prove a same-lane replacement. The next
+  gate is `resynthesize_package_with_same_lane_axis_requirements`.
 
 ## Global Commander Rollout - 2026-07-01
 

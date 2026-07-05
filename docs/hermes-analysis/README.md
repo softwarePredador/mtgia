@@ -600,6 +600,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `hypothesis_count=0`, `blocked_hypothesis_count=88` e
     `external_policy_exclusion_count=8`. Proximo gate:
     `broaden_commander_package_axis_or_external_cut_research`.
+    O plano de broadening fica em
+    `global_commander_package_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md`.
+    Resultado: `commander_package_axis_broadening_plan_ready_no_deck_action`,
+    com `selected_add_count=6`, `selected_cut_count=5`,
+    `value_safe_cut_count=0` e
+    `lane_alignment_status=package_axis_mismatch_with_exhausted_cut_lanes`.
+    O pacote atual adiciona `angels_demons_dragons_payoffs`, mas os cortes
+    esgotados estao em `haste_protection_silence`, `mana_acceleration` e
+    `tutors_access`; texto secundario nos payoffs e incidental, nao prova
+    same-lane. Proximo gate:
+    `resynthesize_package_with_same_lane_axis_requirements`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

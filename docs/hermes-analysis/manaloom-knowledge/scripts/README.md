@@ -160,6 +160,13 @@ Rerun `global_commander_value_safe_cut_source_miner.py` with
 hypotheses, the current cut lane is exhausted and the next route is to broaden
 the package axis or external cut research, not candidate copy or battle.
 
+Use `global_commander_package_axis_broadening_plan.py` for that route decision.
+It compares the selected add axes against target cut roles, treats incidental
+secondary text on payoff cards as non-proof, and routes to
+`resynthesize_package_with_same_lane_axis_requirements` or external nonpayoff
+cut-lane corpus research. Candidate copy, battle, promotion, and value-safe
+reclassification remain closed.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

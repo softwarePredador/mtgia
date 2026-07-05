@@ -1,0 +1,237 @@
+{
+  "artifact_type": "global_commander_package_axis_broadening_plan",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "broadening_actions": [
+    {
+      "action": "resynthesize_package_with_same_lane_axis_requirements",
+      "candidate_copy_allowed": false,
+      "package_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "priority": "P0",
+      "reason": "The current add package is not competing in the same lanes as the exhausted cut pressure.",
+      "status": "required_now",
+      "target_cut_roles": {
+        "haste_protection_silence": 4,
+        "mana_acceleration": 1,
+        "tutors_access": 8
+      }
+    },
+    {
+      "action": "collect_external_nonpayoff_cut_lane_corpus",
+      "candidate_copy_allowed": false,
+      "corpus_source_count": 5,
+      "policy_row_count": 8,
+      "priority": "P1",
+      "reason": "The external policy consumed current hypotheses; target cut roles need new source context before reuse.",
+      "status": "evidence_lane"
+    },
+    {
+      "action": "reduce_package_to_existing_value_safe_pairs_only_after_proof",
+      "candidate_copy_allowed": false,
+      "priority": "P2",
+      "reason": "No reduced package may advance without at least one value-safe add/cut pair.",
+      "selected_add_count": 6,
+      "selected_cut_count": 5,
+      "status": "blocked_until_cut_pair_exists",
+      "value_safe_cut_count": 0
+    },
+    {
+      "action": "keep_current_package_closed",
+      "candidate_copy_allowed": false,
+      "priority": "P3",
+      "reason": "Current evidence does not authorize deck copy, battle, promotion, or mutation.",
+      "status": "closed_no_deck_action"
+    }
+  ],
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "policy_aware_miner_has_no_fresh_value_safe_cut_hypotheses",
+    "current_package_axis_not_authorized_for_cross_lane_cuts",
+    "candidate_copy_closed_until_value_safe_same_lane_pair_exists"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T23:10:14.174867+00:00",
+  "input_artifacts": {
+    "corpus_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "cut_source_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "miner_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json",
+    "package_synthesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "policy_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "axis_boundary": "A payoff add package cannot justify cuts from ramp, tutor, haste/protection, or other lanes without explicit same-lane/equal-gate proof.",
+    "battle_boundary": "This plan does not run battle or open promotion.",
+    "cut_boundary": "External absence, stage-only status, and forced-access diagnostics do not create value-safe cuts.",
+    "incidental_signal_boundary": "Secondary text such as haste, treasure, draw, or protection on a payoff is not same-lane replacement proof by itself."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "selected_add_axis_diagnostics": [
+    {
+      "card_name": "Dragon Mage",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "guardrail": "incidental_payload_is_not_same_lane_cut_proof",
+      "incidental_signals": {},
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    },
+    {
+      "card_name": "Bonehoard Dracosaur",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "guardrail": "incidental_payload_is_not_same_lane_cut_proof",
+      "incidental_signals": {
+        "haste_protection_silence": [
+          "combat_keywords"
+        ],
+        "mana_acceleration": [
+          "mana_or_treasure_payload"
+        ]
+      },
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    },
+    {
+      "card_name": "Drakuseth, Maw of Flames",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "guardrail": "incidental_payload_is_not_same_lane_cut_proof",
+      "incidental_signals": {},
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    },
+    {
+      "card_name": "The Balrog of Moria",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "guardrail": "incidental_payload_is_not_same_lane_cut_proof",
+      "incidental_signals": {
+        "haste_protection_silence": [
+          "combat_keywords",
+          "haste"
+        ],
+        "mana_acceleration": [
+          "mana_or_treasure_payload"
+        ]
+      },
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    },
+    {
+      "card_name": "Wrathful Red Dragon",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "guardrail": "incidental_payload_is_not_same_lane_cut_proof",
+      "incidental_signals": {},
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    },
+    {
+      "card_name": "Akroma, Angel of Wrath",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "guardrail": "incidental_payload_is_not_same_lane_cut_proof",
+      "incidental_signals": {
+        "haste_protection_silence": [
+          "combat_keywords",
+          "haste",
+          "protection_or_lock_payload"
+        ]
+      },
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    }
+  ],
+  "selected_cut_lane_diagnostics": [
+    {
+      "card_name": "Diabolic Intent",
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "guardrail": "selected_cut_still_needs_value_safe_or_equal_gate_proof",
+      "matching_over_target_roles": [
+        "tutors_access"
+      ]
+    },
+    {
+      "card_name": "Jeska's Will",
+      "cut_reasons": [
+        "over_target_mana_acceleration"
+      ],
+      "guardrail": "selected_cut_still_needs_value_safe_or_equal_gate_proof",
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ]
+    },
+    {
+      "card_name": "Professional Face-Breaker",
+      "cut_reasons": [
+        "over_target_mana_acceleration"
+      ],
+      "guardrail": "selected_cut_still_needs_value_safe_or_equal_gate_proof",
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ]
+    },
+    {
+      "card_name": "Ornithopter of Paradise",
+      "cut_reasons": [
+        "over_target_mana_acceleration"
+      ],
+      "guardrail": "selected_cut_still_needs_value_safe_or_equal_gate_proof",
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ]
+    },
+    {
+      "card_name": "Dark Ritual",
+      "cut_reasons": [
+        "over_target_mana_acceleration"
+      ],
+      "guardrail": "selected_cut_still_needs_value_safe_or_equal_gate_proof",
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ]
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "commander_package_axis_broadening_plan_ready_no_deck_action",
+  "summary": {
+    "blocked_hypothesis_count": 88,
+    "commander": "Kaalia of the Vast",
+    "corpus_source_count": 5,
+    "deck_id": "619",
+    "external_policy_exclusion_count": 8,
+    "fresh_hypothesis_count": 0,
+    "incidental_secondary_signal_count": 3,
+    "lane_alignment_status": "package_axis_mismatch_with_exhausted_cut_lanes",
+    "next_gate": "resynthesize_package_with_same_lane_axis_requirements",
+    "package_axes": [
+      "angels_demons_dragons_payoffs"
+    ],
+    "policy_row_count": 8,
+    "same_lane_axes": [],
+    "selected_add_count": 6,
+    "selected_cut_count": 5,
+    "target_cut_roles": {
+      "haste_protection_silence": 4,
+      "mana_acceleration": 1,
+      "tutors_access": 8
+    },
+    "unmatched_cut_roles": [
+      "haste_protection_silence",
+      "mana_acceleration",
+      "tutors_access"
+    ],
+    "unpaired_add_count": 1,
+    "value_safe_cut_count": 0
+  },
+  "value_safe_reclassification_allowed_now": false
+}
