@@ -21,7 +21,9 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_RUNTIME = SCRIPT_DIR / "battle_analyst_v9.py"
 DEFAULT_TEST = SCRIPT_DIR / "test_xmage_exact_scope_runtime.py"
-DEFAULT_CONTRACT_REPORT = REPORT_DIR / "lorehold_brain_entreat_haze_runtime_contract_20260705_current.json"
+DEFAULT_CONTRACT_REPORT = (
+    REPORT_DIR / "lorehold_brain_entreat_haze_runtime_contract_20260705_post_authorized_full_validation.json"
+)
 DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_entreat_x_token_runtime_preflight_20260705_current"
 
 

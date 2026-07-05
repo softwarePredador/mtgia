@@ -163,6 +163,7 @@ EXILE_SCOPE = "xmage_exile_target_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
 MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
+ETB_FIXED_MANA_CREATURE_SCOPE = "xmage_creature_etb_add_fixed_mana_v1"
 SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_self_sacrifice_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 COUNTER_DRAW_SCOPE = "xmage_counter_target_and_draw_card_spell_v1"
@@ -6106,6 +6107,15 @@ def is_creature_etb_tutor_to_hand_unit(row: dict[str, Any]) -> bool:
         and "EntersBattlefieldTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
+def is_creature_etb_fixed_mana_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == RAMP_CREATURE_UNIT
+        and effect_classes(row) == {"BasicManaEffect"}
+        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"triggered_ability"}
     )
 
 
@@ -12449,6 +12459,42 @@ def sacrifice_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[s
     return None
 
 
+def fixed_mana_symbols_from_braces(text: str) -> list[str]:
+    symbols = re.findall(r"\{([WUBRGC])\}", str(text or "").upper())
+    return [symbol for symbol in symbols if symbol in JAVA_MANA_METHOD_SYMBOLS.values()]
+
+
+def etb_fixed_mana_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    candidates: list[dict[str, Any]] = []
+    for line in normalized_oracle_lines(metadata):
+        if " if " in line or "whenever " in line or "at the beginning " in line:
+            if "enters" in line and "add " in line:
+                return None
+            continue
+        match = re.fullmatch(
+            r"when (?:(?:this|that) creature|(?:this|that) permanent|[^,.]+) "
+            r"enters(?: the battlefield)?, add (?P<mana>(?:\{[wubrgc]\})+)\.?",
+            line,
+        )
+        if not match:
+            if "enters" in line and "add " in line:
+                return None
+            continue
+        produced_symbols = fixed_mana_symbols_from_braces(match.group("mana"))
+        if not produced_symbols:
+            return None
+        candidates.append(
+            {
+                "produces": _unique_mana_symbols(produced_symbols),
+                "mana_produced": len(produced_symbols),
+                "produced_mana_symbols": produced_symbols,
+            }
+        )
+    if len(candidates) == 1:
+        return candidates[0]
+    return None
+
+
 JAVA_MANA_METHOD_SYMBOLS = {
     "White": "W",
     "Blue": "U",
@@ -12467,6 +12513,12 @@ def java_simple_mana_symbols_from_source(source_text: str) -> list[str] | None:
     )
     if method_match:
         return [JAVA_MANA_METHOD_SYMBOLS[method_match.group(1)]] * int(method_match.group(2))
+    colored_constructor_match = re.search(
+        r"new\s+Mana\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)",
+        text,
+    )
+    if colored_constructor_match:
+        return [colored_constructor_match.group(1)]
     constructor_match = re.search(r"new\s+Mana\s*\(\s*([0-9,\s]+)\)", text)
     if constructor_match:
         values = [int(value.strip()) for value in constructor_match.group(1).split(",") if value.strip()]
@@ -12507,6 +12559,31 @@ def sacrifice_mana_source_source_blocker(source_text: str, detail: dict[str, Any
     expected_symbols = list(detail.get("produced_mana_symbols") or [])
     if source_symbols is not None and expected_symbols and Counter(source_symbols) != Counter(expected_symbols):
         return "mana_source_sacrifice_source_mana_output_mismatch"
+    return None
+
+
+def etb_fixed_mana_source_blocker(source_text: str, detail: dict[str, Any]) -> str | None:
+    text = source_text or ""
+    if len(re.findall(r"new\s+EntersBattlefieldTriggeredAbility\s*\(", text)) != 1:
+        return "etb_mana_source_not_single_etb_trigger"
+    if len(re.findall(r"new\s+BasicManaEffect\s*\(", text)) != 1:
+        return "etb_mana_source_not_single_basic_mana_effect"
+    unsupported_markers = {
+        ".withInterveningIf": "etb_mana_source_condition_not_supported",
+        "Conditional": "etb_mana_source_condition_not_supported",
+        "DynamicManaEffect": "etb_mana_source_dynamic_not_supported",
+        "AddConditionalManaEffect": "etb_mana_source_restricted_spend_not_supported",
+        "Target": "etb_mana_source_target_not_supported",
+    }
+    for marker, reason in unsupported_markers.items():
+        if marker in text:
+            return reason
+    source_symbols = java_simple_mana_symbols_from_source(text)
+    expected_symbols = list(detail.get("produced_mana_symbols") or [])
+    if source_symbols is None:
+        return "etb_mana_source_output_not_fixed"
+    if Counter(source_symbols) != Counter(expected_symbols):
+        return "etb_mana_source_oracle_mismatch"
     return None
 
 
@@ -13344,6 +13421,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "activated mana-source permanent with separate activated draw ability"
     elif scope == MANA_WITH_ETB_DRAW_SCOPE:
         scope_kind = "mana-source permanent with fixed enter-the-battlefield draw trigger"
+    elif scope == ETB_FIXED_MANA_CREATURE_SCOPE:
+        scope_kind = "creature with fixed enter-the-battlefield mana trigger"
     elif str(row.get("adapter_work_unit") or "") in RAMP_UNITS:
         scope_kind = "activated mana-source permanent"
     elif scope == TOKEN_SPELL_SCOPE:
@@ -13557,6 +13636,7 @@ def split_row(
     etb_library_pick_creature_unit = is_creature_etb_library_pick_unit(row)
     etb_tutor_battlefield_creature_unit = is_creature_etb_tutor_to_battlefield_unit(row)
     etb_tutor_hand_creature_unit = is_creature_etb_tutor_to_hand_unit(row)
+    etb_fixed_mana_creature_unit = is_creature_etb_fixed_mana_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
     dies_token_creature_unit = is_creature_dies_token_unit(row)
     permanent_activated_token_unit = is_permanent_activated_token_unit(row)
@@ -13648,6 +13728,7 @@ def split_row(
         and not etb_library_pick_creature_unit
         and not etb_tutor_battlefield_creature_unit
         and not etb_tutor_hand_creature_unit
+        and not etb_fixed_mana_creature_unit
         and not etb_token_creature_unit
         and not dies_token_creature_unit
         and not permanent_activated_token_unit
@@ -13716,6 +13797,7 @@ def split_row(
         and not etb_library_pick_creature_unit
         and not etb_tutor_battlefield_creature_unit
         and not etb_tutor_hand_creature_unit
+        and not etb_fixed_mana_creature_unit
         and not etb_token_creature_unit
         and not dies_token_creature_unit
         and not permanent_activated_token_unit
@@ -13760,6 +13842,40 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if etb_fixed_mana_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_mana_not_creature"
+        mana_detail = etb_fixed_mana_detail_from_oracle(metadata)
+        if mana_detail is None:
+            return None, "etb_mana_oracle_not_simple_fixed"
+        source_blocker = etb_fixed_mana_source_blocker(source_text, mana_detail)
+        if source_blocker:
+            return None, source_blocker
+        effect_json = {
+            "effect": "ramp_permanent",
+            "battle_model_scope": ETB_FIXED_MANA_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "add_mana",
+            "permanent_type": "creature",
+            "is_mana_source": False,
+            "etb_mana_produced": int(mana_detail["mana_produced"]),
+            "etb_produces": str(mana_detail["produces"]),
+            "etb_produced_mana_symbols": list(mana_detail["produced_mana_symbols"]),
+            "mana_produced": int(mana_detail["mana_produced"]),
+            "produces": str(mana_detail["produces"]),
+            "produced_mana_symbols": list(mana_detail["produced_mana_symbols"]),
+            "xmage_effect_class": "BasicManaEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_add_fixed_mana",
+        ), "selected_exact_scope"
 
     if static_cast_as_flash_permission_unit:
         if not is_permanent_metadata(metadata) or is_spell(metadata):
@@ -19999,6 +20115,7 @@ def build_exact_split_report(
                 "SetBasePowerToughnessSourceEffect + SimpleStaticAbility creature rows whose source and Oracle both set source power/toughness to a direct controller/all-graveyards card-type count",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + AttacksTriggeredAbility, exact attack-trigger target-creature keyword until EOT, and Oracle/source target constraints agreement",
+                "ramp_permanent::xmage_creature_mana_source_variant_review_v1 rows with EntersBattlefieldTriggeredAbility + BasicManaEffect, exact unconditional fixed ETB mana Oracle/source agreement, and no auxiliary ability class",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice/discard-a-card source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToBattlefieldTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-battlefield Oracle text, and mana/tap/source self-sacrifice costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, AttacksTriggeredAbility, exact attack graveyard-to-hand Oracle/source agreement, optional trigger mana cost, and only static self keywords or ETB tapped metadata",

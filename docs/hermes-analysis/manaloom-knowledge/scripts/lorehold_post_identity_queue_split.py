@@ -28,7 +28,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_SIMULATION_REPORT = REPORT_DIR / "lorehold_external_identity_cache_simulation_20260705_current.json"
 DEFAULT_SCOUT_REPORT = REPORT_DIR / "lorehold_external_material_evidence_scout_20260705_current.json"
-DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_post_identity_queue_split_20260705_current"
+DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_post_identity_queue_split_20260705_post_authorized_full_validation"
 
 SHELL_FAMILY_BY_CARD = {
     "anointed procession": "token_multiplier_shell",

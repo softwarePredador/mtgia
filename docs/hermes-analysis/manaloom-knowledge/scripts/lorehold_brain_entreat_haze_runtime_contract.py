@@ -25,8 +25,10 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
 
 DEFAULT_DB = resolve_default_knowledge_db()
-DEFAULT_SPLIT_REPORT = REPORT_DIR / "lorehold_post_identity_queue_split_20260705_current.json"
-DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_brain_entreat_haze_runtime_contract_20260705_current"
+DEFAULT_SPLIT_REPORT = REPORT_DIR / "lorehold_post_identity_queue_split_20260705_post_authorized_full_validation.json"
+DEFAULT_OUT_PREFIX = (
+    REPORT_DIR / "lorehold_brain_entreat_haze_runtime_contract_20260705_post_authorized_full_validation"
+)
 DEFAULT_BATTLE_RUNTIME = SCRIPT_DIR / "battle_analyst_v9.py"
 DEFAULT_HINTS = SCRIPT_DIR / "xmage_to_manaloom_effect_hints.py"
 

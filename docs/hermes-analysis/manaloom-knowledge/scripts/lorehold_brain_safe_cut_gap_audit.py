@@ -23,17 +23,24 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_BRAIN_PREFLIGHT = (
-    REPORT_DIR / "lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_current.json"
+    REPORT_DIR
+    / "lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_BRAIN_PG_PACKAGE = (
-    REPORT_DIR / "lorehold_brain_in_a_jar_pg_package_preflight_20260705_current.json"
+    REPORT_DIR
+    / "lorehold_brain_in_a_jar_pg_package_preflight_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_VALUE_MODEL = REPORT_DIR / "lorehold_deckbuilding_value_model_20260704_current.json"
-DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_brain_safe_cut_gap_audit_20260705_current"
+DEFAULT_OUT_PREFIX = (
+    REPORT_DIR / "lorehold_brain_safe_cut_gap_audit_20260705_post_authorized_full_validation"
+)
 
 BRAIN = "Brain in a Jar"
 TARGET_RUNTIME_PREFLIGHT_STATUS = (
     "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607"
+)
+TARGET_ACTIVE_RULE_PREFLIGHT_STATUS = (
+    "brain_in_a_jar_runtime_cut_preflight_blocked_no_safe_cut_keep_607"
 )
 LEGACY_TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_package_review_keep_607"
 TARGET_ROUTE_PLANNER_STATUS = (
@@ -317,6 +324,25 @@ def package_runtime_preflight_governed(package_summary: Mapping[str, Any]) -> bo
     )
 
 
+def current_runtime_preflight_governed(preflight_summary: Mapping[str, Any]) -> bool:
+    return (
+        preflight_summary.get("decision_status") == TARGET_ACTIVE_RULE_PREFLIGHT_STATUS
+        and bool(preflight_summary.get("route_gate_valid"))
+        and preflight_summary.get("route_planner_status") in TARGET_ROUTE_PLANNER_STATUSES
+        and bool(preflight_summary.get("route_planner_candidate_queue_governed"))
+        and preflight_summary.get("route_planner_candidate_queue_next_shell_status")
+        == TARGET_NEXT_SHELL_STATUS
+        and bool(preflight_summary.get("candidate_queue_matrix_route_governed"))
+        and bool(preflight_summary.get("brain_exact_adapter_present"))
+        and as_int(preflight_summary.get("brain_active_rule_count")) > 0
+        and as_int(preflight_summary.get("safe_cut_count")) == 0
+        and not bool(preflight_summary.get("postgres_writes_allowed_now"))
+        and not bool(preflight_summary.get("deck_action_allowed_now"))
+        and not bool(preflight_summary.get("natural_battle_gate_allowed_now"))
+        and not bool(preflight_summary.get("promotion_allowed_now"))
+    )
+
+
 def build_report(
     *,
     brain_preflight: Mapping[str, Any],
@@ -327,13 +353,17 @@ def build_report(
 ) -> dict[str, Any]:
     preflight_summary = summary(brain_preflight)
     package_summary = summary(brain_pg_package)
+    active_rule_count_from_preflight = as_int(preflight_summary.get("brain_active_rule_count"))
     active_rule_count = as_int(
-        package_summary.get("brain_active_rule_count_before_apply")
-        or preflight_summary.get("brain_active_rule_count")
+        active_rule_count_from_preflight
+        or package_summary.get("brain_active_rule_count_before_apply")
     )
     package_apply_ready = bool(package_summary.get("apply_ready_for_manual_review"))
     package_apply_executed = bool(package_summary.get("apply_executed_by_this_script"))
-    package_route_governed = package_runtime_preflight_governed(package_summary)
+    postgres_rule_active_confirmed_now = active_rule_count_from_preflight > 0
+    package_route_governed = package_runtime_preflight_governed(
+        package_summary
+    ) or current_runtime_preflight_governed(preflight_summary)
     rows = enriched_cut_rows(
         brain_preflight=brain_preflight,
         active_rule_count=active_rule_count,
@@ -369,24 +399,35 @@ def build_report(
             "brain_pg_package_status": brain_pg_package.get("status") or "",
             "apply_ready_for_manual_review": package_apply_ready,
             "apply_executed_by_this_script": package_apply_executed,
+            "postgres_rule_active_confirmed_now": postgres_rule_active_confirmed_now,
+            "apply_confirmed_outside_package_script": (
+                postgres_rule_active_confirmed_now and not package_apply_executed
+            ),
             "brain_pg_package_route_governed": package_route_governed,
-            "runtime_preflight_status": package_summary.get("runtime_preflight_status") or "",
+            "runtime_preflight_status": preflight_summary.get("decision_status")
+            or package_summary.get("runtime_preflight_status")
+            or "",
             "runtime_preflight_route_gate_valid": bool(
-                package_summary.get("runtime_preflight_route_gate_valid")
+                preflight_summary.get("route_gate_valid")
+                or package_summary.get("runtime_preflight_route_gate_valid")
             ),
             "runtime_preflight_route_planner_status": package_summary.get(
                 "runtime_preflight_route_planner_status"
             )
+            or preflight_summary.get("route_planner_status")
             or "",
             "runtime_preflight_candidate_queue_governed": bool(
-                package_summary.get("runtime_preflight_candidate_queue_governed")
+                preflight_summary.get("route_planner_candidate_queue_governed")
+                or package_summary.get("runtime_preflight_candidate_queue_governed")
             ),
             "runtime_preflight_candidate_queue_next_shell_status": package_summary.get(
                 "runtime_preflight_candidate_queue_next_shell_status"
             )
+            or preflight_summary.get("route_planner_candidate_queue_next_shell_status")
             or "",
             "runtime_preflight_candidate_queue_matrix_route_governed": bool(
-                package_summary.get("runtime_preflight_candidate_queue_matrix_route_governed")
+                preflight_summary.get("candidate_queue_matrix_route_governed")
+                or package_summary.get("runtime_preflight_candidate_queue_matrix_route_governed")
             ),
             "brain_active_rule_count": active_rule_count,
             "brain_exact_adapter_present": bool(package_summary.get("brain_exact_adapter_present")),
@@ -436,6 +477,13 @@ def build_report(
             "pg_apply_requires_explicit_approval": active_rule_count <= 0 and package_apply_ready,
             "lowest_risk_diagnostic_allowed": False,
             "reason": (
+                "Brain in a Jar now has an active PostgreSQL-backed runtime rule, "
+                "but its current external adoption is low-context and every protected-607 "
+                "same-lane slot remains blocked. Deck 607 therefore remains the Lorehold "
+                "champion until a named seed-safe cut and matrix score exist."
+            )
+            if active_rule_count > 0
+            else (
                 "Brain in a Jar is a useful runtime/deckbuilding lesson, but its current "
                 "external adoption is low-context, all protected-607 same-lane slots are "
                 "blocked, and no active PostgreSQL-backed Brain rule exists. Deck 607 "
@@ -466,6 +514,10 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Brain PG package status: `{summary_row['brain_pg_package_status'] or '-'}`",
         f"- Apply ready for manual review: `{str(summary_row['apply_ready_for_manual_review']).lower()}`",
         f"- Apply executed by this script: `{str(summary_row['apply_executed_by_this_script']).lower()}`",
+        "- PostgreSQL rule active confirmed now: "
+        f"`{str(summary_row['postgres_rule_active_confirmed_now']).lower()}`",
+        "- Apply confirmed outside package script: "
+        f"`{str(summary_row['apply_confirmed_outside_package_script']).lower()}`",
         f"- Brain PG package route governed: `{str(summary_row['brain_pg_package_route_governed']).lower()}`",
         f"- Runtime preflight status: `{summary_row['runtime_preflight_status'] or '-'}`",
         f"- Runtime route gate valid: `{str(summary_row['runtime_preflight_route_gate_valid']).lower()}`",

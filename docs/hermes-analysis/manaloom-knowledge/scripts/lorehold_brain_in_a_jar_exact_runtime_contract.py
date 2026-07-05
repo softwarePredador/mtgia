@@ -26,10 +26,15 @@ XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
 
 DEFAULT_XMAGE_SOURCE = XMAGE_ROOT / "Mage.Sets/src/mage/cards/b/BrainInAJar.java"
 DEFAULT_BATTLE_RUNTIME = SCRIPT_DIR / "battle_analyst_v9.py"
-DEFAULT_ROUTE_PLANNER = REPORT_DIR / "lorehold_miracle_next_route_planner_20260705_current.json"
-DEFAULT_PREFLIGHT = REPORT_DIR / "lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_current.json"
+DEFAULT_ROUTE_PLANNER = (
+    REPORT_DIR / "lorehold_miracle_next_route_planner_20260705_post_authorized_full_validation.json"
+)
+DEFAULT_PREFLIGHT = (
+    REPORT_DIR / "lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_post_authorized_full_validation.json"
+)
 DEFAULT_OUT_PREFIX = (
-    REPORT_DIR / "lorehold_brain_in_a_jar_exact_runtime_contract_20260705_current"
+    REPORT_DIR
+    / "lorehold_brain_in_a_jar_exact_runtime_contract_20260705_post_authorized_full_validation"
 )
 
 SCOPE = "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1"

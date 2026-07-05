@@ -23,13 +23,15 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_SAFE_CUT_GAP = REPORT_DIR / "lorehold_brain_safe_cut_gap_audit_20260705_current.json"
+DEFAULT_SAFE_CUT_GAP = (
+    REPORT_DIR / "lorehold_brain_safe_cut_gap_audit_20260705_post_authorized_full_validation.json"
+)
 DEFAULT_CUT_SLOT_TRACE = REPORT_DIR / "lorehold_brain_cut_slot_trace_miner_20260705_current_summary.json"
 DEFAULT_CURRENT_BEST = (
     REPORT_DIR / "lorehold_current_best_baseline_synthesis_20260705_current.json"
 )
 DEFAULT_OUT_PREFIX = (
-    REPORT_DIR / "lorehold_brain_seed_safe_cut_unlock_audit_20260705_current"
+    REPORT_DIR / "lorehold_brain_seed_safe_cut_unlock_audit_20260705_post_authorized_full_validation"
 )
 
 HARD_CLOSED_CATEGORIES = {
@@ -239,7 +241,10 @@ def enriched_rows(
     gap_summary = summary(safe_cut_gap)
     active_rule_count = as_int(gap_summary.get("brain_active_rule_count"))
     apply_ready = bool(gap_summary.get("apply_ready_for_manual_review"))
-    apply_executed = bool(gap_summary.get("apply_executed_by_this_script"))
+    apply_executed = bool(
+        gap_summary.get("apply_executed_by_this_script")
+        or gap_summary.get("postgres_rule_active_confirmed_now")
+    )
     floor_by_name = floor_trace_index(floor_trace)
     rows: list[dict[str, Any]] = []
     for raw in source_rows(safe_cut_gap):
@@ -356,11 +361,13 @@ def build_report(
     target_floor_missing_count = sum(
         1 for row in rows if "targeted_floor_trace_for_this_cut_slot" in row["missing_evidence"]
     )
-    next_action = (
-        "mine_targeted_same_lane_cut_traces_or_request_pg_apply_review_separately"
-        if target_floor_missing_count
-        else "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action"
-    )
+    active_rule_count = as_int(gap_summary.get("brain_active_rule_count"))
+    if target_floor_missing_count:
+        next_action = "mine_targeted_same_lane_cut_traces_before_any_brain_deck_action"
+    elif active_rule_count > 0:
+        next_action = "continue_seed_safe_cut_discovery_no_deck_action"
+    else:
+        next_action = "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action"
     return {
         "generated_at": utc_now(),
         "artifact_type": "lorehold_brain_seed_safe_cut_unlock_audit",
@@ -381,6 +388,12 @@ def build_report(
             ),
             "brain_apply_executed_by_this_script": bool(
                 gap_summary.get("apply_executed_by_this_script")
+            ),
+            "brain_postgres_rule_active_confirmed_now": bool(
+                gap_summary.get("postgres_rule_active_confirmed_now")
+            ),
+            "brain_apply_confirmed_outside_package_script": bool(
+                gap_summary.get("apply_confirmed_outside_package_script")
             ),
             "brain_pg_package_route_governed": bool(
                 gap_summary.get("brain_pg_package_route_governed")
@@ -462,6 +475,10 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Decision status: `{summary_row['decision_status']}`",
         f"- Brain safe-cut gap status: `{summary_row['brain_safe_cut_gap_status']}`",
         f"- Active Brain rule count: `{summary_row['brain_active_rule_count']}`",
+        "- Brain PostgreSQL rule active confirmed now: "
+        f"`{str(summary_row['brain_postgres_rule_active_confirmed_now']).lower()}`",
+        "- Brain apply confirmed outside package script: "
+        f"`{str(summary_row['brain_apply_confirmed_outside_package_script']).lower()}`",
         f"- Brain PG package route governed: `{str(summary_row['brain_pg_package_route_governed']).lower()}`",
         f"- Safe cut count: `{summary_row['safe_cut_count']}`",
         f"- Unlockable now: `{summary_row['unlockable_now_count']}`",

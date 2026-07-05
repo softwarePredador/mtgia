@@ -17710,6 +17710,40 @@ def resolve_generic_permanent_etb(
             turn,
             phase=phase,
         )
+    if effect_data.get("etb_mana_produced"):
+        produced = max(0, int(effect_data.get("etb_mana_produced") or 0))
+        pool_before = player.mana_pool.total()
+        mana_payload = {
+            **effect_data,
+            "mana_produced": produced,
+            "produced_mana_symbols": (
+                effect_data.get("etb_produced_mana_symbols")
+                or effect_data.get("produced_mana_symbols")
+                or []
+            ),
+        }
+        if produced > 0 and not add_fixed_produced_mana_symbols_to_pool(player, mana_payload, produced):
+            mana_color = str(effect_data.get("etb_produces") or effect_data.get("produces") or "").lower()
+            player.mana_pool.add(
+                mana_color
+                if mana_color in {"white", "blue", "black", "red", "green", "colorless"}
+                else "generic",
+                produced,
+            )
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="enters_battlefield",
+            effect="add_mana",
+            mana_added=produced,
+            produced_mana_symbols=list(mana_payload.get("produced_mana_symbols") or []),
+            mana_pool_before=pool_before,
+            mana_pool_after=player.mana_pool.total(),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
     if effect_data.get("etb_land_ramp_count"):
         if (
             effect_data.get("etb_land_ramp_condition") == "opponent_controls_more_lands"

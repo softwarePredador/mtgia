@@ -14735,3 +14735,96 @@ Register decision:
   activation path.
 - The remaining token sacrifice backlog must continue as exact subpatterns, not
   as a generic token-sacrifice promotion.
+
+## 2026-07-05 - PG Brain in a Jar runtime rule
+
+- Deploy id: `lorehold_brain_in_a_jar_pg_package_20260705_post_authorized_full_validation`.
+- Runtime family:
+  `xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1`.
+- Promoted card: `Brain in a Jar`.
+- User authorization: total authorization was provided in the active Codex
+  thread before apply.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_pg_apply_evidence_20260705_post_authorized_full_validation.md`.
+- Precheck:
+  `target_card_rows=1`, `existing_rule_rows=0`,
+  `expected_rule_rows_before=0`, and
+  `active_same_scope_rows_before=0`.
+- Apply:
+  `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, `promoted_scope_rows=1`,
+  `promoted_brain_free_cast_rows=1`, and
+  `promoted_rule_version_rows=1`.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_pg_to_sqlite_sync_20260705_post_authorized_full_validation.json`;
+  `pg_rows_loaded=1`, `sqlite_inserted_or_updated=1`.
+
+Register decision:
+
+- Brain in a Jar now has an active PostgreSQL-backed runtime rule and is
+  mirrored into local Hermes SQLite.
+- Brain still cannot enter a Lorehold deck candidate because no named
+  seed-safe same-lane cut exists for protected 607.
+- Natural battle, deck materialization, and promotion remain closed until the
+  seed-safe cut and matrix gates pass.
+
+## 2026-07-05 - PG503 creature ETB fixed mana
+
+- Deploy id: `xmage_pg503_creature_etb_fixed_mana_new_server`.
+- Runtime family: `xmage_creature_etb_add_fixed_mana_v1`.
+- Promoted cards: `4`.
+- Promoted card names: `Akki Rockspeaker`, `Burning-Tree Emissary`,
+  `Priest of Gix`, and `Priest of Urabrask`.
+- Only exact fixed creature enters-the-battlefield mana is allowed in this
+  batch. Conditional ETB mana, variable ETB mana, delayed mana, noncreature ETB
+  mana, and "if you cast it from your hand" patterns remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg503_creature_etb_fixed_mana_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg503_creature_etb_fixed_mana_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg503_creature_etb_fixed_mana_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg503_creature_etb_fixed_mana_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg503_creature_etb_fixed_mana_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg503_creature_etb_fixed_mana_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg503_creature_etb_fixed_mana_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=4`, `COMMIT`.
+- Postcheck:
+  all four promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- Field postcheck:
+  all four promoted rows have expected `etb_mana`, `produces`, and
+  `symbols` fields.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg503_creature_etb_fixed_mana_new_server_pg_to_sqlite_sync.json`;
+  `pg_rows_loaded=8435`, `sqlite_inserted_or_updated=8199`,
+  `canonical_snapshot_rows_exported=5961`.
+- Runtime lookup:
+  all four cards resolve from curated runtime cache with scope
+  `xmage_creature_etb_add_fixed_mana_v1`.
+- Battle suite:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg503_creature_etb_fixed_mana_new_server_full_battle_suite_post_sync.out`.
+
+Register decision:
+
+- PG503 is applied and should not be rebuilt.
+- Exact fixed ETB mana is executable through the local battle runtime via
+  `resolve_generic_permanent_etb`.
+- The remaining ETB mana backlog must continue as exact subpatterns, not as a
+  generic ETB mana promotion.

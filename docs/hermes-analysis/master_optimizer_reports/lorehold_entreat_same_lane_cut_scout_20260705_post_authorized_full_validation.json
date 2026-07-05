@@ -1,0 +1,871 @@
+{
+  "artifact_type": "lorehold_entreat_same_lane_cut_scout",
+  "blocked_same_lane_cut_rows": [
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Approach of the Second Sun",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "wincon",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 82,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 140,
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Storm Herd",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "big_spell_value",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 20,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 25,
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Creative Technique",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "big_spell_value",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "same_lane_only_not_seed_safe",
+      "direct_event_count": 54,
+      "functional_tag": "draw",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "draw",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 58,
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Mizzix's Mastery",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "wincon",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 76,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "format_staple_long_tail",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 97,
+      "value_score": 141,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Rise of the Eldrazi",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "removal",
+      "cut_policy": "same_lane_or_package_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 48,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "format_staple_long_tail",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 60,
+      "value_score": 41,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Call Forth the Tempest",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "spell_velocity",
+      "cut_policy": "same_lane_or_package_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 4,
+      "functional_tag": "board_wipe",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 8,
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Hit the Mother Lode",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "early_mana",
+      "cut_policy": "same_lane_or_package_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 7,
+      "functional_tag": "draw",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "draw",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 11,
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Insurrection",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "wincon",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 22,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 23,
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Surge to Victory",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "removal",
+      "cut_policy": "same_lane_or_package_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 243,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 275,
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Everything Comes to Dust",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "spell_velocity",
+      "cut_policy": "same_lane_or_package_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 31,
+      "functional_tag": "board_wipe",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 34,
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    }
+  ],
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "matrix_scoring_allowed_now": false,
+    "named_safe_cut_required_before_scoring": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_materialize_entreat_candidate_deck",
+      "do_not_run_natural_battle_until_entreat_rule_is_active_and_a_named_cut_is_seed_safe",
+      "mine_or_generate_cut_evidence_for_low-risk_miracle-finisher_slots",
+      "after_pg_apply_refresh_candidate_queue_and_structure_matrix_before_any_battle_gate"
+    ],
+    "pg_apply_required_before_battle": true,
+    "promotion_allowed": false,
+    "reason": "Entreat has a generated verified/auto package and the X-token runtime primitive is ready, but no protected-607 same-lane cut is seed-safe. The current shell therefore stays on 607 and Entreat remains a research candidate."
+  },
+  "deck_607_mutated": false,
+  "entreat_candidate_row": {
+    "add_card": "Entreat the Angels",
+    "blocker_reasons": [
+      "matrix_contract_blockers_not_cleared",
+      "no named same-lane cut exists for current 607",
+      "runtime rule is not verified for candidate use"
+    ],
+    "blockers": [
+      "matrix_contract_blockers_not_cleared",
+      "named_safe_cut_missing",
+      "verified_battle_rule_missing"
+    ],
+    "candidate_key": "miracle_access_row_entreat_the_angels",
+    "cut_card": null,
+    "expected_metric_lift": "miracle_token_closure",
+    "floor_risk": "unknown_until_matrix_scored",
+    "lane": "miracle_finisher",
+    "matrix_cells": [
+      "approach_finisher_conversion",
+      "topdeck_miracle_access"
+    ],
+    "protected_anchor_impact": "unproven_until_cut_is_named_and_trace_checked",
+    "rule_runtime_status": "runtime_missing_or_manual_review",
+    "same_lane_cut_reason": "",
+    "source_provenance": [
+      "gametyrant_miracle_topdeck_pressure"
+    ],
+    "source_required_contract": "miracle_token_runtime_contract_then_cut_safety"
+  },
+  "entreat_package_state": {
+    "battle_model_scope": "xmage_x_create_creature_tokens_spell_v1",
+    "execution_status": "auto",
+    "logical_rule_key": "battle_rule_v1:0ce4d97cb4f226cd2df5f9bdbdebc04e",
+    "native_miracle_cost": "{X}{W}{W}",
+    "normal_mana_cost": "{X}{X}{W}{W}{W}",
+    "package_generated": true,
+    "postgres_writes_executed": false,
+    "review_status": "verified"
+  },
+  "entreat_runtime_state": {
+    "battle_ready_now_count": 0,
+    "entreat_active_rule_count": 0,
+    "preflight_status": "entreat_x_token_runtime_primitive_ready_rule_still_blocked_keep_607",
+    "runtime_primitive_ready": true
+  },
+  "generated_at": "2026-07-05T11:38:35Z",
+  "postgres_writes": false,
+  "safe_same_lane_cut_candidates": [],
+  "same_lane_cut_rows": [
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Approach of the Second Sun",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "wincon",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 82,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 140,
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Storm Herd",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "big_spell_value",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 20,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 25,
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Creative Technique",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "big_spell_value",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "same_lane_only_not_seed_safe",
+      "direct_event_count": 54,
+      "functional_tag": "draw",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "draw",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 58,
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Mizzix's Mastery",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "wincon",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 76,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "format_staple_long_tail",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 97,
+      "value_score": 141,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Rise of the Eldrazi",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "removal",
+      "cut_policy": "same_lane_or_package_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 48,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "format_staple_long_tail",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 60,
+      "value_score": 41,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Call Forth the Tempest",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "spell_velocity",
+      "cut_policy": "same_lane_or_package_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 4,
+      "functional_tag": "board_wipe",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 8,
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Hit the Mother Lode",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "early_mana",
+      "cut_policy": "same_lane_or_package_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 7,
+      "functional_tag": "draw",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "draw",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 11,
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Insurrection",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "wincon",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 22,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 23,
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Surge to Victory",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "removal",
+      "cut_policy": "same_lane_or_package_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 243,
+      "functional_tag": "wincon",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 275,
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Everything Comes to Dust",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "spell_velocity",
+      "cut_policy": "same_lane_or_package_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 31,
+      "functional_tag": "board_wipe",
+      "investigation_action": "do_not_use_as_entreat_cut_under_current_607_contract",
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 34,
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    }
+  ],
+  "source_db_mutated": false,
+  "source_evidence": {
+    "candidate_queue_summary": {
+      "blocked_candidate_row_count": 5,
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
+      "deck_action_allowed_now": false,
+      "matrix_contract_blocker_count": 28,
+      "matrix_engine_cut_path_closed": true,
+      "matrix_fallback_route_key": "miracle_access_first_shell_contract",
+      "matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+      "matrix_route_governed": true,
+      "matrix_scoring_allowed_now": false,
+      "matrix_status": "miracle_access_structure_matrix_template_ready_no_candidate_no_battle",
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "resolve_runtime_and_named_same_lane_cut_before_matrix_scoring",
+      "scoreable_candidate_row_count": 0,
+      "source_candidate_count": 5,
+      "value_model_quantity_total": 100
+    },
+    "cut_miner_summary": {
+      "classification_counts": {
+        "closed_hard_stop_current_607": 94
+      },
+      "contract_status": "hypothesis_contract_written_blocked_no_named_safe_cuts",
+      "cross_lane_excluded_count": 0,
+      "cut_expansion_status": "pressure_cut_expansion_no_seed_safe_cut_keep_607",
+      "cut_shortage": 2,
+      "decision_status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+      "hard_stop_blocker_counts": {
+        "commander_never_cut": 1,
+        "cut_is_early_mana_floor_support": 14,
+        "cut_is_miracle_core_big_spell": 25,
+        "cut_is_protection_shell": 14,
+        "early_mana_floor_support": 18,
+        "mana_base_never_cut": 28,
+        "measured_high_cut_exposure": 34,
+        "miracle_or_finisher_core": 24,
+        "never_cut_lane": 29,
+        "never_cut_or_mana_base": 29,
+        "prior_rejected_cut": 37,
+        "prior_rejected_cut_slot": 24,
+        "prior_rejected_signature": 4,
+        "protected_cut": 22,
+        "protection_shell": 14,
+        "structural_dependency": 24
+      },
+      "hard_stop_cut_count": 94,
+      "lane_counts": {
+        "big_spell_value": 2,
+        "commander": 1,
+        "contextual": 1,
+        "draw": 6,
+        "early_mana": 18,
+        "graveyard_recursion": 1,
+        "hand_filter": 1,
+        "mana_base": 28,
+        "misc": 2,
+        "protection": 13,
+        "removal": 10,
+        "spell_velocity": 5,
+        "wincon": 6
+      },
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "recommended_next_action": "do_not_battle_mine_new_nonanchor_trace_or_new_shell_contract",
+      "router_route_status": "best_next_learning_route_contract_required_no_deck_action",
+      "target_adds": [
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "target_lane_evidence_gap_count": 0,
+      "target_required_cut_count": 2,
+      "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair",
+      "total_cut_slots_reviewed": 94
+    },
+    "external_confirmation": {
+      "gatherer": "https://gatherer.wizards.com/search?cardName=Entreat_the_Angels",
+      "interpretation": "External identity confirms Entreat as an X miracle token finisher; deck promotion still depends on ManaLoom runtime apply and same-lane cut proof.",
+      "scryfall": "https://scryfall.com/search?as=text&q=%21%22Entreat+the+Angels%22"
+    },
+    "value_model_summary": {
+      "card_rows": 94,
+      "commander_count": 1,
+      "deck_id": 607,
+      "gate_ready_now_count": 0,
+      "keep_607_as_protected_baseline": true,
+      "lane_profile": {
+        "artifact": 17,
+        "basic_floor": 8,
+        "board_wipe": 8,
+        "commander_center": 1,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "fast_pressure_guard": 12,
+        "fetch_or_search_fixing": 8,
+        "format_staple_long_tail": 6,
+        "global_top_100": 17,
+        "global_top_500": 11,
+        "instant_sorcery_spell": 36,
+        "land": 34,
+        "mana_base": 34,
+        "miracle_conversion_finisher": 10,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "structural_ramp_floor": 8,
+        "topdeck_miracle_engine": 9,
+        "tutor": 1,
+        "typed_dual_or_fetch_target": 5,
+        "untapped_or_multiplayer_fixing": 5,
+        "utility_engine_land": 8,
+        "wincon": 9
+      },
+      "mana_foundation": {
+        "artifact_ramp_quantity": 11,
+        "enchantment_ramp_quantity": 1,
+        "instant_sorcery_ramp_quantity": 3,
+        "interpretation": "The 607 mana plan is not just more fast mana: it combines 34 lands, fetch/dual fixing, artifact ramp, spell ramp, and opponent-turn mana rocks that feed miracle windows.",
+        "land_groups": {
+          "basic_floor": 8,
+          "fetch_or_search_fixing": 8,
+          "typed_dual_or_fetch_target": 5,
+          "untapped_or_multiplayer_fixing": 5,
+          "utility_engine_land": 8
+        },
+        "land_quantity": 34,
+        "land_rows": 28,
+        "mana_sources_land_plus_ramp": 49,
+        "ramp_quantity": 15
+      },
+      "preflight_status": "no_current_candidate_passes_miracle_access_first_preflight",
+      "promotion_allowed": false,
+      "quantity_total": 100,
+      "role_profile": {
+        "board_wipe": 8,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "land": 34,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "trace_status": "lorehold_miracle_trace_failure_learning_ready"
+    }
+  },
+  "source_reports": {
+    "candidate_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_candidate_row_queue_20260705_post_authorized_full_validation.json",
+    "cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json",
+    "entreat_package": "docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current.json",
+    "entreat_preflight": "docs/hermes-analysis/master_optimizer_reports/lorehold_entreat_x_token_runtime_preflight_20260705_current.json",
+    "value_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json"
+  },
+  "status": "entreat_same_lane_cut_scout_blocked_no_safe_cut_keep_607",
+  "summary": {
+    "blocked_same_lane_cut_count": 10,
+    "candidate_deck_materialization_allowed_now": false,
+    "decision_status": "entreat_same_lane_cut_scout_blocked_no_safe_cut_keep_607",
+    "deck_action_allowed_now": false,
+    "entreat_active_rule_count": 0,
+    "entreat_candidate_row_found": true,
+    "entreat_lane": "miracle_finisher",
+    "matrix_contract_blocker_count": 28,
+    "matrix_scoring_allowed_now": false,
+    "natural_battle_gate_allowed_now": false,
+    "package_generated": true,
+    "postgres_writes_executed": false,
+    "promotion_allowed_now": false,
+    "recommended_next_action": "do_not_score_entreat_until_pg_apply_and_safe_cut_evidence",
+    "runtime_primitive_ready": true,
+    "safe_cut_count": 0,
+    "same_lane_candidate_count": 10,
+    "status_counts": {
+      "blocked_current_607_hard_stop": 10
+    },
+    "top_blocker_counts": {
+      "cut_is_miracle_core_big_spell": 10,
+      "cut_not_flex_decision": 8,
+      "cut_safety_not_seed_safe": 2,
+      "manual_review_cut_safety_block": 1,
+      "manual_status_not_seed_safe": 10,
+      "measured_high_cut_exposure": 2,
+      "miracle_or_finisher_core": 10,
+      "missing_cut_safety_row": 8,
+      "prior_rejected_cut": 3,
+      "protected_cut": 3,
+      "same_lane_only_requires_concrete_same_lane_add": 1,
+      "structural_dependency": 7
+    }
+  }
+}

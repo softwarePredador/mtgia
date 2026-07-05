@@ -6469,6 +6469,93 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "additional_cost_detected")
 
+    def test_creature_etb_fixed_mana_maps_to_triggered_ramp_permanent(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Burning-Tree Emissary",
+                type_line="Creature - Human Shaman",
+                oracle_text="When this creature enters, add {R}{G}.",
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new BasicManaEffect(new Mana(0, 0, 0, 1, 1, 0, 0, 0))));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "ramp_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_FIXED_MANA_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+        self.assertEqual(effect["trigger_effect"], "add_mana")
+        self.assertFalse(effect["is_mana_source"])
+        self.assertEqual(effect["etb_mana_produced"], 2)
+        self.assertEqual(effect["etb_produces"], "RG")
+        self.assertEqual(effect["etb_produced_mana_symbols"], ["R", "G"])
+
+    def test_creature_etb_fixed_mana_accepts_colored_mana_symbol_constructor(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Akki Rockspeaker",
+                type_line="Creature - Goblin Shaman",
+                oracle_text="When this creature enters, add {R}.",
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new BasicManaEffect(new Mana(ColoredManaSymbol.R))));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_FIXED_MANA_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_mana_produced"], 1)
+        self.assertEqual(effect["etb_produced_mana_symbols"], ["R"])
+
+    def test_creature_etb_conditional_mana_stays_blocked(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Coal Stoker",
+                type_line="Creature - Elemental",
+                oracle_text=(
+                    "When this creature enters, if you cast it from your hand, "
+                    "add {R}{R}{R}."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new BasicManaEffect(Mana.RedMana(3)))"
+                ".withInterveningIf(CastFromHandSourcePermanentCondition.instance));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_mana_oracle_not_simple_fixed")
+
     def test_simple_artifact_mana_source_maps_to_ramp_permanent(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,

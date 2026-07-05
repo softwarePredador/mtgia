@@ -1,0 +1,302 @@
+{
+  "artifact_type": "lorehold_brain_in_a_jar_exact_runtime_contract",
+  "battle_runtime_surfaces": {
+    "activated_add_counters_executor": true,
+    "brain_exact_scope_adapter": true,
+    "charge_counter_state_surface": true,
+    "exact_mana_value_hand_free_cast_adapter": true,
+    "free_cast_from_hand_primitive": true,
+    "free_cast_without_paying_mana_primitive": true,
+    "remove_x_charge_counters_scry_adapter": true,
+    "scry_library_primitive": true
+  },
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "prepare_brain_in_a_jar_pg_package_precheck_no_deck_action",
+      "rerun_brain_runtime_cut_preflight_after_pg_package_review"
+    ],
+    "postgres_writes_allowed": false,
+    "preflight_required_after_adapter": true,
+    "promotion_allowed": false,
+    "reason": "The exact Brain runtime contract is explicit and the ManaLoom adapter is detectable, but protected deck 607 still cannot use Brain until an active PostgreSQL rule and a seed-safe same-lane cut exist.",
+    "runtime_adapter_required_before_pg_package": false,
+    "safe_cut_still_required": true
+  },
+  "deck_607_mutated": false,
+  "effect_json_contract": {
+    "ability_kind": "activated",
+    "activated_add_counters": true,
+    "activated_add_counters_count": 1,
+    "activated_add_counters_counter_type": "charge",
+    "activated_add_counters_target": "self",
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1",
+    "brain_in_a_jar_free_cast": true,
+    "cast_without_paying_mana_cost": true,
+    "effect": "topdeck_manipulation",
+    "free_cast_card_types": [
+      "instant",
+      "sorcery"
+    ],
+    "free_cast_exactly_one_card": true,
+    "free_cast_from_zone": "hand",
+    "free_cast_mana_value_match": "source_charge_counters_after_add",
+    "replay_required_fields": [
+      "activation_kind",
+      "charge_counters_before",
+      "charge_counters_after",
+      "eligible_spell_names",
+      "selected_spell",
+      "selected_spell_mana_value",
+      "cast_without_paying_mana_cost",
+      "removed_charge_counters",
+      "scry_count",
+      "scry_looked_at",
+      "scry_kept_on_top",
+      "scry_bottomed",
+      "scry_top_after"
+    ],
+    "secondary_activation_cost_generic": 3,
+    "secondary_activation_cost_mana": "{3}",
+    "secondary_activation_remove_counter_type": "charge",
+    "secondary_activation_remove_x_counters": true,
+    "secondary_activation_requires_tap": true,
+    "secondary_activation_scry_count_source": "removed_charge_counters",
+    "source_card": "Brain in a Jar",
+    "xmage_cost_classes": [
+      "GenericManaCost",
+      "TapSourceCost",
+      "RemoveVariableCountersSourceCost"
+    ],
+    "xmage_effect_classes": [
+      "AddCountersSourceEffect",
+      "BrainInAJarCastEffect",
+      "ScryEffect"
+    ]
+  },
+  "focused_runtime_test_vectors": [
+    {
+      "activation": "{1}, tap",
+      "expected": {
+        "artifact_with_matching_mana_value_is_not_eligible": true,
+        "cast_without_paying_mana_cost": true,
+        "charge_counters_after": 1,
+        "eligible_spell_names": [
+          "Shock"
+        ],
+        "selected_spell": "Shock"
+      },
+      "hand": [
+        {
+          "mana_value": 1,
+          "name": "Shock",
+          "type_line": "Instant"
+        },
+        {
+          "mana_value": 3,
+          "name": "Divination",
+          "type_line": "Sorcery"
+        },
+        {
+          "mana_value": 1,
+          "name": "Sol Ring",
+          "type_line": "Artifact"
+        }
+      ],
+      "name": "first_activation_casts_exact_mana_value_one",
+      "starting_brain_charge_counters": 0
+    },
+    {
+      "activation": "{1}, tap",
+      "expected": {
+        "cast_without_paying_mana_cost": true,
+        "charge_counters_after": 2,
+        "eligible_spell_names": [
+          "Lightning Helix"
+        ],
+        "selected_spell": "Lightning Helix"
+      },
+      "hand": [
+        {
+          "mana_value": 2,
+          "name": "Lightning Helix",
+          "type_line": "Instant"
+        },
+        {
+          "mana_value": 5,
+          "name": "Reforge the Soul",
+          "type_line": "Sorcery"
+        }
+      ],
+      "name": "second_activation_casts_exact_mana_value_two_or_declines",
+      "starting_brain_charge_counters": 1
+    },
+    {
+      "activation": "{3}, tap, remove X charge counters",
+      "expected": {
+        "charge_counters_after": 1,
+        "scry_count": 2,
+        "scry_reorders_or_bottoms_low_priority_cards": true
+      },
+      "library_top": [
+        "Low Priority Land",
+        "High Priority Spell",
+        "Medium Priority Spell"
+      ],
+      "name": "remove_x_charge_counters_scry_x",
+      "remove_x": 2,
+      "starting_brain_charge_counters": 3
+    }
+  ],
+  "generated_at": "2026-07-05T11:33:29Z",
+  "missing_xmage_signals": [],
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "external_confirmation": {
+      "gatherer": "https://gatherer.wizards.com/SOI/en-us/252/brain-in-a-jar",
+      "interpretation": "Brain's first ability counts charge counters after adding one, then may cast one matching instant or sorcery from hand for free; the second activation removes X charge counters to scry X.",
+      "scryfall": "https://scryfall.com/card/soi/252/brain-in-a-jar"
+    },
+    "prior_preflight_summary": {
+      "blocked_same_lane_cut_count": 9,
+      "brain_active_rule_count": 0,
+      "brain_candidate_row_found": true,
+      "brain_contract_found": true,
+      "brain_exact_adapter_present": false,
+      "candidate_deck_materialization_allowed_now": false,
+      "candidate_queue_matrix_route_governed": true,
+      "decision_status": "brain_in_a_jar_runtime_cut_preflight_blocked_no_active_rule_no_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "exact_runtime_contract_drafted": false,
+      "exact_runtime_contract_found": false,
+      "exact_runtime_effect_scope": "",
+      "matrix_contract_blocker_count": 28,
+      "matrix_scoring_allowed_now": false,
+      "natural_battle_gate_allowed_now": false,
+      "postgres_writes_allowed_now": false,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "draft_exact_mana_value_free_cast_runtime_family_before_any_brain_deck_action",
+      "required_runtime_slice_count": 5,
+      "route_gate_valid": true,
+      "route_planner_candidate_queue_governed": true,
+      "route_planner_candidate_queue_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+      "route_planner_selected_brain": true,
+      "route_planner_status": "miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607",
+      "safe_cut_count": 0,
+      "same_lane_candidate_count": 9,
+      "status_counts": {
+        "blocked_current_607_hard_stop": 9
+      },
+      "top_blocker_counts": {
+        "cut_is_early_mana_floor_support": 2,
+        "cut_not_flex_decision": 9,
+        "early_mana_floor_support": 3,
+        "manual_status_not_seed_safe": 9,
+        "measured_high_cut_exposure": 9,
+        "missing_cut_safety_row": 9,
+        "never_cut_lane": 2,
+        "never_cut_or_mana_base": 2,
+        "prior_rejected_cut": 3,
+        "prior_rejected_cut_slot": 3,
+        "protected_cut": 4,
+        "structural_dependency": 3
+      },
+      "xmage_class_found": true,
+      "xmage_signal_hit_count": 5
+    },
+    "route_planner_summary": {
+      "brain_active_rule_count": 0,
+      "brain_apply_executed_by_this_script": false,
+      "brain_apply_ready_for_manual_review": false,
+      "brain_pg_package_route_governed": false,
+      "brain_pg_package_status": "",
+      "brain_safe_cut_count": 0,
+      "brain_targeted_floor_trace_missing_slot_count": 0,
+      "brain_unlock_audit_status": "brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607",
+      "brain_unlock_recommended_next_action": "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action",
+      "brain_unlockable_now_count": 0,
+      "candidate_deck_materialization_allowed_now": false,
+      "candidate_queue_matrix_fallback_route_key": "miracle_access_first_shell_contract",
+      "candidate_queue_matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+      "candidate_queue_matrix_route_governed": true,
+      "candidate_queue_scoreable_row_count": 0,
+      "candidate_queue_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
+      "decision_status": "miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "entreat_active_rule_count": 0,
+      "entreat_safe_cut_count": 0,
+      "matrix_scoring_allowed_now": false,
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "postgres_writes_allowed_now": false,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action",
+      "route_candidate_count": 5,
+      "selected_card": "Brain in a Jar",
+      "selected_lane": "topdeck_miracle_access",
+      "selected_learning_score": 104,
+      "selected_route_state": "brain_floor_traces_protect_all_cut_slots_no_seed_safe_cut",
+      "state_counts": {
+        "brain_floor_traces_protect_all_cut_slots_no_seed_safe_cut": 1,
+        "combo_package_runtime_lesson": 1,
+        "defer_lower_priority_runtime_review": 2,
+        "parked_entreat_no_safe_cut": 1
+      },
+      "top_blocker_counts": {
+        "combo_runtime_required": 1,
+        "matrix_contract_blockers_not_cleared": 5,
+        "named_safe_cut_missing": 5,
+        "verified_battle_rule_missing": 5
+      }
+    }
+  },
+  "source_reports": {
+    "battle_runtime": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+    "preflight": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_post_authorized_full_validation.json",
+    "route_planner": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_next_route_planner_20260705_post_authorized_full_validation.json",
+    "xmage_source": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BrainInAJar.java"
+  },
+  "status": "brain_exact_runtime_contract_adapter_detected_preflight_required_keep_607",
+  "summary": {
+    "battle_runtime_surface_count": 8,
+    "brain_exact_scope_adapter_present": true,
+    "candidate_deck_materialization_allowed_now": false,
+    "contract_drafted": true,
+    "decision_status": "brain_exact_runtime_contract_adapter_detected_preflight_required_keep_607",
+    "deck_action_allowed_now": false,
+    "effect_json_scope": "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1",
+    "natural_battle_gate_allowed_now": false,
+    "postgres_writes_allowed_now": false,
+    "prior_preflight_status": "brain_in_a_jar_runtime_cut_preflight_blocked_no_active_rule_no_safe_cut_keep_607",
+    "promotion_allowed_now": false,
+    "recommended_next_action": "rerun_brain_runtime_cut_preflight_before_any_deck_action",
+    "route_planner_selected_brain": true,
+    "test_vector_count": 3,
+    "xmage_missing_signal_count": 0,
+    "xmage_signal_count": 13
+  },
+  "xmage_signals": {
+    "adds_charge_counter": true,
+    "artifact_cost_two": true,
+    "brain_cast_effect": true,
+    "casts_from_hand_for_free": true,
+    "class_found": true,
+    "exact_mana_value_predicate": true,
+    "filters_instant_or_sorcery": true,
+    "first_activation_generic_one": true,
+    "first_activation_tap_cost": true,
+    "remove_variable_charge_counters": true,
+    "scry_uses_x_value": true,
+    "second_activation_generic_three": true,
+    "uses_current_charge_count": true
+  }
+}

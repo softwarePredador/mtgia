@@ -23,13 +23,16 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_EXACT_CONTRACT = (
-    REPORT_DIR / "lorehold_brain_in_a_jar_exact_runtime_contract_20260705_current.json"
+    REPORT_DIR
+    / "lorehold_brain_in_a_jar_exact_runtime_contract_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_PREFLIGHT = (
-    REPORT_DIR / "lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_current.json"
+    REPORT_DIR
+    / "lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_OUT_PREFIX = (
-    REPORT_DIR / "lorehold_brain_in_a_jar_pg_package_preflight_20260705_current"
+    REPORT_DIR
+    / "lorehold_brain_in_a_jar_pg_package_preflight_20260705_post_authorized_full_validation"
 )
 
 BRAIN_NAME = "Brain in a Jar"
@@ -55,7 +58,7 @@ TARGET_ROUTE_PLANNER_STATUSES = {TARGET_ROUTE_PLANNER_STATUS, LEGACY_TARGET_ROUT
 TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
 BACKUP_TABLE = (
     "manaloom_deploy_audit."
-    "lorehold_brain_in_a_jar_pg_package_20260705_current_backup"
+    "lorehold_brain_in_a_jar_pg_package_20260705_post_authorized_full_validation_backup"
 )
 
 

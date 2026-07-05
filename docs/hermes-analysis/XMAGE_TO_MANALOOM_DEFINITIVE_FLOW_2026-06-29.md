@@ -12744,6 +12744,60 @@ token pattern is executable. Scion/Sliver variants, non-creature sacrifice
 tokens, tap-and-sacrifice tokens, any-color sacrifice tokens, and token text
 with extra abilities require separate exact runtime families.
 
+## 2026-07-05 Checkpoint: PG503 Creature ETB Fixed Mana
+
+PG503 closed the exact creature enters-the-battlefield fixed mana subpattern.
+The package promoted `Akki Rockspeaker`, `Burning-Tree Emissary`,
+`Priest of Gix`, and `Priest of Urabrask` under
+`xmage_creature_etb_add_fixed_mana_v1`.
+
+Runtime and mapper changes:
+
+- `xmage_authoritative_exact_scope_split.py` now recognizes only fixed
+  creature ETB mana backed by a single XMage `BasicManaEffect` on
+  `EntersBattlefieldTriggeredAbility`.
+- `battle_analyst_v9.py` executes the scope through
+  `resolve_generic_permanent_etb`, adding the exact symbols to the
+  controller's mana pool and emitting a `trigger_resolved` replay event.
+- Conditional ETB mana, variable mana, delayed mana, noncreature ETB mana,
+  and "if you cast it from your hand" cases remain blocked.
+
+PostgreSQL and cache evidence:
+
+- Precheck: 4 target card rows, 0 existing active same-scope rules.
+- Apply: `deprecated_shadow_rows=0`, `upserted_rows=4`, `COMMIT`.
+- Postcheck: all four rows have promoted rule, verified-auto, and Oracle hash
+  matches.
+- PG -> Hermes/SQLite sync:
+  `pg_rows_loaded=8435`, `sqlite_inserted_or_updated=8199`, and
+  `canonical_snapshot_rows_exported=5961`.
+- SQLite/rule lookup: all four promoted rows resolve with the expected
+  `etb_mana_produced`, `etb_produces`, and
+  `etb_produced_mana_symbols` fields.
+
+Post-sync global state:
+
+- Authoritative queue:
+  `target_identity_count=26056`, `xmage_authoritative_source_count=25742`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25742`.
+- Global readiness:
+  `battle_and_oracle_ready=4894`, `battle_family_mapper_required=28979`,
+  `generic_runtime_or_no_card_rule=360`, `oracle_data_sync=4`,
+  `commander_legality_sync=3`, and `oracle_identity_rule_link_or_copy=2`.
+- Exact splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg503_creature_etb_fixed_mana_new_server_final_recheck.json`
+  reported `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+- Contract/alignment audits:
+  PG/Hermes/SQLite `51/51` pass, XMage strategy `26/26` pass, and
+  operational surface `39/39` pass.
+
+Residual boundary: PG503 does not authorize broad creature mana-source review
+rows. It only closes the exact fixed ETB mana trigger family. The next work
+must select a new exact subpattern from the rebuilt queue instead of promoting
+generic `xmage_creature_mana_source_variant_review_v1` rows.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

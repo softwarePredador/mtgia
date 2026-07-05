@@ -22,23 +22,28 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_POST_IDENTITY = REPORT_DIR / "lorehold_post_identity_queue_split_20260705_current.json"
+DEFAULT_POST_IDENTITY = REPORT_DIR / "lorehold_post_identity_queue_split_20260705_post_authorized_full_validation.json"
 DEFAULT_RUNTIME_CONTRACT = (
-    REPORT_DIR / "lorehold_brain_entreat_haze_runtime_contract_20260705_current.json"
+    REPORT_DIR / "lorehold_brain_entreat_haze_runtime_contract_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_CANDIDATE_QUEUE = (
-    REPORT_DIR / "lorehold_miracle_access_candidate_row_queue_20260705_current_relearn.json"
+    REPORT_DIR
+    / "lorehold_miracle_access_candidate_row_queue_20260705_post_authorized_full_validation.json"
 )
-DEFAULT_ENTREAT_SCOUT = REPORT_DIR / "lorehold_entreat_same_lane_cut_scout_20260705_current.json"
+DEFAULT_ENTREAT_SCOUT = (
+    REPORT_DIR / "lorehold_entreat_same_lane_cut_scout_20260705_post_authorized_full_validation.json"
+)
 DEFAULT_CUT_MINER = (
     REPORT_DIR / "lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json"
 )
-DEFAULT_BRAIN_SAFE_CUT_GAP = REPORT_DIR / "lorehold_brain_safe_cut_gap_audit_20260705_current.json"
+DEFAULT_BRAIN_SAFE_CUT_GAP = (
+    REPORT_DIR / "lorehold_brain_safe_cut_gap_audit_20260705_post_authorized_full_validation.json"
+)
 DEFAULT_BRAIN_UNLOCK_AUDIT = (
-    REPORT_DIR / "lorehold_brain_seed_safe_cut_unlock_audit_20260705_current.json"
+    REPORT_DIR / "lorehold_brain_seed_safe_cut_unlock_audit_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_OUT_PREFIX = (
-    REPORT_DIR / "lorehold_miracle_next_route_planner_20260705_current"
+    REPORT_DIR / "lorehold_miracle_next_route_planner_20260705_post_authorized_full_validation"
 )
 
 ENTREAT = "Entreat the Angels"

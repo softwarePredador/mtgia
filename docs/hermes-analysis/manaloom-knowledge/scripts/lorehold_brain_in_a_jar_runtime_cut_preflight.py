@@ -22,22 +22,27 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_ROUTE_PLANNER = REPORT_DIR / "lorehold_miracle_next_route_planner_20260705_current.json"
+DEFAULT_ROUTE_PLANNER = (
+    REPORT_DIR / "lorehold_miracle_next_route_planner_20260705_post_authorized_full_validation.json"
+)
 DEFAULT_RUNTIME_CONTRACT = (
-    REPORT_DIR / "lorehold_brain_entreat_haze_runtime_contract_20260705_current.json"
+    REPORT_DIR / "lorehold_brain_entreat_haze_runtime_contract_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_CANDIDATE_QUEUE = (
-    REPORT_DIR / "lorehold_miracle_access_candidate_row_queue_20260705_current_relearn.json"
+    REPORT_DIR
+    / "lorehold_miracle_access_candidate_row_queue_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_VALUE_MODEL = REPORT_DIR / "lorehold_deckbuilding_value_model_20260704_current.json"
 DEFAULT_CUT_MINER = (
     REPORT_DIR / "lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json"
 )
 DEFAULT_EXACT_RUNTIME_CONTRACT = (
-    REPORT_DIR / "lorehold_brain_in_a_jar_exact_runtime_contract_20260705_current.json"
+    REPORT_DIR
+    / "lorehold_brain_in_a_jar_exact_runtime_contract_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_OUT_PREFIX = (
-    REPORT_DIR / "lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_current"
+    REPORT_DIR
+    / "lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_post_authorized_full_validation"
 )
 
 BRAIN = "Brain in a Jar"

@@ -1,0 +1,7 @@
+       card_name       |    normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-----------------------+-----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Akki Rockspeaker      | akki rockspeaker      | battle_rule_v1:03d10668e241154656a14f9ac5949550 |                  1 |                           1 |                         1 |           0
+ Burning-Tree Emissary | burning-tree emissary | battle_rule_v1:26c40d0b0bdd51355b5247591324af4c |                  1 |                           1 |                         1 |           0
+ Priest of Gix         | priest of gix         | battle_rule_v1:2d3e4b8f02be6791b9d9707558b0ccd6 |                  1 |                           1 |                         1 |           0
+ Priest of Urabrask    | priest of urabrask    | battle_rule_v1:e98b5dbd90254c3b996852a344bcfc08 |                  1 |                           1 |                         1 |           0
+(4 rows)

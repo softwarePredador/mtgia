@@ -1,0 +1,584 @@
+{
+  "generated_at": "2026-07-05T11:38:16Z",
+  "artifact_type": "lorehold_post_identity_queue_split",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "deck_607_mutated": false,
+  "source_reports": {
+    "identity_cache_simulation": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_simulation_20260705_current.json",
+    "external_material_scout": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_material_evidence_scout_20260705_current.json"
+  },
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "status": "post_identity_queue_split_no_battle_ready_keep_607",
+  "summary": {
+    "current_baseline": "deck_607",
+    "queue_card_count": 14,
+    "identity_import_remaining_count": 0,
+    "temporary_identity_ready_count": 6,
+    "source_identity_ready_count": 8,
+    "runtime_or_manual_review_count": 4,
+    "combo_runtime_contract_count": 1,
+    "full_shell_contract_count": 9,
+    "verified_auto_rule_ready_count": 2,
+    "battle_ready_now_count": 0,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "recommended_next_action": "draft_runtime_contracts_for_brain_entreat_haze_before_any_deck_gate"
+  },
+  "cards": [
+    {
+      "card_name": "Brain in a Jar",
+      "normalized_name": "brain in a jar",
+      "queues": [
+        "runtime_or_manual_review_required"
+      ],
+      "route_class": "runtime_or_manual_review",
+      "shell_family": null,
+      "lane": "topdeck_miracle_access",
+      "value_role": "alternate_cost_timing_engine",
+      "deckbuilding_value": "Potentially helps cast key spells on constrained turns, but only if charge-counter timing and spell mana values are modeled correctly.",
+      "priority_rank": 1,
+      "required_contract": "single_card_runtime_contract_then_cut_safety",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "identity_ready": true,
+      "identity_source": "temporary_simulation",
+      "oracle_name": "Brain in a Jar",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 1,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Entreat the Angels",
+      "normalized_name": "entreat the angels",
+      "queues": [
+        "runtime_or_manual_review_required"
+      ],
+      "route_class": "runtime_or_manual_review",
+      "shell_family": null,
+      "lane": "miracle_finisher",
+      "value_role": "miracle_token_closure",
+      "deckbuilding_value": "Fits the Lorehold miracle thesis as a high-ceiling finisher, but needs miracle/tokens runtime and a named cut before battle.",
+      "priority_rank": 1,
+      "required_contract": "miracle_token_runtime_contract_then_cut_safety",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "identity_ready": true,
+      "identity_source": "temporary_simulation",
+      "oracle_name": "Entreat the Angels",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Haze of Rage",
+      "normalized_name": "haze of rage",
+      "queues": [
+        "combo_runtime_required",
+        "runtime_or_manual_review_required"
+      ],
+      "route_class": "combo_runtime_contract",
+      "shell_family": null,
+      "lane": "storm_combo_pressure",
+      "value_role": "storm_kiln_combo_payoff",
+      "deckbuilding_value": "Only meaningful as a Storm-Kiln Artist combo package; by itself it does not prove a 607 one-for-one replacement.",
+      "priority_rank": 2,
+      "required_contract": "combo_runtime_contract_with_storm_kiln_artist",
+      "source_keys": [
+        "commander_spellbook_storm_kiln_haze"
+      ],
+      "route_types": [
+        "combo_package"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "combo_package_research_only_requires_runtime_cut_and_battle_proof",
+      "identity_ready": true,
+      "identity_source": "temporary_simulation",
+      "oracle_name": "Haze of Rage",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "combo_runtime_required",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Burning Prophet",
+      "normalized_name": "burning prophet",
+      "queues": [
+        "runtime_or_manual_review_required"
+      ],
+      "route_class": "runtime_or_manual_review",
+      "shell_family": null,
+      "lane": "spell_scry_pressure",
+      "value_role": "cheap_spell_velocity_creature",
+      "deckbuilding_value": "Adds repeated scry and small pressure from noncreature spell volume, but current evidence treats it as diagnostic until runtime exists.",
+      "priority_rank": 3,
+      "required_contract": "spell_trigger_runtime_review_then_diagnostic_cut_check",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "identity_ready": true,
+      "identity_source": "source_db",
+      "oracle_name": "Burning Prophet",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Inti, Seneschal of the Sun",
+      "normalized_name": "inti, seneschal of the sun",
+      "queues": [
+        "runtime_or_manual_review_required"
+      ],
+      "route_class": "runtime_or_manual_review",
+      "shell_family": null,
+      "lane": "rummage_pressure_access",
+      "value_role": "attack_discard_exile_access_engine",
+      "deckbuilding_value": "Could align with Lorehold discard/access play, but attack timing, discard trigger, and temporary exile access all need runtime review.",
+      "priority_rank": 3,
+      "required_contract": "discard_access_runtime_review_then_shell_or_cut_check",
+      "source_keys": [
+        "edhrec_upgraded_spellslinger_current"
+      ],
+      "route_types": [
+        "reference_corpus"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "identity_ready": true,
+      "identity_source": "source_db",
+      "oracle_name": "Inti, Seneschal of the Sun",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Anointed Procession",
+      "normalized_name": "anointed procession",
+      "queues": [
+        "shell_contract_required"
+      ],
+      "route_class": "full_shell_contract",
+      "shell_family": "token_multiplier_shell",
+      "lane": "token_multiplier",
+      "value_role": "token_doubling_shell_payoff",
+      "deckbuilding_value": "Raises token output only in a deck that already commits to token density.",
+      "priority_rank": 4,
+      "required_contract": "token_multiplier_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "identity_ready": true,
+      "identity_source": "source_db",
+      "oracle_name": "Anointed Procession // Anointed Procession",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "full_shell_contract_required",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Cathars' Crusade",
+      "normalized_name": "cathars' crusade",
+      "queues": [
+        "shell_contract_required"
+      ],
+      "route_class": "full_shell_contract",
+      "shell_family": "token_multiplier_shell",
+      "lane": "token_multiplier",
+      "value_role": "wide_board_counter_scaler",
+      "deckbuilding_value": "Pays off repeated creature/token entries, which is a different shell from current 607.",
+      "priority_rank": 4,
+      "required_contract": "token_multiplier_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "identity_ready": true,
+      "identity_source": "source_db",
+      "oracle_name": "Cathars' Crusade",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "full_shell_contract_required",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Karmic Guide",
+      "normalized_name": "karmic guide",
+      "queues": [
+        "shell_contract_required"
+      ],
+      "route_class": "full_shell_contract",
+      "shell_family": "white_reanimator_shell",
+      "lane": "white_reanimator",
+      "value_role": "creature_recursion_bridge",
+      "deckbuilding_value": "Rule-known card, but it matters only in a creature/graveyard recursion shell.",
+      "priority_rank": 4,
+      "required_contract": "white_reanimator_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "source_classification": "rule_known_external_not_in_lorehold_candidate_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "identity_ready": true,
+      "identity_source": "source_db",
+      "oracle_name": "Karmic Guide",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 1,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "full_shell_contract_required",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Late to Dinner",
+      "normalized_name": "late to dinner",
+      "queues": [
+        "shell_contract_required"
+      ],
+      "route_class": "full_shell_contract",
+      "shell_family": "white_reanimator_shell",
+      "lane": "white_reanimator",
+      "value_role": "creature_reanimation_plus_treasure",
+      "deckbuilding_value": "Requires enough creature targets and graveyard setup to justify leaving 607's spell shell.",
+      "priority_rank": 4,
+      "required_contract": "white_reanimator_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "identity_ready": true,
+      "identity_source": "temporary_simulation",
+      "oracle_name": "Late to Dinner",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "full_shell_contract_required",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Miraculous Recovery",
+      "normalized_name": "miraculous recovery",
+      "queues": [
+        "shell_contract_required"
+      ],
+      "route_class": "full_shell_contract",
+      "shell_family": "white_reanimator_shell",
+      "lane": "white_reanimator",
+      "value_role": "instant_speed_creature_reanimation",
+      "deckbuilding_value": "A recursion payoff for a creature-heavy graveyard plan, not a current 607 flex slot.",
+      "priority_rank": 4,
+      "required_contract": "white_reanimator_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "identity_ready": true,
+      "identity_source": "temporary_simulation",
+      "oracle_name": "Miraculous Recovery",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "full_shell_contract_required",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Storm of Souls",
+      "normalized_name": "storm of souls",
+      "queues": [
+        "shell_contract_required"
+      ],
+      "route_class": "full_shell_contract",
+      "shell_family": "white_reanimator_shell",
+      "lane": "white_reanimator",
+      "value_role": "mass_reanimation_closure",
+      "deckbuilding_value": "A full-shell payoff that needs graveyard volume and creature density first.",
+      "priority_rank": 4,
+      "required_contract": "white_reanimator_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "identity_ready": true,
+      "identity_source": "source_db",
+      "oracle_name": "Storm of Souls",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "full_shell_contract_required",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Blackblade Reforged",
+      "normalized_name": "blackblade reforged",
+      "queues": [
+        "shell_contract_required"
+      ],
+      "route_class": "full_shell_contract",
+      "shell_family": "voltron_equipment_shell",
+      "lane": "voltron_equipment",
+      "value_role": "land_count_power_scaler",
+      "deckbuilding_value": "Strong only if the deck becomes a protected commander/equipment damage shell.",
+      "priority_rank": 5,
+      "required_contract": "voltron_equipment_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "identity_ready": true,
+      "identity_source": "source_db",
+      "oracle_name": "Blackblade Reforged",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "full_shell_contract_required",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Excalibur, Sword of Eden",
+      "normalized_name": "excalibur, sword of eden",
+      "queues": [
+        "shell_contract_required"
+      ],
+      "route_class": "full_shell_contract",
+      "shell_family": "voltron_equipment_shell",
+      "lane": "voltron_equipment",
+      "value_role": "historic_cost_reduction_equipment_finisher",
+      "deckbuilding_value": "Needs historic permanent density and a combat finisher plan before it is meaningful.",
+      "priority_rank": 5,
+      "required_contract": "voltron_equipment_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "identity_ready": true,
+      "identity_source": "source_db",
+      "oracle_name": "Excalibur, Sword of Eden",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "full_shell_contract_required",
+        "named_safe_cut_missing"
+      ]
+    },
+    {
+      "card_name": "Strata Scythe",
+      "normalized_name": "strata scythe",
+      "queues": [
+        "shell_contract_required"
+      ],
+      "route_class": "full_shell_contract",
+      "shell_family": "voltron_equipment_shell",
+      "lane": "voltron_equipment",
+      "value_role": "basic_land_scaling_equipment",
+      "deckbuilding_value": "Depends on land-name density and equipment combat pressure, not the current 607 lane.",
+      "priority_rank": 5,
+      "required_contract": "voltron_equipment_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "identity_ready": true,
+      "identity_source": "temporary_simulation",
+      "oracle_name": "Strata Scythe",
+      "commander_status": "legal",
+      "verified_auto_rule_count": 0,
+      "in_607": false,
+      "known_deck_ids": [],
+      "battle_ready_now": false,
+      "promotion_allowed_now": false,
+      "blockers": [
+        "verified_battle_rule_missing",
+        "full_shell_contract_required",
+        "named_safe_cut_missing"
+      ]
+    }
+  ],
+  "contracts": [
+    {
+      "contract_key": "token_multiplier_shell",
+      "cards": [
+        "Anointed Procession",
+        "Cathars' Crusade"
+      ],
+      "verified_auto_rule_count": 0,
+      "ready_for_battle": false,
+      "required_next_step": "define_token_density_engine_and_cuts_before_any_battle",
+      "reason": "These payoffs need repeated token/creature entries; current 607 is protected as miracle/topdeck spell conversion, not token swarm."
+    },
+    {
+      "contract_key": "voltron_equipment_shell",
+      "cards": [
+        "Blackblade Reforged",
+        "Excalibur, Sword of Eden",
+        "Strata Scythe"
+      ],
+      "verified_auto_rule_count": 0,
+      "ready_for_battle": false,
+      "required_next_step": "define_equipment_commander_damage_shell_before_any_battle",
+      "reason": "These cards require a combat-damage equipment plan and protection package, which is a different thesis from current 607."
+    },
+    {
+      "contract_key": "white_reanimator_shell",
+      "cards": [
+        "Karmic Guide",
+        "Late to Dinner",
+        "Miraculous Recovery",
+        "Storm of Souls"
+      ],
+      "verified_auto_rule_count": 1,
+      "ready_for_battle": false,
+      "required_next_step": "define_creature_graveyard_density_shell_before_any_battle",
+      "reason": "These cards require creature density, graveyard setup, and recursion targets; they cannot justify one-for-one cuts from 607."
+    },
+    {
+      "contract_key": "storm_kiln_haze_combo",
+      "cards": [
+        "Storm-Kiln Artist",
+        "Haze of Rage"
+      ],
+      "verified_auto_rule_count": 0,
+      "ready_for_battle": false,
+      "required_next_step": "define_combo_runtime_and_cut_safety_before_any_battle",
+      "reason": "The external combo signal is package-only; Haze of Rage still needs storm/buyback/combat-buff runtime and a named cut plan."
+    }
+  ],
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "reason": "Post-identity queues are now clear enough to plan, but every path still requires runtime, combo, shell, or named safe-cut work before a battle gate."
+  }
+}

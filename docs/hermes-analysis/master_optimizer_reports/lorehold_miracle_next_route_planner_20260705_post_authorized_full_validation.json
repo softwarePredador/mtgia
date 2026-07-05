@@ -1,0 +1,518 @@
+{
+  "artifact_type": "lorehold_miracle_next_route_planner",
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "matrix_scoring_allowed_now": false,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_materialize_candidate_deck_from_route_planner_output",
+      "do_not_run_natural_battle_from_route_planner_output",
+      "mine_named_brain_same_lane_seed_safe_cut_no_deck_action",
+      "rerun deckbuilding contract surface audit after generating the route report"
+    ],
+    "postgres_writes_allowed": false,
+    "promotion_allowed": false,
+    "reason": "Entreat remains blocked by named safe-cut and unapplied-rule gates; Brain in a Jar is the next best learning route because it teaches charge-counter/free-cast/scry timing for the miracle-access thesis without mutating deck 607."
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T11:41:00Z",
+  "postgres_writes": false,
+  "route_rows": [
+    {
+      "active_rule_count": 1,
+      "blockers": [
+        "matrix_contract_blockers_not_cleared",
+        "named_safe_cut_missing"
+      ],
+      "card_name": "Brain in a Jar",
+      "deckbuilding_value": "Potentially helps cast key spells on constrained turns, but only if charge-counter timing and spell mana values are modeled correctly.",
+      "external_evidence": {
+        "learning_signal": "charge-counter timing, exact mana-value free casting, and scry form a single-card runtime lesson for miracle/topdeck access",
+        "links": {
+          "gatherer": "https://gatherer.wizards.com/SOI/en-us/252/brain-in-a-jar",
+          "scryfall": "https://scryfall.com/card/soi/252/brain-in-a-jar"
+        },
+        "source_lane": "official_card_text_and_rulings"
+      },
+      "lane": "topdeck_miracle_access",
+      "learning_score": 114,
+      "matrix_cells": [
+        "topdeck_miracle_access",
+        "turn_cycle_miracle_mana"
+      ],
+      "next_action": "mine_named_brain_same_lane_seed_safe_cut_no_deck_action",
+      "priority_rank": 1,
+      "required_contract": "single_card_runtime_contract_then_cut_safety",
+      "route_class": "runtime_or_manual_review",
+      "route_state": "brain_rule_active_no_seed_safe_cut",
+      "runtime_readiness": "blocked_requires_new_runtime_family",
+      "runtime_slice_count": 5,
+      "xmage_class_found": true
+    },
+    {
+      "active_rule_count": 0,
+      "blockers": [
+        "combo_runtime_required",
+        "matrix_contract_blockers_not_cleared",
+        "named_safe_cut_missing",
+        "verified_battle_rule_missing"
+      ],
+      "card_name": "Haze of Rage",
+      "deckbuilding_value": "Only meaningful as a Storm-Kiln Artist combo package; by itself it does not prove a 607 one-for-one replacement.",
+      "external_evidence": {
+        "learning_signal": "Commander Spellbook validates Haze plus Storm-Kiln Artist as a combo package, but package evidence is not a one-for-one 607 inclusion",
+        "links": {
+          "commander_spellbook": "https://commanderspellbook.com/combo/3940-5195/",
+          "gatherer": "https://gatherer.wizards.com/FUT/en-us/100/haze-of-rage",
+          "scryfall": "https://scryfall.com/card/fut/100/haze-of-rage"
+        },
+        "source_lane": "combo_reference_corpus"
+      },
+      "lane": "storm_combo_pressure",
+      "learning_score": 66,
+      "matrix_cells": [
+        "pressure_survival_floor"
+      ],
+      "next_action": "draft Haze plus Storm-Kiln Artist combo runtime contract after Brain lane",
+      "priority_rank": 2,
+      "required_contract": "combo_runtime_contract_with_storm_kiln_artist",
+      "route_class": "combo_runtime_contract",
+      "route_state": "combo_package_runtime_lesson",
+      "runtime_readiness": "blocked_complex_combo_runtime",
+      "runtime_slice_count": 5,
+      "xmage_class_found": true
+    },
+    {
+      "active_rule_count": 0,
+      "blockers": [
+        "matrix_contract_blockers_not_cleared",
+        "named_safe_cut_missing",
+        "verified_battle_rule_missing"
+      ],
+      "card_name": "Burning Prophet",
+      "deckbuilding_value": "Adds repeated scry and small pressure from noncreature spell volume, but current evidence treats it as diagnostic until runtime exists.",
+      "external_evidence": {},
+      "lane": "spell_scry_pressure",
+      "learning_score": 42,
+      "matrix_cells": [
+        "spell_volume_density",
+        "pressure_survival_floor"
+      ],
+      "next_action": "defer until core miracle-access runtime and cut lanes produce evidence",
+      "priority_rank": 3,
+      "required_contract": "spell_trigger_runtime_review_then_diagnostic_cut_check",
+      "route_class": "runtime_or_manual_review",
+      "route_state": "defer_lower_priority_runtime_review",
+      "runtime_readiness": "missing_runtime_contract",
+      "runtime_slice_count": 0,
+      "xmage_class_found": false
+    },
+    {
+      "active_rule_count": 0,
+      "blockers": [
+        "matrix_contract_blockers_not_cleared",
+        "named_safe_cut_missing",
+        "verified_battle_rule_missing"
+      ],
+      "card_name": "Inti, Seneschal of the Sun",
+      "deckbuilding_value": "Could align with Lorehold discard/access play, but attack timing, discard trigger, and temporary exile access all need runtime review.",
+      "external_evidence": {},
+      "lane": "rummage_pressure_access",
+      "learning_score": 38,
+      "matrix_cells": [
+        "topdeck_miracle_access",
+        "pressure_survival_floor"
+      ],
+      "next_action": "defer until core miracle-access runtime and cut lanes produce evidence",
+      "priority_rank": 3,
+      "required_contract": "discard_access_runtime_review_then_shell_or_cut_check",
+      "route_class": "runtime_or_manual_review",
+      "route_state": "defer_lower_priority_runtime_review",
+      "runtime_readiness": "missing_runtime_contract",
+      "runtime_slice_count": 0,
+      "xmage_class_found": false
+    },
+    {
+      "active_rule_count": 0,
+      "blockers": [
+        "matrix_contract_blockers_not_cleared",
+        "named_safe_cut_missing",
+        "verified_battle_rule_missing"
+      ],
+      "card_name": "Entreat the Angels",
+      "deckbuilding_value": "Fits the Lorehold miracle thesis as a high-ceiling finisher, but needs miracle/tokens runtime and a named cut before battle.",
+      "external_evidence": {
+        "learning_signal": "X miracle token finishing is aligned with the Lorehold thesis, but the current gate is named cut safety plus applied rule evidence",
+        "links": {
+          "gatherer": "https://gatherer.wizards.com/search?cardName=Entreat_the_Angels",
+          "scryfall": "https://scryfall.com/search?as=text&q=%21%22Entreat+the+Angels%22"
+        },
+        "source_lane": "official_card_text_and_generated_runtime_package"
+      },
+      "lane": "miracle_finisher",
+      "learning_score": 34,
+      "matrix_cells": [
+        "approach_finisher_conversion",
+        "topdeck_miracle_access"
+      ],
+      "next_action": "keep Entreat parked until a named same-lane cut is seed-safe",
+      "priority_rank": 1,
+      "required_contract": "miracle_token_runtime_contract_then_cut_safety",
+      "route_class": "runtime_or_manual_review",
+      "route_state": "parked_entreat_no_safe_cut",
+      "runtime_readiness": "best_first_runtime_contract_candidate",
+      "runtime_slice_count": 5,
+      "xmage_class_found": true
+    }
+  ],
+  "selected_route": {
+    "active_rule_count": 1,
+    "blockers": [
+      "matrix_contract_blockers_not_cleared",
+      "named_safe_cut_missing"
+    ],
+    "card_name": "Brain in a Jar",
+    "deckbuilding_value": "Potentially helps cast key spells on constrained turns, but only if charge-counter timing and spell mana values are modeled correctly.",
+    "external_evidence": {
+      "learning_signal": "charge-counter timing, exact mana-value free casting, and scry form a single-card runtime lesson for miracle/topdeck access",
+      "links": {
+        "gatherer": "https://gatherer.wizards.com/SOI/en-us/252/brain-in-a-jar",
+        "scryfall": "https://scryfall.com/card/soi/252/brain-in-a-jar"
+      },
+      "source_lane": "official_card_text_and_rulings"
+    },
+    "lane": "topdeck_miracle_access",
+    "learning_score": 114,
+    "matrix_cells": [
+      "topdeck_miracle_access",
+      "turn_cycle_miracle_mana"
+    ],
+    "next_action": "mine_named_brain_same_lane_seed_safe_cut_no_deck_action",
+    "priority_rank": 1,
+    "required_contract": "single_card_runtime_contract_then_cut_safety",
+    "route_class": "runtime_or_manual_review",
+    "route_state": "brain_rule_active_no_seed_safe_cut",
+    "runtime_readiness": "blocked_requires_new_runtime_family",
+    "runtime_slice_count": 5,
+    "xmage_class_found": true
+  },
+  "source_db_mutated": false,
+  "source_evidence": {
+    "brain_safe_cut_gap_summary": {
+      "apply_confirmed_outside_package_script": true,
+      "apply_executed_by_this_script": false,
+      "apply_ready_for_manual_review": true,
+      "blocked_same_lane_cut_count": 9,
+      "brain_active_rule_count": 1,
+      "brain_exact_adapter_present": true,
+      "brain_oracle_hash": "41468898bf6400763de517269fdeb456",
+      "brain_pg_package_route_governed": true,
+      "brain_pg_package_status": "prepared_read_only_pending_apply_approval",
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "brain_safe_cut_gap_no_seed_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "external_brain_global_inclusion_percent": 0.03,
+      "external_brain_lorehold_inclusion_percent": 0.4,
+      "external_signal_classification": "low_context_signal_not_staple",
+      "gap_category_counts": {
+        "never_cut_commander": 1,
+        "never_cut_mana_base": 1,
+        "prior_rejected_protected_slot": 2,
+        "protected_core_topdeck_engine": 3,
+        "protected_structural_floor": 2
+      },
+      "lowest_risk_diagnostic_allowed_now": false,
+      "lowest_risk_diagnostic_cut_candidate": "Molecule Man",
+      "lowest_risk_diagnostic_cut_category": "prior_rejected_protected_slot",
+      "matrix_scoring_allowed_now": false,
+      "natural_battle_gate_allowed_now": false,
+      "postgres_rule_active_confirmed_now": true,
+      "postgres_writes_allowed_now": false,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "mine_named_topdeck_engine_seed_safe_cut_before_matrix_scoring",
+      "runtime_preflight_candidate_queue_governed": true,
+      "runtime_preflight_candidate_queue_matrix_route_governed": true,
+      "runtime_preflight_candidate_queue_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+      "runtime_preflight_route_gate_valid": true,
+      "runtime_preflight_route_planner_status": "miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607",
+      "runtime_preflight_status": "brain_in_a_jar_runtime_cut_preflight_blocked_no_safe_cut_keep_607",
+      "safe_cut_count": 0,
+      "same_lane_candidate_count": 9,
+      "top_blocker_counts": {
+        "cut_is_early_mana_floor_support": 2,
+        "cut_not_flex_decision": 9,
+        "early_mana_floor_support": 3,
+        "manual_status_not_seed_safe": 9,
+        "measured_high_cut_exposure": 9,
+        "missing_cut_safety_row": 9,
+        "never_cut_lane": 2,
+        "never_cut_or_mana_base": 2,
+        "prior_rejected_cut": 3,
+        "prior_rejected_cut_slot": 3,
+        "protected_cut": 4,
+        "structural_dependency": 3
+      }
+    },
+    "brain_seed_safe_cut_unlock_summary": {
+      "blocked_same_lane_cut_count": 9,
+      "brain_active_rule_count": 1,
+      "brain_apply_confirmed_outside_package_script": true,
+      "brain_apply_executed_by_this_script": false,
+      "brain_apply_ready_for_manual_review": true,
+      "brain_pg_package_route_governed": true,
+      "brain_pg_package_status": "prepared_read_only_pending_apply_approval",
+      "brain_postgres_rule_active_confirmed_now": true,
+      "brain_safe_cut_gap_status": "brain_safe_cut_gap_no_seed_safe_cut_keep_607",
+      "candidate_deck_materialization_allowed_now": false,
+      "current_best_protected_baseline_rank": 1,
+      "current_best_status": "current_best_baseline_synthesis_keep_607",
+      "current_best_top_deck_is_607": true,
+      "decision_status": "brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "diagnostic_focus_card": "Molecule Man",
+      "diagnostic_focus_unlock_class": "diagnostic_only_prior_reject_requires_new_trace",
+      "matrix_scoring_allowed_now": false,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "postgres_writes_allowed_now": false,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "continue_seed_safe_cut_discovery_no_deck_action",
+      "safe_cut_count": 0,
+      "slot_count": 9,
+      "targeted_floor_trace_missing_slot_count": 0,
+      "unlock_class_counts": {
+        "diagnostic_only_prior_reject_requires_new_trace": 2,
+        "locked_no_unlock_current_607_contract": 2,
+        "protected_floor_requires_floor_replacement_trace": 2,
+        "protected_topdeck_anchor_requires_role_preservation": 3
+      },
+      "unlockable_now_count": 0
+    },
+    "candidate_queue_summary": {
+      "blocked_candidate_row_count": 5,
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
+      "deck_action_allowed_now": false,
+      "matrix_contract_blocker_count": 28,
+      "matrix_engine_cut_path_closed": true,
+      "matrix_fallback_route_key": "miracle_access_first_shell_contract",
+      "matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+      "matrix_route_governed": true,
+      "matrix_scoring_allowed_now": false,
+      "matrix_status": "miracle_access_structure_matrix_template_ready_no_candidate_no_battle",
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "resolve_runtime_and_named_same_lane_cut_before_matrix_scoring",
+      "scoreable_candidate_row_count": 0,
+      "source_candidate_count": 5,
+      "value_model_quantity_total": 100
+    },
+    "cut_miner_summary": {
+      "classification_counts": {
+        "closed_hard_stop_current_607": 94
+      },
+      "contract_status": "hypothesis_contract_written_blocked_no_named_safe_cuts",
+      "cross_lane_excluded_count": 0,
+      "cut_expansion_status": "pressure_cut_expansion_no_seed_safe_cut_keep_607",
+      "cut_shortage": 2,
+      "decision_status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+      "hard_stop_blocker_counts": {
+        "commander_never_cut": 1,
+        "cut_is_early_mana_floor_support": 14,
+        "cut_is_miracle_core_big_spell": 25,
+        "cut_is_protection_shell": 14,
+        "early_mana_floor_support": 18,
+        "mana_base_never_cut": 28,
+        "measured_high_cut_exposure": 34,
+        "miracle_or_finisher_core": 24,
+        "never_cut_lane": 29,
+        "never_cut_or_mana_base": 29,
+        "prior_rejected_cut": 37,
+        "prior_rejected_cut_slot": 24,
+        "prior_rejected_signature": 4,
+        "protected_cut": 22,
+        "protection_shell": 14,
+        "structural_dependency": 24
+      },
+      "hard_stop_cut_count": 94,
+      "lane_counts": {
+        "big_spell_value": 2,
+        "commander": 1,
+        "contextual": 1,
+        "draw": 6,
+        "early_mana": 18,
+        "graveyard_recursion": 1,
+        "hand_filter": 1,
+        "mana_base": 28,
+        "misc": 2,
+        "protection": 13,
+        "removal": 10,
+        "spell_velocity": 5,
+        "wincon": 6
+      },
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "recommended_next_action": "do_not_battle_mine_new_nonanchor_trace_or_new_shell_contract",
+      "router_route_status": "best_next_learning_route_contract_required_no_deck_action",
+      "target_adds": [
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "target_lane_evidence_gap_count": 0,
+      "target_required_cut_count": 2,
+      "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair",
+      "total_cut_slots_reviewed": 94
+    },
+    "entreat_scout_summary": {
+      "blocked_same_lane_cut_count": 10,
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "entreat_same_lane_cut_scout_blocked_no_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "entreat_active_rule_count": 0,
+      "entreat_candidate_row_found": true,
+      "entreat_lane": "miracle_finisher",
+      "matrix_contract_blocker_count": 28,
+      "matrix_scoring_allowed_now": false,
+      "natural_battle_gate_allowed_now": false,
+      "package_generated": true,
+      "postgres_writes_executed": false,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "do_not_score_entreat_until_pg_apply_and_safe_cut_evidence",
+      "runtime_primitive_ready": true,
+      "safe_cut_count": 0,
+      "same_lane_candidate_count": 10,
+      "status_counts": {
+        "blocked_current_607_hard_stop": 10
+      },
+      "top_blocker_counts": {
+        "cut_is_miracle_core_big_spell": 10,
+        "cut_not_flex_decision": 8,
+        "cut_safety_not_seed_safe": 2,
+        "manual_review_cut_safety_block": 1,
+        "manual_status_not_seed_safe": 10,
+        "measured_high_cut_exposure": 2,
+        "miracle_or_finisher_core": 10,
+        "missing_cut_safety_row": 8,
+        "prior_rejected_cut": 3,
+        "protected_cut": 3,
+        "same_lane_only_requires_concrete_same_lane_add": 1,
+        "structural_dependency": 7
+      }
+    },
+    "external_sources_consulted": {
+      "Brain in a Jar": {
+        "learning_signal": "charge-counter timing, exact mana-value free casting, and scry form a single-card runtime lesson for miracle/topdeck access",
+        "links": {
+          "gatherer": "https://gatherer.wizards.com/SOI/en-us/252/brain-in-a-jar",
+          "scryfall": "https://scryfall.com/card/soi/252/brain-in-a-jar"
+        },
+        "source_lane": "official_card_text_and_rulings"
+      },
+      "Entreat the Angels": {
+        "learning_signal": "X miracle token finishing is aligned with the Lorehold thesis, but the current gate is named cut safety plus applied rule evidence",
+        "links": {
+          "gatherer": "https://gatherer.wizards.com/search?cardName=Entreat_the_Angels",
+          "scryfall": "https://scryfall.com/search?as=text&q=%21%22Entreat+the+Angels%22"
+        },
+        "source_lane": "official_card_text_and_generated_runtime_package"
+      },
+      "Haze of Rage": {
+        "learning_signal": "Commander Spellbook validates Haze plus Storm-Kiln Artist as a combo package, but package evidence is not a one-for-one 607 inclusion",
+        "links": {
+          "commander_spellbook": "https://commanderspellbook.com/combo/3940-5195/",
+          "gatherer": "https://gatherer.wizards.com/FUT/en-us/100/haze-of-rage",
+          "scryfall": "https://scryfall.com/card/fut/100/haze-of-rage"
+        },
+        "source_lane": "combo_reference_corpus"
+      }
+    },
+    "post_identity_summary": {
+      "battle_ready_now_count": 0,
+      "combo_runtime_contract_count": 1,
+      "current_baseline": "deck_607",
+      "full_shell_contract_count": 9,
+      "identity_import_remaining_count": 0,
+      "natural_battle_allowed_now": false,
+      "promotion_allowed": false,
+      "queue_card_count": 14,
+      "recommended_next_action": "draft_runtime_contracts_for_brain_entreat_haze_before_any_deck_gate",
+      "runtime_or_manual_review_count": 4,
+      "source_identity_ready_count": 8,
+      "temporary_identity_ready_count": 6,
+      "verified_auto_rule_ready_count": 2
+    },
+    "runtime_contract_summary": {
+      "battle_ready_now_count": 0,
+      "best_first_runtime_contract": "Entreat the Angels",
+      "cards_with_active_rule_count": 1,
+      "current_baseline": "deck_607",
+      "natural_battle_allowed_now": false,
+      "promotion_allowed": false,
+      "recommended_next_action": "prepare_entreat_the_angels_runtime_contract_before_battle",
+      "runtime_contract_count": 3,
+      "xmage_class_found_count": 3
+    }
+  },
+  "source_reports": {
+    "brain_safe_cut_gap": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_safe_cut_gap_audit_20260705_post_authorized_full_validation.json",
+    "brain_unlock_audit": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_seed_safe_cut_unlock_audit_20260705_post_authorized_full_validation.json",
+    "candidate_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_candidate_row_queue_20260705_post_authorized_full_validation.json",
+    "cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json",
+    "entreat_scout": "docs/hermes-analysis/master_optimizer_reports/lorehold_entreat_same_lane_cut_scout_20260705_post_authorized_full_validation.json",
+    "post_identity": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_identity_queue_split_20260705_post_authorized_full_validation.json",
+    "runtime_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_entreat_haze_runtime_contract_20260705_post_authorized_full_validation.json"
+  },
+  "status": "miracle_next_route_planner_selected_brain_seed_cut_mining_keep_607",
+  "summary": {
+    "brain_active_rule_count": 1,
+    "brain_apply_executed_by_this_script": false,
+    "brain_apply_ready_for_manual_review": true,
+    "brain_pg_package_route_governed": true,
+    "brain_pg_package_status": "prepared_read_only_pending_apply_approval",
+    "brain_safe_cut_count": 0,
+    "brain_targeted_floor_trace_missing_slot_count": 0,
+    "brain_unlock_audit_status": "brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607",
+    "brain_unlock_recommended_next_action": "continue_seed_safe_cut_discovery_no_deck_action",
+    "brain_unlockable_now_count": 0,
+    "candidate_deck_materialization_allowed_now": false,
+    "candidate_queue_matrix_fallback_route_key": "miracle_access_first_shell_contract",
+    "candidate_queue_matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+    "candidate_queue_matrix_route_governed": true,
+    "candidate_queue_scoreable_row_count": 0,
+    "candidate_queue_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
+    "decision_status": "miracle_next_route_planner_selected_brain_seed_cut_mining_keep_607",
+    "deck_action_allowed_now": false,
+    "entreat_active_rule_count": 0,
+    "entreat_safe_cut_count": 0,
+    "matrix_scoring_allowed_now": false,
+    "named_seed_safe_cut_count": 0,
+    "natural_battle_gate_allowed_now": false,
+    "postgres_writes_allowed_now": false,
+    "promotion_allowed_now": false,
+    "recommended_next_action": "mine_named_brain_same_lane_seed_safe_cut_no_deck_action",
+    "route_candidate_count": 5,
+    "selected_card": "Brain in a Jar",
+    "selected_lane": "topdeck_miracle_access",
+    "selected_learning_score": 114,
+    "selected_route_state": "brain_rule_active_no_seed_safe_cut",
+    "state_counts": {
+      "brain_rule_active_no_seed_safe_cut": 1,
+      "combo_package_runtime_lesson": 1,
+      "defer_lower_priority_runtime_review": 2,
+      "parked_entreat_no_safe_cut": 1
+    },
+    "top_blocker_counts": {
+      "combo_runtime_required": 1,
+      "matrix_contract_blockers_not_cleared": 5,
+      "named_safe_cut_missing": 5,
+      "verified_battle_rule_missing": 4
+    }
+  }
+}

@@ -19851,6 +19851,61 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_xmage_creature_etb_fixed_mana_adds_exact_symbols():
+        events = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Gruul")
+            opponent = player("Opponent")
+            battle.apply_effect_immediate(
+                active,
+                [opponent],
+                {
+                    "name": "Burning-Tree Emissary",
+                    "type_line": "Creature - Human Shaman",
+                    "cmc": 2,
+                    "power": 2,
+                    "toughness": 2,
+                },
+                turn=3,
+                rng=random.Random(1503),
+                effect_data_override={
+                    "effect": "ramp_permanent",
+                    "battle_model_scope": "xmage_creature_etb_add_fixed_mana_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "trigger_effect": "add_mana",
+                    "permanent_type": "creature",
+                    "is_mana_source": False,
+                    "etb_mana_produced": 2,
+                    "etb_produces": "RG",
+                    "etb_produced_mana_symbols": ["R", "G"],
+                    "mana_produced": 2,
+                    "produces": "RG",
+                    "produced_mana_symbols": ["R", "G"],
+                    "_rule_logical_key": "battle_rule_v1:test_etb_fixed_mana",
+                    "_rule_oracle_hash": "test-etb-fixed-mana-hash",
+                },
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+
+        assert any(
+            isinstance(permanent, dict) and permanent.get("name") == "Burning-Tree Emissary"
+            for permanent in active.battlefield
+        )
+        assert active.mana_pool.red == 1
+        assert active.mana_pool.green == 1
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Burning-Tree Emissary"
+            and data.get("effect") == "add_mana"
+            and data.get("mana_added") == 2
+            and data.get("produced_mana_symbols") == ["R", "G"]
+            for event, data in events
+        )
+
     def test_eldrazi_confluence_uses_pump_then_blink_then_scion_when_context_exists():
         events = []
         previous_event_handler = battle.REPLAY_EVENT_HANDLER
@@ -23491,6 +23546,7 @@ def register_tests(battle, player):
         test_patrol_signaler_skips_when_not_tapped_for_untap_activation,
         test_eldrazi_confluence_creates_three_scions_when_no_other_modes_are_live,
         test_xmage_token_sacrifice_colorless_mana_unlocks_contextual_cast,
+        test_xmage_creature_etb_fixed_mana_adds_exact_symbols,
         test_eldrazi_confluence_uses_pump_then_blink_then_scion_when_context_exists,
         test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache,
         test_pg114_emerias_call_creates_angels_and_protects_non_angels_until_next_turn,
