@@ -1,0 +1,274 @@
+{
+  "artifact_type": "lorehold_same_lane_microbenchmark_decision_synthesis",
+  "bender_waterskin_blocked_queue": [
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Seething Song",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "seething_song_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 117
+    },
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "birgi_god_of_storytelling_harnfel_horn_of_bounty_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 112
+    },
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Mana Vault",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 112
+    },
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Basalt Monolith",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "basalt_monolith_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 104
+    },
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Desperate Ritual",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "desperate_ritual_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 101
+    },
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Pyretic Ritual",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "pyretic_ritual_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 101
+    },
+    {
+      "blockers": [
+        "candidate_policy_blocked_no_premium_mox"
+      ],
+      "candidate": "Chrome Mox",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "chrome_mox_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 96
+    },
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Cloud Key",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "cloud_key_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 96
+    },
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Electro, Assaulting Battery",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "electro_assaulting_battery_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 96
+    },
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Locket of Yesterdays",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "locket_of_yesterdays_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 96
+    },
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Lotus Petal",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "lotus_petal_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 96
+    },
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Millikin",
+      "candidate_role": "ramp",
+      "cut_role": "ramp",
+      "package_key": "millikin_same_lane_benchmark_cut_bender_s_waterskin",
+      "score": 96
+    }
+  ],
+  "candidate_decisions": [
+    {
+      "candidate": "Possibility Storm",
+      "candidate_role": "big_spell_value",
+      "cut": "Creative Technique",
+      "cut_role": "big_spell_value",
+      "decision": "static_ready_but_prior_natural_rejected",
+      "forced_access_signal_count": 1,
+      "next_action": "do_not_rerun_natural_gate_without_new_material_evidence",
+      "package_key": "possibility_storm_same_lane_benchmark_cut_creative_technique",
+      "prior_natural_reject_count": 2,
+      "score": 96,
+      "static_status": "preflight_ready"
+    }
+  ],
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_promote_possibility_storm_over_creative_technique",
+      "do_not_retest_bender_waterskin_fast_mana_pairs already blocked by prior_exact_reject",
+      "only reopen this lane with new material evidence, a changed runtime adapter, or a new same-lane candidate not in the exhausted queue"
+    ],
+    "promotion_allowed": false,
+    "reason": "The current static same-lane scan finds Possibility Storm over Creative Technique, but prior natural gates already lost to protected 607. Forced-access improvement is diagnostic only and cannot override natural evidence."
+  },
+  "deck_607_mutated": false,
+  "external_rule_context": [
+    {
+      "learning": "Possibility Storm is Commander legal and red, so it passes the Lorehold color/legal entry gate.",
+      "source": "Scryfall Possibility Storm",
+      "url": "https://scryfall.com/card/dgm/34/possibility-storm"
+    },
+    {
+      "learning": "Official card text/rulings support treating it as a cast-from-hand replacement/free-cast chaos engine.",
+      "source": "Gatherer Possibility Storm",
+      "url": "https://gatherer.wizards.com/DGM/en-us/34/possibility-storm"
+    }
+  ],
+  "generated_at": "2026-07-05T01:20:50Z",
+  "postgres_writes": false,
+  "prior_gate_evidence": [
+    {
+      "baseline": {
+        "candidate_card_event_count": 0,
+        "deck_key": "deck_607",
+        "draws": 1,
+        "focus_cut_trace_count": 1486,
+        "games": 24,
+        "losses": 12,
+        "win_rate": 45.83,
+        "wins": 11
+      },
+      "candidate": {
+        "candidate_card_event_count": 3,
+        "deck_key": "synergy_possibility_storm_same_lane_benchmark_cut_creative_technique",
+        "draws": 0,
+        "focus_candidate_trace_count": 1074,
+        "games": 24,
+        "losses": 21,
+        "win_rate": 12.5,
+        "wins": 3
+      },
+      "decision": "prior_natural_reject",
+      "delta_win_rate_pp": -33.33,
+      "forced_access_mode": "none",
+      "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_big_spell_value_creative_technique_gate_20260630_goal_learning_smoke_20260630_213730_possibility_storm_same_lane_benchmark_cut_creative_technique.json",
+      "status": "ready"
+    },
+    {
+      "baseline": {
+        "candidate_card_event_count": 0,
+        "deck_key": "deck_607",
+        "draws": 0,
+        "focus_cut_trace_count": 294,
+        "games": 4,
+        "losses": 2,
+        "win_rate": 50.0,
+        "wins": 2
+      },
+      "candidate": {
+        "candidate_card_event_count": 0,
+        "deck_key": "synergy_possibility_storm_same_lane_benchmark_cut_creative_technique",
+        "draws": 0,
+        "focus_candidate_trace_count": 242,
+        "games": 4,
+        "losses": 3,
+        "win_rate": 25.0,
+        "wins": 1
+      },
+      "decision": "prior_natural_reject",
+      "delta_win_rate_pp": -25.0,
+      "forced_access_mode": "none",
+      "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_unprotected_staple_relearn_gate_20260704_possibility_storm_smoke_possibility_storm_same_lane_benchmark_cut_creative_technique.json",
+      "status": "ready"
+    },
+    {
+      "baseline": {
+        "candidate_card_event_count": 0,
+        "deck_key": "deck_607",
+        "draws": 0,
+        "focus_cut_trace_count": 150,
+        "games": 4,
+        "losses": 4,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "candidate": {
+        "candidate_card_event_count": 0,
+        "deck_key": "synergy_possibility_storm_same_lane_benchmark_cut_creative_technique",
+        "draws": 0,
+        "focus_candidate_trace_count": 277,
+        "games": 4,
+        "losses": 2,
+        "win_rate": 50.0,
+        "wins": 2
+      },
+      "decision": "forced_access_signal_only",
+      "delta_win_rate_pp": 50.0,
+      "forced_access_mode": "opening_hand",
+      "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_unprotected_staple_relearn_gate_20260704_possibility_storm_forced_opening_possibility_storm_same_lane_benchmark_cut_creative_technique.json",
+      "status": "ready"
+    }
+  ],
+  "source_db_mutated": false,
+  "source_reports": {
+    "benchmark": "docs/hermes-analysis/master_optimizer_reports/lorehold_same_lane_diagnostic_microbenchmarks_20260705_current.json",
+    "prior_gates": [
+      "docs/hermes-analysis/master_optimizer_reports/lorehold_big_spell_value_creative_technique_gate_20260630_goal_learning_smoke_20260630_213730_possibility_storm_same_lane_benchmark_cut_creative_technique.json",
+      "docs/hermes-analysis/master_optimizer_reports/lorehold_607_unprotected_staple_relearn_gate_20260704_possibility_storm_smoke_possibility_storm_same_lane_benchmark_cut_creative_technique.json",
+      "docs/hermes-analysis/master_optimizer_reports/lorehold_607_unprotected_staple_relearn_gate_20260704_possibility_storm_forced_opening_possibility_storm_same_lane_benchmark_cut_creative_technique.json"
+    ]
+  },
+  "status": "same_lane_static_ready_prior_natural_rejected_keep_607",
+  "summary": {
+    "bender_waterskin_ready_pair_count": 0,
+    "current_baseline": "deck_607",
+    "forced_access_signal_count": 1,
+    "natural_battle_allowed_now": false,
+    "pair_evaluation_count": 540,
+    "prior_natural_reject_count": 2,
+    "profiled_cut_count": 2,
+    "promotion_allowed": false,
+    "recommended_next_action": "record_possibility_storm_as_diagnostic_only_and_do_not_rerun_gate",
+    "selected_package_count": 1,
+    "static_preflight_ready_pair_count": 1,
+    "supported_cut_count": 2
+  }
+}

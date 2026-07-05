@@ -346,11 +346,47 @@ def exact_prior_rejects(prior_results: dict[str, Any]) -> set[tuple[str, str]]:
 
 
 def normalized_cut_safety(cut_safety: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    if not isinstance(cut_safety, dict):
+        return {}
+    manifest = cut_safety.get("cut_safety_manifest")
+    if isinstance(manifest, dict):
+        cut_safety = manifest
+    direct_rows = cut_safety.get("cuts_by_name")
+    if isinstance(direct_rows, dict):
+        return {
+            normalize_key(name): row
+            for name, row in direct_rows.items()
+            if isinstance(row, dict)
+        }
+    cut_rows = cut_safety.get("cuts")
+    if isinstance(cut_rows, list):
+        return {
+            normalize_key(row.get("card_name"))
+            : row
+            for row in cut_rows
+            if isinstance(row, dict) and row.get("card_name")
+        }
     return {
         normalize_key(name): row
         for name, row in (cut_safety.get("cuts_by_name") or {}).items()
         if isinstance(row, dict)
     }
+
+
+def row_cut_safety(
+    row: dict[str, Any],
+    cut_safety_by_name: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    embedded = row.get("cut_safety")
+    merged = dict(embedded) if isinstance(embedded, dict) else {}
+    from_report = cut_safety_by_name.get(normalize_key(row.get("card_name")))
+    if isinstance(from_report, dict):
+        for key, value in from_report.items():
+            if value not in (None, "", [], {}):
+                if key == "current_lane" and value == "registry_protected" and merged.get("current_lane"):
+                    continue
+                merged[key] = value
+    return merged
 
 
 def active_rule_text(rule: dict[str, Any]) -> str:
@@ -796,9 +832,10 @@ def build_report(
     for cut in cuts:
         cut_name = str(cut.get("card_name") or "")
         cut_key = normalize_key(cut_name)
+        cut_safety_row = row_cut_safety(cut, cut_safety_by_name)
         cut_with_metadata = {
             **cut,
-            "cut_safety": cut_safety_by_name.get(cut_key, {}),
+            "cut_safety": cut_safety_row,
             "cut_metadata": current_metadata.get(
                 cut_key,
                 {
@@ -867,12 +904,12 @@ def build_report(
             "status": row.get("status"),
             "recommended_action": row.get("recommended_action"),
             "cut_exposure": row.get("cut_exposure") or {},
-            "cut_safety": cut_safety_by_name.get(normalize_key(row.get("card_name")), {}),
+            "cut_safety": row_cut_safety(row, cut_safety_by_name),
             "reason": "no supported generator for this cut role yet",
         }
         for row in eligible_cut_rows
         if (
-            (cut_safety_by_name.get(normalize_key(row.get("card_name")), {}).get("effective_role"))
+            (row_cut_safety(row, cut_safety_by_name).get("effective_role"))
             or (row.get("cut_exposure") or {}).get("inferred_role")
         ) not in SUPPORTED_CUT_ROLES
     ]

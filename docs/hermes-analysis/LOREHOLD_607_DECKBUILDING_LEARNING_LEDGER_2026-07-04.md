@@ -211,3 +211,58 @@ Staple/artifact/land lesson:
 Current conclusion remains unchanged: protected deck `607` is still the
 Lorehold champion. The persistent learning task continues through cut-cost
 discovery and diagnostic-only same-lane microbenchmarks, not natural battles.
+
+## Same-Lane Microbenchmark Decision - 2026-07-05
+
+The pressure safe-cut expansion pointed at diagnostic-only same-lane
+microbenchmarks for `Creative Technique` and `Bender's Waterskin`. The current
+reports are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_same_lane_diagnostic_microbenchmarks_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_same_lane_microbenchmark_decision_synthesis_20260705_current.md`
+
+Implementation note: the profiled cut benchmark generator now preserves
+`cut_safety` embedded in the current manual review rows when the external
+cut-safety report or registry provides only partial protection metadata. This
+keeps the functional lane (`finisher_or_big_spell`, `early_mana`) separate from
+generic `registry_protected` status.
+
+Current same-lane scan:
+
+- profiled cuts: `2`;
+- supported cuts: `2`;
+- candidate pairs evaluated: `540`;
+- static preflight-ready pairs: `1`;
+- selected static package:
+  `Possibility Storm` over `Creative Technique`;
+- `Bender's Waterskin` ready pairs: `0`.
+
+Decision synthesis:
+
+- status: `same_lane_static_ready_prior_natural_rejected_keep_607`;
+- prior natural rejects: `2`;
+- forced-access diagnostic signal: `1`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`.
+
+Historical gate evidence for `Possibility Storm` over `Creative Technique`:
+
+- 2026-06-30 natural smoke: protected `607` went `11/24`; candidate went
+  `3/24`, delta `-33.33pp`.
+- 2026-07-04 natural smoke: protected `607` went `2/4`; candidate went `1/4`,
+  delta `-25.0pp`.
+- 2026-07-04 forced opening-hand diagnostic: protected `607` went `0/4`;
+  candidate went `2/4`, delta `+50.0pp`, but forced access is diagnostic only
+  and cannot override natural rejection.
+
+`Bender's Waterskin` remains blocked as an early-mana cut. The highest-scoring
+same-lane replacements in the current scan (`Seething Song`, `Birgi`,
+`Mana Vault`, `Basalt Monolith`, `Desperate Ritual`, `Pyretic Ritual`,
+`Cloud Key`, `Electro`, `Locket of Yesterdays`, `Lotus Petal`, and others)
+are blocked by `prior_exact_reject` or explicit premium-Mox/runtime-cost
+policy blockers.
+
+Current conclusion remains unchanged: do not mutate or promote over protected
+deck `607`. Reopen this same-lane path only with new material evidence, a
+changed runtime adapter, or a same-lane candidate not already exhausted by the
+current queue.

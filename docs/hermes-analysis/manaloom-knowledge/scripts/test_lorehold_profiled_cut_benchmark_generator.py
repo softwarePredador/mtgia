@@ -268,6 +268,50 @@ def test_generator_uses_cut_safety_roles_for_ramp_and_big_spell_packages():
     assert any("candidate_scope_not_same_lane" in row["blockers"] for row in thrumming_rows)
 
 
+def test_generator_uses_embedded_manual_review_cut_safety_roles():
+    review = manual_review()
+    cuts_by_name = cut_safety()["cuts_by_name"]
+    for row in review["cut_evidence_expansion"]["top_same_lane_candidates"]:
+        if row["card_name"] in cuts_by_name:
+            row["cut_safety"] = cuts_by_name[row["card_name"]]
+    review["cut_evidence_expansion"]["rows"] = (
+        review["cut_evidence_expansion"]["top_same_lane_candidates"]
+        + review["cut_evidence_expansion"]["rows"]
+    )
+
+    with build_conn() as conn:
+        payload = generator.build_report(
+            conn=conn,
+            manual_review=review,
+            prior_results={"by_signature": {}},
+            cut_safety={
+                "enabled": True,
+                "cuts_by_name": {
+                    "Creative Technique": {
+                        "current_decision": "registry_protected",
+                        "current_lane": "registry_protected",
+                        "status": "protected_until_same_function_replacement_wins",
+                    }
+                },
+            },
+            db_path=Path("memory.db"),
+            manual_review_path=Path("manual_review.json"),
+            variant_deck_ids=[612, 614],
+            max_per_cut=1,
+            cut_names=["Bender's Waterskin", "Creative Technique"],
+        )
+
+    selected = {(row["candidate"], row["cut"], row["candidate_role"], row["cut_role"]) for row in payload["selected_pairs"]}
+    assert ("Mana Vault", "Bender's Waterskin", "ramp", "ramp") in selected
+    assert ("Galvanoth", "Creative Technique", "big_spell_value", "big_spell_value") in selected
+    assert payload["summary"]["supported_cut_count"] == 2
+    assert payload["summary"]["selected_package_count"] == 2
+    assert payload["blocked_cut_rows"] == []
+    creative = next(row for row in payload["selected_pairs"] if row["cut"] == "Creative Technique")
+    assert creative["cut_safety"]["current_lane"] == "finisher_or_big_spell"
+    assert creative["cut_safety"]["status"] == "protected_until_same_function_replacement_wins"
+
+
 def test_generator_can_restrict_to_removal_lane_without_ramp_fallback():
     with build_conn() as conn:
         payload = generator.build_report(
