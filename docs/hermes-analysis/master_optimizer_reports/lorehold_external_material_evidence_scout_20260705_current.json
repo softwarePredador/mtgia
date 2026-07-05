@@ -1,0 +1,842 @@
+{
+  "generated_at": "2026-07-05T01:31:25Z",
+  "artifact_type": "lorehold_external_material_evidence_scout",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "deck_607_mutated": false,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_reports": {
+    "pressure_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_cut_expansion_model_20260705_current.json",
+    "same_lane_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_same_lane_microbenchmark_decision_synthesis_20260705_current.json",
+    "value_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json"
+  },
+  "external_source_lanes": [
+    {
+      "source_key": "edhrec_upgraded_spellslinger_current",
+      "source": "EDHREC Lorehold upgraded spellslinger page",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian/upgraded/spellslinger",
+      "route_type": "reference_corpus",
+      "learning": "The current public Lorehold surface is tagged Topdeck, Spellslinger, Discard, and Burn; high-synergy cards still point toward topdeck, miracle, big-spell conversion, and pressure payoffs.",
+      "candidate_cards": [
+        "Storm-Kiln Artist",
+        "Guttersnipe",
+        "Young Pyromancer",
+        "Monastery Mentor",
+        "Surly Badgersaur",
+        "Goldspan Dragon",
+        "Glint-Horn Buccaneer",
+        "Inti, Seneschal of the Sun"
+      ]
+    },
+    {
+      "source_key": "gametyrant_miracle_topdeck_pressure",
+      "source": "GameTyrant Lorehold deck tech",
+      "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech",
+      "route_type": "topdeck_pressure_reference",
+      "learning": "The article reinforces Library of Leng, miracle setup, topdeck control, alternate casting, and pressure conversion rather than generic Boros goodstuff.",
+      "candidate_cards": [
+        "Brain in a Jar",
+        "Galvanoth",
+        "Burning Prophet",
+        "Dragon's Rage Channeler",
+        "Planetarium of Wan Shi Tong",
+        "Entreat the Angels"
+      ]
+    },
+    {
+      "source_key": "card_kingdom_reanimator_direction",
+      "source": "Card Kingdom Lorehold synergy cards",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/",
+      "route_type": "archetype_fork",
+      "learning": "A reanimator build is a separate direction: expensive white reanimation spells and Karmic Guide can exploit discard and cost reduction, but that is not a one-card update to the current 607 shell.",
+      "candidate_cards": [
+        "Storm of Souls",
+        "Late to Dinner",
+        "Miraculous Recovery",
+        "Karmic Guide"
+      ]
+    },
+    {
+      "source_key": "coolstuffinc_token_combo_voltron_directions",
+      "source": "CoolStuffInc Lorehold commander article",
+      "url": "https://www.coolstuffinc.com/a/stephenjohnson-04202026-lorehold-the-historian-commander",
+      "route_type": "archetype_fork",
+      "learning": "The article frames token swarm, combo, burn/damage, and Voltron as directions beyond the instant/sorcery shell. These need full-shell contracts, not isolated cuts from 607.",
+      "candidate_cards": [
+        "Anointed Procession",
+        "Cathars' Crusade",
+        "Blackblade Reforged",
+        "Strata Scythe",
+        "Excalibur, Sword of Eden"
+      ]
+    },
+    {
+      "source_key": "commander_spellbook_storm_kiln_haze",
+      "source": "Commander Spellbook Storm-Kiln Artist + Haze of Rage",
+      "url": "https://commanderspellbook.com/combo/3940-5195/",
+      "route_type": "combo_package",
+      "learning": "Storm-Kiln Artist plus Haze of Rage is a red combo lane with mana, storm, magecraft, Treasure, and creature-power outputs. It remains a package hypothesis until local identity, runtime, cuts, and natural battle proof all exist.",
+      "candidate_cards": [
+        "Storm-Kiln Artist",
+        "Haze of Rage"
+      ]
+    },
+    {
+      "source_key": "archidekt_recent_public_corpus",
+      "source": "Archidekt Lorehold commander search",
+      "url": "https://archidekt.com/commanders/Lorehold%2C_the_Historian",
+      "route_type": "reference_corpus",
+      "learning": "The public corpus is broad and fresh enough to mine, but raw public deck presence is only reference evidence until normalized into local identity, legality, lane, and battle-gate artifacts.",
+      "candidate_cards": []
+    }
+  ],
+  "status": "external_material_evidence_found_but_no_gate_ready_keep_607",
+  "summary": {
+    "current_baseline": "deck_607",
+    "external_source_count": 6,
+    "external_candidate_count": 24,
+    "in_607_count": 0,
+    "local_lorehold_variant_candidate_count": 10,
+    "non_lorehold_lab_only_count": 0,
+    "rule_known_external_not_in_lorehold_candidate_pool_count": 1,
+    "missing_from_local_deck_pool_count": 13,
+    "archetype_fork_candidate_count": 9,
+    "package_assessment_count": 3,
+    "gate_ready_now_count": 0,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "pressure_report_status": "pressure_cut_expansion_no_seed_safe_cut_keep_607",
+    "pressure_seed_safe_cut_ready_count": 0,
+    "pressure_gate_ready_package_count": 0,
+    "same_lane_report_status": "same_lane_static_ready_prior_natural_rejected_keep_607",
+    "same_lane_prior_natural_reject_count": 2,
+    "value_model_status": "lorehold_value_model_ready_607_remains_protected",
+    "value_model_quantity_total": 100,
+    "recommended_next_action": "build_external_candidate_identity_import_preflight_before_any_new_gate"
+  },
+  "candidate_classifications": [
+    {
+      "card_name": "Anointed Procession",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool",
+        "not_a_one_for_one_607_cut"
+      ]
+    },
+    {
+      "card_name": "Blackblade Reforged",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool",
+        "not_a_one_for_one_607_cut"
+      ]
+    },
+    {
+      "card_name": "Brain in a Jar",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool"
+      ]
+    },
+    {
+      "card_name": "Burning Prophet",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool"
+      ]
+    },
+    {
+      "card_name": "Cathars' Crusade",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool",
+        "not_a_one_for_one_607_cut"
+      ]
+    },
+    {
+      "card_name": "Entreat the Angels",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool"
+      ]
+    },
+    {
+      "card_name": "Excalibur, Sword of Eden",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool",
+        "not_a_one_for_one_607_cut"
+      ]
+    },
+    {
+      "card_name": "Haze of Rage",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "combo_package_research_only_requires_runtime_cut_and_battle_proof",
+      "source_keys": [
+        "commander_spellbook_storm_kiln_haze"
+      ],
+      "route_types": [
+        "combo_package"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "combo_package_not_single_card_proof",
+        "missing_from_local_deck_pool"
+      ]
+    },
+    {
+      "card_name": "Inti, Seneschal of the Sun",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "source_keys": [
+        "edhrec_upgraded_spellslinger_current"
+      ],
+      "route_types": [
+        "reference_corpus"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool"
+      ]
+    },
+    {
+      "card_name": "Late to Dinner",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool",
+        "not_a_one_for_one_607_cut"
+      ]
+    },
+    {
+      "card_name": "Miraculous Recovery",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool",
+        "not_a_one_for_one_607_cut"
+      ]
+    },
+    {
+      "card_name": "Storm of Souls",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool",
+        "not_a_one_for_one_607_cut"
+      ]
+    },
+    {
+      "card_name": "Strata Scythe",
+      "classification": "external_missing_from_local_deck_pool",
+      "actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "blockers": [
+        "missing_from_local_deck_pool",
+        "not_a_one_for_one_607_cut"
+      ]
+    },
+    {
+      "card_name": "Dragon's Rage Channeler",
+      "classification": "local_lorehold_variant_candidate_not_in_607",
+      "actionability": "local_candidate_but_blocked_by_current_cut_safety_or_prior_route",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [
+        609,
+        613,
+        614
+      ],
+      "lab_deck_ids": [],
+      "all_deck_ids": [
+        609,
+        613,
+        614
+      ],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "no_seed_safe_cut_or_prior_reject"
+      ]
+    },
+    {
+      "card_name": "Galvanoth",
+      "classification": "local_lorehold_variant_candidate_not_in_607",
+      "actionability": "local_candidate_but_blocked_by_current_cut_safety_or_prior_route",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [
+        611,
+        613,
+        614,
+        615
+      ],
+      "lab_deck_ids": [],
+      "all_deck_ids": [
+        611,
+        613,
+        614,
+        615
+      ],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "no_seed_safe_cut_or_prior_reject"
+      ]
+    },
+    {
+      "card_name": "Glint-Horn Buccaneer",
+      "classification": "local_lorehold_variant_candidate_not_in_607",
+      "actionability": "local_candidate_but_blocked_by_current_cut_safety_or_prior_route",
+      "source_keys": [
+        "edhrec_upgraded_spellslinger_current"
+      ],
+      "route_types": [
+        "reference_corpus"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [
+        613
+      ],
+      "lab_deck_ids": [
+        617
+      ],
+      "all_deck_ids": [
+        613,
+        617
+      ],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "no_seed_safe_cut_or_prior_reject"
+      ]
+    },
+    {
+      "card_name": "Goldspan Dragon",
+      "classification": "local_lorehold_variant_candidate_not_in_607",
+      "actionability": "local_candidate_but_blocked_by_current_cut_safety_or_prior_route",
+      "source_keys": [
+        "edhrec_upgraded_spellslinger_current"
+      ],
+      "route_types": [
+        "reference_corpus"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [
+        608,
+        611,
+        614,
+        615
+      ],
+      "lab_deck_ids": [],
+      "all_deck_ids": [
+        608,
+        611,
+        614,
+        615
+      ],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "no_seed_safe_cut_or_prior_reject"
+      ]
+    },
+    {
+      "card_name": "Guttersnipe",
+      "classification": "local_lorehold_variant_candidate_not_in_607",
+      "actionability": "local_candidate_but_blocked_by_current_cut_safety_or_prior_route",
+      "source_keys": [
+        "edhrec_upgraded_spellslinger_current"
+      ],
+      "route_types": [
+        "reference_corpus"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [
+        615,
+        616
+      ],
+      "lab_deck_ids": [],
+      "all_deck_ids": [
+        615,
+        616
+      ],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "no_seed_safe_cut_or_prior_reject"
+      ]
+    },
+    {
+      "card_name": "Monastery Mentor",
+      "classification": "local_lorehold_variant_candidate_not_in_607",
+      "actionability": "local_candidate_but_blocked_by_current_cut_safety_or_prior_route",
+      "source_keys": [
+        "edhrec_upgraded_spellslinger_current"
+      ],
+      "route_types": [
+        "reference_corpus"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [
+        616
+      ],
+      "lab_deck_ids": [],
+      "all_deck_ids": [
+        616
+      ],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "no_seed_safe_cut_or_prior_reject"
+      ]
+    },
+    {
+      "card_name": "Planetarium of Wan Shi Tong",
+      "classification": "local_lorehold_variant_candidate_not_in_607",
+      "actionability": "local_candidate_but_blocked_by_current_cut_safety_or_prior_route",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [
+        611,
+        613
+      ],
+      "lab_deck_ids": [],
+      "all_deck_ids": [
+        611,
+        613
+      ],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "no_seed_safe_cut_or_prior_reject"
+      ]
+    },
+    {
+      "card_name": "Storm-Kiln Artist",
+      "classification": "local_lorehold_variant_candidate_not_in_607",
+      "actionability": "combo_package_research_only_requires_runtime_cut_and_battle_proof",
+      "source_keys": [
+        "edhrec_upgraded_spellslinger_current",
+        "commander_spellbook_storm_kiln_haze"
+      ],
+      "route_types": [
+        "combo_package",
+        "reference_corpus"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [
+        608,
+        611,
+        612,
+        613,
+        614
+      ],
+      "lab_deck_ids": [],
+      "all_deck_ids": [
+        6,
+        608,
+        611,
+        612,
+        613,
+        614
+      ],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "combo_package_not_single_card_proof",
+        "no_seed_safe_cut_or_prior_reject",
+        "prior_arcane_signet_replacement_rejected_by_winota_guard"
+      ]
+    },
+    {
+      "card_name": "Surly Badgersaur",
+      "classification": "local_lorehold_variant_candidate_not_in_607",
+      "actionability": "local_candidate_but_blocked_by_current_cut_safety_or_prior_route",
+      "source_keys": [
+        "edhrec_upgraded_spellslinger_current"
+      ],
+      "route_types": [
+        "reference_corpus"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [
+        608
+      ],
+      "lab_deck_ids": [
+        617
+      ],
+      "all_deck_ids": [
+        608,
+        617
+      ],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "no_seed_safe_cut_or_prior_reject"
+      ]
+    },
+    {
+      "card_name": "Young Pyromancer",
+      "classification": "local_lorehold_variant_candidate_not_in_607",
+      "actionability": "local_candidate_but_blocked_by_current_cut_safety_or_prior_route",
+      "source_keys": [
+        "edhrec_upgraded_spellslinger_current"
+      ],
+      "route_types": [
+        "reference_corpus"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [
+        612,
+        616
+      ],
+      "lab_deck_ids": [],
+      "all_deck_ids": [
+        612,
+        616
+      ],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "no_seed_safe_cut_or_prior_reject"
+      ]
+    },
+    {
+      "card_name": "Karmic Guide",
+      "classification": "rule_known_external_not_in_lorehold_candidate_pool",
+      "actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "in_607": false,
+      "baseline_quantity": 0,
+      "lorehold_variant_deck_ids": [],
+      "lab_deck_ids": [],
+      "all_deck_ids": [],
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "blockers": [
+        "not_a_one_for_one_607_cut",
+        "not_in_current_lorehold_deck_pool"
+      ]
+    }
+  ],
+  "package_assessments": [
+    {
+      "package_key": "storm_kiln_artist_haze_of_rage_combo",
+      "route_type": "combo_package",
+      "cards": [
+        {
+          "card_name": "Storm-Kiln Artist",
+          "classification": "local_lorehold_variant_candidate_not_in_607",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [
+            608,
+            611,
+            612,
+            613,
+            614
+          ],
+          "battle_rule_count": 1
+        },
+        {
+          "card_name": "Haze of Rage",
+          "classification": "external_missing_from_local_deck_pool",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [],
+          "battle_rule_count": 0
+        }
+      ],
+      "status": "research_only_mixed_local_and_missing_material",
+      "gate_ready": false,
+      "natural_battle_allowed_now": false,
+      "reason": "Storm-Kiln Artist is visible locally, but Haze of Rage is not a current local Lorehold deck candidate. Even if imported, the package still needs cut-safety, runtime scope, and natural battle proof."
+    },
+    {
+      "package_key": "white_reanimator_lorehold_shell",
+      "route_type": "archetype_fork",
+      "cards": [
+        {
+          "card_name": "Storm of Souls",
+          "classification": "external_missing_from_local_deck_pool",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [],
+          "battle_rule_count": 0
+        },
+        {
+          "card_name": "Late to Dinner",
+          "classification": "external_missing_from_local_deck_pool",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [],
+          "battle_rule_count": 0
+        },
+        {
+          "card_name": "Miraculous Recovery",
+          "classification": "external_missing_from_local_deck_pool",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [],
+          "battle_rule_count": 0
+        },
+        {
+          "card_name": "Karmic Guide",
+          "classification": "rule_known_external_not_in_lorehold_candidate_pool",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [],
+          "battle_rule_count": 1
+        }
+      ],
+      "status": "archetype_fork_only_requires_full_shell_contract",
+      "gate_ready": false,
+      "natural_battle_allowed_now": false,
+      "reason": "This changes the deck thesis toward reanimator and cannot justify one-for-one cuts from 607."
+    },
+    {
+      "package_key": "voltron_or_token_closure_shell",
+      "route_type": "archetype_fork",
+      "cards": [
+        {
+          "card_name": "Blackblade Reforged",
+          "classification": "external_missing_from_local_deck_pool",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [],
+          "battle_rule_count": 0
+        },
+        {
+          "card_name": "Strata Scythe",
+          "classification": "external_missing_from_local_deck_pool",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [],
+          "battle_rule_count": 0
+        },
+        {
+          "card_name": "Excalibur, Sword of Eden",
+          "classification": "external_missing_from_local_deck_pool",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [],
+          "battle_rule_count": 0
+        },
+        {
+          "card_name": "Anointed Procession",
+          "classification": "external_missing_from_local_deck_pool",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [],
+          "battle_rule_count": 0
+        },
+        {
+          "card_name": "Cathars' Crusade",
+          "classification": "external_missing_from_local_deck_pool",
+          "in_607": false,
+          "lorehold_variant_deck_ids": [],
+          "battle_rule_count": 0
+        }
+      ],
+      "status": "archetype_fork_only_requires_full_shell_contract",
+      "gate_ready": false,
+      "natural_battle_allowed_now": false,
+      "reason": "This is a new closure plan, not direct evidence that a protected 607 anchor should be cut."
+    }
+  ],
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "next_actions": [
+      "do_not_mutate_or_replace_deck_607",
+      "run identity/import preflight for missing material cards before any deck test",
+      "separate archetype forks from one-for-one 607 cut work",
+      "keep Storm-Kiln/Haze as combo research until Haze exists locally and a safe package is declared",
+      "rerun safe-cut logic only after material evidence changes a candidate or cut row"
+    ],
+    "reason": "External sources add real learning lanes, but the current internal state still has zero seed-safe cuts, prior natural rejects on the only same-lane static package, and no package that is ready for a natural battle gate."
+  }
+}

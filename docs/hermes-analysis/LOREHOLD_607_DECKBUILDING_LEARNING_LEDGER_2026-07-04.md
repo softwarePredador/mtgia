@@ -266,3 +266,70 @@ Current conclusion remains unchanged: do not mutate or promote over protected
 deck `607`. Reopen this same-lane path only with new material evidence, a
 changed runtime adapter, or a same-lane candidate not already exhausted by the
 current queue.
+
+## External Material Evidence Scout - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_material_evidence_scout_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_material_evidence_scout_20260705_current.json`
+
+It converts current external Lorehold research into local ManaLoom routing
+evidence. The purpose is not to add cards directly; it is to decide which
+external cards are already local candidates, which require identity/import
+work, and which are archetype forks that need a full-shell contract.
+
+External lanes checked:
+
+- EDHREC upgraded spellslinger: Topdeck/Spellslinger/Discard/Burn public
+  surface with pressure candidates such as `Storm-Kiln Artist`, `Guttersnipe`,
+  `Young Pyromancer`, `Monastery Mentor`, `Surly Badgersaur`, `Goldspan
+  Dragon`, `Glint-Horn Buccaneer`, and `Inti, Seneschal of the Sun`.
+- GameTyrant Lorehold deck tech: topdeck setup, miracle hits, alternate cast
+  support, and pressure conversion cards such as `Brain in a Jar`, `Galvanoth`,
+  `Burning Prophet`, `Dragon's Rage Channeler`, `Planetarium of Wan Shi Tong`,
+  and `Entreat the Angels`.
+- Card Kingdom synergy article: white reanimator direction with `Storm of
+  Souls`, `Late to Dinner`, `Miraculous Recovery`, and `Karmic Guide`.
+- CoolStuffInc commander article: token, combo, burn/damage, and Voltron
+  directions with `Anointed Procession`, `Cathars' Crusade`,
+  `Blackblade Reforged`, `Strata Scythe`, and `Excalibur, Sword of Eden`.
+- Commander Spellbook: `Storm-Kiln Artist` plus `Haze of Rage` combo lane.
+- Archidekt: broad public Lorehold corpus for future reference mining.
+
+Current result:
+
+- status: `external_material_evidence_found_but_no_gate_ready_keep_607`;
+- external sources: `6`;
+- external candidates: `24`;
+- candidates already in protected `607`: `0`;
+- local Lorehold variant candidates not in `607`: `10`;
+- rule-known external cards not in the Lorehold candidate pool: `1`;
+- missing from the local deck pool: `13`;
+- archetype-fork candidates: `9`;
+- gate-ready packages: `0`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`.
+
+Important classifications:
+
+- `Storm-Kiln Artist` is present in local Lorehold variants
+  `608,611,612,613,614` and has verified auto rule support, but the
+  `Storm-Kiln Artist + Haze of Rage` package is still only research because
+  `Haze of Rage` is not in the current local Lorehold deck pool and has no
+  local battle-rule row.
+- Reanimator cards from the Card Kingdom lane are not one-for-one 607 cuts.
+  `Karmic Guide` has a local verified auto battle rule, but no current
+  Lorehold variant materialization. The reanimator lane therefore requires a
+  full-shell contract before any battle gate.
+- Token/Voltron closure cards from the CoolStuffInc lane are missing from the
+  local deck pool and represent a different closure plan, not evidence to cut
+  a protected 607 anchor.
+- Existing pressure cards from EDHREC/GameTyrant that already appear in local
+  variants remain blocked by the current cut-safety state, not by lack of
+  public support.
+
+Current conclusion remains unchanged: protected deck `607` is still the
+Lorehold champion. External evidence has expanded the learning queue, but the
+next valid step is `build_external_candidate_identity_import_preflight_before_any_new_gate`,
+not a natural battle or mutation of `607`.
