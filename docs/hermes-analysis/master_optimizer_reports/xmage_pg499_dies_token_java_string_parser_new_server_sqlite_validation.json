@@ -1,0 +1,108 @@
+{
+  "deploy_id": "xmage_pg499_dies_token_java_string_parser_new_server",
+  "expected_card_count": 2,
+  "generated_at": "2026-07-05T10:20:57.091589+00:00",
+  "issues": [],
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "status": "pass",
+  "validated_card_count": 2,
+  "validated_rows": [
+    {
+      "card_name": "Conclave Cavalier",
+      "checks": {
+        "colors": true,
+        "count": true,
+        "execution_status": true,
+        "keywords": true,
+        "name": true,
+        "oracle_hash": true,
+        "power": true,
+        "review_status": true,
+        "scope": true,
+        "source": true,
+        "subtype": true,
+        "toughness": true
+      },
+      "effect": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "W",
+          "G"
+        ],
+        "dies_token_count": 2,
+        "dies_token_keywords": [
+          "vigilance"
+        ],
+        "dies_token_name": "Elf Knight Token",
+        "dies_token_power": 2,
+        "dies_token_subtype": "Elf Knight",
+        "dies_token_toughness": 2,
+        "dies_trigger_effect": "token_maker",
+        "effect": "creature",
+        "keywords": [
+          "vigilance"
+        ],
+        "token_description": "2/2 green and white Elf Knight creature token with vigilance",
+        "trigger": "dies",
+        "vigilance": true,
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ElfKnightToken"
+      },
+      "execution_status": "auto",
+      "logical_rule_key": "battle_rule_v1:58daf2a246e6436795f70126ae7ffb4e",
+      "normalized_name": "conclave cavalier",
+      "oracle_hash": "86ee3235d8dac67cb72746df99c78840",
+      "review_status": "verified",
+      "source": "curated"
+    },
+    {
+      "card_name": "Mausoleum Guard",
+      "checks": {
+        "colors": true,
+        "count": true,
+        "execution_status": true,
+        "keywords": true,
+        "name": true,
+        "oracle_hash": true,
+        "power": true,
+        "review_status": true,
+        "scope": true,
+        "source": true,
+        "subtype": true,
+        "toughness": true
+      },
+      "effect": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "W"
+        ],
+        "dies_token_count": 2,
+        "dies_token_flying": true,
+        "dies_token_keywords": [
+          "flying"
+        ],
+        "dies_token_name": "Spirit Token",
+        "dies_token_power": 1,
+        "dies_token_subtype": "Spirit",
+        "dies_token_toughness": 1,
+        "dies_trigger_effect": "token_maker",
+        "effect": "creature",
+        "token_description": "1/1 white Spirit creature token with flying",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SpiritWhiteToken"
+      },
+      "execution_status": "auto",
+      "logical_rule_key": "battle_rule_v1:8353d6f565c6514ca6b646ff9bb6c16c",
+      "normalized_name": "mausoleum guard",
+      "oracle_hash": "60da45a069d67434ad255badf1670505",
+      "review_status": "verified",
+      "source": "curated"
+    }
+  ]
+}

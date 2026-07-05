@@ -10312,6 +10312,71 @@ def register_tests(battle, player):
         assert dies_event["treasures_created"] == 1
         assert dies_event["destination"] == "graveyard"
 
+    def test_pg499_dies_token_maker_creates_keyworded_tokens():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        previous_turn = battle.CURRENT_REPLAY_TURN
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.CURRENT_REPLAY_TURN = 7
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            mausoleum_guard = {
+                "name": "Mausoleum Guard",
+                "effect": "creature",
+                "type_line": "Creature - Human Scout",
+                "power": 2,
+                "toughness": 2,
+                "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+                "dies_trigger_effect": "token_maker",
+                "dies_token_count": 2,
+                "dies_token_name": "Spirit Token",
+                "dies_token_power": 1,
+                "dies_token_toughness": 1,
+                "dies_token_subtype": "Spirit",
+                "dies_token_colors": ["W"],
+                "dies_token_keywords": ["flying"],
+                "dies_token_flying": True,
+                "_rule_logical_key": "battle_rule_v1:pg499_dies_token_test",
+                "_rule_oracle_hash": "pg499-dies-token-hash",
+            }
+            active.battlefield = [mausoleum_guard]
+
+            destination = battle.move_creature_from_battlefield(
+                active,
+                mausoleum_guard,
+                reason="combat_damage_lethal",
+                source={"name": "Test Combat"},
+                all_players=[active, opponent],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+            battle.CURRENT_REPLAY_TURN = previous_turn
+
+        assert destination == "graveyard"
+        tokens = [
+            card
+            for card in active.battlefield
+            if isinstance(card, dict) and card.get("name") == "Spirit Token"
+        ]
+        assert len(tokens) == 2
+        assert all(token.get("power") == 1 and token.get("toughness") == 1 for token in tokens)
+        assert all(token.get("type_line") == "Creature Token — Spirit" for token in tokens)
+        assert all(token.get("colors") == ["W"] for token in tokens)
+        assert all(token.get("flying") is True for token in tokens)
+        assert all("flying" in (token.get("keywords") or []) for token in tokens)
+        dies_event = next(
+            data
+            for event, data in events
+            if event == "dies_token_maker_resolved"
+            and data.get("card") == "Mausoleum Guard"
+        )
+        assert dies_event["token_count"] == 2
+        assert dies_event["token_name"] == "Spirit Token"
+        assert dies_event["token_subtype"] == "Spirit"
+        assert dies_event["rule_logical_key"] == "battle_rule_v1:pg499_dies_token_test"
+        assert dies_event["rule_oracle_hash"] == "pg499-dies-token-hash"
+
     def test_reckless_endeavor_damage_wipe_creates_treasures():
         active = player("Active")
         opponent = player("Opponent")
@@ -23013,6 +23078,7 @@ def register_tests(battle, player):
         test_pg144_knuckles_combat_damage_trigger_creates_treasure_each_damage_step,
         test_prized_statue_enters_and_dies_create_treasures,
         test_impulsive_pilferer_dies_create_treasure,
+        test_pg499_dies_token_maker_creates_keyworded_tokens,
         test_electroduplicate_creates_hasty_copy_and_sacrifices_at_end_step,
         test_heat_shimmer_copies_any_creature_and_exiles_token_at_end_step,
         test_twinflame_copies_own_creature_only_and_exiles_token_at_end_step,

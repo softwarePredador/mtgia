@@ -2310,6 +2310,95 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "token_description_keyword_not_supported")
 
+    def test_token_class_parser_accepts_concatenated_java_string_description(self) -> None:
+        token_data, reason = split.parse_simple_token_class(
+            """
+            public final class FixtureClericToken extends TokenImpl {
+                public FixtureClericToken() {
+                    super("Cleric Token", "1/1 white " +
+                        "Cleric creature token");
+                    cardType.add(CardType.CREATURE);
+                    subtype.add(SubType.CLERIC);
+                    color.setWhite(true);
+                    power = new MageInt(1);
+                    toughness = new MageInt(1);
+                }
+            }
+            """,
+            "FixtureClericToken",
+        )
+
+        self.assertIsNone(reason)
+        self.assertEqual(token_data["token_name"], "Cleric Token")
+        self.assertEqual(token_data["token_description"], "1/1 white Cleric creature token")
+        self.assertEqual(token_data["token_power"], 1)
+        self.assertEqual(token_data["token_toughness"], 1)
+        self.assertEqual(token_data["token_subtype"], "Cleric")
+        self.assertEqual(token_data["token_colors"], ["W"])
+
+    def test_token_class_parser_decodes_escaped_quotes_before_keyword_filter(self) -> None:
+        token_data, reason = split.parse_simple_token_class(
+            r"""
+            public final class FixtureScionToken extends TokenImpl {
+                public FixtureScionToken() {
+                    super("Eldrazi Scion Token", "1/1 colorless Eldrazi Scion creature token with \"Sacrifice this creature: Add {C}.\"");
+                    cardType.add(CardType.CREATURE);
+                    subtype.add(SubType.ELDRAZI);
+                    subtype.add(SubType.SCION);
+                    power = new MageInt(1);
+                    toughness = new MageInt(1);
+                    addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, Mana.ColorlessMana(1), new SacrificeSourceCost()));
+                }
+            }
+            """,
+            "FixtureScionToken",
+        )
+
+        self.assertEqual(token_data, {})
+        self.assertEqual(reason, "token_description_keyword_not_supported")
+
+    def test_dies_create_tokens_matches_plural_keyword_token_description(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Guard",
+                type_line="Creature - Human Scout",
+                oracle_text=(
+                    "When Fixture Guard dies, create two 1/1 white "
+                    "Spirit creature tokens with flying."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new DiesSourceTriggeredAbility(
+                    new CreateTokenEffect(new SpiritWhiteToken(), 2)));
+                class SpiritWhiteToken extends TokenImpl {
+                    public SpiritWhiteToken() {
+                        super("Spirit Token", "1/1 white Spirit creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SPIRIT);
+                        color.setWhite(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(FlyingAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["dies_token_count"], 2)
+        self.assertEqual(effect["dies_token_name"], "Spirit Token")
+        self.assertEqual(effect["dies_token_keywords"], ["flying"])
+
     def test_creature_etb_create_tokens_is_package_safe(self) -> None:
         row = queue_row(
             split.ETB_TOKEN_CREATURE_UNIT,

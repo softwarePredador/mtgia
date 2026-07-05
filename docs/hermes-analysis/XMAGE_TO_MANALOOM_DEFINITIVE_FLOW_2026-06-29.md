@@ -12432,6 +12432,78 @@ Next exact family should not revisit PG498. Continue from the rebuilt queue;
 the largest remaining work units are still recursion, draw engine, targeted
 protection, direct damage, add counters, and life gain.
 
+## 2026-07-05 PG499 Dies Token Java String Parser Checkpoint
+
+PG499 closed the exact XMage family
+`DiesSourceTriggeredAbility + CreateTokenEffect` for fixed keyworded creature
+tokens created when a creature dies. The parser now extracts token
+`super(name, description)` arguments from Java source with balanced call
+parsing, supports simple Java string concatenation, and decodes escaped Java
+string literals before token safety filtering.
+
+Promoted cards:
+
+- `Conclave Cavalier`
+- `Mausoleum Guard`
+
+Runtime and parser changes:
+
+- Token constructor parsing no longer depends on a narrow
+  `super("name", "description")` regex.
+- Plural Oracle matching handles token descriptions containing `token with`
+  and `token named`.
+- Dynamic/custom token descriptions remain blocked by safety filters including
+  `it has`, `gets`, `get +`, and `for each`.
+- The battle runtime has focused coverage through
+  `test_pg499_dies_token_maker_creates_keyworded_tokens`, which verifies
+  created token count, name, subtype, color, power/toughness, keyword flags,
+  and replay rule provenance.
+
+Validation and deploy evidence:
+
+- Split candidate:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg499_token_java_string_parser_candidate.json`
+  with `proposal_count=2`.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_package.md`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_precheck.out`
+  validated both target rows and found no existing executable/shadow rows.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_apply.out`
+  reported `upserted_rows=2`, `deprecated_shadow_rows=0`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_postcheck.out`
+  confirmed both promoted rows as verified/auto with Oracle hashes.
+- PG -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_pg_to_sqlite_sync.json`
+  reported `pg_rows_loaded=8417`, `sqlite_inserted_or_updated=8181`, and
+  `canonical_snapshot_rows_exported=5946`.
+- SQLite validation:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_sqlite_validation.json`
+  reported `status=pass`, `validated_card_count=2`, and `issue_count=0`.
+- Battle tests:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_full_battle_suite_post_sync.out`
+  passed `380` tests after sync.
+- PG/Hermes/SQLite contract:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg499_dies_token_java_string_parser_new_server.md`
+  passed `51/51`.
+- Post-sync Commander-legal queue:
+  `target_identity_count=26074`, `xmage_authoritative_source_count=25760`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25760`.
+- Post-sync global readiness:
+  `battle_and_oracle_ready=4876`, `battle_family_mapper_required=28997`,
+  `generic_runtime_or_no_card_rule=360`, `oracle_data_sync=4`,
+  `commander_legality_sync=3`, and `oracle_identity_rule_link_or_copy=2`.
+- Post-sync exact splitter recheck against the rebuilt queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg499_dies_token_java_string_parser_new_server_final_recheck.json`
+  reported `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: `Deathknell Berserker`, `Tuktuk the Explorer`, dynamic token
+counts, custom token text, and token classes with mana abilities remain outside
+PG499 and require separate exact runtime families.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

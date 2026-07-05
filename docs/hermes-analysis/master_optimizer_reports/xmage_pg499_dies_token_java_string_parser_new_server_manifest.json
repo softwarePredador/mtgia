@@ -1,0 +1,137 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg499_dies_token_java_string_parse_20260705_101611",
+  "deploy_id": "xmage_pg499_dies_token_java_string_parser_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Conclave Cavalier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:58daf2a246e6436795f70126ae7ffb4e",
+      "min_rule_version": 2,
+      "normalized_name": "conclave cavalier",
+      "oracle_hash": "86ee3235d8dac67cb72746df99c78840",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "effect": "creature",
+        "keywords": [
+          "vigilance"
+        ],
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mausoleum Guard",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8353d6f565c6514ca6b646ff9bb6c16c",
+      "min_rule_version": 2,
+      "normalized_name": "mausoleum guard",
+      "oracle_hash": "60da45a069d67434ad255badf1670505",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "effect": "creature",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_dies_create_tokens": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg499_dies_token_java_string_parser_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T10:16:11+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Conclave Cavalier"
+      },
+      "card_name": "Conclave Cavalier",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:58daf2a246e6436795f70126ae7ffb4e",
+      "normalized_name": "conclave cavalier",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "effect": "creature",
+        "keywords": [
+          "vigilance"
+        ],
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mausoleum Guard"
+      },
+      "card_name": "Mausoleum Guard",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8353d6f565c6514ca6b646ff9bb6c16c",
+      "normalized_name": "mausoleum guard",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "effect": "creature",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Conclave Cavalier",
+    "Mausoleum Guard"
+  ],
+  "selected_count": 2,
+  "slug": "xmage_pg499_dies_token_java_string_parser_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Conclave Cavalier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:58daf2a246e6436795f70126ae7ffb4e",
+      "min_rule_version": 2,
+      "normalized_name": "conclave cavalier",
+      "oracle_hash": "86ee3235d8dac67cb72746df99c78840",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mausoleum Guard",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8353d6f565c6514ca6b646ff9bb6c16c",
+      "min_rule_version": 2,
+      "normalized_name": "mausoleum guard",
+      "oracle_hash": "60da45a069d67434ad255badf1670505",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

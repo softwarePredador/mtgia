@@ -392,6 +392,10 @@ TOKEN_COLOR_WORDS = {
 UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS = {
     "when ",
     "whenever ",
+    "it has ",
+    "gets ",
+    "get +",
+    "for each ",
     "infect",
     "prowess",
     "toxic",
@@ -710,6 +714,160 @@ def token_colors_from_description(description: str) -> list[str]:
     ]
 
 
+JAVA_STRING_ESCAPE_VALUES = {
+    "b": "\b",
+    "f": "\f",
+    "n": "\n",
+    "r": "\r",
+    "t": "\t",
+    '"': '"',
+    "'": "'",
+    "\\": "\\",
+}
+
+
+def extract_java_call_args(source: str, call_name: str) -> str | None:
+    match = re.search(rf"\b{re.escape(call_name)}\s*\(", source or "")
+    if not match:
+        return None
+    text = str(source or "")
+    open_index = text.find("(", match.start())
+    depth = 0
+    in_string = False
+    escaped = False
+    for index in range(open_index, len(text)):
+        char = text[index]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            continue
+        if char == '"':
+            in_string = True
+            continue
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0:
+                return text[open_index + 1 : index]
+    return None
+
+
+def split_java_args(arg_text: str) -> list[str]:
+    args: list[str] = []
+    current: list[str] = []
+    depth = 0
+    in_string = False
+    escaped = False
+    for char in str(arg_text or ""):
+        if in_string:
+            current.append(char)
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            continue
+        if char == '"':
+            in_string = True
+            current.append(char)
+            continue
+        if char == "," and depth == 0:
+            args.append("".join(current).strip())
+            current = []
+            continue
+        current.append(char)
+        if char == "(":
+            depth += 1
+        elif char == ")" and depth > 0:
+            depth -= 1
+    if current:
+        args.append("".join(current).strip())
+    return args
+
+
+def decode_java_string_literal(literal: str) -> str | None:
+    text = str(literal or "").strip()
+    if len(text) < 2 or not text.startswith('"') or not text.endswith('"'):
+        return None
+    result: list[str] = []
+    index = 1
+    while index < len(text) - 1:
+        char = text[index]
+        if char == "\\" and index + 1 < len(text) - 1:
+            escaped = text[index + 1]
+            result.append(JAVA_STRING_ESCAPE_VALUES.get(escaped, escaped))
+            index += 2
+            continue
+        result.append(char)
+        index += 1
+    return "".join(result)
+
+
+def evaluate_java_string_expression(expression: str) -> str | None:
+    text = str(expression or "").strip()
+    if not text:
+        return None
+    result: list[str] = []
+    index = 0
+    while index < len(text):
+        while index < len(text) and text[index].isspace():
+            index += 1
+        if index < len(text) and text[index] == "+":
+            index += 1
+            continue
+        if index >= len(text):
+            break
+        if text[index] != '"':
+            return None
+        end = index + 1
+        escaped = False
+        while end < len(text):
+            char = text[end]
+            if escaped:
+                escaped = False
+                end += 1
+                continue
+            if char == "\\":
+                escaped = True
+                end += 1
+                continue
+            if char == '"':
+                break
+            end += 1
+        if end >= len(text):
+            return None
+        literal = decode_java_string_literal(text[index : end + 1])
+        if literal is None:
+            return None
+        result.append(literal)
+        index = end + 1
+        while index < len(text) and text[index].isspace():
+            index += 1
+        if index < len(text) and text[index] != "+":
+            return None
+    return "".join(result) if result else None
+
+
+def token_super_name_and_description(constructor_source: str) -> tuple[str, str] | None:
+    args = extract_java_call_args(constructor_source, "super")
+    if args is None:
+        return None
+    parts = split_java_args(args)
+    if len(parts) < 2:
+        return None
+    token_name = evaluate_java_string_expression(parts[0])
+    description = evaluate_java_string_expression(parts[1])
+    if token_name is None or description is None:
+        return None
+    return token_name, description
+
+
 def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[str, Any], str | None]:
     if not token_source:
         return {}, "token_source_missing"
@@ -723,11 +881,10 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
     if not constructor_match:
         return {}, "token_noarg_constructor_missing"
     constructor_source = constructor_match.group("body")
-    description_match = re.search(r'super\("([^"]+)",\s*"([^"]+)"\)', constructor_source)
-    if not description_match:
+    token_descriptor = token_super_name_and_description(constructor_source)
+    if token_descriptor is None:
         return {}, "token_literal_description_missing"
-    token_name = description_match.group(1)
-    description = description_match.group(2)
+    token_name, description = token_descriptor
     lower_description = description.lower()
     if "creature token" not in lower_description:
         return {}, "token_description_not_creature_token"
@@ -822,6 +979,10 @@ def normalized_token_oracle_phrase(value: str) -> str:
 
 def plural_token_description(description: str) -> str:
     phrase = normalized_token_oracle_phrase(description)
+    if " token with " in phrase:
+        return phrase.replace(" token with ", " tokens with ", 1)
+    if " token named " in phrase:
+        return phrase.replace(" token named ", " tokens named ", 1)
     if phrase.endswith(" token"):
         return phrase[:-6] + " tokens"
     return phrase + "s"

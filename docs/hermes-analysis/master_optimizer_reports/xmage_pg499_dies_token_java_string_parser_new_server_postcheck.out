@@ -1,0 +1,5 @@
+     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Conclave Cavalier | conclave cavalier | battle_rule_v1:58daf2a246e6436795f70126ae7ffb4e |                  1 |                           1 |                         1 |           0
+ Mausoleum Guard   | mausoleum guard   | battle_rule_v1:8353d6f565c6514ca6b646ff9bb6c16c |                  1 |                           1 |                         1 |           0
+(2 rows)

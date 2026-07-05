@@ -1,0 +1,5 @@
+     card_name     |  normalized_name  |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+-------------------+-------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Conclave Cavalier | conclave cavalier | 86ee3235d8dac67cb72746df99c78840 | battle_rule_v1:58daf2a246e6436795f70126ae7ffb4e | deprecate_nonmatching_rows |                1 | 7162f807-6603-479f-b1ce-ca346ca20373 |                  0 |                         0 |                           0
+ Mausoleum Guard   | mausoleum guard   | 60da45a069d67434ad255badf1670505 | battle_rule_v1:8353d6f565c6514ca6b646ff9bb6c16c | deprecate_nonmatching_rows |                1 | dfd6ed98-7633-4bb7-b052-4042f91808ef |                  0 |                         0 |                           0
+(2 rows)
