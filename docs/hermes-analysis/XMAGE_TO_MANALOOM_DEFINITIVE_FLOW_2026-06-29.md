@@ -13473,6 +13473,61 @@ whose source is not exact, mode/conditional/additional cost variants, or broad
 `xmage_*_review_v1` promotions. The next wave must start from the rebuilt
 post-PG517 queue.
 
+## PG518 Boost Keyword Draw Checkpoint
+
+As of 2026-07-05, PG518 is applied and synced against the new server target.
+It promotes exact local-XMage instant spells where target creature gets a fixed
+boost until EOT, gains one supported keyword until EOT, then controller draws
+one card.
+
+Promoted cards:
+
+- `Guided Strike`
+- `Moment of Defiance`
+- `Wildsize`
+
+Runtime scope:
+
+- `xmage_fixed_boost_keyword_target_creature_until_eot_draw_card_spell_v1`
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg518_boost_keyword_draw_candidate.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg518_xmage_pg518_boost_keyword_draw_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg518_boost_keyword_draw_new_server.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/battle_package_end_to_end_validation_20260705_pg518_boost_keyword_draw_new_server.md`
+- runtime smoke:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg518_boost_keyword_draw_new_server_runtime_get_card_effect.out`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg518_boost_keyword_draw_new_server.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg518_boost_keyword_draw_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg518_boost_keyword_draw_new_server.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4970`
+- `battle_family_mapper_required=28903`
+- `target_identity_count=25980`
+- `xmage_authoritative_source_count=25666`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25666`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+- final exact-scope recheck `adapter_work_unit_counts={}`
+
+Residual boundary: PG518 does not authorize dynamic boost counts, activated
+permanent abilities, multi-target effects, delayed draw triggers, combat-damage
+draw triggers, non-fixed draw, mode/conditional/additional cost variants, or
+broad `xmage_*_review_v1` promotions. The next wave must start from the
+rebuilt post-PG518 queue.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

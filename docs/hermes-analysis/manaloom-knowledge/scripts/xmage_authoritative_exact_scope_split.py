@@ -159,6 +159,7 @@ BOUNCE_SCRY_SCOPE = "xmage_return_target_to_hand_and_scry_spell_v1"
 DAMAGE_DRAW_SCOPE = "xmage_fixed_damage_target_and_draw_card_spell_v1"
 BOOST_DRAW_SCOPE = "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
 KEYWORD_DRAW_SCOPE = "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1"
+BOOST_KEYWORD_DRAW_SCOPE = "xmage_fixed_boost_keyword_target_creature_until_eot_draw_card_spell_v1"
 DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
 BOUNCE_DRAW_SCOPE = "xmage_return_target_to_hand_and_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
@@ -5099,6 +5100,45 @@ def fixed_keyword_draw_target_from_source(
     return target_controller, int(draw_matches[0])
 
 
+def fixed_boost_keyword_draw_target_from_source(
+    source: str,
+    keyword_ability_class: str,
+) -> tuple[int, int, str, int] | None:
+    text = source or ""
+    boost = fixed_boost_target_from_source(text)
+    if boost is None:
+        return None
+    gain_matches = re.findall(r"new\s+GainAbilityTargetEffect\s*\(", text)
+    if len(gain_matches) != 1:
+        return None
+    ability_expr = (
+        rf"(?:{re.escape(keyword_ability_class)}\.getInstance\s*\(\s*\)"
+        rf"|new\s+{re.escape(keyword_ability_class)}\s*\([^)]*\))"
+    )
+    gain_match = re.search(
+        rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}"
+        rf"\s*(?:,\s*Duration\.EndOfTurn\s*)?\)",
+        text,
+        re.S,
+    )
+    if not gain_match:
+        return None
+    draw_matches = re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(\s*(\d+)\s*\)", text)
+    if len(draw_matches) != 1:
+        return None
+    boost_match = re.search(r"new\s+BoostTargetEffect\s*\(", text)
+    draw_match = re.search(r"new\s+DrawCardSourceControllerEffect\s*\(", text)
+    if not boost_match or not draw_match:
+        return None
+    if not (boost_match.start() < gain_match.start() < draw_match.start()):
+        return None
+    if len(re.findall(r"new\s+TargetCreaturePermanent\s*\(", text)) != 1:
+        return None
+    if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text):
+        return None
+    return boost[0], boost[1], "any", int(draw_matches[0])
+
+
 STATIC_CONTROLLED_PT_BLOCKED_ORACLE_WORDS = {
     "attacking",
     "blocking",
@@ -5735,6 +5775,30 @@ def fixed_keyword_draw_target_from_oracle(metadata: dict[str, Any]) -> tuple[str
     target_controller = "self" if match.group(1) else "any"
     keyword = TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group(2)]
     return keyword, target_controller, 1
+
+
+def fixed_boost_keyword_draw_target_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[int, int, str, str, int] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    keyword_words = "|".join(
+        re.escape(word)
+        for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True)
+    )
+    match = re.match(
+        rf"^target creature( you control)? gets ([+-]?\d+)/([+-]?\d+) "
+        rf"and gains ({keyword_words}) until end of turn\. draw a card\.?$",
+        text,
+    )
+    if not match:
+        return None
+    power = signed_int_from_oracle(match.group(2))
+    toughness = signed_int_from_oracle(match.group(3))
+    if power is None or toughness is None:
+        return None
+    target_controller = "self" if match.group(1) else "any"
+    keyword = TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group(4)]
+    return power, toughness, keyword, target_controller, 1
 
 
 def is_creature_metadata(metadata: dict[str, Any]) -> bool:
@@ -13936,6 +14000,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed target-creature boost plus draw-card spell"
     elif scope == KEYWORD_DRAW_SCOPE:
         scope_kind = "fixed target-creature keyword plus draw-card spell"
+    elif scope == BOOST_KEYWORD_DRAW_SCOPE:
+        scope_kind = "fixed target-creature boost plus keyword plus draw-card spell"
     elif scope == DESTROY_DRAW_SCOPE:
         scope_kind = "fixed destroy-target plus draw-card spell"
     elif scope == BOUNCE_DRAW_SCOPE:
@@ -14192,6 +14258,14 @@ def split_row(
         and len(ability_classes(row)) == 1
         and next(iter(ability_classes(row))) in TARGET_GRANT_KEYWORD_ABILITY_CLASSES
     )
+    boost_keyword_draw_spell_unit = (
+        unit == DRAW_UNIT
+        and effect_classes(row)
+        == {"BoostTargetEffect", "DrawCardSourceControllerEffect", "GainAbilityTargetEffect"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "draw"}
+        and len(ability_classes(row)) == 1
+        and next(iter(ability_classes(row))) in TARGET_GRANT_KEYWORD_ABILITY_CLASSES
+    )
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
     draw_self_cost_reduction_spell_unit = (
         unit == DRAW_UNIT
@@ -14332,6 +14406,7 @@ def split_row(
         and not graveyard_count_damage_unit
         and not draw_self_cost_reduction_spell_unit
         and not keyword_draw_spell_unit
+        and not boost_keyword_draw_spell_unit
     ):
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
@@ -18407,6 +18482,93 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_fixed_boost_draw_card_spell",
+            ), "selected_exact_scope"
+
+        if classes == {"BoostTargetEffect", "DrawCardSourceControllerEffect", "GainAbilityTargetEffect"}:
+            if not boost_keyword_draw_spell_unit:
+                return None, "boost_keyword_draw_ability_class_not_simple"
+            if not is_spell(metadata):
+                return None, "not_instant_or_sorcery_spell"
+            abilities = ability_classes(row)
+            ability_class = next(iter(abilities))
+            keyword = TARGET_GRANT_KEYWORD_ABILITY_CLASSES.get(ability_class)
+            if not keyword:
+                return None, "boost_keyword_draw_ability_not_supported"
+            if has_oracle_complexity(metadata):
+                return None, "boost_keyword_draw_oracle_not_simple"
+            source_boost = fixed_boost_keyword_draw_target_from_source(source_text, ability_class)
+            if source_boost is None:
+                return None, "boost_keyword_draw_source_not_exact_fixed"
+            oracle_boost = fixed_boost_keyword_draw_target_from_oracle(metadata)
+            if oracle_boost is None:
+                return None, "boost_keyword_draw_oracle_not_exact_fixed"
+            source_power, source_toughness, source_target_controller, source_draw_count = source_boost
+            (
+                oracle_power,
+                oracle_toughness,
+                oracle_keyword,
+                oracle_target_controller,
+                oracle_draw_count,
+            ) = oracle_boost
+            if (source_power, source_toughness) != (oracle_power, oracle_toughness):
+                return None, "boost_keyword_draw_source_oracle_boost_mismatch"
+            if keyword != oracle_keyword:
+                return None, "boost_keyword_draw_source_oracle_keyword_mismatch"
+            if source_target_controller != oracle_target_controller:
+                return None, "boost_keyword_draw_source_oracle_target_mismatch"
+            if source_draw_count != oracle_draw_count:
+                return None, "boost_keyword_draw_source_oracle_draw_count_mismatch"
+            boost_keyword_component = {
+                "effect": "stat_modifier_until_eot",
+                "battle_model_scope": BOOST_KEYWORD_SCOPE,
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"]},
+                "target_controller": oracle_target_controller,
+                "power_delta": oracle_power,
+                "toughness_delta": oracle_toughness,
+                "power_boost": oracle_power,
+                "toughness_boost": oracle_toughness,
+                "duration": "until_end_of_turn",
+                "granted_keywords_until_eot": [keyword],
+                "compose_on_resolution": True,
+                "xmage_effect_classes": ["BoostTargetEffect", "GainAbilityTargetEffect"],
+                "xmage_ability_class": ability_class,
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": oracle_draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": BOOST_KEYWORD_DRAW_SCOPE,
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"]},
+                "target_controller": oracle_target_controller,
+                "power_delta": oracle_power,
+                "toughness_delta": oracle_toughness,
+                "power_boost": oracle_power,
+                "toughness_boost": oracle_toughness,
+                "duration": "until_end_of_turn",
+                "granted_keywords_until_eot": [keyword],
+                "draw_count": oracle_draw_count,
+                "count": oracle_draw_count,
+                "_composite_rule_components": [boost_keyword_component, draw_component],
+                "xmage_effect_classes": [
+                    "BoostTargetEffect",
+                    "GainAbilityTargetEffect",
+                    "DrawCardSourceControllerEffect",
+                ],
+                "xmage_ability_class": ability_class,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_boost_keyword_draw_card_spell",
             ), "selected_exact_scope"
 
         if keyword_draw_spell_unit:

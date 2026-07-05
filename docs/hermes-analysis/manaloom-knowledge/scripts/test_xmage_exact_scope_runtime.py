@@ -5736,6 +5736,94 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertNotIn("deathtouch", target)
         self.assertEqual(target.get("keywords", []), [])
 
+    def test_composite_boost_keyword_draw_spell_modifies_keyword_and_draws(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Fresh Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Active Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield = [target]
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_boost_keyword_target_creature_until_eot_draw_card_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "power_delta": 1,
+            "toughness_delta": 0,
+            "power_boost": 1,
+            "toughness_boost": 0,
+            "duration": "until_end_of_turn",
+            "granted_keywords_until_eot": ["first_strike"],
+            "draw_count": 1,
+            "count": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "target_controller": "any",
+                    "power_delta": 1,
+                    "toughness_delta": 0,
+                    "power_boost": 1,
+                    "toughness_boost": 0,
+                    "duration": "until_end_of_turn",
+                    "granted_keywords_until_eot": ["first_strike"],
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Guided Strike",
+            "type_line": "Instant",
+            "oracle_text": "Target creature gets +1/+0 and gains first strike until end of turn. Draw a card.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(51),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(target["power"], 3)
+        self.assertEqual(target["toughness"], 2)
+        self.assertTrue(target["first_strike"])
+        self.assertEqual(target["keywords"], ["first_strike"])
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Card"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Guided Strike"])
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Guided Strike"
+                and data.get("target") == "Active Bear"
+                and data.get("target_power_after") == 3
+                and data.get("granted_keywords_until_eot") == ["first_strike"]
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Guided Strike"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+        self.assertEqual(target["power"], 2)
+        self.assertNotIn("first_strike", target)
+        self.assertEqual(target.get("keywords", []), [])
+
     def test_composite_destroy_draw_spell_resolves_both_components_once(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
         opponent = self.battle.Player("Opponent", None, [])

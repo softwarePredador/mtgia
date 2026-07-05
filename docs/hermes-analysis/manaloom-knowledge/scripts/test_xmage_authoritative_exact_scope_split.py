@@ -5074,6 +5074,148 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "keyword_draw_source_oracle_draw_count_mismatch")
 
+    def test_fixed_boost_keyword_draw_spell_maps_guided_strike_pattern(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "BoostTargetEffect",
+                "GainAbilityTargetEffect",
+                "DrawCardSourceControllerEffect",
+            ],
+            ability_classes=["FirstStrikeAbility"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Target creature gets +1/+0 and gains first strike until end of turn.\n"
+                    "Draw a card."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "Effect effect = new BoostTargetEffect(1, 0, Duration.EndOfTurn);"
+                "this.getSpellAbility().addEffect(effect);"
+                "effect = new GainAbilityTargetEffect(FirstStrikeAbility.getInstance(), Duration.EndOfTurn);"
+                "this.getSpellAbility().addEffect(effect);"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy(\"<br>\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_KEYWORD_DRAW_SCOPE)
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["granted_keywords_until_eot"], ["first_strike"])
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["stat_modifier_until_eot", "draw_cards"],
+        )
+
+    def test_fixed_boost_keyword_draw_spell_blocks_dynamic_boost_oracle(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "BoostTargetEffect",
+                "GainAbilityTargetEffect",
+                "DrawCardSourceControllerEffect",
+            ],
+            ability_classes=["TrampleAbility"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Target creature gains trample and gets +X/+0 until end of turn, "
+                    "where X is 1 plus the number of cards named Ancestral Anger in your graveyard.\n"
+                    "Draw a card."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(1, 0, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "TrampleAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_keyword_draw_oracle_not_exact_fixed")
+
+    def test_fixed_boost_keyword_draw_spell_blocks_non_eot_source_duration(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "BoostTargetEffect",
+                "GainAbilityTargetEffect",
+                "DrawCardSourceControllerEffect",
+            ],
+            ability_classes=["FirstStrikeAbility"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Target creature gets +1/+0 and gains first strike until end of turn.\n"
+                    "Draw a card."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(1, 0, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "FirstStrikeAbility.getInstance(), Duration.WhileOnBattlefield));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_keyword_draw_source_not_exact_fixed")
+
+    def test_fixed_boost_keyword_draw_spell_blocks_activated_or_multi_ability_pattern(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "BoostTargetEffect",
+                "GainAbilityTargetEffect",
+                "DrawCardSourceControllerEffect",
+            ],
+            ability_classes=[
+                "ActivateAsSorceryActivatedAbility",
+                "SimpleActivatedAbility",
+                "TrampleAbility",
+            ],
+            xmage_signals=["targeting", "draw", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Artifact",
+                oracle_text=(
+                    "{1}, Sacrifice this artifact: Draw a card.\n"
+                    "{2}{G}, Sacrifice this artifact: Target creature you control gets +3/+3 "
+                    "and gains trample until end of turn. Draw a card. Activate only as a sorcery."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility(new DrawCardSourceControllerEffect(1)));"
+                "Ability ability = new ActivateAsSorceryActivatedAbility(new BoostTargetEffect(3, 3));"
+                "ability.addEffect(new GainAbilityTargetEffect(TrampleAbility.getInstance()));"
+                "ability.addTarget(new TargetControlledCreaturePermanent());"
+                "ability.addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "not_instant_or_sorcery_spell")
+
     def test_fixed_scry_draw_spell_maps_scry_first_order_to_composite_runtime(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,
