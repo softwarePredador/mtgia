@@ -52,10 +52,14 @@ def resolution_report() -> dict:
 
 def test_build_sql_files_quotes_values_and_keeps_marker():
     rows = package.ready_rows(resolution_report())
-    sql = package.build_sql_files(rows, updated_at="2026-07-05T00:00:00Z")
+    sql = package.build_sql_files(
+        rows,
+        updated_at="2026-07-05T00:00:00Z",
+        source_marker="resolution_test_marker",
+    )
 
     assert "Text with ''quote''." in sql["apply"]
-    assert package.SOURCE_MARKER in sql["apply"]
+    assert "resolution_test_marker" in sql["apply"]
     assert "ON CONFLICT" not in sql["apply"]
     assert "DELETE FROM card_oracle_cache" in sql["rollback"]
     assert "expected after apply" in sql["postcheck"].lower()
@@ -73,9 +77,11 @@ def test_payload_is_not_applied_and_keeps_607():
             "rollback": Path("/tmp/rollback.sql"),
         },
         rows=rows,
+        source_marker="resolution_test_marker",
     )
 
     assert payload["status"] == "external_identity_cache_apply_package_prepared_not_applied_keep_607"
+    assert payload["source_marker"] == "resolution_test_marker"
     assert payload["source_db_mutated"] is False
     assert payload["sqlite_apply_executed"] is False
     assert payload["summary"]["promotion_allowed"] is False
@@ -93,9 +99,19 @@ def test_markdown_surfaces_sql_files_and_rows():
             "rollback": Path("/tmp/rollback.sql"),
         },
         rows=rows,
+        source_marker="resolution_test_marker",
     )
     markdown = package.render_markdown(payload)
 
     assert "Lorehold External Identity Cache Apply Package" in markdown
     assert "SQL Files" in markdown
     assert "Brain in a Jar" in markdown
+    assert "resolution_test_marker" in markdown
+
+
+def test_source_marker_uses_resolution_report_stem():
+    marker = package.source_marker_from_resolution_path(
+        Path("/tmp/lorehold_external_identity_resolution_queue_20260705_goal_continue.json")
+    )
+
+    assert marker == "lorehold_external_identity_resolution_queue_20260705_goal_continue"

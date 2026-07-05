@@ -45,6 +45,17 @@ def test_sqlite_json_lines_parses_multiple_json_arrays():
     assert rows[1][1]["name"] == "Entreat"
 
 
+def test_package_source_marker_prefers_package_field():
+    marker = simulation.package_source_marker(
+        {
+            "source_marker": "resolution_test_marker",
+            "source_reports": {"identity_resolution_queue": "ignored.json"},
+        }
+    )
+
+    assert marker == "resolution_test_marker"
+
+
 def test_simulate_applies_and_rolls_back_temp_copy(tmp_path: Path):
     source_db = tmp_path / "source.db"
     with sqlite3.connect(source_db) as conn:
@@ -101,7 +112,7 @@ def test_simulate_applies_and_rolls_back_temp_copy(tmp_path: Path):
         ) VALUES (
           'brain in a jar', 'Brain in a Jar', '{2}', '[]', '[]', 'Artifact',
           'text', 2, NULL, NULL, '[]', 'brain-scryfall',
-          'lorehold_external_identity_resolution_queue_20260705_current',
+          'resolution_test_marker',
           '2026-07-05T00:00:00Z', 'brain-scryfall'
         );
         """,
@@ -110,7 +121,7 @@ def test_simulate_applies_and_rolls_back_temp_copy(tmp_path: Path):
     postcheck.write_text(
         """
         SELECT COUNT(*) AS resolved_cache_rows FROM card_oracle_cache
-        WHERE source = 'lorehold_external_identity_resolution_queue_20260705_current';
+        WHERE source = 'resolution_test_marker';
         SELECT normalized_name, name, 'legal' AS commander_status
         FROM card_oracle_cache;
         """,
@@ -119,14 +130,15 @@ def test_simulate_applies_and_rolls_back_temp_copy(tmp_path: Path):
     rollback.write_text(
         """
         DELETE FROM card_oracle_cache
-        WHERE source = 'lorehold_external_identity_resolution_queue_20260705_current';
+        WHERE source = 'resolution_test_marker';
         SELECT COUNT(*) AS remaining_package_cache_rows FROM card_oracle_cache
-        WHERE source = 'lorehold_external_identity_resolution_queue_20260705_current';
+        WHERE source = 'resolution_test_marker';
         """,
         encoding="utf-8",
     )
     package_report = {
         "summary": {"cache_insert_ready_count": 1},
+        "source_marker": "resolution_test_marker",
         "sql_files": {
             "precheck": str(precheck),
             "apply": str(apply),
@@ -155,6 +167,7 @@ def test_simulate_applies_and_rolls_back_temp_copy(tmp_path: Path):
     )
 
     assert payload["status"] == "external_identity_cache_simulation_pass_keep_607"
+    assert payload["source_marker"] == "resolution_test_marker"
     assert payload["summary"]["temp_precheck_existing_cache_rows"] == 0
     assert payload["summary"]["temp_postcheck_resolved_cache_rows"] == 1
     assert payload["summary"]["temp_rollback_remaining_direct_count"] == 0

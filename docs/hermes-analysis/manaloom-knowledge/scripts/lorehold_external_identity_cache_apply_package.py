@@ -19,7 +19,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_RESOLUTION_REPORT = REPORT_DIR / "lorehold_external_identity_resolution_queue_20260705_current.json"
 DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_external_identity_cache_apply_package_20260705_current"
-SOURCE_MARKER = "lorehold_external_identity_resolution_queue_20260705_current"
+DEFAULT_SOURCE_MARKER = DEFAULT_RESOLUTION_REPORT.stem
 
 
 def utc_now() -> str:
@@ -57,6 +57,10 @@ def json_sql(value: Any) -> str:
     return sql_quote(json.dumps(value if value is not None else [], ensure_ascii=False, separators=(",", ":")))
 
 
+def source_marker_from_resolution_path(path: Path) -> str:
+    return path.stem or DEFAULT_SOURCE_MARKER
+
+
 def ready_rows(resolution_report: Mapping[str, Any]) -> list[dict[str, Any]]:
     rows = []
     for row in as_list(resolution_report.get("resolution_rows")):
@@ -69,7 +73,7 @@ def ready_rows(resolution_report: Mapping[str, Any]) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda row: normalize_name(str(row.get("card_name") or "")))
 
 
-def cache_values(row: Mapping[str, Any]) -> dict[str, Any]:
+def cache_values(row: Mapping[str, Any], *, source_marker: str) -> dict[str, Any]:
     lookup = dict(row["lookup"])
     name = str(lookup.get("name") or row["card_name"])
     scryfall_id = lookup.get("scryfall_id")
@@ -86,7 +90,7 @@ def cache_values(row: Mapping[str, Any]) -> dict[str, Any]:
         "toughness": None,
         "keywords_json": json.dumps(as_list(lookup.get("keywords")), ensure_ascii=False, separators=(",", ":")),
         "scryfall_id": scryfall_id,
-        "source": SOURCE_MARKER,
+        "source": source_marker,
         "updated_at": "__UPDATED_AT__",
         "card_id": scryfall_id,
     }
@@ -117,7 +121,7 @@ def name_list_sql(names: list[str]) -> str:
     return ", ".join(sql_quote(normalize_name(name)) for name in names)
 
 
-def build_sql_files(rows: list[dict[str, Any]], *, updated_at: str) -> dict[str, str]:
+def build_sql_files(rows: list[dict[str, Any]], *, updated_at: str, source_marker: str) -> dict[str, str]:
     names = [str(row["card_name"]) for row in rows]
     normalized_names = name_list_sql(names)
     precheck = f"""-- Lorehold external identity cache precheck.
@@ -131,7 +135,7 @@ FROM card_oracle_cache
 WHERE normalized_name IN ({normalized_names})
 ORDER BY normalized_name;
 """
-    values = [cache_values(row) for row in rows]
+    values = [cache_values(row, source_marker=source_marker) for row in rows]
     value_sql = ",\n  ".join(tuple_sql(value, updated_at=updated_at) for value in values)
     apply = f"""-- Lorehold external identity cache apply package.
 -- Report-only generated SQL. Review before executing against local SQLite.
@@ -159,7 +163,7 @@ INSERT INTO card_oracle_cache (
 SELECT COUNT(*) AS resolved_cache_rows
 FROM card_oracle_cache
 WHERE normalized_name IN ({normalized_names})
-  AND source = {sql_quote(SOURCE_MARKER)};
+  AND source = {sql_quote(source_marker)};
 
 SELECT coc.normalized_name, coc.name, coc.card_id, coc.color_identity_json, cl.status AS commander_status
 FROM card_oracle_cache coc
@@ -173,12 +177,12 @@ ORDER BY coc.normalized_name;
 -- Deletes only rows inserted/updated by this package source marker.
 DELETE FROM card_oracle_cache
 WHERE normalized_name IN ({normalized_names})
-  AND source = {sql_quote(SOURCE_MARKER)};
+  AND source = {sql_quote(source_marker)};
 
 SELECT COUNT(*) AS remaining_package_cache_rows
 FROM card_oracle_cache
 WHERE normalized_name IN ({normalized_names})
-  AND source = {sql_quote(SOURCE_MARKER)};
+  AND source = {sql_quote(source_marker)};
 """
     return {
         "precheck": precheck,
@@ -194,6 +198,7 @@ def build_payload(
     resolution_path: Path,
     sql_paths: Mapping[str, Path],
     rows: list[dict[str, Any]],
+    source_marker: str,
 ) -> dict[str, Any]:
     return {
         "generated_at": utc_now(),
@@ -202,6 +207,7 @@ def build_payload(
         "source_db_mutated": False,
         "deck_607_mutated": False,
         "sqlite_apply_executed": False,
+        "source_marker": source_marker,
         "source_reports": {"identity_resolution_queue": rel(resolution_path)},
         "sql_files": {key: rel(path) for key, path in sql_paths.items()},
         "status": "external_identity_cache_apply_package_prepared_not_applied_keep_607",
@@ -254,6 +260,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Current baseline: `{summary['current_baseline']}`",
         f"- Source DB mutated: `{payload['source_db_mutated']}`",
         f"- SQLite apply executed: `{payload['sqlite_apply_executed']}`",
+        f"- Source marker: `{payload['source_marker']}`",
         "",
         "## SQL Files",
         "",
@@ -297,7 +304,8 @@ def main() -> int:
     resolution_report = read_json(args.resolution_report)
     rows = ready_rows(resolution_report)
     generated_at = utc_now()
-    sql_payloads = build_sql_files(rows, updated_at=generated_at)
+    source_marker = source_marker_from_resolution_path(args.resolution_report)
+    sql_payloads = build_sql_files(rows, updated_at=generated_at, source_marker=source_marker)
     sql_paths = {
         "precheck": args.out_prefix.with_name(args.out_prefix.name + "_precheck.sql"),
         "apply": args.out_prefix.with_name(args.out_prefix.name + "_apply_sqlite.sql"),
@@ -312,6 +320,7 @@ def main() -> int:
         resolution_path=args.resolution_report,
         sql_paths=sql_paths,
         rows=rows,
+        source_marker=source_marker,
     )
     json_path = args.out_prefix.with_suffix(".json")
     md_path = args.out_prefix.with_suffix(".md")

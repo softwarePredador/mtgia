@@ -33,7 +33,7 @@ DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_PACKAGE_REPORT = REPORT_DIR / "lorehold_external_identity_cache_apply_package_20260705_current.json"
 DEFAULT_SCOUT_REPORT = REPORT_DIR / "lorehold_external_material_evidence_scout_20260705_current.json"
 DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_external_identity_cache_simulation_20260705_current"
-PACKAGE_SOURCE_MARKER = "lorehold_external_identity_resolution_queue_20260705_current"
+DEFAULT_PACKAGE_SOURCE_MARKER = "lorehold_external_identity_resolution_queue_20260705_current"
 
 
 def utc_now() -> str:
@@ -57,6 +57,20 @@ def read_json(path: Path) -> dict[str, Any]:
 def resolve_repo_path(value: str) -> Path:
     path = Path(value)
     return path if path.is_absolute() else REPO_ROOT / path
+
+
+def sql_quote(value: Any) -> str:
+    return "'" + str(value).replace("'", "''") + "'"
+
+
+def package_source_marker(package_report: Mapping[str, Any]) -> str:
+    marker = package_report.get("source_marker")
+    if isinstance(marker, str) and marker:
+        return marker
+    source_report = (package_report.get("source_reports") or {}).get("identity_resolution_queue")
+    if isinstance(source_report, str) and source_report:
+        return Path(source_report).stem
+    return DEFAULT_PACKAGE_SOURCE_MARKER
 
 
 def sqlite_json_lines(stdout: str) -> list[Any]:
@@ -154,10 +168,12 @@ def simulate(
     missing = sorted(required - set(sql_files))
     if missing:
         raise RuntimeError(f"package report missing sql files: {missing}")
+    source_marker = package_source_marker(package_report)
+    source_marker_sql = sql_quote(source_marker)
 
     source_marker_rows_before = query_scalar(
         source_db,
-        f"SELECT COUNT(*) FROM card_oracle_cache WHERE source = '{PACKAGE_SOURCE_MARKER}'",
+        f"SELECT COUNT(*) FROM card_oracle_cache WHERE source = {source_marker_sql}",
     )
     with tempfile.TemporaryDirectory(prefix="manaloom_identity_cache_sim_") as tmpdir:
         temp_db = Path(tmpdir) / "knowledge_simulation.db"
@@ -176,11 +192,11 @@ def simulate(
         rollback_result = run_sqlite_script(temp_db, sql_files["rollback"])
         rollback_remaining = query_scalar(
             temp_db,
-            f"SELECT COUNT(*) FROM card_oracle_cache WHERE source = '{PACKAGE_SOURCE_MARKER}'",
+            f"SELECT COUNT(*) FROM card_oracle_cache WHERE source = {source_marker_sql}",
         )
     source_marker_rows_after = query_scalar(
         source_db,
-        f"SELECT COUNT(*) FROM card_oracle_cache WHERE source = '{PACKAGE_SOURCE_MARKER}'",
+        f"SELECT COUNT(*) FROM card_oracle_cache WHERE source = {source_marker_sql}",
     )
     post_summary = dict(post_apply_preflight.get("summary") or {})
     post_queues = queue_from_preflight(post_apply_preflight)
@@ -205,6 +221,7 @@ def simulate(
         "deck_607_mutated": False,
         "simulation_db_removed": True,
         "source_db": str(source_db),
+        "source_marker": source_marker,
         "source_reports": {
             "external_material_scout": rel(scout_path),
             "identity_cache_package": rel(package_path) if package_path is not None else None,
@@ -269,6 +286,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Current baseline: `{summary['current_baseline']}`",
         f"- Source DB mutated: `{payload['source_db_mutated']}`",
         f"- Simulation DB removed: `{payload['simulation_db_removed']}`",
+        f"- Source marker: `{payload['source_marker']}`",
         "",
         "## Simulation Summary",
         "",

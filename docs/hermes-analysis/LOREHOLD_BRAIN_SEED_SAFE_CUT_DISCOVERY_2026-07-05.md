@@ -79,3 +79,75 @@ seed-safe cut discovery pass:
 - Do not run a natural battle gate.
 - Do not promote Brain in a Jar, Mana Vault, The One Ring, or any other staple
   into `deck_607` from popularity or runtime readiness alone.
+
+## Authorized Continuation Refresh
+
+Generated on 2026-07-05 under prefix
+`20260705_goal_continue_brain_seed_mining`.
+
+Additional learning that is now current:
+
+- Brain cut-slot trace miner scanned `1152` gate reports and `229`
+  game-result reports. It found floor trace for all `9` current Brain cut
+  slots, `1905` same-slot `607` win/candidate-loss traces, and `1504`
+  positive target-delta traces. This protects the current slots; it does not
+  unlock a cut.
+- Brain unlock audit still closed with `safe_cut_count=0`,
+  `unlockable_now_count=0`, `candidate_deck_materialization_allowed_now=false`,
+  `natural_battle_gate_allowed_now=false`, and `promotion_allowed_now=false`.
+- External material scout found `24` external candidates: `10` local Lorehold
+  variants not in `607`, `7` rule-known external cards not in the local
+  candidate pool, and `7` missing from the local deck pool. Gate-ready count
+  remained `0`.
+- Scryfall identity resolution found `6/6` missing identities as Commander
+  legal and Lorehold color-identity compatible: `Brain in a Jar`,
+  `Entreat the Angels`, `Haze of Rage`, `Late to Dinner`,
+  `Miraculous Recovery`, and `Strata Scythe`.
+- SQLite identity cache package was simulated on a temporary DB, applied to the
+  local `knowledge.db`, and postchecked with `resolved_cache_rows=6`. The
+  applied source marker is
+  `lorehold_external_identity_resolution_queue_20260705_goal_continue_brain_seed_mining`.
+  PostgreSQL and `deck_607` were not mutated.
+- Post-cache identity preflight now has `oracle_identity_missing_count=0`, but
+  still has `runtime_or_manual_review_required_count=4`,
+  `shell_contract_required_count=9`, and `gate_ready_now_count=0`.
+- Post-identity queue split has `queue_card_count=14`,
+  `verified_auto_rule_ready_count=2`, and `battle_ready_now_count=0`.
+- Brain/Entreat/Haze runtime contract found XMage classes for all `3` cards.
+  Only Brain currently has an active ManaLoom rule. `Entreat the Angels` is the
+  best first runtime contract candidate because it directly extends the
+  Lorehold miracle/token-pressure thesis.
+- Miracle access candidate row queue remains blocked:
+  `source_candidate_count=5`, `scoreable_candidate_row_count=0`,
+  `named_seed_safe_cut_count=0`, matrix scoring `false`, deck materialization
+  `false`, natural battle `false`, and promotion `false`.
+- Miracle next route planner still selects `Brain in a Jar` with learning score
+  `114`, state `brain_rule_active_no_seed_safe_cut`, and next action
+  `mine_named_brain_same_lane_seed_safe_cut_no_deck_action`.
+
+Implementation cleanup from this refresh:
+
+- `lorehold_external_identity_cache_apply_package.py` and
+  `lorehold_external_identity_cache_simulation.py` now derive the cache
+  `source_marker` from the actual identity-resolution report instead of using
+  a hardcoded `20260705_current` marker. This prevents future lineage drift
+  when a non-current report prefix is applied.
+
+Validation evidence from this refresh:
+
+- `python3 -m pytest` for all Lorehold/Commander/global Commander tests:
+  `821 passed`, `1 skipped`.
+- XMage exact-scope/runtime tests: `817 passed`.
+- `pg_hermes_sqlite_contract_audit.py` with local server env:
+  `51/51 pass`.
+- `deckbuilding_contract_surface_audit.py`: `pass`.
+- `lorehold_artifact_contract_audit.py`: `pass`.
+- `operational_surface_alignment_audit.py`: `pass`.
+- `legacy_contamination_audit.py`: `pass`.
+- `xmage_strategy_consistency_audit.py`: `26/26 pass`.
+
+Current decision after authorized validation: authorization is broad enough to
+apply local cache and run tests, but the evidence still does not justify a deck
+mutation. Keep `607` protected. The next real work is runtime implementation
+or focused evidence for `Entreat the Angels` and continued named same-lane
+safe-cut mining for Brain.
