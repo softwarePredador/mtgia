@@ -11701,6 +11701,61 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG487 Activated Self-Boost With Static Keyword Closure
+
+- PG487 extends the existing activated self-boost family by allowing
+  `BoostSourceEffect` rows whose `SimpleActivatedAbility` is accompanied only
+  by safe self static keyword ability classes such as flying, defender,
+  lifelink, trample, vigilance, haste, first strike, double strike, menace,
+  reach, flash, or deathtouch.
+- The parser now strips leading self static keyword Oracle lines before
+  validating the activated cost/effect. This keeps cards like Shivan Dragon,
+  Aven Flock, Wall of Fire, Killer Bees, and Anointed Chorister in the exact
+  self-boost lane instead of blocking on `Flying {R}: ...`-style cost parsing.
+- The accepted shape remains narrow: fixed `BoostSourceEffect`, source-only
+  pump until end of turn, exact Oracle/source agreement, no targets, no
+  conditions, and only supported mana/tap activation costs inherited from the
+  existing self-boost runtime. Unsafe costs and non-simple Oracle text remain
+  blocked.
+- The batch covers `58` cards; the complete list lives in
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg487_activated_self_boost_keyword_new_server_manifest.json`
+  under `selected_card_names`.
+- Runtime behavior reuses the already-tested
+  `xmage_permanent_simple_activated_self_boost_until_eot_v1` executor. The
+  promoted effect JSON now also records safe auxiliary self keywords so the
+  rule remains source-explainable while battle keyword behavior is still
+  normalized from Oracle/base card data.
+- Focused validation passed `763` parser/runtime/package-builder tests.
+  `py_compile` also passed for the touched parser, runtime, and focused test
+  files.
+- PostgreSQL package PG487 applied against `143.198.230.247:5433/halder` and
+  promoted `58/58` selected cards as verified/auto rule-version `2` rows with
+  matching Oracle hashes. The apply upserted `58` rows and deprecated `0`
+  shadow rows.
+- Hermes metadata sync matched `5808` PostgreSQL cards, wrote `5719` SQLite
+  cache aliases, updated `104` deck-card ids, and left the known `unresolved=1`
+  residual unchanged. The targeted battle-rule sync loaded `58` PostgreSQL
+  rows, wrote `58` SQLite rows, and exported `4670` canonical fallback rows.
+- Generic E2E validation passed across PostgreSQL, SQLite
+  `battle_card_rules`, canonical snapshot, and runtime `get_card_effect` for
+  all `58` selected cards. The manifest does not define battle-execution
+  scenarios for this generic family, so scenario execution remains `0`;
+  concrete activation/pump behavior remains covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract with live PostgreSQL connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26187`, `xmage_authoritative_source_count=25873`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25873`. This is an exact
+  reduction of `58` from the post-PG486 queue. The post-PG487 exact split
+  recheck reports `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`.
+- Post-sync global readiness is now `34331` known cards, `4763`
+  `battle_and_oracle_ready`, `29110` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

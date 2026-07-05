@@ -10278,6 +10278,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_tap"])
         self.assertEqual(effect["_activated_rule_effects"][0]["target"], "self")
 
+    def test_activated_self_boost_accepts_leading_static_keyword(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostSourceEffect::FlyingAbility,SimpleActivatedAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Drake",
+                type_line="Creature - Drake",
+                oracle_text="Flying\n{R}: Fixture Drake gets +1/+0 until end of turn.",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new SimpleActivatedAbility("
+                "new BoostSourceEffect(1, 0, Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{R}")));'
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_BOOST_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{R}")
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertTrue(effect["flying"])
+
     def test_activated_self_boost_accepts_colored_mana_cost_source(self) -> None:
         row = queue_row(
             split.SELF_BOOST_ACTIVATED_UNIT,

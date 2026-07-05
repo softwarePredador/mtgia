@@ -1,0 +1,61 @@
+      card_name       |   normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+----------------------+----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Almighty Brushwagg   | almighty brushwagg   | battle_rule_v1:dee1d5fdcce8a7d41ce9cb71769cc4a1 |                  1 |                           1 |                         1 |           0
+ Anointed Chorister   | anointed chorister   | battle_rule_v1:bd270a5aaa2a2f6fcbeb41b20c9b0e51 |                  1 |                           1 |                         1 |           0
+ Aven Flock           | aven flock           | battle_rule_v1:c47a8875ba2037b7b1104e195c024dd6 |                  1 |                           1 |                         1 |           0
+ Balshan Collaborator | balshan collaborator | battle_rule_v1:694861e655bdfa1e09157c70ca27a715 |                  1 |                           1 |                         1 |           0
+ Blistering Dieflyn   | blistering dieflyn   | battle_rule_v1:215ed6c0663ac712d8908764f893e5bc |                  1 |                           1 |                         1 |           0
+ Burrog Banemaker     | burrog banemaker     | battle_rule_v1:6ec89fb1ff020a09bd4b7d556d8d7a5e |                  1 |                           1 |                         1 |           0
+ Capashen Knight      | capashen knight      | battle_rule_v1:f73b279dcf57b8d564b9a5ee7b91a096 |                  1 |                           1 |                         1 |           0
+ Char-Rumbler         | char-rumbler         | battle_rule_v1:3b404ad0b195a352272cf59c5218af71 |                  1 |                           1 |                         1 |           0
+ Crypt Ripper         | crypt ripper         | battle_rule_v1:b6732ab1b8f7b5472c692781e8e75004 |                  1 |                           1 |                         1 |           0
+ Dragon Hatchling     | dragon hatchling     | battle_rule_v1:c368af5ab4fc204a162244d655b62eca |                  1 |                           1 |                         1 |           0
+ Drifting Shade       | drifting shade       | battle_rule_v1:694861e655bdfa1e09157c70ca27a715 |                  1 |                           1 |                         1 |           0
+ Dungeon Shade        | dungeon shade        | battle_rule_v1:694861e655bdfa1e09157c70ca27a715 |                  1 |                           1 |                         1 |           0
+ Ember-Eye Wolf       | ember-eye wolf       | battle_rule_v1:fc0bc3dbb35c8170a89199f8464f0ac2 |                  1 |                           1 |                         1 |           0
+ Feral Ridgewolf      | feral ridgewolf      | battle_rule_v1:a991b9ae5b653dfb337dfce1bb77d4e0 |                  1 |                           1 |                         1 |           0
+ Fireborn Knight      | fireborn knight      | battle_rule_v1:81b47a1d1067012d9448722e21ae0e7a |                  1 |                           1 |                         1 |           0
+ Firefly              | firefly              | battle_rule_v1:c368af5ab4fc204a162244d655b62eca |                  1 |                           1 |                         1 |           0
+ Flowstone Hellion    | flowstone hellion    | battle_rule_v1:6c8d2b120ef825bb9bfe56d8664ed73f |                  1 |                           1 |                         1 |           0
+ Flowstone Kavu       | flowstone kavu       | battle_rule_v1:e670dac0e0beccc44521ee3e774f6ba7 |                  1 |                           1 |                         1 |           0
+ Flowstone Mauler     | flowstone mauler     | battle_rule_v1:ce81ced1eebeeadca2ac09097c722550 |                  1 |                           1 |                         1 |           0
+ Flowstone Wall       | flowstone wall       | battle_rule_v1:280c7ca5135c5f8113f60cb1ecbde86c |                  1 |                           1 |                         1 |           0
+ Flowstone Wyvern     | flowstone wyvern     | battle_rule_v1:857507e7add5a7998adb32158945020d |                  1 |                           1 |                         1 |           0
+ Furnace Spirit       | furnace spirit       | battle_rule_v1:4d907cccec1625eaac2d4f778c2e6e18 |                  1 |                           1 |                         1 |           0
+ Furnace Whelp        | furnace whelp        | battle_rule_v1:c368af5ab4fc204a162244d655b62eca |                  1 |                           1 |                         1 |           0
+ Granite Gargoyle     | granite gargoyle     | battle_rule_v1:81dd0103db37c7143ccd4d64771b5b60 |                  1 |                           1 |                         1 |           0
+ Hellkite Punisher    | hellkite punisher    | battle_rule_v1:c368af5ab4fc204a162244d655b62eca |                  1 |                           1 |                         1 |           0
+ Hermitic Nautilus    | hermitic nautilus    | battle_rule_v1:6fbe57091b18ebd5a193b86f8e4539d9 |                  1 |                           1 |                         1 |           0
+ Inkrise Infiltrator  | inkrise infiltrator  | battle_rule_v1:399fb2aedc543f5cc79e2366784c968d |                  1 |                           1 |                         1 |           0
+ Killer Bees          | killer bees          | battle_rule_v1:8f35774cf06969e2fe8b2cb2d33be769 |                  1 |                           1 |                         1 |           0
+ Lionheart Maverick   | lionheart maverick   | battle_rule_v1:af8c786d4cd03f8efc4128e5833e5afa |                  1 |                           1 |                         1 |           0
+ Loxodon Stalwart     | loxodon stalwart     | battle_rule_v1:cc214962023b3845b59e79dc1a4dc8bb |                  1 |                           1 |                         1 |           0
+ Marble Gargoyle      | marble gargoyle      | battle_rule_v1:c47a8875ba2037b7b1104e195c024dd6 |                  1 |                           1 |                         1 |           0
+ Masked Blackguard    | masked blackguard    | battle_rule_v1:544e9d05054b1496b945ea6f33380bd8 |                  1 |                           1 |                         1 |           0
+ Mesa Falcon          | mesa falcon          | battle_rule_v1:b52fe3a21a3c9c72d8d0500a464e4239 |                  1 |                           1 |                         1 |           0
+ Metropolis Sprite    | metropolis sprite    | battle_rule_v1:950b21f71f666f24f07a0fa675d2c305 |                  1 |                           1 |                         1 |           0
+ Minotaur Sureshot    | minotaur sureshot    | battle_rule_v1:4ab9f74caa9440031d6b9729c8cddae7 |                  1 |                           1 |                         1 |           0
+ Moonwing Moth        | moonwing moth        | battle_rule_v1:c47a8875ba2037b7b1104e195c024dd6 |                  1 |                           1 |                         1 |           0
+ Nightwing Shade      | nightwing shade      | battle_rule_v1:9d74e870b21fc9560f2adf66ba347650 |                  1 |                           1 |                         1 |           0
+ Pardic Collaborator  | pardic collaborator  | battle_rule_v1:68c326d17044aa9876c4aed52e2e1e30 |                  1 |                           1 |                         1 |           0
+ Pearl Dragon         | pearl dragon         | battle_rule_v1:b52fe3a21a3c9c72d8d0500a464e4239 |                  1 |                           1 |                         1 |           0
+ Pyre Charger         | pyre charger         | battle_rule_v1:4d907cccec1625eaac2d4f778c2e6e18 |                  1 |                           1 |                         1 |           0
+ Rakdos Trumpeter     | rakdos trumpeter     | battle_rule_v1:7d8cdabe8f03a49391e2ac2706a9f8fa |                  1 |                           1 |                         1 |           0
+ Ravine Raider        | ravine raider        | battle_rule_v1:3e117c80b5a9c8c16b1cea7f2e54c455 |                  1 |                           1 |                         1 |           0
+ Rune-Cervin Rider    | rune-cervin rider    | battle_rule_v1:535e47b2105f034898ccf6776050de96 |                  1 |                           1 |                         1 |           0
+ Sandstone Warrior    | sandstone warrior    | battle_rule_v1:66a529c971397c868bd13bce61018e05 |                  1 |                           1 |                         1 |           0
+ Shivan Dragon        | shivan dragon        | battle_rule_v1:c368af5ab4fc204a162244d655b62eca |                  1 |                           1 |                         1 |           0
+ Steam Spitter        | steam spitter        | battle_rule_v1:1ef7b201da30ac4ca515bd6d3b2ab08a |                  1 |                           1 |                         1 |           0
+ Sun-Collared Raptor  | sun-collared raptor  | battle_rule_v1:454bdff4e011070224a0ba0c322753eb |                  1 |                           1 |                         1 |           0
+ Talonrend            | talonrend            | battle_rule_v1:7bb3f55d7eb725487695655fb1ca6010 |                  1 |                           1 |                         1 |           0
+ Tattered Apparition  | tattered apparition  | battle_rule_v1:9d74e870b21fc9560f2adf66ba347650 |                  1 |                           1 |                         1 |           0
+ Thirsting Shade      | thirsting shade      | battle_rule_v1:bf3deb58d117dc8173a13996793d65f7 |                  1 |                           1 |                         1 |           0
+ Thunder Wall         | thunder wall         | battle_rule_v1:e22d8580ab6eb1dcc0101ee099b976ce |                  1 |                           1 |                         1 |           0
+ Torch Drake          | torch drake          | battle_rule_v1:67ca015731703b979782a4f0b07b06ef |                  1 |                           1 |                         1 |           0
+ Tower Drake          | tower drake          | battle_rule_v1:c47a8875ba2037b7b1104e195c024dd6 |                  1 |                           1 |                         1 |           0
+ Wall of Faith        | wall of faith        | battle_rule_v1:e604ba35e838001ad2fa41364405aaf2 |                  1 |                           1 |                         1 |           0
+ Wall of Fire         | wall of fire         | battle_rule_v1:f6434f24517f7bad4e918828affc44e5 |                  1 |                           1 |                         1 |           0
+ Wall of Lava         | wall of lava         | battle_rule_v1:330dda59fd1f61d2a32bd04398f3e54d |                  1 |                           1 |                         1 |           0
+ Wall of Opposition   | wall of opposition   | battle_rule_v1:8f392660925e515a6b82b6a455685297 |                  1 |                           1 |                         1 |           0
+ Wall of Water        | wall of water        | battle_rule_v1:a256190bebbc2a81ec82e7ed105625cb |                  1 |                           1 |                         1 |           0
+(58 rows)

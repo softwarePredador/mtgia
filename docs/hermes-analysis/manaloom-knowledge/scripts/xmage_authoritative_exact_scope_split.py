@@ -64,6 +64,7 @@ SELF_BOOST_ACTIVATED_UNIT = (
     "xmage_signature::BoostSourceEffect::SimpleActivatedAbility::"
     "no_target_class::no_condition_class::activated_ability"
 )
+SELF_BOOST_ACTIVATED_UNIT_PREFIX = "xmage_signature::BoostSourceEffect::"
 TARGET_BOOST_ACTIVATED_UNIT = (
     "xmage_signature::BoostTargetEffect::SimpleActivatedAbility::"
     "TargetCreaturePermanent::no_condition_class::targeting,activated_ability"
@@ -5160,12 +5161,17 @@ def is_permanent_activated_tutor_battlefield_unit(row: dict[str, Any]) -> bool:
 
 
 def is_permanent_activated_self_boost_unit(row: dict[str, Any]) -> bool:
-    if str(row.get("adapter_work_unit") or "") != SELF_BOOST_ACTIVATED_UNIT:
+    adapter_work_unit = str(row.get("adapter_work_unit") or "")
+    if not adapter_work_unit.startswith(SELF_BOOST_ACTIVATED_UNIT_PREFIX):
         return False
+    abilities = ability_classes(row)
+    remaining_abilities = abilities - {"SimpleActivatedAbility"}
     return (
         effect_classes(row) == {"BoostSourceEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
-        and "activated_ability" in set(row.get("xmage_signals") or [])
+        and "SimpleActivatedAbility" in abilities
+        and remaining_abilities.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and "::no_target_class::no_condition_class::" in adapter_work_unit
+        and set(row.get("xmage_signals") or []) == {"activated_ability"}
     )
 
 
@@ -8056,7 +8062,7 @@ def activated_life_gain_from_source(source: str) -> dict[str, Any] | str:
 
 
 def activated_self_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
     if text.count(":") != 1:
         return "activated_self_boost_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
@@ -13276,6 +13282,19 @@ def split_row(
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": False,
         }
+        auxiliary_keywords = ordered_keywords(
+            {
+                STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
+                for ability in ability_classes(row)
+                if ability in STATIC_SELF_KEYWORD_ABILITY_CLASSES
+            }
+        )
+        if auxiliary_keywords:
+            effect_json["keywords"] = auxiliary_keywords
+            effect_json["_keywords_are_self"] = True
+            effect_json["xmage_auxiliary_static_keywords"] = auxiliary_keywords
+            for keyword in auxiliary_keywords:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,
