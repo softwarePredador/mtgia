@@ -11166,6 +11166,66 @@ new server:
   `xmage_permanent_attack_graveyard_to_hand`, and
   `xmage_permanent_simple_activated_destroy_target`.
 
+## 2026-07-05 PG477 Fixed Target Player Draw Spell Closure
+
+- Closed the exact XMage fixed target-player draw spell family as ManaLoom
+  scope `xmage_fixed_target_player_draw_spell_v1`.
+- The selected package accepted local XMage spell sources whose executable
+  behavior is `DrawCardTargetEffect`, preserving fixed draw count,
+  `target=player`, `target_controller=target_player`,
+  `target_player_draw=true`, and `target_preference=self`.
+- The batch covers `3` cards: Inspiration, Opportunity, and Overflowing
+  Insight.
+- Focused mapper/runtime/package tests covered exact split selection,
+  default-self target selection, declared target respect, package generation,
+  and manifest field preservation; the focused runtime/split lane passed `722`
+  checks, and the package-builder test lane also passed.
+- The PostgreSQL package promoted `3` cards. Precheck found `3` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` generated shadow
+  rows to deprecate; apply/postcheck verified `3/3` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `3` promoted rows are
+  `verified`/`auto`, have `rule_version=2`, and preserve
+  `battle_model_scope=xmage_fixed_target_player_draw_spell_v1`,
+  `effect=draw_cards`, target-player metadata, target preference, and Oracle
+  hash. Draw counts are Inspiration `2`, Opportunity `4`, and Overflowing
+  Insight `7`.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `3` selected cards. Generic battle
+  scenario count remained `0`; target-player draw behavior remains covered by
+  focused runtime tests
+  `test_fixed_target_player_draw_spell_defaults_to_self` and
+  `test_fixed_target_player_draw_spell_respects_declared_target`.
+- Additional cache verification confirmed SQLite `battle_card_rules` and
+  `known_cards_canonical_snapshot.json` both preserve draw counts,
+  target-player metadata, and `target_preference=self`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4532` PostgreSQL runtime rows, wrote `4524` SQLite runtime
+  rows, and exported `4499` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy
+  contamination (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL
+  connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26354`, `xmage_authoritative_source_count=26040`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26040`. This is an exact
+  reduction of `3` from the post-PG476 queue.
+- The post-PG477 exact split recheck reports `proposal_count=15` and
+  `safe_for_batch_pg_package_count=15`. The remaining exact families are
+  `xmage_return_target_to_hand_and_scry_spell`,
+  `xmage_graveyard_multi_zone_recursion_spell`,
+  `xmage_static_play_lands_from_graveyard`,
+  `xmage_permanent_simple_activated_graveyard_to_battlefield`,
+  `xmage_permanent_simple_activated_graveyard_to_hand`,
+  `xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell`,
+  `xmage_creature_combat_damage_graveyard_to_hand`,
+  `xmage_permanent_attack_graveyard_to_hand`, and
+  `xmage_permanent_simple_activated_destroy_target`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
