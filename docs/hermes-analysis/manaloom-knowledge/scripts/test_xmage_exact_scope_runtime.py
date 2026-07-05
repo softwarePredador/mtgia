@@ -5408,6 +5408,154 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_optional_discard_draw_discards_then_draws(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn A"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand.append({"name": "Discard Me", "type_line": "Land", "mana_cost": ""})
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_optional_discard_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_optional_discard_draw": True,
+            "etb_optional_discard_count": 1,
+            "etb_optional_discard_draw_count": 1,
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_optional_discard_draw",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Racketeer",
+                "type_line": "Creature - Lizard Rogue",
+                "oracle_text": "When this creature enters, you may discard a card. If you do, draw a card.",
+                "power": 2,
+                "toughness": 1,
+            },
+            turn=4,
+            rng=random.Random(47),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Racketeer"])
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn A"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Discard Me"])
+        self.assertTrue(
+            any(
+                event == "etb_optional_discard_draw_resolved"
+                and data.get("card") == "Fixture Racketeer"
+                and data.get("cards_drawn") == 1
+                and data.get("discarded") == ["Discard Me"]
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_dynamic_draw_counts_green_creatures_after_entry(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Drawn A"}, {"name": "Drawn B"}, {"name": "Drawn C"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.append(
+            {
+                "name": "Green Bear",
+                "type_line": "Creature - Bear",
+                "mana_cost": "{1}{G}",
+                "power": 2,
+                "toughness": 2,
+            }
+        )
+        active.battlefield.append(
+            {
+                "name": "Blue Drake",
+                "type_line": "Creature - Drake",
+                "mana_cost": "{2}{U}",
+                "power": 2,
+                "toughness": 2,
+            }
+        )
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_dynamic_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_dynamic_draw": True,
+            "etb_draw_count_source": "controlled_creatures_with_color",
+            "etb_draw_count_color": "green",
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_dynamic_draw",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Force",
+                "type_line": "Creature - Elemental",
+                "mana_cost": "{4}{G}{G}{G}",
+                "oracle_text": "When this creature enters, draw a card for each green creature you control.",
+                "power": 5,
+                "toughness": 5,
+            },
+            turn=4,
+            rng=random.Random(48),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn A", "Drawn B"])
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Fixture Force"
+                and data.get("effect") == "dynamic_draw_cards"
+                and data.get("cards_requested") == 2
+                and data.get("cards_drawn") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_dynamic_draw_excludes_source_for_other_subtype(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn A"}, {"name": "Drawn B"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.append(
+            {
+                "name": "Other Dinosaur",
+                "type_line": "Creature - Dinosaur",
+                "mana_cost": "{3}{G}",
+                "power": 4,
+                "toughness": 4,
+            }
+        )
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_dynamic_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_dynamic_draw": True,
+            "etb_draw_count_source": "controlled_creatures_with_subtype",
+            "etb_draw_count_subtype": "dinosaur",
+            "etb_draw_count_exclude_source": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Dreadmaw",
+                "type_line": "Creature - Dinosaur",
+                "mana_cost": "{4}{G}{G}",
+                "oracle_text": "When this creature enters, draw a card for each other Dinosaur you control.",
+                "power": 6,
+                "toughness": 6,
+            },
+            turn=5,
+            rng=random.Random(49),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn A"])
+
     def test_creature_etb_draw_lose_life_resolves_after_entering_battlefield(self) -> None:
         active = self.battle.Player(
             "Active",

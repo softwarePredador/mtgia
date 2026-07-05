@@ -17156,6 +17156,155 @@ def process_player_discard_triggers(
     return trigger_events
 
 
+def _permanent_has_plus_one_counter(permanent):
+    if not isinstance(permanent, dict):
+        return False
+    if int(permanent.get("plus_one_counters") or 0) > 0:
+        return True
+    counters = permanent.get("counters")
+    return isinstance(counters, dict) and int(counters.get("+1/+1") or 0) > 0
+
+
+def _permanent_has_color(permanent, color):
+    symbol = _color_symbol(color)
+    if not symbol:
+        return False
+    return symbol in _spell_color_symbols(permanent)
+
+
+def _controlled_permanents(player):
+    return [
+        permanent
+        for permanent in getattr(player, "battlefield", []) or []
+        if isinstance(permanent, dict)
+    ]
+
+
+def etb_dynamic_draw_count(player, permanent, effect_data):
+    source = str(effect_data.get("etb_draw_count_source") or effect_data.get("draw_count_source") or "")
+    if source == "controlled_creatures_with_plus_one_counters":
+        return sum(
+            1
+            for candidate in _controlled_permanents(player)
+            if is_battlefield_creature(candidate) and _permanent_has_plus_one_counter(candidate)
+        )
+    if source == "controlled_creatures_with_subtype":
+        subtype = str(effect_data.get("etb_draw_count_subtype") or effect_data.get("draw_count_subtype") or "").strip()
+        exclude_source = bool(effect_data.get("etb_draw_count_exclude_source") or effect_data.get("draw_count_exclude_source"))
+        return sum(
+            1
+            for candidate in _controlled_permanents(player)
+            if is_battlefield_creature(candidate)
+            and (not exclude_source or candidate is not permanent)
+            and permanent_has_subtype(candidate, subtype)
+        )
+    if source == "controlled_creatures_with_color":
+        color = str(effect_data.get("etb_draw_count_color") or effect_data.get("draw_count_color") or "").strip()
+        return sum(
+            1
+            for candidate in _controlled_permanents(player)
+            if is_battlefield_creature(candidate) and _permanent_has_color(candidate, color)
+        )
+    if source == "colors_among_permanents_you_control":
+        colors = set()
+        for candidate in _controlled_permanents(player):
+            colors.update(_spell_color_symbols(candidate))
+        return len(colors)
+    if source == "max_controlled_creatures_or_graveyard_cards_with_subtype":
+        subtype = str(effect_data.get("etb_draw_count_subtype") or effect_data.get("draw_count_subtype") or "").strip()
+        battlefield_count = sum(
+            1
+            for candidate in _controlled_permanents(player)
+            if is_battlefield_creature(candidate) and permanent_has_subtype(candidate, subtype)
+        )
+        graveyard_count = sum(
+            1
+            for card in getattr(player, "graveyard", []) or []
+            if isinstance(card, dict) and permanent_has_subtype(card, subtype)
+        )
+        return max(battlefield_count, graveyard_count)
+    return 0
+
+
+def resolve_etb_optional_discard_draw(
+    player,
+    opponents,
+    permanent,
+    effect_data,
+    turn,
+    rng,
+    *,
+    stack=None,
+    all_players=None,
+    phase="battlefield_etb",
+):
+    discard_count = max(1, int(effect_data.get("etb_optional_discard_count") or 1))
+    draw_count = max(1, int(effect_data.get("etb_optional_discard_draw_count") or effect_data.get("draw_count") or 1))
+    if len(getattr(player, "hand", []) or []) < discard_count:
+        emit_replay_event(
+            "etb_optional_discard_draw_skipped",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            reason="no_discard_candidate",
+            discard_count=discard_count,
+            draw_count=draw_count,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return []
+    discarded_cards = _draw_discard_spell_selected_discards(player, discard_count, rng=rng)
+    if len(discarded_cards) != discard_count:
+        emit_replay_event(
+            "etb_optional_discard_draw_skipped",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            reason="discard_candidate_missing_on_resolution",
+            discard_count=discard_count,
+            draw_count=draw_count,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return []
+    discard_resolution = resolve_effect_discard_cards(
+        player,
+        discarded_cards,
+        top_limit=0,
+        opponents=opponents,
+        turn=turn,
+        phase=phase,
+        rng=rng,
+    )
+    drawn = player.draw(draw_count, rng)
+    if all_players is not None:
+        process_player_draw_triggers(
+            player,
+            len(drawn),
+            turn,
+            phase,
+            all_players,
+            stack=stack,
+            turn_player=player,
+        )
+    emit_replay_event(
+        "etb_optional_discard_draw_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        discarded=[card.get("name", "?") for card in discarded_cards],
+        discarded_to_graveyard=[
+            entry.get("name", "?")
+            for entry in discard_resolution.get("to_graveyard", [])
+        ],
+        cards_drawn=len(drawn),
+        hand_size=len(player.hand),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return drawn
+
+
 def resolve_generic_permanent_etb(
     player,
     opponents,
@@ -17276,6 +17425,50 @@ def resolve_generic_permanent_etb(
             cards_drawn=len(drawn),
             hand_size=len(player.hand),
             turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+    if effect_data.get("etb_optional_discard_draw"):
+        resolve_etb_optional_discard_draw(
+            player,
+            opponents,
+            permanent,
+            effect_data,
+            turn,
+            rng,
+            stack=stack,
+            all_players=all_players,
+            phase=phase,
+        )
+    if effect_data.get("etb_dynamic_draw"):
+        requested = max(0, int(etb_dynamic_draw_count(player, permanent, effect_data) or 0))
+        hand_before = len(player.hand)
+        library_before = len(player.library)
+        drawn = player.draw(requested, rng) if requested > 0 else []
+        if all_players is not None and drawn:
+            process_player_draw_triggers(
+                player,
+                len(drawn),
+                turn,
+                phase,
+                all_players,
+                stack=stack,
+                turn_player=player,
+            )
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="enters_battlefield",
+            effect="dynamic_draw_cards",
+            draw_count_source=effect_data.get("etb_draw_count_source") or effect_data.get("draw_count_source"),
+            cards_requested=requested,
+            cards_drawn=len(drawn),
+            hand_before=hand_before,
+            hand_after=len(player.hand),
+            library_before=library_before,
+            library_after=len(player.library),
+            turn=turn,
+            phase=phase,
             **replay_rule_fields(effect_data),
         )
     if effect_data.get("etb_draw_count"):

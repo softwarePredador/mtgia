@@ -10764,6 +10764,140 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_draw_count_not_fixed")
 
+    def test_creature_etb_optional_discard_draw_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fissure Wizard",
+                type_line="Creature - Goblin Wizard",
+                oracle_text="When this creature enters, you may discard a card. If you do, draw a card.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new DoIfCostPaid(
+                    new DrawCardSourceControllerEffect(), new DiscardCardCost())));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_OPTIONAL_DISCARD_DRAW_CREATURE_SCOPE)
+        self.assertTrue(effect["etb_optional_discard_draw"])
+        self.assertEqual(effect["etb_optional_discard_count"], 1)
+        self.assertEqual(effect["etb_optional_discard_draw_count"], 1)
+        self.assertNotIn("etb_draw_count", effect)
+
+    def test_creature_etb_dynamic_draw_maps_plus_one_counter_count(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Armorcraft Judge",
+                type_line="Creature - Elf Artificer",
+                oracle_text=(
+                    "When this creature enters, draw a card for each creature you control "
+                    "with a +1/+1 counter on it."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect("
+                "new PermanentsOnBattlefieldCount(StaticFilters.FILTER_CONTROLLED_CREATURE_P1P1))));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_DYNAMIC_DRAW_CREATURE_SCOPE)
+        self.assertTrue(effect["etb_dynamic_draw"])
+        self.assertEqual(effect["etb_draw_count_source"], "controlled_creatures_with_plus_one_counters")
+
+    def test_creature_etb_dynamic_draw_maps_color_and_subtype_counts(self) -> None:
+        fixtures = [
+            (
+                "Regal Force",
+                "When this creature enters, draw a card for each green creature you control.",
+                (
+                    'private static final FilterControlledCreaturePermanent filter = '
+                    'new FilterControlledCreaturePermanent("green creature you control");'
+                    "filter.add(new ColorPredicate(ObjectColor.GREEN));"
+                    "this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect("
+                    "new PermanentsOnBattlefieldCount(filter))));"
+                ),
+                "controlled_creatures_with_color",
+                {"etb_draw_count_color": "green"},
+            ),
+            (
+                "Earthshaker Dreadmaw",
+                "Trample\nWhen this creature enters, draw a card for each other Dinosaur you control.",
+                (
+                    'private static final FilterPermanent filter = new FilterControlledPermanent(SubType.DINOSAUR, '
+                    '"other Dinosaur you control");'
+                    "filter.add(AnotherPredicate.instance);"
+                    "private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(filter);"
+                    "this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(xValue)));"
+                ),
+                "controlled_creatures_with_subtype",
+                {"etb_draw_count_subtype": "dinosaur", "etb_draw_count_exclude_source": True},
+            ),
+        ]
+        for name, oracle_text, source_text, expected_source, expected_fields in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.DRAW_ENGINE_UNIT,
+                    effect_classes=["DrawCardSourceControllerEffect"],
+                    ability_kind="triggered",
+                    ability_classes=["EntersBattlefieldTriggeredAbility", "TrampleAbility"] if "Trample" in oracle_text else ["EntersBattlefieldTriggeredAbility"],
+                    xmage_signals=["draw", "triggered_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line="Creature", oracle_text=oracle_text),
+                    source_text=source_text,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.ETB_DYNAMIC_DRAW_CREATURE_SCOPE)
+                self.assertEqual(effect["etb_draw_count_source"], expected_source)
+                for key, value in expected_fields.items():
+                    self.assertEqual(effect[key], value)
+
+    def test_creature_etb_dynamic_draw_blocks_turn_death_count(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlashAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Liliana's Standard Bearer",
+                type_line="Creature - Zombie Knight",
+                oracle_text=(
+                    "Flash\nWhen this creature enters, draw X cards, where X is the number "
+                    "of creatures that died under your control this turn."
+                ),
+            ),
+            source_text="new DrawCardSourceControllerEffect(new CreaturesDiedUnderYourControlThisTurnCount())",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_draw_count_not_fixed")
+
     def test_creature_etb_draw_lose_life_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

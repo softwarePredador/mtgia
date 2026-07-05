@@ -380,6 +380,57 @@ def test_manifest_expected_rule_preserves_combat_damage_draw_fields() -> None:
     assert required["xmage_ability_class"] == "DealsCombatDamageToAPlayerTriggeredAbility"
 
 
+def test_manifest_expected_rule_preserves_etb_optional_and_dynamic_draw_fields() -> None:
+    proposal = {
+        "normalized_name": "fissure wizard",
+        "card_name": "Fissure Wizard",
+        "oracle_hash": "hash-fissure-wizard",
+        "logical_rule_key": "battle_rule_v1:hash-fissure-wizard",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_optional_discard_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "optional_discard_draw",
+            "etb_optional_discard_draw": True,
+            "etb_optional_discard_count": 1,
+            "etb_optional_discard_draw_count": 1,
+            "draw_count": 1,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+
+    assert required["etb_optional_discard_draw"] is True
+    assert required["etb_optional_discard_count"] == 1
+    assert required["etb_optional_discard_draw_count"] == 1
+    assert required["draw_count"] == 1
+
+    proposal["effect_json"] = {
+        "effect": "creature",
+        "battle_model_scope": "xmage_creature_etb_dynamic_draw_cards_v1",
+        "ability_kind": "triggered",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "dynamic_draw_cards",
+        "etb_dynamic_draw": True,
+        "draw_count_source": "controlled_creatures_with_color",
+        "etb_draw_count_source": "controlled_creatures_with_color",
+        "draw_count_color": "green",
+        "etb_draw_count_color": "green",
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+    required = expected["required_effect_fields"]
+    assert required["etb_dynamic_draw"] is True
+    assert required["draw_count_source"] == "controlled_creatures_with_color"
+    assert required["etb_draw_count_source"] == "controlled_creatures_with_color"
+    assert required["draw_count_color"] == "green"
+    assert required["etb_draw_count_color"] == "green"
+
+
 def test_manifest_expected_rule_preserves_activation_discard_cost_fields() -> None:
     proposal = {
         "normalized_name": "goblin picker",

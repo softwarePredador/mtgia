@@ -11388,6 +11388,64 @@ new server:
   largest remaining family buckets, starting with recursion and draw-engine
   subpatterns that can be split into runtime-backed exact scopes.
 
+## 2026-07-05 PG481 ETB Draw Patterns Closure
+
+- Closed two exact XMage `DrawCardSourceControllerEffect` +
+  `EntersBattlefieldTriggeredAbility` creature subpatterns:
+  `xmage_creature_etb_optional_discard_draw_cards_v1` and
+  `xmage_creature_etb_dynamic_draw_cards_v1`.
+- The optional-discard scope accepts only exact local XMage sources using
+  `DoIfCostPaid(new DrawCardSourceControllerEffect(...), new DiscardCardCost())`
+  whose Oracle text says "when this creature enters, you may discard a card. If
+  you do, draw a card." The runtime now pays the optional discard only when a
+  discard candidate exists, draws after the discard resolves, and emits
+  `etb_optional_discard_draw_resolved` or explicit skip events.
+- The dynamic-draw scope accepts only source/oracle-matched ETB draw counts for
+  supported runtime count sources: controlled creatures with +1/+1 counters,
+  controlled creatures with a subtype with optional source exclusion, controlled
+  creatures with a color, colors among permanents you control, and the maximum
+  of controlled subtype creatures vs subtype cards in your graveyard.
+- The batch covers `12` cards: Armorcraft Judge, Discerning Peddler,
+  Earthshaker Dreadmaw, Fissure Wizard, Immersturm Raider, Keldon Raider,
+  Plundering Predator, Prophet of the Scarab, Regal Force, Shinestriker,
+  Viashino Racketeer, and Yuyan Archers.
+- The mapper deliberately keeps `Liliana's Standard Bearer` blocked because it
+  depends on creatures that died under your control this turn, and keeps
+  `Treetop Sentries` blocked because forage cost payment needs its own runtime
+  contract.
+- Focused split/runtime/sync tests passed `769` checks. The package-builder
+  test lane passed after extending the manifest whitelist for
+  `etb_optional_discard_*`, `etb_dynamic_draw`, and ETB draw-count source
+  metadata, and the touched scripts compiled.
+- The PostgreSQL package promoted `12` cards. Precheck found `12` target rows,
+  `0` existing expected rows, and `0` nonmatching shadow rows to deprecate.
+  Apply/postcheck verified `12/12` promoted rows as `verified`/`auto` with
+  Oracle hashes; backup rows were `0`.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `12` selected cards. Direct
+  verification confirmed all twelve expose the expected battle scopes without
+  falling through to unconditional `etb_draw_count`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. Metadata sync
+  matched `6701` PostgreSQL cards and `6629` SQLite cache aliases. The battle
+  sync loaded `4579` PostgreSQL rows, wrote `7175` SQLite rows, and exported
+  `4550` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`pass`), legacy contamination
+  (`pass`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26307`, `xmage_authoritative_source_count=25993`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25993`. This is an exact
+  reduction of `12` from the post-PG480 queue and reduces
+  `draw_engine::xmage_draw_card_variant_review_v1` from `1605` to `1593`.
+- The post-PG481 exact split recheck reports `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`. The next work should continue with a
+  new subpattern from the remaining blocked reasons, not rerun this ETB draw
+  family.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

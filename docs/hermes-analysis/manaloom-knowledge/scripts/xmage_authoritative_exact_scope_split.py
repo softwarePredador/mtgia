@@ -225,6 +225,8 @@ PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE = "xmage_permanent_simple_activated_draw_
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
+ETB_OPTIONAL_DISCARD_DRAW_CREATURE_SCOPE = "xmage_creature_etb_optional_discard_draw_cards_v1"
+ETB_DYNAMIC_DRAW_CREATURE_SCOPE = "xmage_creature_etb_dynamic_draw_cards_v1"
 ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE = "xmage_creature_etb_draw_lose_life_v1"
 ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
 ETB_GRAVEYARD_COUNT_DAMAGE_CREATURE_SCOPE = (
@@ -9836,6 +9838,126 @@ def etb_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(value)
 
 
+def etb_optional_discard_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, int] | str:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    if re.fullmatch(
+        r"(?:when|whenever) (?:this creature|[^.]+?) enters(?: the battlefield)?[, ]+"
+        r"you may discard a card\. if you do, draw a card\.?",
+        text,
+    ):
+        return {"discard_count": 1, "draw_count": 1}
+    return "etb_optional_discard_draw_oracle_not_exact"
+
+
+def etb_optional_discard_draw_from_source(source_text: str) -> dict[str, int] | str:
+    text = str(source_text or "")
+    if "DoIfCostPaid" not in text or "DiscardCardCost" not in text:
+        return "etb_optional_discard_draw_source_not_optional_discard_cost"
+    if len(re.findall(r"DrawCardSourceControllerEffect\s*\(", text)) != 1:
+        return "etb_optional_discard_draw_source_count_not_fixed"
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count != 1:
+        return "etb_optional_discard_draw_source_count_not_fixed"
+    if re.search(r"new\s+DiscardCardCost\s*\(\s*\)", text) is None:
+        return "etb_optional_discard_draw_source_discard_cost_not_simple"
+    return {"discard_count": 1, "draw_count": 1}
+
+
+def etb_dynamic_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    if re.fullmatch(
+        r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+draw a card for each creature "
+        r"you control with a \+1/\+1 counter on it\.?",
+        text,
+    ):
+        return {"draw_count_source": "controlled_creatures_with_plus_one_counters"}
+    color_match = re.fullmatch(
+        r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+draw a card for each "
+        r"(white|blue|black|red|green) creature you control\.?",
+        text,
+    )
+    if color_match:
+        return {
+            "draw_count_source": "controlled_creatures_with_color",
+            "draw_count_color": color_match.group(1),
+        }
+    subtype_match = re.fullmatch(
+        r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+draw a card for each "
+        r"(other )?([a-z][a-z -]+?) you control\.?",
+        text,
+    )
+    if subtype_match:
+        raw_subtype = subtype_match.group(2).strip()
+        if raw_subtype in {"green creature", "creature"}:
+            return "etb_dynamic_draw_oracle_not_supported"
+        return {
+            "draw_count_source": "controlled_creatures_with_subtype",
+            "draw_count_subtype": raw_subtype.replace(" creatures", "").replace(" creature", ""),
+            "draw_count_exclude_source": bool(subtype_match.group(1)),
+        }
+    if re.fullmatch(
+        r"(?:vivid — )?(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+draw cards equal to "
+        r"the number of colors among permanents you control\.?",
+        text,
+    ):
+        return {"draw_count_source": "colors_among_permanents_you_control"}
+    zombie_match = re.fullmatch(
+        r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+draw cards equal to the number of "
+        r"([a-z][a-z -]+?)s you control or the number of \1 cards in your graveyard, whichever is greater\.?",
+        text,
+    )
+    if zombie_match:
+        return {
+            "draw_count_source": "max_controlled_creatures_or_graveyard_cards_with_subtype",
+            "draw_count_subtype": zombie_match.group(1),
+        }
+    return "etb_dynamic_draw_oracle_not_supported"
+
+
+def etb_dynamic_draw_from_source(source_text: str, oracle_data: dict[str, Any]) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    source = str(oracle_data.get("draw_count_source") or "")
+    subtype = str(oracle_data.get("draw_count_subtype") or "").strip()
+    color = str(oracle_data.get("draw_count_color") or "").strip().lower()
+    if source == "controlled_creatures_with_plus_one_counters":
+        if "PermanentsOnBattlefieldCount(StaticFilters.FILTER_CONTROLLED_CREATURE_P1P1)" not in re.sub(r"\s+", "", text):
+            return "etb_dynamic_draw_source_oracle_mismatch"
+        return dict(oracle_data)
+    if source == "controlled_creatures_with_subtype":
+        subtype_constant = subtype.upper().replace(" ", "_").replace("-", "_")
+        if f"SubType.{subtype_constant}" not in text or "PermanentsOnBattlefieldCount" not in text:
+            return "etb_dynamic_draw_source_oracle_mismatch"
+        if bool(oracle_data.get("draw_count_exclude_source")) != ("AnotherPredicate.instance" in text):
+            return "etb_dynamic_draw_source_oracle_mismatch"
+        return dict(oracle_data)
+    if source == "controlled_creatures_with_color":
+        color_constant = color.upper()
+        if color_constant == "GREEN":
+            color_constant = "GREEN"
+        if f"ObjectColor.{color_constant}" not in text or "PermanentsOnBattlefieldCount" not in text:
+            return "etb_dynamic_draw_source_oracle_mismatch"
+        return dict(oracle_data)
+    if source == "colors_among_permanents_you_control":
+        if "ColorsAmongControlledPermanentsCount.ALL_PERMANENTS" not in text:
+            return "etb_dynamic_draw_source_oracle_mismatch"
+        return dict(oracle_data)
+    if source == "max_controlled_creatures_or_graveyard_cards_with_subtype":
+        subtype_constant = subtype.upper().replace(" ", "_").replace("-", "_")
+        if (
+            "MaximumDynamicValue" not in text
+            or "PermanentsOnBattlefieldCount" not in text
+            or "CardsInControllerGraveyardCount" not in text
+            or f"SubType.{subtype_constant}" not in text
+        ):
+            return "etb_dynamic_draw_source_oracle_mismatch"
+        return dict(oracle_data)
+    return "etb_dynamic_draw_source_not_supported"
+
+
 def etb_draw_lose_life_from_oracle(metadata: dict[str, Any]) -> dict[str, int] | str:
     trigger_complexity_tokens = SPELL_COMPLEXITY_TOKENS - {"when ", "whenever "}
     if has_oracle_complexity(metadata, tokens=trigger_complexity_tokens):
@@ -14093,6 +14215,70 @@ def split_row(
     if etb_draw_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "etb_draw_not_creature"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        optional_discard_draw = etb_optional_discard_draw_from_oracle(metadata)
+        if not isinstance(optional_discard_draw, str):
+            source_optional_discard_draw = etb_optional_discard_draw_from_source(source_text)
+            if isinstance(source_optional_discard_draw, str):
+                return None, source_optional_discard_draw
+            if optional_discard_draw != source_optional_discard_draw:
+                return None, "etb_optional_discard_draw_source_oracle_mismatch"
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": ETB_OPTIONAL_DISCARD_DRAW_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "trigger_effect": "optional_discard_draw",
+                "etb_optional_discard_draw": True,
+                "etb_optional_discard_count": int(optional_discard_draw["discard_count"]),
+                "etb_optional_discard_draw_count": int(optional_discard_draw["draw_count"]),
+                "draw_count": int(optional_discard_draw["draw_count"]),
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+                "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+            }
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_etb_optional_discard_draw_cards",
+            ), "selected_exact_scope"
+        dynamic_draw = etb_dynamic_draw_from_oracle(metadata)
+        if not isinstance(dynamic_draw, str):
+            source_dynamic_draw = etb_dynamic_draw_from_source(source_text, dynamic_draw)
+            if isinstance(source_dynamic_draw, str):
+                return None, source_dynamic_draw
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": ETB_DYNAMIC_DRAW_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "trigger_effect": "dynamic_draw_cards",
+                "etb_dynamic_draw": True,
+                "draw_count_source": str(source_dynamic_draw["draw_count_source"]),
+                "etb_draw_count_source": str(source_dynamic_draw["draw_count_source"]),
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+                "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+            }
+            for key in ("draw_count_subtype", "draw_count_color", "draw_count_exclude_source"):
+                if key in source_dynamic_draw:
+                    effect_json[key] = source_dynamic_draw[key]
+                    effect_json[f"etb_{key}"] = source_dynamic_draw[key]
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_etb_dynamic_draw_cards",
+            ), "selected_exact_scope"
         count = etb_draw_count_from_oracle(metadata)
         constructor_count = java_constructor_int_or_noarg_default(
             source_text,
@@ -14105,7 +14291,6 @@ def split_row(
             return None, "etb_draw_count_source_not_fixed"
         if constructor_count != count:
             return None, "etb_draw_count_source_oracle_mismatch"
-        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
         effect_json = {
             "effect": "creature",
             "battle_model_scope": ETB_DRAW_CREATURE_SCOPE,
