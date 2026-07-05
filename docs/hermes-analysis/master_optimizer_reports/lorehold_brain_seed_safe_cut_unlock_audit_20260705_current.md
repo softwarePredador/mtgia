@@ -1,0 +1,69 @@
+# Lorehold Brain in a Jar Seed-Safe Cut Unlock Audit
+
+- Generated at: `2026-07-05T09:42:07Z`
+- PostgreSQL writes: `false`
+- Source DB mutated: `false`
+- Deck 607 mutated: `false`
+- Decision status: `brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607`
+- Brain safe-cut gap status: `brain_safe_cut_gap_no_active_rule_no_seed_safe_cut_keep_607`
+- Active Brain rule count: `0`
+- Brain PG package route governed: `true`
+- Safe cut count: `0`
+- Unlockable now: `0`
+- Diagnostic focus: `Molecule Man`
+- Targeted floor trace missing slots: `7`
+- Current best status: `current_best_baseline_synthesis_keep_607`
+- Current best top deck is 607: `true`
+- Matrix scoring allowed now: `false`
+- Candidate deck materialization allowed now: `false`
+- Natural battle gate allowed now: `false`
+- Recommended next action: `mine_targeted_same_lane_cut_traces_or_request_pg_apply_review_separately`
+
+## Source Reports
+
+- `current_best`: `docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_current.json`
+- `floor_trace`: `docs/hermes-analysis/master_optimizer_reports/lorehold_gap_floor_trace_miner_20260705_current.json`
+- `safe_cut_gap`: `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_safe_cut_gap_audit_20260705_current.json`
+
+## External Deckbuilding Lessons
+
+- EDHREC Lorehold commander page: Lorehold's public profile is Topdeck, Spellslinger, and Discard; high-synergy topdeck anchors include Library of Leng, Sensei's Divining Top, and Scroll Rack. Guardrail: External adoption discovers lanes; it is not local cut proof. (https://edhrec.com/commanders/lorehold-the-historian)
+- Wizards Commander Brackets Beta: Mana Vault and The One Ring are treated as Game Changers because fast mana and overwhelming resource advantage can change table power. Guardrail: A Game Changer label raises review burden; it does not bypass the 607 same-lane cut and battle gates. (https://magic.wizards.com/en/news/announcements/introducing-commander-brackets-beta)
+- Official Commander banned list: Legality and bracket pressure are separate checks. Guardrail: Legal cards still need role fit, cut safety, and trace evidence. (https://mtgcommander.net/index.php/banned-list/)
+
+## Unlock Classes
+
+- `diagnostic_only_prior_reject_requires_new_trace`: `2`
+- `locked_no_unlock_current_607_contract`: `2`
+- `protected_floor_requires_floor_replacement_trace`: `2`
+- `protected_topdeck_anchor_requires_role_preservation`: `3`
+
+## Slot Queue
+
+| Slot | Unlock class | Role requirement | Exposure | Floor trace | Missing evidence | Action |
+| --- | --- | --- | ---: | --- | --- | --- |
+| Molecule Man | `diagnostic_only_prior_reject_requires_new_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 102 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, new_trace_evidence_reverses_prior_rejected_cut, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | mine_new_trace_evidence_before_reopening_prior_rejected_cut |
+| Land Tax | `diagnostic_only_prior_reject_requires_new_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 3449 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, new_trace_evidence_reverses_prior_rejected_cut, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | mine_new_trace_evidence_before_reopening_prior_rejected_cut |
+| Library of Leng | `protected_topdeck_anchor_requires_role_preservation` | preserve_topdeck_miracle_access_or_discard_to_top_role | 855 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, replacement_preserves_topdeck_miracle_anchor_role, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | prove_replacement_preserves_topdeck_miracle_anchor_before_matrix |
+| Scroll Rack | `protected_topdeck_anchor_requires_role_preservation` | preserve_topdeck_miracle_access_or_discard_to_top_role | 2957 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, replacement_preserves_topdeck_miracle_anchor_role, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | prove_replacement_preserves_topdeck_miracle_anchor_before_matrix |
+| Sensei's Divining Top | `protected_topdeck_anchor_requires_role_preservation` | preserve_topdeck_miracle_access_or_discard_to_top_role | 3816 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, replacement_preserves_topdeck_miracle_anchor_role, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | prove_replacement_preserves_topdeck_miracle_anchor_before_matrix |
+| The Scarlet Witch | `protected_floor_requires_floor_replacement_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 362 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, replacement_preserves_mana_or_curve_floor, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | collect_floor_replacement_trace_before_matrix |
+| The Mind Stone | `protected_floor_requires_floor_replacement_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 2312 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, replacement_preserves_mana_or_curve_floor, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | collect_floor_replacement_trace_before_matrix |
+| Urza's Saga | `locked_no_unlock_current_607_contract` | not_applicable_never_cut_slot | 2656 | `missing` | cannot_unlock_under_current_607_contract | do_not_use_as_brain_cut_under_current_607_contract |
+| Lorehold, the Historian | `locked_no_unlock_current_607_contract` | not_applicable_never_cut_slot | 5768 | `missing` | cannot_unlock_under_current_607_contract | do_not_use_as_brain_cut_under_current_607_contract |
+
+## Decision
+
+- keep_607_as_protected_baseline: `true`
+- brain_cut_unlocked_now: `false`
+- deck_action_allowed: `false`
+- natural_battle_allowed_now: `false`
+- pg_apply_requires_explicit_approval: `true`
+- reason: No Brain in a Jar seed-safe cut is unlocked. Current slots are either never-cut, protected anchors/floors, or prior-rejected diagnostic rows that need new trace evidence before matrix scoring.
+- next_actions:
+  - do_not_mutate_deck_607
+  - do_not_materialize_brain_candidate_deck
+  - do_not_run_natural_battle_from_this_audit
+  - keep_pg_apply_as_explicit_manual_approval_only
+  - mine_targeted_floor_trace_for_brain_cut_slots
+  - reopen_prior_rejected_slots_only_with_new_same_lane_trace_evidence

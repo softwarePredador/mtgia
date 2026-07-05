@@ -1831,3 +1831,33 @@ Operational lesson:
 - No Brain candidate list may be materialized until the active rule exists,
   Hermes is synced, the Brain runtime preflight is rerun, and a named same-lane
   seed-safe cut exists.
+
+Brain seed-safe cut unlock audit added on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_seed_safe_cut_unlock_audit_20260705_current.md`.
+- Status:
+  `brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607`.
+- The audit consumes the Brain safe-cut gap, protected floor trace miner, and
+  current-best baseline synthesis. It must preserve explicit mutation flags:
+  PostgreSQL writes `false`, source DB mutation `false`, and deck `607`
+  mutation `false`.
+- A low-exposure slot is not a safe cut. `Molecule Man` is only the diagnostic
+  focus because it has the lowest exposure among prior-rejected rows; it still
+  requires active Brain rule proof, named same-lane seed-safe evidence,
+  targeted floor trace, and new trace evidence that reverses the prior rejected
+  cut before any matrix scoring.
+- Hard locks:
+  `Lorehold, the Historian` and `Urza's Saga` cannot unlock under the current
+  protected-`607` contract.
+- Protected topdeck anchors:
+  `Library of Leng`, `Scroll Rack`, and `Sensei's Divining Top` require
+  replacement proof that preserves the topdeck/miracle access role.
+- Protected floors:
+  `The Scarlet Witch` and `The Mind Stone` require floor-replacement trace
+  proof before scoring.
+- Public deckbuilding evidence, including EDHREC Lorehold lanes and official
+  Commander Game Changer guidance for cards such as `Mana Vault` and
+  `The One Ring`, is learning context only. It cannot bypass local same-lane
+  cut proof, route-governed runtime proof, structure matrix review, or equal
+  battle gates.

@@ -781,6 +781,35 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertFalse(classification.canonical_summary["deck_607_mutated"])
 
+    def test_brain_seed_safe_cut_unlock_audit_is_recognized(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_brain_seed_safe_cut_unlock_audit",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "deck_607_mutated": False,
+            "summary": {
+                "decision_status": (
+                    "brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607"
+                ),
+                "unlockable_now_count": 0,
+            },
+            "unlock_rows": [{"card_name": "Molecule Man"}],
+            "external_deckbuilding_lessons": [{"source": "EDHREC Lorehold commander page"}],
+            "source_summaries": {"safe_cut_gap": {}},
+            "decision": {"keep_607_as_protected_baseline": True},
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "brain_cut_unlock.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(
+            classification.artifact_kind,
+            "lorehold_brain_seed_safe_cut_unlock_audit",
+        )
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+
     def test_unknown_schema_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "unknown.json"

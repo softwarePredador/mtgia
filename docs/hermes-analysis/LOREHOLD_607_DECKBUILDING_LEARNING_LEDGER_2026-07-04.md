@@ -3282,6 +3282,56 @@ Deckbuilding lesson captured by the contract:
 
 Deck `607` remains untouched and protected.
 
+## Brain in a Jar Seed-Safe Cut Unlock Audit - 2026-07-05
+
+The Brain cut blocker is now split into explicit learning classes:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_seed_safe_cut_unlock_audit_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_seed_safe_cut_unlock_audit_20260705_current.json`.
+- Status:
+  `brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607`.
+- Brain safe-cut gap status:
+  `brain_safe_cut_gap_no_active_rule_no_seed_safe_cut_keep_607`.
+- Active Brain rule rows: `0`.
+- Brain package route governed: `true`.
+- Safe cut count: `0`.
+- Unlockable cuts now: `0`.
+- Diagnostic focus: `Molecule Man`.
+- Current best status: `current_best_baseline_synthesis_keep_607`, with
+  `top_deck_is_607=true` and protected baseline rank `1`.
+- Matrix scoring, candidate materialization, natural battle, deck action,
+  PostgreSQL writes, and promotion all remain `false`.
+
+Current slot classes:
+
+- `diagnostic_only_prior_reject_requires_new_trace`: `Molecule Man` and
+  `Land Tax`;
+- `protected_topdeck_anchor_requires_role_preservation`: `Library of Leng`,
+  `Scroll Rack`, and `Sensei's Divining Top`;
+- `protected_floor_requires_floor_replacement_trace`: `The Scarlet Witch` and
+  `The Mind Stone`;
+- `locked_no_unlock_current_607_contract`: `Urza's Saga` and
+  `Lorehold, the Historian`.
+
+Deckbuilding lesson:
+
+- `Molecule Man` remains the lowest-exposure diagnostic row, not a cut. It can
+  only be reopened by explicit Brain rule activation, named same-lane
+  seed-safe evidence, targeted floor trace, and new trace evidence that reverses
+  the prior rejected cut.
+- Public Lorehold evidence is useful for learning lanes: EDHREC shows the
+  commander as Topdeck/Spellslinger/Discard and reinforces the topdeck anchor
+  role of `Library of Leng`, `Sensei's Divining Top`, and `Scroll Rack`.
+- Official Commander bracket guidance keeps `Mana Vault` and `The One Ring` as
+  high-pressure Game Changer lessons, not automatic 607 inclusions. They still
+  require the same local role-fit, cut-safety, and battle gates.
+- The next valid work is targeted same-lane cut trace mining or separate manual
+  PostgreSQL apply review for Brain; neither path is a deck mutation.
+
+Deck `607` remains untouched and protected.
+
 ## Named Same-Lane Cut Frontier - 2026-07-05
 
 The named same-lane cut frontier is now consolidated:
