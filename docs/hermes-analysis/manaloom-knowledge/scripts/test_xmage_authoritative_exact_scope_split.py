@@ -5060,6 +5060,61 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["_composite_rule_components"][0]["effect"], "remove_permanent")
         self.assertEqual(effect["_composite_rule_components"][1]["effect"], "scry")
 
+    def test_fixed_exile_scry_spell_maps_black_or_red_creature_or_planeswalker_target(self) -> None:
+        row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect", "ScryEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Exile target creature or planeswalker that's black or red. Scry 1."),
+            source_text=(
+                "new FilterCreatureOrPlaneswalkerPermanent(\"creature or planeswalker that's black or red\");"
+                "new ColorPredicate(ObjectColor.BLACK);"
+                "new ColorPredicate(ObjectColor.RED);"
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addEffect(new ScryEffect(1));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_SCRY_SCOPE)
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "planeswalker"], "target_colors": ["B", "R"]})
+        self.assertEqual(effect["resolution_order"], "exile_then_scry")
+
+    def test_fixed_exile_scry_spell_maps_creature_vehicle_or_nonbasic_land_target(self) -> None:
+        row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect", "ScryEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Exile target creature, Vehicle, or nonbasic land. Scry 1."),
+            source_text=(
+                'new FilterPermanent("creature, Vehicle, or nonbasic land");'
+                "CardType.CREATURE.getPredicate();"
+                "SubType.VEHICLE.getPredicate();"
+                "Predicates.not(SuperType.BASIC.getPredicate());"
+                "CardType.LAND.getPredicate();"
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addEffect(new ScryEffect(1));"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_SCRY_SCOPE)
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "any_of": [
+                    {"card_types": ["creature"]},
+                    {"card_types": ["artifact"], "required_subtypes": ["vehicle"]},
+                    {"card_types": ["land"], "exclude_supertypes": ["basic"]},
+                ]
+            },
+        )
+        self.assertEqual(effect["resolution_order"], "exile_then_scry")
+
     def test_fixed_bounce_scry_spell_maps_to_composite_runtime(self) -> None:
         row = queue_row(split.BOUNCE_UNIT, effect_classes=["ReturnToHandTargetEffect", "ScryEffect"])
         proposal, reason = split.split_row(

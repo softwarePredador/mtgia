@@ -1,0 +1,130 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T15:25:20.205960+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg514_xmage_pg514_exile_scry_targets_new_server_manifest.json",
+  "package_id": "pg514_xmage_pg514_exile_scry_targets_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_and_scry_spell_v1",
+          "card_name": "Devout Decree",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:77c2ca923d2c6b62ff46fc58b27e27fb",
+          "oracle_hash": "2ffef40b32de279e5d069ebdd05a631d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_and_scry_spell_v1",
+          "card_name": "Ray of Ruin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3ba725d656340693d4c616116bb305ef",
+          "oracle_hash": "2c30c4034ace17cd7c4d01f9cb32d74c",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_and_scry_spell_v1",
+          "card_name": "Devout Decree",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:77c2ca923d2c6b62ff46fc58b27e27fb",
+          "oracle_hash": "2ffef40b32de279e5d069ebdd05a631d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_and_scry_spell_v1",
+          "card_name": "Ray of Ruin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3ba725d656340693d4c616116bb305ef",
+          "oracle_hash": "2c30c4034ace17cd7c4d01f9cb32d74c",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_and_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Devout Decree",
+          "logical_rule_key": "battle_rule_v1:77c2ca923d2c6b62ff46fc58b27e27fb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_and_scry_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ray of Ruin",
+          "logical_rule_key": "battle_rule_v1:3ba725d656340693d4c616116bb305ef"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Devout Decree",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:77c2ca923d2c6b62ff46fc58b27e27fb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ray of Ruin",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:3ba725d656340693d4c616116bb305ef"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

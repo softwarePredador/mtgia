@@ -5692,6 +5692,151 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual([card["name"] for card in opponent.graveyard], ["Green Guard"])
         self.assertEqual([card["name"] for card in active.hand], ["Drawn Card"])
 
+    def test_composite_exile_scry_spell_respects_black_red_creature_planeswalker_constraints(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "High Priority Spell", "type_line": "Instant", "cmc": 4},
+                {"name": "Low Priority Land", "type_line": "Land", "cmc": 0},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.battlefield = [
+            {
+                "name": "White Walker",
+                "type_line": "Planeswalker",
+                "colors": ["W"],
+                "cmc": 5,
+            },
+            {
+                "name": "Black Guard",
+                "type_line": "Creature - Knight",
+                "colors": ["B"],
+                "cmc": 2,
+                "power": 2,
+                "toughness": 2,
+            },
+            {
+                "name": "Green Guard",
+                "type_line": "Creature - Elf",
+                "colors": ["G"],
+                "cmc": 2,
+                "power": 2,
+                "toughness": 2,
+            },
+        ]
+        constraints = {"card_types": ["creature", "planeswalker"], "target_colors": ["B", "R"]}
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_exile_target_and_scry_spell_v1",
+            "_composite_rule_components": [
+                {
+                    "effect": "remove_permanent",
+                    "battle_model_scope": "xmage_exile_target_spell_v1",
+                    "target": "permanent",
+                    "target_constraints": constraints,
+                    "destination": "exile",
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "scry",
+                    "battle_model_scope": "xmage_fixed_scry_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Devout Decree",
+            "type_line": "Sorcery",
+            "oracle_text": "Exile target creature or planeswalker that's black or red. Scry 1.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(55),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["White Walker", "Green Guard"])
+        self.assertEqual([card["name"] for card in opponent.exile], ["Black Guard"])
+        self.assertTrue(any(event == "scry_resolved" and data.get("card") == "Devout Decree" for event, data in self.events))
+
+    def test_composite_exile_scry_spell_respects_creature_vehicle_or_nonbasic_land_constraints(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "High Priority Spell", "type_line": "Instant", "cmc": 4},
+                {"name": "Low Priority Land", "type_line": "Land", "cmc": 0},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.battlefield = [
+            {"name": "Plains", "type_line": "Basic Land - Plains", "cmc": 0},
+            {"name": "Fleetwheel Cruiser", "type_line": "Artifact - Vehicle", "cmc": 4},
+            {"name": "Command Tower", "type_line": "Land", "cmc": 0},
+            {"name": "Banishing Light", "type_line": "Enchantment", "cmc": 3},
+        ]
+        constraints = {
+            "any_of": [
+                {"card_types": ["creature"]},
+                {"card_types": ["artifact"], "required_subtypes": ["vehicle"]},
+                {"card_types": ["land"], "exclude_supertypes": ["basic"]},
+            ]
+        }
+        removal_component = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_exile_target_spell_v1",
+            "target": "permanent",
+            "target_constraints": constraints,
+            "destination": "exile",
+            "compose_on_resolution": True,
+        }
+        legal_targets = self.battle.removal_target_candidates(
+            opponent,
+            removal_component,
+            controller=active,
+            source={"name": "Ray of Ruin"},
+        )
+        self.assertEqual([card["name"] for card in legal_targets], ["Fleetwheel Cruiser", "Command Tower"])
+
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_exile_target_and_scry_spell_v1",
+            "_composite_rule_components": [
+                removal_component,
+                {
+                    "effect": "scry",
+                    "battle_model_scope": "xmage_fixed_scry_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Ray of Ruin",
+            "type_line": "Sorcery",
+            "oracle_text": "Exile target creature, Vehicle, or nonbasic land. Scry 1.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(56),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Plains", "Command Tower", "Banishing Light"])
+        self.assertEqual([card["name"] for card in opponent.exile], ["Fleetwheel Cruiser"])
+        self.assertTrue(any(event == "scry_resolved" and data.get("card") == "Ray of Ruin" for event, data in self.events))
+
     def test_composite_scry_draw_spell_reorders_library_then_draws_once(self) -> None:
         active = self.battle.Player(
             "Active",

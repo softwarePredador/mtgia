@@ -13264,6 +13264,47 @@ counts, extra clauses, modal effects, unsupported activation costs, or broad
 `xmage_*_review_v1` promotions. The next wave must start from the rebuilt
 post-PG513 queue.
 
+## PG514 Exile/Scry Target Checkpoint
+
+As of 2026-07-05, PG514 is applied and synced against the new server target.
+It closes two exact rows:
+
+- `Devout Decree`: exile target creature or planeswalker that's black or red,
+  then scry 1.
+- `Ray of Ruin`: exile target creature, Vehicle, or nonbasic land, then scry 1.
+
+Evidence:
+
+- package and apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg514_xmage_pg514_exile_scry_targets_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg514_exile_scry_targets_new_server.json`
+- battle package E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/battle_package_end_to_end_validation_20260705_pg514_exile_scry_targets_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg514_exile_scry_targets_new_server.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg514_exile_scry_targets_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg514_exile_scry_targets_new_server.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4951`
+- `battle_family_mapper_required=28922`
+- `target_identity_count=25999`
+- `xmage_authoritative_source_count=25685`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25685`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+- final exact-scope recheck `adapter_work_unit_counts={}`
+
+Residual boundary: PG514 does not authorize broader exile variants, extra
+clauses, modal effects, unsupported costs, or broad `xmage_*_review_v1`
+promotions. The next wave must start from the rebuilt post-PG514 queue.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

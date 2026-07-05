@@ -15537,3 +15537,69 @@ Register decision:
   are now exact-scope supported for the four promoted cards.
 - The next wave must start from the rebuilt post-PG513 queue and choose a new
   exact subpattern; do not reuse the pre-PG513 candidate queue.
+
+## 2026-07-05 - PG514 exile/scry targets
+
+- Deploy id: `xmage_pg514_exile_scry_targets_new_server`.
+- Runtime family: `xmage_exile_target_scry_spell`.
+- Promoted cards: `2`.
+- Promoted card names: `Devout Decree` and `Ray of Ruin`.
+- Scope boundary: only local-XMage-backed exile-target plus fixed scry patterns
+  with exact target constraints are allowed in this package. Unsupported exile
+  variants, extra clauses, modal effects, unsupported costs, and broad
+  `xmage_*_review_v1` rows remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg514_xmage_pg514_exile_scry_targets_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/pg514_xmage_pg514_exile_scry_targets_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg514_xmage_pg514_exile_scry_targets_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg514_xmage_pg514_exile_scry_targets_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg514_xmage_pg514_exile_scry_targets_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg514_xmage_pg514_exile_scry_targets_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg514_xmage_pg514_exile_scry_targets_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=2`, `COMMIT`.
+- Postcheck:
+  both promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg514_exile_scry_targets_new_server.json`;
+  `selected_card_count=2`, `pg_rows_loaded=2`,
+  `sqlite_inserted_or_updated=2`, and
+  `canonical_snapshot_rows_exported=6018`.
+- Validation:
+  combined exact-scope/runtime suite `826` tests passed, battle package E2E
+  validation `pass`, XMage strategy `26/26` pass, operational surface `39/39`
+  pass, legacy contamination `32/32` pass, and PG/Hermes/SQLite `51/51` pass.
+- Post-sync queue:
+  `target_identity_count=25999`, `xmage_authoritative_source_count=25685`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25685`.
+- Global readiness:
+  `battle_and_oracle_ready=4951`,
+  `battle_family_mapper_required=28922`,
+  `snapshot_has_any_rule=6021`, and
+  `snapshot_has_verified_rule=4773`.
+- Final exact-scope recheck:
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`, and
+  `adapter_work_unit_counts={}`.
+
+Register decision:
+
+- PG514 is applied and should not be rebuilt.
+- Exile+scry target constraints are now exact-scope supported for the two
+  promoted cards.
+- The next wave must start from the rebuilt post-PG514 queue and choose a new
+  exact subpattern; do not reuse the pre-PG514 candidate queue.

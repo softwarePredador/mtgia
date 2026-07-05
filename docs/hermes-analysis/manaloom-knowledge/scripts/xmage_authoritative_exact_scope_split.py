@@ -7620,7 +7620,14 @@ def restricted_target_base(target: str) -> str:
         "wall_creature",
     }:
         return "creature"
-    if target in {"black_or_red_permanent", "nonwhite_permanent", "noncreature_permanent", "token_opponent_controls"}:
+    if target in {
+        "black_or_red_creature_or_planeswalker",
+        "black_or_red_permanent",
+        "creature_vehicle_or_nonbasic_land",
+        "nonwhite_permanent",
+        "noncreature_permanent",
+        "token_opponent_controls",
+    }:
         return "permanent"
     if target in {"noncreature_artifact", "equipment"}:
         return "artifact"
@@ -7713,6 +7720,8 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target noncreature artifact", "noncreature_artifact"),
         (r"target nonbasic land", "nonbasic_land"),
         (r"target blue or black creature with flying", "blue_or_black_flying_creature"),
+        (r"target creature or planeswalker that's black or red", "black_or_red_creature_or_planeswalker"),
+        (r"target creature, vehicle, or nonbasic land", "creature_vehicle_or_nonbasic_land"),
         (r"target black or red permanent", "black_or_red_permanent"),
         (r"target nonwhite permanent", "nonwhite_permanent"),
         (r"target creature with power 3 or greater", "creature_power_3_or_greater"),
@@ -7873,6 +7882,23 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "flying_creature"
     if "ObjectColor.BLACK" in text and "ObjectColor.RED" in text and "FilterPermanent(\"black or red permanent\")" in text:
         return "black_or_red_permanent"
+    if (
+        "ObjectColor.BLACK" in text
+        and "ObjectColor.RED" in text
+        and "FilterCreatureOrPlaneswalkerPermanent" in text
+    ):
+        return "black_or_red_creature_or_planeswalker"
+    if (
+        'FilterPermanent("creature, Vehicle, or nonbasic land")' in text
+        or (
+            "CardType.CREATURE.getPredicate()" in text
+            and "SubType.VEHICLE.getPredicate()" in text
+            and "CardType.LAND.getPredicate()" in text
+            and "SuperType.BASIC.getPredicate()" in text
+            and "Predicates.not" in text
+        )
+    ):
+        return "creature_vehicle_or_nonbasic_land"
     if 'FilterPermanent("nonwhite permanent")' in text or "nonwhite permanent" in text:
         return "nonwhite_permanent"
     if re.search(r"PowerPredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*2\s*\)", text):
@@ -13601,8 +13627,18 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "color_count_exact": 1}
     if target == "blue_or_black_flying_creature":
         return {"card_types": ["creature"], "target_colors": ["U", "B"], "required_keywords": ["flying"]}
+    if target == "black_or_red_creature_or_planeswalker":
+        return {"card_types": ["creature", "planeswalker"], "target_colors": ["B", "R"]}
     if target == "black_or_red_permanent":
         return {"card_types": ["permanent"], "target_colors": ["B", "R"]}
+    if target == "creature_vehicle_or_nonbasic_land":
+        return {
+            "any_of": [
+                {"card_types": ["creature"]},
+                {"card_types": ["artifact"], "required_subtypes": ["vehicle"]},
+                {"card_types": ["land"], "exclude_supertypes": ["basic"]},
+            ]
+        }
     if target == "historic_permanent":
         return {
             "any_of": [
