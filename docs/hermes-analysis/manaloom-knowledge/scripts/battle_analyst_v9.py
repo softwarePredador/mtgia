@@ -11471,6 +11471,27 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
     }
     if protected_subtypes and any(permanent_has_subtype(spell, subtype) for subtype in protected_subtypes):
         return False
+    any_of = constraints.get("any_of")
+    if isinstance(any_of, list) and any_of:
+        base_constraints = dict(constraints)
+        base_constraints.pop("any_of", None)
+        for option in any_of:
+            if not isinstance(option, dict):
+                continue
+            nested_spell = dict(spell or {})
+            nested_constraints = dict(base_constraints)
+            nested_constraints.update(option)
+            nested_spell["target_constraints"] = nested_constraints
+            if is_legal_target(
+                nested_spell,
+                target,
+                controller,
+                all_players=all_players,
+                target_type=target_type,
+                target_controller=target_controller,
+            ):
+                return True
+        return False
     allowed_types = _constraint_card_types(spell)
     if allowed_types and "permanent" not in allowed_types:
         if not any(target_matches_type(target, allowed_type) for allowed_type in allowed_types):
@@ -11534,6 +11555,16 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         for supertype in required_supertypes:
             if supertype not in type_line and not bool(target.get(supertype)):
                 return False
+    excluded_supertypes = {
+        str(value or "").strip().lower()
+        for value in _as_list(constraints.get("exclude_supertypes") or constraints.get("excluded_supertypes"))
+        if str(value or "").strip()
+    }
+    if excluded_supertypes:
+        type_line = str(target.get("type_line") or "").lower()
+        for supertype in excluded_supertypes:
+            if supertype in type_line or bool(target.get(supertype)):
+                return False
     required_subtypes = [
         str(value or "").strip().lower()
         for value in _as_list(
@@ -11554,6 +11585,17 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
                 return False
         elif not any(permanent_has_subtype(target, subtype) for subtype in required_subtypes):
             return False
+    excluded_subtypes = [
+        str(value or "").strip().lower()
+        for value in _as_list(
+            constraints.get("exclude_subtypes")
+            or constraints.get("excluded_subtypes")
+            or constraints.get("target_exclude_subtypes")
+        )
+        if str(value or "").strip()
+    ]
+    if excluded_subtypes and any(permanent_has_subtype(target, subtype) for subtype in excluded_subtypes):
+        return False
     color_count_exact = first_present_value(constraints, ("color_count_exact", "target_color_count_exact"))
     if color_count_exact is not None:
         try:

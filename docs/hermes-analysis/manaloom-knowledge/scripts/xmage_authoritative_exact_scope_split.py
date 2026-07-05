@@ -6935,26 +6935,42 @@ def restricted_target_base(target: str) -> str:
         "attacking_creature",
         "blocking_creature",
         "attacking_or_blocking_creature",
+        "attacking_creature_power_3_or_less",
+        "attacking_or_blocking_creature_power_2_or_less",
+        "attacking_or_blocking_creature_power_3_or_less",
         "tapped_creature",
         "untapped_creature",
         "flying_creature",
         "nonblack_creature",
+        "nongreen_creature",
         "black_creature",
         "green_or_white_creature",
         "nonartifact_creature",
         "nonartifact_nonblack_creature",
         "legendary_creature",
+        "nonlegendary_creature",
+        "nonsnow_creature",
         "monocolored_creature",
         "blue_or_black_flying_creature",
         "creature_power_3_or_greater",
         "creature_power_4_or_greater",
         "creature_mana_value_3_or_greater",
+        "non_angel_demon_devil_dragon_creature",
+        "non_elf_creature",
+        "non_merfolk_creature",
+        "non_spirit_creature",
+        "non_vampire_werewolf_zombie_creature",
+        "human_creature",
+        "spirit_creature",
+        "wall_creature",
     }:
         return "creature"
     if target in {"black_or_red_permanent", "nonwhite_permanent", "noncreature_permanent"}:
         return "permanent"
     if target == "noncreature_artifact":
         return "artifact"
+    if target == "spirit_or_enchantment":
+        return "permanent"
     return target
 
 
@@ -6972,6 +6988,9 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
     else:
         return None
     patterns: list[tuple[str, str]] = [
+        (r"target attacking or blocking creature with power 2 or less", "attacking_or_blocking_creature_power_2_or_less"),
+        (r"target attacking or blocking creature with power 3 or less", "attacking_or_blocking_creature_power_3_or_less"),
+        (r"target attacking creature with power 3 or less", "attacking_creature_power_3_or_less"),
         (r"target attacking or blocking creature", "attacking_or_blocking_creature"),
         (r"target attacking creature", "attacking_creature"),
         (r"target blocking creature", "blocking_creature"),
@@ -6981,9 +7000,21 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target nonartifact, nonblack creature(?:\. it can't be regenerated)?", "nonartifact_nonblack_creature"),
         (r"target nonartifact creature", "nonartifact_creature"),
         (r"target nonblack creature(?:\. it can't be regenerated)?", "nonblack_creature"),
+        (r"target nongreen creature(?:\. it can't be regenerated)?", "nongreen_creature"),
         (r"target black creature", "black_creature"),
         (r"target green or white creature", "green_or_white_creature"),
         (r"target legendary creature", "legendary_creature"),
+        (r"target nonlegendary creature", "nonlegendary_creature"),
+        (r"target nonsnow creature", "nonsnow_creature"),
+        (r"target non-angel, non-demon, non-devil, non-dragon creature", "non_angel_demon_devil_dragon_creature"),
+        (r"target non-elf creature", "non_elf_creature"),
+        (r"target non-merfolk creature", "non_merfolk_creature"),
+        (r"target non-spirit creature(?:\. it can't be regenerated)?", "non_spirit_creature"),
+        (r"target non-vampire, non-werewolf, non-zombie creature", "non_vampire_werewolf_zombie_creature"),
+        (r"target human creature", "human_creature"),
+        (r"target spirit(?:\.|$)", "spirit_creature"),
+        (r"target wall(?:\. it can't be regenerated)?", "wall_creature"),
+        (r"target spirit or enchantment", "spirit_or_enchantment"),
         (r"target monocolored creature", "monocolored_creature"),
         (r"target noncreature permanent", "noncreature_permanent"),
         (r"target noncreature artifact", "noncreature_artifact"),
@@ -7002,6 +7033,21 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
 
 def restricted_battlefield_target_from_source(source: str) -> str | None:
     text = source or ""
+    if (
+        "FilterAttackingOrBlockingCreature" in text
+        and "PowerPredicate(ComparisonType.FEWER_THAN, 3)" in text
+    ):
+        return "attacking_or_blocking_creature_power_2_or_less"
+    if (
+        "FilterAttackingOrBlockingCreature" in text
+        and "PowerPredicate(ComparisonType.FEWER_THAN, 4)" in text
+    ):
+        return "attacking_or_blocking_creature_power_3_or_less"
+    if (
+        "FilterAttackingCreature" in text
+        and "PowerPredicate(ComparisonType.FEWER_THAN, 4)" in text
+    ):
+        return "attacking_creature_power_3_or_less"
     if re.search(r"new\s+TargetAttackingOrBlockingCreature\s*\(", text) or "FilterAttackingOrBlockingCreature" in text:
         return "attacking_or_blocking_creature"
     if re.search(r"new\s+TargetAttackingCreature\s*\(", text) or "FilterAttackingCreature" in text:
@@ -7029,12 +7075,44 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         or "nonblack creature" in text
     ):
         return "nonblack_creature"
+    if (
+        'FilterCreaturePermanent("nongreen creature")' in text
+        or "nongreen creature" in text
+    ):
+        return "nongreen_creature"
     if 'FilterCreaturePermanent("black creature")' in text or "black creature" in text:
         return "black_creature"
     if 'FilterCreaturePermanent("green or white creature")' in text or "green or white creature" in text:
         return "green_or_white_creature"
+    if (
+        'FilterCreaturePermanent("nonlegendary creature")' in text
+        or "nonlegendary creature" in text
+    ):
+        return "nonlegendary_creature"
     if 'FilterCreaturePermanent("legendary creature")' in text or "legendary creature" in text:
         return "legendary_creature"
+    if (
+        'FilterCreaturePermanent("nonsnow creature")' in text
+        or "nonsnow creature" in text
+    ):
+        return "nonsnow_creature"
+    subtype_targets = {
+        "non-Angel, non-Demon, non-Devil, non-Dragon creature": "non_angel_demon_devil_dragon_creature",
+        "non-Elf creature": "non_elf_creature",
+        "non-Merfolk creature": "non_merfolk_creature",
+        "non-Spirit creature": "non_spirit_creature",
+        "non-Vampire, non-Werewolf, non-Zombie creature": "non_vampire_werewolf_zombie_creature",
+        "Human creature": "human_creature",
+    }
+    for phrase, target in subtype_targets.items():
+        if f'FilterCreaturePermanent("{phrase}")' in text or phrase in text:
+            return target
+    if 'FilterPermanent("Spirit")' in text and "SubType.SPIRIT.getPredicate()" in text:
+        return "spirit_creature"
+    if 'FilterPermanent("Spirit or enchantment")' in text and "SubType.SPIRIT.getPredicate()" in text:
+        return "spirit_or_enchantment"
+    if "TargetPermanent(filter)" in text and "SubType.WALL.getPredicate()" in text:
+        return "wall_creature"
     if 'FilterCreaturePermanent("monocolored creature")' in text or "monocolored creature" in text:
         return "monocolored_creature"
     if "FILTER_PERMANENT_NON_CREATURE" in text or "noncreature permanent" in text:
@@ -12087,6 +12165,12 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "combat_state": "blocking"}
     if target == "attacking_or_blocking_creature":
         return {"card_types": ["creature"], "combat_state": "attacking_or_blocking"}
+    if target == "attacking_creature_power_3_or_less":
+        return {"card_types": ["creature"], "combat_state": "attacking", "power_max": 3}
+    if target == "attacking_or_blocking_creature_power_2_or_less":
+        return {"card_types": ["creature"], "combat_state": "attacking_or_blocking", "power_max": 2}
+    if target == "attacking_or_blocking_creature_power_3_or_less":
+        return {"card_types": ["creature"], "combat_state": "attacking_or_blocking", "power_max": 3}
     if target == "tapped_creature":
         return {"card_types": ["creature"], "tapped_state": "tapped"}
     if target == "untapped_creature":
@@ -12095,6 +12179,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "required_keywords": ["flying"]}
     if target == "nonblack_creature":
         return {"card_types": ["creature"], "exclude_colors": ["B"]}
+    if target == "nongreen_creature":
+        return {"card_types": ["creature"], "exclude_colors": ["G"]}
     if target == "black_creature":
         return {"card_types": ["creature"], "target_colors": ["B"]}
     if target == "green_or_white_creature":
@@ -12105,6 +12191,33 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_card_types": ["artifact"], "exclude_colors": ["B"]}
     if target == "legendary_creature":
         return {"card_types": ["creature"], "required_supertypes": ["legendary"]}
+    if target == "nonlegendary_creature":
+        return {"card_types": ["creature"], "exclude_supertypes": ["legendary"]}
+    if target == "nonsnow_creature":
+        return {"card_types": ["creature"], "exclude_supertypes": ["snow"]}
+    if target == "non_angel_demon_devil_dragon_creature":
+        return {"card_types": ["creature"], "exclude_subtypes": ["angel", "demon", "devil", "dragon"]}
+    if target == "non_elf_creature":
+        return {"card_types": ["creature"], "exclude_subtypes": ["elf"]}
+    if target == "non_merfolk_creature":
+        return {"card_types": ["creature"], "exclude_subtypes": ["merfolk"]}
+    if target == "non_spirit_creature":
+        return {"card_types": ["creature"], "exclude_subtypes": ["spirit"]}
+    if target == "non_vampire_werewolf_zombie_creature":
+        return {"card_types": ["creature"], "exclude_subtypes": ["vampire", "werewolf", "zombie"]}
+    if target == "human_creature":
+        return {"card_types": ["creature"], "required_subtypes": ["human"]}
+    if target == "spirit_creature":
+        return {"card_types": ["creature"], "required_subtypes": ["spirit"]}
+    if target == "wall_creature":
+        return {"card_types": ["creature"], "required_subtypes": ["wall"]}
+    if target == "spirit_or_enchantment":
+        return {
+            "any_of": [
+                {"card_types": ["creature"], "required_subtypes": ["spirit"]},
+                {"card_types": ["enchantment"]},
+            ]
+        }
     if target == "monocolored_creature":
         return {"card_types": ["creature"], "color_count_exact": 1}
     if target == "blue_or_black_flying_creature":

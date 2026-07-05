@@ -1,0 +1,572 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T07:19:00.169079+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg489_destroy_extended_target_filters_new_server_manifest.json",
+  "package_id": "xmage_pg489_destroy_extended_target_filters_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 15
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Cast Down",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:48ecef55044ff31a73766e0d02c5c982",
+          "oracle_hash": "d7177953b559eeb70968d0db0a6dcd44",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Chill to the Bone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:92d35b28a96bdbf7759ece249d3eaf42",
+          "oracle_hash": "efadd757a1cd1a347e1c4d6def4e6156",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Eyeblight's Ending",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ee9539dea222354c7d84f8605b1e9b5a",
+          "oracle_hash": "725b1628761308ed1fe2571950419c55",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Goblin Digging Team",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:57fead261d1531f32ab8c64d969315eb",
+          "oracle_hash": "48f5af5cebe8d9af8a1d0ca392610c1c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Human Frailty",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:361a1d5b420e1dfd39e4548ae5b52429",
+          "oracle_hash": "a8edf3a8319d58e818ac1f784ecc657e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Power Word Kill",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3bceb5f541db7797af198546ecdabe9",
+          "oracle_hash": "5eb1c679400e3cabdf30e82870bb6679",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Puncturing Light",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32e8e2ce66aa2393e0579c4c428ca93d",
+          "oracle_hash": "46cae80334c7a840bb86f5d865400abb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Rend Flesh",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32ee95b6991c9f63021ab3d1f69f2d64",
+          "oracle_hash": "9dd403226b7ce269c20b61dc7a2a04f3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Rend Spirit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:264be4609e3e98a8372ea5513e0f4f7c",
+          "oracle_hash": "fcd733ed712d1a7224ebca28cc439a0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Searing Light",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:380052980c93128c2c8e6d8816e1f35c",
+          "oracle_hash": "1bfbb0fc05d85070853dbb71b9d3f6ad",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Terashi's Verdict",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d99f26d66c7b0820b6422987970d57b8",
+          "oracle_hash": "2c30319d6ef0fa1021019b3f8bb9a45f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Tunnel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e6171d75058d4449d6ca92392dd186b",
+          "oracle_hash": "0b5964125744430db96b375e73ce66d8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Urgent Exorcism",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cfbdec5c0cfe485fb994666b774ad5a1",
+          "oracle_hash": "aa55968bfbfdaf2eb4006fd922e90533",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Victim of Night",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8bdaae97317bd40d07eea974fa6f1db2",
+          "oracle_hash": "4e2a3a6c707c6ae294d360d04f030e37",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Walk the Plank",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b71d2fb0924752a6d3824a394f79d783",
+          "oracle_hash": "35c7db3fd35eae230b3830901a15f5cc",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 15
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Cast Down",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:48ecef55044ff31a73766e0d02c5c982",
+          "oracle_hash": "d7177953b559eeb70968d0db0a6dcd44",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Chill to the Bone",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:92d35b28a96bdbf7759ece249d3eaf42",
+          "oracle_hash": "efadd757a1cd1a347e1c4d6def4e6156",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Eyeblight's Ending",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ee9539dea222354c7d84f8605b1e9b5a",
+          "oracle_hash": "725b1628761308ed1fe2571950419c55",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Goblin Digging Team",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:57fead261d1531f32ab8c64d969315eb",
+          "oracle_hash": "48f5af5cebe8d9af8a1d0ca392610c1c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Human Frailty",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:361a1d5b420e1dfd39e4548ae5b52429",
+          "oracle_hash": "a8edf3a8319d58e818ac1f784ecc657e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Power Word Kill",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3bceb5f541db7797af198546ecdabe9",
+          "oracle_hash": "5eb1c679400e3cabdf30e82870bb6679",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Puncturing Light",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32e8e2ce66aa2393e0579c4c428ca93d",
+          "oracle_hash": "46cae80334c7a840bb86f5d865400abb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Rend Flesh",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32ee95b6991c9f63021ab3d1f69f2d64",
+          "oracle_hash": "9dd403226b7ce269c20b61dc7a2a04f3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Rend Spirit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:264be4609e3e98a8372ea5513e0f4f7c",
+          "oracle_hash": "fcd733ed712d1a7224ebca28cc439a0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Searing Light",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:380052980c93128c2c8e6d8816e1f35c",
+          "oracle_hash": "1bfbb0fc05d85070853dbb71b9d3f6ad",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Terashi's Verdict",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d99f26d66c7b0820b6422987970d57b8",
+          "oracle_hash": "2c30319d6ef0fa1021019b3f8bb9a45f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Tunnel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e6171d75058d4449d6ca92392dd186b",
+          "oracle_hash": "0b5964125744430db96b375e73ce66d8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Urgent Exorcism",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cfbdec5c0cfe485fb994666b774ad5a1",
+          "oracle_hash": "aa55968bfbfdaf2eb4006fd922e90533",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Victim of Night",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8bdaae97317bd40d07eea974fa6f1db2",
+          "oracle_hash": "4e2a3a6c707c6ae294d360d04f030e37",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Walk the Plank",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b71d2fb0924752a6d3824a394f79d783",
+          "oracle_hash": "35c7db3fd35eae230b3830901a15f5cc",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 15
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cast Down",
+          "logical_rule_key": "battle_rule_v1:48ecef55044ff31a73766e0d02c5c982"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Chill to the Bone",
+          "logical_rule_key": "battle_rule_v1:92d35b28a96bdbf7759ece249d3eaf42"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eyeblight's Ending",
+          "logical_rule_key": "battle_rule_v1:ee9539dea222354c7d84f8605b1e9b5a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Digging Team",
+          "logical_rule_key": "battle_rule_v1:57fead261d1531f32ab8c64d969315eb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Human Frailty",
+          "logical_rule_key": "battle_rule_v1:361a1d5b420e1dfd39e4548ae5b52429"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Power Word Kill",
+          "logical_rule_key": "battle_rule_v1:b3bceb5f541db7797af198546ecdabe9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Puncturing Light",
+          "logical_rule_key": "battle_rule_v1:32e8e2ce66aa2393e0579c4c428ca93d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rend Flesh",
+          "logical_rule_key": "battle_rule_v1:32ee95b6991c9f63021ab3d1f69f2d64"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rend Spirit",
+          "logical_rule_key": "battle_rule_v1:264be4609e3e98a8372ea5513e0f4f7c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Searing Light",
+          "logical_rule_key": "battle_rule_v1:380052980c93128c2c8e6d8816e1f35c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Terashi's Verdict",
+          "logical_rule_key": "battle_rule_v1:d99f26d66c7b0820b6422987970d57b8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tunnel",
+          "logical_rule_key": "battle_rule_v1:7e6171d75058d4449d6ca92392dd186b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Urgent Exorcism",
+          "logical_rule_key": "battle_rule_v1:cfbdec5c0cfe485fb994666b774ad5a1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Victim of Night",
+          "logical_rule_key": "battle_rule_v1:8bdaae97317bd40d07eea974fa6f1db2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Walk the Plank",
+          "logical_rule_key": "battle_rule_v1:b71d2fb0924752a6d3824a394f79d783"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 15
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Cast Down",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:48ecef55044ff31a73766e0d02c5c982"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Chill to the Bone",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:92d35b28a96bdbf7759ece249d3eaf42"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eyeblight's Ending",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:ee9539dea222354c7d84f8605b1e9b5a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Digging Team",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:57fead261d1531f32ab8c64d969315eb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Human Frailty",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:361a1d5b420e1dfd39e4548ae5b52429"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Power Word Kill",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:b3bceb5f541db7797af198546ecdabe9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Puncturing Light",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:32e8e2ce66aa2393e0579c4c428ca93d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rend Flesh",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:32ee95b6991c9f63021ab3d1f69f2d64"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rend Spirit",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:264be4609e3e98a8372ea5513e0f4f7c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Searing Light",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:380052980c93128c2c8e6d8816e1f35c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Terashi's Verdict",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:d99f26d66c7b0820b6422987970d57b8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tunnel",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:7e6171d75058d4449d6ca92392dd186b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Urgent Exorcism",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:cfbdec5c0cfe485fb994666b774ad5a1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Victim of Night",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:8bdaae97317bd40d07eea974fa6f1db2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Walk the Plank",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:b71d2fb0924752a6d3824a394f79d783"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

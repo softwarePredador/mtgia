@@ -1,0 +1,1086 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg489_destroy_extended_target_filters_ne_20260705_071656",
+  "deploy_id": "PG489",
+  "expected_rules": [
+    {
+      "card_name": "Cast Down",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48ecef55044ff31a73766e0d02c5c982",
+      "min_rule_version": 2,
+      "normalized_name": "cast down",
+      "oracle_hash": "d7177953b559eeb70968d0db0a6dcd44",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_supertypes": [
+            "legendary"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chill to the Bone",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:92d35b28a96bdbf7759ece249d3eaf42",
+      "min_rule_version": 2,
+      "normalized_name": "chill to the bone",
+      "oracle_hash": "efadd757a1cd1a347e1c4d6def4e6156",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_supertypes": [
+            "snow"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eyeblight's Ending",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ee9539dea222354c7d84f8605b1e9b5a",
+      "min_rule_version": 2,
+      "normalized_name": "eyeblight's ending",
+      "oracle_hash": "725b1628761308ed1fe2571950419c55",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "elf"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Digging Team",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:57fead261d1531f32ab8c64d969315eb",
+      "min_rule_version": 2,
+      "normalized_name": "goblin digging team",
+      "oracle_hash": "48f5af5cebe8d9af8a1d0ca392610c1c",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "destroy_target",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "wall_creature",
+            "activated_self_sacrifice_destroy": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "required_subtypes": [
+                "wall"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_subtypes": [
+            "wall"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Human Frailty",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:361a1d5b420e1dfd39e4548ae5b52429",
+      "min_rule_version": 2,
+      "normalized_name": "human frailty",
+      "oracle_hash": "a8edf3a8319d58e818ac1f784ecc657e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_subtypes": [
+            "human"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Power Word Kill",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b3bceb5f541db7797af198546ecdabe9",
+      "min_rule_version": 2,
+      "normalized_name": "power word kill",
+      "oracle_hash": "5eb1c679400e3cabdf30e82870bb6679",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "angel",
+            "demon",
+            "devil",
+            "dragon"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Puncturing Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32e8e2ce66aa2393e0579c4c428ca93d",
+      "min_rule_version": 2,
+      "normalized_name": "puncturing light",
+      "oracle_hash": "46cae80334c7a840bb86f5d865400abb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking",
+          "power_max": 3
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rend Flesh",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32ee95b6991c9f63021ab3d1f69f2d64",
+      "min_rule_version": 2,
+      "normalized_name": "rend flesh",
+      "oracle_hash": "9dd403226b7ce269c20b61dc7a2a04f3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "spirit"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rend Spirit",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:264be4609e3e98a8372ea5513e0f4f7c",
+      "min_rule_version": 2,
+      "normalized_name": "rend spirit",
+      "oracle_hash": "fcd733ed712d1a7224ebca28cc439a0a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_subtypes": [
+            "spirit"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Searing Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:380052980c93128c2c8e6d8816e1f35c",
+      "min_rule_version": 2,
+      "normalized_name": "searing light",
+      "oracle_hash": "1bfbb0fc05d85070853dbb71b9d3f6ad",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking",
+          "power_max": 2
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Terashi's Verdict",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d99f26d66c7b0820b6422987970d57b8",
+      "min_rule_version": 2,
+      "normalized_name": "terashi's verdict",
+      "oracle_hash": "2c30319d6ef0fa1021019b3f8bb9a45f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking",
+          "power_max": 3
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tunnel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7e6171d75058d4449d6ca92392dd186b",
+      "min_rule_version": 2,
+      "normalized_name": "tunnel",
+      "oracle_hash": "0b5964125744430db96b375e73ce66d8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_subtypes": [
+            "wall"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Urgent Exorcism",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cfbdec5c0cfe485fb994666b774ad5a1",
+      "min_rule_version": 2,
+      "normalized_name": "urgent exorcism",
+      "oracle_hash": "aa55968bfbfdaf2eb4006fd922e90533",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ],
+              "required_subtypes": [
+                "spirit"
+              ]
+            },
+            {
+              "card_types": [
+                "enchantment"
+              ]
+            }
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Victim of Night",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8bdaae97317bd40d07eea974fa6f1db2",
+      "min_rule_version": 2,
+      "normalized_name": "victim of night",
+      "oracle_hash": "4e2a3a6c707c6ae294d360d04f030e37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "vampire",
+            "werewolf",
+            "zombie"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Walk the Plank",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b71d2fb0924752a6d3824a394f79d783",
+      "min_rule_version": 2,
+      "normalized_name": "walk the plank",
+      "oracle_hash": "35c7db3fd35eae230b3830901a15f5cc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "merfolk"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_destroy_target_spell": 14,
+    "xmage_permanent_simple_activated_destroy_target": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg489_destroy_extended_target_filters_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg489_destroy_extended_target_filters_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg489_destroy_extended_target_filters_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg489_destroy_extended_target_filters_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg489_destroy_extended_target_filters_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg489_destroy_extended_target_filters_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T07:16:56+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Cast Down"
+      },
+      "card_name": "Cast Down",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48ecef55044ff31a73766e0d02c5c982",
+      "normalized_name": "cast down",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_supertypes": [
+            "legendary"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Chill to the Bone"
+      },
+      "card_name": "Chill to the Bone",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:92d35b28a96bdbf7759ece249d3eaf42",
+      "normalized_name": "chill to the bone",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_supertypes": [
+            "snow"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Eyeblight's Ending"
+      },
+      "card_name": "Eyeblight's Ending",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ee9539dea222354c7d84f8605b1e9b5a",
+      "normalized_name": "eyeblight's ending",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "elf"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Goblin Digging Team"
+      },
+      "card_name": "Goblin Digging Team",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:57fead261d1531f32ab8c64d969315eb",
+      "normalized_name": "goblin digging team",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "destroy_target",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "wall_creature",
+            "activated_self_sacrifice_destroy": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "required_subtypes": [
+                "wall"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_subtypes": [
+            "wall"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Human Frailty"
+      },
+      "card_name": "Human Frailty",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:361a1d5b420e1dfd39e4548ae5b52429",
+      "normalized_name": "human frailty",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_subtypes": [
+            "human"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Power Word Kill"
+      },
+      "card_name": "Power Word Kill",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b3bceb5f541db7797af198546ecdabe9",
+      "normalized_name": "power word kill",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "angel",
+            "demon",
+            "devil",
+            "dragon"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Puncturing Light"
+      },
+      "card_name": "Puncturing Light",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32e8e2ce66aa2393e0579c4c428ca93d",
+      "normalized_name": "puncturing light",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking",
+          "power_max": 3
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rend Flesh"
+      },
+      "card_name": "Rend Flesh",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32ee95b6991c9f63021ab3d1f69f2d64",
+      "normalized_name": "rend flesh",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "spirit"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rend Spirit"
+      },
+      "card_name": "Rend Spirit",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:264be4609e3e98a8372ea5513e0f4f7c",
+      "normalized_name": "rend spirit",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_subtypes": [
+            "spirit"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Searing Light"
+      },
+      "card_name": "Searing Light",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:380052980c93128c2c8e6d8816e1f35c",
+      "normalized_name": "searing light",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking",
+          "power_max": 2
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Terashi's Verdict"
+      },
+      "card_name": "Terashi's Verdict",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d99f26d66c7b0820b6422987970d57b8",
+      "normalized_name": "terashi's verdict",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking",
+          "power_max": 3
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tunnel"
+      },
+      "card_name": "Tunnel",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7e6171d75058d4449d6ca92392dd186b",
+      "normalized_name": "tunnel",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_subtypes": [
+            "wall"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Urgent Exorcism"
+      },
+      "card_name": "Urgent Exorcism",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cfbdec5c0cfe485fb994666b774ad5a1",
+      "normalized_name": "urgent exorcism",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ],
+              "required_subtypes": [
+                "spirit"
+              ]
+            },
+            {
+              "card_types": [
+                "enchantment"
+              ]
+            }
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Victim of Night"
+      },
+      "card_name": "Victim of Night",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8bdaae97317bd40d07eea974fa6f1db2",
+      "normalized_name": "victim of night",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "vampire",
+            "werewolf",
+            "zombie"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Walk the Plank"
+      },
+      "card_name": "Walk the Plank",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b71d2fb0924752a6d3824a394f79d783",
+      "normalized_name": "walk the plank",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "merfolk"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Cast Down",
+    "Chill to the Bone",
+    "Eyeblight's Ending",
+    "Goblin Digging Team",
+    "Human Frailty",
+    "Power Word Kill",
+    "Puncturing Light",
+    "Rend Flesh",
+    "Rend Spirit",
+    "Searing Light",
+    "Terashi's Verdict",
+    "Tunnel",
+    "Urgent Exorcism",
+    "Victim of Night",
+    "Walk the Plank"
+  ],
+  "selected_count": 15,
+  "slug": "destroy_extended_target_filters_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Cast Down",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48ecef55044ff31a73766e0d02c5c982",
+      "min_rule_version": 2,
+      "normalized_name": "cast down",
+      "oracle_hash": "d7177953b559eeb70968d0db0a6dcd44",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chill to the Bone",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:92d35b28a96bdbf7759ece249d3eaf42",
+      "min_rule_version": 2,
+      "normalized_name": "chill to the bone",
+      "oracle_hash": "efadd757a1cd1a347e1c4d6def4e6156",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eyeblight's Ending",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ee9539dea222354c7d84f8605b1e9b5a",
+      "min_rule_version": 2,
+      "normalized_name": "eyeblight's ending",
+      "oracle_hash": "725b1628761308ed1fe2571950419c55",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Digging Team",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:57fead261d1531f32ab8c64d969315eb",
+      "min_rule_version": 2,
+      "normalized_name": "goblin digging team",
+      "oracle_hash": "48f5af5cebe8d9af8a1d0ca392610c1c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Human Frailty",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:361a1d5b420e1dfd39e4548ae5b52429",
+      "min_rule_version": 2,
+      "normalized_name": "human frailty",
+      "oracle_hash": "a8edf3a8319d58e818ac1f784ecc657e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Power Word Kill",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b3bceb5f541db7797af198546ecdabe9",
+      "min_rule_version": 2,
+      "normalized_name": "power word kill",
+      "oracle_hash": "5eb1c679400e3cabdf30e82870bb6679",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Puncturing Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32e8e2ce66aa2393e0579c4c428ca93d",
+      "min_rule_version": 2,
+      "normalized_name": "puncturing light",
+      "oracle_hash": "46cae80334c7a840bb86f5d865400abb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rend Flesh",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32ee95b6991c9f63021ab3d1f69f2d64",
+      "min_rule_version": 2,
+      "normalized_name": "rend flesh",
+      "oracle_hash": "9dd403226b7ce269c20b61dc7a2a04f3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rend Spirit",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:264be4609e3e98a8372ea5513e0f4f7c",
+      "min_rule_version": 2,
+      "normalized_name": "rend spirit",
+      "oracle_hash": "fcd733ed712d1a7224ebca28cc439a0a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Searing Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:380052980c93128c2c8e6d8816e1f35c",
+      "min_rule_version": 2,
+      "normalized_name": "searing light",
+      "oracle_hash": "1bfbb0fc05d85070853dbb71b9d3f6ad",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Terashi's Verdict",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d99f26d66c7b0820b6422987970d57b8",
+      "min_rule_version": 2,
+      "normalized_name": "terashi's verdict",
+      "oracle_hash": "2c30319d6ef0fa1021019b3f8bb9a45f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tunnel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7e6171d75058d4449d6ca92392dd186b",
+      "min_rule_version": 2,
+      "normalized_name": "tunnel",
+      "oracle_hash": "0b5964125744430db96b375e73ce66d8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Urgent Exorcism",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cfbdec5c0cfe485fb994666b774ad5a1",
+      "min_rule_version": 2,
+      "normalized_name": "urgent exorcism",
+      "oracle_hash": "aa55968bfbfdaf2eb4006fd922e90533",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Victim of Night",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8bdaae97317bd40d07eea974fa6f1db2",
+      "min_rule_version": 2,
+      "normalized_name": "victim of night",
+      "oracle_hash": "4e2a3a6c707c6ae294d360d04f030e37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Walk the Plank",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b71d2fb0924752a6d3824a394f79d783",
+      "min_rule_version": 2,
+      "normalized_name": "walk the plank",
+      "oracle_hash": "35c7db3fd35eae230b3830901a15f5cc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -11821,6 +11821,67 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG489 Destroy Target Filter Closure
+
+- PG489 extends the existing targeted-destroy families for exact static target
+  filters that XMage expresses as pure `DestroyTargetEffect` or, for one
+  permanent, a simple activated destroy ability. The accepted target filters
+  are nonlegendary creature, nonsnow creature, excluded creature subtypes,
+  required creature subtypes, Spirit-or-enchantment, attacking creature with a
+  fixed power ceiling, and attacking-or-blocking creature with a fixed power
+  ceiling.
+- The accepted shape remains narrow: pure destroy effect, exact Oracle/source
+  agreement, no modal or auxiliary draw/life/scry effect, no sacrifice or
+  dynamic-cost destroy, and no unsupported target filter. The remaining
+  `destroy_target_not_supported` rows stay blocked until their target
+  vocabulary or effect shape has an executable ManaLoom model.
+- Runtime target validation now understands generic `target_constraints.any_of`
+  plus `exclude_supertypes` and `exclude_subtypes` for permanent/creature
+  targeting. This avoids card-specific patches for common restricted destroy
+  text and lets future families reuse the same target gate.
+- The batch covers `15` cards: Cast Down, Chill to the Bone, Eyeblight's
+  Ending, Goblin Digging Team, Human Frailty, Power Word Kill, Puncturing
+  Light, Rend Flesh, Rend Spirit, Searing Light, Terashi's Verdict, Tunnel,
+  Urgent Exorcism, Victim of Night, and Walk the Plank. The complete list lives
+  in
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg489_destroy_extended_target_filters_new_server_manifest.json`
+  under `selected_card_names`.
+- Focused validation passed `766` parser/runtime/package-builder tests,
+  `py_compile` passed for the touched parser/runtime/test files, the focused
+  PG489 target-filter runtime test passed, and the full
+  `test_battle_analyst_v10_3.py` suite passed with the live PostgreSQL
+  environment loaded.
+- PostgreSQL package PG489 applied against `143.198.230.247:5433/halder` and
+  promoted `15/15` selected cards as verified/auto rule-version `2` rows with
+  matching Oracle hashes. The apply upserted `15` rows and deprecated `0`
+  shadow rows.
+- Hermes metadata sync matched `5878` PostgreSQL cards, wrote `5789` SQLite
+  cache aliases, updated `102` deck-card ids, and left the known
+  `unresolved=1` residual unchanged. The targeted battle-rule sync loaded `15`
+  PostgreSQL rows, wrote `15` SQLite rows, exported `4697` canonical fallback
+  rows, and refreshed the tracked default canonical snapshot.
+- Generic E2E validation passed across PostgreSQL, SQLite
+  `battle_card_rules`, the default canonical snapshot, and runtime
+  `get_card_effect` for all `15` selected cards. The manifest does not define
+  battle-execution scenarios for this generic family, so scenario execution
+  remains `0`; concrete restricted-target behavior is covered by the focused
+  PG489 runtime test.
+- Final governance audits passed: XMage strategy (`26/26`), operational
+  surface, deckbuilding contract surface, legacy contamination, and
+  PG/Hermes/SQLite contract with live PostgreSQL connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26160`, `xmage_authoritative_source_count=25846`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25846`. This is an exact
+  reduction of `15` from the post-PG488 queue. The targeted-destroy work unit
+  fell from `611` before PG488 to `596` after PG489, and the post-PG489 exact
+  split recheck reports `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`.
+- Post-sync global readiness is now `34331` known cards, `4790`
+  `battle_and_oracle_ready`, `29083` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

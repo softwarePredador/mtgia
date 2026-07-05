@@ -6035,6 +6035,87 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["target"], target)
                 self.assertEqual(effect["target_constraints"], constraints)
 
+    def test_destroy_target_spell_maps_extended_static_target_filters(self) -> None:
+        cases = [
+            (
+                "Destroy target nonlegendary creature.",
+                'new FilterCreaturePermanent("nonlegendary creature"); Predicates.not(SuperType.LEGENDARY.getPredicate());',
+                "creature",
+                {"card_types": ["creature"], "exclude_supertypes": ["legendary"]},
+            ),
+            (
+                "Destroy target nonsnow creature.",
+                'new FilterCreaturePermanent("nonsnow creature"); Predicates.not(SuperType.SNOW.getPredicate());',
+                "creature",
+                {"card_types": ["creature"], "exclude_supertypes": ["snow"]},
+            ),
+            (
+                "Destroy target non-Spirit creature. It can't be regenerated.",
+                'new FilterCreaturePermanent("non-Spirit creature"); Predicates.not(SubType.SPIRIT.getPredicate());',
+                "creature",
+                {"card_types": ["creature"], "exclude_subtypes": ["spirit"]},
+            ),
+            (
+                "Destroy target non-Angel, non-Demon, non-Devil, non-Dragon creature.",
+                (
+                    'new FilterCreaturePermanent("non-Angel, non-Demon, non-Devil, non-Dragon creature");'
+                    "Predicates.not(SubType.ANGEL.getPredicate());"
+                    "Predicates.not(SubType.DEMON.getPredicate());"
+                    "Predicates.not(SubType.DEVIL.getPredicate());"
+                    "Predicates.not(SubType.DRAGON.getPredicate());"
+                ),
+                "creature",
+                {"card_types": ["creature"], "exclude_subtypes": ["angel", "demon", "devil", "dragon"]},
+            ),
+            (
+                "Destroy target Human creature.",
+                'new FilterCreaturePermanent("Human creature"); SubType.HUMAN.getPredicate();',
+                "creature",
+                {"card_types": ["creature"], "required_subtypes": ["human"]},
+            ),
+            (
+                "Destroy target Spirit or enchantment.",
+                'new FilterPermanent("Spirit or enchantment"); SubType.SPIRIT.getPredicate(); CardType.ENCHANTMENT.getPredicate();',
+                "permanent",
+                {
+                    "any_of": [
+                        {"card_types": ["creature"], "required_subtypes": ["spirit"]},
+                        {"card_types": ["enchantment"]},
+                    ]
+                },
+            ),
+            (
+                "Destroy target attacking or blocking creature with power 3 or less.",
+                "new FilterAttackingOrBlockingCreature(); new PowerPredicate(ComparisonType.FEWER_THAN, 4);",
+                "creature",
+                {"card_types": ["creature"], "combat_state": "attacking_or_blocking", "power_max": 3},
+            ),
+            (
+                "Destroy target attacking creature with power 3 or less.",
+                "new FilterAttackingCreature(); new PowerPredicate(ComparisonType.FEWER_THAN, 4);",
+                "creature",
+                {"card_types": ["creature"], "combat_state": "attacking", "power_max": 3},
+            ),
+        ]
+        for oracle, source_filter, target, constraints in cases:
+            with self.subTest(oracle=oracle):
+                row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(oracle_text=oracle),
+                    source_text=(
+                        f"{source_filter};"
+                        "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                        "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    ),
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCOPE)
+                self.assertEqual(effect["target"], target)
+                self.assertEqual(effect["target_constraints"], constraints)
+
     def test_destroy_target_spell_blocks_color_restricted_source_mismatch(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
         proposal, reason = split.split_row(

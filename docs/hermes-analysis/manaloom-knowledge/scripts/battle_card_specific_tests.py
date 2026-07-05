@@ -7751,6 +7751,84 @@ def register_tests(battle, player):
             arcane_spell,
         )
 
+    def test_pg489_destroy_target_extended_static_target_filters_runtime():
+        controller = player("Controller")
+        removal = {
+            "name": "Fixture Removal",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "exclude_supertypes": ["legendary"]},
+        }
+        ordinary = {"name": "Ordinary Creature", "type_line": "Creature - Human", "effect": "creature"}
+        legendary = {"name": "Legendary Creature", "type_line": "Legendary Creature - Human", "effect": "creature"}
+        assert battle.is_legal_target(removal, ordinary, controller, target_type="creature")
+        assert not battle.is_legal_target(removal, legendary, controller, target_type="creature")
+
+        snow_filter = {
+            "name": "Fixture Removal",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "exclude_supertypes": ["snow"]},
+        }
+        snow_creature = {"name": "Snow Creature", "type_line": "Snow Creature - Elk", "effect": "creature"}
+        assert battle.is_legal_target(snow_filter, ordinary, controller, target_type="creature")
+        assert not battle.is_legal_target(snow_filter, snow_creature, controller, target_type="creature")
+
+        subtype_filter = {
+            "name": "Fixture Removal",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "exclude_subtypes": ["spirit", "merfolk"]},
+        }
+        spirit = {"name": "Spirit Creature", "type_line": "Creature - Spirit", "effect": "creature"}
+        merfolk = {"name": "Merfolk Creature", "type_line": "Creature - Merfolk Scout", "effect": "creature"}
+        assert battle.is_legal_target(subtype_filter, ordinary, controller, target_type="creature")
+        assert not battle.is_legal_target(subtype_filter, spirit, controller, target_type="creature")
+        assert not battle.is_legal_target(subtype_filter, merfolk, controller, target_type="creature")
+
+        spirit_or_enchantment = {
+            "name": "Fixture Removal",
+            "effect": "remove_permanent",
+            "target": "permanent",
+            "target_constraints": {
+                "any_of": [
+                    {"card_types": ["creature"], "required_subtypes": ["spirit"]},
+                    {"card_types": ["enchantment"]},
+                ]
+            },
+        }
+        enchantment = {"name": "Enchantment", "type_line": "Enchantment", "effect": "enchantment"}
+        artifact = {"name": "Artifact", "type_line": "Artifact", "effect": "artifact"}
+        assert battle.is_legal_target(spirit_or_enchantment, spirit, controller, target_type="permanent")
+        assert battle.is_legal_target(spirit_or_enchantment, enchantment, controller, target_type="permanent")
+        assert not battle.is_legal_target(spirit_or_enchantment, ordinary, controller, target_type="permanent")
+        assert not battle.is_legal_target(spirit_or_enchantment, artifact, controller, target_type="permanent")
+
+        combat_filter = {
+            "name": "Fixture Removal",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "combat_state": "attacking_or_blocking", "power_max": 3},
+        }
+        small_attacker = {
+            "name": "Small Attacker",
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 3,
+            "attacking": True,
+        }
+        large_attacker = {
+            "name": "Large Attacker",
+            "type_line": "Creature",
+            "effect": "creature",
+            "power": 4,
+            "attacking": True,
+        }
+        resting_small = {"name": "Resting Small", "type_line": "Creature", "effect": "creature", "power": 2}
+        assert battle.is_legal_target(combat_filter, small_attacker, controller, target_type="creature")
+        assert not battle.is_legal_target(combat_filter, large_attacker, controller, target_type="creature")
+        assert not battle.is_legal_target(combat_filter, resting_small, controller, target_type="creature")
+
     def test_pg086_removal_targets_filter_nontoken_and_mana_value_max():
         active = player("Active")
         opponent = player("Opponent")
@@ -22182,6 +22260,7 @@ def register_tests(battle, player):
         test_pg241_penance_skips_non_black_red_source,
         test_removal_exile_stack_target_exiles_spell_instead_of_countering_to_graveyard,
         test_pg488_counter_target_filters_color_mana_value_and_alternative_spell_types,
+        test_pg489_destroy_target_extended_static_target_filters_runtime,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
         test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,
