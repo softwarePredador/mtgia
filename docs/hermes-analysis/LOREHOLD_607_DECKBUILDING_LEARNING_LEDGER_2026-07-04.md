@@ -2756,3 +2756,66 @@ Operational lesson:
   miracle/topdeck or mana floor.
 - The next real work is not battle; it is cut-model mining for topdeck and mana
   rows so the structure matrix can score an actual sidecar row.
+
+## Topdeck Sidecar Cut Model Planner - 2026-07-05
+
+The current cut-model planner artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.json`
+
+This planner consumes:
+
+- `lorehold_topdeck_sidecar_candidate_queue_20260705_current`;
+- `lorehold_deckbuilding_value_model_20260704_current`;
+- `lorehold_topdeck_safe_cut_miner_20260705_current`.
+
+Current result:
+
+- status:
+  `topdeck_sidecar_cut_model_planner_review_probes_ready_no_safe_cut_keep_607`;
+- target rows reviewed: `12`;
+- named cut probes produced: `48`;
+- safe-cut ready rows: `0`;
+- matrix-candidate rows eligible now: `0`;
+- candidate deck materialization allowed now: `false`;
+- forced access allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- protected near-misses: `25`;
+- recommended next action:
+  `collect_probe_evidence_for_named_topdeck_and_mana_cuts`.
+
+Topdeck probe set learned:
+
+- for `Dragon's Rage Channeler`, `Galvanoth`, `Penance`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wheel of Fortune`, the named
+  review probes are `Artist's Talent`, `Improvisation Capstone`,
+  `Pinnacle Monk // Mystic Peak`, and `Reforge the Soul`;
+- all topdeck probes are blocked by:
+  `safe_cut_miner_zero_current_ready`,
+  `requires_exposure_trace_before_safe_cut`, and
+  `miracle_topdeck_floor_equivalence_required`;
+- protected topdeck near-misses remain protected and are not cut proposals.
+
+Mana-base probe set learned:
+
+- for `Boros Garrison`, `Boseiju, Who Shelters All`, `Cavern of Souls`,
+  `Clifftop Retreat`, `Plateau`, `Rugged Prairie`, and `Sundown Pass`, the first
+  named review probes are `Mountain // Mountain`, `Plains // Plains`,
+  `Ancient Tomb`, and `Battlefield Forge`;
+- all mana probes are blocked by:
+  `safe_cut_miner_zero_current_ready`,
+  `requires_exposure_trace_before_safe_cut`,
+  `mana_source_floor_equivalence_required`, and
+  `structural_floor_equivalence_required`.
+
+Operational lesson:
+
+- A named probe is not a cut. It is the next evidence target.
+- Topdeck rows need exposure traces showing the candidate add matters and the
+  probe cut is low-impact or redundant.
+- Mana rows need source-count, color, untapped/fetchable role, and same-seed
+  no-regression proof before any land swap can be considered.
+- `607` still remains the best protected Lorehold baseline because the planner
+  found review targets, not a safe deck change.

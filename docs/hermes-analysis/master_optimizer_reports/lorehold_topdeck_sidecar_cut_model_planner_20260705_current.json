@@ -1,0 +1,2003 @@
+{
+  "artifact_type": "lorehold_topdeck_sidecar_cut_model_planner",
+  "current_baseline": "deck_607",
+  "cut_model_targets": [
+    {
+      "add_card": "Boros Garrison",
+      "candidate_allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Boros Garrison",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Mountain // Mountain",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Boros Garrison",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Plains // Plains",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Boros Garrison",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Ancient Tomb",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "utility_engine_land"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Boros Garrison",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Battlefield Forge",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "untapped_or_multiplayer_fixing"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        }
+      ],
+      "candidate_priority": "P2_forced_access_diagnostic",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "mana_base_safe_cut_model",
+      "target_cut_lanes": [
+        "land",
+        "mana_base"
+      ]
+    },
+    {
+      "add_card": "Boseiju, Who Shelters All",
+      "candidate_allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Boseiju, Who Shelters All",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Mountain // Mountain",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Boseiju, Who Shelters All",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Plains // Plains",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Boseiju, Who Shelters All",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Ancient Tomb",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "utility_engine_land"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Boseiju, Who Shelters All",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Battlefield Forge",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "untapped_or_multiplayer_fixing"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        }
+      ],
+      "candidate_priority": "P1_safe_cut_model",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "mana_base_safe_cut_model",
+      "target_cut_lanes": [
+        "land",
+        "mana_base"
+      ]
+    },
+    {
+      "add_card": "Cavern of Souls",
+      "candidate_allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Cavern of Souls",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Mountain // Mountain",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Cavern of Souls",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Plains // Plains",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Cavern of Souls",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Ancient Tomb",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "utility_engine_land"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Cavern of Souls",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Battlefield Forge",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "untapped_or_multiplayer_fixing"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        }
+      ],
+      "candidate_priority": "P2_forced_access_diagnostic",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "mana_base_safe_cut_model",
+      "target_cut_lanes": [
+        "land",
+        "mana_base"
+      ]
+    },
+    {
+      "add_card": "Clifftop Retreat",
+      "candidate_allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Clifftop Retreat",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Mountain // Mountain",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Clifftop Retreat",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Plains // Plains",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Clifftop Retreat",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Ancient Tomb",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "utility_engine_land"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Clifftop Retreat",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Battlefield Forge",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "untapped_or_multiplayer_fixing"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        }
+      ],
+      "candidate_priority": "P1_safe_cut_model",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "mana_base_safe_cut_model",
+      "target_cut_lanes": [
+        "land",
+        "mana_base"
+      ]
+    },
+    {
+      "add_card": "Plateau",
+      "candidate_allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Plateau",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Mountain // Mountain",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Plateau",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Plains // Plains",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Plateau",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Ancient Tomb",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "utility_engine_land"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Plateau",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Battlefield Forge",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "untapped_or_multiplayer_fixing"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        }
+      ],
+      "candidate_priority": "P1_safe_cut_model",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "mana_base_safe_cut_model",
+      "target_cut_lanes": [
+        "land",
+        "mana_base"
+      ]
+    },
+    {
+      "add_card": "Rugged Prairie",
+      "candidate_allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Rugged Prairie",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Mountain // Mountain",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Rugged Prairie",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Plains // Plains",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Rugged Prairie",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Ancient Tomb",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "utility_engine_land"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Rugged Prairie",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Battlefield Forge",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "untapped_or_multiplayer_fixing"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        }
+      ],
+      "candidate_priority": "P1_safe_cut_model",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "mana_base_safe_cut_model",
+      "target_cut_lanes": [
+        "land",
+        "mana_base"
+      ]
+    },
+    {
+      "add_card": "Sundown Pass",
+      "candidate_allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Sundown Pass",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Mountain // Mountain",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Sundown Pass",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Plains // Plains",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "basic_floor",
+            "land",
+            "mana_base"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 18,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Sundown Pass",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Ancient Tomb",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "utility_engine_land"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        },
+        {
+          "add_card": "Sundown Pass",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "mana_source_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready",
+            "structural_floor_equivalence_required"
+          ],
+          "cut_card": "Battlefield Forge",
+          "cut_functional_tag": "land",
+          "cut_lanes": [
+            "land",
+            "mana_base",
+            "untapped_or_multiplayer_fixing"
+          ],
+          "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+          "cut_usable_now": false,
+          "cut_value_score": 28,
+          "cut_value_tier": "tier_1_structural_floor",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "same_color_source_count_preserved",
+            "untapped_or_fetchable_role_preserved",
+            "land_count_floor_preserved",
+            "same_seed_no_mana_regression_trace"
+          ],
+          "target_tag": "mana_base_safe_cut_model"
+        }
+      ],
+      "candidate_priority": "P1_safe_cut_model",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "mana_base_safe_cut_model",
+      "target_cut_lanes": [
+        "land",
+        "mana_base"
+      ]
+    },
+    {
+      "add_card": "Dragon's Rage Channeler",
+      "candidate_allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Dragon's Rage Channeler",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Artist's Talent",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw"
+          ],
+          "cut_policy": "review_with_exposure_trace_before_cut",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_3_role_filler_with_battle_context",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Dragon's Rage Channeler",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Improvisation Capstone",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw",
+            "instant_sorcery_spell"
+          ],
+          "cut_policy": "same_lane_or_package_proof_required",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_2_commander_contextual_synergy",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Dragon's Rage Channeler",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Pinnacle Monk // Mystic Peak",
+          "cut_functional_tag": "engine",
+          "cut_lanes": [
+            "engine"
+          ],
+          "cut_policy": "review_with_exposure_trace_before_cut",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_3_role_filler_with_battle_context",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Dragon's Rage Channeler",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Reforge the Soul",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw",
+            "format_staple_long_tail",
+            "instant_sorcery_spell"
+          ],
+          "cut_policy": "same_lane_or_package_proof_required",
+          "cut_usable_now": false,
+          "cut_value_score": 13,
+          "cut_value_tier": "tier_2_commander_contextual_synergy",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        }
+      ],
+      "candidate_priority": "P1_forced_access_diagnostic",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [
+        {
+          "card_name": "Creative Technique",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 138
+        },
+        {
+          "card_name": "Library of Leng",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Molecule Man",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Scroll Rack",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        }
+      ],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "topdeck_access_sidecar_primary",
+      "target_cut_lanes": [
+        "draw",
+        "engine",
+        "topdeck_miracle_engine"
+      ]
+    },
+    {
+      "add_card": "Galvanoth",
+      "candidate_allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Galvanoth",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Artist's Talent",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw"
+          ],
+          "cut_policy": "review_with_exposure_trace_before_cut",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_3_role_filler_with_battle_context",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Galvanoth",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Improvisation Capstone",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw",
+            "instant_sorcery_spell"
+          ],
+          "cut_policy": "same_lane_or_package_proof_required",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_2_commander_contextual_synergy",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Galvanoth",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Pinnacle Monk // Mystic Peak",
+          "cut_functional_tag": "engine",
+          "cut_lanes": [
+            "engine"
+          ],
+          "cut_policy": "review_with_exposure_trace_before_cut",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_3_role_filler_with_battle_context",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Galvanoth",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Reforge the Soul",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw",
+            "format_staple_long_tail",
+            "instant_sorcery_spell"
+          ],
+          "cut_policy": "same_lane_or_package_proof_required",
+          "cut_usable_now": false,
+          "cut_value_score": 13,
+          "cut_value_tier": "tier_2_commander_contextual_synergy",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        }
+      ],
+      "candidate_priority": "P1_forced_access_diagnostic",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [
+        {
+          "card_name": "Creative Technique",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 138
+        },
+        {
+          "card_name": "Library of Leng",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Molecule Man",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Scroll Rack",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        }
+      ],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "topdeck_access_sidecar_primary",
+      "target_cut_lanes": [
+        "draw",
+        "engine",
+        "topdeck_miracle_engine"
+      ]
+    },
+    {
+      "add_card": "Penance",
+      "candidate_allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Penance",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Artist's Talent",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw"
+          ],
+          "cut_policy": "review_with_exposure_trace_before_cut",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_3_role_filler_with_battle_context",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Penance",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Improvisation Capstone",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw",
+            "instant_sorcery_spell"
+          ],
+          "cut_policy": "same_lane_or_package_proof_required",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_2_commander_contextual_synergy",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Penance",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Pinnacle Monk // Mystic Peak",
+          "cut_functional_tag": "engine",
+          "cut_lanes": [
+            "engine"
+          ],
+          "cut_policy": "review_with_exposure_trace_before_cut",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_3_role_filler_with_battle_context",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Penance",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Reforge the Soul",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw",
+            "format_staple_long_tail",
+            "instant_sorcery_spell"
+          ],
+          "cut_policy": "same_lane_or_package_proof_required",
+          "cut_usable_now": false,
+          "cut_value_score": 13,
+          "cut_value_tier": "tier_2_commander_contextual_synergy",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        }
+      ],
+      "candidate_priority": "P1_forced_access_diagnostic",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [
+        {
+          "card_name": "Creative Technique",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 138
+        },
+        {
+          "card_name": "Library of Leng",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Molecule Man",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Scroll Rack",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        }
+      ],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "topdeck_access_sidecar_primary",
+      "target_cut_lanes": [
+        "draw",
+        "engine",
+        "topdeck_miracle_engine"
+      ]
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "candidate_allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Valakut Awakening // Valakut Stoneforge",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Artist's Talent",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw"
+          ],
+          "cut_policy": "review_with_exposure_trace_before_cut",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_3_role_filler_with_battle_context",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Valakut Awakening // Valakut Stoneforge",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Improvisation Capstone",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw",
+            "instant_sorcery_spell"
+          ],
+          "cut_policy": "same_lane_or_package_proof_required",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_2_commander_contextual_synergy",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Valakut Awakening // Valakut Stoneforge",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Pinnacle Monk // Mystic Peak",
+          "cut_functional_tag": "engine",
+          "cut_lanes": [
+            "engine"
+          ],
+          "cut_policy": "review_with_exposure_trace_before_cut",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_3_role_filler_with_battle_context",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Valakut Awakening // Valakut Stoneforge",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Reforge the Soul",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw",
+            "format_staple_long_tail",
+            "instant_sorcery_spell"
+          ],
+          "cut_policy": "same_lane_or_package_proof_required",
+          "cut_usable_now": false,
+          "cut_value_score": 13,
+          "cut_value_tier": "tier_2_commander_contextual_synergy",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        }
+      ],
+      "candidate_priority": "P1_forced_access_diagnostic",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [
+        {
+          "card_name": "Creative Technique",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 138
+        },
+        {
+          "card_name": "Library of Leng",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Molecule Man",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Scroll Rack",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        }
+      ],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "topdeck_access_sidecar_primary",
+      "target_cut_lanes": [
+        "draw",
+        "engine",
+        "topdeck_miracle_engine"
+      ]
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "candidate_allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "candidate_cut_probes": [
+        {
+          "add_card": "Wheel of Fortune",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Artist's Talent",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw"
+          ],
+          "cut_policy": "review_with_exposure_trace_before_cut",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_3_role_filler_with_battle_context",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Wheel of Fortune",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Improvisation Capstone",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw",
+            "instant_sorcery_spell"
+          ],
+          "cut_policy": "same_lane_or_package_proof_required",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_2_commander_contextual_synergy",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Wheel of Fortune",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Pinnacle Monk // Mystic Peak",
+          "cut_functional_tag": "engine",
+          "cut_lanes": [
+            "engine"
+          ],
+          "cut_policy": "review_with_exposure_trace_before_cut",
+          "cut_usable_now": false,
+          "cut_value_score": 10,
+          "cut_value_tier": "tier_3_role_filler_with_battle_context",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        },
+        {
+          "add_card": "Wheel of Fortune",
+          "attempted_or_prior_blocked": false,
+          "blockers": [
+            "miracle_topdeck_floor_equivalence_required",
+            "requires_exposure_trace_before_safe_cut",
+            "safe_cut_miner_zero_current_ready"
+          ],
+          "cut_card": "Reforge the Soul",
+          "cut_functional_tag": "draw",
+          "cut_lanes": [
+            "draw",
+            "format_staple_long_tail",
+            "instant_sorcery_spell"
+          ],
+          "cut_policy": "same_lane_or_package_proof_required",
+          "cut_usable_now": false,
+          "cut_value_score": 13,
+          "cut_value_tier": "tier_2_commander_contextual_synergy",
+          "matrix_candidate_row_eligible_now": false,
+          "probe_status": "review_only_not_safe",
+          "protected_anchor": false,
+          "required_evidence": [
+            "candidate_add_drawn_cast_or_activated",
+            "cut_card_low_exposure_or_redundant_trace",
+            "miracle_cast_floor_preserved",
+            "topdeck_manipulation_floor_preserved"
+          ],
+          "target_tag": "topdeck_access_sidecar_primary"
+        }
+      ],
+      "candidate_priority": "P1_forced_access_diagnostic",
+      "candidate_readiness_status": "needs_safe_cut_model",
+      "matrix_candidate_row_eligible_count": 0,
+      "named_cut_probe_count": 4,
+      "next_action": "collect_cut_exposure_and_floor_equivalence_evidence_before_matrix_row",
+      "protected_near_misses": [
+        {
+          "card_name": "Creative Technique",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 138
+        },
+        {
+          "card_name": "Library of Leng",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Molecule Man",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Scroll Rack",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "reason": "protected_anchor_or_high_value_floor",
+          "value_score": 150
+        }
+      ],
+      "safe_cut_ready_count": 0,
+      "sidecar_tag": "topdeck_access_sidecar_primary",
+      "target_cut_lanes": [
+        "draw",
+        "engine",
+        "topdeck_miracle_engine"
+      ]
+    }
+  ],
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "forced_access_allowed_now": false,
+    "keep_607_as_protected_baseline": true,
+    "matrix_candidate_rows_ready": false,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_turn_review_probes_into_cuts_without trace evidence",
+      "mine exposure and floor-equivalence traces for topdeck and mana probes",
+      "feed only safe-cut-ready rows into the structure matrix"
+    ],
+    "promotion_allowed": false,
+    "reason": "Named cut probes exist for review, but every probe remains blocked by safe-cut, exposure-trace, or floor-equivalence requirements.",
+    "safe_cut_ready_now": false
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T06:41:07Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "attempted_package_cut_names": [
+      "bender's waterskin",
+      "big score",
+      "hexing squelcher",
+      "promise of loyalty",
+      "the scarlet witch",
+      "thor, god of thunder",
+      "victory chimes"
+    ],
+    "input_health": {
+      "all_required_inputs_present": true,
+      "missing_inputs": []
+    },
+    "safe_cut_summary": {
+      "action_counts": {
+        "no_current_safe_cut_for_target": 5
+      },
+      "attempted_package_cut_count": 9,
+      "deck_607_mutated": false,
+      "natural_promotion_allowed_count": 0,
+      "package_execution_counts": {
+        "blocked_cut_safety_new_cut_required": 1,
+        "blocked_prior_reject_and_cut_safety": 2,
+        "blocked_prior_reject_new_cut_required": 2
+      },
+      "postgres_writes": false,
+      "recommended_next_action": "do_not_run_forced_access_until_new_nonanchor_cut_evidence",
+      "reviewable_same_lane_gap_count": 0,
+      "runnable_now_count": 0,
+      "same_lane_hard_blocked_count": 1,
+      "seed_safe_cut_candidate_count": 0,
+      "source_db_mutated": false,
+      "target_count": 5,
+      "trace_cut_expander_status": "",
+      "trace_cut_expander_summary": {
+        "hard_blocked_count": 92,
+        "reviewable_evidence_gap_count": 0,
+        "same_lane_hard_blocked_count": 2,
+        "seed_safe_ready_count": 0
+      }
+    },
+    "sidecar_queue_summary": {
+      "blocker_counts": {
+        "generic_staple_not_lorehold_specific_until_trace_proof": 2,
+        "missing_named_same_lane_cut": 40,
+        "must_follow_topdeck_miracle_floor": 13,
+        "needs_safe_cut_model": 40,
+        "prior_reject_requires_new_trace_hypothesis": 9
+      },
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_sidecar_candidate_queue_blocked_no_matrix_rows_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "matrix_candidate_row_eligible_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "post_safe_cut_selected_route": "topdeck_access_first_sidecar_shell",
+      "promotion_allowed_now": false,
+      "queue_row_count": 40,
+      "readiness_counts": {
+        "blocked_prior_reject": 9,
+        "needs_safe_cut_model": 31
+      },
+      "recommended_next_action": "build_named_same_lane_cut_models_for_topdeck_and_mana_rows_before_matrix_scoring",
+      "safe_cut_reviewable_count": 0,
+      "safe_cut_seed_ready_count": 0,
+      "structure_matrix_scoring_allowed_now": false,
+      "tag_counts": {
+        "generic_staple_learning_only": 2,
+        "mana_base_safe_cut_model": 7,
+        "pressure_window_after_topdeck_floor": 5,
+        "sidecar_watchlist": 10,
+        "spell_chain_after_miracle_floor": 8,
+        "topdeck_access_sidecar_primary": 5,
+        "tutor_learning_only_after_prior_reject": 3
+      },
+      "value_model_land_quantity": 34,
+      "value_model_ramp_quantity": 15
+    },
+    "value_model_summary": {
+      "card_rows": 94,
+      "commander_count": 1,
+      "deck_id": 607,
+      "gate_ready_now_count": 0,
+      "keep_607_as_protected_baseline": true,
+      "lane_profile": {
+        "artifact": 17,
+        "basic_floor": 8,
+        "board_wipe": 8,
+        "commander_center": 1,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "fast_pressure_guard": 12,
+        "fetch_or_search_fixing": 8,
+        "format_staple_long_tail": 6,
+        "global_top_100": 17,
+        "global_top_500": 11,
+        "instant_sorcery_spell": 36,
+        "land": 34,
+        "mana_base": 34,
+        "miracle_conversion_finisher": 10,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "structural_ramp_floor": 8,
+        "topdeck_miracle_engine": 9,
+        "tutor": 1,
+        "typed_dual_or_fetch_target": 5,
+        "untapped_or_multiplayer_fixing": 5,
+        "utility_engine_land": 8,
+        "wincon": 9
+      },
+      "mana_foundation": {
+        "artifact_ramp_quantity": 11,
+        "enchantment_ramp_quantity": 1,
+        "instant_sorcery_ramp_quantity": 3,
+        "interpretation": "The 607 mana plan is not just more fast mana: it combines 34 lands, fetch/dual fixing, artifact ramp, spell ramp, and opponent-turn mana rocks that feed miracle windows.",
+        "land_groups": {
+          "basic_floor": 8,
+          "fetch_or_search_fixing": 8,
+          "typed_dual_or_fetch_target": 5,
+          "untapped_or_multiplayer_fixing": 5,
+          "utility_engine_land": 8
+        },
+        "land_quantity": 34,
+        "land_rows": 28,
+        "mana_sources_land_plus_ramp": 49,
+        "ramp_quantity": 15
+      },
+      "preflight_status": "no_current_candidate_passes_miracle_access_first_preflight",
+      "promotion_allowed": false,
+      "quantity_total": 100,
+      "role_profile": {
+        "board_wipe": 8,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "land": 34,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "trace_status": "lorehold_miracle_trace_failure_learning_ready"
+    }
+  },
+  "source_reports": {
+    "safe_cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_safe_cut_miner_20260705_current.json",
+    "sidecar_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_candidate_queue_20260705_current.json",
+    "value_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json"
+  },
+  "status": "topdeck_sidecar_cut_model_planner_review_probes_ready_no_safe_cut_keep_607",
+  "summary": {
+    "attempted_package_cut_name_count": 7,
+    "blocker_counts": {
+      "mana_source_floor_equivalence_required": 28,
+      "miracle_topdeck_floor_equivalence_required": 20,
+      "requires_exposure_trace_before_safe_cut": 48,
+      "safe_cut_miner_zero_current_ready": 48,
+      "structural_floor_equivalence_required": 28
+    },
+    "candidate_deck_materialization_allowed_now": false,
+    "decision_status": "topdeck_sidecar_cut_model_planner_review_probes_ready_no_safe_cut_keep_607",
+    "deck_action_allowed_now": false,
+    "forced_access_allowed_now": false,
+    "matrix_candidate_row_eligible_count": 0,
+    "missing_inputs": [],
+    "named_cut_probe_count": 48,
+    "natural_battle_gate_allowed_now": false,
+    "promotion_allowed_now": false,
+    "protected_near_miss_count": 25,
+    "recommended_next_action": "collect_probe_evidence_for_named_topdeck_and_mana_cuts",
+    "safe_cut_ready_count": 0,
+    "tag_counts": {
+      "mana_base_safe_cut_model": 7,
+      "topdeck_access_sidecar_primary": 5
+    },
+    "target_row_count": 12
+  }
+}
