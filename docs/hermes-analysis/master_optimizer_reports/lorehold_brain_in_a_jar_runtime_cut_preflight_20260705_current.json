@@ -324,16 +324,16 @@
       "source_lane": "official_card_text_and_rulings"
     },
     "lane": "topdeck_miracle_access",
-    "learning_score": 104,
+    "learning_score": 110,
     "matrix_cells": [
       "topdeck_miracle_access",
       "turn_cycle_miracle_mana"
     ],
-    "next_action": "draft Brain in a Jar runtime contract and cut miner, no deck action",
+    "next_action": "review_brain_pg_package_then_request_explicit_apply_or_continue_seed_safe_cut_mining_no_deck_action",
     "priority_rank": 1,
     "required_contract": "single_card_runtime_contract_then_cut_safety",
     "route_class": "runtime_or_manual_review",
-    "route_state": "next_single_card_runtime_lesson",
+    "route_state": "brain_package_prepared_no_active_rule_no_seed_safe_cut",
     "runtime_readiness": "blocked_requires_new_runtime_family",
     "runtime_slice_count": 5,
     "xmage_class_found": true
@@ -387,7 +387,7 @@
     "runtime_family_required_before_battle": false
   },
   "deck_607_mutated": false,
-  "generated_at": "2026-07-05T09:13:35Z",
+  "generated_at": "2026-07-05T09:30:24Z",
   "postgres_writes": false,
   "safe_same_lane_cut_candidates": [],
   "same_lane_cut_rows": [
@@ -786,13 +786,19 @@
       "source_lane": "official_card_text_and_rulings"
     },
     "route_planner_summary": {
+      "brain_active_rule_count": 0,
+      "brain_apply_executed_by_this_script": false,
+      "brain_apply_ready_for_manual_review": true,
+      "brain_pg_package_route_governed": true,
+      "brain_pg_package_status": "prepared_read_only_pending_apply_approval",
+      "brain_safe_cut_count": 0,
       "candidate_deck_materialization_allowed_now": false,
       "candidate_queue_matrix_fallback_route_key": "miracle_access_first_shell_contract",
       "candidate_queue_matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
       "candidate_queue_matrix_route_governed": true,
       "candidate_queue_scoreable_row_count": 0,
       "candidate_queue_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
-      "decision_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
+      "decision_status": "miracle_next_route_planner_selected_brain_package_review_keep_607",
       "deck_action_allowed_now": false,
       "entreat_active_rule_count": 0,
       "entreat_safe_cut_count": 0,
@@ -801,16 +807,16 @@
       "natural_battle_gate_allowed_now": false,
       "postgres_writes_allowed_now": false,
       "promotion_allowed_now": false,
-      "recommended_next_action": "draft_brain_in_a_jar_runtime_contract_and_cut_miner_no_deck_action",
+      "recommended_next_action": "review_brain_pg_package_then_request_explicit_apply_or_continue_seed_safe_cut_mining_no_deck_action",
       "route_candidate_count": 5,
       "selected_card": "Brain in a Jar",
       "selected_lane": "topdeck_miracle_access",
-      "selected_learning_score": 104,
-      "selected_route_state": "next_single_card_runtime_lesson",
+      "selected_learning_score": 110,
+      "selected_route_state": "brain_package_prepared_no_active_rule_no_seed_safe_cut",
       "state_counts": {
+        "brain_package_prepared_no_active_rule_no_seed_safe_cut": 1,
         "combo_package_runtime_lesson": 1,
         "defer_lower_priority_runtime_review": 2,
-        "next_single_card_runtime_lesson": 1,
         "parked_entreat_no_safe_cut": 1
       },
       "top_blocker_counts": {
@@ -933,7 +939,7 @@
     "route_planner_candidate_queue_governed": true,
     "route_planner_candidate_queue_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
     "route_planner_selected_brain": true,
-    "route_planner_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
+    "route_planner_status": "miracle_next_route_planner_selected_brain_package_review_keep_607",
     "safe_cut_count": 0,
     "same_lane_candidate_count": 9,
     "status_counts": {

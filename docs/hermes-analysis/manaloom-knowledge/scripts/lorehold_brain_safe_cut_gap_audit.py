@@ -35,7 +35,7 @@ BRAIN = "Brain in a Jar"
 TARGET_RUNTIME_PREFLIGHT_STATUS = (
     "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607"
 )
-TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_runtime_learning_keep_607"
+TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_package_review_keep_607"
 TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
 TOPDECK_CORE_ANCHORS = {
     "Sensei's Divining Top",

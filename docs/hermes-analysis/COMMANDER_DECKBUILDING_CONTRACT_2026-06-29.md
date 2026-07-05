@@ -1766,14 +1766,20 @@ Miracle next route planner refreshed on 2026-07-05:
 - JSON:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_next_route_planner_20260705_current.json`.
 - Status:
-  `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`.
+  `miracle_next_route_planner_selected_brain_package_review_keep_607`.
 - Candidate queue gate:
   `candidate_queue_matrix_route_governed=true`,
   `candidate_queue_matrix_next_shell_status=next_shell_cut_path_closed_route_miracle_access_first_keep_607`,
   and `candidate_queue_scoreable_row_count=0`.
 - Selected route:
   `Brain in a Jar`, lane `topdeck_miracle_access`, route state
-  `next_single_card_runtime_lesson`, learning score `104`.
+  `brain_package_prepared_no_active_rule_no_seed_safe_cut`, learning score
+  `110`.
+- Brain package state:
+  `prepared_read_only_pending_apply_approval`, with
+  `brain_pg_package_route_governed=true`, `apply_ready_for_manual_review=true`,
+  `apply_executed_by_this_script=false`, active Brain rule rows `0`, and safe
+  same-lane cuts `0`.
 - Current blockers remain:
   `named_seed_safe_cut_count=0`, Entreat safe cuts `0`, Entreat active rule
   rows `0`, matrix scoring `false`, natural battle `false`, deck action
@@ -1785,7 +1791,7 @@ Operational lesson:
 - The planner must block route selection when the candidate queue is not
   governed by the routed miracle-access matrix.
 - The next allowed work is:
-  `draft_brain_in_a_jar_runtime_contract_and_cut_miner_no_deck_action`.
+  `review_brain_pg_package_then_request_explicit_apply_or_continue_seed_safe_cut_mining_no_deck_action`.
 
 Brain route-governed runtime/package preflight refreshed on 2026-07-05:
 
@@ -1801,7 +1807,7 @@ Brain route-governed runtime/package preflight refreshed on 2026-07-05:
   gated.
 - Route gate:
   `route_gate_valid=true`,
-  `route_planner_status=miracle_next_route_planner_selected_brain_runtime_learning_keep_607`,
+  `route_planner_status=miracle_next_route_planner_selected_brain_package_review_keep_607`,
   `route_planner_candidate_queue_governed=true`,
   and
   `route_planner_candidate_queue_next_shell_status=next_shell_cut_path_closed_route_miracle_access_first_keep_607`.

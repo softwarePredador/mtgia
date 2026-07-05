@@ -1,6 +1,6 @@
 # Lorehold Brain in a Jar Safe-Cut Gap Audit
 
-- Generated at: `2026-07-05T09:21:17Z`
+- Generated at: `2026-07-05T09:30:24Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
@@ -11,7 +11,7 @@
 - Brain PG package route governed: `true`
 - Runtime preflight status: `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`
 - Runtime route gate valid: `true`
-- Runtime route planner status: `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`
+- Runtime route planner status: `miracle_next_route_planner_selected_brain_package_review_keep_607`
 - Runtime candidate queue governed: `true`
 - Runtime candidate queue next-shell status: `next_shell_cut_path_closed_route_miracle_access_first_keep_607`
 - Runtime candidate queue matrix-route governed: `true`

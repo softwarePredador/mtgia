@@ -42,7 +42,7 @@ DEFAULT_OUT_PREFIX = (
 
 BRAIN = "Brain in a Jar"
 BRAIN_LANE = "topdeck_miracle_engine"
-TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_runtime_learning_keep_607"
+TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_package_review_keep_607"
 TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
 TARGET_MATRIX_CONTRACT = "miracle_access_first_shell_contract"
 BRAIN_SAME_LANE_PRIORITY = {

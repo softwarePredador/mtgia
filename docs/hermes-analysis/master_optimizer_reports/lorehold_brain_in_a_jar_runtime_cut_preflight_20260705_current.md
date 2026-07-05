@@ -1,11 +1,11 @@
 # Lorehold Brain in a Jar Runtime/Cut Preflight
 
-- Generated at: `2026-07-05T09:13:35Z`
+- Generated at: `2026-07-05T09:30:24Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
 - Decision status: `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`
-- Route planner status: `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`
+- Route planner status: `miracle_next_route_planner_selected_brain_package_review_keep_607`
 - Route planner selected Brain: `true`
 - Route planner candidate queue governed: `true`
 - Route gate valid: `true`

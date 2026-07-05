@@ -20,7 +20,7 @@
     "promotion_allowed": false
   },
   "deck_607_mutated": false,
-  "generated_at": "2026-07-05T09:17:30Z",
+  "generated_at": "2026-07-05T09:30:24Z",
   "postgres_writes": false,
   "proposed_rule": {
     "card_name": "Brain in a Jar",
@@ -156,7 +156,7 @@
       "route_planner_candidate_queue_governed": true,
       "route_planner_candidate_queue_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
       "route_planner_selected_brain": true,
-      "route_planner_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
+      "route_planner_status": "miracle_next_route_planner_selected_brain_package_review_keep_607",
       "safe_cut_count": 0,
       "same_lane_candidate_count": 9,
       "status_counts": {
@@ -208,7 +208,7 @@
     "runtime_preflight_candidate_queue_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
     "runtime_preflight_required_status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607",
     "runtime_preflight_route_gate_valid": true,
-    "runtime_preflight_route_planner_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
+    "runtime_preflight_route_planner_status": "miracle_next_route_planner_selected_brain_package_review_keep_607",
     "runtime_preflight_status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607",
     "safe_cut_count_before_apply": 0,
     "sql_file_count": 4

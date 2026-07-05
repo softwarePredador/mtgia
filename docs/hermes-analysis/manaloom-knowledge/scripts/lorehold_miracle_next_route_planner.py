@@ -33,6 +33,7 @@ DEFAULT_ENTREAT_SCOUT = REPORT_DIR / "lorehold_entreat_same_lane_cut_scout_20260
 DEFAULT_CUT_MINER = (
     REPORT_DIR / "lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json"
 )
+DEFAULT_BRAIN_SAFE_CUT_GAP = REPORT_DIR / "lorehold_brain_safe_cut_gap_audit_20260705_current.json"
 DEFAULT_OUT_PREFIX = (
     REPORT_DIR / "lorehold_miracle_next_route_planner_20260705_current"
 )
@@ -42,6 +43,11 @@ BRAIN = "Brain in a Jar"
 HAZE = "Haze of Rage"
 TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
 TARGET_MATRIX_CONTRACT = "miracle_access_first_shell_contract"
+BRAIN_PACKAGE_ROUTE_STATUS = "brain_safe_cut_gap_no_active_rule_no_seed_safe_cut_keep_607"
+BRAIN_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_package_review_keep_607"
+BRAIN_ROUTE_PLANNER_ACTION = (
+    "review_brain_pg_package_then_request_explicit_apply_or_continue_seed_safe_cut_mining_no_deck_action"
+)
 
 LANE_BASE_SCORE = {
     "miracle_finisher": 96,
@@ -176,6 +182,7 @@ def route_state(
     contract: Mapping[str, Any],
     candidate_row: Mapping[str, Any],
     entreat_summary: Mapping[str, Any],
+    brain_summary: Mapping[str, Any],
 ) -> tuple[str, str]:
     name = str(card.get("card_name") or "")
     blockers = {str(item) for item in as_list(card.get("blockers"))}
@@ -200,6 +207,31 @@ def route_state(
             "refresh candidate queue and structure matrix before any battle",
         )
     if name == BRAIN:
+        if brain_summary:
+            if not bool(brain_summary.get("brain_pg_package_route_governed")):
+                return (
+                    "blocked_brain_package_route_not_governed",
+                    "rerun_governed_brain_runtime_package_and_safe_cut_gap",
+                )
+            if (
+                brain_summary.get("decision_status") == BRAIN_PACKAGE_ROUTE_STATUS
+                and brain_summary.get("brain_pg_package_status") == "prepared_read_only_pending_apply_approval"
+                and bool(brain_summary.get("apply_ready_for_manual_review"))
+                and not bool(brain_summary.get("apply_executed_by_this_script"))
+                and as_int(brain_summary.get("brain_active_rule_count")) == 0
+                and as_int(brain_summary.get("safe_cut_count")) == 0
+            ):
+                return (
+                    "brain_package_prepared_no_active_rule_no_seed_safe_cut",
+                    BRAIN_ROUTE_PLANNER_ACTION,
+                )
+            if as_int(brain_summary.get("brain_active_rule_count")) > 0 and as_int(
+                brain_summary.get("safe_cut_count")
+            ) == 0:
+                return (
+                    "brain_rule_active_no_seed_safe_cut",
+                    "mine_named_brain_same_lane_seed_safe_cut_no_deck_action",
+                )
         return (
             "next_single_card_runtime_lesson",
             "draft Brain in a Jar runtime contract and cut miner, no deck action",
@@ -224,6 +256,7 @@ def score_route(
     candidate_row: Mapping[str, Any],
     entreat_summary: Mapping[str, Any],
     cut_summary: Mapping[str, Any],
+    brain_summary: Mapping[str, Any],
 ) -> int:
     name = str(card.get("card_name") or "")
     lane = str(card.get("lane") or "")
@@ -237,6 +270,8 @@ def score_route(
         score += 8
     if name == BRAIN:
         score += 14
+        if brain_summary.get("decision_status") == BRAIN_PACKAGE_ROUTE_STATUS:
+            score += 6
     if name == HAZE:
         score += 12
         score -= 18
@@ -270,6 +305,7 @@ def build_route_rows(
     candidate_queue: Mapping[str, Any],
     entreat_scout: Mapping[str, Any],
     cut_miner: Mapping[str, Any],
+    brain_safe_cut_gap: Mapping[str, Any],
 ) -> list[dict[str, Any]]:
     contract_index = by_card(as_list(runtime_contract.get("contracts")), "card_name")
     candidate_index = by_card(
@@ -280,6 +316,7 @@ def build_route_rows(
     )
     entreat_summary = summary(entreat_scout)
     cut_summary = summary(cut_miner)
+    brain_summary = summary(brain_safe_cut_gap)
     rows = []
     for card in candidate_cards(post_identity):
         name = str(card.get("card_name") or "")
@@ -290,6 +327,7 @@ def build_route_rows(
             contract=contract,
             candidate_row=queue_row,
             entreat_summary=entreat_summary,
+            brain_summary=brain_summary,
         )
         score = score_route(
             card=card,
@@ -297,6 +335,7 @@ def build_route_rows(
             candidate_row=queue_row,
             entreat_summary=entreat_summary,
             cut_summary=cut_summary,
+            brain_summary=brain_summary,
         )
         blockers = sorted(
             {
@@ -331,6 +370,8 @@ def build_route_rows(
 def selectable(row: Mapping[str, Any]) -> bool:
     return str(row.get("route_state") or "") in {
         "next_single_card_runtime_lesson",
+        "brain_package_prepared_no_active_rule_no_seed_safe_cut",
+        "brain_rule_active_no_seed_safe_cut",
         "combo_package_runtime_lesson",
         "resume_entreat_matrix_refresh",
     }
@@ -365,6 +406,16 @@ def decision_status(
             "mine named safe cuts or runtime contracts before any deck action",
         )
     if selected.get("card_name") == BRAIN:
+        if selected.get("route_state") == "brain_package_prepared_no_active_rule_no_seed_safe_cut":
+            return (
+                BRAIN_ROUTE_PLANNER_STATUS,
+                BRAIN_ROUTE_PLANNER_ACTION,
+            )
+        if selected.get("route_state") == "brain_rule_active_no_seed_safe_cut":
+            return (
+                "miracle_next_route_planner_selected_brain_seed_cut_mining_keep_607",
+                "mine_named_brain_same_lane_seed_safe_cut_no_deck_action",
+            )
         return (
             "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
             "draft_brain_in_a_jar_runtime_contract_and_cut_miner_no_deck_action",
@@ -387,6 +438,7 @@ def build_report(
     candidate_queue: Mapping[str, Any],
     entreat_scout: Mapping[str, Any],
     cut_miner: Mapping[str, Any],
+    brain_safe_cut_gap: Mapping[str, Any],
     paths: Mapping[str, Path],
 ) -> dict[str, Any]:
     candidate_summary = summary(candidate_queue)
@@ -397,6 +449,7 @@ def build_report(
         candidate_queue=candidate_queue,
         entreat_scout=entreat_scout,
         cut_miner=cut_miner,
+        brain_safe_cut_gap=brain_safe_cut_gap,
     )
     selected = select_route(route_rows) if candidate_queue_governed else {}
     status, next_action = decision_status(
@@ -406,6 +459,7 @@ def build_report(
     )
     state_counts = Counter(str(row.get("route_state") or "") for row in route_rows)
     blocker_counts = Counter(blocker for row in route_rows for blocker in as_list(row.get("blockers")))
+    brain_summary = summary(brain_safe_cut_gap)
     return {
         "generated_at": utc_now(),
         "artifact_type": "lorehold_miracle_next_route_planner",
@@ -431,6 +485,12 @@ def build_report(
             "selected_learning_score": as_int(selected.get("learning_score")),
             "entreat_safe_cut_count": as_int(summary(entreat_scout).get("safe_cut_count")),
             "entreat_active_rule_count": as_int(summary(entreat_scout).get("entreat_active_rule_count")),
+            "brain_pg_package_status": brain_summary.get("brain_pg_package_status") or "",
+            "brain_pg_package_route_governed": bool(brain_summary.get("brain_pg_package_route_governed")),
+            "brain_apply_ready_for_manual_review": bool(brain_summary.get("apply_ready_for_manual_review")),
+            "brain_apply_executed_by_this_script": bool(brain_summary.get("apply_executed_by_this_script")),
+            "brain_active_rule_count": as_int(brain_summary.get("brain_active_rule_count")),
+            "brain_safe_cut_count": as_int(brain_summary.get("safe_cut_count")),
             "named_seed_safe_cut_count": as_int(summary(cut_miner).get("named_seed_safe_cut_count")),
             "candidate_deck_materialization_allowed_now": False,
             "matrix_scoring_allowed_now": False,
@@ -450,6 +510,7 @@ def build_report(
             "candidate_queue_summary": candidate_summary,
             "entreat_scout_summary": summary(entreat_scout),
             "cut_miner_summary": summary(cut_miner),
+            "brain_safe_cut_gap_summary": brain_summary,
             "external_sources_consulted": EXTERNAL_EVIDENCE,
         },
         "decision": {
@@ -465,6 +526,13 @@ def build_report(
                 "cannot select a runtime or cut lane."
             )
             if not candidate_queue_governed
+            else (
+                "Brain in a Jar is no longer at the draft-runtime step: the current "
+                "package is review-ready but still has no active PostgreSQL rule and "
+                "no seed-safe cut. Deck 607 stays protected."
+            )
+            if selected.get("card_name") == BRAIN
+            and selected.get("route_state") == "brain_package_prepared_no_active_rule_no_seed_safe_cut"
             else (
                 "Entreat remains blocked by named safe-cut and unapplied-rule gates; "
                 "Brain in a Jar is the next best learning route because it teaches "
@@ -512,6 +580,12 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Selected learning score: `{summary_row['selected_learning_score']}`",
         f"- Entreat safe cuts: `{summary_row['entreat_safe_cut_count']}`",
         f"- Entreat active rules: `{summary_row['entreat_active_rule_count']}`",
+        f"- Brain PG package status: `{summary_row['brain_pg_package_status'] or '-'}`",
+        f"- Brain PG package route governed: `{str(summary_row['brain_pg_package_route_governed']).lower()}`",
+        f"- Brain apply ready for manual review: `{str(summary_row['brain_apply_ready_for_manual_review']).lower()}`",
+        f"- Brain apply executed by this script: `{str(summary_row['brain_apply_executed_by_this_script']).lower()}`",
+        f"- Brain active rules: `{summary_row['brain_active_rule_count']}`",
+        f"- Brain safe cuts: `{summary_row['brain_safe_cut_count']}`",
         f"- Named seed-safe cuts: `{summary_row['named_seed_safe_cut_count']}`",
         f"- Matrix scoring allowed now: `{str(summary_row['matrix_scoring_allowed_now']).lower()}`",
         f"- Candidate deck materialization allowed now: `{str(summary_row['candidate_deck_materialization_allowed_now']).lower()}`",
@@ -586,6 +660,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--candidate-queue", type=Path, default=DEFAULT_CANDIDATE_QUEUE)
     parser.add_argument("--entreat-scout", type=Path, default=DEFAULT_ENTREAT_SCOUT)
     parser.add_argument("--cut-miner", type=Path, default=DEFAULT_CUT_MINER)
+    parser.add_argument("--brain-safe-cut-gap", type=Path, default=DEFAULT_BRAIN_SAFE_CUT_GAP)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     return parser.parse_args()
 
@@ -598,6 +673,7 @@ def main() -> int:
         "candidate_queue": args.candidate_queue,
         "entreat_scout": args.entreat_scout,
         "cut_miner": args.cut_miner,
+        "brain_safe_cut_gap": args.brain_safe_cut_gap,
     }
     payload = build_report(
         post_identity=read_json(args.post_identity),
@@ -605,6 +681,7 @@ def main() -> int:
         candidate_queue=read_json(args.candidate_queue),
         entreat_scout=read_json(args.entreat_scout),
         cut_miner=read_json(args.cut_miner),
+        brain_safe_cut_gap=read_json(args.brain_safe_cut_gap),
         paths=paths,
     )
     json_path, md_path = write_outputs(payload, args.out_prefix)

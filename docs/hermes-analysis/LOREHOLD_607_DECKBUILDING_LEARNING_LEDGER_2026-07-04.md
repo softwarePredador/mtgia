@@ -2075,7 +2075,7 @@ next card.
 Current result:
 
 - decision status:
-  `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`;
+  `miracle_next_route_planner_selected_brain_package_review_keep_607`;
 - candidate queue status:
   `miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607`;
 - candidate queue matrix route governed: `true`;
@@ -2084,8 +2084,15 @@ Current result:
 - route candidates reviewed: `5`;
 - selected card: `Brain in a Jar`;
 - selected lane: `topdeck_miracle_access`;
-- selected route state: `next_single_card_runtime_lesson`;
-- selected learning score: `104`;
+- selected route state: `brain_package_prepared_no_active_rule_no_seed_safe_cut`;
+- selected learning score: `110`;
+- Brain PostgreSQL package status:
+  `prepared_read_only_pending_apply_approval`;
+- Brain PG package route governed: `true`;
+- Brain apply ready for manual review: `true`;
+- Brain apply executed by this script: `false`;
+- Brain active rule rows: `0`;
+- Brain safe same-lane cuts: `0`;
 - `Entreat the Angels` safe same-lane cuts: `0`;
 - active Entreat rule rows: `0`;
 - named seed-safe cuts across the current cut miner: `0`;
@@ -2094,15 +2101,15 @@ Current result:
 - natural battle gate allowed now: `false`;
 - PostgreSQL writes allowed now: `false`;
 - recommended next action:
-  `draft_brain_in_a_jar_runtime_contract_and_cut_miner_no_deck_action`.
+  `review_brain_pg_package_then_request_explicit_apply_or_continue_seed_safe_cut_mining_no_deck_action`.
 
 Ranked learning interpretation:
 
 - `Entreat the Angels` remains parked because the rule is not active in
   PostgreSQL and the scout found no named safe same-lane cut.
-- `Brain in a Jar` is the next best learning route because it teaches
-  charge-counter timing, exact mana-value free casting, and scry decisions in
-  the same topdeck/miracle-access thesis without requiring a deck mutation.
+- `Brain in a Jar` is no longer at the draft-runtime step. The route planner now
+  recognizes that Brain has a review-only package prepared, but no active
+  PostgreSQL rule and no seed-safe cut.
 - `Haze of Rage` is real combo research with `Storm-Kiln Artist`, but it is a
   package-only route and needs combo runtime plus cut safety before it can
   compete with protected `607`.
@@ -2111,8 +2118,9 @@ Ranked learning interpretation:
 
 Operational lesson:
 
-- The persistent goal should continue with a Brain in a Jar runtime contract
-  and cut miner, not by modifying `607` or forcing a battle.
+- The persistent goal should continue with Brain package review/apply approval
+  if explicitly approved, or seed-safe cut mining, not by modifying `607` or
+  forcing a battle.
 - The planner must not select a route from a stale queue that lacks the governed
   miracle-access matrix route.
 - The governed route-planner audit set passes after this change: deckbuilding
@@ -2141,7 +2149,7 @@ Current result:
   `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`;
 - route planner selected Brain: `true`;
 - route planner status:
-  `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`;
+  `miracle_next_route_planner_selected_brain_package_review_keep_607`;
 - route gate valid: `true`;
 - route planner candidate queue governed: `true`;
 - route planner candidate queue next-shell status:
@@ -2353,7 +2361,7 @@ Current package result:
   `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`;
 - runtime preflight route gate valid: `true`;
 - runtime preflight route planner status:
-  `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`;
+  `miracle_next_route_planner_selected_brain_package_review_keep_607`;
 - runtime preflight candidate queue governed: `true`;
 - runtime preflight candidate queue next-shell status:
   `next_shell_cut_path_closed_route_miracle_access_first_keep_607`;
@@ -2420,6 +2428,33 @@ Validation after route-governed package/safe-cut refresh:
   `legacy_contamination_audit_20260705_brain_route_governed_current`, and
   `xmage_strategy_consistency_audit_20260705_brain_route_governed_current` all
   returned `pass`.
+- Brain route migration validation:
+  `lorehold_miracle_next_route_planner_20260705_current` now returns
+  `miracle_next_route_planner_selected_brain_package_review_keep_607`,
+  selected route state `brain_package_prepared_no_active_rule_no_seed_safe_cut`,
+  Brain package status `prepared_read_only_pending_apply_approval`, active Brain
+  rule rows `0`, and Brain safe cuts `0`;
+- focused pytest set covering miracle next route planner, Brain runtime/cut
+  preflight, PostgreSQL package preflight, safe-cut gap audit, miracle candidate
+  queue, miracle structure-matrix contract, next-shell synthesis, current-best
+  synthesis, artifact contract, operational surface, legacy contamination, and
+  XMage strategy consistency returned `90 passed`;
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_brain_in_a_jar_runtime.py`
+  returned `PASS test_brain_in_a_jar_runtime`;
+- `python3 -m pytest -q
+  docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_exact_scope_runtime.py
+  docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_batch_pg_package_builder.py`
+  returned `301 passed, 3 subtests passed`;
+- `lorehold_current_best_baseline_synthesis_20260705_current` still returns
+  `current_best_baseline_synthesis_keep_607`, `top_deck_is_607=true`,
+  `protected_baseline_rank=1`, `sidecar_safe_cut_ready_count=0`, and
+  `ready_for_real_deck_change_from_artifact_gate=false`;
+- `lorehold_artifact_contract_audit_20260705_brain_package_route_current`,
+  `deckbuilding_contract_surface_audit_20260705_brain_package_route_current`,
+  `operational_surface_alignment_audit_20260705_brain_package_route_current`,
+  `legacy_contamination_audit_20260705_brain_package_route_current`, and
+  `xmage_strategy_consistency_audit_20260705_brain_package_route_current` all
+  returned `pass`.
 
 ## Brain in a Jar Safe-Cut Gap Audit - 2026-07-05
 
@@ -2447,7 +2482,7 @@ Current result:
   `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`;
 - runtime route gate valid: `true`;
 - runtime route planner status:
-  `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`;
+  `miracle_next_route_planner_selected_brain_package_review_keep_607`;
 - runtime candidate queue governed: `true`;
 - runtime candidate queue next-shell status:
   `next_shell_cut_path_closed_route_miracle_access_first_keep_607`;
