@@ -58,6 +58,20 @@ def _candidate_queue(*, matrix_blockers=28):
     }
 
 
+def _exact_runtime_contract(*, drafted=False, adapter_present=False):
+    if not drafted:
+        return {}
+    return {
+        "status": "brain_exact_runtime_contract_drafted_adapter_missing_keep_607",
+        "summary": {
+            "contract_drafted": True,
+            "effect_json_scope": "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1",
+            "brain_exact_scope_adapter_present": adapter_present,
+            "recommended_next_action": "implement_brain_in_a_jar_runtime_adapter_no_deck_action",
+        },
+    }
+
+
 def _value_model(*, names=None):
     if names is None:
         names = ["Scroll Rack", "Sensei's Divining Top"]
@@ -131,6 +145,7 @@ def _build(**overrides):
         route_planner=overrides.get("route_planner", _route_planner()),
         runtime_contract=overrides.get("runtime_contract", _runtime_contract()),
         candidate_queue=overrides.get("candidate_queue", _candidate_queue()),
+        exact_runtime_contract=overrides.get("exact_runtime_contract", _exact_runtime_contract()),
         value_model=overrides.get("value_model", _value_model()),
         cut_miner=overrides.get("cut_miner", _cut_miner()),
         paths=_paths(),
@@ -149,6 +164,21 @@ def test_current_like_state_blocks_brain_without_rule_or_safe_cut() -> None:
     assert payload["summary"]["blocked_same_lane_cut_count"] == 2
     assert payload["decision"]["deck_action_allowed"] is False
     assert payload["decision"]["natural_battle_allowed_now"] is False
+
+
+def test_exact_contract_drafted_changes_blocker_to_adapter_missing() -> None:
+    payload = _build(exact_runtime_contract=_exact_runtime_contract(drafted=True))
+
+    assert payload["summary"]["decision_status"] == (
+        "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_missing_no_active_rule_no_safe_cut_keep_607"
+    )
+    assert payload["summary"]["exact_runtime_contract_drafted"] is True
+    assert payload["summary"]["brain_exact_adapter_present"] is False
+    assert payload["decision"]["runtime_family_required_before_battle"] is False
+    assert payload["decision"]["runtime_adapter_required_before_battle"] is True
+    assert payload["summary"]["recommended_next_action"] == (
+        "implement_brain_in_a_jar_runtime_adapter_before_any_brain_deck_action"
+    )
 
 
 def test_active_rule_and_safe_cut_only_allow_matrix_scoring_no_battle() -> None:

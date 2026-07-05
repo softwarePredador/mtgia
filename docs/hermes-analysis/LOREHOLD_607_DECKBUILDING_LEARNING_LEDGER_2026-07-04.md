@@ -2114,3 +2114,69 @@ Operational lesson:
   a deck mutation or natural battle.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion.
+
+## Brain in a Jar Exact Runtime Contract - 2026-07-05
+
+The Brain exact-runtime artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_exact_runtime_contract_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_exact_runtime_contract_20260705_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_after_exact_contract.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_after_exact_contract.json`
+
+This closes the previous vague action item, `draft_exact_mana_value_free_cast_runtime_family`,
+by writing the exact Brain effect-json contract and focused runtime vectors. It
+does not create a PostgreSQL package, does not mark Brain battle-ready, and does
+not modify protected deck `607`.
+
+Current exact-runtime result:
+
+- decision status:
+  `brain_exact_runtime_contract_drafted_adapter_missing_keep_607`;
+- XMage signals found: `13`;
+- missing XMage signals: `0`;
+- existing reusable runtime surfaces: `5`;
+- Brain exact adapter present in `battle_analyst_v9.py`: `false`;
+- proposed scope:
+  `xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1`;
+- focused test vectors: `3`;
+- natural battle gate allowed now: `false`;
+- PostgreSQL writes allowed now: `false`;
+- recommended next action:
+  `implement_brain_in_a_jar_runtime_adapter_no_deck_action`.
+
+The exact contract requires:
+
+- first activation: `{1}, tap`, add one charge counter, then optionally cast
+  one instant or sorcery from hand with mana value equal to the source's charge
+  counter count after the counter is added;
+- free-cast path: cast without paying mana cost, from hand only, exact mana
+  value only, instant/sorcery only;
+- second activation: `{3}, tap`, remove X charge counters, then scry X;
+- replay fields for counters before/after, eligible spell names, selected
+  spell, selected spell mana value, free-cast flag, removed counters, and scry
+  result.
+
+Updated Brain preflight result:
+
+- decision status:
+  `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_missing_no_active_rule_no_safe_cut_keep_607`;
+- exact runtime contract drafted: `true`;
+- Brain exact adapter present: `false`;
+- active Brain rule rows: `0`;
+- safe same-lane cuts in protected `607`: `0`;
+- blocked same-lane cuts: `9`;
+- matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- natural battle gate allowed now: `false`.
+
+Operational lesson:
+
+- Brain has moved from "runtime family undefined" to "runtime family defined,
+  adapter missing." That is real progress, but it still does not make Brain a
+  deck card.
+- The next code step is a Brain-specific runtime adapter and focused tests.
+  PostgreSQL packaging, candidate scoring, natural battle, and deck mutation
+  remain closed until the adapter exists and the preflight is rerun.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion.

@@ -33,6 +33,9 @@ DEFAULT_VALUE_MODEL = REPORT_DIR / "lorehold_deckbuilding_value_model_20260704_c
 DEFAULT_CUT_MINER = (
     REPORT_DIR / "lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json"
 )
+DEFAULT_EXACT_RUNTIME_CONTRACT = (
+    REPORT_DIR / "lorehold_brain_in_a_jar_exact_runtime_contract_20260705_current.json"
+)
 DEFAULT_OUT_PREFIX = (
     REPORT_DIR / "lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_current"
 )
@@ -251,9 +254,22 @@ def runtime_state(contract: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def exact_contract_state(exact_contract: Mapping[str, Any]) -> dict[str, Any]:
+    exact_summary = summary(exact_contract)
+    return {
+        "contract_found": bool(exact_contract),
+        "contract_drafted": bool(exact_summary.get("contract_drafted")),
+        "decision_status": exact_contract.get("status") or exact_summary.get("decision_status") or "",
+        "effect_json_scope": exact_summary.get("effect_json_scope") or "",
+        "adapter_present": bool(exact_summary.get("brain_exact_scope_adapter_present")),
+        "recommended_next_action": exact_summary.get("recommended_next_action") or "",
+    }
+
+
 def decision_status(
     *,
     state: Mapping[str, Any],
+    exact_state: Mapping[str, Any],
     safe_cut_count: int,
     matrix_blocker_count: int,
 ) -> tuple[str, str, bool]:
@@ -265,7 +281,15 @@ def decision_status(
         )
     no_rule = as_int(state.get("active_rule_count")) <= 0
     no_cut = safe_cut_count == 0
+    exact_drafted = bool(exact_state.get("contract_drafted"))
+    adapter_missing = exact_drafted and not bool(exact_state.get("adapter_present"))
     if no_rule and no_cut:
+        if adapter_missing:
+            return (
+                "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_missing_no_active_rule_no_safe_cut_keep_607",
+                "implement_brain_in_a_jar_runtime_adapter_before_any_brain_deck_action",
+                False,
+            )
         return (
             "brain_in_a_jar_runtime_cut_preflight_blocked_no_active_rule_no_safe_cut_keep_607",
             "draft_exact_mana_value_free_cast_runtime_family_before_any_brain_deck_action",
@@ -301,6 +325,7 @@ def build_report(
     route_planner: Mapping[str, Any],
     runtime_contract: Mapping[str, Any],
     candidate_queue: Mapping[str, Any],
+    exact_runtime_contract: Mapping[str, Any],
     value_model: Mapping[str, Any],
     cut_miner: Mapping[str, Any],
     paths: Mapping[str, Path],
@@ -309,17 +334,39 @@ def build_report(
     candidate_row = brain_candidate_row(candidate_queue)
     route_row = brain_route_row(route_planner)
     state = runtime_state(contract)
+    exact_state = exact_contract_state(exact_runtime_contract)
     same_lane_rows = build_same_lane_rows(value_model, cut_miner)
     safe_rows = [row for row in same_lane_rows if row["scout_status"] == "safe_same_lane_cut_candidate"]
     blocked_rows = [row for row in same_lane_rows if row["scout_status"] != "safe_same_lane_cut_candidate"]
     matrix_blocker_count = as_int(summary(candidate_queue).get("matrix_contract_blocker_count"))
     status, next_action, matrix_allowed = decision_status(
         state=state,
+        exact_state=exact_state,
         safe_cut_count=len(safe_rows),
         matrix_blocker_count=matrix_blocker_count,
     )
     status_counts = Counter(row["scout_status"] for row in same_lane_rows)
     blocker_counts = Counter(blocker for row in same_lane_rows for blocker in as_list(row.get("blockers")))
+    blocked_before_deck_action = as_int(state.get("active_rule_count")) <= 0 or len(safe_rows) == 0
+    if not blocked_before_deck_action:
+        decision_reason = (
+            "Brain has runtime and at least one synthetic same-lane cut candidate, but deck "
+            "materialization and natural battle remain closed until refreshed matrix scoring."
+        )
+    elif bool(exact_state.get("contract_drafted")):
+        decision_reason = (
+            "Brain in a Jar now has an exact runtime-family contract, but ManaLoom still "
+            "has no Brain-specific adapter, no active card rule, and no seed-safe same-lane "
+            "cut in protected 607. Brain therefore remains a runtime implementation route, "
+            "not a deck card."
+        )
+    else:
+        decision_reason = (
+            "Brain in a Jar has strong XMage/source evidence for the miracle-access thesis, "
+            "but ManaLoom has no exact runtime-family contract, no active card rule, and "
+            "protected 607 has no seed-safe same-lane cut. Brain therefore remains a runtime "
+            "learning route, not a deck card."
+        )
     return {
         "generated_at": utc_now(),
         "artifact_type": "lorehold_brain_in_a_jar_runtime_cut_preflight",
@@ -337,6 +384,10 @@ def build_report(
             "xmage_class_found": bool(state.get("xmage_class_found")),
             "xmage_signal_hit_count": as_int(state.get("xmage_signal_hit_count")),
             "required_runtime_slice_count": as_int(state.get("required_runtime_slice_count")),
+            "exact_runtime_contract_found": bool(exact_state.get("contract_found")),
+            "exact_runtime_contract_drafted": bool(exact_state.get("contract_drafted")),
+            "exact_runtime_effect_scope": exact_state.get("effect_json_scope") or "",
+            "brain_exact_adapter_present": bool(exact_state.get("adapter_present")),
             "brain_active_rule_count": as_int(state.get("active_rule_count")),
             "same_lane_candidate_count": len(same_lane_rows),
             "safe_cut_count": len(safe_rows),
@@ -355,12 +406,14 @@ def build_report(
         "brain_route_row": route_row,
         "brain_candidate_row": candidate_row,
         "brain_runtime_state": state,
+        "brain_exact_runtime_contract_state": exact_state,
         "safe_same_lane_cut_candidates": safe_rows,
         "blocked_same_lane_cut_rows": blocked_rows,
         "same_lane_cut_rows": same_lane_rows,
         "source_evidence": {
             "route_planner_summary": summary(route_planner),
             "runtime_contract_summary": summary(runtime_contract),
+            "exact_runtime_contract_summary": summary(exact_runtime_contract),
             "candidate_queue_summary": summary(candidate_queue),
             "value_model_summary": summary(value_model),
             "cut_miner_summary": summary(cut_miner),
@@ -374,24 +427,23 @@ def build_report(
             "natural_battle_allowed_now": False,
             "promotion_allowed": False,
             "postgres_writes_allowed": False,
-            "runtime_family_required_before_battle": as_int(state.get("active_rule_count")) <= 0,
-            "named_safe_cut_required_before_scoring": len(safe_rows) == 0,
-            "reason": (
-                "Brain in a Jar has strong XMage/source evidence for the miracle-access thesis, "
-                "but ManaLoom has no active card rule and protected 607 has no seed-safe "
-                "same-lane cut. Brain therefore remains a runtime learning route, not a deck card."
-            )
-            if as_int(state.get("active_rule_count")) <= 0 or len(safe_rows) == 0
-            else (
-                "Brain has runtime and at least one synthetic same-lane cut candidate, but deck "
-                "materialization and natural battle remain closed until refreshed matrix scoring."
+            "runtime_family_required_before_battle": (
+                as_int(state.get("active_rule_count")) <= 0
+                and not bool(exact_state.get("contract_drafted"))
             ),
+            "runtime_adapter_required_before_battle": (
+                as_int(state.get("active_rule_count")) <= 0
+                and bool(exact_state.get("contract_drafted"))
+                and not bool(exact_state.get("adapter_present"))
+            ),
+            "named_safe_cut_required_before_scoring": len(safe_rows) == 0,
+            "reason": decision_reason,
             "next_actions": [
                 "do_not_mutate_deck_607",
                 "do_not_materialize_brain_candidate_deck",
                 "do_not_run_natural_battle_for_brain_from_this_preflight",
                 next_action,
-                "after_runtime_family_exists_rerun_this_preflight_before_candidate_queue_refresh",
+                "after_runtime_adapter_exists_rerun_this_preflight_before_candidate_queue_refresh",
             ],
         },
     }
@@ -413,6 +465,9 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- XMage class found: `{str(summary_row['xmage_class_found']).lower()}`",
         f"- XMage signal hits: `{summary_row['xmage_signal_hit_count']}`",
         f"- Required runtime slices: `{summary_row['required_runtime_slice_count']}`",
+        f"- Exact runtime contract drafted: `{str(summary_row['exact_runtime_contract_drafted']).lower()}`",
+        f"- Exact runtime effect scope: `{summary_row['exact_runtime_effect_scope'] or '-'}`",
+        f"- Brain exact adapter present: `{str(summary_row['brain_exact_adapter_present']).lower()}`",
         f"- Active Brain rule count: `{summary_row['brain_active_rule_count']}`",
         f"- Same-lane candidates reviewed: `{summary_row['same_lane_candidate_count']}`",
         f"- Safe same-lane cuts: `{summary_row['safe_cut_count']}`",
@@ -428,11 +483,15 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
     for key, path in sorted(as_dict(payload.get("source_reports")).items()):
         lines.append(f"- `{key}`: `{path}`")
     runtime = as_dict(payload.get("brain_runtime_state"))
+    exact = as_dict(payload.get("brain_exact_runtime_contract_state"))
     lines.extend(["", "## Runtime State", ""])
     lines.append(f"- readiness: `{runtime.get('readiness') or '-'}`")
     lines.append(f"- manaloom_foundation: `{runtime.get('manaloom_foundation') or '-'}`")
     lines.append(f"- xmage_path: `{runtime.get('xmage_path') or '-'}`")
     lines.append(f"- required slices: `{', '.join(as_list(runtime.get('required_runtime_slices')))}`")
+    lines.append(f"- exact_contract_status: `{exact.get('decision_status') or '-'}`")
+    lines.append(f"- exact_contract_scope: `{exact.get('effect_json_scope') or '-'}`")
+    lines.append(f"- exact_adapter_present: `{str(bool(exact.get('adapter_present'))).lower()}`")
     lines.extend(["", "## Safe Same-Lane Cut Candidates", ""])
     if payload.get("safe_same_lane_cut_candidates"):
         lines.append("| Cut | Lane | Value | Exposure | Action |")
@@ -474,6 +533,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
     lines.append(f"- promotion_allowed: `{str(decision['promotion_allowed']).lower()}`")
     lines.append(f"- postgres_writes_allowed: `{str(decision['postgres_writes_allowed']).lower()}`")
     lines.append(f"- runtime_family_required_before_battle: `{str(decision['runtime_family_required_before_battle']).lower()}`")
+    lines.append(f"- runtime_adapter_required_before_battle: `{str(decision['runtime_adapter_required_before_battle']).lower()}`")
     lines.append(f"- named_safe_cut_required_before_scoring: `{str(decision['named_safe_cut_required_before_scoring']).lower()}`")
     lines.append(f"- reason: {decision['reason']}")
     lines.append("- next_actions:")
@@ -500,6 +560,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--route-planner", type=Path, default=DEFAULT_ROUTE_PLANNER)
     parser.add_argument("--runtime-contract", type=Path, default=DEFAULT_RUNTIME_CONTRACT)
     parser.add_argument("--candidate-queue", type=Path, default=DEFAULT_CANDIDATE_QUEUE)
+    parser.add_argument("--exact-runtime-contract", type=Path, default=DEFAULT_EXACT_RUNTIME_CONTRACT)
     parser.add_argument("--value-model", type=Path, default=DEFAULT_VALUE_MODEL)
     parser.add_argument("--cut-miner", type=Path, default=DEFAULT_CUT_MINER)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
@@ -512,6 +573,7 @@ def main() -> int:
         "route_planner": args.route_planner,
         "runtime_contract": args.runtime_contract,
         "candidate_queue": args.candidate_queue,
+        "exact_runtime_contract": args.exact_runtime_contract,
         "value_model": args.value_model,
         "cut_miner": args.cut_miner,
     }
@@ -519,6 +581,7 @@ def main() -> int:
         route_planner=read_json(args.route_planner),
         runtime_contract=read_json(args.runtime_contract),
         candidate_queue=read_json(args.candidate_queue),
+        exact_runtime_contract=read_json(args.exact_runtime_contract),
         value_model=read_json(args.value_model),
         cut_miner=read_json(args.cut_miner),
         paths=paths,

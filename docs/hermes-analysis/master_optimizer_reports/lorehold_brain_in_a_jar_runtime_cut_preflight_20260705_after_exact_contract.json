@@ -1,0 +1,923 @@
+{
+  "artifact_type": "lorehold_brain_in_a_jar_runtime_cut_preflight",
+  "blocked_same_lane_cut_rows": [
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Scroll Rack",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "early_mana",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 2745,
+      "functional_tag": "draw",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "artifact",
+        "draw",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 2957,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut"
+      ],
+      "card_name": "Sensei's Divining Top",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "draw",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 3514,
+      "functional_tag": "draw",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "artifact",
+        "draw",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 3816,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Library of Leng",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "early_mana",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 816,
+      "functional_tag": "engine",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "artifact",
+        "engine",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 855,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Molecule Man",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "draw",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 101,
+      "functional_tag": "draw",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "draw",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 102,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "The Scarlet Witch",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "misc",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 304,
+      "functional_tag": "creature",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "creature",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 362,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "The Mind Stone",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "early_mana",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 2266,
+      "functional_tag": "ramp",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "artifact",
+        "ramp",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 2312,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Land Tax",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "misc",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 3395,
+      "functional_tag": "tutor",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "global_top_500",
+        "topdeck_miracle_engine",
+        "tutor"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 3449,
+      "value_score": 156,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Urza's Saga",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "mana_base",
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "cut_status": "blocked",
+      "direct_event_count": 2656,
+      "functional_tag": "land",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "global_top_500",
+        "land",
+        "mana_base",
+        "topdeck_miracle_engine",
+        "utility_engine_land"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 2656,
+      "value_score": 74,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "blockers": [
+        "commander_never_cut",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Lorehold, the Historian",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "commander",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 5558,
+      "functional_tag": "engine",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "commander_center",
+        "engine",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 5768,
+      "value_score": 230,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    }
+  ],
+  "brain_candidate_row": {
+    "add_card": "Brain in a Jar",
+    "blocker_reasons": [
+      "matrix_contract_blockers_not_cleared",
+      "no named same-lane cut exists for current 607",
+      "runtime rule is not verified for candidate use"
+    ],
+    "blockers": [
+      "matrix_contract_blockers_not_cleared",
+      "named_safe_cut_missing",
+      "verified_battle_rule_missing"
+    ],
+    "candidate_key": "miracle_access_row_brain_in_a_jar",
+    "cut_card": null,
+    "expected_metric_lift": "alternate_cost_timing_engine",
+    "floor_risk": "unknown_until_matrix_scored",
+    "lane": "topdeck_miracle_access",
+    "matrix_cells": [
+      "topdeck_miracle_access",
+      "turn_cycle_miracle_mana"
+    ],
+    "protected_anchor_impact": "unproven_until_cut_is_named_and_trace_checked",
+    "rule_runtime_status": "runtime_missing_or_manual_review",
+    "same_lane_cut_reason": "",
+    "source_provenance": [
+      "gametyrant_miracle_topdeck_pressure"
+    ],
+    "source_required_contract": "single_card_runtime_contract_then_cut_safety"
+  },
+  "brain_exact_runtime_contract_state": {
+    "adapter_present": false,
+    "contract_drafted": true,
+    "contract_found": true,
+    "decision_status": "brain_exact_runtime_contract_drafted_adapter_missing_keep_607",
+    "effect_json_scope": "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1",
+    "recommended_next_action": "implement_brain_in_a_jar_runtime_adapter_no_deck_action"
+  },
+  "brain_route_row": {
+    "active_rule_count": 0,
+    "blockers": [
+      "matrix_contract_blockers_not_cleared",
+      "named_safe_cut_missing",
+      "verified_battle_rule_missing"
+    ],
+    "card_name": "Brain in a Jar",
+    "deckbuilding_value": "Potentially helps cast key spells on constrained turns, but only if charge-counter timing and spell mana values are modeled correctly.",
+    "external_evidence": {
+      "learning_signal": "charge-counter timing, exact mana-value free casting, and scry form a single-card runtime lesson for miracle/topdeck access",
+      "links": {
+        "gatherer": "https://gatherer.wizards.com/SOI/en-us/252/brain-in-a-jar",
+        "scryfall": "https://scryfall.com/card/soi/252/brain-in-a-jar"
+      },
+      "source_lane": "official_card_text_and_rulings"
+    },
+    "lane": "topdeck_miracle_access",
+    "learning_score": 104,
+    "matrix_cells": [
+      "topdeck_miracle_access",
+      "turn_cycle_miracle_mana"
+    ],
+    "next_action": "draft Brain in a Jar runtime contract and cut miner, no deck action",
+    "priority_rank": 1,
+    "required_contract": "single_card_runtime_contract_then_cut_safety",
+    "route_class": "runtime_or_manual_review",
+    "route_state": "next_single_card_runtime_lesson",
+    "runtime_readiness": "blocked_requires_new_runtime_family",
+    "runtime_slice_count": 5,
+    "xmage_class_found": true
+  },
+  "brain_runtime_state": {
+    "active_rule_count": 0,
+    "contract_found": true,
+    "manaloom_foundation": "generic_charge_counter_and_casting_primitives_exist_but_no_card_contract",
+    "readiness": "blocked_requires_new_runtime_family",
+    "required_runtime_slice_count": 5,
+    "required_runtime_slices": [
+      "activated_add_charge_counter_then_tap_cost",
+      "select_hand_instant_or_sorcery_by_exact_mana_value",
+      "cast_selected_spell_without_paying_mana_cost",
+      "activated_remove_x_charge_counters_scry_x",
+      "replay_charge_counter_and_free_cast_decision_fields"
+    ],
+    "runtime_family_ready": false,
+    "xmage_class_found": true,
+    "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BrainInAJar.java",
+    "xmage_signal_hit_count": 5,
+    "xmage_signal_hits": {
+      "AddCountersSourceEffect": true,
+      "BrainInAJarCastEffect": true,
+      "ManaValuePredicate": true,
+      "RemoveVariableCountersSourceCost": true,
+      "ScryEffect": true
+    },
+    "xmage_signal_miss_count": 0
+  },
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "matrix_scoring_allowed_now": false,
+    "named_safe_cut_required_before_scoring": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_materialize_brain_candidate_deck",
+      "do_not_run_natural_battle_for_brain_from_this_preflight",
+      "implement_brain_in_a_jar_runtime_adapter_before_any_brain_deck_action",
+      "after_runtime_adapter_exists_rerun_this_preflight_before_candidate_queue_refresh"
+    ],
+    "postgres_writes_allowed": false,
+    "promotion_allowed": false,
+    "reason": "Brain in a Jar now has an exact runtime-family contract, but ManaLoom still has no Brain-specific adapter, no active card rule, and no seed-safe same-lane cut in protected 607. Brain therefore remains a runtime implementation route, not a deck card.",
+    "runtime_adapter_required_before_battle": true,
+    "runtime_family_required_before_battle": false
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T05:18:36Z",
+  "postgres_writes": false,
+  "safe_same_lane_cut_candidates": [],
+  "same_lane_cut_rows": [
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Scroll Rack",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "early_mana",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 2745,
+      "functional_tag": "draw",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "artifact",
+        "draw",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 2957,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut"
+      ],
+      "card_name": "Sensei's Divining Top",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "draw",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 3514,
+      "functional_tag": "draw",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "artifact",
+        "draw",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 3816,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Library of Leng",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "early_mana",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 816,
+      "functional_tag": "engine",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "artifact",
+        "engine",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 855,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Molecule Man",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "draw",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 101,
+      "functional_tag": "draw",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "draw",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 102,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "The Scarlet Witch",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "misc",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 304,
+      "functional_tag": "creature",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "creature",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 362,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "The Mind Stone",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "early_mana",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 2266,
+      "functional_tag": "ramp",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "artifact",
+        "ramp",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 2312,
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Land Tax",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "misc",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 3395,
+      "functional_tag": "tutor",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "global_top_500",
+        "topdeck_miracle_engine",
+        "tutor"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 3449,
+      "value_score": 156,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Urza's Saga",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "mana_base",
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "cut_status": "blocked",
+      "direct_event_count": 2656,
+      "functional_tag": "land",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "global_top_500",
+        "land",
+        "mana_base",
+        "topdeck_miracle_engine",
+        "utility_engine_land"
+      ],
+      "protected_anchor": false,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 2656,
+      "value_score": 74,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "blockers": [
+        "commander_never_cut",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Lorehold, the Historian",
+      "cut_classification": "closed_hard_stop_current_607",
+      "cut_lane": "commander",
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "cut_status": "blocked",
+      "direct_event_count": 5558,
+      "functional_tag": "engine",
+      "investigation_action": "do_not_use_as_brain_cut_under_current_607_contract",
+      "lanes": [
+        "commander_center",
+        "engine",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "runtime_ready": true,
+      "scout_status": "blocked_current_607_hard_stop",
+      "unique_exposure_count": 5768,
+      "value_score": 230,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    }
+  ],
+  "source_db_mutated": false,
+  "source_evidence": {
+    "candidate_queue_summary": {
+      "blocked_candidate_row_count": 5,
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
+      "deck_action_allowed_now": false,
+      "matrix_contract_blocker_count": 28,
+      "matrix_scoring_allowed_now": false,
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "resolve_runtime_and_named_same_lane_cut_before_matrix_scoring",
+      "scoreable_candidate_row_count": 0,
+      "source_candidate_count": 5,
+      "value_model_quantity_total": 100
+    },
+    "cut_miner_summary": {
+      "classification_counts": {
+        "closed_hard_stop_current_607": 94
+      },
+      "contract_status": "hypothesis_contract_written_blocked_no_named_safe_cuts",
+      "cross_lane_excluded_count": 0,
+      "cut_expansion_status": "pressure_cut_expansion_no_seed_safe_cut_keep_607",
+      "cut_shortage": 2,
+      "decision_status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+      "hard_stop_blocker_counts": {
+        "commander_never_cut": 1,
+        "cut_is_early_mana_floor_support": 14,
+        "cut_is_miracle_core_big_spell": 25,
+        "cut_is_protection_shell": 14,
+        "early_mana_floor_support": 18,
+        "mana_base_never_cut": 28,
+        "measured_high_cut_exposure": 34,
+        "miracle_or_finisher_core": 24,
+        "never_cut_lane": 29,
+        "never_cut_or_mana_base": 29,
+        "prior_rejected_cut": 37,
+        "prior_rejected_cut_slot": 24,
+        "prior_rejected_signature": 4,
+        "protected_cut": 22,
+        "protection_shell": 14,
+        "structural_dependency": 24
+      },
+      "hard_stop_cut_count": 94,
+      "lane_counts": {
+        "big_spell_value": 2,
+        "commander": 1,
+        "contextual": 1,
+        "draw": 6,
+        "early_mana": 18,
+        "graveyard_recursion": 1,
+        "hand_filter": 1,
+        "mana_base": 28,
+        "misc": 2,
+        "protection": 13,
+        "removal": 10,
+        "spell_velocity": 5,
+        "wincon": 6
+      },
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "recommended_next_action": "do_not_battle_mine_new_nonanchor_trace_or_new_shell_contract",
+      "router_route_status": "best_next_learning_route_contract_required_no_deck_action",
+      "target_adds": [
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "target_lane_evidence_gap_count": 0,
+      "target_required_cut_count": 2,
+      "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair",
+      "total_cut_slots_reviewed": 94
+    },
+    "exact_runtime_contract_summary": {
+      "battle_runtime_surface_count": 5,
+      "brain_exact_scope_adapter_present": false,
+      "candidate_deck_materialization_allowed_now": false,
+      "contract_drafted": true,
+      "decision_status": "brain_exact_runtime_contract_drafted_adapter_missing_keep_607",
+      "deck_action_allowed_now": false,
+      "effect_json_scope": "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1",
+      "natural_battle_gate_allowed_now": false,
+      "postgres_writes_allowed_now": false,
+      "prior_preflight_status": "brain_in_a_jar_runtime_cut_preflight_blocked_no_active_rule_no_safe_cut_keep_607",
+      "promotion_allowed_now": false,
+      "recommended_next_action": "implement_brain_in_a_jar_runtime_adapter_no_deck_action",
+      "route_planner_selected_brain": true,
+      "test_vector_count": 3,
+      "xmage_missing_signal_count": 0,
+      "xmage_signal_count": 13
+    },
+    "external_confirmation": {
+      "learning_signal": "Brain is not generic ramp; its value depends on modeling charge counters, exact mana-value spell selection from hand, free casting, and X-counter scry.",
+      "links": {
+        "gatherer": "https://gatherer.wizards.com/SOI/en-us/252/brain-in-a-jar",
+        "scryfall": "https://scryfall.com/card/soi/252/brain-in-a-jar"
+      },
+      "source_lane": "official_card_text_and_rulings"
+    },
+    "route_planner_summary": {
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
+      "deck_action_allowed_now": false,
+      "entreat_active_rule_count": 0,
+      "entreat_safe_cut_count": 0,
+      "matrix_scoring_allowed_now": false,
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "postgres_writes_allowed_now": false,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "draft_brain_in_a_jar_runtime_contract_and_cut_miner_no_deck_action",
+      "route_candidate_count": 5,
+      "selected_card": "Brain in a Jar",
+      "selected_lane": "topdeck_miracle_access",
+      "selected_learning_score": 104,
+      "selected_route_state": "next_single_card_runtime_lesson",
+      "state_counts": {
+        "combo_package_runtime_lesson": 1,
+        "defer_lower_priority_runtime_review": 2,
+        "next_single_card_runtime_lesson": 1,
+        "parked_entreat_no_safe_cut": 1
+      },
+      "top_blocker_counts": {
+        "combo_runtime_required": 1,
+        "matrix_contract_blockers_not_cleared": 5,
+        "named_safe_cut_missing": 5,
+        "verified_battle_rule_missing": 5
+      }
+    },
+    "runtime_contract_summary": {
+      "battle_ready_now_count": 0,
+      "best_first_runtime_contract": "Entreat the Angels",
+      "cards_with_active_rule_count": 0,
+      "current_baseline": "deck_607",
+      "natural_battle_allowed_now": false,
+      "promotion_allowed": false,
+      "recommended_next_action": "prepare_entreat_the_angels_runtime_contract_before_battle",
+      "runtime_contract_count": 3,
+      "xmage_class_found_count": 3
+    },
+    "value_model_summary": {
+      "card_rows": 94,
+      "commander_count": 1,
+      "deck_id": 607,
+      "gate_ready_now_count": 0,
+      "keep_607_as_protected_baseline": true,
+      "lane_profile": {
+        "artifact": 17,
+        "basic_floor": 8,
+        "board_wipe": 8,
+        "commander_center": 1,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "fast_pressure_guard": 12,
+        "fetch_or_search_fixing": 8,
+        "format_staple_long_tail": 6,
+        "global_top_100": 17,
+        "global_top_500": 11,
+        "instant_sorcery_spell": 36,
+        "land": 34,
+        "mana_base": 34,
+        "miracle_conversion_finisher": 10,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "structural_ramp_floor": 8,
+        "topdeck_miracle_engine": 9,
+        "tutor": 1,
+        "typed_dual_or_fetch_target": 5,
+        "untapped_or_multiplayer_fixing": 5,
+        "utility_engine_land": 8,
+        "wincon": 9
+      },
+      "mana_foundation": {
+        "artifact_ramp_quantity": 11,
+        "enchantment_ramp_quantity": 1,
+        "instant_sorcery_ramp_quantity": 3,
+        "interpretation": "The 607 mana plan is not just more fast mana: it combines 34 lands, fetch/dual fixing, artifact ramp, spell ramp, and opponent-turn mana rocks that feed miracle windows.",
+        "land_groups": {
+          "basic_floor": 8,
+          "fetch_or_search_fixing": 8,
+          "typed_dual_or_fetch_target": 5,
+          "untapped_or_multiplayer_fixing": 5,
+          "utility_engine_land": 8
+        },
+        "land_quantity": 34,
+        "land_rows": 28,
+        "mana_sources_land_plus_ramp": 49,
+        "ramp_quantity": 15
+      },
+      "preflight_status": "no_current_candidate_passes_miracle_access_first_preflight",
+      "promotion_allowed": false,
+      "quantity_total": 100,
+      "role_profile": {
+        "board_wipe": 8,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "land": 34,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "trace_status": "lorehold_miracle_trace_failure_learning_ready"
+    }
+  },
+  "source_reports": {
+    "candidate_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_candidate_row_queue_20260705_current_relearn.json",
+    "cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json",
+    "exact_runtime_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_exact_runtime_contract_20260705_current.json",
+    "route_planner": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_next_route_planner_20260705_current.json",
+    "runtime_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_entreat_haze_runtime_contract_20260705_current.json",
+    "value_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json"
+  },
+  "status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_missing_no_active_rule_no_safe_cut_keep_607",
+  "summary": {
+    "blocked_same_lane_cut_count": 9,
+    "brain_active_rule_count": 0,
+    "brain_candidate_row_found": true,
+    "brain_contract_found": true,
+    "brain_exact_adapter_present": false,
+    "candidate_deck_materialization_allowed_now": false,
+    "decision_status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_missing_no_active_rule_no_safe_cut_keep_607",
+    "deck_action_allowed_now": false,
+    "exact_runtime_contract_drafted": true,
+    "exact_runtime_contract_found": true,
+    "exact_runtime_effect_scope": "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1",
+    "matrix_contract_blocker_count": 28,
+    "matrix_scoring_allowed_now": false,
+    "natural_battle_gate_allowed_now": false,
+    "postgres_writes_allowed_now": false,
+    "promotion_allowed_now": false,
+    "recommended_next_action": "implement_brain_in_a_jar_runtime_adapter_before_any_brain_deck_action",
+    "required_runtime_slice_count": 5,
+    "route_planner_selected_brain": true,
+    "safe_cut_count": 0,
+    "same_lane_candidate_count": 9,
+    "status_counts": {
+      "blocked_current_607_hard_stop": 9
+    },
+    "top_blocker_counts": {
+      "cut_is_early_mana_floor_support": 2,
+      "cut_not_flex_decision": 9,
+      "early_mana_floor_support": 3,
+      "manual_status_not_seed_safe": 9,
+      "measured_high_cut_exposure": 9,
+      "missing_cut_safety_row": 9,
+      "never_cut_lane": 2,
+      "never_cut_or_mana_base": 2,
+      "prior_rejected_cut": 3,
+      "prior_rejected_cut_slot": 3,
+      "protected_cut": 4,
+      "structural_dependency": 3
+    },
+    "xmage_class_found": true,
+    "xmage_signal_hit_count": 5
+  }
+}
