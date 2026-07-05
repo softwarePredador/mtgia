@@ -5652,6 +5652,145 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activated_damage_amount"], 1)
         self.assertTrue(effect["activation_requires_tap"])
 
+    def test_permanent_activated_damage_maps_opponent_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Deadeye Duelist",
+                type_line="Creature - Human Pirate",
+                oracle_text="{1}, {T}: This creature deals 1 damage to target opponent.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(1), new GenericManaCost(1));
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetOpponent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "opponent")
+        self.assertEqual(effect["target_constraints"], {"scope": "opponent"})
+        self.assertEqual(effect["activation_cost_mana"], "{1}")
+        self.assertEqual(effect["activated_damage_amount"], 1)
+        self.assertTrue(effect["activation_requires_tap"])
+
+    def test_permanent_activated_damage_maps_player_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Pyroclastic Elemental",
+                type_line="Creature - Elemental",
+                oracle_text="{1}{R}{R}: This creature deals 1 damage to target player.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(1), new ManaCostsImpl<>("{1}{R}{R}")
+                );
+                ability.addTarget(new TargetPlayer());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "player")
+        self.assertEqual(effect["target_constraints"], {"scope": "player"})
+        self.assertEqual(effect["activation_cost_mana"], "{1}{R}{R}")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], ["R", "R"])
+        self.assertFalse(effect["activation_requires_tap"])
+
+    def test_permanent_activated_damage_maps_opponent_or_planeswalker_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Razortip Whip",
+                type_line="Artifact",
+                oracle_text="{1}, {T}: This artifact deals 1 damage to target opponent or planeswalker.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(1), new ManaCostsImpl<>("{1}"));
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetOpponentOrPlaneswalker());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "artifact")
+        self.assertEqual(effect["target"], "opponent_or_planeswalker")
+        self.assertEqual(effect["target_constraints"], {"scope": "opponent_or_planeswalker"})
+        self.assertEqual(effect["activated_damage_amount"], 1)
+        self.assertTrue(effect["activation_requires_tap"])
+
+    def test_permanent_activated_damage_maps_creature_or_planeswalker_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Elite Headhunter",
+                type_line="Creature - Human Assassin",
+                oracle_text=(
+                    "{B/R}{B/R}{B/R}, Sacrifice another creature or an artifact: "
+                    "This creature deals 2 damage to target creature or planeswalker."
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(2), new ManaCostsImpl<>("{B/R}{B/R}{B/R}")
+                );
+                ability.addCost(new SacrificeTargetCost(StaticFilters.FILTER_CONTROLLED_ARTIFACT_OR_OTHER_CREATURE));
+                ability.addTarget(new TargetCreatureOrPlaneswalker());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature_or_planeswalker")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "planeswalker"]})
+        self.assertEqual(effect["activation_cost_mana"], "{B/R}{B/R}{B/R}")
+        self.assertEqual(effect["activation_cost_colors"], ["B/R", "B/R", "B/R"])
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+        self.assertEqual(
+            effect["activation_sacrifice_cost"],
+            {
+                "count": 1,
+                "target_controller": "self",
+                "constraints": {"card_types": ["artifact", "creature"], "exclude_source": True},
+            },
+        )
+
     def test_permanent_activated_damage_allows_static_keyword_auxiliary(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,
@@ -5741,6 +5880,75 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target"], "flying_creature")
         self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "required_keywords": ["flying"]})
         self.assertEqual(effect["activated_damage_amount"], 1)
+
+    def test_permanent_activated_damage_maps_attacking_flying_creature_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Femeref Archers",
+                type_line="Creature - Human Archer",
+                oracle_text="{T}: This creature deals 4 damage to target attacking creature with flying.",
+            ),
+            source_text="""
+                private static final FilterAttackingCreature filter = new FilterAttackingCreature("attacking creature with flying");
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(4), new TapSourceCost());
+                ability.addTarget(new TargetPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "attacking_flying_creature")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "combat_state": "attacking", "required_keywords": ["flying"]},
+        )
+        self.assertEqual(effect["activated_damage_amount"], 4)
+
+    def test_permanent_activated_damage_maps_simple_color_creature_targets(self) -> None:
+        fixtures = [
+            ("Shauku's Minion", "white", "W", "WHITE", "{B}{R}"),
+            ("Slingshot Goblin", "blue", "U", "BLUE", "{R}"),
+        ]
+        for name, color_word, color_symbol, object_color, cost_text in fixtures:
+            with self.subTest(name=name):
+                row = queue_row(
+                    split.DAMAGE_UNIT,
+                    effect_classes=["DamageTargetEffect"],
+                    ability_kind="activated",
+                    ability_classes=["SimpleActivatedAbility"],
+                    xmage_signals=["targeting", "activated_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=name,
+                        type_line="Creature - Fixture",
+                        oracle_text=f"{cost_text}, {{T}}: This creature deals 2 damage to target {color_word} creature.",
+                    ),
+                    source_text=f"""
+                        private static final FilterCreaturePermanent filter = new FilterCreaturePermanent("{color_word} creature");
+                        filter.add(new ColorPredicate(ObjectColor.{object_color}));
+                        Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(2), new ManaCostsImpl<>("{cost_text}"));
+                        ability.addCost(new TapSourceCost());
+                        ability.addTarget(new TargetPermanent(filter));
+                        this.addAbility(ability);
+                    """,
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["target"], f"{color_word}_creature")
+                self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "target_colors": [color_symbol]})
+                self.assertEqual(effect["activated_damage_amount"], 2)
 
     def test_permanent_activated_damage_maps_attacking_or_blocking_creature_target(self) -> None:
         row = queue_row(

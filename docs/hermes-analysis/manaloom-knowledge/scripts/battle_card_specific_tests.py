@@ -19906,6 +19906,59 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_xmage_activated_damage_opponent_or_planeswalker_hits_opponent():
+        events = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            opponent.life = 7
+            planeswalker = {
+                "name": "Opponent Planeswalker",
+                "type_line": "Legendary Planeswalker - Test",
+                "effect": "planeswalker",
+                "loyalty": 4,
+                "cmc": 3,
+            }
+            effect_data = {
+                "name": "Razortip Whip",
+                "effect": "direct_damage",
+                "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+                "ability_kind": "activated",
+                "amount": 1,
+                "damage": 1,
+                "target": "opponent_or_planeswalker",
+                "target_constraints": {"scope": "opponent_or_planeswalker"},
+                "_rule_logical_key": "battle_rule_v1:test_opponent_or_planeswalker_damage",
+                "_rule_oracle_hash": "test-opponent-or-planeswalker-damage-hash",
+                "_rule_review_status": "verified",
+                "_rule_execution_status": "auto",
+            }
+
+            assert battle.direct_damage_targets_player(effect_data)
+            assert battle.target_matches_type(planeswalker, "opponent_or_planeswalker")
+            battle.apply_direct_damage(
+                active,
+                [opponent],
+                {"name": "Razortip Whip", "type_line": "Artifact", "cmc": 2},
+                effect_data,
+                turn=5,
+                rng=random.Random(504),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+
+        assert opponent.life == 6
+        assert any(
+            event == "damage_resolved"
+            and data.get("card") == "Razortip Whip"
+            and data.get("target_player") == "Opponent"
+            and data.get("result") == "player_damage"
+            and data.get("rule_logical_key") == "battle_rule_v1:test_opponent_or_planeswalker_damage"
+            for event, data in events
+        )
+
     def test_eldrazi_confluence_uses_pump_then_blink_then_scion_when_context_exists():
         events = []
         previous_event_handler = battle.REPLAY_EVENT_HANDLER
@@ -23547,6 +23600,7 @@ def register_tests(battle, player):
         test_eldrazi_confluence_creates_three_scions_when_no_other_modes_are_live,
         test_xmage_token_sacrifice_colorless_mana_unlocks_contextual_cast,
         test_xmage_creature_etb_fixed_mana_adds_exact_symbols,
+        test_xmage_activated_damage_opponent_or_planeswalker_hits_opponent,
         test_eldrazi_confluence_uses_pump_then_blink_then_scion_when_context_exists,
         test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache,
         test_pg114_emerias_call_creates_angels_and_protects_non_angels_until_next_turn,

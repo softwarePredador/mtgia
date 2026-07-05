@@ -7512,6 +7512,7 @@ def restricted_target_base(target: str) -> str:
         return mana_value_target["base"]
     if target in {
         "attacking_creature",
+        "attacking_flying_creature",
         "blocking_creature",
         "attacking_or_blocking_creature",
         "attacking_creature_power_3_or_less",
@@ -7523,6 +7524,8 @@ def restricted_target_base(target: str) -> str:
         "nonblack_creature",
         "nongreen_creature",
         "black_creature",
+        "white_creature",
+        "blue_creature",
         "green_or_white_creature",
         "nonartifact_creature",
         "nonartifact_nonblack_creature",
@@ -7605,6 +7608,7 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target attacking or blocking creature with power 2 or less", "attacking_or_blocking_creature_power_2_or_less"),
         (r"target attacking or blocking creature with power 3 or less", "attacking_or_blocking_creature_power_3_or_less"),
         (r"target attacking creature with power 3 or less", "attacking_creature_power_3_or_less"),
+        (r"target attacking creature with flying", "attacking_flying_creature"),
         (r"target attacking or blocking creature", "attacking_or_blocking_creature"),
         (r"target attacking creature", "attacking_creature"),
         (r"target blocking creature", "blocking_creature"),
@@ -7617,6 +7621,8 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target nongreen creature(?:\. it can't be regenerated)?", "nongreen_creature"),
         (r"target black creature", "black_creature"),
         (r"target green or white creature", "green_or_white_creature"),
+        (r"target white creature", "white_creature"),
+        (r"target blue creature", "blue_creature"),
         (r"target legendary creature", "legendary_creature"),
         (r"target nonlegendary creature", "nonlegendary_creature"),
         (r"target nonsnow creature", "nonsnow_creature"),
@@ -7678,6 +7684,15 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         and "PowerPredicate(ComparisonType.FEWER_THAN, 4)" in text
     ):
         return "attacking_creature_power_3_or_less"
+    if (
+        "FilterAttackingCreature" in text
+        and (
+            "attacking creature with flying" in text
+            or "FILTER_CREATURE_FLYING" in text
+            or "AbilityPredicate(FlyingAbility.class)" in text
+        )
+    ):
+        return "attacking_flying_creature"
     if re.search(r"new\s+TargetAttackingOrBlockingCreature\s*\(", text) or "FilterAttackingOrBlockingCreature" in text:
         return "attacking_or_blocking_creature"
     if re.search(r"new\s+TargetAttackingCreature\s*\(", text) or "FilterAttackingCreature" in text:
@@ -7714,6 +7729,10 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "black_creature"
     if 'FilterCreaturePermanent("green or white creature")' in text or "green or white creature" in text:
         return "green_or_white_creature"
+    if 'FilterCreaturePermanent("white creature")' in text or "white creature" in text:
+        return "white_creature"
+    if 'FilterCreaturePermanent("blue creature")' in text or "blue creature" in text:
+        return "blue_creature"
     if (
         'FilterCreaturePermanent("nonlegendary creature")' in text
         or "nonlegendary creature" in text
@@ -9878,7 +9897,7 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
         }
     match = re.match(
         r"^(?:it|this (?:artifact|creature|enchantment)|[^.]+?) deals (\d+) damage to "
-        r"(any target|target creature|target player or planeswalker)\.?$",
+        r"(any target|target creature|target player|target opponent|target player or planeswalker|target opponent or planeswalker|target creature or planeswalker)\.?$",
         effect_text,
     )
     if not match:
@@ -9886,7 +9905,11 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
     target_map = {
         "any target": "any_target",
         "target creature": "creature",
+        "target player": "player",
+        "target opponent": "opponent",
         "target player or planeswalker": "player_or_planeswalker",
+        "target opponent or planeswalker": "opponent_or_planeswalker",
+        "target creature or planeswalker": "creature_or_planeswalker",
     }
     sacrifice_cost = activation_sacrifice_cost_from_oracle(text)
     if isinstance(sacrifice_cost, str):
@@ -9928,6 +9951,14 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
         target = "any_target"
     elif "new TargetPlayerOrPlaneswalker(" in text:
         target = "player_or_planeswalker"
+    elif "new TargetOpponentOrPlaneswalker(" in text:
+        target = "opponent_or_planeswalker"
+    elif "new TargetCreatureOrPlaneswalker(" in text:
+        target = "creature_or_planeswalker"
+    elif "new TargetOpponent(" in text:
+        target = "opponent"
+    elif "new TargetPlayer(" in text:
+        target = "player"
     elif "new TargetCreaturePermanent(" in text:
         target = "creature"
     else:
@@ -13283,6 +13314,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"scope": "any_target"}
     if target == "attacking_creature":
         return {"card_types": ["creature"], "combat_state": "attacking"}
+    if target == "attacking_flying_creature":
+        return {"card_types": ["creature"], "combat_state": "attacking", "required_keywords": ["flying"]}
     if target == "blocking_creature":
         return {"card_types": ["creature"], "combat_state": "blocking"}
     if target == "attacking_or_blocking_creature":
@@ -13305,6 +13338,10 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_colors": ["G"]}
     if target == "black_creature":
         return {"card_types": ["creature"], "target_colors": ["B"]}
+    if target == "white_creature":
+        return {"card_types": ["creature"], "target_colors": ["W"]}
+    if target == "blue_creature":
+        return {"card_types": ["creature"], "target_colors": ["U"]}
     if target == "green_or_white_creature":
         return {"card_types": ["creature"], "target_colors": ["G", "W"]}
     if target == "nonartifact_creature":
@@ -13396,6 +13433,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"scope": "player"}
     if target == "player_or_planeswalker":
         return {"scope": "player_or_planeswalker"}
+    if target == "opponent_or_planeswalker":
+        return {"scope": "opponent_or_planeswalker"}
     if target == "opponent":
         return {"scope": "opponent"}
     if target == "nonland_permanent":

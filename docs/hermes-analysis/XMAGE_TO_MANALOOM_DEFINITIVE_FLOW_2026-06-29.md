@@ -12798,6 +12798,45 @@ rows. It only closes the exact fixed ETB mana trigger family. The next work
 must select a new exact subpattern from the rebuilt queue instead of promoting
 generic `xmage_creature_mana_source_variant_review_v1` rows.
 
+## 2026-07-05 Checkpoint: PG504 Activated Damage Target Parser
+
+PG504 closed the exact activated permanent damage target-parser expansion for
+supported simple XMage `DamageTargetEffect` abilities and adjacent activated
+color-restricted destroy targets. The package promoted `Deadeye Duelist`,
+`Elite Headhunter`, `Femeref Archers`, `Pyroclastic Elemental`, `Razortip
+Whip`, `Shauku's Minion`, `Slingshot Goblin`, `Sorcerer of the Fang`, `Spinal
+Villain`, `Western Paladin`, and `Zealot of the God-Pharaoh`.
+
+Runtime and mapper changes:
+
+- `xmage_authoritative_exact_scope_split.py` now recognizes activated damage
+  targets `player`, `opponent`, `opponent_or_planeswalker`,
+  `creature_or_planeswalker`, `attacking_flying_creature`, `white_creature`,
+  and `blue_creature` when Oracle text and local XMage source agree.
+- The restricted-target matcher keeps `green_or_white_creature` ahead of
+  simple `white_creature` to avoid substring misclassification.
+- `battle_analyst_v9.py` treats `opponent_or_planeswalker` as player-damage
+  capable while still allowing planeswalker target matching.
+
+PostgreSQL and cache evidence:
+
+- Precheck: 11 target card rows, 0 existing active same-scope rules.
+- Apply: `deprecated_shadow_rows=0`, `upserted_rows=11`, `COMMIT`.
+- Postcheck: all 11 rows have promoted rule, verified-auto, and Oracle hash
+  matches.
+- PG -> Hermes/SQLite sync:
+  `pg_rows_loaded=8446`, `sqlite_inserted_or_updated=8210`, and
+  `canonical_snapshot_rows_exported=5972`.
+- Focused split/runtime tests passed `804` checks with `60` subtests; full
+  script suite passed `2807` tests, `5` skipped, and `167` subtests.
+- Contract/alignment audits passed: PG/Hermes/SQLite `51/51`, XMage strategy
+  `26/26`, operational surface `pass`, and legacy contamination `pass`.
+
+Residual boundary: PG504 only closes the exact supported activated target
+parser shapes above. It does not authorize broad activated damage or destroy
+review rows, modal abilities, unsupported target predicates, or non-matching
+Oracle/XMage target pairs.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

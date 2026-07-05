@@ -11395,7 +11395,7 @@ def target_matches_type(target, target_type):
         return True
     if target_type in ("player", "opponent"):
         return False
-    if target_type == "player_or_planeswalker":
+    if target_type in ("player_or_planeswalker", "opponent_or_planeswalker"):
         return is_planeswalker_permanent(target)
     if target_type == "any_target":
         return (
@@ -11838,7 +11838,7 @@ def direct_damage_targets_player(effect_data):
     if str(constraints.get("scope") or "").lower() == "any_target":
         return True
     target = str((effect_data or {}).get("target") or "").lower()
-    if target in {"player", "opponent", "any_target", "player_or_planeswalker"}:
+    if target in {"player", "opponent", "any_target", "player_or_planeswalker", "opponent_or_planeswalker"}:
         return True
     return False
 
