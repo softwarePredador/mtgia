@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T01:45:52Z",
+  "generated_at": "2026-07-05T01:48:27Z",
   "artifact_type": "lorehold_external_identity_cache_apply_package",
   "postgres_writes": false,
   "source_db_mutated": false,
@@ -17,7 +17,7 @@
   "status": "external_identity_cache_apply_package_prepared_not_applied_keep_607",
   "summary": {
     "current_baseline": "deck_607",
-    "cache_insert_ready_count": 7,
+    "cache_insert_ready_count": 6,
     "sqlite_apply_executed": false,
     "deck_test_ready_count": 0,
     "natural_battle_allowed_now": false,
@@ -25,14 +25,6 @@
     "recommended_next_action": "review_and_apply_sqlite_identity_cache_package_only_if_cache_update_is_approved"
   },
   "package_rows": [
-    {
-      "card_name": "Anointed Procession",
-      "post_import_status": "identity_ready_then_shell_contract_required",
-      "scryfall_id": "9a52c265-6920-4929-ba0a-70da08df01f1",
-      "oracle_id": "7246d45b-2185-4cdd-981b-5419b7d52bce",
-      "commander_legal": true,
-      "lorehold_color_identity_compatible": true
-    },
     {
       "card_name": "Brain in a Jar",
       "post_import_status": "identity_ready_then_runtime_or_cut_safety_required",

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T01:36:24Z",
+  "generated_at": "2026-07-05T01:48:11Z",
   "artifact_type": "lorehold_external_candidate_identity_import_preflight",
   "postgres_writes": false,
   "source_db_mutated": false,
@@ -13,11 +13,11 @@
     "current_baseline": "deck_607",
     "material_candidate_count": 14,
     "commander_legal_count": 14,
-    "oracle_identity_ready_count": 7,
-    "oracle_identity_missing_count": 7,
-    "identity_ready_without_verified_rule_count": 6,
+    "oracle_identity_ready_count": 8,
+    "oracle_identity_missing_count": 6,
+    "identity_ready_without_verified_rule_count": 7,
     "runtime_or_manual_review_required_count": 2,
-    "shell_contract_required_count": 5,
+    "shell_contract_required_count": 6,
     "format_staple_candidate_count": 1,
     "gate_ready_now_count": 0,
     "natural_battle_allowed_now": false,
@@ -35,13 +35,13 @@
       "route_types": [
         "archetype_fork"
       ],
-      "oracle_identity_ready": false,
-      "oracle_name": null,
-      "card_id": null,
-      "scryfall_id": null,
-      "color_identity_json": null,
-      "type_line": null,
-      "cmc": null,
+      "oracle_identity_ready": true,
+      "oracle_name": "Anointed Procession // Anointed Procession",
+      "card_id": "75824e7e-1ffe-40cf-b362-a7aab13f630b",
+      "scryfall_id": "7246d45b-2185-4cdd-981b-5419b7d52bce",
+      "color_identity_json": "[\"W\"]",
+      "type_line": "Enchantment",
+      "cmc": 4.0,
       "commander_legal_status": "legal",
       "format_staple_rank": 341,
       "format_staple_category": "",
@@ -49,9 +49,10 @@
       "battle_rule_count": 0,
       "verified_auto_rule_count": 0,
       "battle_rules": [],
-      "preflight_status": "identity_import_required",
+      "preflight_status": "shell_contract_required_not_one_for_one_cut",
       "blockers": [
-        "oracle_identity_missing"
+        "full_shell_contract_required",
+        "verified_battle_rule_missing"
       ],
       "deck_test_allowed_now": false
     },
@@ -460,7 +461,6 @@
   ],
   "queues": {
     "identity_import_required": [
-      "Anointed Procession",
       "Brain in a Jar",
       "Entreat the Angels",
       "Haze of Rage",
@@ -473,6 +473,7 @@
       "Inti, Seneschal of the Sun"
     ],
     "shell_contract_required": [
+      "Anointed Procession",
       "Blackblade Reforged",
       "Cathars' Crusade",
       "Excalibur, Sword of Eden",

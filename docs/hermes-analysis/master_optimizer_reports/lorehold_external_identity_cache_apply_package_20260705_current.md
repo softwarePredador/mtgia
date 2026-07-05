@@ -1,6 +1,6 @@
 # Lorehold External Identity Cache Apply Package
 
-- Generated at: `2026-07-05T01:45:52Z`
+- Generated at: `2026-07-05T01:48:27Z`
 - Status: `external_identity_cache_apply_package_prepared_not_applied_keep_607`
 - Current baseline: `deck_607`
 - Source DB mutated: `False`
@@ -17,7 +17,6 @@
 
 | Card | Post-Import Status | Commander | Color Fit |
 | --- | --- | ---: | ---: |
-| Anointed Procession | `identity_ready_then_shell_contract_required` | `True` | `True` |
 | Brain in a Jar | `identity_ready_then_runtime_or_cut_safety_required` | `True` | `True` |
 | Entreat the Angels | `identity_ready_then_runtime_or_cut_safety_required` | `True` | `True` |
 | Haze of Rage | `identity_ready_then_combo_runtime_and_cut_safety_required` | `True` | `True` |

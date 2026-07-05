@@ -350,32 +350,37 @@ Current result:
 - status: `external_identity_preflight_blocks_gate_keep_607`;
 - material candidates: `14`;
 - Commander legal: `14`;
-- local Oracle identity ready: `7`;
-- local Oracle identity missing: `7`;
-- identity-ready without verified rule: `6`;
+- local Oracle identity ready: `8`;
+- local Oracle identity missing: `6`;
+- identity-ready without verified rule: `7`;
 - isolated runtime/manual-review queue: `2`;
-- full-shell contract queue: `5`;
+- full-shell contract queue: `6`;
 - gate-ready packages: `0`;
 - natural battle allowed now: `false`;
 - promotion allowed: `false`.
 
 Current queues:
 
-- `identity_import_required`: `Anointed Procession`, `Brain in a Jar`,
-  `Entreat the Angels`, `Haze of Rage`, `Late to Dinner`,
-  `Miraculous Recovery`, and `Strata Scythe`.
+- `identity_import_required`: `Brain in a Jar`, `Entreat the Angels`,
+  `Haze of Rage`, `Late to Dinner`, `Miraculous Recovery`, and
+  `Strata Scythe`.
 - `runtime_or_manual_review_required`: `Burning Prophet` and
   `Inti, Seneschal of the Sun`.
-- `shell_contract_required`: `Blackblade Reforged`, `Cathars' Crusade`,
-  `Excalibur, Sword of Eden`, `Karmic Guide`, and `Storm of Souls`.
+- `shell_contract_required`: `Anointed Procession`, `Blackblade Reforged`,
+  `Cathars' Crusade`, `Excalibur, Sword of Eden`, `Karmic Guide`, and
+  `Storm of Souls`.
 - `cut_safety_contract_required`: none.
 
 Interpretation:
 
 - All material candidates pass Commander legality, so the current blocker is
   not color identity or legality.
-- Seven candidates cannot be materialized responsibly because local Oracle
+- Six candidates cannot be materialized responsibly because local Oracle
   identity is missing.
+- `Anointed Procession` already has local Oracle identity through
+  `normalized_name=anointed procession` even though its display name is stored
+  as `Anointed Procession // Anointed Procession`; this is a shell-contract
+  card, not an identity-import row.
 - `Burning Prophet` and `Inti, Seneschal of the Sun` have local identity but
   require runtime/manual-review work before any focused deck test.
 - The shell-contract queue is a deck-thesis question, not a one-card cut
@@ -394,25 +399,24 @@ The next learning artifact is:
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_resolution_queue_20260705_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_resolution_queue_20260705_current.json`
 
-It resolves the `7` missing identity cards through Scryfall and produces a
+It resolves the `6` missing identity cards through Scryfall and produces a
 report-only queue. It does not write SQLite, does not mutate `607`, and does
 not make any card battle-ready by itself.
 
 Current result:
 
 - status: `external_identity_resolution_ready_for_apply_plan_keep_607`;
-- identity queue: `7`;
-- Scryfall identities found: `7`;
-- Commander legal: `7`;
-- Lorehold color-identity compatible: `7`;
-- cache-insert ready: `7`;
+- identity queue: `6`;
+- Scryfall identities found: `6`;
+- Commander legal: `6`;
+- Lorehold color-identity compatible: `6`;
+- cache-insert ready: `6`;
 - deck-test ready: `0`;
 - natural battle allowed now: `false`;
 - promotion allowed: `false`.
 
 Cache identity queue:
 
-- `Anointed Procession`
 - `Brain in a Jar`
 - `Entreat the Angels`
 - `Haze of Rage`
@@ -424,8 +428,8 @@ Post-identity routes:
 
 - `Haze of Rage`: combo runtime plus cut-safety route after identity exists
   locally.
-- `Anointed Procession`, `Late to Dinner`, `Miraculous Recovery`, and
-  `Strata Scythe`: shell-contract route; keep them out of one-for-one `607`
+- `Late to Dinner`, `Miraculous Recovery`, and `Strata Scythe`:
+  shell-contract route; keep them out of one-for-one `607`
   swap gates.
 - `Brain in a Jar` and `Entreat the Angels`: runtime or cut-safety route after
   identity exists locally.
@@ -446,13 +450,13 @@ The next learning artifact is:
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_postcheck.sql`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_rollback_sqlite.sql`
 
-It prepares a reviewed SQLite cache package for the seven Scryfall-resolved
+It prepares a reviewed SQLite cache package for the six Scryfall-resolved
 external identities. The package was generated but not executed.
 
 Current result:
 
 - status: `external_identity_cache_apply_package_prepared_not_applied_keep_607`;
-- cache-insert ready rows: `7`;
+- cache-insert ready rows: `6`;
 - SQLite apply executed: `false`;
 - deck-test ready: `0`;
 - natural battle allowed now: `false`;
@@ -466,6 +470,9 @@ Safety notes:
   already exists, the apply should fail rather than overwrite local cache data.
 - The rollback deletes only rows with source marker
   `lorehold_external_identity_resolution_queue_20260705_current`.
+- The package was validated on a temporary copy of `knowledge.db`: precheck
+  found `0` existing target rows, apply inserted `6`, postcheck returned `6`,
+  rollback returned `0`, and the source database was not touched.
 
 Current conclusion remains unchanged: protected deck `607` is still the
 Lorehold champion. Applying identity cache rows, if later approved, is a data

@@ -80,26 +80,39 @@ def query_by_name(
     columns: list[str],
     extra_where: str = "",
     extra_params: tuple[Any, ...] = (),
+    alternate_name_columns: tuple[str, ...] = (),
 ) -> dict[str, list[dict[str, Any]]]:
     if not names or not sqlite_connection_has_table(conn, table):
         return {normalize_name(name): [] for name in names}
     normalized = [normalize_name(name) for name in names]
     placeholders = ",".join("?" for _ in normalized)
     column_sql = ", ".join(columns)
+    name_matchers = [f"lower({name_column}) IN ({placeholders})"]
+    for alternate in alternate_name_columns:
+        name_matchers.append(f"lower({alternate}) IN ({placeholders})")
+    name_where = "(" + " OR ".join(name_matchers) + ")"
     where_tail = f" AND {extra_where}" if extra_where else ""
     rows = conn.execute(
         f"""
         SELECT {column_sql}
         FROM {table}
-        WHERE lower({name_column}) IN ({placeholders}){where_tail}
+        WHERE {name_where}{where_tail}
         ORDER BY lower({name_column})
         """,
-        (*normalized, *extra_params),
+        (*(normalized * (1 + len(alternate_name_columns))), *extra_params),
     ).fetchall()
     result: dict[str, list[dict[str, Any]]] = {normalize_name(name): [] for name in names}
     for row in rows:
-        key = normalize_name(row[name_column])
-        result.setdefault(key, []).append(dict(row))
+        row_dict = dict(row)
+        matched = False
+        for column in (name_column, *alternate_name_columns):
+            key = normalize_name(row[column])
+            if key in result:
+                result[key].append(row_dict)
+                matched = True
+        if not matched:
+            key = normalize_name(row[name_column])
+            result.setdefault(key, []).append(row_dict)
     return result
 
 
@@ -143,6 +156,7 @@ def build_rows(conn: sqlite3.Connection, scout_rows: list[dict[str, Any]]) -> li
         "name",
         names,
         [
+            "normalized_name",
             "name",
             "card_id",
             "mana_cost",
@@ -152,6 +166,7 @@ def build_rows(conn: sqlite3.Connection, scout_rows: list[dict[str, Any]]) -> li
             "cmc",
             "scryfall_id",
         ],
+        alternate_name_columns=("normalized_name",),
     )
     legality_rows = query_by_name(
         conn,

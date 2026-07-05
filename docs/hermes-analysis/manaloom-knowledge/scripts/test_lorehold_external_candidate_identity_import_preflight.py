@@ -53,6 +53,7 @@ def make_conn() -> sqlite3.Connection:
         VALUES (?, 'commander', 'legal')
         """,
         [
+            ("Anointed Procession",),
             ("Brain in a Jar",),
             ("Burning Prophet",),
             ("Haze of Rage",),
@@ -67,6 +68,15 @@ def make_conn() -> sqlite3.Connection:
         """,
         [
             ("burning prophet", "Burning Prophet", '["R"]', "Creature - Human Wizard", "scry text", 2, "burning-id"),
+            (
+                "anointed procession",
+                "Anointed Procession // Anointed Procession",
+                '["W"]',
+                "Enchantment",
+                "token text",
+                4,
+                "anointed-id",
+            ),
             ("karmic guide", "Karmic Guide", '["W"]', "Creature - Angel Spirit", "reanimate text", 5, "karmic-id"),
         ],
     )
@@ -83,6 +93,13 @@ def make_conn() -> sqlite3.Connection:
 def scout_report() -> dict:
     return {
         "candidate_classifications": [
+            {
+                "card_name": "Anointed Procession",
+                "classification": "external_missing_from_local_deck_pool",
+                "actionability": "archetype_fork_only_requires_full_shell_contract",
+                "route_types": ["archetype_fork"],
+                "source_keys": ["coolstuffinc_token_combo_voltron_directions"],
+            },
             {
                 "card_name": "Brain in a Jar",
                 "classification": "external_missing_from_local_deck_pool",
@@ -128,7 +145,7 @@ def test_preflight_blocks_gate_and_keeps_607():
     payload = build_payload()
 
     assert payload["status"] == "external_identity_preflight_blocks_gate_keep_607"
-    assert payload["summary"]["material_candidate_count"] == 4
+    assert payload["summary"]["material_candidate_count"] == 5
     assert payload["summary"]["promotion_allowed"] is False
     assert payload["decision"]["natural_battle_allowed_now"] is False
 
@@ -138,12 +155,14 @@ def test_identity_runtime_and_shell_queues_are_split():
     rows = {row["card_name"]: row for row in payload["preflight_rows"]}
 
     assert rows["Brain in a Jar"]["preflight_status"] == "identity_import_required"
+    assert rows["Anointed Procession"]["preflight_status"] == "shell_contract_required_not_one_for_one_cut"
+    assert rows["Anointed Procession"]["oracle_name"] == "Anointed Procession // Anointed Procession"
     assert rows["Haze of Rage"]["preflight_status"] == "identity_import_required_before_combo_runtime"
     assert rows["Burning Prophet"]["preflight_status"] == "runtime_rule_or_manual_review_required"
     assert rows["Karmic Guide"]["preflight_status"] == "shell_contract_required_not_one_for_one_cut"
     assert payload["queues"]["identity_import_required"] == ["Brain in a Jar", "Haze of Rage"]
     assert payload["queues"]["runtime_or_manual_review_required"] == ["Burning Prophet"]
-    assert payload["queues"]["shell_contract_required"] == ["Karmic Guide"]
+    assert payload["queues"]["shell_contract_required"] == ["Anointed Procession", "Karmic Guide"]
 
 
 def test_markdown_surfaces_preflight_rows_and_queues():

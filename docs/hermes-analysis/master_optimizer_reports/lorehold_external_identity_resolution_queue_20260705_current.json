@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T01:41:32Z",
+  "generated_at": "2026-07-05T01:48:27Z",
   "artifact_type": "lorehold_external_identity_resolution_queue",
   "postgres_writes": false,
   "source_db_mutated": false,
@@ -11,55 +11,17 @@
   "status": "external_identity_resolution_ready_for_apply_plan_keep_607",
   "summary": {
     "current_baseline": "deck_607",
-    "identity_queue_count": 7,
-    "scryfall_found_count": 7,
-    "commander_legal_count": 7,
-    "lorehold_color_identity_compatible_count": 7,
-    "cache_insert_ready_count": 7,
+    "identity_queue_count": 6,
+    "scryfall_found_count": 6,
+    "commander_legal_count": 6,
+    "lorehold_color_identity_compatible_count": 6,
+    "cache_insert_ready_count": 6,
     "deck_test_ready_count": 0,
     "natural_battle_allowed_now": false,
     "promotion_allowed": false,
     "recommended_next_action": "prepare_reviewed_sqlite_identity_cache_apply_package_without_deck_mutation"
   },
   "resolution_rows": [
-    {
-      "card_name": "Anointed Procession",
-      "source_preflight_status": "identity_import_required",
-      "route_types": [
-        "archetype_fork"
-      ],
-      "lookup": {
-        "lookup_status": "found",
-        "name": "Anointed Procession",
-        "oracle_id": "7246d45b-2185-4cdd-981b-5419b7d52bce",
-        "scryfall_id": "9a52c265-6920-4929-ba0a-70da08df01f1",
-        "mana_cost": "{3}{W}",
-        "cmc": 4.0,
-        "type_line": "Enchantment",
-        "oracle_text": "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead.",
-        "colors": [
-          "W"
-        ],
-        "color_identity": [
-          "W"
-        ],
-        "keywords": [],
-        "legalities": {
-          "commander": "legal"
-        },
-        "scryfall_uri": "https://scryfall.com/card/akh/2/anointed-procession?utm_source=api",
-        "scryfall_api_url": "https://api.scryfall.com/cards/named?exact=Anointed+Procession"
-      },
-      "scryfall_lookup_status": "found",
-      "commander_legal": true,
-      "lorehold_color_identity_compatible": true,
-      "cache_insert_ready": true,
-      "post_import_status": "identity_ready_then_shell_contract_required",
-      "deck_test_allowed_after_identity": false,
-      "blockers": [
-        "full_shell_contract_still_required"
-      ]
-    },
     {
       "card_name": "Brain in a Jar",
       "source_preflight_status": "identity_import_required",
@@ -295,7 +257,6 @@
   ],
   "queues": {
     "cache_insert_ready": [
-      "Anointed Procession",
       "Brain in a Jar",
       "Entreat the Angels",
       "Haze of Rage",
@@ -307,7 +268,6 @@
       "Haze of Rage"
     ],
     "shell_contract_after_identity": [
-      "Anointed Procession",
       "Late to Dinner",
       "Miraculous Recovery",
       "Strata Scythe"

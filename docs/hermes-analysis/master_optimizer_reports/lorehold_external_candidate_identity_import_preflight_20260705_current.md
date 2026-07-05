@@ -1,6 +1,6 @@
 # Lorehold External Candidate Identity Import Preflight
 
-- Generated at: `2026-07-05T01:36:24Z`
+- Generated at: `2026-07-05T01:48:11Z`
 - Status: `external_identity_preflight_blocks_gate_keep_607`
 - Current baseline: `deck_607`
 - Source DB mutated: `False`
@@ -12,11 +12,11 @@
 | --- | ---: |
 | `material_candidate_count` | `14` |
 | `commander_legal_count` | `14` |
-| `oracle_identity_ready_count` | `7` |
-| `oracle_identity_missing_count` | `7` |
-| `identity_ready_without_verified_rule_count` | `6` |
+| `oracle_identity_ready_count` | `8` |
+| `oracle_identity_missing_count` | `6` |
+| `identity_ready_without_verified_rule_count` | `7` |
 | `runtime_or_manual_review_required_count` | `2` |
-| `shell_contract_required_count` | `5` |
+| `shell_contract_required_count` | `6` |
 | `format_staple_candidate_count` | `1` |
 | `gate_ready_now_count` | `0` |
 
@@ -24,7 +24,7 @@
 
 | Card | Status | Oracle | Commander | Rules | Route |
 | --- | --- | ---: | --- | ---: | --- |
-| Anointed Procession | `identity_import_required` | `False` | `legal` | `0` | `archetype_fork` |
+| Anointed Procession | `shell_contract_required_not_one_for_one_cut` | `True` | `legal` | `0` | `archetype_fork` |
 | Blackblade Reforged | `shell_contract_required_not_one_for_one_cut` | `True` | `legal` | `0` | `archetype_fork` |
 | Brain in a Jar | `identity_import_required` | `False` | `legal` | `0` | `topdeck_pressure_reference` |
 | Burning Prophet | `runtime_rule_or_manual_review_required` | `True` | `legal` | `0` | `topdeck_pressure_reference` |
@@ -41,9 +41,9 @@
 
 ## Queues
 
-- `identity_import_required`: Anointed Procession, Brain in a Jar, Entreat the Angels, Haze of Rage, Late to Dinner, Miraculous Recovery, Strata Scythe
+- `identity_import_required`: Brain in a Jar, Entreat the Angels, Haze of Rage, Late to Dinner, Miraculous Recovery, Strata Scythe
 - `runtime_or_manual_review_required`: Burning Prophet, Inti, Seneschal of the Sun
-- `shell_contract_required`: Blackblade Reforged, Cathars' Crusade, Excalibur, Sword of Eden, Karmic Guide, Storm of Souls
+- `shell_contract_required`: Anointed Procession, Blackblade Reforged, Cathars' Crusade, Excalibur, Sword of Eden, Karmic Guide, Storm of Souls
 - `cut_safety_contract_required`: -
 
 ## Decision
