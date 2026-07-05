@@ -2327,3 +2327,76 @@ Validation after package generation:
   `operational_surface_alignment_audit_20260705_brain_pg_package_current`,
   and `legacy_contamination_audit_20260705_brain_pg_package_current` all
   returned `pass`.
+
+## Brain in a Jar Safe-Cut Gap Audit - 2026-07-05
+
+The Brain deckbuilding gap audit artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_safe_cut_gap_audit_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_safe_cut_gap_audit_20260705_current.json`
+
+This audit uses the current Brain runtime/cut preflight, the Brain PostgreSQL
+package preflight, protected deck `607` value model, and external deckbuilding
+evidence. It keeps the same Commander contract boundary: a runtime package
+can make Brain executable later, but it does not make Brain a Lorehold deck
+card without a named same-lane seed-safe cut and later equal battle evidence.
+
+Current result:
+
+- decision status:
+  `brain_safe_cut_gap_no_active_rule_no_seed_safe_cut_keep_607`;
+- Brain PostgreSQL package status:
+  `prepared_read_only_pending_apply_approval`;
+- apply ready for manual review: `true`;
+- apply executed by this script: `false`;
+- active Brain rule count: `0`;
+- safe same-lane cuts: `0`;
+- blocked same-lane cuts: `9`;
+- external signal classification:
+  `low_context_signal_not_staple`;
+- EDHREC Brain global inclusion: `0.03%`;
+- EDHREC Brain in Lorehold inclusion: `0.4%`;
+- lowest-risk diagnostic cut candidate: `Molecule Man`;
+- diagnostic cut allowed now: `false`;
+- matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- recommended next action:
+  `review_pg_package_then_request_explicit_apply_and_continue_cut_mining`.
+
+Same-lane gap categories:
+
+- `protected_core_topdeck_engine`: `3` slots:
+  `Library of Leng`, `Scroll Rack`, and `Sensei's Divining Top`;
+- `protected_structural_floor`: `2` slots:
+  `The Mind Stone` and `The Scarlet Witch`;
+- `prior_rejected_protected_slot`: `2` slots:
+  `Molecule Man` and `Land Tax`;
+- `never_cut_mana_base`: `1` slot:
+  `Urza's Saga`;
+- `never_cut_commander`: `1` slot:
+  `Lorehold, the Historian`.
+
+External deckbuilding lesson:
+
+- EDHREC currently shows Brain as a very low-adoption contextual card, not a
+  staple proof path: `0.03%` global and `0.4%` in Lorehold.
+- The current Lorehold article names `Sensei's Divining Top`, `Scroll Rack`,
+  and `Library of Leng` as key topdeck-manipulation cards; this supports the
+  local protected-core classification instead of cutting those anchors for
+  Brain.
+- The spellslinger planning lesson remains that a deck can add one or two
+  extra packages only when they still serve Plan A. Brain may still be a useful
+  learning route, but current evidence says it is not yet a deck replacement.
+
+Operational lesson:
+
+- Brain has advanced as a runtime/card-rule candidate, but it has not advanced
+  as a 607 deck-quality candidate.
+- `Molecule Man` is the lowest-exposure diagnostic row, but it remains blocked
+  because it is a prior rejected protected slot and needs new trace evidence
+  before it can even become a named cut hypothesis.
+- Do not materialize a Brain candidate, do not mutate deck `607`, and do not
+  run a natural Brain battle from this audit. The next valid work is explicit
+  PostgreSQL apply approval for the prepared Brain package plus continued
+  same-lane cut mining.
