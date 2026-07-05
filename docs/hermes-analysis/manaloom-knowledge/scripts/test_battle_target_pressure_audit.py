@@ -2,6 +2,23 @@
 """Regression tests for battle_target_pressure_audit."""
 
 import battle_target_pressure_audit as audit
+import battle_analyst_v9 as battle
+
+
+def test_commander_target_player_name_defaults_lorehold_alias():
+    assert (
+        battle.target_player_name_for_commander({"name": "Lorehold, the Historian"})
+        == "Lorehold"
+    )
+    assert (
+        battle.target_player_name_for_commander(
+            {"oracle_name": "Lorehold, the Historian // Example Back Face"}
+        )
+        == "Lorehold"
+    )
+    assert battle.target_player_name_for_commander({"name": "Kaalia of the Vast"}) == (
+        "Kaalia of the Vast"
+    )
 
 
 def test_passes_when_all_opponent_combat_targets_lorehold():
@@ -188,6 +205,8 @@ def test_ignores_opponent_combat_after_lorehold_is_eliminated():
 
 
 if __name__ == "__main__":
+    test_commander_target_player_name_defaults_lorehold_alias()
+    print("PASS test_commander_target_player_name_defaults_lorehold_alias")
     test_passes_when_all_opponent_combat_targets_lorehold()
     print("PASS test_passes_when_all_opponent_combat_targets_lorehold")
     test_accepts_lethal_target_reason_when_evaluation_target_is_active()

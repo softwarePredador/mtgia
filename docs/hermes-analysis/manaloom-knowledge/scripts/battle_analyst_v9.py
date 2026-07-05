@@ -222,6 +222,23 @@ def evaluation_target_player_name():
     return name
 
 
+def target_player_name_for_commander(commander):
+    if isinstance(commander, dict):
+        name = str(commander.get("oracle_name") or commander.get("name") or "").strip()
+    else:
+        name = str(commander or "").strip()
+    if not name:
+        return "Target Deck"
+    if name.lower().startswith("lorehold, the historian"):
+        return "Lorehold"
+    return name
+
+
+def set_default_evaluation_target_for_commander(commander):
+    if EVALUATION_TARGET_ENV not in os.environ:
+        os.environ[EVALUATION_TARGET_ENV] = target_player_name_for_commander(commander)
+
+
 def player_is_evaluation_target(player):
     target = evaluation_target_player_name()
     return bool(target) and getattr(player, "name", None) == target
@@ -59706,21 +59723,27 @@ def simulate_game_with_real_opponents(my_commander, my_deck, opponent_data_list,
     turn, max_turns = 0, 35
     stack = Stack()
 
-    lorehold = Player("Lorehold", my_commander, my_deck, is_human=True, strategy="spellslinger")
+    target_player = Player(
+        target_player_name_for_commander(my_commander),
+        my_commander,
+        my_deck,
+        is_human=True,
+        strategy="spellslinger",
+    )
     opponents = []
     for opp_data in opponent_data_list:
         opp_cmd = learned_opponent_commander_card(opp_data)
         opp = Player(opp_data["name"], opp_cmd, opp_data["deck"], strategy=opp_data.get("strategy", "midrange"))
         opponents.append(opp)
 
-    all_players = [lorehold] + opponents
+    all_players = [target_player] + opponents
     approach_found = False
     approach_countered = 0
 
     for p in all_players:
         play_mulligan(p, rng)
 
-    while lorehold.is_alive() and turn < max_turns:
+    while target_player.is_alive() and turn < max_turns:
         turn += 1
         alive = [p for p in all_players if p.is_alive()]
         if len(alive) <= 1:
@@ -59736,12 +59759,12 @@ def simulate_game_with_real_opponents(my_commander, my_deck, opponent_data_list,
             # Check any explicit alternate-win state.
             for p in all_players:
                 if p.has_won():
-                    return ("win" if p is lorehold else "loss"), turn, p.win_reason
+                    return ("win" if p is target_player else "loss"), turn, p.win_reason
             check_sbas_until_stable(all_players)
             if any(getattr(p, "eliminated", False) for p in all_players):
                 break
 
-    if lorehold.is_alive():
+    if target_player.is_alive():
         alive_opps = sum(1 for o in opponents if o.is_alive())
         if alive_opps == 0:
             return "win", turn, "elimination"
@@ -59789,7 +59812,13 @@ def simulate_game_v8(my_commander, my_deck, opp_profile, rng, game_id=0):
     turn, max_turns = 0, 35
     stack = Stack()
 
-    lorehold = Player("Lorehold", my_commander, my_deck, is_human=True, strategy="spellslinger")
+    target_player = Player(
+        target_player_name_for_commander(my_commander),
+        my_commander,
+        my_deck,
+        is_human=True,
+        strategy="spellslinger",
+    )
     opponents = []
     for profile in opp_profile:
         if profile.get("is_real") and profile.get("built_deck"):
@@ -59802,7 +59831,7 @@ def simulate_game_v8(my_commander, my_deck, opp_profile, rng, game_id=0):
             opp = Player(profile["name"], opp_cmd, opp_deck, strategy=profile["strategy"])
         opponents.append(opp)
 
-    all_players = [lorehold] + opponents
+    all_players = [target_player] + opponents
 
     # v8.3: Track Approach statistics
     approach_found = False
@@ -59812,7 +59841,7 @@ def simulate_game_v8(my_commander, my_deck, opp_profile, rng, game_id=0):
     for p in all_players:
         play_mulligan(p, rng)
 
-    while lorehold.is_alive() and turn < max_turns:
+    while target_player.is_alive() and turn < max_turns:
         turn += 1
         alive = [p for p in all_players if p.is_alive()]
         if len(alive) <= 1:
@@ -59828,12 +59857,12 @@ def simulate_game_v8(my_commander, my_deck, opp_profile, rng, game_id=0):
             # Check any explicit alternate-win state.
             for p in all_players:
                 if p.has_won():
-                    return ("win" if p is lorehold else "loss"), turn, p.win_reason
+                    return ("win" if p is target_player else "loss"), turn, p.win_reason
             check_sbas_until_stable(all_players)
             if any(getattr(p, "eliminated", False) for p in all_players):
                 break
 
-    if lorehold.is_alive():
+    if target_player.is_alive():
         alive_opps = sum(1 for o in opponents if o.is_alive())
         if alive_opps == 0:
             return "win", turn, "elimination"
@@ -60134,6 +60163,7 @@ def main(argv=None):
     print("=" * 60)
 
     commander, deck, construction_report = load_deck_with_construction_report(args.deck_id)
+    set_default_evaluation_target_for_commander(commander)
     lands = sum(1 for c in deck if card_has_functional_tag(c, "land") or "Land" in c.get("type_line", ""))
     ramp = sum(1 for c in deck if card_has_functional_tag(c, "ramp", "ritual"))
     removal = sum(1 for c in deck if card_has_functional_tag(c, "removal", "board_wipe"))

@@ -19,6 +19,11 @@ class FakeBattleModule:
     def replay_card_snapshot(card):
         return {"name": card.get("name", "?")}
 
+    @staticmethod
+    def target_player_name_for_commander(commander):
+        name = str(commander.get("name") or "")
+        return "Lorehold" if name.startswith("Lorehold, the Historian") else name
+
 
 class FakePlayer:
     def __init__(self, name, life, hand, alive=True):
@@ -347,6 +352,23 @@ def test_target_deck_id_env_defaults_validates_and_overrides():
             raise AssertionError(f"expected invalid deck id to fail: {raw}")
 
 
+def test_target_player_name_uses_commander_for_non_lorehold_decks():
+    assert (
+        replay_renderer.target_player_name_from_battle_module(
+            FakeBattleModule,
+            {"name": "Kaalia of the Vast"},
+        )
+        == "Kaalia of the Vast"
+    )
+    assert (
+        replay_renderer.target_player_name_from_battle_module(
+            FakeBattleModule,
+            {"name": "Lorehold, the Historian"},
+        )
+        == "Lorehold"
+    )
+
+
 def test_provenance_line_names_source_metrics_and_blocker_domain():
     handle = StringIO()
 
@@ -402,6 +424,7 @@ if __name__ == "__main__":
         test_renderer_explains_kicked_orims_chant_attack_prevention,
         test_deck_metrics_are_derived_from_resolved_cards,
         test_target_deck_id_env_defaults_validates_and_overrides,
+        test_target_player_name_uses_commander_for_non_lorehold_decks,
         test_provenance_line_names_source_metrics_and_blocker_domain,
         test_final_player_summary_includes_hand_card_names,
     ]

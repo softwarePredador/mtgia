@@ -38,6 +38,12 @@ def target_deck_id_from_env(environ=None):
     return deck_id
 
 
+def target_player_name_from_battle_module(battle_module, commander):
+    if hasattr(battle_module, "target_player_name_for_commander"):
+        return battle_module.target_player_name_for_commander(commander)
+    return "Lorehold"
+
+
 def is_land_like(card):
     type_line = str(card.get("type_line") or "").lower()
     effect = str(card.get("effect") or "").lower()
@@ -501,6 +507,11 @@ def main():
         else:
             commander, deck = battle.load_deck(target_deck_id)
             construction_report = {}
+        if hasattr(battle, "set_default_evaluation_target_for_commander"):
+            battle.set_default_evaluation_target_for_commander(commander)
+        target_player_name = (
+            target_player_name_from_battle_module(battle, commander)
+        )
         learned = battle.load_learned_opponents()
         source = learned if learned and len(learned) >= 3 else battle.OPPONENT_ARCHETYPES
         rng = random.Random(int(os.environ.get("REPLAY_SEED", "42")))
@@ -535,12 +546,12 @@ def main():
         )
         replay.write("=" * 70 + "\n")
 
-        lorehold = battle.Player(
-            "Lorehold", commander, deck, is_human=True, strategy="spellslinger"
+        target_player = battle.Player(
+            target_player_name, commander, deck, is_human=True, strategy="spellslinger"
         )
         provenance = [
             {
-                "name": "Lorehold",
+                "name": target_player_name,
                 "source_kind": "sqlite_deck_cards",
                 "source_ref": f"deck_id:{target_deck_id}",
                 "target_deck_id": target_deck_id,
@@ -605,7 +616,7 @@ def main():
                 })
             opponents.append(opp)
 
-        all_players = [lorehold] + opponents
+        all_players = [target_player] + opponents
         stack = battle.Stack()
 
         replay.write("\nDECK SOURCE PROVENANCE\n")
@@ -659,14 +670,14 @@ def main():
                     continue
                 others = [other for other in all_players if other is not player]
                 battle.play_turn_v8(player, others, all_players, turn, rng, stack)
-                if not lorehold.is_alive():
+                if not target_player.is_alive():
                     winner = next(
                         (
                             candidate
                             for candidate in all_players
-                            if candidate is not lorehold and candidate.is_alive()
+                            if candidate is not target_player and candidate.is_alive()
                         ),
-                        player if player is not lorehold and player.is_alive() else None,
+                        player if player is not target_player and player.is_alive() else None,
                     )
                     break
                 winner = next(
