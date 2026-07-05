@@ -267,6 +267,65 @@ def summarize_prior_package_decision(payload: Mapping[str, Any]) -> dict[str, An
     }
 
 
+def summarize_candidate_decision_registry(payload: Mapping[str, Any]) -> dict[str, Any]:
+    packages = payload.get("packages") or []
+    packages = packages if isinstance(packages, list) else []
+    valid_rows = [
+        row
+        for row in packages
+        if isinstance(row, Mapping)
+        and row.get("package_key")
+        and isinstance(row.get("adds"), list)
+        and isinstance(row.get("cuts"), list)
+        and row.get("decision")
+    ]
+    decision_counts: dict[str, int] = {}
+    for row in valid_rows:
+        decision = str(row.get("decision"))
+        decision_counts[decision] = decision_counts.get(decision, 0) + 1
+    return {
+        "registry_kind": payload.get("registry_kind"),
+        "baseline_deck_id": payload.get("baseline_deck_id"),
+        "package_count": len(packages),
+        "valid_package_row_count": len(valid_rows),
+        "decision_counts": decision_counts,
+        "postgres_writes": False,
+        "source_db_mutated": False,
+        "deck_607_mutated": False,
+        "package_keys": [str(row.get("package_key")) for row in valid_rows],
+    }
+
+
+def summarize_shell_package_delta(payload: Mapping[str, Any]) -> dict[str, Any]:
+    decision = payload.get("decision") if isinstance(payload.get("decision"), Mapping) else {}
+    mutation_flags = payload.get("mutation_flags") if isinstance(payload.get("mutation_flags"), Mapping) else {}
+    deck_delta = payload.get("deck_delta_summary") if isinstance(payload.get("deck_delta_summary"), Mapping) else {}
+    battle_summary = payload.get("battle_summary") if isinstance(payload.get("battle_summary"), Mapping) else {}
+    return {
+        "baseline_deck_id": payload.get("baseline_deck_id"),
+        "challenger_deck_id": payload.get("challenger_deck_id"),
+        "added_card_event_count": len(payload.get("added_card_events") or [])
+        if isinstance(payload.get("added_card_events"), list)
+        else 0,
+        "removed_card_event_count": len(payload.get("removed_card_events") or [])
+        if isinstance(payload.get("removed_card_events"), list)
+        else 0,
+        "added_package_group_count": len(payload.get("added_package_groups") or [])
+        if isinstance(payload.get("added_package_groups"), list)
+        else 0,
+        "removed_package_group_count": len(payload.get("removed_package_groups") or [])
+        if isinstance(payload.get("removed_package_groups"), list)
+        else 0,
+        "battle_summary": battle_summary,
+        "deck_delta_summary": deck_delta,
+        "decision_status": decision.get("status"),
+        "promotion_ready_from_this_report": bool(decision.get("promotion_ready_from_this_report")),
+        "postgres_writes": bool(mutation_flags.get("postgres_writes")),
+        "source_db_mutated": bool(mutation_flags.get("source_db_mutated")),
+        "deck_607_mutated": bool(mutation_flags.get("deck_607_mutated")),
+    }
+
+
 def summarize_exposure_aware_gate_queue(payload: Mapping[str, Any]) -> dict[str, Any]:
     packages = payload.get("packages") or []
     ready_queue = payload.get("ready_queue") or []
@@ -441,6 +500,21 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
         )
 
     if (
+        payload.get("registry_kind") == "compact_prior_package_decisions"
+        and "packages" in keys
+        and "baseline_deck_id" in keys
+    ):
+        summary = summarize_candidate_decision_registry(payload)
+        return ArtifactClassification(
+            **base,
+            artifact_kind="prior_package_decision",
+            schema_version="lorehold_607_candidate_decision_registry_v1",
+            status="pass" if summary["package_count"] == summary["valid_package_row_count"] else "warn",
+            detail="compact Lorehold 607 prior decision registry for package-reject memory",
+            canonical_summary=summary,
+        )
+
+    if (
         payload.get("source") == "lorehold_profiled_cut_benchmark_generator"
         and "manual_review" in keys
         and "prior_package_reports" in keys
@@ -453,6 +527,26 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             schema_version="profiled_cut_package_manifest_v1",
             status="pass" if summary["package_count"] == summary["valid_package_row_count"] else "warn",
             detail="profiled cut benchmark package manifest",
+            canonical_summary=summary,
+        )
+
+    if (
+        {"added_card_events", "removed_card_events", "added_package_groups", "removed_package_groups"}
+        <= keys
+        and {"baseline_deck_id", "challenger_deck_id", "decision", "mutation_flags"} <= keys
+    ):
+        summary = summarize_shell_package_delta(payload)
+        has_historical_mutation = (
+            summary["source_db_mutated"]
+            or summary["postgres_writes"]
+            or summary["deck_607_mutated"]
+        )
+        return ArtifactClassification(
+            **base,
+            artifact_kind="lorehold_615_shell_package_delta",
+            schema_version="lorehold_615_shell_package_delta_v1",
+            status="warn" if has_historical_mutation else "pass",
+            detail="Lorehold 615 shell package delta evidence; not a promotion decision",
             canonical_summary=summary,
         )
 

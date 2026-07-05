@@ -163,6 +163,73 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
             {"reject_regresses_critical_matchup": 1},
         )
 
+    def test_candidate_decision_registry_is_recognized(self) -> None:
+        payload = {
+            "registry_kind": "compact_prior_package_decisions",
+            "baseline_deck_id": 607,
+            "generated_at": "2026-07-05T00:00:00+00:00",
+            "packages": [
+                {
+                    "package_key": "one_ring_burden_reset",
+                    "adds": ["The One Ring"],
+                    "cuts": ["Creative Technique"],
+                    "decision": "reject_keep_607",
+                }
+            ],
+            "notes": ["unit"],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            classification = audit.classify_payload(
+                Path(tmp) / "lorehold_607_candidate_decision_registry_20260705.json",
+                payload,
+            )
+
+        self.assertEqual(classification.artifact_kind, "prior_package_decision")
+        self.assertEqual(classification.schema_version, "lorehold_607_candidate_decision_registry_v1")
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+        self.assertEqual(classification.canonical_summary["valid_package_row_count"], 1)
+
+    def test_shell_package_delta_is_recognized_as_non_promotion_evidence(self) -> None:
+        payload = {
+            "baseline_deck_id": 607,
+            "challenger_deck_id": 615,
+            "generated_at": "2026-07-05T00:00:00+00:00",
+            "source_db": "knowledge.db",
+            "added_card_events": [{"card_name": "Birgi, God of Storytelling"}],
+            "removed_card_events": [{"card_name": "Bender's Waterskin"}],
+            "added_package_groups": [{"package": "spell_chain"}],
+            "removed_package_groups": [{"package": "topdeck_floor"}],
+            "official_power_watch_added": [],
+            "official_power_watch_shared": [],
+            "official_research_sources": [],
+            "strategic_event_delta": {},
+            "deck_delta_summary": {"added_count": 1, "removed_count": 1},
+            "battle_report": "unit.json",
+            "battle_summary": {"baseline_wins": 1, "challenger_wins": 0},
+            "mutation_flags": {
+                "postgres_writes": False,
+                "source_db_mutated": False,
+                "deck_607_mutated": False,
+            },
+            "decision": {
+                "status": "keep_607_protected_baseline",
+                "promotion_ready_from_this_report": False,
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            classification = audit.classify_payload(
+                Path(tmp) / "lorehold_615_shell_package_delta_20260705_current.json",
+                payload,
+            )
+
+        self.assertEqual(classification.artifact_kind, "lorehold_615_shell_package_delta")
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["promotion_ready_from_this_report"])
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+
     def test_from_scratch_challenger_artifacts_are_recognized(self) -> None:
         summary_payload = {
             "candidates": [{"candidate_key": "challenger_lorehold_access_density_control_v1"}],
