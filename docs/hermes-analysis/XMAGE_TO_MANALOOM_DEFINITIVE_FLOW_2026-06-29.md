@@ -12284,6 +12284,66 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG497 ETB Counter Target-Constraints Closure
+
+- PG497 extends the PG496 ETB add-counters lane to exact target constraints
+  beyond single `target creature you control`. The accepted XMage/Oracle
+  shapes now include `another`, subtype-filtered controlled targets, excluded
+  keyword targets such as "without flying", fixed `-1/-1` counter application,
+  and up-to-two target counts when source and Oracle agree.
+- The splitter now extracts `target_count_min`, `target_count_max`,
+  `up_to_count`, subtype constraints, `exclude_source`, controller
+  restrictions, and excluded keywords from both local XMage source and Oracle
+  text before producing a PostgreSQL candidate.
+- Runtime add-counter targeting now honors `effect_data.target_constraints`
+  during legal-target selection. This fixes the old unsafe behavior where an
+  effect could carry a structured target constraint but the battle selector
+  still evaluated only the card-level fallback constraint. Multi-target ETB
+  counter effects now select legal targets up to the configured maximum and
+  emit one replay event per target while finishing the spell only once.
+- The batch promoted `14` cards: Aeronaut Cavalry, Basri's Acolyte, Earth
+  Kingdom Soldier, Felidar Savior, Gavony Silversmith, Jade Bearer,
+  Keen-Eyed Raven, Pileated Provisioner, Sanguine Glorifier, Skinrender,
+  Sterling Supplier, Stromkirk Mentor, Timberland Guide, and Vineshaper Mystic.
+- `Angelic Quartermaster` deliberately remains blocked as
+  `etb_add_counters_source_oracle_mismatch`: local XMage constrains the targets
+  to another creature controlled by the source controller, while Oracle says
+  "other target creatures" without the same controller restriction.
+- Validation passed: `py_compile` for touched splitter/runtime/test files, the
+  full exact-scope splitter suite (`499` tests OK), and the full
+  `test_battle_analyst_v10_3.py` suite (`625` PASS lines) with the live
+  PostgreSQL environment loaded.
+- PostgreSQL package PG497 applied against `143.198.230.247:5433/halder`.
+  Precheck found `14/14` target card rows, no existing rule rows, and no shadow
+  rows to deprecate. Apply upserted `14` verified/auto rows. Postcheck
+  confirmed `14/14` promoted rule rows, verified/auto rows, and matching Oracle
+  hashes.
+- Hermes metadata sync matched `6904` PostgreSQL cards, wrote `6832` SQLite
+  cache aliases, updated `96` deck-card ids, and left the known
+  `unresolved=1` residual unchanged. The battle-rule sync loaded `8394`
+  PostgreSQL rows, wrote `8158` SQLite rows, and exported `5928` canonical
+  fallback rows.
+- E2E validation passed across PostgreSQL, SQLite `battle_card_rules`, the
+  default canonical snapshot, and runtime `get_card_effect` for all `14`
+  selected cards. The manifest has no generic battle-execution scenarios, so
+  scenario execution remains `0`; concrete target-constraint behavior is
+  covered by focused PG497 runtime tests.
+- Final governance audits passed: XMage strategy (`26/26`), operational
+  surface (`39/39`), legacy contamination (`32/32`), deckbuilding contract
+  surface, and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26097`, `xmage_authoritative_source_count=25783`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25783`. This is an exact
+  reduction of `14` from the post-PG496 queue. The targeted add-counters work
+  unit is now `440`, and the current exact splitter has no PG497-safe
+  residual candidates left.
+- Post-sync global readiness is now `34331` known cards, `4853`
+  `battle_and_oracle_ready`, `29020` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

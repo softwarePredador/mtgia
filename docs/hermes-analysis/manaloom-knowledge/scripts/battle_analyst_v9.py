@@ -4236,6 +4236,7 @@ def add_counters_target_type(effect_data):
 def add_counters_candidate_targets(player, opponents, card, effect_data):
     target_type = add_counters_target_type(effect_data)
     target_controller = str((effect_data or {}).get("target_controller") or "any").lower()
+    targeting_source = target_constraint_source(card if isinstance(card, dict) else {}, effect_data)
     participants = []
     if target_controller in {"self", "you", "controller", "controlled"}:
         participants = [player]
@@ -4248,8 +4249,10 @@ def add_counters_candidate_targets(player, opponents, card, effect_data):
         for permanent in list(getattr(owner, "battlefield", []) or []):
             if not is_battlefield_creature(permanent):
                 continue
+            if _target_constraints_dict(effect_data).get("exclude_source") and permanent is card:
+                continue
             if not is_legal_target(
-                card if isinstance(card, dict) else effect_data,
+                targeting_source,
                 permanent,
                 player,
                 target_type=target_type,
@@ -4261,23 +4264,57 @@ def add_counters_candidate_targets(player, opponents, card, effect_data):
 
 
 def choose_add_counters_target(player, opponents, card, effect_data):
+    selected, target_options = choose_add_counters_targets(player, opponents, card, effect_data)
+    if not selected:
+        return None, None, target_options
+    owner, target = selected[0]
+    return owner, target, target_options
+
+
+def add_counters_target_count_max(effect_data):
+    try:
+        return max(1, int((effect_data or {}).get("target_count_max") or (effect_data or {}).get("target_count") or 1))
+    except Exception:
+        return 1
+
+
+def add_counters_is_up_to_count(effect_data):
+    if not isinstance(effect_data, dict):
+        return False
+    if effect_data.get("up_to_count"):
+        return True
+    try:
+        return int(effect_data.get("target_count_min") or 1) == 0 and add_counters_target_count_max(effect_data) > 1
+    except Exception:
+        return False
+
+
+def choose_add_counters_targets(player, opponents, card, effect_data):
     candidates = add_counters_candidate_targets(player, opponents, card, effect_data)
     if not candidates:
-        return None, None, []
+        return [], []
     counter_type = str((effect_data or {}).get("counter_type") or "+1/+1")
     target_controller = str((effect_data or {}).get("target_controller") or "any").lower()
     forced_self = target_controller in {"self", "you", "controller", "controlled"}
+    forced_opponent = target_controller in {"opponent", "opponents"}
+    max_targets = add_counters_target_count_max(effect_data)
+    up_to_count = add_counters_is_up_to_count(effect_data)
     if counter_type == "-1/-1":
         if forced_self:
-            owner, target = min(candidates, key=lambda item: target_priority(item[1]))
-            return owner, target, [target for _owner, target in candidates]
+            ordered = sorted(candidates, key=lambda item: target_priority(item[1]))
+            return ordered[:max_targets], [target for _owner, target in candidates]
         preferred = [(owner, target) for owner, target in candidates if owner is not player]
     else:
-        preferred = [(owner, target) for owner, target in candidates if owner is player]
+        if forced_opponent:
+            preferred = candidates
+        else:
+            preferred = [(owner, target) for owner, target in candidates if owner is player]
+            if not preferred and up_to_count:
+                return [], [target for _owner, target in candidates]
     if not preferred:
         preferred = candidates
-    owner, target = max(preferred, key=lambda item: target_priority(item[1]))
-    return owner, target, [target for _owner, target in candidates]
+    ordered = sorted(preferred, key=lambda item: target_priority(item[1]), reverse=True)
+    return ordered[:max_targets], [target for _owner, target in candidates]
 
 
 def resolve_add_counters_target_effect(
@@ -4294,13 +4331,13 @@ def resolve_add_counters_target_effect(
 ):
     counter_type = str(effect_data.get("counter_type") or "+1/+1")
     count = max(0, int(effect_data.get("counter_count") or effect_data.get("count") or 1))
-    target_owner, target, target_options = choose_add_counters_target(
+    selected_targets, target_options = choose_add_counters_targets(
         player,
         opponents,
         card,
         effect_data,
     )
-    if target is None or target_owner is None or count <= 0:
+    if not selected_targets or count <= 0:
         event_payload = dict(
             player=player.name,
             card=card.get("name", "?"),
@@ -4321,70 +4358,74 @@ def resolve_add_counters_target_effect(
             finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return None
 
-    power_before = _numeric_card_stat(target, "power")
-    toughness_before = _numeric_card_stat(target, "toughness", "power")
-    counters_before = (
-        int(target.get("plus_one_counters") or 0)
-        if counter_type == "+1/+1"
-        else int(target.get("minus_one_counters") or 0)
-        if counter_type == "-1/-1"
-        else get_named_counter_count(target, counter_type)
-    )
-    if counter_type == "+1/+1":
-        added = add_plus_one_counters(target, count) or count
-    elif counter_type == "-1/-1":
-        added = add_minus_one_counters(target, count)
-    else:
-        added = add_named_counters(target, counter_type, count)
-    power_after = _numeric_card_stat(target, "power")
-    toughness_after = _numeric_card_stat(target, "toughness", "power")
-    destination = None
-    result = "counters_added"
-    if counter_type == "-1/-1" and is_battlefield_creature(target) and toughness_after <= 0:
-        destination = move_creature_from_battlefield(
-            target_owner,
-            target,
-            reason="zero_toughness",
-            source=card,
+    resolved_targets = []
+    for target_owner, target in selected_targets:
+        power_before = _numeric_card_stat(target, "power")
+        toughness_before = _numeric_card_stat(target, "toughness", "power")
+        counters_before = (
+            int(target.get("plus_one_counters") or 0)
+            if counter_type == "+1/+1"
+            else int(target.get("minus_one_counters") or 0)
+            if counter_type == "-1/-1"
+            else get_named_counter_count(target, counter_type)
         )
-        result = "creature_put_into_graveyard_zero_toughness"
-    decision = targeting_decision(
-        card if isinstance(card, dict) else effect_data,
-        target,
-        player,
-        target_controller=target_owner,
-        target_type=add_counters_target_type(effect_data),
-    )
-    event_payload = dict(
-        player=player.name,
-        card=card.get("name", "?"),
-        target_player=target_owner.name,
-        target=target.get("name", "?"),
-        target_power_before=power_before,
-        target_power_after=power_after,
-        target_toughness_before=toughness_before,
-        target_toughness_after=toughness_after,
-        counter_type=counter_type,
-        counters_before=counters_before,
-        counters_added=added,
-        counters_after=counters_before + added,
-        result=result,
-        destination=destination,
-        available_targets=len(target_options),
-        **target_selection_replay_fields(target, target_options),
-        turn=turn,
-        **decision,
-        **replay_rule_fields(effect_data),
-    )
-    if trigger:
-        event_payload["trigger"] = trigger
-        event_payload["effect"] = "add_counters"
-    if phase:
-        event_payload["phase"] = phase
-    emit_replay_event(event_name, **event_payload)
+        if counter_type == "+1/+1":
+            added = add_plus_one_counters(target, count) or count
+        elif counter_type == "-1/-1":
+            added = add_minus_one_counters(target, count)
+        else:
+            added = add_named_counters(target, counter_type, count)
+        power_after = _numeric_card_stat(target, "power")
+        toughness_after = _numeric_card_stat(target, "toughness", "power")
+        destination = None
+        result = "counters_added"
+        if counter_type == "-1/-1" and is_battlefield_creature(target) and toughness_after <= 0:
+            destination = move_creature_from_battlefield(
+                target_owner,
+                target,
+                reason="zero_toughness",
+                source=card,
+            )
+            result = "creature_put_into_graveyard_zero_toughness"
+        decision = targeting_decision(
+            card if isinstance(card, dict) else effect_data,
+            target,
+            player,
+            target_controller=target_owner,
+            target_type=add_counters_target_type(effect_data),
+        )
+        event_payload = dict(
+            player=player.name,
+            card=card.get("name", "?"),
+            target_player=target_owner.name,
+            target=target.get("name", "?"),
+            target_power_before=power_before,
+            target_power_after=power_after,
+            target_toughness_before=toughness_before,
+            target_toughness_after=toughness_after,
+            counter_type=counter_type,
+            counters_before=counters_before,
+            counters_added=added,
+            counters_after=counters_before + added,
+            result=result,
+            destination=destination,
+            selected_target_count=len(selected_targets),
+            available_targets=len(target_options),
+            **target_selection_replay_fields(target, target_options),
+            turn=turn,
+            **decision,
+            **replay_rule_fields(effect_data),
+        )
+        if trigger:
+            event_payload["trigger"] = trigger
+            event_payload["effect"] = "add_counters"
+        if phase:
+            event_payload["phase"] = phase
+        emit_replay_event(event_name, **event_payload)
+        resolved_targets.append(target)
     if finish_spell:
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
-    return target
+    return resolved_targets[0] if len(resolved_targets) == 1 else resolved_targets
 
 
 def resolve_add_counters_source_effect(
@@ -4508,6 +4549,12 @@ def resolve_etb_add_counters_target(player, opponents, permanent, effect_data, t
             or 1
         ),
     }
+    if effect_data.get("target_count_max"):
+        etb_effect["target_count_max"] = int(effect_data.get("target_count_max") or 1)
+    if effect_data.get("target_count_min") is not None:
+        etb_effect["target_count_min"] = int(effect_data.get("target_count_min") or 0)
+    if effect_data.get("up_to_count"):
+        etb_effect["up_to_count"] = True
     return resolve_add_counters_target_effect(
         player,
         opponents,

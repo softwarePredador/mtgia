@@ -4013,6 +4013,116 @@ def etb_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] 
     return match.group(2), count
 
 
+def etb_counter_target_spec(
+    *,
+    counter_type: str,
+    counter_count: int,
+    target_controller: str = "any",
+    target_count_max: int = 1,
+    up_to_count: bool = False,
+    exclude_source: bool = False,
+    required_subtypes: list[str] | None = None,
+    excluded_keywords: list[str] | None = None,
+) -> dict[str, Any]:
+    constraints: dict[str, Any] = {"card_types": ["creature"]}
+    if target_controller == "self":
+        constraints["controller_scope"] = "self"
+    if exclude_source:
+        constraints["exclude_source"] = True
+    if required_subtypes:
+        constraints["required_subtypes"] = [
+            str(subtype or "").strip().lower()
+            for subtype in required_subtypes
+            if str(subtype or "").strip()
+        ]
+    if excluded_keywords:
+        constraints["excluded_keywords"] = [
+            str(keyword or "").strip().lower().replace(" ", "_")
+            for keyword in excluded_keywords
+            if str(keyword or "").strip()
+        ]
+    spec: dict[str, Any] = {
+        "counter_type": counter_type,
+        "counter_count": int(counter_count),
+        "target": "creature",
+        "target_controller": target_controller,
+        "target_constraints": constraints,
+    }
+    if target_count_max > 1:
+        spec["target_count_min"] = 0 if up_to_count else target_count_max
+        spec["target_count_max"] = int(target_count_max)
+    if up_to_count:
+        spec["up_to_count"] = True
+    return spec
+
+
+def etb_counter_filter_spec_from_source(source: str) -> dict[str, Any] | None:
+    text = source or ""
+    target_controller = "self" if (
+        "FilterControlled" in text
+        or "TargetController.YOU.getControllerPredicate()" in text
+        or "StaticFilters.FILTER_ANOTHER_TARGET_CREATURE_YOU_CONTROL" in text
+        or "StaticFilters.FILTER_OTHER_CONTROLLED_CREATURES" in text
+        or "StaticFilters.FILTER_CONTROLLED_CREATURES" in text
+        or "StaticFilters.FILTER_CONTROLLED_ANOTHER_CREATURE" in text
+    ) else "any"
+    exclude_source = (
+        "AnotherPredicate.instance" in text
+        or "StaticFilters.FILTER_ANOTHER_TARGET_CREATURE_YOU_CONTROL" in text
+        or "StaticFilters.FILTER_OTHER_CONTROLLED_CREATURES" in text
+        or "StaticFilters.FILTER_CONTROLLED_ANOTHER_CREATURE" in text
+    )
+    required_subtypes = [
+        value.lower()
+        for value in re.findall(
+            r"new\s+Filter(?:Controlled)?(?:Creature)?Permanent\s*\(\s*SubType\.([A-Z_]+)",
+            text,
+        )
+    ]
+    required_subtypes += [
+        value.lower()
+        for value in re.findall(r"filter\.add\s*\(\s*SubType\.([A-Z_]+)\.getPredicate\s*\(\s*\)\s*\)", text)
+    ]
+    excluded_keywords: list[str] = []
+    if re.search(r"Predicates\.not\s*\(\s*new\s+AbilityPredicate\s*\(\s*FlyingAbility\.class\s*\)\s*\)", text):
+        excluded_keywords.append("flying")
+    if (
+        target_controller == "any"
+        and not exclude_source
+        and not required_subtypes
+        and not excluded_keywords
+    ):
+        return None
+    return {
+        "target_controller": target_controller,
+        "exclude_source": exclude_source,
+        "required_subtypes": sorted(set(required_subtypes)),
+        "excluded_keywords": sorted(set(excluded_keywords)),
+    }
+
+
+def etb_counter_target_count_from_source(source: str) -> tuple[int, bool] | None:
+    text = source or ""
+    max_matches = re.findall(
+        r"new\s+(?:TargetCreaturePermanent|TargetControlledCreaturePermanent|TargetPermanent)"
+        r"\s*\(\s*0\s*,\s*(\d+|Integer\.MAX_VALUE)\s*,",
+        text,
+    )
+    max_matches += re.findall(
+        r"new\s+(?:TargetCreaturePermanent|TargetControlledCreaturePermanent)"
+        r"\s*\(\s*0\s*,\s*(\d+|Integer\.MAX_VALUE)\s*\)",
+        text,
+    )
+    if not max_matches:
+        return 1, False
+    if len(max_matches) != 1:
+        return None
+    raw_max = max_matches[0]
+    if raw_max == "Integer.MAX_VALUE":
+        return None
+    return int(raw_max), True
+
+
 def etb_counter_target_spec_from_source(source: str) -> dict[str, Any] | None:
     text = source or ""
     counter = re.findall(
@@ -4021,24 +4131,45 @@ def etb_counter_target_spec_from_source(source: str) -> dict[str, Any] | None:
     )
     if len(counter) != 1:
         return None
-    targets = re.findall(r"\.addTarget\s*\(\s*new\s+(TargetControlledCreaturePermanent|TargetCreaturePermanent)\s*\(", text)
-    if len(targets) != 1:
+    if len(re.findall(r"\.addTarget\s*\(", text)) != 1:
         return None
-    target_class = targets[0]
-    if not re.search(rf"\.addTarget\s*\(\s*new\s+{target_class}\s*\(\s*\)\s*\)", text):
+    target_count = etb_counter_target_count_from_source(text)
+    if target_count is None:
         return None
     counter_class, raw_count = counter[0]
-    target_controller = "self" if target_class == "TargetControlledCreaturePermanent" else "any"
-    constraints = {"card_types": ["creature"]}
-    if target_controller == "self":
-        constraints["controller_scope"] = "self"
-    return {
-        "counter_type": "+1/+1" if counter_class == "P1P1" else "-1/-1",
-        "counter_count": int(raw_count or "1"),
-        "target": "creature",
-        "target_controller": target_controller,
-        "target_constraints": constraints,
-    }
+    counter_type = "+1/+1" if counter_class == "P1P1" else "-1/-1"
+    target_count_max, up_to_count = target_count
+    if re.search(r"new\s+TargetControlledCreaturePermanent\s*\(", text):
+        return etb_counter_target_spec(
+            counter_type=counter_type,
+            counter_count=int(raw_count or "1"),
+            target_controller="self",
+            target_count_max=target_count_max,
+            up_to_count=up_to_count,
+        )
+    if re.search(r"new\s+TargetCreaturePermanent\s*\(", text):
+        return etb_counter_target_spec(
+            counter_type=counter_type,
+            counter_count=int(raw_count or "1"),
+            target_controller="any",
+            target_count_max=target_count_max,
+            up_to_count=up_to_count,
+        )
+    if re.search(r"new\s+Target(?:Controlled)?Permanent\s*\(", text):
+        filter_spec = etb_counter_filter_spec_from_source(text)
+        if filter_spec is None:
+            return None
+        return etb_counter_target_spec(
+            counter_type=counter_type,
+            counter_count=int(raw_count or "1"),
+            target_controller=str(filter_spec["target_controller"]),
+            target_count_max=target_count_max,
+            up_to_count=up_to_count,
+            exclude_source=bool(filter_spec.get("exclude_source")),
+            required_subtypes=list(filter_spec.get("required_subtypes") or []),
+            excluded_keywords=list(filter_spec.get("excluded_keywords") or []),
+        )
+    return None
 
 
 def etb_counter_target_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -4048,8 +4179,8 @@ def etb_counter_target_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, A
     match = re.match(
         r"^(?:when|whenever) (?:this creature|.+) enters(?: the battlefield)?, put "
         r"(a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
-        r"(\+1/\+1|-1/-1) counters? on "
-        r"(target creature|target creature you control)\.?$",
+        r"(\+1/\+1|-1/-1) counters? on (?:(each of up to "
+        r"(one|two|three|four|five|six|seven|eight|nine|ten|\d+) )?(.+?))\.?$",
         text,
     )
     if not match:
@@ -4057,17 +4188,41 @@ def etb_counter_target_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, A
     count = counter_count_from_text(match.group(1))
     if count is None or count <= 0:
         return None
-    target_controller = "self" if match.group(3) == "target creature you control" else "any"
-    constraints = {"card_types": ["creature"]}
+    up_to_text = match.group(4)
+    target_count_max = counter_count_from_text(up_to_text) if up_to_text else 1
+    if target_count_max is None or target_count_max <= 0:
+        return None
+    phrase = str(match.group(5) or "").strip().lower()
+    excluded_keywords: list[str] = []
+    if phrase.endswith(" without flying"):
+        excluded_keywords.append("flying")
+        phrase = phrase.removesuffix(" without flying").strip()
+    exclude_source = phrase.startswith("another target ") or phrase.startswith("other target ")
+    normalized_phrase = phrase
+    for prefix in ("another target ", "other target ", "target "):
+        if normalized_phrase.startswith(prefix):
+            normalized_phrase = normalized_phrase[len(prefix) :]
+            break
+    target_controller = "self" if normalized_phrase.endswith(" you control") else "any"
     if target_controller == "self":
-        constraints["controller_scope"] = "self"
-    return {
-        "counter_type": match.group(2),
-        "counter_count": count,
-        "target": "creature",
-        "target_controller": target_controller,
-        "target_constraints": constraints,
-    }
+        normalized_phrase = normalized_phrase.removesuffix(" you control").strip()
+    if normalized_phrase in {"creature", "creatures"}:
+        required_subtypes: list[str] = []
+    else:
+        subtype_match = re.fullmatch(r"([a-z][a-z '\\-]+?)s?", normalized_phrase)
+        if not subtype_match:
+            return None
+        required_subtypes = [subtype_match.group(1).strip()]
+    return etb_counter_target_spec(
+        counter_type=match.group(2),
+        counter_count=count,
+        target_controller=target_controller,
+        target_count_max=target_count_max,
+        up_to_count=bool(up_to_text),
+        exclude_source=exclude_source,
+        required_subtypes=required_subtypes,
+        excluded_keywords=excluded_keywords,
+    )
 
 
 def fixed_boost_target_from_source(source: str) -> tuple[int, int] | None:
@@ -15081,6 +15236,12 @@ def split_row(
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
             **flags,
         }
+        if oracle_counter.get("target_count_min") is not None:
+            effect_json["target_count_min"] = int(oracle_counter["target_count_min"])
+        if oracle_counter.get("target_count_max") is not None:
+            effect_json["target_count_max"] = int(oracle_counter["target_count_max"])
+        if oracle_counter.get("up_to_count"):
+            effect_json["up_to_count"] = True
         if keyword_list:
             effect_json["keywords"] = keyword_list
             effect_json["_keywords_are_self"] = True

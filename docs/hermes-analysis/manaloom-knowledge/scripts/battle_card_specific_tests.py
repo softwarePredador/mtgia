@@ -8492,6 +8492,185 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg497_etb_add_counters_up_to_two_excludes_source_and_opponents():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Basri's Acolyte",
+                "type_line": "Creature - Cat Cleric",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 3,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            elite = {
+                "name": "Elite Veteran",
+                "type_line": "Creature - Human Soldier",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            recruit = {
+                "name": "Fresh Recruit",
+                "type_line": "Creature - Human Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            token = {
+                "name": "Small Token",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            opponent_engine = {
+                "name": "Opponent Engine",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 9,
+                "toughness": 9,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            active.battlefield = [source, elite, recruit, token]
+            opponent.battlefield = [opponent_engine]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_add_counters_target": "creature",
+                    "etb_add_counters_counter_type": "+1/+1",
+                    "etb_add_counters_count": 1,
+                    "target": "creature",
+                    "target_controller": "self",
+                    "target_constraints": {
+                        "card_types": ["creature"],
+                        "controller_scope": "self",
+                        "exclude_source": True,
+                    },
+                    "target_count_min": 0,
+                    "target_count_max": 2,
+                    "up_to_count": True,
+                    "counter_type": "+1/+1",
+                    "counter_count": 1,
+                    "_rule_logical_key": "battle_rule_v1:pg497-etb-up-to-two-counters",
+                    "_rule_oracle_hash": "pg497-etb-up-to-two-counters-hash",
+                },
+                17,
+                random.Random(497),
+                all_players=[active, opponent],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert int(elite.get("plus_one_counters") or 0) == 1
+        assert int(recruit.get("plus_one_counters") or 0) == 1
+        assert int(source.get("plus_one_counters") or 0) == 0
+        assert int(token.get("plus_one_counters") or 0) == 0
+        assert int(opponent_engine.get("plus_one_counters") or 0) == 0
+        resolved_targets = [
+            data.get("target")
+            for event, data in events
+            if event == "trigger_resolved" and data.get("effect") == "add_counters"
+        ]
+        assert resolved_targets == ["Elite Veteran", "Fresh Recruit"]
+
+    def test_pg497_etb_add_counters_without_flying_skips_flying_creatures():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Pileated Provisioner",
+                "type_line": "Creature - Bird Scout",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 4,
+                "controller": "Active",
+                "owner": "Active",
+                "flying": True,
+            }
+            flyer = {
+                "name": "Cloudkin",
+                "type_line": "Creature - Bird",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 5,
+                "controller": "Active",
+                "owner": "Active",
+                "flying": True,
+            }
+            ground = {
+                "name": "Ground Guard",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            active.battlefield = [source, flyer, ground]
+            opponent.battlefield = []
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_add_counters_target": "creature",
+                    "etb_add_counters_counter_type": "+1/+1",
+                    "etb_add_counters_count": 1,
+                    "target": "creature",
+                    "target_controller": "self",
+                    "target_constraints": {
+                        "card_types": ["creature"],
+                        "controller_scope": "self",
+                        "excluded_keywords": ["flying"],
+                    },
+                    "counter_type": "+1/+1",
+                    "counter_count": 1,
+                    "_rule_logical_key": "battle_rule_v1:pg497-etb-without-flying-counter",
+                    "_rule_oracle_hash": "pg497-etb-without-flying-counter-hash",
+                },
+                17,
+                random.Random(4971),
+                all_players=[active, opponent],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert int(ground.get("plus_one_counters") or 0) == 1
+        assert int(source.get("plus_one_counters") or 0) == 0
+        assert int(flyer.get("plus_one_counters") or 0) == 0
+        assert any(
+            event == "trigger_resolved"
+            and data.get("target") == "Ground Guard"
+            and data.get("rule_logical_key") == "battle_rule_v1:pg497-etb-without-flying-counter"
+            for event, data in events
+        )
+
     def test_pg495_exile_target_respects_mana_value_and_nonland_constraints():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -23013,6 +23192,8 @@ def register_tests(battle, player):
         test_pg493_etb_destroy_respects_extended_target_constraints,
         test_pg494_etb_destroy_requires_damaged_this_turn_target,
         test_pg496_etb_add_counters_self_negative_targets_own_expendable_creature,
+        test_pg497_etb_add_counters_up_to_two_excludes_source_and_opponents,
+        test_pg497_etb_add_counters_without_flying_skips_flying_creatures,
         test_pg495_exile_target_respects_mana_value_and_nonland_constraints,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,

@@ -9991,6 +9991,155 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "controller_scope": "self"})
         self.assertEqual(effect["keywords"], ["lifelink"])
 
+    def test_creature_etb_up_to_two_other_controlled_counters_maps_multi_target(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "LifelinkAbility"],
+            xmage_signals=["targeting", "counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Basri's Acolyte",
+                type_line="Creature - Cat Cleric",
+                oracle_text=(
+                    "Lifelink\n"
+                    "When this creature enters, put a +1/+1 counter on each of up to two "
+                    "other target creatures you control."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility("
+                "new AddCountersTargetEffect(CounterType.P1P1.createInstance())"
+                ".setText(\"put a +1/+1 counter on each of up to two other target creatures you control\"));"
+                "ability.addTarget(new TargetPermanent(0, 2, StaticFilters.FILTER_OTHER_CONTROLLED_CREATURES, false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["target_count_min"], 0)
+        self.assertEqual(effect["target_count_max"], 2)
+        self.assertTrue(effect["up_to_count"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "controller_scope": "self", "exclude_source": True},
+        )
+
+    def test_creature_etb_counter_another_controlled_subtype_maps_constraints(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aeronaut Cavalry",
+                type_line="Creature - Human Soldier",
+                oracle_text=(
+                    "Flying\n"
+                    "When this creature enters, put a +1/+1 counter on another target Soldier you control."
+                ),
+            ),
+            source_text=(
+                "private static final FilterPermanent filter = "
+                "new FilterControlledPermanent(SubType.SOLDIER, \"another target Soldier you control\");"
+                "static { filter.add(AnotherPredicate.instance); }"
+                "Ability ability = new EntersBattlefieldTriggeredAbility("
+                "new AddCountersTargetEffect(CounterType.P1P1.createInstance()));"
+                "ability.addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "card_types": ["creature"],
+                "controller_scope": "self",
+                "exclude_source": True,
+                "required_subtypes": ["soldier"],
+            },
+        )
+
+    def test_creature_etb_counter_controlled_without_flying_maps_excluded_keyword(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Pileated Provisioner",
+                type_line="Creature - Bird Scout",
+                oracle_text=(
+                    "Flying\n"
+                    "When this creature enters, put a +1/+1 counter on target creature you control without flying."
+                ),
+            ),
+            source_text=(
+                "private static final FilterPermanent filter = "
+                "new FilterControlledCreaturePermanent(\"creature you control without flying\");"
+                "static { filter.add(Predicates.not(new AbilityPredicate(FlyingAbility.class))); }"
+                "Ability ability = new EntersBattlefieldTriggeredAbility("
+                "new AddCountersTargetEffect(CounterType.P1P1.createInstance()));"
+                "ability.addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "card_types": ["creature"],
+                "controller_scope": "self",
+                "excluded_keywords": ["flying"],
+            },
+        )
+
+    def test_creature_etb_three_minus_one_counters_target_creature_maps_fixed_count(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Skinrender",
+                type_line="Creature - Phyrexian Zombie",
+                oracle_text="When this creature enters, put three -1/-1 counters on target creature.",
+            ),
+            source_text=(
+                "Effect putCountersEffect = new AddCountersTargetEffect("
+                "CounterType.M1M1.createInstance(3), Outcome.UnboostCreature);"
+                "Ability ability = new EntersBattlefieldTriggeredAbility(putCountersEffect, false);"
+                "Target target = new TargetCreaturePermanent();"
+                "ability.addTarget(target);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_add_counters_counter_type"], "-1/-1")
+        self.assertEqual(effect["etb_add_counters_count"], 3)
+        self.assertEqual(effect["target_controller"], "any")
+
     def test_creature_etb_minus_one_counter_after_reminder_text_maps_to_etb_scope(self) -> None:
         row = queue_row(
             split.ADD_COUNTERS_TARGET_UNIT,
@@ -10020,7 +10169,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_add_counters_counter_type"], "-1/-1")
         self.assertEqual(effect["etb_add_counters_count"], 1)
 
-    def test_creature_etb_counter_multi_target_stays_blocked(self) -> None:
+    def test_creature_etb_counter_source_oracle_controller_mismatch_stays_blocked(self) -> None:
         row = queue_row(
             split.ADD_COUNTERS_TARGET_UNIT,
             effect_classes=["AddCountersTargetEffect"],
@@ -10045,7 +10194,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "etb_add_counters_counter_not_fixed")
+        self.assertEqual(reason, "etb_add_counters_source_oracle_mismatch")
 
     def test_fixed_boost_target_creature_maps_to_stat_modifier_until_eot(self) -> None:
         row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"])
