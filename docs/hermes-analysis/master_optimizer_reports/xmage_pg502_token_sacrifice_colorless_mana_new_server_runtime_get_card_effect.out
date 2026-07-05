@@ -1,0 +1,47 @@
+[
+  {
+    "effect": "creature",
+    "logical_rule_key": "battle_rule_v1:4977ea2073119ffdc86918b1496b93b1",
+    "name": "Dread Drone",
+    "scope": "xmage_creature_etb_create_tokens_v1",
+    "source": "curated",
+    "token_produces": "C",
+    "token_sacrifice_for_colorless_mana": true
+  },
+  {
+    "effect": "creature",
+    "logical_rule_key": "battle_rule_v1:ac512ef260039c67afe5cc63566955c6",
+    "name": "Emrakul's Hatcher",
+    "scope": "xmage_creature_etb_create_tokens_v1",
+    "source": "curated",
+    "token_produces": "C",
+    "token_sacrifice_for_colorless_mana": true
+  },
+  {
+    "effect": "creature",
+    "logical_rule_key": "battle_rule_v1:4977ea2073119ffdc86918b1496b93b1",
+    "name": "Kozilek's Predator",
+    "scope": "xmage_creature_etb_create_tokens_v1",
+    "source": "curated",
+    "token_produces": "C",
+    "token_sacrifice_for_colorless_mana": true
+  },
+  {
+    "effect": "creature",
+    "logical_rule_key": "battle_rule_v1:78d896732ea9eefc2e22a28974526cd9",
+    "name": "Nest Invader",
+    "scope": "xmage_creature_etb_create_tokens_v1",
+    "source": "curated",
+    "token_produces": "C",
+    "token_sacrifice_for_colorless_mana": true
+  },
+  {
+    "effect": "token_maker",
+    "logical_rule_key": "battle_rule_v1:e1d250018bb56e6a9c6e3fe2143e5568",
+    "name": "Skittering Invasion",
+    "scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "source": "curated",
+    "token_produces": "C",
+    "token_sacrifice_for_colorless_mana": true
+  }
+]

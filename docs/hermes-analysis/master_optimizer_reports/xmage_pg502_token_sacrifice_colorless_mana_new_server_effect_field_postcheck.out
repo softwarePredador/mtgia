@@ -1,0 +1,8 @@
+   normalized_name   |                    scope                    | token_sac_mana | produces | produced_symbols
+---------------------+---------------------------------------------+----------------+----------+------------------
+ dread drone         | xmage_creature_etb_create_tokens_v1         | true           | C        | ["C"]
+ emrakul's hatcher   | xmage_creature_etb_create_tokens_v1         | true           | C        | ["C"]
+ kozilek's predator  | xmage_creature_etb_create_tokens_v1         | true           | C        | ["C"]
+ nest invader        | xmage_creature_etb_create_tokens_v1         | true           | C        | ["C"]
+ skittering invasion | xmage_fixed_create_creature_tokens_spell_v1 | true           | C        | ["C"]
+(5 rows)

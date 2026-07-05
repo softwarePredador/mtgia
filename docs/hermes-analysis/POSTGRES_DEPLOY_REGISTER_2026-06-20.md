@@ -14648,3 +14648,90 @@ Register decision:
   `landwalk_land_types` blocker legality path.
 - The remaining token keyword backlog must continue as exact subpatterns, not
   as a generic token-keyword promotion.
+
+## 2026-07-05 - PG502 Token Sacrifice Colorless Mana New Server
+
+Status: applied on the new PostgreSQL target and synced to Hermes SQLite.
+
+Scope:
+
+- Deploy id: `xmage_pg502_token_sacrifice_colorless_mana_new_server`.
+- Runtime families:
+  `xmage_creature_etb_create_tokens_v1` and
+  `xmage_fixed_create_creature_tokens_spell_v1`.
+- XMage source signature:
+  fixed `CreateTokenEffect` with `EldraziSpawnToken`, whose token class has
+  `SimpleManaAbility(Zone.BATTLEFIELD, Mana.ColorlessMana(1),
+  new SacrificeSourceCost())`.
+- Promoted cards: `5`.
+- Promoted card names: `Dread Drone`, `Emrakul's Hatcher`,
+  `Kozilek's Predator`, `Nest Invader`, and `Skittering Invasion`.
+- Only exact fixed colorless self-sacrifice mana token metadata is allowed in
+  this batch. Generic token sacrifice text, Scion/Sliver variants,
+  non-creature sacrifice tokens, tap-and-sacrifice tokens, any-color sacrifice
+  tokens, dynamic token counts, and extra token abilities remain blocked for
+  separate runtime families.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_rollback.sql`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_manifest.json`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_apply_evidence.md`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_precheck.out`;
+  all 5 target cards matched exactly one canonical row, and 2 stale
+  `Skittering Invasion` rows were identified for deprecation.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_apply.out`;
+  `deprecated_shadow_rows=2`, `upserted_rows=5`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_postcheck.out`;
+  all promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- Field postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_effect_field_postcheck.out`;
+  all five promoted rows have `token_sac_mana=true`, `produces=C`, and
+  `produced_symbols=["C"]`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_pg_to_sqlite_sync.json`;
+  `pg_rows_loaded=8430`, `sqlite_inserted_or_updated=8194`,
+  `canonical_snapshot_rows_exported=5956`.
+- SQLite validation:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_sqlite_rule_check.out`;
+  all five rows are present in SQLite with the expected token sacrifice mana
+  fields.
+- Runtime lookup:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_runtime_get_card_effect.out`;
+  all five cards resolve from curated runtime cache with expected scopes.
+- Contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg502_token_sacrifice_colorless_mana_new_server.md`;
+  `51/51` checks passed.
+- Post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg502_token_sacrifice_colorless_mana_new_server_commander_legal.md`;
+  `xmage_authoritative_adapter_required_count=25747`.
+- Post-sync exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg502_token_sacrifice_colorless_mana_new_server_final_recheck.json`;
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`.
+
+Register decision:
+
+- PG502 is applied and should not be rebuilt.
+- Fixed Eldrazi Spawn token creation with exact colorless self-sacrifice mana
+  metadata is executable through the existing self-sacrifice mana-source
+  activation path.
+- The remaining token sacrifice backlog must continue as exact subpatterns, not
+  as a generic token-sacrifice promotion.

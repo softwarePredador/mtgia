@@ -1,0 +1,8 @@
+      card_name      |   normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+---------------------+---------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Dread Drone         | dread drone         | battle_rule_v1:4977ea2073119ffdc86918b1496b93b1 |                  1 |                           1 |                         1 |           2
+ Emrakul's Hatcher   | emrakul's hatcher   | battle_rule_v1:ac512ef260039c67afe5cc63566955c6 |                  1 |                           1 |                         1 |           2
+ Kozilek's Predator  | kozilek's predator  | battle_rule_v1:4977ea2073119ffdc86918b1496b93b1 |                  1 |                           1 |                         1 |           2
+ Nest Invader        | nest invader        | battle_rule_v1:78d896732ea9eefc2e22a28974526cd9 |                  1 |                           1 |                         1 |           2
+ Skittering Invasion | skittering invasion | battle_rule_v1:e1d250018bb56e6a9c6e3fe2143e5568 |                  1 |                           1 |                         1 |           2
+(5 rows)
