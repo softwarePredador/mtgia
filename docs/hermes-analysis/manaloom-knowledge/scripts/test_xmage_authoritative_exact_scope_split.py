@@ -6435,7 +6435,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_damage_target_not_supported")
 
-    def test_creature_etb_damage_blocks_restricted_flying_target(self) -> None:
+    def test_creature_etb_damage_maps_restricted_flying_target(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,
             effect_classes=["DamageTargetEffect"],
@@ -6454,13 +6454,113 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 ),
             ),
             source_text=(
-                "this.addAbility(new EntersBattlefieldTriggeredAbility("
-                "new DamageTargetEffect(4), true));"
+                "Ability ability = new EntersBattlefieldTriggeredAbility("
+                "new DamageTargetEffect(4), true);"
+                "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_CREATURE_FLYING));"
+                "this.addAbility(ability);"
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "etb_damage_target_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_DAMAGE_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_damage_amount"], 4)
+        self.assertEqual(effect["etb_damage_target"], "flying_creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "required_keywords": ["flying"]})
+
+    def test_creature_etb_damage_maps_self_controlled_creature_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Moloch",
+                type_line="Creature - Lizard",
+                oracle_text="When this creature enters, it deals 3 damage to target creature you control.",
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new DamageTargetEffect(3));"
+                "ability.addTarget(new TargetControlledCreaturePermanent());"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_damage_amount"], 3)
+        self.assertEqual(effect["etb_damage_target"], "creature")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "controller_scope": "self"})
+
+    def test_creature_etb_damage_maps_damaged_opponent_creature_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Boltcaster",
+                type_line="Creature - Human Wizard",
+                oracle_text=(
+                    "When this creature enters, it deals 5 damage to target creature "
+                    "an opponent controls that was dealt damage this turn."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new DamageTargetEffect(5));"
+                "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_OPPONENTS_CREATURE_DAMAGED_THIS_TURN));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_damage_amount"], 5)
+        self.assertEqual(effect["etb_damage_target"], "creature")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_controller"], "opponent")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "controller_scope": "opponent", "damaged_this_turn": True},
+        )
+
+    def test_creature_etb_damage_maps_player_or_planeswalker_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Firebeast",
+                type_line="Creature - Elemental Ox",
+                oracle_text="When this creature enters, it deals 4 damage to target player or planeswalker.",
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new DamageTargetEffect(4));"
+                "ability.addTarget(new TargetPlayerOrPlaneswalker());"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_damage_amount"], 4)
+        self.assertEqual(effect["etb_damage_target"], "player_or_planeswalker")
+        self.assertEqual(effect["target_constraints"], {"scope": "player_or_planeswalker"})
 
     def test_creature_dies_damage_maps_any_target_scope(self) -> None:
         row = queue_row(

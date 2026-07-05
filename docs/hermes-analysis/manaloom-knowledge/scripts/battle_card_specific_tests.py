@@ -9131,6 +9131,246 @@ def register_tests(battle, player):
         ]
         assert resolved_targets == ["Damaged Engine", "Wounded Planeswalker"]
 
+    def test_pg509_etb_fixed_damage_respects_restricted_targets():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            rig = {
+                "name": "Geistcatcher's Rig",
+                "type_line": "Artifact Creature - Construct",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 5,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            ground = {
+                "name": "Ground Creature",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            flyer = {
+                "name": "Flying Creature",
+                "type_line": "Creature - Bird",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "flying": True,
+                "keywords": ["flying"],
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [ground, flyer]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                rig,
+                {
+                    **rig,
+                    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_damage_amount": 4,
+                    "etb_damage_target": "flying_creature",
+                    "target": "flying_creature",
+                    "target_constraints": {"card_types": ["creature"], "required_keywords": ["flying"]},
+                    "_rule_logical_key": "battle_rule_v1:pg509-geistcatchers-rig",
+                    "_rule_oracle_hash": "pg509-geistcatchers-rig-hash",
+                },
+                15,
+                random.Random(509),
+                all_players=[active, opponent],
+            )
+
+            assert ground in opponent.battlefield
+            assert flyer not in opponent.battlefield
+            assert flyer in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            firebeast = {
+                "name": "Goretusk Firebeast",
+                "type_line": "Creature - Elemental Ox Beast",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            opponent_life_before = opponent.life
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                firebeast,
+                {
+                    **firebeast,
+                    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_damage_amount": 4,
+                    "etb_damage_target": "player_or_planeswalker",
+                    "target": "player_or_planeswalker",
+                    "target_constraints": {"scope": "player_or_planeswalker"},
+                    "_rule_logical_key": "battle_rule_v1:pg509-goretusk-firebeast",
+                    "_rule_oracle_hash": "pg509-goretusk-firebeast-hash",
+                },
+                15,
+                random.Random(5091),
+                all_players=[active, opponent],
+            )
+
+            assert opponent.life == opponent_life_before - 4
+
+            active = player("Active")
+            opponent = player("Opponent")
+            boltcaster = {
+                "name": "Unsparing Boltcaster",
+                "type_line": "Creature - Human Wizard",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            healthy = {
+                "name": "Healthy Creature",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 5,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            damaged = {
+                "name": "Damaged Creature",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 4,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            battle.mark_permanent_dealt_damage_this_turn(damaged, 1, 15)
+            opponent.battlefield = [healthy, damaged]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                boltcaster,
+                {
+                    **boltcaster,
+                    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_damage_amount": 5,
+                    "etb_damage_target": "creature",
+                    "target": "creature",
+                    "target_controller": "opponent",
+                    "target_constraints": {
+                        "card_types": ["creature"],
+                        "controller_scope": "opponent",
+                        "damaged_this_turn": True,
+                    },
+                    "_rule_logical_key": "battle_rule_v1:pg509-unsparing-boltcaster",
+                    "_rule_oracle_hash": "pg509-unsparing-boltcaster-hash",
+                },
+                15,
+                random.Random(5092),
+                all_players=[active, opponent],
+            )
+
+            assert healthy in opponent.battlefield
+            assert damaged not in opponent.battlefield
+            assert damaged in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            moloch = {
+                "name": "Whiptail Moloch",
+                "type_line": "Creature - Lizard",
+                "effect": "creature",
+                "power": 6,
+                "toughness": 3,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            expendable = {
+                "name": "Servo Token",
+                "type_line": "Artifact Creature - Servo",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            resilient = {
+                "name": "Resilient Creature",
+                "type_line": "Creature - Giant",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 5,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            opponent_engine = {
+                "name": "Opponent Engine",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            active.battlefield = [expendable, resilient]
+            opponent.battlefield = [opponent_engine]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                moloch,
+                {
+                    **moloch,
+                    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_damage_amount": 3,
+                    "etb_damage_target": "creature",
+                    "target": "creature",
+                    "target_controller": "self",
+                    "target_constraints": {"card_types": ["creature"], "controller_scope": "self"},
+                    "_rule_logical_key": "battle_rule_v1:pg509-whiptail-moloch",
+                    "_rule_oracle_hash": "pg509-whiptail-moloch-hash",
+                },
+                15,
+                random.Random(5093),
+                all_players=[active, opponent],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert expendable in active.battlefield
+        assert resilient in active.battlefield
+        assert int(resilient.get("damage_marked_this_turn") or 0) == 3
+        assert opponent_engine in opponent.battlefield
+        damage_events = [
+            data
+            for event, data in events
+            if event == "damage_resolved"
+            and str(data.get("rule_logical_key") or "").startswith("battle_rule_v1:pg509-")
+        ]
+        assert [(data.get("target"), data.get("result")) for data in damage_events] == [
+            ("Flying Creature", "creature_destroyed"),
+            (None, "player_damage"),
+            ("Damaged Creature", "creature_destroyed"),
+            ("Resilient Creature", "creature_damaged"),
+        ]
+        assert damage_events[-1]["target_player"] == "Active"
+
     def test_pg496_etb_add_counters_self_negative_targets_own_expendable_creature():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -24205,6 +24445,7 @@ def register_tests(battle, player):
         test_pg492_etb_bounce_respects_subtype_and_historic_constraints,
         test_pg493_etb_destroy_respects_extended_target_constraints,
         test_pg494_etb_destroy_requires_damaged_this_turn_target,
+        test_pg509_etb_fixed_damage_respects_restricted_targets,
         test_pg496_etb_add_counters_self_negative_targets_own_expendable_creature,
         test_pg497_etb_add_counters_up_to_two_excludes_source_and_opponents,
         test_pg497_etb_add_counters_without_flying_skips_flying_creatures,

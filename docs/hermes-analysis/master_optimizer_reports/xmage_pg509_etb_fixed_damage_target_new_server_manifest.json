@@ -1,0 +1,367 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg509_xmage_pg509_etb_fixed_damage_targe_20260705_134357",
+  "deploy_id": "PG509",
+  "expected_rules": [
+    {
+      "card_name": "Geistcatcher's Rig",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9c5990d7e2bffaaa3f9c312f0f11781c",
+      "min_rule_version": 2,
+      "normalized_name": "geistcatcher's rig",
+      "oracle_hash": "db3e02163c294694a172feeaf45d88ea",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+        "effect": "creature",
+        "etb_damage_amount": 4,
+        "etb_damage_target": "flying_creature",
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goretusk Firebeast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0b3bbe5604fd9bf374462e470c31d1d4",
+      "min_rule_version": 2,
+      "normalized_name": "goretusk firebeast",
+      "oracle_hash": "3b2c41e97bcd2e61e7b16ba8797227ad",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+        "effect": "creature",
+        "etb_damage_amount": 4,
+        "etb_damage_target": "player_or_planeswalker",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Unsparing Boltcaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:050b3a24d030eff42eae7a9910ac3ce6",
+      "min_rule_version": 2,
+      "normalized_name": "unsparing boltcaster",
+      "oracle_hash": "9a46e09738ecdb690d12258849179c96",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+        "effect": "creature",
+        "etb_damage_amount": 5,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent",
+          "damaged_this_turn": true
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Viashino Pyromancer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:60d41dd048c092bca317332544334052",
+      "min_rule_version": 2,
+      "normalized_name": "viashino pyromancer",
+      "oracle_hash": "0b7677080966557d281ce2381e6ba675",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+        "effect": "creature",
+        "etb_damage_amount": 2,
+        "etb_damage_target": "player_or_planeswalker",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Whiptail Moloch",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d3c745c30c6578b608c0e39feadd8c5",
+      "min_rule_version": 2,
+      "normalized_name": "whiptail moloch",
+      "oracle_hash": "de709bf2a4de7400cb14e793e6eb0357",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+        "effect": "creature",
+        "etb_damage_amount": 3,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "self"
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_fixed_damage_target": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T13:43:57+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Geistcatcher's Rig"
+      },
+      "card_name": "Geistcatcher's Rig",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9c5990d7e2bffaaa3f9c312f0f11781c",
+      "normalized_name": "geistcatcher's rig",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+        "effect": "creature",
+        "etb_damage_amount": 4,
+        "etb_damage_target": "flying_creature",
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Goretusk Firebeast"
+      },
+      "card_name": "Goretusk Firebeast",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0b3bbe5604fd9bf374462e470c31d1d4",
+      "normalized_name": "goretusk firebeast",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+        "effect": "creature",
+        "etb_damage_amount": 4,
+        "etb_damage_target": "player_or_planeswalker",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Unsparing Boltcaster"
+      },
+      "card_name": "Unsparing Boltcaster",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:050b3a24d030eff42eae7a9910ac3ce6",
+      "normalized_name": "unsparing boltcaster",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+        "effect": "creature",
+        "etb_damage_amount": 5,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent",
+          "damaged_this_turn": true
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Viashino Pyromancer"
+      },
+      "card_name": "Viashino Pyromancer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:60d41dd048c092bca317332544334052",
+      "normalized_name": "viashino pyromancer",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+        "effect": "creature",
+        "etb_damage_amount": 2,
+        "etb_damage_target": "player_or_planeswalker",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Whiptail Moloch"
+      },
+      "card_name": "Whiptail Moloch",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d3c745c30c6578b608c0e39feadd8c5",
+      "normalized_name": "whiptail moloch",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+        "effect": "creature",
+        "etb_damage_amount": 3,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "self"
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Geistcatcher's Rig",
+    "Goretusk Firebeast",
+    "Unsparing Boltcaster",
+    "Viashino Pyromancer",
+    "Whiptail Moloch"
+  ],
+  "selected_count": 5,
+  "slug": "xmage_pg509_etb_fixed_damage_target_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Geistcatcher's Rig",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9c5990d7e2bffaaa3f9c312f0f11781c",
+      "min_rule_version": 2,
+      "normalized_name": "geistcatcher's rig",
+      "oracle_hash": "db3e02163c294694a172feeaf45d88ea",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goretusk Firebeast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0b3bbe5604fd9bf374462e470c31d1d4",
+      "min_rule_version": 2,
+      "normalized_name": "goretusk firebeast",
+      "oracle_hash": "3b2c41e97bcd2e61e7b16ba8797227ad",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Unsparing Boltcaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:050b3a24d030eff42eae7a9910ac3ce6",
+      "min_rule_version": 2,
+      "normalized_name": "unsparing boltcaster",
+      "oracle_hash": "9a46e09738ecdb690d12258849179c96",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Viashino Pyromancer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:60d41dd048c092bca317332544334052",
+      "min_rule_version": 2,
+      "normalized_name": "viashino pyromancer",
+      "oracle_hash": "0b7677080966557d281ce2381e6ba675",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Whiptail Moloch",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6d3c745c30c6578b608c0e39feadd8c5",
+      "min_rule_version": 2,
+      "normalized_name": "whiptail moloch",
+      "oracle_hash": "de709bf2a4de7400cb14e793e6eb0357",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

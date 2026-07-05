@@ -1,0 +1,8 @@
+normalized_name|battle_model_scope|amount|etb_damage_target|target|target_controller|target_constraints|review_status|execution_status|oracle_hash|logical_rule_key
+geistcatcher's rig|xmage_creature_etb_fixed_damage_target_v1|4|flying_creature|flying_creature||{"card_types": ["creature"], "required_keywords": ["flying"]}|verified|auto|db3e02163c294694a172feeaf45d88ea|battle_rule_v1:9c5990d7e2bffaaa3f9c312f0f11781c
+goretusk firebeast|xmage_creature_etb_fixed_damage_target_v1|4|player_or_planeswalker|player_or_planeswalker||{"scope": "player_or_planeswalker"}|verified|auto|3b2c41e97bcd2e61e7b16ba8797227ad|battle_rule_v1:0b3bbe5604fd9bf374462e470c31d1d4
+unsparing boltcaster|xmage_creature_etb_fixed_damage_target_v1|5|creature|creature|opponent|{"card_types": ["creature"], "controller_scope": "opponent", "damaged_this_turn": true}|verified|auto|9a46e09738ecdb690d12258849179c96|battle_rule_v1:050b3a24d030eff42eae7a9910ac3ce6
+viashino pyromancer|xmage_creature_etb_fixed_damage_target_v1|2|player_or_planeswalker|player_or_planeswalker||{"scope": "player_or_planeswalker"}|verified|auto|0b7677080966557d281ce2381e6ba675|battle_rule_v1:60d41dd048c092bca317332544334052
+whiptail moloch|xmage_creature_etb_fixed_damage_target_v1|3|creature|creature|self|{"card_types": ["creature"], "controller_scope": "self"}|verified|auto|de709bf2a4de7400cb14e793e6eb0357|battle_rule_v1:6d3c745c30c6578b608c0e39feadd8c5
+(5 rows)
+pg_direct_postcheck_exit_code=0

@@ -1,0 +1,2 @@
+PASS test_pg509_etb_fixed_damage_respects_restricted_targets
+focused_battle_test_exit_code=0

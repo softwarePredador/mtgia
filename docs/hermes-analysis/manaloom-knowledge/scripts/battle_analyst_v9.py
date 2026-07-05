@@ -11869,6 +11869,19 @@ def direct_damage_targets_player(effect_data):
     return False
 
 
+def direct_damage_target_participants(player, opponents, effect_data):
+    target_controller = str((effect_data or {}).get("target_controller") or "").lower()
+    constraint_scope = str(_target_constraints_dict(effect_data).get("controller_scope") or "").lower()
+    if target_controller in {"self", "you", "controller", "controlled"} or constraint_scope in {
+        "self",
+        "you",
+        "controller",
+        "controlled",
+    }:
+        return [player]
+    return list(opponents or [])
+
+
 def removal_annotation_replay_fields(effect_data):
     fields = {}
     if not isinstance(effect_data, dict):
@@ -42374,7 +42387,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
         life_gained = player.life - controller_life_before
         return life_gained, controller_life_before, player.life, spell_lifelink_gain
 
-    for opp in opponents:
+    for opp in direct_damage_target_participants(player, opponents, effect_data):
         target_options = []
         player_target_allowed = direct_damage_targets_player(effect_data)
         for target in removal_target_candidates(
@@ -42395,13 +42408,14 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
                 emit=False,
             )
             if is_battlefield_creature(target):
-                if int(target.get("toughness") or target.get("power") or 2) <= target_amount:
+                lethal = int(target.get("toughness") or target.get("power") or 2) <= target_amount
+                if target_amount > 0 and (lethal or not player_target_allowed):
                     target_options.append(
                         {
                             "target": target,
                             "amount": target_amount,
                             "kind": "creature",
-                            "lethal": True,
+                            "lethal": lethal,
                         }
                     )
                 continue
@@ -42431,13 +42445,16 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
                         }
                     )
         if target_options:
-            target_option = max(
-                target_options,
-                key=lambda item: (
-                    int(bool(item["lethal"])),
-                    target_priority(item["target"]),
-                    {"creature": 3, "planeswalker": 2, "battle": 1}.get(item["kind"], 0),
-                ),
+            targeting_own_permanents = opp is player
+            target_sort_key = lambda item: (
+                int(bool(item["lethal"])),
+                target_priority(item["target"]),
+                {"creature": 3, "planeswalker": 2, "battle": 1}.get(item["kind"], 0),
+            )
+            target_option = (
+                min(target_options, key=target_sort_key)
+                if targeting_own_permanents
+                else max(target_options, key=target_sort_key)
             )
             target = target_option["target"]
             target_amount = apply_static_damage_replacements(
@@ -42458,6 +42475,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
             defense_before = None
             defense_after = None
             if target_kind == "creature":
+                lethal_damage = int(target.get("toughness") or target.get("power") or 2) <= target_amount
                 mark_permanent_dealt_damage_this_turn(target, target_amount, turn)
                 trigger_creature_damage_controller_reflect(
                     [player, *list(opponents)],
@@ -42479,7 +42497,10 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
                     turn=turn,
                     phase=phase,
                 )
-                if effect_data.get("exile_if_dies_from_damage"):
+                if not lethal_damage:
+                    destination = "battlefield"
+                    result = "creature_damaged"
+                elif effect_data.get("exile_if_dies_from_damage"):
                     destination = move_permanent_from_battlefield_to_exile(
                         opp,
                         target,

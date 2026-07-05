@@ -13031,6 +13031,53 @@ promotion, modal ETB destroy effects, unsupported source-effect-count rows, or
 unrelated destroy target blockers. The next wave must start from the rebuilt
 post-PG508 queue, not from historical PG507 residual counts.
 
+## PG509 Exact ETB Fixed Damage Target Checkpoint
+
+As of 2026-07-05, PG509 is applied and synced against the new server target.
+It closes five exact ETB fixed damage target predicates:
+
+- `Geistcatcher's Rig`: `etb_damage_amount=4`,
+  `target=flying_creature`, `target_constraints.required_keywords=["flying"]`.
+- `Goretusk Firebeast`: `etb_damage_amount=4`,
+  `target=player_or_planeswalker`.
+- `Unsparing Boltcaster`: `etb_damage_amount=5`, `target=creature`,
+  `target_controller=opponent`, `target_constraints.damaged_this_turn=true`.
+- `Viashino Pyromancer`: `etb_damage_amount=2`,
+  `target=player_or_planeswalker`.
+- `Whiptail Moloch`: `etb_damage_amount=3`, `target=creature`,
+  `target_controller=self`.
+
+Evidence:
+
+- package and apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_pg_to_sqlite_sync.json`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg509_etb_fixed_damage_target_new_server_final_recheck.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg509_etb_fixed_damage_target_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg509_etb_fixed_damage_target_new_server_commander_legal.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4930`
+- `battle_family_mapper_required=28943`
+- `target_identity_count=26020`
+- `xmage_authoritative_source_count=25706`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25706`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+- `etb_damage_target_not_supported=8`
+
+Residual boundary: PG509 does not authorize dynamic damage amount rows,
+unrelated direct-damage review scopes, or broad `xmage_*_review_v1`
+promotion. The remaining `etb_damage_target_not_supported` rows require a
+separate dynamic amount/modeling pass.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

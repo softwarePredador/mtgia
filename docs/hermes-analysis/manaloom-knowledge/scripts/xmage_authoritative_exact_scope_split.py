@@ -7798,6 +7798,8 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "creature_power_3_or_greater"
     if re.search(r"PowerPredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*3\s*\)", text):
         return "creature_power_4_or_greater"
+    if "FILTER_OPPONENTS_CREATURE_DAMAGED_THIS_TURN" in text:
+        return "creature_damaged_this_turn_opponent_controls"
     if "FILTER_CREATURE_DAMAGED_THIS_TURN" in text:
         return "creature_damaged_this_turn"
     if "ManaValuePredicate(ComparisonType.MORE_THAN, 2)" in text:
@@ -11711,8 +11713,28 @@ def etb_damage_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] |
         ),
         (
             r"^when this creature enters(?: the battlefield)?, "
+            r"(?:it|this creature) deals (\d+) damage to target player or planeswalker\.?$",
+            "player_or_planeswalker",
+        ),
+        (
+            r"^when this creature enters(?: the battlefield)?, "
             r"(?:it|this creature) deals (\d+) damage to target creature or planeswalker\.?$",
             "creature_or_planeswalker",
+        ),
+        (
+            r"^when this creature enters(?: the battlefield)?, "
+            r"(?:it|this creature) deals (\d+) damage to target creature you control\.?$",
+            "creature_you_control",
+        ),
+        (
+            r"^when this creature enters(?: the battlefield)?, "
+            r"(?:you may have )?(?:it|this creature) deal (\d+) damage to target creature with flying\.?$",
+            "flying_creature",
+        ),
+        (
+            r"^when this creature enters(?: the battlefield)?, "
+            r"(?:it|this creature) deals (\d+) damage to target creature an opponent controls that was dealt damage this turn\.?$",
+            "creature_damaged_this_turn_opponent_controls",
         ),
         (
             r"^when this creature enters(?: the battlefield)?, "
@@ -11782,6 +11804,8 @@ def damage_target_from_source(source: str) -> str | None:
         return "creature_or_planeswalker"
     if "TargetPermanent" in text and "creature or planeswalker" in text:
         return "creature_or_planeswalker"
+    if re.search(r"new\s+TargetControlledCreaturePermanent\s*\(", text):
+        return "creature_you_control"
     if (
         re.search(r"new\s+TargetCreaturePermanent\s*\(", text)
         or "FilterCreaturePermanent" in text
@@ -13516,6 +13540,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "mana_value_min": 3}
     if target == "creature":
         return {"card_types": ["creature"]}
+    if target == "creature_you_control":
+        return {"card_types": ["creature"], "controller_scope": "self"}
     if target == "creature_or_planeswalker":
         return {"card_types": ["creature", "planeswalker"]}
     if target == "player":
@@ -16801,6 +16827,9 @@ def split_row(
             return None, "etb_damage_amount_source_not_fixed"
         if constructor_amount != amount:
             return None, "etb_damage_source_oracle_mismatch"
+        source_target = damage_target_from_source(source_text)
+        if source_target is not None and source_target != target:
+            return None, "etb_damage_source_target_mismatch"
         effect_json = {
             "effect": "creature",
             "battle_model_scope": ETB_DAMAGE_CREATURE_SCOPE,
@@ -16813,6 +16842,16 @@ def split_row(
             "xmage_effect_class": "DamageTargetEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
         }
+        if target == "creature_you_control":
+            effect_json["etb_damage_target"] = "creature"
+            effect_json["target"] = "creature"
+            effect_json["target_controller"] = "self"
+        if target in {
+            "creature_damaged_this_turn_opponent_controls",
+        }:
+            effect_json["etb_damage_target"] = "creature"
+            effect_json["target"] = "creature"
+            effect_json["target_controller"] = "opponent"
         return build_proposal(
             row,
             metadata,

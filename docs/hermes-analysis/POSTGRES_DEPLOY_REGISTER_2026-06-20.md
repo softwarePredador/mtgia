@@ -15186,3 +15186,79 @@ Register decision:
   target predicates listed in this package.
 - Remaining destroy/ETB backlog must continue through exact subpatterns, not
   broad generic review-scope promotion.
+
+## 2026-07-05 - PG509 creature ETB fixed damage target parser
+
+- Deploy id: `xmage_pg509_etb_fixed_damage_target_new_server`.
+- Runtime family: `xmage_creature_etb_fixed_damage_target_v1`.
+- Promoted cards: `5`.
+- Promoted card names: `Geistcatcher's Rig`, `Goretusk Firebeast`,
+  `Unsparing Boltcaster`, `Viashino Pyromancer`, and `Whiptail Moloch`.
+- Scope boundary: only exact creature enters-the-battlefield fixed damage
+  triggers backed by local XMage `EntersBattlefieldTriggeredAbility` plus
+  `DamageTargetEffect` and matching ManaLoom target constraints are allowed in
+  this package. Dynamic damage amounts and unsupported target/source forms
+  remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=5`, `COMMIT`.
+- Postcheck:
+  all 5 promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- Field postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_pg_direct_postcheck.out`;
+  PG509 covers fixed damage to target creature with flying, target player or
+  planeswalker, target damaged creature an opponent controls, and target
+  creature you control.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_pg_to_sqlite_sync.json`;
+  `selected_card_count=5`, `pg_rows_loaded=5`,
+  `sqlite_inserted_or_updated=5`, and
+  `canonical_snapshot_rows_exported=5997`.
+- Runtime lookup:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg509_etb_fixed_damage_target_new_server_runtime_get_card_effect.out`
+  resolves all 5 cards to the expected runtime scope, damage amount, target,
+  target controller, logical rule key, and Oracle hash.
+- Validation:
+  splitter unit suite `529` tests passed, focused battle runtime test exited
+  `0`, full battle runtime suite has `633` PASS lines, XMage strategy `26/26`
+  pass, deckbuilding contract `pass`, operational surface `pass`, legacy
+  contamination `pass`, and PG/Hermes/SQLite `51/51` pass.
+- Post-sync queue:
+  `target_identity_count=26020`, `xmage_authoritative_source_count=25706`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25706`.
+- Global readiness:
+  `battle_and_oracle_ready=4930` and
+  `battle_family_mapper_required=28943`.
+- Final exact-scope recheck:
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`, and
+  `etb_damage_target_not_supported=8`.
+
+Register decision:
+
+- PG509 is applied and should not be rebuilt.
+- The ETB fixed damage target parser/runtime now supports the five exact
+  target predicates listed in this package.
+- Remaining ETB damage backlog must continue through dynamic amount and
+  unsupported target subpatterns, not broad generic review-scope promotion.
