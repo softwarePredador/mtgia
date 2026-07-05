@@ -604,3 +604,58 @@ Current conclusion remains unchanged: protected deck `607` is still the
 Lorehold champion. The next valid learning step is
 `draft_runtime_contracts_for_brain_entreat_haze_before_any_deck_gate`, not a
 natural battle, not a shell promotion, and not a direct mutation of `607`.
+
+## Brain/Entreat/Haze Runtime Contract - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_entreat_haze_runtime_contract_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_entreat_haze_runtime_contract_20260705_current.json`
+
+It reads the post-identity queue split and local XMage sources under
+`/Users/desenvolvimentomobile/Downloads/mage-master` to draft the first runtime
+contracts for `Brain in a Jar`, `Entreat the Angels`, and `Haze of Rage`.
+
+Current result:
+
+- status: `runtime_contracts_drafted_no_battle_ready_keep_607`;
+- runtime contracts drafted: `3`;
+- XMage classes found: `3`;
+- cards with active ManaLoom rule rows among these three: `0`;
+- battle-ready cards now: `0`;
+- best first runtime contract: `Entreat the Angels`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`.
+
+XMage evidence:
+
+- `Brain in a Jar`: XMage class includes charge-counter add, exact mana-value
+  free-cast from hand, remove-X-charge-counters, and scry. ManaLoom has some
+  generic charge-counter/scry surfaces, but no exact-mana-value free-cast
+  contract for this card.
+- `Entreat the Angels`: XMage class includes `CreateTokenEffect`,
+  `AngelToken`, `GetXValue`, and `MiracleAbility`. ManaLoom already has
+  miracle and token primitives, so this is the best first runtime candidate.
+- `Haze of Rage`: XMage class includes `BuybackAbility`,
+  `BoostControlledEffect`, and `StormAbility`. ManaLoom has buyback and some
+  storm-copy foundations, but not the global boost storm resolution or the
+  full `Storm-Kiln Artist` combo.
+- `Storm-Kiln Artist`: XMage class includes `MagecraftAbility`,
+  `CreateTokenEffect`, `TreasureToken`, and artifact-count power scaling.
+  ManaLoom has one local rule row, but its scope is
+  `creature_body_artifact_power_magecraft_treasure_annotation_v1`; the Haze
+  combo needs executable treasure on cast/copy, not annotation-only evidence.
+
+Runtime priority:
+
+1. `Entreat the Angels`: implement X-spell miracle/token runtime first because
+   it directly tests the protected 607 miracle closing window.
+2. `Brain in a Jar`: keep as high-value runtime research, but it needs a new
+   charge-counter/free-cast family before battle.
+3. `Haze of Rage`: keep as combo research only until storm boost, buyback,
+   Storm-Kiln magecraft treasure, loop guard, and cut safety all exist.
+
+Current conclusion remains unchanged: protected deck `607` is still the
+Lorehold champion. The next valid learning step is
+`prepare_entreat_the_angels_runtime_contract_before_battle`; this is still not
+a natural battle gate or deck promotion.
