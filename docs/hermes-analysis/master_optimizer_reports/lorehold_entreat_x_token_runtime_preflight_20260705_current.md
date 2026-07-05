@@ -1,6 +1,6 @@
 # Lorehold Entreat X-Token Runtime Preflight
 
-- Generated at: `2026-07-05T02:14:36Z`
+- Generated at: `2026-07-05T02:18:41Z`
 - Status: `entreat_x_token_runtime_primitive_ready_rule_still_blocked_keep_607`
 - Current baseline: `deck_607`
 - Source DB mutated: `False`
@@ -24,6 +24,7 @@
 | `x_value_helper` | `True` |
 | `token_count_uses_x_value` | `True` |
 | `token_count_per_x_guard` | `True` |
+| `cast_planner_uses_x_token_count` | `True` |
 | `tokens_created_replay_source` | `True` |
 | `tokens_created_replay_x_value` | `True` |
 
@@ -35,6 +36,7 @@
 | `entreat_fixture` | `True` |
 | `x_value_fixture` | `True` |
 | `angel_token_model` | `True` |
+| `xx_cost_plan_test` | `True` |
 | `replay_assertion` | `True` |
 
 ## Decision

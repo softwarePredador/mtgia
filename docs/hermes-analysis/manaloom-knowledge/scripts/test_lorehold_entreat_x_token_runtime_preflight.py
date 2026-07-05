@@ -29,6 +29,7 @@ def test_build_payload_marks_x_token_runtime_ready_but_not_promotable(tmp_path: 
     runtime.write_text(
         """
         def x_value_from_effect_context(effect_data): return 3
+        uses_x_cast_value = any(("count_from_x",)) or str(effect_data.get("token_count_source") or "").lower() == "x_value"
         def token_count_for_effect(player, effect_data):
             if effect_data.get("token_count_source") == "x_value":
                 token_count_per_x = 1
@@ -46,6 +47,8 @@ def test_build_payload_marks_x_token_runtime_ready_but_not_promotable(tmp_path: 
             token = "Angel Token"
             assert "tokens_requested"
             assert "token_count_source"
+        def test_x_create_creature_tokens_spell_cast_plan_uses_xx_cost():
+            assert True
         """,
         encoding="utf-8",
     )

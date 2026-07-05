@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T02:14:36Z",
+  "generated_at": "2026-07-05T02:18:41Z",
   "artifact_type": "lorehold_entreat_x_token_runtime_preflight",
   "postgres_writes": false,
   "source_db_mutated": false,
@@ -27,6 +27,7 @@
     "x_value_helper": true,
     "token_count_uses_x_value": true,
     "token_count_per_x_guard": true,
+    "cast_planner_uses_x_token_count": true,
     "tokens_created_replay_source": true,
     "tokens_created_replay_x_value": true
   },
@@ -35,6 +36,7 @@
     "entreat_fixture": true,
     "x_value_fixture": true,
     "angel_token_model": true,
+    "xx_cost_plan_test": true,
     "replay_assertion": true
   },
   "entreat_active_rules": [],

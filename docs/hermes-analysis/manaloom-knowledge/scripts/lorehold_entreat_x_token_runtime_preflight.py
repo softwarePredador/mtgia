@@ -83,6 +83,10 @@ def runtime_checks(runtime_text: str) -> dict[str, bool]:
         "x_value_helper": "def x_value_from_effect_context" in runtime_text,
         "token_count_uses_x_value": "token_count_source" in runtime_text and "x_value_from_effect_context(effect_data)" in runtime_text,
         "token_count_per_x_guard": "token_count_per_x" in runtime_text,
+        "cast_planner_uses_x_token_count": (
+            "uses_x_cast_value = any(" in runtime_text
+            and "str(effect_data.get(\"token_count_source\") or \"\").lower() == \"x_value\"" in runtime_text
+        ),
         "tokens_created_replay_source": "token_count_source=effect_data.get(\"token_count_source\")" in runtime_text,
         "tokens_created_replay_x_value": "x_value_from_effect_context(effect_data)" in runtime_text and "tokens_created" in runtime_text,
     }
@@ -94,6 +98,7 @@ def test_checks(test_text: str) -> dict[str, bool]:
         "entreat_fixture": "Entreat the Angels" in test_text,
         "x_value_fixture": "\"_cast_context\": {\"x_value\": 3}" in test_text,
         "angel_token_model": "Angel Token" in test_text and "token_flying" in test_text,
+        "xx_cost_plan_test": "test_x_create_creature_tokens_spell_cast_plan_uses_xx_cost" in test_text,
         "replay_assertion": "tokens_requested" in test_text and "token_count_source" in test_text,
     }
 

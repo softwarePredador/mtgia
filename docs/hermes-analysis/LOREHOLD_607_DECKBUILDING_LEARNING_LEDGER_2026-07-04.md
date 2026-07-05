@@ -678,6 +678,7 @@ Current result:
   `entreat_x_token_runtime_primitive_ready_rule_still_blocked_keep_607`;
 - runtime primitive ready: `true`;
 - focused runtime test present: `true`;
+- normal `{X}{X}{W}{W}{W}` cast planner coverage: `true`;
 - active ManaLoom rule rows for `Entreat the Angels`: `0`;
 - battle-ready cards now: `0`;
 - natural battle allowed now: `false`;
@@ -690,10 +691,68 @@ Test evidence:
 - `python3 -m pytest -q docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_entreat_x_token_runtime_preflight.py`
   -> `2 passed`;
 - `python3 -m pytest -q docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_exact_scope_runtime.py -k 'x_create_creature_tokens or x_damage_uses_cast_context'`
-  -> `2 passed, 265 deselected`.
+  -> `3 passed, 265 deselected`.
 
 Runtime conclusion: ManaLoom can now model an Entreat-style X spell that
-creates X 4/4 white Angel creature tokens with flying, but this is still only a
-generic primitive plus fixture. The next valid learning step is
+creates X 4/4 white Angel creature tokens with flying and can choose X for the
+normal `{X}{X}{W}{W}{W}` cost, but this is still only a generic primitive plus
+fixture. The next valid learning step is
 `draft_reviewed_entreat_card_rule_package_without_apply_then_gate`; no natural
 battle, cut, shell promotion, or 607 mutation is justified yet.
+
+## Entreat PG472 Review-Only Rule Package - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current_rollback.sql`
+- `docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current_postcheck.sql`
+
+It prepares the PostgreSQL package for `Entreat the Angels`, but intentionally
+keeps it `needs_review` / `review_only`. The package was generated and tested,
+not applied.
+
+Current result:
+
+- status: `review_only_package_generated_no_apply_keep_607`;
+- PostgreSQL writes executed: `false`;
+- source DB mutated: `false`;
+- protected deck `607` mutated: `false`;
+- proposed effect: `token_maker`;
+- proposed scope: `xmage_x_create_creature_tokens_spell_v1`;
+- normal cost: `{X}{X}{W}{W}{W}`;
+- native miracle cost: `{X}{W}{W}`;
+- proposed review status: `needs_review`;
+- proposed execution status: `review_only`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`.
+
+Rule-source evidence:
+
+- local XMage class `EntreatTheAngels.java` uses `CreateTokenEffect`,
+  `AngelToken`, `GetXValue`, and `MiracleAbility`;
+- external Oracle surfaces confirm normal cost `{X}{X}{W}{W}{W}` and native
+  miracle `{X}{W}{W}`;
+- ManaLoom now covers the normal X-token path, but native miracle X casting is
+  still marked `blocked_requires_x_miracle_cast_plan`.
+
+Test evidence:
+
+- `python3 -m pytest -q docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_entreat_rule_package_preapply.py`
+  -> `2 passed`;
+- `python3 -m pytest -q docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_entreat_x_token_runtime_preflight.py`
+  -> `2 passed`;
+- `python3 -m pytest -q docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_exact_scope_runtime.py -k 'x_create_creature_tokens or x_damage_uses_cast_context'`
+  -> `3 passed, 265 deselected`.
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py --out-prefix docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_entreat_pg472_review_only_current`
+  -> `status: pass`;
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_entreat_pg472_review_only_current`
+  -> `status: pass`, `26/26` checks passing.
+
+Current conclusion remains unchanged: protected deck `607` is still the
+Lorehold champion. Entreat is not yet a valid battle-gate challenger because
+native miracle `{X}{W}{W}` needs an executable X miracle cast plan before the
+rule can become `auto`.

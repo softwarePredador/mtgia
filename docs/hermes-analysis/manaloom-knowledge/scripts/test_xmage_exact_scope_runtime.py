@@ -3296,6 +3296,33 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_x_create_creature_tokens_spell_cast_plan_uses_xx_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.mana_pool.add("white", 3)
+        active.mana_pool.add("generic", 4)
+        card = {
+            "name": "Entreat the Angels",
+            "type_line": "Sorcery",
+            "mana_cost": "{X}{X}{W}{W}{W}",
+            "cmc": 3,
+        }
+        effect = {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_x_create_creature_tokens_spell_v1",
+            "token_count_source": "x_value",
+            "token_name": "Angel Token",
+            "token_power": 4,
+            "token_toughness": 4,
+            "sorcery": True,
+        }
+
+        cast_plan = self.battle.runtime_cast_plan_for_card(active, card, effect)
+
+        self.assertIsNotNone(cast_plan)
+        self.assertEqual(cast_plan["x_value"], 2)
+        self.assertEqual(cast_plan["locked_cost"]["generic"], 4)
+        self.assertEqual(dict(cast_plan["locked_cost"]["colored"]), {"white": 3})
+
     def test_creature_etb_create_tokens_preserves_token_model(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

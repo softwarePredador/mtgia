@@ -2025,7 +2025,7 @@ def runtime_cast_plan_for_card(player, card, effect_data, *, additional_generic=
             "target_count_from_x",
             "recursion_count_from_x",
         )
-    )
+    ) or str(effect_data.get("token_count_source") or "").lower() == "x_value"
     if uses_x_cast_value:
         max_candidate_x = max(0, int(player.available_mana() or 0))
         chosen_x = None

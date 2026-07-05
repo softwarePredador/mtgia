@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-07-05T02:22:35Z",
+  "artifact_type": "lorehold_entreat_rule_package_preapply",
+  "status": "review_only_package_generated_no_apply_keep_607",
+  "postgres_writes_executed": false,
+  "source_db_mutated": false,
+  "deck_607_mutated": false,
+  "proposal": {
+    "normalized_name": "entreat the angels",
+    "card_name": "Entreat the Angels",
+    "mana_cost": "{X}{X}{W}{W}{W}",
+    "oracle_text": "Create X 4/4 white Angel creature tokens with flying.\nMiracle {X}{W}{W} (You may cast this card for its miracle cost when you draw it if it's the first card you drew this turn.)",
+    "oracle_hash": "30f38db3fe030a6002c9a8120d216ec8",
+    "logical_rule_key": "battle_rule_v1:0ce4d97cb4f226cd2df5f9bdbdebc04e",
+    "effect_json": {
+      "effect": "token_maker",
+      "battle_model_scope": "xmage_x_create_creature_tokens_spell_v1",
+      "ability_kind": "one_shot",
+      "token_count_source": "x_value",
+      "token_count_per_x": 1,
+      "token_name": "Angel Token",
+      "token_subtype": "Angel",
+      "token_power": 4,
+      "token_toughness": 4,
+      "token_flying": true,
+      "token_colors": [
+        "W"
+      ],
+      "x_spell": true,
+      "normal_mana_cost": "{X}{X}{W}{W}{W}",
+      "x_cost_symbol_count": 2,
+      "miracle": true,
+      "native_miracle": true,
+      "miracle_cost": "{X}{W}{W}",
+      "native_miracle_cost": "{X}{W}{W}",
+      "miracle_x_cost_symbol_count": 1,
+      "native_miracle_runtime_status": "blocked_requires_x_miracle_cast_plan",
+      "sorcery": true,
+      "xmage_effect_class": "CreateTokenEffect",
+      "xmage_dynamic_value_class": "GetXValue",
+      "xmage_token_class": "AngelToken",
+      "xmage_ability_class": "MiracleAbility"
+    },
+    "deck_role_json": {
+      "category": "finisher",
+      "effect": "token_maker",
+      "subtype": "x_miracle_token_finisher",
+      "lane": "miracle_finisher"
+    },
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "needs_review",
+    "execution_status": "review_only",
+    "notes": "PG472 review-only package: XMage exact class EntreatTheAngels uses CreateTokenEffect, AngelToken, GetXValue, and MiracleAbility. Normal XXWWW X-token runtime is covered, but native miracle XWW still requires an executable X miracle cast plan before auto execution.",
+    "shadow_handling": "preserve_existing_rows"
+  },
+  "source_evidence": {
+    "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/e/EntreatTheAngels.java",
+    "runtime_preflight_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_entreat_x_token_runtime_preflight_20260705_current.json",
+    "external_oracle_confirmation": [
+      "Gatherer search result confirms official Entreat card text surface.",
+      "Scryfall exact-card search confirms normal cost XXWWW and miracle XWW."
+    ]
+  },
+  "generated_files": {
+    "manifest_json": "docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current.json",
+    "markdown": "docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current.md",
+    "precheck_sql": "docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current_precheck.sql",
+    "apply_sql": "docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current_apply.sql",
+    "rollback_sql": "docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current_rollback.sql",
+    "postcheck_sql": "docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current_postcheck.sql"
+  },
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "reason": "The normal X-token runtime is available, but native miracle {X}{W}{W} still needs an executable X miracle cast plan before this can be auto or used in 607 battle gates."
+  }
+}
