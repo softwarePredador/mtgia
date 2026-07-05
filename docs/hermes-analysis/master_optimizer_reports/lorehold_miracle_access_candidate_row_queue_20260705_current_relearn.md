@@ -1,10 +1,13 @@
 # Lorehold Miracle Access Candidate Row Queue
 
-- Generated at: `2026-07-05T04:37:27Z`
+- Generated at: `2026-07-05T09:02:28Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
 - Decision status: `miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607`
+- Matrix status: `miracle_access_structure_matrix_template_ready_no_candidate_no_battle`
+- Matrix next-shell status: `next_shell_cut_path_closed_route_miracle_access_first_keep_607`
+- Matrix route governed: `true`
 - Source candidates: `5`
 - Scoreable candidate rows: `0`
 - Blocked candidate rows: `5`

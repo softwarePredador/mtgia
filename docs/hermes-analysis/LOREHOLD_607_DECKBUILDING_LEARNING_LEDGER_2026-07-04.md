@@ -1909,15 +1909,31 @@ The next learning artifacts are:
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_candidate_row_queue_20260705_current_relearn.json`
 - `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_access_candidate_row_queue_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_access_candidate_row_queue_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_candidate_queue_routed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_candidate_queue_routed_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_miracle_candidate_queue_routed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_miracle_candidate_queue_routed_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_candidate_queue_routed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_candidate_queue_routed_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_candidate_queue_routed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_candidate_queue_routed_current.json`
 
 This queue attempts to convert post-identity external/internal candidates into
 the candidate-row schema required by the miracle-access matrix. It is still
-read-only and does not generate or mutate any deck.
+read-only and does not generate or mutate any deck. The queue now also requires
+the matrix to prove its routed entry condition: closed Guttersnipe plus
+Storm-Kiln cut path, fallback to `miracle_access_first_shell_contract`, and no
+deck materialization/battle/promotion gate.
 
 Current result:
 
 - decision status:
   `miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607`;
+- matrix status:
+  `miracle_access_structure_matrix_template_ready_no_candidate_no_battle`;
+- matrix next-shell status:
+  `next_shell_cut_path_closed_route_miracle_access_first_keep_607`;
+- matrix route governed: `true`;
 - source candidates considered: `5`;
 - scoreable candidate rows: `0`;
 - blocked candidate rows: `5`;
@@ -1958,6 +1974,12 @@ Operational lesson:
 - The strongest current topdeck/miracle additions are visible, but none can
   score yet because the project lacks both verified runtime and named same-lane
   cuts for them.
+- The queue is now protected against stale or manually incomplete matrices: it
+  will not produce scoreable rows unless the matrix confirms the closed
+  next-shell route into miracle/topdeck access.
+- The routed candidate-row audit set passes after this change: deckbuilding
+  contract surface, operational surface alignment, legacy contamination, and
+  XMage strategy consistency.
 - The next practical work is not another shell or battle. It is either runtime
   contract work for the top-priority cards or a named same-lane non-anchor cut
   discovery path that clears the matrix hard gates.

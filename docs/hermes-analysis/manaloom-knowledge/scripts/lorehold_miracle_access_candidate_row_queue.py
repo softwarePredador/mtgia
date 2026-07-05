@@ -31,6 +31,10 @@ DEFAULT_OUT_PREFIX = (
     REPORT_DIR / "lorehold_miracle_access_candidate_row_queue_20260705_current_relearn"
 )
 
+TARGET_MATRIX_CONTRACT = "miracle_access_first_shell_contract"
+TARGET_MATRIX_STATUS = "miracle_access_structure_matrix_template_ready_no_candidate_no_battle"
+TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
+
 MIRACLE_ACCESS_LANE_TO_MATRIX = {
     "topdeck_miracle_access": ["topdeck_miracle_access", "turn_cycle_miracle_mana"],
     "miracle_finisher": ["approach_finisher_conversion", "topdeck_miracle_access"],
@@ -42,6 +46,7 @@ MIRACLE_ACCESS_LANE_TO_MATRIX = {
 ROW_BLOCKER_EXPLANATIONS = {
     "verified_battle_rule_missing": "runtime rule is not verified for candidate use",
     "named_safe_cut_missing": "no named same-lane cut exists for current 607",
+    "matrix_route_not_governed": "matrix does not confirm closed next-shell route to miracle access",
     "combo_runtime_required": "combo package must be modeled before matrix scoring",
     "full_shell_contract_required": "this belongs to a separate full-shell fork",
 }
@@ -114,6 +119,19 @@ def ready_cut_rows(cut_miner: Mapping[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+def matrix_route_governed(matrix_summary: Mapping[str, Any]) -> bool:
+    return bool(
+        matrix_summary.get("selected_contract_key") == TARGET_MATRIX_CONTRACT
+        and matrix_summary.get("next_shell_status") == TARGET_NEXT_SHELL_STATUS
+        and matrix_summary.get("engine_cut_path_closed") is True
+        and matrix_summary.get("fallback_route_key") == TARGET_MATRIX_CONTRACT
+        and matrix_summary.get("fallback_structure_matrix_contract_allowed_now") is True
+        and matrix_summary.get("candidate_deck_materialization_allowed_now") is False
+        and matrix_summary.get("natural_battle_gate_allowed_now") is False
+        and matrix_summary.get("promotion_allowed_now") is False
+    )
+
+
 def blocker_reasons(blockers: list[Any]) -> list[str]:
     reasons = []
     for blocker in blockers:
@@ -123,7 +141,9 @@ def blocker_reasons(blockers: list[Any]) -> list[str]:
 
 
 def can_score_row(card: Mapping[str, Any], cuts: list[Mapping[str, Any]], matrix_summary: Mapping[str, Any]) -> bool:
-    if matrix_summary.get("selected_contract_key") != "miracle_access_first_shell_contract":
+    if matrix_summary.get("selected_contract_key") != TARGET_MATRIX_CONTRACT:
+        return False
+    if not matrix_route_governed(matrix_summary):
         return False
     if as_int(matrix_summary.get("contract_aggregate_blocker_count")) > 0:
         return False
@@ -173,8 +193,10 @@ def classify_rows(
         row_blockers = list(as_list(card.get("blockers")))
         if not cuts and "named_safe_cut_missing" not in row_blockers:
             row_blockers.append("named_safe_cut_missing")
-        if matrix_summary.get("selected_contract_key") != "miracle_access_first_shell_contract":
+        if matrix_summary.get("selected_contract_key") != TARGET_MATRIX_CONTRACT:
             row_blockers.append("matrix_contract_missing")
+        if not matrix_route_governed(matrix_summary):
+            row_blockers.append("matrix_route_not_governed")
         if as_int(matrix_summary.get("contract_aggregate_blocker_count")) > 0:
             row_blockers.append("matrix_contract_blockers_not_cleared")
         if can_score_row(card, cuts, matrix_summary):
@@ -192,10 +214,15 @@ def decision_status(
     source_candidate_count: int,
     ready_count: int,
 ) -> tuple[str, str]:
-    if matrix_summary.get("selected_contract_key") != "miracle_access_first_shell_contract":
+    if matrix_summary.get("selected_contract_key") != TARGET_MATRIX_CONTRACT:
         return (
             "miracle_access_candidate_row_queue_blocked_missing_matrix_contract",
             "rerun_miracle_access_structure_matrix_contract",
+        )
+    if not matrix_route_governed(matrix_summary):
+        return (
+            "miracle_access_candidate_row_queue_blocked_matrix_route_not_governed",
+            "rerun_routed_miracle_access_structure_matrix_contract",
         )
     if source_candidate_count == 0:
         return (
@@ -243,6 +270,11 @@ def build_report(
         "status": status,
         "summary": {
             "decision_status": status,
+            "matrix_status": matrix_summary.get("decision_status") or "",
+            "matrix_next_shell_status": matrix_summary.get("next_shell_status") or "",
+            "matrix_engine_cut_path_closed": bool(matrix_summary.get("engine_cut_path_closed")),
+            "matrix_fallback_route_key": matrix_summary.get("fallback_route_key") or "",
+            "matrix_route_governed": matrix_route_governed(matrix_summary),
             "source_candidate_count": len(cards),
             "scoreable_candidate_row_count": len(ready),
             "blocked_candidate_row_count": len(blocked),
@@ -302,6 +334,9 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "- Source DB mutated: `false`",
         "- Deck 607 mutated: `false`",
         f"- Decision status: `{summary_row['decision_status']}`",
+        f"- Matrix status: `{summary_row['matrix_status']}`",
+        f"- Matrix next-shell status: `{summary_row['matrix_next_shell_status']}`",
+        f"- Matrix route governed: `{str(summary_row['matrix_route_governed']).lower()}`",
         f"- Source candidates: `{summary_row['source_candidate_count']}`",
         f"- Scoreable candidate rows: `{summary_row['scoreable_candidate_row_count']}`",
         f"- Blocked candidate rows: `{summary_row['blocked_candidate_row_count']}`",

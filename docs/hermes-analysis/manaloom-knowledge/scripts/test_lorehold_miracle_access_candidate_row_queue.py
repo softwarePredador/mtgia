@@ -3,11 +3,19 @@ from pathlib import Path
 import lorehold_miracle_access_candidate_row_queue as queue
 
 
-def _matrix(*, blockers=28, selected=True):
+def _matrix(*, blockers=28, selected=True, routed=True):
     return {
         "summary": {
-            "selected_contract_key": "miracle_access_first_shell_contract" if selected else "",
+            "decision_status": queue.TARGET_MATRIX_STATUS,
+            "selected_contract_key": queue.TARGET_MATRIX_CONTRACT if selected else "",
             "contract_aggregate_blocker_count": blockers,
+            "next_shell_status": queue.TARGET_NEXT_SHELL_STATUS if routed else "",
+            "engine_cut_path_closed": routed,
+            "fallback_route_key": queue.TARGET_MATRIX_CONTRACT if routed else "",
+            "fallback_structure_matrix_contract_allowed_now": routed,
+            "candidate_deck_materialization_allowed_now": False,
+            "natural_battle_gate_allowed_now": False,
+            "promotion_allowed_now": False,
         }
     }
 
@@ -71,6 +79,8 @@ def test_current_queue_blocks_all_rows_and_keeps_607():
     assert payload["summary"]["decision_status"] == (
         "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607"
     )
+    assert payload["summary"]["matrix_next_shell_status"] == queue.TARGET_NEXT_SHELL_STATUS
+    assert payload["summary"]["matrix_route_governed"] is True
     assert payload["summary"]["scoreable_candidate_row_count"] == 0
     assert payload["summary"]["blocked_candidate_row_count"] == 2
     assert payload["summary"]["natural_battle_gate_allowed_now"] is False
@@ -135,11 +145,26 @@ def test_missing_matrix_contract_blocks_queue():
     )
 
 
+def test_matrix_without_next_shell_route_blocks_queue():
+    payload = _build(matrix=_matrix(routed=False))
+
+    assert payload["summary"]["decision_status"] == (
+        "miracle_access_candidate_row_queue_blocked_matrix_route_not_governed"
+    )
+    assert payload["summary"]["recommended_next_action"] == (
+        "rerun_routed_miracle_access_structure_matrix_contract"
+    )
+    assert payload["summary"]["matrix_route_governed"] is False
+    assert "matrix_route_not_governed" in payload["blocked_candidate_rows"][0]["blockers"]
+
+
 def test_markdown_surfaces_blocked_rows_and_no_mutation():
     markdown = queue.render_markdown(_build())
 
     assert "PostgreSQL writes: `false`" in markdown
     assert "Deck 607 mutated: `false`" in markdown
+    assert f"Matrix next-shell status: `{queue.TARGET_NEXT_SHELL_STATUS}`" in markdown
+    assert "Matrix route governed: `true`" in markdown
     assert "Brain in a Jar" in markdown
     assert "Scoreable candidate rows: `0`" in markdown
     assert "Natural battle gate allowed now: `false`" in markdown

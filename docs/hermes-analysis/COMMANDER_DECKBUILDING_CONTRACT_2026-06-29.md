@@ -1727,3 +1727,34 @@ Operational lesson:
   preserves protected `607` miracle/topdeck floors and names same-lane cuts.
 - The next allowed work is:
   `declare_candidate_rows_with_named_same_lane_cuts_before_scoring`.
+
+Miracle access candidate row queue refreshed on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_candidate_row_queue_20260705_current_relearn.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_candidate_row_queue_20260705_current_relearn.json`.
+- Status:
+  `miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607`.
+- Matrix route:
+  `matrix_route_governed=true`,
+  `matrix_next_shell_status=next_shell_cut_path_closed_route_miracle_access_first_keep_607`,
+  and `matrix_fallback_route_key=miracle_access_first_shell_contract`.
+- Current queue facts:
+  `source_candidate_count=5`, `scoreable_candidate_row_count=0`,
+  `blocked_candidate_row_count=5`, `named_seed_safe_cut_count=0`,
+  and `matrix_contract_blocker_count=28`.
+- Current gates:
+  matrix scoring `false`, candidate deck materialization `false`, natural battle
+  gate `false`, deck action `false`, and promotion `false`.
+
+Operational lesson:
+
+- A candidate row queue may list useful cards, but it is not a deck-change
+  permit.
+- The queue must reject stale matrices that do not carry the governed
+  next-shell fallback route.
+- The visible topdeck/miracle candidates still need both runtime proof and named
+  same-lane non-anchor cuts before scoring.
+- The next allowed work is:
+  `resolve_runtime_and_named_same_lane_cut_before_matrix_scoring`.
