@@ -1277,3 +1277,63 @@ Operational lesson:
   retried as an automatic mana-pressure swap.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Young Pyromancer Singleton Cut-Safety Relearn - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_young_pyromancer_singleton_cut_safety_model_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_young_pyromancer_singleton_cut_safety_model_20260705_current_relearn.json`
+
+This model narrows the previous package-size router to the best singleton
+learning candidate: `Young Pyromancer`.
+
+Current result:
+
+- decision status: `young_pyromancer_singleton_no_cut_keep_607`;
+- target package: `pressure_1_card_young_pyromancer`;
+- package status: `blocked_no_cut_or_hypothesis_capacity`;
+- evaluated cut slots: `94`;
+- eligible cuts: `0`;
+- pressure-lane evidence gaps: `0`;
+- pressure-lane hard-blocked slots: `1`;
+- seed-safe cut count: `0`;
+- reviewable evidence gap count: `0`;
+- ready deck changes: `0`;
+- promotion allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- recommended next action:
+  `mine_pressure_lane_cut_evidence_or_non_deck_forced_diagnostic`.
+
+Why this still cannot mutate `607`:
+
+- `Young Pyromancer` passes identity/runtime preflight and is legal in
+  Lorehold, but it remains missing from the current natural-gate hypothesis
+  queue.
+- The card's value lane is low-curve token pressure from instant/sorcery
+  chains. It cannot use generic cuts from mana, topdeck, miracle, protection,
+  removal, or draw just because it is a good spellslinger card.
+- Current 607 cut evidence has no seed-safe pressure-compatible cut.
+- The only pressure/contextual slot surfaced by current cut rows is still
+  hard-blocked by protected/prior-reject evidence, so there is no legal
+  singleton package to send into a natural battle gate.
+
+External learning used by the model:
+
+- EDHREC's current Lorehold core spellslinger page keeps the public shell tied
+  to topdeck, spellslinger, discard, and reanimator tags.
+- GameTyrant's Lorehold deck tech treats Young Pyromancer as spell-chain body
+  conversion, not as a replacement for ramp, removal, draw, or miracle engines.
+- Draftsim's spellslinger overview reinforces that token-pressure is only one
+  branch of spellslinger deckbuilding; it must fit the commander shell instead
+  of overriding it.
+
+Operational lesson:
+
+- `Young Pyromancer` is now a real learning target, but not a 607 add.
+- A pressure singleton still needs one named cut in a compatible pressure lane,
+  plus structure matrix, equal battle gate, and direct card-use evidence.
+- The next useful work is pressure-window trace mining or a non-deck forced
+  diagnostic to learn whether the token-pressure branch repairs a real failure.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.

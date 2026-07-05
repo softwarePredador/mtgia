@@ -1,0 +1,747 @@
+{
+  "artifact_type": "lorehold_young_pyromancer_singleton_cut_safety_model",
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_gate_allowed": false,
+    "next_actions": [
+      "do_not_mutate_or_replace_deck_607",
+      "do_not_run_natural_battle_without_one_named_pressure_safe_cut",
+      "mine pressure-window losses for low-use non-anchor pressure slots",
+      "use forced diagnostics only for learning, not promotion"
+    ],
+    "promotion_allowed": false,
+    "reason": "Young Pyromancer passes local identity/runtime preflight, but current 607 cut evidence has no eligible pressure-compatible cut and the card is still missing a natural-gate hypothesis row."
+  },
+  "deck_607_mutated": false,
+  "eligible_cut_candidates": [],
+  "external_support": [
+    {
+      "learning": "Current public Lorehold tags keep the deck in topdeck, spellslinger, discard, and reanimator lanes; a token-pressure add must not dilute those axes.",
+      "model_effect": "preserve_lorehold_core_axes_before_young_pyromancer_gate",
+      "source": "EDHREC Lorehold core spellslinger",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian/core/spellslinger"
+    },
+    {
+      "learning": "Young Pyromancer and Monastery Mentor are pressure-body conversion payoffs for spell chains, not generic replacements for ramp, removal, or miracle engines.",
+      "model_effect": "young_pyromancer_requires_pressure_body_cut_or_package_proof",
+      "source": "GameTyrant Lorehold deck tech",
+      "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech"
+    },
+    {
+      "learning": "Spellslinger decks can be token, burn, or storm oriented. ManaLoom must choose the pressure-token branch only when the commander shell supports it without losing its existing plan.",
+      "model_effect": "token_pressure_is_a_branch_not_automatic_lorehold_truth",
+      "source": "Draftsim spellslinger commander overview",
+      "url": "https://draftsim.com/best-spellslinger-commanders/"
+    }
+  ],
+  "generated_at": "2026-07-05T03:47:34Z",
+  "method_notes": [
+    "This model does not create, mutate, or battle a decklist.",
+    "Young Pyromancer is treated as pressure-token conversion, not as ramp, removal, or draw.",
+    "A singleton add still requires one named cut that preserves the 607 miracle/topdeck, protection, and pressure floors.",
+    "Forced diagnostics can teach card behavior, but cannot promote 607 without a natural add/cut gate."
+  ],
+  "postgres_writes": false,
+  "pressure_lane_evidence_gaps": [],
+  "pressure_lane_hard_blocked": [
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Hexing Squelcher",
+      "current_status": "blocked",
+      "direct_event_count": 17,
+      "lane": "contextual",
+      "lane_group": "pressure_compatible",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_cut_until_new_evidence_removes_anchor_blocker",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 93,
+      "young_pyromancer_cut_status": "blocked_pressure_lane_hard_anchor"
+    }
+  ],
+  "source_db_mutated": false,
+  "source_reports": {
+    "package_router": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_package_size_router_20260705_current_relearn.json",
+    "pressure_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_spell_payoff_contract_20260705_current_relearn.json",
+    "seed_safe_cut_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260704_role_tag_repair.json",
+    "trace_cut_evidence_expander": "docs/hermes-analysis/master_optimizer_reports/lorehold_trace_cut_evidence_expander_20260704_role_tag_repair.json"
+  },
+  "status": "young_pyromancer_singleton_no_cut_keep_607",
+  "summary": {
+    "current_baseline": "deck_607",
+    "eligible_cut_count": 0,
+    "evaluated_cut_slot_count": 94,
+    "hard_blocked_count": 92,
+    "natural_battle_gate_allowed_now": false,
+    "package_gate_ready": false,
+    "package_score": 75,
+    "package_status": "blocked_no_cut_or_hypothesis_capacity",
+    "pressure_lane_evidence_gap_count": 0,
+    "pressure_lane_hard_blocked_count": 1,
+    "promotion_allowed_now": false,
+    "ready_deck_change_count": 0,
+    "recommended_next_action": "mine_pressure_lane_cut_evidence_or_non_deck_forced_diagnostic",
+    "reviewable_evidence_gap_count": 0,
+    "seed_safe_cut_ready_count": 0,
+    "target_card": "Young Pyromancer",
+    "trace_seed_safe_ready_count": 0
+  },
+  "target_card": {
+    "already_in_607": false,
+    "card_name": "Young Pyromancer",
+    "cmc": 2.0,
+    "commander_legal_status": "legal",
+    "hypothesis_queue_overlay": {
+      "allowed_next_test": "forced_access_diagnostic_or_queue_rebuild_only",
+      "hypothesis_queue_status": "missing_from_current_hypothesis_queue",
+      "natural_gate_ready": false,
+      "priority": "unqueued_pressure_candidate",
+      "readiness_status": "identity_runtime_cut_model_required_before_gate",
+      "runtime_ready": null,
+      "same_lane_current_607_anchors": []
+    },
+    "package_blockers": [
+      "insufficient_diagnostic_cut_capacity",
+      "insufficient_hypothesis_natural_gate_capacity",
+      "insufficient_seed_safe_cut_capacity",
+      "missing_current_hypothesis_queue",
+      "no_card_level_natural_gate_ready"
+    ],
+    "package_key": "pressure_1_card_young_pyromancer",
+    "package_status": "blocked_no_cut_or_hypothesis_capacity",
+    "preflight_status": "pass",
+    "role": "low_curve_token_pressure_payoff",
+    "type_line": "Creature \u2014 Human Shaman",
+    "value_test": "Adds low-cost pressure absorption and chip pressure from instants and sorceries without asking the deck to become creature-heavy.",
+    "verified_auto_battle_rule_count": 1
+  },
+  "top_cut_safety_rows": [
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Hexing Squelcher",
+      "current_status": "blocked",
+      "direct_event_count": 17,
+      "lane": "contextual",
+      "lane_group": "pressure_compatible",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_cut_until_new_evidence_removes_anchor_blocker",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 93,
+      "young_pyromancer_cut_status": "blocked_pressure_lane_hard_anchor"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Call Forth the Tempest",
+      "current_status": "blocked",
+      "direct_event_count": 4,
+      "lane": "spell_velocity",
+      "lane_group": "lane_mismatch",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 8,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature"
+      ],
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "current_status": "blocked",
+      "direct_event_count": 7,
+      "lane": "removal",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 8,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "card_name": "Redirect Lightning",
+      "current_status": "blocked",
+      "direct_event_count": 1,
+      "lane": "protection",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 9,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Hit the Mother Lode",
+      "current_status": "blocked",
+      "direct_event_count": 7,
+      "lane": "early_mana",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 11,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Flawless Maneuver",
+      "current_status": "blocked",
+      "direct_event_count": 12,
+      "lane": "protection",
+      "lane_group": "lane_mismatch",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 16,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Tibalt's Trickery",
+      "current_status": "blocked",
+      "direct_event_count": 0,
+      "lane": "protection",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 17,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Dawn's Truce",
+      "current_status": "blocked",
+      "direct_event_count": 1,
+      "lane": "hand_filter",
+      "lane_group": "soft_diagnostic_only",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 17,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Reforge the Soul",
+      "current_status": "blocked",
+      "direct_event_count": 15,
+      "lane": "draw",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 23,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Insurrection",
+      "current_status": "blocked",
+      "direct_event_count": 22,
+      "lane": "wincon",
+      "lane_group": "lane_mismatch",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 23,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Teferi's Protection",
+      "current_status": "blocked",
+      "direct_event_count": 12,
+      "lane": "protection",
+      "lane_group": "lane_mismatch",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 24,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Storm Herd",
+      "current_status": "blocked",
+      "direct_event_count": 20,
+      "lane": "big_spell_value",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 25,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Tempt with Bunnies",
+      "current_status": "blocked",
+      "direct_event_count": 3,
+      "lane": "wincon",
+      "lane_group": "lane_mismatch",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 31,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Unexpected Windfall",
+      "current_status": "blocked",
+      "direct_event_count": 25,
+      "lane": "early_mana",
+      "lane_group": "lane_mismatch",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 33,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Everything Comes to Dust",
+      "current_status": "blocked",
+      "direct_event_count": 31,
+      "lane": "spell_velocity",
+      "lane_group": "lane_mismatch",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 34,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Big Score",
+      "current_status": "blocked",
+      "direct_event_count": 33,
+      "lane": "early_mana",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 40,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Stroke of Midnight",
+      "current_status": "blocked",
+      "direct_event_count": 32,
+      "lane": "removal",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 43,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Jeska's Will",
+      "current_status": "blocked",
+      "direct_event_count": 6,
+      "lane": "early_mana",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 44,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Generous Gift",
+      "current_status": "blocked",
+      "direct_event_count": 19,
+      "lane": "removal",
+      "lane_group": "lane_mismatch",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 52,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Promise of Loyalty",
+      "current_status": "blocked",
+      "direct_event_count": 46,
+      "lane": "protection",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 53,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Creative Technique",
+      "current_status": "same_lane_only_not_seed_safe",
+      "direct_event_count": 54,
+      "lane": "big_spell_value",
+      "lane_group": "lane_mismatch",
+      "manual_status": "same_lane_only",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.same_lane_only_cut_slots",
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.same_lane_hard_blocked_queue"
+      ],
+      "unique_exposure_count": 58,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Winds of Abandon",
+      "current_status": "blocked",
+      "direct_event_count": 32,
+      "lane": "removal",
+      "lane_group": "lane_mismatch",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 59,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Improvisation Capstone",
+      "current_status": "blocked",
+      "direct_event_count": 49,
+      "lane": "draw",
+      "lane_group": "lane_mismatch",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 59,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Rise of the Eldrazi",
+      "current_status": "blocked",
+      "direct_event_count": 48,
+      "lane": "removal",
+      "lane_group": "lane_mismatch",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_young_pyromancer_cut_under_current_contract",
+      "seed_safe_candidate": false,
+      "source_sections": [
+        "seed_safe.cut_slots",
+        "trace_expander.all_cut_slots",
+        "trace_expander.hard_blocked_queue"
+      ],
+      "unique_exposure_count": 60,
+      "young_pyromancer_cut_status": "blocked_hard_anchor_or_prior_reject"
+    }
+  ]
+}
