@@ -9682,6 +9682,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "7893d091d986786110bf554afb33d973"
   },
+  "Bogardan Firefiend": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_fixed_damage_target_v1",
+    "dies_damage_amount": 2,
+    "dies_damage_target": "creature",
+    "effect": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9c97a0bb3f8d95c6861678f7a210a696",
+    "battle_rule_oracle_hash": "d210b4897146ab01359623ef415616a5"
+  },
   "Bogbrew Witch": {
     "_activated_rule_effects": [
       {
@@ -12871,6 +12894,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0d2aaf58fe699e4cc5b5c7ebc69a05c1",
     "battle_rule_oracle_hash": "bbc40777c44eb8cca3e6a811ad954178"
+  },
+  "Careless Celebrant": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_fixed_damage_target_v1",
+    "dies_damage_amount": 2,
+    "dies_damage_target": "creature_or_planeswalker",
+    "effect": "creature",
+    "target": "creature_or_planeswalker",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "planeswalker"
+      ]
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:47dd9df12e72454256312ff74c57a219",
+    "battle_rule_oracle_hash": "14b9501f0c035da8dbd3dfb8945a7b2f"
   },
   "Carnage Altar": {
     "ability_kind": "activated",
@@ -31572,6 +31619,27 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "fa1bb5c70fd36a18113db83e5ceb2a41"
   },
+  "Footlight Fiend": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_fixed_damage_target_v1",
+    "dies_damage_amount": 1,
+    "dies_damage_target": "any_target",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e674fea2b801e52066c06b5504a1a242",
+    "battle_rule_oracle_hash": "849b98bfe418aa4fdad033045c561296"
+  },
   "Forbidden Orchard": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -34825,6 +34893,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "22d619606bd4c3a8e7cb0818fecea451"
+  },
+  "Goblin Arsonist": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_fixed_damage_target_v1",
+    "dies_damage_amount": 1,
+    "dies_damage_optional": true,
+    "dies_damage_target": "any_target",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0f26849f10bf9e0357f6a7a23f392f75",
+    "battle_rule_oracle_hash": "68b46e8a49e3947f0a6b65b7aa924c04"
   },
   "Goblin Barrage": {
     "amount": 4,
@@ -53516,6 +53606,27 @@
     "battle_rule_logical_key": "battle_rule_v1:657d3c61d21b24772f990860178f3b1e",
     "battle_rule_oracle_hash": "3aa58f60404a53ceb104407f17423fe4"
   },
+  "Mudbutton Torchrunner": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_fixed_damage_target_v1",
+    "dies_damage_amount": 3,
+    "dies_damage_target": "any_target",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5b89a7a55f519dfc8a4f39120ddda3a9",
+    "battle_rule_oracle_hash": "7fa459ff91be335e859f88b5b0c305ac"
+  },
   "Mudflat Village": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -58339,6 +58450,27 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "72364f6f918547e083934c75ecba3e92"
   },
+  "Perilous Myr": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_fixed_damage_target_v1",
+    "dies_damage_amount": 2,
+    "dies_damage_target": "any_target",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0cad1f375dbce251b5d86ecd298660a1",
+    "battle_rule_oracle_hash": "54bcabf69140caa8b8f4b29ef191b4c0"
+  },
   "Perilous Shadow": {
     "_activated_rule_effects": [
       {
@@ -59386,6 +59518,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "962e3aeeb84465691b0746b47817c549"
+  },
+  "Pitchburn Devils": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_fixed_damage_target_v1",
+    "dies_damage_amount": 3,
+    "dies_damage_target": "any_target",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5b89a7a55f519dfc8a4f39120ddda3a9",
+    "battle_rule_oracle_hash": "7fa459ff91be335e859f88b5b0c305ac"
   },
   "Pith Driller": {
     "ability_kind": "triggered",
@@ -61419,6 +61572,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "0eb8f6509f829b9bc6c98e8dd5cf17e0"
+  },
+  "Pyre Spawn": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_fixed_damage_target_v1",
+    "dies_damage_amount": 3,
+    "dies_damage_target": "any_target",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5b89a7a55f519dfc8a4f39120ddda3a9",
+    "battle_rule_oracle_hash": "7fa459ff91be335e859f88b5b0c305ac"
   },
   "Pyretic Ritual": {
     "ability_kind": "one_shot",

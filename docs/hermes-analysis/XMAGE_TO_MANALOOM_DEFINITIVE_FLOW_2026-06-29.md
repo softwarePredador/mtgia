@@ -10190,6 +10190,58 @@ new server:
   `xmage_fixed_draw_spell_self_cost_reduction`, and
   `xmage_static_cast_spells_as_flash_permission` with `7` cards each.
 
+## 2026-07-05 PG459 Creature Dies Fixed Damage Closure
+
+- Closed the exact XMage creature dies fixed-damage triggered family as
+  ManaLoom scope `xmage_creature_dies_fixed_damage_target_v1`.
+- The selected package accepted local XMage creature sources whose executable
+  behavior is a `DiesSourceTriggeredAbility` with fixed `DamageTargetEffect`,
+  fixed damage amount, and supported target constraints.
+- The batch covers `8` cards: Bogardan Firefiend, Careless Celebrant,
+  Footlight Fiend, Goblin Arsonist, Mudbutton Torchrunner, Perilous Myr,
+  Pitchburn Devils, and Pyre Spawn.
+- Focused mapper/runtime tests covered resolving the dies damage trigger when
+  the permanent moves to graveyard and not firing when the permanent is exiled;
+  PG459 performed no code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `8` cards. Precheck found `8` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `8/8` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `8` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve damage amount,
+  target family, target constraints, and optionality. The selected parameters
+  are: Bogardan Firefiend `2 to creature`, Careless Celebrant
+  `2 to creature_or_planeswalker`, Footlight Fiend `1 to any_target`,
+  Goblin Arsonist `1 to any_target optional`, Mudbutton Torchrunner
+  `3 to any_target`, Perilous Myr `2 to any_target`, Pitchburn Devils
+  `3 to any_target`, and Pyre Spawn `3 to any_target`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4437` PostgreSQL runtime rows, wrote `4429` SQLite runtime
+  rows, and exported `4404` canonical fallback rows.
+- PG459 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `8` selected cards. Generic
+  battle scenario count remained `0`; dies-damage behavior remains covered by
+  focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26449`, `xmage_authoritative_source_count=26135`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26135`. This is an exact
+  reduction of `8` from the post-PG458 queue.
+- The post-PG459 exact split recheck reports `proposal_count=110` and
+  `safe_for_batch_pg_package_count=110`. The largest remaining exact families
+  are `xmage_destroy_target_scry_spell`,
+  `xmage_fixed_damage_scry_spell`, and
+  `xmage_static_self_protection_from_subtypes_creature` with `8` cards each,
+  followed by `xmage_creature_dies_gain_life`,
+  `xmage_fixed_draw_spell_self_cost_reduction`, and
+  `xmage_static_cast_spells_as_flash_permission` with `7` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
