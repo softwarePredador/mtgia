@@ -13417,6 +13417,62 @@ cards with mana value X or less, non-land hand-to-battlefield effects, modal
 effects, unsafe auxiliary abilities, or broad `xmage_*_review_v1` promotions.
 The next wave must start from the rebuilt post-PG516 queue.
 
+## PG517 Keyword Draw Checkpoint
+
+As of 2026-07-05, PG517 is applied and synced against the new server target.
+It promotes exact local-XMage instant/sorcery spells where target creature gains
+one supported keyword until EOT, then controller draws one card.
+
+Promoted cards:
+
+- `Accelerate`
+- `Bladebrand`
+- `Cloak of Feathers`
+- `Lace with Moonglove`
+- `Leap`
+
+Runtime scope:
+
+- `xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1`
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg517_keyword_draw_candidate.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg517_xmage_pg517_keyword_draw_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg517_keyword_draw_new_server.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/battle_package_end_to_end_validation_20260705_pg517_keyword_draw_new_server.md`
+- runtime smoke:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg517_keyword_draw_new_server_runtime_get_card_effect.out`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg517_keyword_draw_new_server.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg517_keyword_draw_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg517_keyword_draw_new_server.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4967`
+- `battle_family_mapper_required=28906`
+- `target_identity_count=25983`
+- `xmage_authoritative_source_count=25669`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25669`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+- final exact-scope recheck `adapter_work_unit_counts={}`
+
+Residual boundary: PG517 does not authorize keyword-draw spells with multiple
+target effects, non-fixed draw, controller-wide keywords, double strike variants
+whose source is not exact, mode/conditional/additional cost variants, or broad
+`xmage_*_review_v1` promotions. The next wave must start from the rebuilt
+post-PG517 queue.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

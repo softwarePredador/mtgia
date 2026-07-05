@@ -1,0 +1,155 @@
+{
+  "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+  "card": "Bladebrand",
+  "effect": "composite_resolution",
+  "events": [
+    {
+      "card": "Bladebrand",
+      "cmc": 2,
+      "composite_rule_component_count": 2,
+      "destination": "graveyard",
+      "effect": "composite_resolution",
+      "event": "spell_resolved",
+      "player": "Active",
+      "result": "resolved",
+      "rule_alternative_count": 1,
+      "rule_confidence": 0.96,
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+      "rule_oracle_hash": "e367c4edeba5549a79de45ff03e70747",
+      "rule_review_status": "verified",
+      "rule_runtime_selection_mode": "single_selected",
+      "rule_source": "curated",
+      "rule_version": 2,
+      "stack_object": "Bladebrand",
+      "to_zone": "graveyard",
+      "turn": 7,
+      "type_line": "Instant",
+      "zone_after": "graveyard"
+    },
+    {
+      "available_targets": 1,
+      "card": "Bladebrand",
+      "destination": null,
+      "event": "stat_modifier_until_eot_resolved",
+      "granted_keywords_until_eot": [
+        "deathtouch"
+      ],
+      "player": "Active",
+      "power_delta": 0,
+      "result": "stat_modifier_until_eot_applied",
+      "rule_confidence": 0.0,
+      "rule_execution_status": "auto",
+      "rule_review_status": "unknown",
+      "rule_source": "unknown",
+      "rule_version": null,
+      "target": "Active Bear",
+      "target_controller": "Active",
+      "target_legal": true,
+      "target_name": "Active Bear",
+      "target_options": [
+        {
+          "target": "Active Bear",
+          "target_cmc": null,
+          "target_effect": "creature",
+          "target_is_commander": false,
+          "target_power": 2,
+          "target_score": [
+            0,
+            1,
+            0,
+            2,
+            2
+          ],
+          "target_toughness": 2
+        }
+      ],
+      "target_player": "Active",
+      "target_power_after": 2,
+      "target_power_before": 2,
+      "target_score": [
+        0,
+        1,
+        0,
+        2,
+        2
+      ],
+      "target_toughness_after": 2,
+      "target_toughness_before": 2,
+      "target_type": "creature",
+      "targeting_pipeline": "targeting_formal_minimal",
+      "toughness_delta": 0,
+      "turn": 7
+    },
+    {
+      "card": "Bladebrand",
+      "component_effect": "stat_modifier_until_eot",
+      "component_index": 0,
+      "event": "composite_rule_component_resolved",
+      "outcome": "stat_modifier_until_eot_applied",
+      "player": "Active",
+      "rule_confidence": 0.0,
+      "rule_execution_status": "auto",
+      "rule_review_status": "unknown",
+      "rule_source": "unknown",
+      "rule_version": null,
+      "turn": 7
+    },
+    {
+      "card": "Bladebrand",
+      "component_effect": "draw_cards",
+      "component_index": 1,
+      "event": "composite_rule_component_resolved",
+      "outcome": "cards_drawn",
+      "player": "Active",
+      "rule_confidence": 0.0,
+      "rule_execution_status": "auto",
+      "rule_review_status": "unknown",
+      "rule_source": "unknown",
+      "rule_version": null,
+      "turn": 7
+    },
+    {
+      "applied": [
+        {
+          "effect": "stat_modifier_until_eot",
+          "power_delta": 0,
+          "target": "Active Bear",
+          "toughness_delta": 0
+        },
+        {
+          "count": 1,
+          "effect": "draw_cards"
+        }
+      ],
+      "card": "Bladebrand",
+      "components_applied": 2,
+      "components_skipped": 0,
+      "composite_rule_component_count": 2,
+      "event": "composite_rule_resolved",
+      "player": "Active",
+      "rule_alternative_count": 1,
+      "rule_confidence": 0.96,
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+      "rule_oracle_hash": "e367c4edeba5549a79de45ff03e70747",
+      "rule_review_status": "verified",
+      "rule_runtime_selection_mode": "single_selected",
+      "rule_source": "curated",
+      "rule_version": 2,
+      "skipped": [],
+      "turn": 7
+    }
+  ],
+  "graveyard_after_resolution": [
+    "Bladebrand"
+  ],
+  "hand_after_resolution": [
+    "Fresh Card"
+  ],
+  "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+  "target_deathtouch_after_resolution": true,
+  "target_keywords_after_resolution": [
+    "deathtouch"
+  ]
+}

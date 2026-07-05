@@ -5023,6 +5023,57 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_draw_source_oracle_mismatch")
 
+    def test_fixed_keyword_draw_spell_maps_bladebrand_pattern(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "GainAbilityTargetEffect"],
+            ability_classes=["DeathtouchAbility"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target creature gains deathtouch until end of turn. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "DeathtouchAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1).concatBy(\"<br>\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.KEYWORD_DRAW_SCOPE)
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["granted_keywords_until_eot"], ["deathtouch"])
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["stat_modifier_until_eot", "draw_cards"],
+        )
+
+    def test_fixed_keyword_draw_spell_blocks_nonmatching_source_draw_count(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "GainAbilityTargetEffect"],
+            ability_classes=["FlyingAbility"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target creature gains flying until end of turn. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "FlyingAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "keyword_draw_source_oracle_draw_count_mismatch")
+
     def test_fixed_scry_draw_spell_maps_scry_first_order_to_composite_runtime(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

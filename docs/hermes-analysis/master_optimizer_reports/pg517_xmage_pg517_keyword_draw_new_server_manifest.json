@@ -1,0 +1,729 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg517_keyword_draw_new_server_pg51_20260705_163407",
+  "deploy_id": "xmage_pg517_keyword_draw_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Accelerate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa92338a2783b8ee4e9be40857bfea0e",
+      "min_rule_version": 2,
+      "normalized_name": "accelerate",
+      "oracle_hash": "0ef3b42b4549f96183cf071626ac47e5",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "haste"
+            ],
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "HasteAbility",
+            "xmage_effect_class": "GainAbilityTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "HasteAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bladebrand",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+      "min_rule_version": 2,
+      "normalized_name": "bladebrand",
+      "oracle_hash": "e367c4edeba5549a79de45ff03e70747",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "deathtouch"
+            ],
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "DeathtouchAbility",
+            "xmage_effect_class": "GainAbilityTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "granted_keywords_until_eot": [
+          "deathtouch"
+        ],
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "DeathtouchAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cloak of Feathers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88bfc41687baea7b9c58ea7edd4b8140",
+      "min_rule_version": 2,
+      "normalized_name": "cloak of feathers",
+      "oracle_hash": "75595da321130e1de061cf53c9daba76",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "flying"
+            ],
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "FlyingAbility",
+            "xmage_effect_class": "GainAbilityTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "FlyingAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lace with Moonglove",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+      "min_rule_version": 2,
+      "normalized_name": "lace with moonglove",
+      "oracle_hash": "c932047f2530a47806464d955000e956",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "deathtouch"
+            ],
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "DeathtouchAbility",
+            "xmage_effect_class": "GainAbilityTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "granted_keywords_until_eot": [
+          "deathtouch"
+        ],
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "DeathtouchAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9136574ebfdcfa63c54f60f028d73783",
+      "min_rule_version": 2,
+      "normalized_name": "leap",
+      "oracle_hash": "75595da321130e1de061cf53c9daba76",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "flying"
+            ],
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "FlyingAbility",
+            "xmage_effect_class": "GainAbilityTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "FlyingAbility"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_keyword_draw_card_spell": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg517_xmage_pg517_keyword_draw_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg517_xmage_pg517_keyword_draw_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg517_xmage_pg517_keyword_draw_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg517_xmage_pg517_keyword_draw_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg517_xmage_pg517_keyword_draw_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg517_xmage_pg517_keyword_draw_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T16:34:07+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Accelerate"
+      },
+      "card_name": "Accelerate",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa92338a2783b8ee4e9be40857bfea0e",
+      "normalized_name": "accelerate",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "haste"
+            ],
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "HasteAbility",
+            "xmage_effect_class": "GainAbilityTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "granted_keywords_until_eot": [
+          "haste"
+        ],
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "HasteAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Bladebrand"
+      },
+      "card_name": "Bladebrand",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+      "normalized_name": "bladebrand",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "deathtouch"
+            ],
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "DeathtouchAbility",
+            "xmage_effect_class": "GainAbilityTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "granted_keywords_until_eot": [
+          "deathtouch"
+        ],
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "DeathtouchAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Cloak of Feathers"
+      },
+      "card_name": "Cloak of Feathers",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88bfc41687baea7b9c58ea7edd4b8140",
+      "normalized_name": "cloak of feathers",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "flying"
+            ],
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "FlyingAbility",
+            "xmage_effect_class": "GainAbilityTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "FlyingAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Lace with Moonglove"
+      },
+      "card_name": "Lace with Moonglove",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+      "normalized_name": "lace with moonglove",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "deathtouch"
+            ],
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "DeathtouchAbility",
+            "xmage_effect_class": "GainAbilityTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "granted_keywords_until_eot": [
+          "deathtouch"
+        ],
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "DeathtouchAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Leap"
+      },
+      "card_name": "Leap",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9136574ebfdcfa63c54f60f028d73783",
+      "normalized_name": "leap",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "compose_on_resolution": true,
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "flying"
+            ],
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "target_controller": "any",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "FlyingAbility",
+            "xmage_effect_class": "GainAbilityTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "draw_count": 1,
+        "duration": "until_end_of_turn",
+        "effect": "composite_resolution",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "FlyingAbility"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Accelerate",
+    "Bladebrand",
+    "Cloak of Feathers",
+    "Lace with Moonglove",
+    "Leap"
+  ],
+  "selected_count": 5,
+  "slug": "pg517_keyword_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Accelerate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa92338a2783b8ee4e9be40857bfea0e",
+      "min_rule_version": 2,
+      "normalized_name": "accelerate",
+      "oracle_hash": "0ef3b42b4549f96183cf071626ac47e5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bladebrand",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+      "min_rule_version": 2,
+      "normalized_name": "bladebrand",
+      "oracle_hash": "e367c4edeba5549a79de45ff03e70747",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cloak of Feathers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88bfc41687baea7b9c58ea7edd4b8140",
+      "min_rule_version": 2,
+      "normalized_name": "cloak of feathers",
+      "oracle_hash": "75595da321130e1de061cf53c9daba76",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lace with Moonglove",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+      "min_rule_version": 2,
+      "normalized_name": "lace with moonglove",
+      "oracle_hash": "c932047f2530a47806464d955000e956",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9136574ebfdcfa63c54f60f028d73783",
+      "min_rule_version": 2,
+      "normalized_name": "leap",
+      "oracle_hash": "75595da321130e1de061cf53c9daba76",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

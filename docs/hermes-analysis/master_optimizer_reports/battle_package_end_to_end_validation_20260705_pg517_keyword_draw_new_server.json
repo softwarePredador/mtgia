@@ -1,0 +1,232 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T16:35:59.673821+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg517_xmage_pg517_keyword_draw_new_server_manifest.json",
+  "package_id": "pg517_xmage_pg517_keyword_draw_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Accelerate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:aa92338a2783b8ee4e9be40857bfea0e",
+          "oracle_hash": "0ef3b42b4549f96183cf071626ac47e5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Bladebrand",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+          "oracle_hash": "e367c4edeba5549a79de45ff03e70747",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Cloak of Feathers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88bfc41687baea7b9c58ea7edd4b8140",
+          "oracle_hash": "75595da321130e1de061cf53c9daba76",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Lace with Moonglove",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+          "oracle_hash": "c932047f2530a47806464d955000e956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Leap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9136574ebfdcfa63c54f60f028d73783",
+          "oracle_hash": "75595da321130e1de061cf53c9daba76",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Accelerate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:aa92338a2783b8ee4e9be40857bfea0e",
+          "oracle_hash": "0ef3b42b4549f96183cf071626ac47e5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Bladebrand",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+          "oracle_hash": "e367c4edeba5549a79de45ff03e70747",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Cloak of Feathers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88bfc41687baea7b9c58ea7edd4b8140",
+          "oracle_hash": "75595da321130e1de061cf53c9daba76",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Lace with Moonglove",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5",
+          "oracle_hash": "c932047f2530a47806464d955000e956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "card_name": "Leap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9136574ebfdcfa63c54f60f028d73783",
+          "oracle_hash": "75595da321130e1de061cf53c9daba76",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Accelerate",
+          "logical_rule_key": "battle_rule_v1:aa92338a2783b8ee4e9be40857bfea0e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bladebrand",
+          "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cloak of Feathers",
+          "logical_rule_key": "battle_rule_v1:88bfc41687baea7b9c58ea7edd4b8140"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lace with Moonglove",
+          "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_keyword_target_creature_until_eot_draw_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Leap",
+          "logical_rule_key": "battle_rule_v1:9136574ebfdcfa63c54f60f028d73783"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Accelerate",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:aa92338a2783b8ee4e9be40857bfea0e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bladebrand",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cloak of Feathers",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:88bfc41687baea7b9c58ea7edd4b8140"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lace with Moonglove",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:bf20e953cf978d7e7822f44345c8f2a5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Leap",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:9136574ebfdcfa63c54f60f028d73783"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
