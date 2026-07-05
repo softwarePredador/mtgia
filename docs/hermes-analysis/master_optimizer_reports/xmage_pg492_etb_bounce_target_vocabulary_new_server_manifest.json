@@ -1,0 +1,385 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg492_etb_bounce_target_vocabulary_new_s_20260705_080218",
+  "deploy_id": "PG492",
+  "expected_rules": [
+    {
+      "card_name": "Air-Cult Elemental",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:add0e0805dd63d69ec22ac0c106dfc08",
+      "min_rule_version": 2,
+      "normalized_name": "air-cult elemental",
+      "oracle_hash": "00cefdd464d0c7e0783d11ae42a4ca57",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Guardians of Koilos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f38b5f7861c20bd8bad36225b02e1919",
+      "min_rule_version": 2,
+      "normalized_name": "guardians of koilos",
+      "oracle_hash": "d98db2233ec18e6c04d492d26d91c045",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_permanent",
+        "etb_remove_target": "historic_permanent",
+        "target": "historic_permanent",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            {
+              "card_types": [
+                "permanent"
+              ],
+              "required_supertypes": [
+                "legendary"
+              ]
+            },
+            {
+              "card_types": [
+                "enchantment"
+              ],
+              "required_subtypes": [
+                "saga"
+              ]
+            }
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Roaming Ghostlight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f37702fd67802ff846d310a75da27ded",
+      "min_rule_version": 2,
+      "normalized_name": "roaming ghostlight",
+      "oracle_hash": "bd14f162bc972d608f87fb6cc5e3c2a5",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "non_spirit_creature",
+        "keywords": [
+          "flying"
+        ],
+        "target": "non_spirit_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "spirit"
+          ]
+        },
+        "target_controller": "any",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Winter Eladrin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471",
+      "min_rule_version": 2,
+      "normalized_name": "winter eladrin",
+      "oracle_hash": "aa12b5b95838062b861c58759881cdd2",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_return_target_to_hand": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg492_etb_bounce_target_vocabulary_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg492_etb_bounce_target_vocabulary_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg492_etb_bounce_target_vocabulary_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg492_etb_bounce_target_vocabulary_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg492_etb_bounce_target_vocabulary_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg492_etb_bounce_target_vocabulary_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T08:02:19+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Air-Cult Elemental"
+      },
+      "card_name": "Air-Cult Elemental",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:add0e0805dd63d69ec22ac0c106dfc08",
+      "normalized_name": "air-cult elemental",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Guardians of Koilos"
+      },
+      "card_name": "Guardians of Koilos",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f38b5f7861c20bd8bad36225b02e1919",
+      "normalized_name": "guardians of koilos",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_permanent",
+        "etb_remove_target": "historic_permanent",
+        "target": "historic_permanent",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "artifact"
+              ]
+            },
+            {
+              "card_types": [
+                "permanent"
+              ],
+              "required_supertypes": [
+                "legendary"
+              ]
+            },
+            {
+              "card_types": [
+                "enchantment"
+              ],
+              "required_subtypes": [
+                "saga"
+              ]
+            }
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Roaming Ghostlight"
+      },
+      "card_name": "Roaming Ghostlight",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f37702fd67802ff846d310a75da27ded",
+      "normalized_name": "roaming ghostlight",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "non_spirit_creature",
+        "keywords": [
+          "flying"
+        ],
+        "target": "non_spirit_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_subtypes": [
+            "spirit"
+          ]
+        },
+        "target_controller": "any",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Winter Eladrin"
+      },
+      "card_name": "Winter Eladrin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471",
+      "normalized_name": "winter eladrin",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Air-Cult Elemental",
+    "Guardians of Koilos",
+    "Roaming Ghostlight",
+    "Winter Eladrin"
+  ],
+  "selected_count": 4,
+  "slug": "etb_bounce_target_vocabulary_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Air-Cult Elemental",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:add0e0805dd63d69ec22ac0c106dfc08",
+      "min_rule_version": 2,
+      "normalized_name": "air-cult elemental",
+      "oracle_hash": "00cefdd464d0c7e0783d11ae42a4ca57",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Guardians of Koilos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f38b5f7861c20bd8bad36225b02e1919",
+      "min_rule_version": 2,
+      "normalized_name": "guardians of koilos",
+      "oracle_hash": "d98db2233ec18e6c04d492d26d91c045",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Roaming Ghostlight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f37702fd67802ff846d310a75da27ded",
+      "min_rule_version": 2,
+      "normalized_name": "roaming ghostlight",
+      "oracle_hash": "bd14f162bc972d608f87fb6cc5e3c2a5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Winter Eladrin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471",
+      "min_rule_version": 2,
+      "normalized_name": "winter eladrin",
+      "oracle_hash": "aa12b5b95838062b861c58759881cdd2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

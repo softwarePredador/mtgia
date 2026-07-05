@@ -1,0 +1,7 @@
+      card_name      |   normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+---------------------+---------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Air-Cult Elemental  | air-cult elemental  | battle_rule_v1:add0e0805dd63d69ec22ac0c106dfc08 |                  1 |                           1 |                         1 |           0
+ Guardians of Koilos | guardians of koilos | battle_rule_v1:f38b5f7861c20bd8bad36225b02e1919 |                  1 |                           1 |                         1 |           0
+ Roaming Ghostlight  | roaming ghostlight  | battle_rule_v1:f37702fd67802ff846d310a75da27ded |                  1 |                           1 |                         1 |           0
+ Winter Eladrin      | winter eladrin      | battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471 |                  1 |                           1 |                         1 |           0
+(4 rows)

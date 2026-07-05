@@ -12081,6 +12081,124 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_count"], 1)
         self.assertEqual(effect["keywords"], ["flying"])
 
+    def test_creature_etb_bounce_maps_ability_word_other_creature(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Air-Cult Elemental",
+                type_line="Creature - Elemental",
+                oracle_text=(
+                    "Flying\n"
+                    "Whirlwind - When Air-Cult Elemental enters the battlefield, "
+                    "return up to one other target creature to its owner's hand."
+                ),
+            ),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = "
+                "new FilterCreaturePermanent(\"other target creature\");"
+                "filter.add(AnotherPredicate.instance);"
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnToHandTargetEffect());"
+                "ability.addTarget(new TargetPermanent(0, 1, filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["etb_bounce_target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "exclude_source": True})
+        self.assertTrue(effect["up_to_count"])
+        self.assertEqual(effect["keywords"], ["flying"])
+
+    def test_creature_etb_bounce_maps_non_spirit_creature(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Roaming Ghostlight",
+                type_line="Creature - Spirit",
+                oracle_text=(
+                    "Flying\n"
+                    "When Roaming Ghostlight enters the battlefield, "
+                    "return up to one target non-Spirit creature to its owner's hand."
+                ),
+            ),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = "
+                "new FilterCreaturePermanent(\"non-Spirit creature\");"
+                "filter.add(Predicates.not(SubType.SPIRIT.getPredicate()));"
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnToHandTargetEffect());"
+                "ability.addTarget(new TargetPermanent(0, 1, filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_bounce_target"], "non_spirit_creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "exclude_subtypes": ["spirit"]})
+        self.assertTrue(effect["up_to_count"])
+
+    def test_creature_etb_bounce_maps_historic_permanent_you_control(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Guardians of Koilos",
+                type_line="Artifact Creature - Construct",
+                oracle_text=(
+                    "When Guardians of Koilos enters the battlefield, you may return another target "
+                    "historic permanent you control to its owner's hand. "
+                    "(Artifacts, legendaries, and Sagas are historic.)"
+                ),
+            ),
+            source_text=(
+                "private static final FilterControlledPermanent filter = "
+                "new FilterControlledPermanent(\"another historic permanent you control\");"
+                "filter.add(AnotherPredicate.instance);"
+                "filter.add(HistoricPredicate.instance);"
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnToHandTargetEffect(), true);"
+                "ability.addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["etb_bounce_target"], "historic_permanent")
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "any_of": [
+                    {"card_types": ["artifact"]},
+                    {"card_types": ["permanent"], "required_supertypes": ["legendary"]},
+                    {"card_types": ["enchantment"], "required_subtypes": ["saga"]},
+                ],
+                "controller_scope": "self",
+                "exclude_source": True,
+            },
+        )
+        self.assertTrue(effect["exclude_source"])
+        self.assertTrue(effect["etb_bounce_optional"])
+
     def test_creature_etb_bounce_blocks_condition_and_self_without_exclude_source(self) -> None:
         conditional_row = queue_row(
             split.BOUNCE_UNIT,

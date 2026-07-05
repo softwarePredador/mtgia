@@ -1730,6 +1730,41 @@
     "battle_rule_logical_key": "battle_rule_v1:2232bfe70d4fa2a13350a5da6f366b6c",
     "battle_rule_oracle_hash": "0bbaaa05e21aefaaa46a6777ece08f03"
   },
+  "Air-Cult Elemental": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "exclude_source": true,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "target_count": 1,
+    "trigger": "enters_battlefield",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:add0e0805dd63d69ec22ac0c106dfc08",
+    "battle_rule_oracle_hash": "00cefdd464d0c7e0783d11ae42a4ca57"
+  },
   "Airborne Aid": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
     "count": 1,
@@ -42312,6 +42347,56 @@
     "battle_rule_logical_key": "battle_rule_v1:ea3402c83a775c8f219f253347e038e2",
     "battle_rule_oracle_hash": "fb84a3bb7563739be586d1570e8c9a56"
   },
+  "Guardians of Koilos": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_optional": true,
+    "etb_bounce_target": "historic_permanent",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "historic_permanent",
+    "exclude_source": true,
+    "target": "historic_permanent",
+    "target_constraints": {
+      "any_of": [
+        {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        {
+          "card_types": [
+            "permanent"
+          ],
+          "required_supertypes": [
+            "legendary"
+          ]
+        },
+        {
+          "card_types": [
+            "enchantment"
+          ],
+          "required_subtypes": [
+            "saga"
+          ]
+        }
+      ],
+      "controller_scope": "self",
+      "exclude_source": true
+    },
+    "target_controller": "self",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f38b5f7861c20bd8bad36225b02e1919",
+    "battle_rule_oracle_hash": "d98db2233ec18e6c04d492d26d91c045"
+  },
   "Guardians of Meletis": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -76747,6 +76832,42 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "0b211f9811129c1fcc8b492f0c393378"
   },
+  "Roaming Ghostlight": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "non_spirit_creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "non_spirit_creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "non_spirit_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_subtypes": [
+        "spirit"
+      ]
+    },
+    "target_controller": "any",
+    "target_count": 1,
+    "trigger": "enters_battlefield",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f37702fd67802ff846d310a75da27ded",
+    "battle_rule_oracle_hash": "bd14f162bc972d608f87fb6cc5e3c2a5"
+  },
   "Roar of Reclamation": {
     "ability_kind": "one_shot",
     "battle_model_scope": "return_all_artifact_cards_from_all_graveyards_to_battlefield_v1",
@@ -107763,6 +107884,36 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:1b0b5f6d4f1ab34821f2b3b326e6c684",
     "battle_rule_oracle_hash": "8f9b430fe2bee3d386c04f85799806a5"
+  },
+  "Winter Eladrin": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "exclude_source": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "target_count": 1,
+    "trigger": "enters_battlefield",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471",
+    "battle_rule_oracle_hash": "aa12b5b95838062b861c58759881cdd2"
   },
   "Winter's Grasp": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",

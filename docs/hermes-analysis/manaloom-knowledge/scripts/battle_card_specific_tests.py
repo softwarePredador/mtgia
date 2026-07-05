@@ -7974,6 +7974,124 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg492_etb_bounce_respects_subtype_and_historic_constraints():
+        active = player("Active")
+        opponent = player("Opponent")
+        ghostlight = {
+            "name": "Roaming Ghostlight",
+            "type_line": "Creature - Spirit",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 2,
+            "controller": "Active",
+            "owner": "Active",
+        }
+        spirit = {
+            "name": "Enemy Spirit",
+            "type_line": "Creature - Spirit",
+            "effect": "draw_engine",
+            "power": 5,
+            "toughness": 5,
+            "controller": "Opponent",
+            "owner": "Opponent",
+        }
+        non_spirit = {
+            "name": "Enemy Wizard",
+            "type_line": "Creature - Human Wizard",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "controller": "Opponent",
+            "owner": "Opponent",
+        }
+        opponent.battlefield = [spirit, non_spirit]
+        battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            ghostlight,
+            {
+                **ghostlight,
+                "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "etb_remove_effect": "remove_creature",
+                "etb_remove_target": "non_spirit_creature",
+                "target": "non_spirit_creature",
+                "target_constraints": {"card_types": ["creature"], "exclude_subtypes": ["spirit"]},
+                "destination": "hand",
+            },
+            9,
+            random.Random(492),
+            all_players=[active, opponent],
+        )
+
+        assert spirit in opponent.battlefield
+        assert non_spirit not in opponent.battlefield
+        assert non_spirit in opponent.hand
+
+        active = player("Active")
+        opponent = player("Opponent")
+        guardians = {
+            "name": "Guardians of Koilos",
+            "type_line": "Artifact Creature - Construct",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+            "controller": "Active",
+            "owner": "Active",
+        }
+        nonhistoric = {
+            "name": "Plain Creature",
+            "type_line": "Creature - Soldier",
+            "effect": "draw_engine",
+            "power": 5,
+            "toughness": 5,
+            "controller": "Active",
+            "owner": "Active",
+        }
+        historic = {
+            "name": "Prophetic Prism",
+            "type_line": "Artifact",
+            "effect": "draw_engine",
+            "cmc": 2,
+            "controller": "Active",
+            "owner": "Active",
+        }
+        active.battlefield = [guardians, nonhistoric, historic]
+        battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            guardians,
+            {
+                **guardians,
+                "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "etb_remove_effect": "remove_permanent",
+                "etb_remove_target": "historic_permanent",
+                "target": "historic_permanent",
+                "target_controller": "self",
+                "target_constraints": {
+                    "any_of": [
+                        {"card_types": ["artifact"]},
+                        {"card_types": ["permanent"], "required_supertypes": ["legendary"]},
+                        {"card_types": ["enchantment"], "required_subtypes": ["saga"]},
+                    ],
+                    "controller_scope": "self",
+                    "exclude_source": True,
+                },
+                "destination": "hand",
+            },
+            10,
+            random.Random(492),
+            all_players=[active, opponent],
+        )
+
+        assert guardians in active.battlefield
+        assert nonhistoric in active.battlefield
+        assert historic not in active.battlefield
+        assert historic in active.hand
+
     def test_pg086_removal_targets_filter_nontoken_and_mana_value_max():
         active = player("Active")
         opponent = player("Opponent")
@@ -22408,6 +22526,7 @@ def register_tests(battle, player):
         test_pg489_destroy_target_extended_static_target_filters_runtime,
         test_pg490_creature_etb_bounce_returns_opponent_creature_to_hand,
         test_pg491_self_etb_bounce_respects_controller_and_exclude_source,
+        test_pg492_etb_bounce_respects_subtype_and_historic_constraints,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
         test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,

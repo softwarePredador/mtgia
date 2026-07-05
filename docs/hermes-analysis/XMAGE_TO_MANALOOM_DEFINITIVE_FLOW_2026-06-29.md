@@ -12001,6 +12001,68 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG492 ETB Bounce Target Vocabulary Closure
+
+- PG492 extends the PG490/PG491 ETB bounce mapper for target-vocabulary cases
+  that still execute through the same ManaLoom scope:
+  `xmage_creature_etb_return_target_to_hand_v1`.
+- The accepted shape remains narrow: pure `ReturnToHandTargetEffect` on
+  `EntersBattlefieldTriggeredAbility`, exact Oracle/source agreement, one
+  target, no stack object target, no land-pair bounce, no target pointer or
+  adjuster, no intervening-if condition, and only static self keyword
+  abilities beside the ETB trigger. The new accepted target phrases are
+  ability/flavor-word prefixed ETB text, `target non-Spirit creature`, and
+  self-controller `target historic permanent you control` with
+  `exclude_source`.
+- The mapper records target constraints for the new vocabulary instead of
+  flattening it into unqualified bounce: `exclude_subtypes=["spirit"]` for
+  non-Spirit creatures, and a historic permanent disjunction covering
+  artifacts, legendary permanents, and Sagas. The focused PG492 runtime test
+  proves subtype and historic constraints are respected during ETB target
+  selection.
+- The batch covers `4` cards: Air-Cult Elemental, Guardians of Koilos, Roaming
+  Ghostlight, and Winter Eladrin. The complete list lives in
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg492_etb_bounce_target_vocabulary_new_server_manifest.json`
+  under `selected_card_names`.
+- Focused validation passed `775` parser/runtime/package-builder tests,
+  `py_compile` passed for the touched parser/runtime-test files, the focused
+  PG492 ETB-bounce runtime test passed, and the full
+  `test_battle_analyst_v10_3.py` suite passed with the live PostgreSQL
+  environment loaded.
+- PostgreSQL package PG492 applied against `143.198.230.247:5433/halder` and
+  promoted `4/4` selected cards as verified/auto rule-version `2` rows with
+  matching Oracle hashes. The apply upserted `4` rows and deprecated `0`
+  shadow rows.
+- Hermes metadata sync matched `5916` PostgreSQL cards, wrote `5827` SQLite
+  cache aliases, updated `108` deck-card ids, and left the known
+  `unresolved=1` residual unchanged. The targeted battle-rule sync loaded `4`
+  PostgreSQL rows, wrote `4` SQLite rows, exported `4724` canonical fallback
+  rows, and refreshed the tracked default canonical snapshot.
+- Generic E2E validation passed across PostgreSQL, SQLite
+  `battle_card_rules`, the default canonical snapshot, and runtime
+  `get_card_effect` for all `4` selected cards. The manifest does not define
+  battle-execution scenarios for this generic family, so scenario execution
+  remains `0`; concrete target-constraint behavior is covered by the focused
+  PG492 runtime test.
+- Final governance audits passed: XMage strategy (`26/26`), operational
+  surface (`39/39`), deckbuilding contract surface, legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26133`, `xmage_authoritative_source_count=25819`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25819`. This is an exact
+  reduction of `4` from the post-PG491 queue. The bounce work unit fell from
+  `239` before PG492 to `235` after PG492, and the post-PG492 exact split
+  recheck reports `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+  The remaining ETB-bounce neighbors stay blocked deliberately: Hoverguard
+  Sweepers needs multi-target support, Sea Drake needs exact two self-land
+  bounce, and Venser, Shaper Savant needs a stack-or-permanent target model.
+- Post-sync global readiness is now `34331` known cards, `4817`
+  `battle_and_oracle_ready`, `29056` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

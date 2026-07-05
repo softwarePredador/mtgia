@@ -1437,8 +1437,20 @@ def source_matches_bounce_target(source: str, target: str) -> bool:
             or "FILTER_ANOTHER_CREATURE" in text
             or "FILTER_ANOTHER_TARGET_CREATURE" in text
         )
+    if target == "non_spirit_creature":
+        return (
+            "FilterCreaturePermanent" in text
+            and ("SubType.SPIRIT" in text or "non-Spirit creature" in text)
+        )
     if target == "nonland_permanent":
         return "TargetNonlandPermanent" in text or "FilterNonlandPermanent" in text or "nonland permanent" in text
+    if target == "historic_permanent":
+        return "HistoricPredicate" in text and (
+            "TargetPermanent" in text
+            or "TargetControlledPermanent" in text
+            or "FilterPermanent" in text
+            or "FilterControlledPermanent" in text
+        )
     if target == "permanent":
         return (
             "TargetPermanent" in text
@@ -1456,7 +1468,9 @@ def source_matches_bounce_target(source: str, target: str) -> bool:
 
 
 def etb_bounce_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
-    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"^[a-z0-9' -]+\s+[—-]\s+", "", text)
     etb_subject = r"(?:this creature|.+?)"
     if not re.match(rf"^when {etb_subject} enters(?: the battlefield)?, ", text):
         return None
@@ -1470,6 +1484,8 @@ def etb_bounce_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | 
     target_patterns: list[tuple[str, str, str]] = [
         ("tapped_creature", "remove_creature", r"target tapped creature(?: an opponent controls| you control)?"),
         ("untapped_creature", "remove_creature", r"target untapped creature(?: an opponent controls| you control)?"),
+        ("non_spirit_creature", "remove_creature", r"target non-spirit creature(?: an opponent controls| you control)?"),
+        ("historic_permanent", "remove_permanent", r"target historic permanent(?: an opponent controls| you control)?"),
         ("nonland_permanent", "remove_permanent", r"target nonland permanent(?: an opponent controls| you control)?"),
         ("artifact_or_enchantment", "remove_permanent", r"target artifact or enchantment(?: an opponent controls| you control)?"),
         ("creature_or_enchantment", "remove_permanent", r"target creature or enchantment(?: an opponent controls| you control)?"),
@@ -12309,6 +12325,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_subtypes": ["spirit"]}
     if target == "non_vampire_werewolf_zombie_creature":
         return {"card_types": ["creature"], "exclude_subtypes": ["vampire", "werewolf", "zombie"]}
+    if target == "non_spirit_creature":
+        return {"card_types": ["creature"], "exclude_subtypes": ["spirit"]}
     if target == "human_creature":
         return {"card_types": ["creature"], "required_subtypes": ["human"]}
     if target == "spirit_creature":
@@ -12328,6 +12346,14 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "target_colors": ["U", "B"], "required_keywords": ["flying"]}
     if target == "black_or_red_permanent":
         return {"card_types": ["permanent"], "target_colors": ["B", "R"]}
+    if target == "historic_permanent":
+        return {
+            "any_of": [
+                {"card_types": ["artifact"]},
+                {"card_types": ["permanent"], "required_supertypes": ["legendary"]},
+                {"card_types": ["enchantment"], "required_subtypes": ["saga"]},
+            ]
+        }
     if target == "nonwhite_permanent":
         return {"card_types": ["permanent"], "exclude_colors": ["W"]}
     if target == "noncreature_permanent":
