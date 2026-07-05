@@ -1,0 +1,378 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg478",
+  "generated_at": "2026-07-05T03:16:20.520234+00:00",
+  "manifest": "../../master_optimizer_reports/pg478_xmage_residual_exact_safe_sweep_new_server_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg478_xmage_residual_exact_safe_sweep_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 2,
+    "cards": [
+      "Badlands Revival",
+      "Bonecaller Cleric",
+      "Crucible of Worlds",
+      "Elvish Hexhunter",
+      "Eternal Taskmaster",
+      "Festive Funeral",
+      "Ghoul's Feast",
+      "Hana Kami",
+      "Pillardrop Warden",
+      "Pull Through the Weft",
+      "Ramunap Excavator",
+      "Select for Inspection",
+      "The Unspeakable",
+      "Valgavoth's Faithful",
+      "Voyage's End"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 15,
+    "promoted_rule_rows": 15,
+    "promoted_verified_auto_rows": 15,
+    "row_count": 15
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 2,
+      "card_name": "Badlands Revival",
+      "logical_rule_key": "battle_rule_v1:cad5ffc686cc6c1e970b5fb45aa6eb1b",
+      "normalized_name": "badlands revival",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Bonecaller Cleric",
+      "logical_rule_key": "battle_rule_v1:e4ccb45e9cadde283fa6780e8682299a",
+      "normalized_name": "bonecaller cleric",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Crucible of Worlds",
+      "logical_rule_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+      "normalized_name": "crucible of worlds",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Elvish Hexhunter",
+      "logical_rule_key": "battle_rule_v1:73ec471ff24b25e9448c521b2eadaf7d",
+      "normalized_name": "elvish hexhunter",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Eternal Taskmaster",
+      "logical_rule_key": "battle_rule_v1:4022dff702a96dc4ab9837e68a1f30e0",
+      "normalized_name": "eternal taskmaster",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Festive Funeral",
+      "logical_rule_key": "battle_rule_v1:3e4f67f3eb47bd397f83c59fd964d38c",
+      "normalized_name": "festive funeral",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Ghoul's Feast",
+      "logical_rule_key": "battle_rule_v1:b7cb7a49d1c68ef3a1d9889ac4853f8d",
+      "normalized_name": "ghoul's feast",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Hana Kami",
+      "logical_rule_key": "battle_rule_v1:42fe7c13f0150f5f2563678a7512c43d",
+      "normalized_name": "hana kami",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Pillardrop Warden",
+      "logical_rule_key": "battle_rule_v1:decee249f26e77cc845acd6db9ba629a",
+      "normalized_name": "pillardrop warden",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Pull Through the Weft",
+      "logical_rule_key": "battle_rule_v1:1c4754386a55d72baa2366482ab859a3",
+      "normalized_name": "pull through the weft",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Ramunap Excavator",
+      "logical_rule_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+      "normalized_name": "ramunap excavator",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Select for Inspection",
+      "logical_rule_key": "battle_rule_v1:db3756c4f301dbc67489a7a394e2654c",
+      "normalized_name": "select for inspection",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "The Unspeakable",
+      "logical_rule_key": "battle_rule_v1:2725808803ad0a91360ce43429ab4063",
+      "normalized_name": "the unspeakable",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Valgavoth's Faithful",
+      "logical_rule_key": "battle_rule_v1:e4ccb45e9cadde283fa6780e8682299a",
+      "normalized_name": "valgavoth's faithful",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Voyage's End",
+      "logical_rule_key": "battle_rule_v1:4199b96cb5aa8ac98612fda29ac6f4e5",
+      "normalized_name": "voyage's end",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Badlands Revival",
+      "Bonecaller Cleric",
+      "Crucible of Worlds",
+      "Elvish Hexhunter",
+      "Eternal Taskmaster",
+      "Festive Funeral",
+      "Ghoul's Feast",
+      "Hana Kami",
+      "Pillardrop Warden",
+      "Pull Through the Weft",
+      "Ramunap Excavator",
+      "Select for Inspection",
+      "The Unspeakable",
+      "Valgavoth's Faithful",
+      "Voyage's End"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 15,
+    "total_target_card_rows": 15,
+    "would_deprecate_shadow_rows": 2
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "e4fd5071-dc56-446e-9e35-ed33efc963d3",
+      "card_name": "Badlands Revival",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:cad5ffc686cc6c1e970b5fb45aa6eb1b",
+      "normalized_name": "badlands revival",
+      "oracle_hash": "6c4a338d9da9a4035afc7786d92d8cfa",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "0b3af7e5-7e92-4ef8-a26f-c613d33db811",
+      "card_name": "Bonecaller Cleric",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:e4ccb45e9cadde283fa6780e8682299a",
+      "normalized_name": "bonecaller cleric",
+      "oracle_hash": "6a31e60c563b4e5cbd50398aa9ccc710",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "7cdc54a5-9cd3-4408-965a-186632c71f44",
+      "card_name": "Crucible of Worlds",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+      "normalized_name": "crucible of worlds",
+      "oracle_hash": "cbfe8d699b0aab297f7c1ce0658589d9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "canonical_card_id": "cd25b700-3fbe-4704-91d1-a61133d73cd8",
+      "card_name": "Elvish Hexhunter",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:73ec471ff24b25e9448c521b2eadaf7d",
+      "normalized_name": "elvish hexhunter",
+      "oracle_hash": "6bd78e7d31dda921e8e7449c2bd39c5b",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "2364ce5a-c279-46d6-972a-90c3d28f1c6c",
+      "card_name": "Eternal Taskmaster",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:4022dff702a96dc4ab9837e68a1f30e0",
+      "normalized_name": "eternal taskmaster",
+      "oracle_hash": "2d79b92556e0ed8ab221480fa5fd873d",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "51b53b0a-9df3-4fff-9179-76c47fec0ccc",
+      "card_name": "Festive Funeral",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3e4f67f3eb47bd397f83c59fd964d38c",
+      "normalized_name": "festive funeral",
+      "oracle_hash": "6e9fbabe708f04c9ed322448d4f409db",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "4e21cdef-0673-4b84-a366-5c6023040fe9",
+      "card_name": "Ghoul's Feast",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b7cb7a49d1c68ef3a1d9889ac4853f8d",
+      "normalized_name": "ghoul's feast",
+      "oracle_hash": "661b340dc8c9f7d884d1d203edb060b2",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "0c43c938-4e75-4482-ba06-639ce6ad71fa",
+      "card_name": "Hana Kami",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:42fe7c13f0150f5f2563678a7512c43d",
+      "normalized_name": "hana kami",
+      "oracle_hash": "8611a25874ac2a52c45bcdabda208bf9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "1292e38f-fcf1-4230-b7ec-faa9fbaa4bbb",
+      "card_name": "Pillardrop Warden",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:decee249f26e77cc845acd6db9ba629a",
+      "normalized_name": "pillardrop warden",
+      "oracle_hash": "c32f8c92a5a3cd47b3cd510867bbf5c5",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "3db511c4-2ddc-4b8d-a397-00062d43d288",
+      "card_name": "Pull Through the Weft",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:1c4754386a55d72baa2366482ab859a3",
+      "normalized_name": "pull through the weft",
+      "oracle_hash": "e0c0356a12d42dc554b125ae70234895",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "191b88fa-3541-437f-8a5d-126223ba57d6",
+      "card_name": "Ramunap Excavator",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:c110a961b3f1c43647de3466a77f152c",
+      "normalized_name": "ramunap excavator",
+      "oracle_hash": "cbfe8d699b0aab297f7c1ce0658589d9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "fffe3634-26b5-4dab-b8a6-126b74d39441",
+      "card_name": "Select for Inspection",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:db3756c4f301dbc67489a7a394e2654c",
+      "normalized_name": "select for inspection",
+      "oracle_hash": "468c507d04bc6858787284ae6b74dd08",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "70aac6f5-e01a-4099-8803-359a72e4e0e6",
+      "card_name": "The Unspeakable",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:2725808803ad0a91360ce43429ab4063",
+      "normalized_name": "the unspeakable",
+      "oracle_hash": "b1b6b05b9d4aea8f3ac0379433f54829",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "4e5c8b36-105b-4204-9019-191c926098bb",
+      "card_name": "Valgavoth's Faithful",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:e4ccb45e9cadde283fa6780e8682299a",
+      "normalized_name": "valgavoth's faithful",
+      "oracle_hash": "6a31e60c563b4e5cbd50398aa9ccc710",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "8b18fb61-0c81-421f-9cea-de503c6aea11",
+      "card_name": "Voyage's End",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:4199b96cb5aa8ac98612fda29ac6f4e5",
+      "normalized_name": "voyage's end",
+      "oracle_hash": "ce22f69a4e8be557a74fc13b7aeb1532",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_residual_exact_safe_sweep_new_server"
+}

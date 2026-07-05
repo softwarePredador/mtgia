@@ -167,6 +167,89 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         )
         self.assertEqual(payload["Seething Song"]["battle_rule_oracle_hash"], "ritual-hash")
 
+    def test_export_canonical_snapshot_keeps_verified_composite_rule_over_stale_snapshot_effect(self) -> None:
+        rows = [
+            {
+                "card_name": "Select for Inspection",
+                "effect_json": {
+                    "effect": "composite_resolution",
+                    "battle_model_scope": "xmage_return_target_to_hand_and_scry_spell_v1",
+                    "resolution_order": "bounce_then_scry",
+                    "destination": "hand",
+                    "target": "creature",
+                    "target_constraints": {
+                        "card_types": ["creature"],
+                        "tapped_state": "tapped",
+                    },
+                    "scry_count": 1,
+                    "_composite_rule_components": [
+                        {
+                            "effect": "remove_creature",
+                            "target": "creature",
+                            "destination": "hand",
+                            "compose_on_resolution": True,
+                        },
+                        {
+                            "effect": "scry",
+                            "scry_count": 1,
+                            "compose_on_resolution": True,
+                        },
+                    ],
+                },
+                "source": "curated",
+                "confidence": 0.96,
+                "review_status": "verified",
+                "execution_status": "auto",
+                "rule_version": 2,
+                "oracle_hash": "468c507d04bc6858787284ae6b74dd08",
+                "logical_rule_key": "battle_rule_v1:db3756c4f301dbc67489a7a394e2654c",
+            }
+        ]
+        existing_payload = {
+            "Select for Inspection": {
+                "effect": "remove_permanent",
+                "battle_model_scope": "xmage_return_target_to_hand_and_scry_spell_v1",
+                "battle_rule_source": "curated",
+                "battle_rule_review_status": "verified",
+                "battle_rule_execution_status": "auto",
+                "battle_rule_version": 2,
+                "battle_rule_oracle_hash": "468c507d04bc6858787284ae6b74dd08",
+                "battle_rule_logical_key": "battle_rule_v1:db3756c4f301dbc67489a7a394e2654c",
+            }
+        }
+        battle_module = sync_pg._oracle_normalized_rows.__globals__["battle"]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_path = Path(tmpdir) / "knowledge.db"
+            sqlite_path.touch()
+            snapshot_path = Path(tmpdir) / "known_cards_canonical_snapshot.json"
+            snapshot_path.write_text(json.dumps(existing_payload), encoding="utf-8")
+
+            with (
+                mock.patch.object(battle_module, "load_card_oracle_cache", return_value={}),
+                mock.patch.object(
+                    battle_module,
+                    "normalize_effect_by_oracle",
+                    return_value={"effect": "remove_permanent"},
+                ) as normalize_effect,
+            ):
+                exported = sync_pg.export_canonical_snapshot(
+                    rows,
+                    sqlite_db=str(sqlite_path),
+                    output_path=snapshot_path,
+                )
+            payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(exported, 1)
+        normalize_effect.assert_not_called()
+        self.assertEqual(
+            payload["Select for Inspection"]["effect"],
+            "composite_resolution",
+        )
+        self.assertEqual(
+            payload["Select for Inspection"]["battle_model_scope"],
+            "xmage_return_target_to_hand_and_scry_spell_v1",
+        )
+
     def test_filter_rows_for_current_reviewed_curated_drops_superseded_pg_curated_row(self) -> None:
         rows = [
             {

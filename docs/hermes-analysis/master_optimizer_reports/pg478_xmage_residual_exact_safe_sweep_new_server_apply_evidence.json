@@ -1,0 +1,88 @@
+{
+  "generated_at_utc": "2026-07-05T03:27:03Z",
+  "package_id": "pg478_xmage_residual_exact_safe_sweep_new_server",
+  "database_target": "143.198.230.247:5433/halder",
+  "status": "pass",
+  "scope": "residual exact safe sweep after PG477",
+  "selected_count": 15,
+  "selected_cards": [
+    "Badlands Revival",
+    "Bonecaller Cleric",
+    "Crucible of Worlds",
+    "Elvish Hexhunter",
+    "Eternal Taskmaster",
+    "Festive Funeral",
+    "Ghoul's Feast",
+    "Hana Kami",
+    "Pillardrop Warden",
+    "Pull Through the Weft",
+    "Ramunap Excavator",
+    "Select for Inspection",
+    "The Unspeakable",
+    "Valgavoth's Faithful",
+    "Voyage's End"
+  ],
+  "runtime_scopes": [
+    "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1",
+    "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+    "xmage_permanent_attack_return_graveyard_card_to_hand_v1",
+    "xmage_permanent_simple_activated_destroy_target_v1",
+    "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+    "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+    "xmage_return_multi_zone_graveyard_cards_spell_v1",
+    "xmage_return_target_to_hand_and_scry_spell_v1",
+    "xmage_static_play_lands_from_graveyard_v1"
+  ],
+  "postgres_apply": {
+    "row_count": 15,
+    "promoted_rule_rows": 15,
+    "promoted_verified_auto_rows": 15,
+    "promoted_oracle_hash_rows": 15,
+    "backup_rows": 2,
+    "failed_cards": []
+  },
+  "snapshot_fix": {
+    "problem": "Oracle normalization during canonical snapshot export could rewrite verified runtime adapter rows back to stale fallback effect shapes.",
+    "fixed_in": "docs/hermes-analysis/manaloom-knowledge/scripts/sync_battle_card_rules.py",
+    "regression_test": "test_sync_battle_card_rules_pg_selection.SyncBattleCardRulesPgSelectionTests.test_export_canonical_snapshot_keeps_verified_composite_rule_over_stale_snapshot_effect",
+    "verified_cards": [
+      "Select for Inspection",
+      "Voyage's End"
+    ],
+    "expected_effect": "composite_resolution"
+  },
+  "sync": {
+    "pg_rows_loaded": 4547,
+    "sqlite_inserted_or_updated": 4539,
+    "canonical_snapshot_rows_exported": 4514
+  },
+  "validation": {
+    "unit_tests": "752 unittest checks passed",
+    "package_builder_test": "pass",
+    "py_compile": "pass",
+    "sqlite_snapshot_manifest_verification": "pass",
+    "battle_package_e2e": "pass",
+    "xmage_strategy_consistency_audit": "26/26 pass",
+    "operational_surface_alignment_audit": "39/39 pass",
+    "legacy_contamination_audit": "32/32 pass",
+    "pg_hermes_sqlite_contract_audit": "51/51 pass"
+  },
+  "post_pg478_queue": {
+    "target_identity_count": 26339,
+    "xmage_authoritative_source_count": 26025,
+    "xmage_missing_source_exception_count": 314,
+    "xmage_authoritative_parser_gap_count": 0,
+    "xmage_authoritative_adapter_required_count": 26025,
+    "adapter_work_unit_count": 11393,
+    "exact_split_proposal_count": 0,
+    "safe_for_batch_pg_package_count": 0
+  },
+  "artifacts": {
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg478_xmage_residual_exact_safe_sweep_new_server_manifest.json",
+    "pg_apply_evidence": "docs/hermes-analysis/master_optimizer_reports/pg478_xmage_residual_exact_safe_sweep_new_server_pg_apply_evidence.json",
+    "sync_after_snapshot_fix": "docs/hermes-analysis/master_optimizer_reports/pg478_xmage_residual_exact_safe_sweep_new_server_full_pg_to_sqlite_sync_operational_after_snapshot_fix.json",
+    "e2e_after_snapshot_fix": "docs/hermes-analysis/master_optimizer_reports/pg478_xmage_residual_exact_safe_sweep_new_server_e2e_validation_after_snapshot_fix.json",
+    "post_queue": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg478_residual_exact_safe_sweep_new_server_commander_legal.json",
+    "post_exact_split": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg478_residual_exact_safe_sweep_new_server_recheck.json"
+  }
+}

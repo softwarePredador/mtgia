@@ -11226,6 +11226,64 @@ new server:
   `xmage_permanent_attack_graveyard_to_hand`, and
   `xmage_permanent_simple_activated_destroy_target`.
 
+## 2026-07-05 PG478 Residual Exact Safe Sweep Closure
+
+- Closed the residual exact safe candidates left by the post-PG477 splitter as
+  one bulk package across `9` runtime-backed XMage scopes.
+- The batch covers `15` cards: Badlands Revival, Bonecaller Cleric, Crucible of
+  Worlds, Elvish Hexhunter, Eternal Taskmaster, Festive Funeral, Ghoul's Feast,
+  Hana Kami, Pillardrop Warden, Pull Through the Weft, Ramunap Excavator,
+  Select for Inspection, The Unspeakable, Valgavoth's Faithful, and Voyage's
+  End.
+- Runtime scopes promoted in the package:
+  `xmage_return_multi_zone_graveyard_cards_spell_v1`,
+  `xmage_permanent_simple_activated_graveyard_to_battlefield_v1`,
+  `xmage_static_play_lands_from_graveyard_v1`,
+  `xmage_permanent_simple_activated_destroy_target_v1`,
+  `xmage_permanent_attack_return_graveyard_card_to_hand_v1`,
+  `xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1`,
+  `xmage_permanent_simple_activated_graveyard_to_hand_v1`,
+  `xmage_return_target_to_hand_and_scry_spell_v1`, and
+  `xmage_creature_combat_damage_return_graveyard_card_to_hand_v1`.
+- The PostgreSQL package promoted `15` cards. Apply/postcheck verified
+  `15/15` promoted rows as `verified`/`auto` with Oracle hashes. The apply
+  backup captured `2` shadow rows; `failed_cards=[]`.
+- Validation exposed and fixed a canonical snapshot export bug. PostgreSQL and
+  SQLite had correct composite XMage rules for Select for Inspection and
+  Voyage's End, but the snapshot export could let older Oracle-normalized
+  fallback effects (`remove_permanent`/`remove_creature`) overwrite the
+  trusted runtime `effect=composite_resolution`. The sync contract now treats
+  trusted `manual`/`curated` verified executable rows with explicit runtime
+  scope, composite components, or XMage effect metadata as authoritative over
+  Oracle normalization during snapshot export.
+- Regression test added:
+  `test_export_canonical_snapshot_keeps_verified_composite_rule_over_stale_snapshot_effect`.
+- Focused runtime/split/sync regression lane passed `752` tests, the
+  package-builder test lane passed, and the touched scripts compiled.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  runtime `get_card_effect`, and no-override battle gate for all `15` selected
+  cards. The additional SQLite/snapshot manifest verifier also passed,
+  including `effect=composite_resolution` for Select for Inspection and
+  Voyage's End.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4547` PostgreSQL runtime rows, wrote `4539` SQLite runtime
+  rows, and exported `4514` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy
+  contamination (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL
+  connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26339`, `xmage_authoritative_source_count=26025`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26025`.
+- The post-PG478 exact split recheck reports `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`. This means the currently implemented
+  exact splitter has no more immediate safe package candidates. The next real
+  work is implementing/splitting new family subpatterns from the blocked
+  reasons, then rebuilding the authoritative queue and exact split.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

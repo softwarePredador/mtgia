@@ -83,6 +83,32 @@ def load_generated_rules() -> dict[str, dict]:
     return decoded if isinstance(decoded, dict) else {}
 
 
+def _trusted_runtime_effect_shape_is_authoritative(row: dict, effect: dict) -> bool:
+    """Return true when Oracle normalization must not rewrite the rule shape."""
+    source = str(row.get("source") or "").lower()
+    review_status = str(row.get("review_status") or "").lower()
+    execution_status = str(row.get("execution_status") or "auto").lower()
+    if source not in {"manual", "curated"}:
+        return False
+    if review_status not in {"verified", "active"}:
+        return False
+    if execution_status not in {"auto", "executable"}:
+        return False
+
+    scope = str(
+        effect.get("battle_model_scope")
+        or effect.get("oracle_runtime_scope")
+        or ""
+    )
+    if scope and scope != "canonical_snapshot_rule_not_runtime_safe":
+        return True
+    if effect.get("_composite_rule_components"):
+        return True
+    if effect.get("xmage_effect_class") or effect.get("xmage_effect_classes"):
+        return True
+    return False
+
+
 def _oracle_normalized_rows(sqlite_db: str | Path | None, rows: list[dict]) -> list[dict]:
     """Keep persisted rule cache aligned with runtime oracle normalization.
 
@@ -113,8 +139,11 @@ def _oracle_normalized_rows(sqlite_db: str | Path | None, rows: list[dict]) -> l
             normalized_rows.append(dict(row))
             continue
         card_name = str(row.get("card_name") or "")
-        card = battle.merge_oracle_metadata({"name": card_name}, oracle_cache)
         effect_before = dict(row.get("effect_json") or {})
+        if _trusted_runtime_effect_shape_is_authoritative(row, effect_before):
+            normalized_rows.append(dict(row))
+            continue
+        card = battle.merge_oracle_metadata({"name": card_name}, oracle_cache)
         effect_after = battle.normalize_effect_by_oracle(card, effect_before)
         review_status = str(row.get("review_status") or "").lower()
         execution_status = str(row.get("execution_status") or "auto").lower()
