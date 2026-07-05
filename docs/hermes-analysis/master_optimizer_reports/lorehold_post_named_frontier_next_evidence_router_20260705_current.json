@@ -1,0 +1,427 @@
+{
+  "artifact_type": "lorehold_post_named_frontier_next_evidence_router",
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "forced_access_allowed_now": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "find_new_nonanchor_same_lane_cut_evidence_not_in_current_hard_blocked_slots",
+      "do_not_mutate_deck_607",
+      "do_not_run_forced_access_or_natural_battle_from_learning_routes",
+      "do_not_retest_exact_plateau_pairs_or_prior_rejected_staples_without_new_trace_evidence"
+    ],
+    "promotion_allowed": false,
+    "reason": "The named same-lane frontier, non-floor probe closure, non-anchor model, and mana integrator all have zero executable rows. The next valid work is learning-only evidence discovery, led by a new nonanchor same-lane cut-evidence scout for the clean-prior topdeck target.",
+    "selected_next_route": "topdeck_new_cut_evidence_scout",
+    "structure_matrix_allowed_now": false
+  },
+  "deck_607_mutated": false,
+  "evidence_routes": [
+    {
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "clean_prior_targets": [
+          {
+            "card_name": "Dragon's Rage Channeler",
+            "model_status": "clean_prior_target_blocked_no_nonanchor_cut",
+            "next_action": "mine_external_or_new_trace_evidence_for_nonanchor_cut",
+            "reviewable_nonanchor_gap_count": 0,
+            "same_lane_slot_count": 6,
+            "seed_safe_nonanchor_count": 0,
+            "top_blocked_same_lane_slots": [
+              {
+                "card_name": "Call Forth the Tempest",
+                "hard_stop_blockers": [
+                  "cut_is_miracle_core_big_spell",
+                  "miracle_or_finisher_core",
+                  "structural_dependency"
+                ],
+                "lane": "spell_velocity",
+                "unique_exposure_count": 8
+              },
+              {
+                "card_name": "Everything Comes to Dust",
+                "hard_stop_blockers": [
+                  "cut_is_miracle_core_big_spell",
+                  "miracle_or_finisher_core",
+                  "structural_dependency"
+                ],
+                "lane": "spell_velocity",
+                "unique_exposure_count": 34
+              },
+              {
+                "card_name": "Hexing Squelcher",
+                "hard_stop_blockers": [
+                  "prior_rejected_cut",
+                  "protected_cut"
+                ],
+                "lane": "contextual",
+                "unique_exposure_count": 93
+              },
+              {
+                "card_name": "Blasphemous Act",
+                "hard_stop_blockers": [
+                  "cut_is_early_mana_floor_support",
+                  "cut_is_miracle_core_big_spell",
+                  "measured_high_cut_exposure",
+                  "miracle_or_finisher_core",
+                  "structural_dependency"
+                ],
+                "lane": "spell_velocity",
+                "unique_exposure_count": 368
+              },
+              {
+                "card_name": "Farewell",
+                "hard_stop_blockers": [
+                  "cut_is_miracle_core_big_spell",
+                  "measured_high_cut_exposure",
+                  "miracle_or_finisher_core",
+                  "structural_dependency"
+                ],
+                "lane": "spell_velocity",
+                "unique_exposure_count": 231
+              },
+              {
+                "card_name": "Starfall Invocation",
+                "hard_stop_blockers": [
+                  "cut_is_miracle_core_big_spell",
+                  "measured_high_cut_exposure",
+                  "miracle_or_finisher_core",
+                  "structural_dependency"
+                ],
+                "lane": "spell_velocity",
+                "unique_exposure_count": 396
+              }
+            ]
+          }
+        ],
+        "collector_cut_safety_blocked_target_count": 5,
+        "prior_reject_targets": [
+          "Penance",
+          "Galvanoth",
+          "Valakut Awakening // Valakut Stoneforge",
+          "Wheel of Fortune"
+        ],
+        "reviewable_nonanchor_gap_count": 0,
+        "seed_safe_nonanchor_count": 0
+      },
+      "execution_allowed_now": false,
+      "learning_allowed_now": true,
+      "natural_battle_allowed_now": false,
+      "next_action": "find_new_nonanchor_same_lane_cut_evidence_not_in_current_hard_blocked_slots",
+      "priority_score": 101,
+      "route_key": "topdeck_new_cut_evidence_scout",
+      "route_status": "learning_scout_primary_clean_prior_target",
+      "why": "Dragon's Rage Channeler is the clean-prior topdeck target, but every same-lane slot is hard-blocked."
+    },
+    {
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "eligible_model_ready_pair_count": 0,
+        "exact_rejected_pair_count": 2,
+        "non_floor_generic_mana_probe_count": 28,
+        "rejected_pairs": [
+          {
+            "add": "Plateau",
+            "cut": "Radiant Summit",
+            "decision_blockers": [
+              "forced_opening_hand_diagnostic_lost_to_607",
+              "natural_smoke_did_not_access_plateau",
+              "natural_smoke_lost_to_607"
+            ],
+            "decision_status": "reject_promotion_keep_607_current_baseline",
+            "next_action": "do_not_retest_exact_pair_without_new_mana_trace_evidence"
+          },
+          {
+            "add": "Plateau",
+            "cut": "Turbulent Steppe",
+            "decision_blockers": [
+              "forced_opening_hand_diagnostic_lost_to_607"
+            ],
+            "decision_status": "reject_promotion_keep_607_current_baseline",
+            "next_action": "do_not_retest_exact_pair_without_new_mana_trace_evidence"
+          }
+        ]
+      },
+      "execution_allowed_now": false,
+      "learning_allowed_now": true,
+      "natural_battle_allowed_now": false,
+      "next_action": "collect_distinct_mana_equivalence_trace_without_retesting_exact_plateau_pairs",
+      "priority_score": 80,
+      "route_key": "mana_trace_evidence_scout",
+      "route_status": "learning_scout_distinct_mana_trace_required",
+      "why": "The exact Plateau pairs are rejected; only materially new mana trace evidence can reopen mana."
+    },
+    {
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "current_best_next_action": "define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate",
+        "current_best_status": "current_best_baseline_synthesis_keep_607",
+        "current_positive_signal_count": 0,
+        "top_deck_is_607": true
+      },
+      "execution_allowed_now": false,
+      "learning_allowed_now": true,
+      "natural_battle_allowed_now": false,
+      "next_action": "define_new_shell_contract_only_if_it_names_floor_metrics_and_cut_evidence",
+      "priority_score": 70,
+      "route_key": "new_shell_contract_scout",
+      "route_status": "learning_scout_new_shell_contract_only",
+      "why": "Current-best requires either a new shell contract or new cut evidence before any battle."
+    },
+    {
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "staples": [
+          {
+            "card_name": "Mana Vault",
+            "commander_legal": true,
+            "game_changer": true,
+            "next_action": "do_not_offer_as_available_deck_change_until_collection_and_new_cut_trace_exist",
+            "owned": false,
+            "promotion_decision": "blocked_prior_gate_rejected",
+            "readiness_status": "blocked_prior_reject"
+          },
+          {
+            "card_name": "The One Ring",
+            "commander_legal": true,
+            "game_changer": true,
+            "next_action": "show_owned_but_blocked_prior_reject_and_require_new_same_lane_trace",
+            "owned": true,
+            "promotion_decision": "blocked_existing_package_rejected",
+            "readiness_status": "blocked_prior_reject"
+          }
+        ]
+      },
+      "execution_allowed_now": false,
+      "learning_allowed_now": false,
+      "natural_battle_allowed_now": false,
+      "next_action": "do_not_retest_staples_until_new_same_lane_cut_and_trace_hypothesis_exists",
+      "priority_score": 40,
+      "route_key": "staple_retest_scout",
+      "route_status": "closed_learning_only_prior_rejects",
+      "why": "Mana Vault and The One Ring remain legal/high-priority ideas, not 607 changes."
+    },
+    {
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "mana_eligible_pair_count": 0,
+        "topdeck_matrix_ready_probe_count": 0
+      },
+      "execution_allowed_now": false,
+      "learning_allowed_now": false,
+      "natural_battle_allowed_now": false,
+      "next_action": "write_structure_matrix_contract_for_frontier_rows_no_battle",
+      "priority_score": 0,
+      "route_key": "structure_matrix_contract_review",
+      "route_status": "closed_no_matrix_ready_rows",
+      "why": "Named frontier has zero topdeck matrix-ready probes and zero eligible mana pairs."
+    }
+  ],
+  "generated_at": "2026-07-05T10:28:15Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "current_best_summary": {
+      "artifact_contract_equal_battle_gate_allowed": true,
+      "artifact_contract_status": "pass",
+      "artifact_count": 972,
+      "current_positive_signal_count": 0,
+      "decision_status": "current_best_baseline_synthesis_keep_607",
+      "floor_trace_cut_blocker_count": 6,
+      "overridden_historical_positive_signal_count": 1,
+      "protected_baseline_rank": 1,
+      "ready_for_real_deck_change_from_artifact_gate": false,
+      "recommended_next_action": "define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate",
+      "sidecar_candidate_deck_materialization_allowed_now": false,
+      "sidecar_matrix_candidate_row_eligible_count": 0,
+      "sidecar_promotion_allowed_now": false,
+      "sidecar_safe_cut_ready_count": 0,
+      "top_deck_is_607": true,
+      "unknown_or_invalid_count": 0,
+      "validation_error_count": 0
+    },
+    "mana_integrator_summary": {
+      "allow_natural_gate_now": false,
+      "eligible_model_ready_pair_count": 0,
+      "exact_rejected_pair_count": 2,
+      "keep_607_as_protected_baseline": true,
+      "loaded_decision_count": 2,
+      "promotion_allowed": false,
+      "safe_model_ready_pair_count": 2
+    },
+    "named_frontier_summary": {
+      "blocked_staple_count": 2,
+      "candidate_deck_materialization_allowed_now": false,
+      "contract_key": "topdeck_access_first_sidecar_shell_contract",
+      "contract_status": "topdeck_access_first_sidecar_contract_written_no_matrix_rows_keep_607",
+      "decision_status": "named_same_lane_cut_frontier_closed_no_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "mana_eligible_pair_count": 0,
+      "mana_exact_rejected_pair_count": 2,
+      "mana_generic_probe_count": 28,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "probe_row_count": 48,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "collect_new_topdeck_floor_or_mana_trace_evidence_before_structure_matrix",
+      "structure_matrix_allowed_now": false,
+      "structure_matrix_contract_allowed_now": false,
+      "topdeck_frontier_target_count": 5,
+      "topdeck_matrix_ready_probe_count": 0
+    },
+    "non_floor_closure_summary": {
+      "blocked_exposed_topdeck_role_probe_count": 20,
+      "blocked_generic_mana_probe_count": 28,
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class_counts": {
+        "closed_exposed_topdeck_role": 20,
+        "closed_generic_mana_probe_route": 28
+      },
+      "current_best_decision_status": "current_best_baseline_synthesis_keep_607",
+      "decision_status": "non_floor_probe_evidence_closure_closed_no_matrix_rows_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "mana_model_eligible_pair_count": 0,
+      "mana_model_exact_rejected_pair_count": 2,
+      "mana_route_status": "mana_route_closed_by_exact_decisions",
+      "missing_inputs": [],
+      "missing_probe_evidence_row_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "non_floor_matrix_candidate_row_eligible_count": 0,
+      "non_floor_probe_count": 48,
+      "non_floor_safe_cut_ready_count": 0,
+      "planner_floor_trace_blocked_probe_count": 0,
+      "planner_floor_trace_cut_blocker_count": 6,
+      "planner_named_probe_count": 48,
+      "probe_evidence_row_count": 48,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate",
+      "status_counts": {
+        "blocked_exposed_topdeck_role_probe": 20,
+        "blocked_generic_mana_probe_not_pair_safe": 28
+      }
+    },
+    "nonanchor_model_summary": {
+      "candidate_deck_materialization_allowed_now": false,
+      "clean_prior_blocked_target_count": 1,
+      "clean_prior_blocked_targets": [
+        "Dragon's Rage Channeler"
+      ],
+      "decision_status": "topdeck_nonanchor_cut_model_none_found_keep_607",
+      "forced_access_allowed_now": false,
+      "microbenchmark_runnable_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "primary_target": "Dragon's Rage Channeler",
+      "primary_target_model_status": "clean_prior_target_blocked_no_nonanchor_cut",
+      "primary_target_same_lane_slot_count": 6,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "collect_new_cut_evidence_or_define_new_shell_contract_before_execution",
+      "reviewable_nonanchor_gap_count": 0,
+      "seed_safe_nonanchor_count": 0,
+      "status_counts": {
+        "clean_prior_target_blocked_no_nonanchor_cut": 1,
+        "prior_reject_target_blocked_no_nonanchor_cut": 4
+      },
+      "structure_matrix_allowed_now": false,
+      "target_card_count": 5
+    },
+    "staple_accessibility_summary": {
+      "cards_reviewed": 2,
+      "deck_action_allowed_now": false,
+      "external_commander_legal_count": 2,
+      "format_staples_gap_count": 1,
+      "game_changer_count": 2,
+      "game_changer_discovery_status": "game_changer_discovery_gap_found_report_only",
+      "hypothesis_queue_natural_gate_ready_count": 0,
+      "hypothesis_queue_status": "lorehold_hypothesis_queue_ready_no_natural_gate",
+      "label_counts": {
+        "rules_accessible_collection_missing_promotion_blocked": 1,
+        "rules_collection_accessible_promotion_blocked": 1
+      },
+      "local_commander_legal_count": 2,
+      "missing_inputs": [],
+      "natural_gate_allowed_now": false,
+      "natural_gate_ready_count": 0,
+      "owned_count": 1,
+      "promotion_allowed_now": false,
+      "promotion_blocked_count": 2,
+      "recommended_next_action": "surface_accessibility_by_layer_and_require_new_cut_trace_before_retesting_staples",
+      "value_priority_ready_replacement_count": 0
+    },
+    "topdeck_collector_summary": {
+      "candidate_deck_materialization_allowed_now": false,
+      "cut_safety_blocked_target_count": 5,
+      "cut_safety_blocked_targets": [
+        "Penance",
+        "Galvanoth",
+        "Dragon's Rage Channeler",
+        "Valakut Awakening // Valakut Stoneforge",
+        "Wheel of Fortune"
+      ],
+      "decision_status": "topdeck_floor_trace_evidence_collected_no_execution_keep_607",
+      "forced_access_allowed_now": false,
+      "microbenchmark_runnable_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "prior_reject_target_count": 4,
+      "prior_reject_targets": [
+        "Penance",
+        "Galvanoth",
+        "Valakut Awakening // Valakut Stoneforge",
+        "Wheel of Fortune"
+      ],
+      "promotion_allowed_now": false,
+      "recommended_next_action": "mine_new_nonanchor_same_lane_cut_models_before_any_trace_execution",
+      "seed_safe_same_lane_count": 0,
+      "status_counts": {
+        "prior_reject_requires_new_same_lane_cut_model": 4,
+        "trace_design_ready_but_cut_safety_blocked": 1
+      },
+      "structure_matrix_allowed_now": false,
+      "target_card_count": 5,
+      "trace_collection_allowed_count": 5
+    }
+  },
+  "source_reports": {
+    "current_best": "docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_non_floor_probe_closure_current.json",
+    "mana_integrator": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current.json",
+    "named_frontier": "docs/hermes-analysis/master_optimizer_reports/lorehold_named_same_lane_cut_frontier_20260705_current.json",
+    "non_floor_closure": "docs/hermes-analysis/master_optimizer_reports/lorehold_non_floor_probe_evidence_closure_20260705_current.json",
+    "nonanchor_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.json",
+    "staple_accessibility": "docs/hermes-analysis/master_optimizer_reports/lorehold_staple_accessibility_freshness_audit_20260705_current.json",
+    "topdeck_collector": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_evidence_collector_20260705_current.json"
+  },
+  "status": "post_named_frontier_next_evidence_router_learning_only_keep_607",
+  "summary": {
+    "candidate_deck_materialization_allowed_now": false,
+    "current_best_top_deck_is_607": true,
+    "current_positive_signal_count": 0,
+    "decision_status": "post_named_frontier_next_evidence_router_learning_only_keep_607",
+    "deck_action_allowed_now": false,
+    "execution_ready_route_count": 0,
+    "forced_access_allowed_now": false,
+    "learning_route_count": 3,
+    "mana_exact_rejected_pair_count": 2,
+    "missing_inputs": [],
+    "named_mana_eligible_pair_count": 0,
+    "named_topdeck_matrix_ready_probe_count": 0,
+    "natural_battle_gate_allowed_now": false,
+    "non_floor_matrix_candidate_row_eligible_count": 0,
+    "non_floor_probe_count": 48,
+    "non_floor_safe_cut_ready_count": 0,
+    "promotion_allowed_now": false,
+    "recommended_next_action": "find_new_nonanchor_same_lane_cut_evidence_not_in_current_hard_blocked_slots",
+    "selected_next_route": "topdeck_new_cut_evidence_scout",
+    "structure_matrix_allowed_now": false,
+    "topdeck_clean_prior_blocked_target_count": 1,
+    "topdeck_cut_safety_blocked_target_count": 5,
+    "topdeck_reviewable_nonanchor_gap_count": 0,
+    "topdeck_seed_safe_nonanchor_count": 0
+  }
+}

@@ -1901,3 +1901,38 @@ Non-floor sidecar probe evidence closure added on 2026-07-05:
   natural battle gate, or promotion under current evidence.
 - Next allowed work:
   `define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate`.
+
+Post-named frontier next-evidence router added on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_post_named_frontier_next_evidence_router_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_post_named_frontier_next_evidence_router_20260705_current.json`.
+- Status:
+  `post_named_frontier_next_evidence_router_learning_only_keep_607`.
+- Scope: consume the non-floor probe closure, named same-lane cut frontier,
+  topdeck floor trace collector, non-anchor cut model miner, mana-base decision
+  integrator, current-best synthesis, and staple accessibility audit.
+- Current facts: non-floor probes `48`, non-floor safe cuts `0`, non-floor
+  matrix rows `0`, named topdeck matrix-ready probes `0`, named mana eligible
+  pairs `0`, topdeck cut-safety blocked targets `5`, topdeck seed-safe
+  non-anchor cuts `0`, topdeck reviewable non-anchor gaps `0`, mana exact
+  rejected pairs `2`, current positive signals `0`, and current-best top deck
+  remains `607`.
+- Selected next route:
+  `topdeck_new_cut_evidence_scout`.
+- Selected target context:
+  `Dragon's Rage Channeler` is the clean-prior topdeck target, but its `6`
+  same-lane slots are currently hard-blocked; this is not a matrix row and not
+  a deck change.
+- Secondary learning routes:
+  `mana_trace_evidence_scout` is allowed only for materially distinct mana
+  equivalence evidence, not exact Plateau-pair retests; `new_shell_contract_scout`
+  is allowed only if it names floor metrics and cut evidence; `staple_retest_scout`
+  remains closed for `Mana Vault` and `The One Ring`.
+- Current gates:
+  execution-ready routes `0`, deck action `false`, structure matrix `false`,
+  candidate materialization `false`, forced access `false`, natural battle gate
+  `false`, and promotion `false`.
+- Next allowed work:
+  `find_new_nonanchor_same_lane_cut_evidence_not_in_current_hard_blocked_slots`.
