@@ -11756,6 +11756,71 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG488 Counter Target Filter Closure
+
+- PG488 extends the existing `CounterTargetEffect` family for stack-spell
+  counterspells whose Oracle target restriction is exact and executable by the
+  ManaLoom counter runtime: colorless spell, nonblue spell, red-or-green spell,
+  multicolored spell, blue instant spell, creature-or-sorcery spell,
+  creature-or-Aura spell, Spirit-or-Arcane spell, and fixed mana-value spell
+  filters.
+- The accepted shape remains narrow: pure `CounterTargetEffect`, no auxiliary
+  XMage ability classes, no `unless`, no modal/multi-target counterspell, and
+  no activated/triggered ability stack targets. Cards such as Disallow,
+  Voidslime, Tale's End, Double Negative, Avoid Fate, Rebuff the Wicked, and
+  target-context counters remain blocked until the stack-ability/targeted-spell
+  runtime can prove those behaviors.
+- Runtime support now understands counter `target_constraints` for `any_of`,
+  spell subtype matching, excluded spell colors, exact/minimum spell color
+  counts, and mana-value filters when those fields live under
+  `target_constraints`. Focused tests cover color, mana-value, multicolor,
+  colorless, nonblue, subtype, and alternative spell-type targets.
+- Two adjacent battle-runtime defects found by the fuller suite were fixed:
+  opening-hand mulligan evaluation no longer treats `stat_modifier_until_eot`
+  combat/protection tricks as proactive board plans, and recursive
+  `return_all_matching` effects now count each participant's graveyard instead
+  of reusing the controller's already-mutated graveyard size. The existing
+  `Open the Vaults` multi-player recursion test proves the latter.
+- The batch covers `12` cards: Ceremonious Rejection, Disdainful Stroke,
+  Flashfreeze, Frazzle, Guttural Response, Hisoka's Defiance, Minor Misstep,
+  Mystic Denial, Neutralizing Blast, Nullify, Spell Snare, and Thoughtbind.
+  The complete list lives in
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg488_counter_target_filters_new_server_manifest.json`
+  under `selected_card_names`.
+- Focused validation passed `765` parser/runtime/package-builder tests,
+  `py_compile` passed for the touched parser/runtime/test/package-builder
+  files, and the full `test_battle_analyst_v10_3.py` suite passed with the
+  live PostgreSQL environment loaded.
+- PostgreSQL package PG488 applied against `143.198.230.247:5433/halder` and
+  promoted `12/12` selected cards as verified/auto rule-version `2` rows with
+  matching Oracle hashes. The apply upserted `12` rows and deprecated `0`
+  shadow rows.
+- Hermes metadata sync matched `5866` PostgreSQL cards, wrote `5777` SQLite
+  cache aliases, updated `93` deck-card ids, and left the known
+  `unresolved=1` residual unchanged. The targeted battle-rule sync loaded `12`
+  PostgreSQL rows, wrote `12` SQLite rows, exported `4682` canonical fallback
+  rows, and refreshed the tracked default canonical snapshot.
+- Generic E2E validation passed across PostgreSQL, SQLite
+  `battle_card_rules`, the default canonical snapshot, and runtime
+  `get_card_effect` for all `12` selected cards. The manifest does not define
+  battle-execution scenarios for this generic family, so scenario execution
+  remains `0`; concrete targeting behavior is covered by focused runtime
+  tests.
+- Final governance audits passed: XMage strategy (`26/26`), operational
+  surface, deckbuilding contract surface, legacy contamination, and
+  PG/Hermes/SQLite contract with live PostgreSQL connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26175`, `xmage_authoritative_source_count=25861`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25861`. This is an exact
+  reduction of `12` from the post-PG487 queue. The counter target work unit
+  fell from `157` to `145`, and the post-PG488 exact split recheck reports
+  `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+- Post-sync global readiness is now `34331` known cards, `4775`
+  `battle_and_oracle_ready`, `29098` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

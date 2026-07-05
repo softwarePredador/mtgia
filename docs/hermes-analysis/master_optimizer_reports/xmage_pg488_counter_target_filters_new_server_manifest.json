@@ -1,0 +1,771 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg488_counter_target_filters_new_server_20260705_065524",
+  "deploy_id": "PG488",
+  "expected_rules": [
+    {
+      "card_name": "Ceremonious Rejection",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:75aa2b94019578c1a570977b25ffa8b7",
+      "min_rule_version": 2,
+      "normalized_name": "ceremonious rejection",
+      "oracle_hash": "86c4b36a4602b7fef40f9b32b77be1cc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "colorless_spell",
+        "target_constraints": {
+          "spell_color_count_exact": 0,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Disdainful Stroke",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:871f97236c26ace8eb5ee7f4e975e0b2",
+      "min_rule_version": 2,
+      "normalized_name": "disdainful stroke",
+      "oracle_hash": "e85808692d47a3eea325bf61cc5d2ab7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_mana_value_4_or_greater",
+        "target_constraints": {
+          "counter_target_mana_value_min": 4,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flashfreeze",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38b0c24e923fb480649bc2980480cec3",
+      "min_rule_version": 2,
+      "normalized_name": "flashfreeze",
+      "oracle_hash": "b7f05c75ef0f7e0ff6131f5359cfc5aa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "red_or_green_spell",
+        "target_constraints": {
+          "spell_colors": [
+            "R",
+            "G"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Frazzle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f5c153fa6cfbfe807eb07d105577c520",
+      "min_rule_version": 2,
+      "normalized_name": "frazzle",
+      "oracle_hash": "6f061044805f2ff186dd32c9ef13ab23",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "nonblue_spell",
+        "target_constraints": {
+          "exclude_spell_colors": [
+            "U"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Guttural Response",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c33dffec2417472a8814c5718ba4239c",
+      "min_rule_version": 2,
+      "normalized_name": "guttural response",
+      "oracle_hash": "9cc0c0327d6926dac941c5850d9b5491",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "blue_instant_spell",
+        "target_constraints": {
+          "spell_colors": [
+            "U"
+          ],
+          "spell_types": [
+            "instant"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hisoka's Defiance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:19294ce266d5922dc7aa3da9f4bfaba9",
+      "min_rule_version": 2,
+      "normalized_name": "hisoka's defiance",
+      "oracle_hash": "0a0040de1fa734a0dc844dd77d193ef4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spirit_or_arcane_spell",
+        "target_constraints": {
+          "spell_subtypes": [
+            "spirit",
+            "arcane"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Minor Misstep",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b1338a74319371dbae47517abb77a17a",
+      "min_rule_version": 2,
+      "normalized_name": "minor misstep",
+      "oracle_hash": "f7bb468ff61c6ca1c1e7a1012b80576b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_mana_value_1_or_less",
+        "target_constraints": {
+          "counter_target_mana_value_max": 1,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mystic Denial",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2e6d06ff5fc9d16d38d700c351007e44",
+      "min_rule_version": 2,
+      "normalized_name": "mystic denial",
+      "oracle_hash": "665c0ef8f444fc500d761bf3b2f3e8d0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "creature_or_sorcery_spell",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ]
+            },
+            {
+              "spell_types": [
+                "sorcery"
+              ]
+            }
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Neutralizing Blast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:985f7945e83075822f54adb39fd77eff",
+      "min_rule_version": 2,
+      "normalized_name": "neutralizing blast",
+      "oracle_hash": "4808f621fd6b39de71f59c6c780c68bf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "multicolored_spell",
+        "target_constraints": {
+          "spell_color_count_min": 2,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nullify",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7597c38a7f6e5f502679e845b6226d1b",
+      "min_rule_version": 2,
+      "normalized_name": "nullify",
+      "oracle_hash": "f8c0431a540bd48c642e2a3ad0fda7a2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "creature_or_aura_spell",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ]
+            },
+            {
+              "spell_subtypes": [
+                "aura"
+              ]
+            }
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spell Snare",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:450824eafd121f5198b3106bef001434",
+      "min_rule_version": 2,
+      "normalized_name": "spell snare",
+      "oracle_hash": "8e0a5121b8126bdf9dce01bbf379376d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_mana_value_2",
+        "target_constraints": {
+          "counter_target_mana_value": 2,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thoughtbind",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a53c11b2fd60dac77624fc7291c3cf11",
+      "min_rule_version": 2,
+      "normalized_name": "thoughtbind",
+      "oracle_hash": "70fb297abb9a4f5f8c0cb7b685bb41de",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_mana_value_4_or_less",
+        "target_constraints": {
+          "counter_target_mana_value_max": 4,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_counter_target_spell": 12
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg488_counter_target_filters_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg488_counter_target_filters_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg488_counter_target_filters_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg488_counter_target_filters_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg488_counter_target_filters_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg488_counter_target_filters_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T06:55:24+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Ceremonious Rejection"
+      },
+      "card_name": "Ceremonious Rejection",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:75aa2b94019578c1a570977b25ffa8b7",
+      "normalized_name": "ceremonious rejection",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "colorless_spell",
+        "target_constraints": {
+          "spell_color_count_exact": 0,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Disdainful Stroke"
+      },
+      "card_name": "Disdainful Stroke",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:871f97236c26ace8eb5ee7f4e975e0b2",
+      "normalized_name": "disdainful stroke",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_mana_value_4_or_greater",
+        "target_constraints": {
+          "counter_target_mana_value_min": 4,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Flashfreeze"
+      },
+      "card_name": "Flashfreeze",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38b0c24e923fb480649bc2980480cec3",
+      "normalized_name": "flashfreeze",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "red_or_green_spell",
+        "target_constraints": {
+          "spell_colors": [
+            "R",
+            "G"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Frazzle"
+      },
+      "card_name": "Frazzle",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f5c153fa6cfbfe807eb07d105577c520",
+      "normalized_name": "frazzle",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "nonblue_spell",
+        "target_constraints": {
+          "exclude_spell_colors": [
+            "U"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Guttural Response"
+      },
+      "card_name": "Guttural Response",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c33dffec2417472a8814c5718ba4239c",
+      "normalized_name": "guttural response",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "blue_instant_spell",
+        "target_constraints": {
+          "spell_colors": [
+            "U"
+          ],
+          "spell_types": [
+            "instant"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hisoka's Defiance"
+      },
+      "card_name": "Hisoka's Defiance",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:19294ce266d5922dc7aa3da9f4bfaba9",
+      "normalized_name": "hisoka's defiance",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spirit_or_arcane_spell",
+        "target_constraints": {
+          "spell_subtypes": [
+            "spirit",
+            "arcane"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Minor Misstep"
+      },
+      "card_name": "Minor Misstep",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b1338a74319371dbae47517abb77a17a",
+      "normalized_name": "minor misstep",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_mana_value_1_or_less",
+        "target_constraints": {
+          "counter_target_mana_value_max": 1,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mystic Denial"
+      },
+      "card_name": "Mystic Denial",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2e6d06ff5fc9d16d38d700c351007e44",
+      "normalized_name": "mystic denial",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "creature_or_sorcery_spell",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ]
+            },
+            {
+              "spell_types": [
+                "sorcery"
+              ]
+            }
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Neutralizing Blast"
+      },
+      "card_name": "Neutralizing Blast",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:985f7945e83075822f54adb39fd77eff",
+      "normalized_name": "neutralizing blast",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "multicolored_spell",
+        "target_constraints": {
+          "spell_color_count_min": 2,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Nullify"
+      },
+      "card_name": "Nullify",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7597c38a7f6e5f502679e845b6226d1b",
+      "normalized_name": "nullify",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "creature_or_aura_spell",
+        "target_constraints": {
+          "any_of": [
+            {
+              "card_types": [
+                "creature"
+              ]
+            },
+            {
+              "spell_subtypes": [
+                "aura"
+              ]
+            }
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Spell Snare"
+      },
+      "card_name": "Spell Snare",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:450824eafd121f5198b3106bef001434",
+      "normalized_name": "spell snare",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_mana_value_2",
+        "target_constraints": {
+          "counter_target_mana_value": 2,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Thoughtbind"
+      },
+      "card_name": "Thoughtbind",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a53c11b2fd60dac77624fc7291c3cf11",
+      "normalized_name": "thoughtbind",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell_mana_value_4_or_less",
+        "target_constraints": {
+          "counter_target_mana_value_max": 4,
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Ceremonious Rejection",
+    "Disdainful Stroke",
+    "Flashfreeze",
+    "Frazzle",
+    "Guttural Response",
+    "Hisoka's Defiance",
+    "Minor Misstep",
+    "Mystic Denial",
+    "Neutralizing Blast",
+    "Nullify",
+    "Spell Snare",
+    "Thoughtbind"
+  ],
+  "selected_count": 12,
+  "slug": "counter_target_filters_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Ceremonious Rejection",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:75aa2b94019578c1a570977b25ffa8b7",
+      "min_rule_version": 2,
+      "normalized_name": "ceremonious rejection",
+      "oracle_hash": "86c4b36a4602b7fef40f9b32b77be1cc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Disdainful Stroke",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:871f97236c26ace8eb5ee7f4e975e0b2",
+      "min_rule_version": 2,
+      "normalized_name": "disdainful stroke",
+      "oracle_hash": "e85808692d47a3eea325bf61cc5d2ab7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flashfreeze",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38b0c24e923fb480649bc2980480cec3",
+      "min_rule_version": 2,
+      "normalized_name": "flashfreeze",
+      "oracle_hash": "b7f05c75ef0f7e0ff6131f5359cfc5aa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Frazzle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f5c153fa6cfbfe807eb07d105577c520",
+      "min_rule_version": 2,
+      "normalized_name": "frazzle",
+      "oracle_hash": "6f061044805f2ff186dd32c9ef13ab23",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Guttural Response",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c33dffec2417472a8814c5718ba4239c",
+      "min_rule_version": 2,
+      "normalized_name": "guttural response",
+      "oracle_hash": "9cc0c0327d6926dac941c5850d9b5491",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hisoka's Defiance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:19294ce266d5922dc7aa3da9f4bfaba9",
+      "min_rule_version": 2,
+      "normalized_name": "hisoka's defiance",
+      "oracle_hash": "0a0040de1fa734a0dc844dd77d193ef4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Minor Misstep",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b1338a74319371dbae47517abb77a17a",
+      "min_rule_version": 2,
+      "normalized_name": "minor misstep",
+      "oracle_hash": "f7bb468ff61c6ca1c1e7a1012b80576b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mystic Denial",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2e6d06ff5fc9d16d38d700c351007e44",
+      "min_rule_version": 2,
+      "normalized_name": "mystic denial",
+      "oracle_hash": "665c0ef8f444fc500d761bf3b2f3e8d0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Neutralizing Blast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:985f7945e83075822f54adb39fd77eff",
+      "min_rule_version": 2,
+      "normalized_name": "neutralizing blast",
+      "oracle_hash": "4808f621fd6b39de71f59c6c780c68bf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nullify",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7597c38a7f6e5f502679e845b6226d1b",
+      "min_rule_version": 2,
+      "normalized_name": "nullify",
+      "oracle_hash": "f8c0431a540bd48c642e2a3ad0fda7a2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spell Snare",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:450824eafd121f5198b3106bef001434",
+      "min_rule_version": 2,
+      "normalized_name": "spell snare",
+      "oracle_hash": "8e0a5121b8126bdf9dce01bbf379376d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thoughtbind",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a53c11b2fd60dac77624fc7291c3cf11",
+      "min_rule_version": 2,
+      "normalized_name": "thoughtbind",
+      "oracle_hash": "70fb297abb9a4f5f8c0cb7b685bb41de",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

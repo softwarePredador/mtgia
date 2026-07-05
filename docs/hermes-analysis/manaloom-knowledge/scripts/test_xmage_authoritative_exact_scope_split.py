@@ -6782,6 +6782,100 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_constraints"]["spell_colors"], ["U"])
         self.assertTrue(effect["requires_blue_target"])
 
+    def test_counter_target_mana_value_spell_maps_to_stack_mana_value_constraints(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+
+        high_value, high_reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target spell with mana value 4 or greater."),
+            source_text="this.getSpellAbility().addEffect(new CounterTargetEffect());",
+        )
+        low_value, low_reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target spell with mana value 1 or less."),
+            source_text="this.getSpellAbility().addEffect(new CounterTargetEffect());",
+        )
+        exact_value, exact_reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target spell with mana value 2."),
+            source_text="this.getSpellAbility().addEffect(new CounterTargetEffect());",
+        )
+
+        self.assertEqual(high_reason, "selected_exact_scope")
+        self.assertEqual(low_reason, "selected_exact_scope")
+        self.assertEqual(exact_reason, "selected_exact_scope")
+        self.assertEqual(high_value["effect_json"]["target"], "spell_mana_value_4_or_greater")
+        self.assertEqual(
+            high_value["effect_json"]["target_constraints"]["counter_target_mana_value_min"],
+            4,
+        )
+        self.assertEqual(
+            low_value["effect_json"]["target_constraints"]["counter_target_mana_value_max"],
+            1,
+        )
+        self.assertEqual(
+            exact_value["effect_json"]["target_constraints"]["counter_target_mana_value"],
+            2,
+        )
+
+    def test_counter_target_extended_color_and_alternative_spell_filters(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        cases = [
+            (
+                "Counter target colorless spell.",
+                "colorless_spell",
+                {"spell_color_count_exact": 0},
+            ),
+            (
+                "Counter target red or green spell.",
+                "red_or_green_spell",
+                {"spell_colors": ["R", "G"]},
+            ),
+            (
+                "Counter target nonblue spell.",
+                "nonblue_spell",
+                {"exclude_spell_colors": ["U"]},
+            ),
+            (
+                "Counter target multicolored spell.",
+                "multicolored_spell",
+                {"spell_color_count_min": 2},
+            ),
+            (
+                "Counter target blue instant spell.",
+                "blue_instant_spell",
+                {"spell_types": ["instant"], "spell_colors": ["U"]},
+            ),
+            (
+                "Counter target creature or sorcery spell.",
+                "creature_or_sorcery_spell",
+                {"any_of": [{"card_types": ["creature"]}, {"spell_types": ["sorcery"]}]},
+            ),
+            (
+                "Counter target creature or Aura spell.",
+                "creature_or_aura_spell",
+                {"any_of": [{"card_types": ["creature"]}, {"spell_subtypes": ["aura"]}]},
+            ),
+            (
+                "Counter target Spirit or Arcane spell.",
+                "spirit_or_arcane_spell",
+                {"spell_subtypes": ["spirit", "arcane"]},
+            ),
+        ]
+
+        for oracle_text, target, expected_fields in cases:
+            with self.subTest(oracle_text=oracle_text):
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(oracle_text=oracle_text),
+                    source_text="this.getSpellAbility().addEffect(new CounterTargetEffect());",
+                )
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["target"], target)
+                for key, value in expected_fields.items():
+                    self.assertEqual(effect["target_constraints"][key], value)
+
     def test_counter_draw_spell_maps_to_counter_runtime_with_draw_on_counter(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

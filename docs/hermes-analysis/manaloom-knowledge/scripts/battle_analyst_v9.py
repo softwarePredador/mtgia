@@ -263,6 +263,7 @@ OPENING_HAND_REACTIVE_EFFECTS = {
     "remove_permanent",
     "silence_opponents",
     "silence_spell",
+    "stat_modifier_until_eot",
 }
 OPENING_HAND_CARD_FLOW_EFFECTS = {
     "draw_cards",
@@ -8826,6 +8827,20 @@ def _counter_target_matches_constraints(counter_effect, target_card, stack_item=
     constraints = _counter_effect_constraints(counter_effect)
     if not constraints:
         return True
+    any_of = constraints.get("any_of")
+    if isinstance(any_of, list) and any_of:
+        base_constraints = dict(constraints)
+        base_constraints.pop("any_of", None)
+        for option in any_of:
+            if not isinstance(option, dict):
+                continue
+            nested_effect = dict(counter_effect or {})
+            nested_constraints = dict(base_constraints)
+            nested_constraints.update(option)
+            nested_effect["target_constraints"] = nested_constraints
+            if _counter_target_matches_constraints(nested_effect, target_card, stack_item=stack_item):
+                return True
+        return False
     expected_stack_object = str(
         constraints.get("stack_object") or constraints.get("stack_object_type") or ""
     ).lower()
@@ -8868,6 +8883,46 @@ def _counter_target_matches_constraints(counter_effect, target_card, stack_item=
     ]
     if spell_colors and not any(_spell_has_color(target_card, color) for color in spell_colors):
         return False
+    excluded_spell_colors = [
+        value
+        for value in _as_list(
+            constraints.get("exclude_spell_colors")
+            or constraints.get("excluded_spell_colors")
+        )
+        if str(value or "").strip()
+    ]
+    if excluded_spell_colors and any(_spell_has_color(target_card, color) for color in excluded_spell_colors):
+        return False
+    spell_subtypes = [
+        str(value or "").strip().lower()
+        for value in _as_list(
+            constraints.get("spell_subtypes")
+            or constraints.get("target_spell_subtypes")
+        )
+        if str(value or "").strip()
+    ]
+    if spell_subtypes and not any(re.search(rf"\b{re.escape(subtype)}\b", type_line) for subtype in spell_subtypes):
+        return False
+    spell_color_count_exact = first_present_value(
+        constraints,
+        ("spell_color_count_exact", "target_spell_color_count_exact"),
+    )
+    if spell_color_count_exact is not None:
+        try:
+            if len(card_color_symbol_set(target_card)) != int(float(spell_color_count_exact)):
+                return False
+        except Exception:
+            return False
+    spell_color_count_min = first_present_value(
+        constraints,
+        ("spell_color_count_min", "target_spell_color_count_min"),
+    )
+    if spell_color_count_min is not None:
+        try:
+            if len(card_color_symbol_set(target_card)) < int(float(spell_color_count_min)):
+                return False
+        except Exception:
+            return False
     return True
 
 
@@ -8884,6 +8939,7 @@ def counter_can_target(counter_card, counter_effect, target_card, stack_item=Non
             return False
     if not _counter_target_matches_constraints(counter_effect, target_card, stack_item=stack_item):
         return False
+    constraints = _counter_effect_constraints(counter_effect)
     target_value = card_mana_value(target_card)
     exact_value = first_present_value(
         counter_effect,
@@ -8894,6 +8950,16 @@ def counter_can_target(counter_card, counter_effect, target_card, stack_item=Non
             "target_mana_value",
         ),
     )
+    if exact_value is None:
+        exact_value = first_present_value(
+            constraints,
+            (
+                "counter_target_cmc",
+                "counter_target_mana_value",
+                "target_cmc",
+                "target_mana_value",
+            ),
+        )
     if exact_value is not None:
         try:
             if target_value != int(float(exact_value)):
@@ -8904,6 +8970,11 @@ def counter_can_target(counter_card, counter_effect, target_card, stack_item=Non
         counter_effect,
         ("counter_target_cmc_max", "counter_target_mana_value_max"),
     )
+    if max_value is None:
+        max_value = first_present_value(
+            constraints,
+            ("counter_target_cmc_max", "counter_target_mana_value_max"),
+        )
     if max_value is not None:
         try:
             if target_value > int(float(max_value)):
@@ -8914,6 +8985,11 @@ def counter_can_target(counter_card, counter_effect, target_card, stack_item=Non
         counter_effect,
         ("counter_target_cmc_min", "counter_target_mana_value_min"),
     )
+    if min_value is None:
+        min_value = first_present_value(
+            constraints,
+            ("counter_target_cmc_min", "counter_target_mana_value_min"),
+        )
     if min_value is not None:
         try:
             if target_value < int(float(min_value)):
@@ -55134,21 +55210,21 @@ def apply_effect_immediate(
             except (TypeError, ValueError):
                 return max(0, int(default or 0))
 
-        def component_count(component_data):
+        def component_count(component_data, participant=None):
             if any(
                 component_data.get(key) or effect_data.get(key)
                 for key in ("count_from_x", "target_count_from_x", "recursion_count_from_x")
             ):
                 return recursion_x_value()
             return (
-                len(player.graveyard)
+                len(getattr(participant or player, "graveyard", []) or [])
                 if return_all_matching or component_data.get("return_all_matching")
                 else int(component_data.get("count") or 2)
             )
 
         def matching_component_candidates(participant, component_data):
             component_target = component_data.get("target")
-            count = component_count(component_data)
+            count = component_count(component_data, participant)
             if component_data.get("shared_subtype_group") == "creature_type" or component_target in (
                 "shared_creature_type",
                 "creature_share_type",
@@ -55221,9 +55297,11 @@ def apply_effect_immediate(
                 or target_controller
             )
             component_participants = recursion_participants(component_target_controller)
-            count = component_count(component_data)
             return sum(
-                min(count, len(matching_component_candidates(participant, component_data)))
+                min(
+                    component_count(component_data, participant),
+                    len(matching_component_candidates(participant, component_data)),
+                )
                 for participant in component_participants
             )
 
@@ -55268,7 +55346,7 @@ def apply_effect_immediate(
                 ] if scored_participants and scored_participants[0][0] > 0 else []
             component_recovered = []
             for participant in component_participants:
-                count = component_count(component_data)
+                count = component_count(component_data, participant)
                 candidates = matching_component_candidates(participant, component_data)
                 participant_recovered = candidates[:count]
                 if participant_recovered:

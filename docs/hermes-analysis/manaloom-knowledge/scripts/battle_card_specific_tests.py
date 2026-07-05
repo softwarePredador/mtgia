@@ -7614,6 +7614,143 @@ def register_tests(battle, player):
             stack_item=uncounterable_stack_item,
         )
 
+    def test_pg488_counter_target_filters_color_mana_value_and_alternative_spell_types():
+        counterspell = {"name": "Fixture Counter", "cmc": 2, "type_line": "Instant", "effect": "counter"}
+        red_spell = {"name": "Red Spell", "cmc": 3, "type_line": "Sorcery", "colors": ["R"]}
+        blue_spell = {"name": "Blue Spell", "cmc": 3, "type_line": "Sorcery", "colors": ["U"]}
+        colorless_spell = {"name": "Colorless Spell", "cmc": 3, "type_line": "Artifact"}
+        multicolor_spell = {"name": "Multicolor Spell", "cmc": 3, "type_line": "Sorcery", "colors": ["R", "G"]}
+        small_spell = {"name": "Small Spell", "cmc": 1, "type_line": "Instant"}
+        large_spell = {"name": "Large Spell", "cmc": 5, "type_line": "Sorcery"}
+        creature_spell = {"name": "Creature Spell", "cmc": 2, "type_line": "Creature - Human"}
+        aura_spell = {"name": "Aura Spell", "cmc": 2, "type_line": "Enchantment - Aura"}
+        arcane_spell = {"name": "Arcane Spell", "cmc": 2, "type_line": "Instant - Arcane"}
+
+        assert battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "exclude_spell_colors": ["U"]},
+            },
+            red_spell,
+        )
+        assert not battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "exclude_spell_colors": ["U"]},
+            },
+            blue_spell,
+        )
+        assert battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "spell_color_count_exact": 0},
+            },
+            colorless_spell,
+        )
+        assert not battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "spell_color_count_exact": 0},
+            },
+            red_spell,
+        )
+        assert battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "spell_color_count_min": 2},
+            },
+            multicolor_spell,
+        )
+        assert not battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "spell_color_count_min": 2},
+            },
+            red_spell,
+        )
+        assert battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "counter_target_mana_value_max": 1},
+            },
+            small_spell,
+        )
+        assert not battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "counter_target_mana_value_max": 1},
+            },
+            large_spell,
+        )
+        assert battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "counter_target_mana_value_min": 4},
+            },
+            large_spell,
+        )
+        assert not battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "counter_target_mana_value_min": 4},
+            },
+            small_spell,
+        )
+        assert battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {
+                    "zone": "stack",
+                    "stack_object": "spell",
+                    "any_of": [{"card_types": ["creature"]}, {"spell_subtypes": ["aura"]}],
+                },
+            },
+            creature_spell,
+        )
+        assert battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {
+                    "zone": "stack",
+                    "stack_object": "spell",
+                    "any_of": [{"card_types": ["creature"]}, {"spell_subtypes": ["aura"]}],
+                },
+            },
+            aura_spell,
+        )
+        assert not battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {
+                    "zone": "stack",
+                    "stack_object": "spell",
+                    "any_of": [{"card_types": ["creature"]}, {"spell_subtypes": ["aura"]}],
+                },
+            },
+            red_spell,
+        )
+        assert battle.counter_can_target(
+            counterspell,
+            {
+                "effect": "counter",
+                "target_constraints": {"zone": "stack", "stack_object": "spell", "spell_subtypes": ["arcane"]},
+            },
+            arcane_spell,
+        )
+
     def test_pg086_removal_targets_filter_nontoken_and_mana_value_max():
         active = player("Active")
         opponent = player("Opponent")
@@ -22044,6 +22181,7 @@ def register_tests(battle, player):
         test_pg241_penance_activates_in_combat_window_and_prevents_matching_damage,
         test_pg241_penance_skips_non_black_red_source,
         test_removal_exile_stack_target_exiles_spell_instead_of_countering_to_graveyard,
+        test_pg488_counter_target_filters_color_mana_value_and_alternative_spell_types,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
         test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,

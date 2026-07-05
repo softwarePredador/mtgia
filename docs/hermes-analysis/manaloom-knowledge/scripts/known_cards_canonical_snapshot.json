@@ -15482,6 +15482,26 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "e72ba4d047bf87f19ddd8ac58e22023b"
   },
+  "Ceremonious Rejection": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "colorless_spell",
+    "target_constraints": {
+      "spell_color_count_exact": 0,
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:75aa2b94019578c1a570977b25ffa8b7",
+    "battle_rule_oracle_hash": "86c4b36a4602b7fef40f9b32b77be1cc"
+  },
   "Cerodon Yearling": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -23667,6 +23687,26 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ad0e12aa20654aba517d10e9f36ba5b6",
     "battle_rule_oracle_hash": "dd733152b1ce5fa027f45c97120115b1"
+  },
+  "Disdainful Stroke": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "spell_mana_value_4_or_greater",
+    "target_constraints": {
+      "counter_target_mana_value_min": 4,
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:871f97236c26ace8eb5ee7f4e975e0b2",
+    "battle_rule_oracle_hash": "e85808692d47a3eea325bf61cc5d2ab7"
   },
   "Disembowel": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -33631,6 +33671,29 @@
     "battle_rule_logical_key": "battle_rule_v1:58ec521613d70df5f7b79b6cbc2b32c1",
     "battle_rule_oracle_hash": "b98455d25c208a3be3b31d671d3f0e66"
   },
+  "Flashfreeze": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "red_or_green_spell",
+    "target_constraints": {
+      "spell_colors": [
+        "R",
+        "G"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:38b0c24e923fb480649bc2980480cec3",
+    "battle_rule_oracle_hash": "b7f05c75ef0f7e0ff6131f5359cfc5aa"
+  },
   "Flatten": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
     "duration": "until_end_of_turn",
@@ -36000,6 +36063,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:407c00ea22d8d464227c70de26296d76",
     "battle_rule_oracle_hash": "09ffa0d8ec70053635a1ed0269ad9a16"
+  },
+  "Frazzle": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "nonblue_spell",
+    "target_constraints": {
+      "exclude_spell_colors": [
+        "U"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f5c153fa6cfbfe807eb07d105577c520",
+    "battle_rule_oracle_hash": "6f061044805f2ff186dd32c9ef13ab23"
   },
   "Freed from the Real": {
     "effect": "ramp_engine",
@@ -42021,6 +42106,31 @@
     "battle_rule_logical_key": "battle_rule_v1:5b634b726647d3bd833233759968be5a",
     "battle_rule_oracle_hash": "f80fdc6153bf00a2198027bfa8b326db"
   },
+  "Guttural Response": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "blue_instant_spell",
+    "target_constraints": {
+      "spell_colors": [
+        "U"
+      ],
+      "spell_types": [
+        "instant"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c33dffec2417472a8814c5718ba4239c",
+    "battle_rule_oracle_hash": "9cc0c0327d6926dac941c5850d9b5491"
+  },
   "Gyre Engineer": {
     "activation_requires_tap": true,
     "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
@@ -44430,6 +44540,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2850ce96f84583b510eac2c0ad840fa3",
     "battle_rule_oracle_hash": "13cecae816b64406aa3f621ad48976b3"
+  },
+  "Hisoka's Defiance": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "spirit_or_arcane_spell",
+    "target_constraints": {
+      "spell_subtypes": [
+        "spirit",
+        "arcane"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:19294ce266d5922dc7aa3da9f4bfaba9",
+    "battle_rule_oracle_hash": "0a0040de1fa734a0dc844dd77d193ef4"
   },
   "Hissing Quagmire": {
     "effect": "land",
@@ -57660,6 +57793,26 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "b53b531328897d8a89134189b8bdaa8f"
   },
+  "Minor Misstep": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "spell_mana_value_1_or_less",
+    "target_constraints": {
+      "counter_target_mana_value_max": 1,
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b1338a74319371dbae47517abb77a17a",
+    "battle_rule_oracle_hash": "f7bb468ff61c6ca1c1e7a1012b80576b"
+  },
   "Minotaur Aggressor": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -60405,6 +60558,37 @@
     "battle_rule_logical_key": "battle_rule_v1:3c4db60dba5c37274fb77c3905514ca6",
     "battle_rule_oracle_hash": "0aea80511565148ed65fe30ed2e392b3"
   },
+  "Mystic Denial": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_or_sorcery_spell",
+    "target_constraints": {
+      "any_of": [
+        {
+          "card_types": [
+            "creature"
+          ]
+        },
+        {
+          "spell_types": [
+            "sorcery"
+          ]
+        }
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2e6d06ff5fc9d16d38d700c351007e44",
+    "battle_rule_oracle_hash": "665c0ef8f444fc500d761bf3b2f3e8d0"
+  },
   "Mystic Forge": {
     "effect": "topdeck_manipulation",
     "battle_rule_source": "curated",
@@ -61527,6 +61711,26 @@
     "battle_rule_logical_key": "battle_rule_v1:cd5f769f19b180ce4a560d21eb27f76b",
     "battle_rule_oracle_hash": "5513aef42481c662aaeeee3a98d5227a"
   },
+  "Neutralizing Blast": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "multicolored_spell",
+    "target_constraints": {
+      "spell_color_count_min": 2,
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:985f7945e83075822f54adb39fd77eff",
+    "battle_rule_oracle_hash": "4808f621fd6b39de71f59c6c780c68bf"
+  },
   "Neverwinter Dryad": {
     "_activated_rule_effects": [
       {
@@ -62422,6 +62626,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:94025e3fa5486dc829156d669dbea3fc",
     "battle_rule_oracle_hash": "d097583f36035e918a71948687c1b8f4"
+  },
+  "Nullify": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_or_aura_spell",
+    "target_constraints": {
+      "any_of": [
+        {
+          "card_types": [
+            "creature"
+          ]
+        },
+        {
+          "spell_subtypes": [
+            "aura"
+          ]
+        }
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7597c38a7f6e5f502679e845b6226d1b",
+    "battle_rule_oracle_hash": "f8c0431a540bd48c642e2a3ad0fda7a2"
   },
   "Nurturing Peatland": {
     "effect": "land",
@@ -80883,9 +81118,7 @@
     "battle_rule_confidence": 0.97,
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7",
-    "battle_rule_oracle_hash": "ccd492289c6f1c14c8fb7a248d7bbf32",
-    "pg058_l3b_simple_red_ritual_family": "deck6_simple_red_rituals",
-    "mana_color_status": "abstracted_to_generic_pool_runtime"
+    "battle_rule_oracle_hash": "ccd492289c6f1c14c8fb7a248d7bbf32"
   },
   "Segovian Angel": {
     "_keywords_are_self": true,
@@ -87206,6 +87439,26 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:4c4f4dc3409b8b13423f2939f1a2c488",
     "battle_rule_oracle_hash": "f657ad73b97962b41b932ebf17bb6e47"
+  },
+  "Spell Snare": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "spell_mana_value_2",
+    "target_constraints": {
+      "counter_target_mana_value": 2,
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:450824eafd121f5198b3106bef001434",
+    "battle_rule_oracle_hash": "8e0a5121b8126bdf9dce01bbf379376d"
   },
   "Spellgorger Weird": {
     "ability_kind": "triggered",
@@ -95241,6 +95494,26 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:93ac5946d2f83cec409a2892520f26d0",
     "battle_rule_oracle_hash": "ff80b35ee08bb1b68ec7c0be24d6eaaa"
+  },
+  "Thoughtbind": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "spell_mana_value_4_or_less",
+    "target_constraints": {
+      "counter_target_mana_value_max": 4,
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a53c11b2fd60dac77624fc7291c3cf11",
+    "battle_rule_oracle_hash": "70fb297abb9a4f5f8c0cb7b685bb41de"
   },
   "Thoughtcast": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",

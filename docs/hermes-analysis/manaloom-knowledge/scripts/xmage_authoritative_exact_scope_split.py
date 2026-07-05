@@ -1498,10 +1498,27 @@ def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | Non
 
 def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     text = oracle_text(metadata)
+    mana_value_patterns: list[tuple[str, str]] = [
+        (r"^counter target spell with mana value (?P<value>\d+) or greater\.?$", "spell_mana_value_{value}_or_greater"),
+        (r"^counter target spell with mana value (?P<value>\d+) or less\.?$", "spell_mana_value_{value}_or_less"),
+        (r"^counter target spell with mana value (?P<value>\d+)\.?$", "spell_mana_value_{value}"),
+    ]
+    for pattern, target_template in mana_value_patterns:
+        match = re.match(pattern, text)
+        if match:
+            return target_template.format(value=int(match.group("value")))
     patterns: list[tuple[str, str]] = [
+        (r"^counter target red or green spell\.?$", "red_or_green_spell"),
+        (r"^counter target blue instant spell\.?$", "blue_instant_spell"),
+        (r"^counter target creature or sorcery spell\.?$", "creature_or_sorcery_spell"),
+        (r"^counter target creature or aura spell\.?$", "creature_or_aura_spell"),
+        (r"^counter target spirit or arcane spell\.?$", "spirit_or_arcane_spell"),
         (r"^counter target artifact or enchantment spell\.?$", "artifact_or_enchantment_spell"),
         (r"^counter target instant or sorcery spell\.?$", "instant_or_sorcery_spell"),
         (r"^counter target noncreature spell\.?$", "noncreature_spell"),
+        (r"^counter target colorless spell\.?$", "colorless_spell"),
+        (r"^counter target nonblue spell\.?$", "nonblue_spell"),
+        (r"^counter target multicolored spell\.?$", "multicolored_spell"),
         (r"^counter target creature spell\.?$", "creature_spell"),
         (r"^counter target artifact spell\.?$", "artifact_spell"),
         (r"^counter target enchantment spell\.?$", "enchantment_spell"),
@@ -1529,12 +1546,45 @@ def counter_draw_target_from_oracle(metadata: dict[str, Any]) -> str | None:
 
 def counter_target_constraints_for(target: str) -> dict[str, Any]:
     constraints: dict[str, Any] = {"zone": "stack", "stack_object": "spell"}
-    if target == "artifact_or_enchantment_spell":
+    mana_value_match = re.match(r"^spell_mana_value_(?P<value>\d+)(?P<op>_or_greater|_or_less)?$", target)
+    if mana_value_match:
+        value = int(mana_value_match.group("value"))
+        op = mana_value_match.group("op") or ""
+        if op == "_or_greater":
+            constraints["counter_target_mana_value_min"] = value
+        elif op == "_or_less":
+            constraints["counter_target_mana_value_max"] = value
+        else:
+            constraints["counter_target_mana_value"] = value
+    elif target == "red_or_green_spell":
+        constraints["spell_colors"] = ["R", "G"]
+    elif target == "blue_instant_spell":
+        constraints["spell_types"] = ["instant"]
+        constraints["spell_colors"] = ["U"]
+    elif target == "creature_or_sorcery_spell":
+        constraints["any_of"] = [
+            {"card_types": ["creature"]},
+            {"spell_types": ["sorcery"]},
+        ]
+    elif target == "creature_or_aura_spell":
+        constraints["any_of"] = [
+            {"card_types": ["creature"]},
+            {"spell_subtypes": ["aura"]},
+        ]
+    elif target == "spirit_or_arcane_spell":
+        constraints["spell_subtypes"] = ["spirit", "arcane"]
+    elif target == "artifact_or_enchantment_spell":
         constraints["card_types"] = ["artifact", "enchantment"]
     elif target == "instant_or_sorcery_spell":
         constraints["spell_types"] = ["instant", "sorcery"]
     elif target == "noncreature_spell":
         constraints["exclude_card_types"] = ["creature"]
+    elif target == "colorless_spell":
+        constraints["spell_color_count_exact"] = 0
+    elif target == "nonblue_spell":
+        constraints["exclude_spell_colors"] = ["U"]
+    elif target == "multicolored_spell":
+        constraints["spell_color_count_min"] = 2
     elif target in {"creature_spell", "artifact_spell", "enchantment_spell"}:
         constraints["card_types"] = [target.removesuffix("_spell")]
     elif target in {"instant_spell", "sorcery_spell"}:
