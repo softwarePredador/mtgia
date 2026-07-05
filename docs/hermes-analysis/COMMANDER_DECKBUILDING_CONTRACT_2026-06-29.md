@@ -288,16 +288,22 @@ Operational priority after this pivot:
    lane without deck action, and if no value-safe cut pair exists it must route
    to mining a fresh value-safe cut source before package resynthesis;
 32. run `global_commander_value_safe_cut_source_miner.py` after post-forced
-   recovery routes to a fresh cut source; it may mine hypotheses from the
-   current deck, but fresh hypotheses are not value-safe cuts until trace,
-   same-lane, or equal-gate proof is collected;
+    recovery routes to a fresh cut source; it may mine hypotheses from the
+    current deck, but fresh hypotheses are not value-safe cuts until trace,
+    same-lane, or equal-gate proof is collected;
 33. run `global_commander_cut_source_hypothesis_trace_collector.py` after fresh
-   hypotheses exist; it must reuse current replay artifacts first, count only
-   target-deck usage, and keep candidate copy closed when a hypothesis was used
-   or only seen without a negative proof;
-34. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
-   probes, as regression evidence only unless they produce a named safe cut and
-   equal-gate proof under the Lorehold promotion gate.
+    hypotheses exist; it must reuse current replay artifacts first, count only
+    target-deck usage, and keep candidate copy closed when a hypothesis was used
+    or only seen without a negative proof;
+34. run `global_commander_cut_hypothesis_same_lane_proof.py` after fresh
+    hypothesis trace collection blocks value-safe reclassification; it must
+    compare used/seen hypotheses against explicit package add axes, treat
+    profile-role overlap as incidental unless the add covers that lane, and
+    route to more cut-source mining or external cut research when no explicit
+    same-lane route exists;
+35. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+    probes, as regression evidence only unless they produce a named safe cut and
+    equal-gate proof under the Lorehold promotion gate.
 
 Current pivot evidence:
 
@@ -347,6 +353,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -767,6 +774,15 @@ Current external refresh on 2026-07-05:
   traces without usage and still require negative review. The next gate is
   `mine_more_hypotheses_or_build_same_lane_proof`; candidate copy, battle,
   promotion, and value-safe reclassification remain closed.
+- Current cut-hypothesis same-lane proof returns
+  `cut_hypothesis_same_lane_proof_routes_to_more_mining` with
+  `explicit_same_lane_route_count=0`, `incidental_role_overlap_count=9`, and
+  `package_explicit_add_axes=["angels_demons_dragons_payoffs"]`. The payoff
+  package does not explicitly replace draw, reanimation, equipment, or
+  off-profile hypothesis lanes, so no mined hypothesis becomes value-safe. The
+  next gate is `mine_more_hypotheses_or_external_cut_source_research`;
+  candidate copy, battle, promotion, and value-safe reclassification remain
+  closed.
 
 ## Global Commander Rollout - 2026-07-01
 

@@ -131,6 +131,12 @@ hypotheses. If it returns `cut_source_hypothesis_trace_blocks_used_hypotheses`,
 the used hypotheses are not value-safe cuts; rows merely seen in decision trace
 need manual negative review or force-access before reclassification.
 
+After that blocker, run `global_commander_cut_hypothesis_same_lane_proof.py`.
+It compares mined hypotheses against the current package's explicit add axes,
+not incidental profile-role overlap. When no explicit same-lane route exists,
+candidate copy, battle, promotion, and value-safe reclassification stay closed
+and the next work is more cut-source mining or external cut research.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

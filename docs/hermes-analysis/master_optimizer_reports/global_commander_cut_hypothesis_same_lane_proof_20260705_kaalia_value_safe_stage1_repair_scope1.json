@@ -1,0 +1,416 @@
+{
+  "artifact_type": "global_commander_cut_hypothesis_same_lane_proof",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "usage_blocked_hypotheses:Biotransference,Maskwood Nexus,Necromancy,Necropotence,Sigarda's Aid,Sram, Senior Edificer",
+    "seen_without_usage_requires_negative_review:Puresteel Paladin,Trouble in Pairs",
+    "no_explicit_same_lane_route_for_usage_blocked_hypotheses",
+    "candidate_copy_closed_until_hypothesis_has_negative_trace_or_explicit_same_lane_equal_gate"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T22:39:10.001219+00:00",
+  "hypothesis_same_lane_rows": [
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Biotransference",
+      "cut_roles": [],
+      "decision": "blocked_no_explicit_same_lane_route_for_used_hypothesis",
+      "decision_trace_count": 15,
+      "exposure_event_count": 11,
+      "incidental_role_overlaps": [],
+      "required_next_evidence": [
+        "mine_more_value_safe_cut_hypotheses",
+        "expand_external_or_internal_cut_source_research",
+        "do_not_reclassify_used_hypothesis_as_value_safe"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "source_reasons": [
+        "off_profile_or_unclassified_slot",
+        "no_runtime_cut_risk_flag",
+        "higher_curve_cut_pressure"
+      ],
+      "source_score": 60,
+      "trace_group": "usage_blocked",
+      "trace_status": "hypothesis_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 1,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Maskwood Nexus",
+      "cut_roles": [],
+      "decision": "blocked_no_explicit_same_lane_route_for_used_hypothesis",
+      "decision_trace_count": 3,
+      "exposure_event_count": 0,
+      "incidental_role_overlaps": [],
+      "required_next_evidence": [
+        "mine_more_value_safe_cut_hypotheses",
+        "expand_external_or_internal_cut_source_research",
+        "do_not_reclassify_used_hypothesis_as_value_safe"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "source_reasons": [
+        "off_profile_or_unclassified_slot",
+        "no_runtime_cut_risk_flag",
+        "higher_curve_cut_pressure"
+      ],
+      "source_score": 60,
+      "trace_group": "usage_blocked",
+      "trace_status": "hypothesis_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 4,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Necromancy",
+      "cut_roles": [
+        "reanimation_plan_b"
+      ],
+      "decision": "blocked_no_explicit_same_lane_route_for_used_hypothesis",
+      "decision_trace_count": 30,
+      "exposure_event_count": 21,
+      "incidental_role_overlaps": [],
+      "required_next_evidence": [
+        "mine_more_value_safe_cut_hypotheses",
+        "expand_external_or_internal_cut_source_research",
+        "do_not_reclassify_used_hypothesis_as_value_safe"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "source_reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "source_score": 38,
+      "trace_group": "usage_blocked",
+      "trace_status": "hypothesis_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 8,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Necropotence",
+      "cut_roles": [
+        "card_draw_selection",
+        "reanimation_plan_b"
+      ],
+      "decision": "blocked_no_explicit_same_lane_route_for_used_hypothesis",
+      "decision_trace_count": 3,
+      "exposure_event_count": 0,
+      "incidental_role_overlaps": [
+        {
+          "add_card": "Dragon Mage",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "card_draw_selection"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "card_draw_selection"
+          ],
+          "score": 98,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_hypothesis_role_overlap_not_same_lane_proof"
+        },
+        {
+          "add_card": "The Balrog of Moria",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "card_draw_selection"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "card_draw_selection",
+            "haste_protection_silence",
+            "mana_acceleration"
+          ],
+          "score": 96,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_hypothesis_role_overlap_not_same_lane_proof"
+        }
+      ],
+      "required_next_evidence": [
+        "mine_more_value_safe_cut_hypotheses",
+        "expand_external_or_internal_cut_source_research",
+        "do_not_reclassify_used_hypothesis_as_value_safe"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "source_reasons": [],
+      "source_score": 30,
+      "trace_group": "usage_blocked",
+      "trace_status": "hypothesis_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 4,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Puresteel Paladin",
+      "cut_roles": [
+        "card_draw_selection"
+      ],
+      "decision": "blocked_seen_without_usage_needs_negative_or_force_access_review",
+      "decision_trace_count": 1,
+      "exposure_event_count": 0,
+      "incidental_role_overlaps": [
+        {
+          "add_card": "Dragon Mage",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "card_draw_selection"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "card_draw_selection"
+          ],
+          "score": 98,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_hypothesis_role_overlap_not_same_lane_proof"
+        },
+        {
+          "add_card": "The Balrog of Moria",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "card_draw_selection"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "card_draw_selection",
+            "haste_protection_silence",
+            "mana_acceleration"
+          ],
+          "score": 96,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_hypothesis_role_overlap_not_same_lane_proof"
+        }
+      ],
+      "required_next_evidence": [
+        "manual_negative_trace_review_or_force_access",
+        "prove_nonuse_was_structural_before_reclassification",
+        "keep_candidate_copy_closed"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "source_reasons": [
+        "format_staple_reviewable_needs_extra_trace"
+      ],
+      "source_score": 24,
+      "trace_group": "seen_without_usage",
+      "trace_status": "hypothesis_seen_without_usage_needs_negative_review",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Sigarda's Aid",
+      "cut_roles": [],
+      "decision": "blocked_no_explicit_same_lane_route_for_used_hypothesis",
+      "decision_trace_count": 13,
+      "exposure_event_count": 27,
+      "incidental_role_overlaps": [],
+      "required_next_evidence": [
+        "mine_more_value_safe_cut_hypotheses",
+        "expand_external_or_internal_cut_source_research",
+        "do_not_reclassify_used_hypothesis_as_value_safe"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "source_reasons": [
+        "off_profile_or_unclassified_slot",
+        "no_runtime_cut_risk_flag"
+      ],
+      "source_score": 54,
+      "trace_group": "usage_blocked",
+      "trace_status": "hypothesis_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 16,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Sram, Senior Edificer",
+      "cut_roles": [
+        "card_draw_selection"
+      ],
+      "decision": "blocked_no_explicit_same_lane_route_for_used_hypothesis",
+      "decision_trace_count": 14,
+      "exposure_event_count": 22,
+      "incidental_role_overlaps": [
+        {
+          "add_card": "Dragon Mage",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "card_draw_selection"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "card_draw_selection"
+          ],
+          "score": 98,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_hypothesis_role_overlap_not_same_lane_proof"
+        },
+        {
+          "add_card": "The Balrog of Moria",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "card_draw_selection"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "card_draw_selection",
+            "haste_protection_silence",
+            "mana_acceleration"
+          ],
+          "score": 96,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_hypothesis_role_overlap_not_same_lane_proof"
+        }
+      ],
+      "required_next_evidence": [
+        "mine_more_value_safe_cut_hypotheses",
+        "expand_external_or_internal_cut_source_research",
+        "do_not_reclassify_used_hypothesis_as_value_safe"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "source_reasons": [
+        "format_staple_reviewable_needs_extra_trace"
+      ],
+      "source_score": 24,
+      "trace_group": "usage_blocked",
+      "trace_status": "hypothesis_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 6,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Trouble in Pairs",
+      "cut_roles": [
+        "card_draw_selection",
+        "dedicated_win_conditions"
+      ],
+      "decision": "blocked_seen_without_usage_needs_negative_or_force_access_review",
+      "decision_trace_count": 3,
+      "exposure_event_count": 0,
+      "incidental_role_overlaps": [
+        {
+          "add_card": "Dragon Mage",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "card_draw_selection"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "card_draw_selection"
+          ],
+          "score": 98,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_hypothesis_role_overlap_not_same_lane_proof"
+        },
+        {
+          "add_card": "The Balrog of Moria",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "card_draw_selection"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "card_draw_selection",
+            "haste_protection_silence",
+            "mana_acceleration"
+          ],
+          "score": 96,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_hypothesis_role_overlap_not_same_lane_proof"
+        },
+        {
+          "add_card": "Wrathful Red Dragon",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "dedicated_win_conditions"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "dedicated_win_conditions"
+          ],
+          "score": 96,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_hypothesis_role_overlap_not_same_lane_proof"
+        }
+      ],
+      "required_next_evidence": [
+        "manual_negative_trace_review_or_force_access",
+        "prove_nonuse_was_structural_before_reclassification",
+        "keep_candidate_copy_closed"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "source_reasons": [
+        "higher_curve_cut_pressure",
+        "format_staple_reviewable_needs_extra_trace"
+      ],
+      "source_score": 30,
+      "trace_group": "seen_without_usage",
+      "trace_status": "hypothesis_seen_without_usage_needs_negative_review",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "input_artifacts": {
+    "miner_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "package_synthesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "trace_collector_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "incidental_overlap_boundary": "Shared profile_roles on a payoff card are incidental overlap, not value-safe cut proof.",
+    "mutation_boundary": "This proof model does not copy decks, mutate DBs, run battles, reclassify cuts, or open promotion.",
+    "same_lane_boundary": "Only package add covered_axes or selected_for_axis create an explicit same-lane route.",
+    "trace_boundary": "Used hypotheses stay blocked; seen-without-usage hypotheses still need negative review or force-access."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "same_lane_replacement_proof_allowed_now": false,
+  "source_db_mutated": false,
+  "status": "cut_hypothesis_same_lane_proof_routes_to_more_mining",
+  "summary": {
+    "candidate_copy_blocker_count": 4,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "explicit_same_lane_route_count": 0,
+    "hypothesis_count": 8,
+    "incidental_role_overlap_count": 9,
+    "next_gate": "mine_more_hypotheses_or_external_cut_source_research",
+    "not_seen_count": 0,
+    "package_add_count": 6,
+    "package_explicit_add_axes": [
+      "angels_demons_dragons_payoffs"
+    ],
+    "seen_without_usage_count": 2,
+    "usage_blocked_hypothesis_count": 6
+  },
+  "value_safe_reclassification_allowed_now": false
+}

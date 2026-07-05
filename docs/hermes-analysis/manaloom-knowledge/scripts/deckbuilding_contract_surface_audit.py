@@ -144,6 +144,12 @@ GLOBAL_COMMANDER_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR = (
 GLOBAL_COMMANDER_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR_TEST = (
     SCRIPT_DIR / "test_global_commander_cut_source_hypothesis_trace_collector.py"
 )
+GLOBAL_COMMANDER_CUT_HYPOTHESIS_SAME_LANE_PROOF = (
+    SCRIPT_DIR / "global_commander_cut_hypothesis_same_lane_proof.py"
+)
+GLOBAL_COMMANDER_CUT_HYPOTHESIS_SAME_LANE_PROOF_TEST = (
+    SCRIPT_DIR / "test_global_commander_cut_hypothesis_same_lane_proof.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -349,6 +355,10 @@ GLOBAL_COMMANDER_SCOPE1_VALUE_SAFE_CUT_SOURCE_MINER_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_CUT_HYPOTHESIS_SAME_LANE_PROOF_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -662,6 +672,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "cut_source_hypothesis_trace_blocks_used_hypotheses",
                 "mine_more_hypotheses_or_build_same_lane_proof",
+                "global_commander_cut_hypothesis_same_lane_proof.py",
+                "global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "cut_hypothesis_same_lane_proof_routes_to_more_mining",
+                "mine_more_hypotheses_or_external_cut_source_research",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -914,6 +928,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "usage_blocked_hypothesis_count=6",
                 "mine_more_hypotheses_or_build_same_lane_proof",
+                "global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "explicit_same_lane_route_count=0",
+                "incidental_role_overlap_count=9",
+                "mine_more_hypotheses_or_external_cut_source_research",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1502,6 +1520,35 @@ def build_audit() -> dict[str, Any]:
                 "Maskwood Nexus",
                 "cut_source_hypothesis_trace_blocks_used_hypotheses",
                 "expand_replay_window_or_force_access_for_unseen_hypotheses",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CUT_HYPOTHESIS_SAME_LANE_PROOF,
+            [
+                "global_commander_cut_hypothesis_same_lane_proof",
+                "cut_hypothesis_same_lane_proof_routes_to_more_mining",
+                "cut_hypothesis_same_lane_proof_needs_explicit_evidence",
+                "incidental_hypothesis_role_overlap_not_same_lane_proof",
+                "Only package add covered_axes or selected_for_axis create an explicit same-lane route.",
+                "mine_more_hypotheses_or_external_cut_source_research",
+                "value_safe_reclassification_allowed_now",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CUT_HYPOTHESIS_SAME_LANE_PROOF_TEST,
+            [
+                "test_incidental_profile_overlap_does_not_create_same_lane_route",
+                "test_explicit_same_lane_route_still_requires_proof_before_copy",
+                "test_seen_without_usage_requires_negative_review_without_copy",
+                "Dragon Mage",
+                "Dedicated Draw Replacement",
+                "cut_hypothesis_same_lane_proof_routes_to_more_mining",
+                "manual_negative_review_or_force_access_for_seen_hypotheses",
             ],
         )
     )
@@ -2339,6 +2386,28 @@ def build_audit() -> dict[str, Any]:
                 "Biotransference",
                 "Trouble in Pairs",
                 "Puresteel Paladin",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_CUT_HYPOTHESIS_SAME_LANE_PROOF_REPORT,
+            [
+                "Global Commander Cut-Hypothesis Same-Lane Proof",
+                "cut_hypothesis_same_lane_proof_routes_to_more_mining",
+                "hypothesis_count: `8`",
+                "usage_blocked_hypothesis_count: `6`",
+                "seen_without_usage_count: `2`",
+                "not_seen_count: `0`",
+                "explicit_same_lane_route_count: `0`",
+                "incidental_role_overlap_count: `9`",
+                "package_explicit_add_axes: `angels_demons_dragons_payoffs`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "mine_more_hypotheses_or_external_cut_source_research",
+                "Biotransference",
+                "Necropotence",
+                "Trouble in Pairs",
             ],
         )
     )

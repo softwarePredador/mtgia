@@ -558,6 +558,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `not_seen_count=0`; `Biotransference`, `Maskwood Nexus`, `Sigarda's Aid`,
     `Necromancy`, `Necropotence` e `Sram, Senior Edificer` foram usados pelo deck
     alvo. Proximo gate: `mine_more_hypotheses_or_build_same_lane_proof`.
+    O proof de mesma lane foi executado por
+    `global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `explicit_same_lane_route_count=0`,
+    `incidental_role_overlap_count=9` e
+    `package_explicit_add_axes=angels_demons_dragons_payoffs`. As sobreposicoes
+    de card draw/dedicated win em payoffs como `Dragon Mage` ou
+    `The Balrog of Moria` sao incidentais porque o pacote foi selecionado para
+    cobrir payoffs Angel/Demon/Dragon, nao para substituir as lanes de corte.
+    Proximo gate: `mine_more_hypotheses_or_external_cut_source_research`;
+    candidate copy, battle, promocao e reclassificacao value-safe seguem
+    fechados.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
