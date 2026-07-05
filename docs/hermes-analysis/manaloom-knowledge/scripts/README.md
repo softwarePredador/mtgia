@@ -62,6 +62,14 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_
 
 The default harness also resolves to v9.
 
+## Commander Deckbuilding Gates
+
+After `global_commander_stage_only_cut_evidence_plan.py` names contextual
+stage-only cuts, run `global_commander_contextual_stage_cut_evidence_collector.py`
+before any value-safe reclassification. The collector is read-only: it records
+current deck context, local format-staple context, and missing usage/same-lane
+or replay proof. It must keep candidate copy, battle, and promotion closed.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

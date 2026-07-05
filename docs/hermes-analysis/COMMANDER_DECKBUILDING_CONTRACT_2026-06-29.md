@@ -246,7 +246,12 @@ Operational priority after this pivot:
    adds; it may open only the strongest smaller paired scope in an isolated DB
    copy, preferring a scope that closes a whole blocker axis, while keeping the
    original full package, battle, and promotion closed;
-23. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+23. run `global_commander_contextual_stage_cut_evidence_collector.py` after
+   `global_commander_stage_only_cut_evidence_plan.py` names contextual staple
+   cuts; it must inspect current deck context, local format-staple context, and
+   missing usage/same-lane/replay proof, but it must not reclassify a cut,
+   materialize a candidate, run battle, or promote a package;
+24. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -286,6 +291,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -596,6 +602,16 @@ Current external refresh on 2026-07-05:
   `contextual_staple_same_lane_usage_review`. This still does not reclassify a
   cut or open battle; the next gate is
   `collect_stage_only_cut_evidence_before_value_safe_reclassification`.
+- Current contextual stage-cut evidence collection is read-only and still keeps
+  materialization closed. The report
+  `global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  inspects `Professional Face-Breaker`, `Diabolic Intent`, and `Ornithopter of
+  Paradise` in the current copied DB, confirms contextual deck roles and local
+  format-staple context, and records `reclassification_ready_count=0` with
+  `missing_usage_or_trace_count=3`. Therefore
+  `contextual_stage_cut_evidence_collected_no_value_safe_reclassification` is
+  the current status, and the next gate is
+  `collect_usage_or_trace_evidence_for_contextual_stage_cuts`.
 
 ## Global Commander Rollout - 2026-07-01
 

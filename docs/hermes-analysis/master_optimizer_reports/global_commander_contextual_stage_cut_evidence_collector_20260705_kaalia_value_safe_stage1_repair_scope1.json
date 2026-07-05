@@ -1,0 +1,193 @@
+{
+  "artifact_type": "global_commander_contextual_stage_cut_evidence_collector",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "contextual_stage_cuts_missing_usage_same_lane_or_replay_proof"
+  ],
+  "contextual_evidence_rows": [
+    {
+      "battle_gate_allowed_now": false,
+      "candidate_copy_allowed_now": false,
+      "card_name": "Professional Face-Breaker",
+      "current_deck_context": {
+        "cmc": 3.0,
+        "functional_tag": null,
+        "functional_tags_json": "[]",
+        "oracle_excerpt": "Menace Whenever one or more creatures you control deal combat damage to a player, create a Treasure token. Sacrifice a Treasure: Exile the top card of your library. You may play that card this turn.",
+        "present": true,
+        "quantity": 1,
+        "type_line": "Creature \u2014 Human Warrior"
+      },
+      "evidence_lanes": [
+        "contextual_staple_same_lane_usage_review"
+      ],
+      "format_staple_context": {
+        "archetype": "red",
+        "card_name": "Professional Face-Breaker",
+        "category": "",
+        "edhrec_rank": 223,
+        "format": "commander"
+      },
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "missing_evidence": [
+        "usage_or_same_lane_or_replay_proof",
+        "format_staple_replacement_risk_review"
+      ],
+      "next_required_evidence": [
+        "drawn_cast_used_or_negative_usage_trace",
+        "same_lane_replacement_proof_preserves_profile_floor",
+        "candidate_strategy_matrix_recheck_before_battle"
+      ],
+      "profile_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "promotion_allowed": false,
+      "reclassification_allowed_now": false,
+      "score": 61,
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "contextual_stage_cut_needs_usage_or_trace_evidence",
+      "supporting_proofs_present": []
+    },
+    {
+      "battle_gate_allowed_now": false,
+      "candidate_copy_allowed_now": false,
+      "card_name": "Diabolic Intent",
+      "current_deck_context": {
+        "cmc": 2.0,
+        "functional_tag": null,
+        "functional_tags_json": "[]",
+        "oracle_excerpt": "As an additional cost to cast this spell, sacrifice a creature. Search your library for a card, put that card into your hand, then shuffle.",
+        "present": true,
+        "quantity": 1,
+        "type_line": "Sorcery"
+      },
+      "evidence_lanes": [
+        "contextual_staple_same_lane_usage_review"
+      ],
+      "format_staple_context": {
+        "archetype": "black",
+        "card_name": "Diabolic Intent",
+        "category": "",
+        "edhrec_rank": 265,
+        "format": "commander"
+      },
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "missing_evidence": [
+        "usage_or_same_lane_or_replay_proof",
+        "format_staple_replacement_risk_review"
+      ],
+      "next_required_evidence": [
+        "drawn_cast_used_or_negative_usage_trace",
+        "same_lane_replacement_proof_preserves_profile_floor",
+        "candidate_strategy_matrix_recheck_before_battle"
+      ],
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "promotion_allowed": false,
+      "reclassification_allowed_now": false,
+      "score": 55,
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "contextual_stage_cut_needs_usage_or_trace_evidence",
+      "supporting_proofs_present": []
+    },
+    {
+      "battle_gate_allowed_now": false,
+      "candidate_copy_allowed_now": false,
+      "card_name": "Ornithopter of Paradise",
+      "current_deck_context": {
+        "cmc": 2.0,
+        "functional_tag": null,
+        "functional_tags_json": "[]",
+        "oracle_excerpt": "Flying {T}: Add one mana of any color.",
+        "present": true,
+        "quantity": 1,
+        "type_line": "Artifact Creature \u2014 Thopter"
+      },
+      "evidence_lanes": [
+        "contextual_staple_same_lane_usage_review"
+      ],
+      "format_staple_context": {
+        "archetype": "ramp",
+        "card_name": "Ornithopter of Paradise",
+        "category": "",
+        "edhrec_rank": 227,
+        "format": "commander"
+      },
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "missing_evidence": [
+        "usage_or_same_lane_or_replay_proof",
+        "format_staple_replacement_risk_review"
+      ],
+      "next_required_evidence": [
+        "drawn_cast_used_or_negative_usage_trace",
+        "same_lane_replacement_proof_preserves_profile_floor",
+        "candidate_strategy_matrix_recheck_before_battle"
+      ],
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "promotion_allowed": false,
+      "reclassification_allowed_now": false,
+      "score": 50,
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "contextual_stage_cut_needs_usage_or_trace_evidence",
+      "supporting_proofs_present": []
+    }
+  ],
+  "db_context": {
+    "available": true,
+    "deck_row_count": 3,
+    "format_staple_row_count": 3,
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db"
+  },
+  "db_resolution": {
+    "fallback_used": false,
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+    "selected_db_exists": true,
+    "source": "cli_override"
+  },
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T21:21:08.046445+00:00",
+  "input_artifacts": {
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+    "stage_only_plan_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "Battle remains closed until candidate-copy, strategy-matrix, and replay gates pass.",
+    "collector_boundary": "This collector records evidence state; it does not reclassify any cut.",
+    "contextual_staple_boundary": "A contextual staple needs usage, same-lane replacement, or replay evidence before value-safe review."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "contextual_stage_cut_evidence_collected_no_value_safe_reclassification",
+  "summary": {
+    "candidate_copy_blocker_count": 1,
+    "commander": "Kaalia of the Vast",
+    "contextual_row_count": 3,
+    "deck_id": "619",
+    "missing_usage_or_trace_count": 3,
+    "next_gate": "collect_usage_or_trace_evidence_for_contextual_stage_cuts",
+    "reclassification_ready_count": 0,
+    "required_cut_count": 6,
+    "stage_only_plan_status": "stage_only_cut_evidence_plan_ready"
+  },
+  "value_safe_reclassification_allowed_now": false
+}
