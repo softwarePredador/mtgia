@@ -218,6 +218,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     nomear cartas: ele mede identidade de cor, fontes diretas/fetchaveis, lands
     viradas, colorless-only e risco de utility lands. Evidencia local atual:
     `master_optimizer_reports/global_commander_mana_base_profile_20260705_global_goal_hermes_only.md`.
+    Quando o perfil estiver pronto, rode
+    `manaloom-knowledge/scripts/global_commander_named_land_candidate_pool.py`
+    para gerar um pool nomeado review-only por identidade de cor e legalidade
+    Commander, ainda sem materializar decks. Evidencia local atual:
+    `master_optimizer_reports/global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md`.
     Para ordenar o proximo aprendizado global sem voltar a focar no `607`,
     rode `manaloom-knowledge/scripts/global_commander_learning_priority_audit.py`;
     evidencia local atual:

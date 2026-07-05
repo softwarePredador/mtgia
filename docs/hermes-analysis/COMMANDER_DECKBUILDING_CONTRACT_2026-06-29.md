@@ -165,11 +165,15 @@ Operational priority after this pivot:
 6. run `global_commander_mana_base_profile.py` for land gaps before naming land
    additions; it must measure commander color identity, direct/fetchable access,
    tapped-land pressure, colorless-only pressure, and utility-land risk;
-7. run `global_commander_learning_priority_audit.py` to combine core gaps,
+7. run `global_commander_named_land_candidate_pool.py` only after the mana
+   profile is ready; named lands are review-only candidate-pool rows and still
+   require same-lane cuts, structure/legal recheck, strategy matrix, battle gate,
+   and replay trace before promotion;
+8. run `global_commander_learning_priority_audit.py` to combine core gaps,
    source-lane availability, current external research, staple/bracket
    guardrails, and the Lorehold benchmark rule into one global next-action
    queue;
-8. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+9. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -181,6 +185,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_core_repair_hypothesis_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_mana_base_profile_20260705_global_goal_hermes_only.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
@@ -207,6 +212,9 @@ Current external refresh on 2026-07-05:
 - Current mana-base profile output is read-only. It can unlock a named land
   candidate pool only after color identity, color access, tapped-land pressure,
   colorless utility, and same-lane cut pressure are visible.
+- Current named land candidate pool output is read-only. It filters local Oracle
+  land rows by commander color identity and Commander legality, excludes current
+  deck cards, and ranks candidates for same-lane cut review only.
 
 ## Global Commander Rollout - 2026-07-01
 

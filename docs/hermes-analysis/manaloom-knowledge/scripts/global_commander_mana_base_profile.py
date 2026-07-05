@@ -188,10 +188,26 @@ def direct_colors(type_line: str, oracle_text: str, commander_colors: list[str])
     for color, land_type in BASIC_TYPES_BY_COLOR.items():
         if land_type in type_text or f"{{{color.lower()}}}" in text or f"add {{{color.lower()}}}" in text:
             direct.add(color)
+    any_color_is_conditional = any(
+        phrase in text
+        for phrase in (
+            "spend this mana only",
+            "could produce",
+            "among legendary",
+            "{1}, {t}: add one mana of any color",
+            "pay {e}: add one mana of any color",
+            "sacrifice this land: add one mana of any color",
+            "chosen color",
+            "choose a color",
+        )
+    )
     if "add one mana of any color in your commander's color identity" in text:
-        direct.update(commander_colors)
+        if any_color_is_conditional:
+            conditional_any.update(commander_colors)
+        else:
+            direct.update(commander_colors)
     elif "add one mana of any color" in text:
-        if any(phrase in text for phrase in ("spend this mana only", "could produce", "among legendary")):
+        if any_color_is_conditional:
             conditional_any.update(commander_colors)
         else:
             direct.update(commander_colors)
