@@ -13362,6 +13362,61 @@ changeling tokens, unsupported auxiliary abilities, broader removal/exile
 variants, modal effects, unsafe target classes, or broad `xmage_*_review_v1`
 promotions. The next wave must start from the rebuilt post-PG515 queue.
 
+## PG516 Draw Put Land From Hand Checkpoint
+
+As of 2026-07-05, PG516 is applied and synced against the new server target.
+It promotes the exact local-XMage pattern where an instant or sorcery draws a
+fixed number of cards, then may put a land card from the controller's hand onto
+the battlefield.
+
+Promoted cards:
+
+- `Embrace the Paradox`
+- `Eureka Moment`
+- `Growth Spiral`
+- `Lessons from Life`
+
+Runtime scope:
+
+- `xmage_fixed_draw_put_land_from_hand_spell_v1`
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg516_draw_put_land_from_hand_new_server.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg516_xmage_pg516_draw_put_land_from_hand_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg516_draw_put_land_from_hand_new_server.json`
+- battle package E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/battle_package_end_to_end_validation_20260705_pg516_draw_put_land_from_hand_new_server.md`
+- runtime smoke:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg516_draw_put_land_from_hand_new_server_runtime_get_card_effect.out`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg516_draw_put_land_from_hand_new_server.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg516_draw_put_land_from_hand_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg516_draw_put_land_from_hand_new_server.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4962`
+- `battle_family_mapper_required=28911`
+- `target_identity_count=25988`
+- `xmage_authoritative_source_count=25674`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25674`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+- final exact-scope recheck `adapter_work_unit_counts={}`
+
+Residual boundary: PG516 does not authorize dynamic X draw counts, permanent
+cards with mana value X or less, non-land hand-to-battlefield effects, modal
+effects, unsafe auxiliary abilities, or broad `xmage_*_review_v1` promotions.
+The next wave must start from the rebuilt post-PG516 queue.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

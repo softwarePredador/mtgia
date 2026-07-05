@@ -1063,6 +1063,111 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_draw_put_land_from_hand_spell_can_put_newly_drawn_land(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Island", "type_line": "Basic Land - Island"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+            "draw_count": 1,
+            "count": 1,
+            "put_land_from_hand": True,
+            "put_land_tapped": False,
+            "_composite_rule_components": [
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "put_land_from_hand_onto_battlefield",
+                    "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+                    "target": "land_card_from_hand",
+                    "destination": "battlefield",
+                    "optional": True,
+                    "put_land_tapped": False,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Growth Spiral",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "Draw a card. You may put a land card from your hand onto the battlefield."
+                ),
+            },
+            turn=1,
+            rng=random.Random(1),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.hand, [])
+        self.assertEqual(active.library, [])
+        self.assertEqual([card.get("name") for card in active.battlefield], ["Island"])
+        self.assertFalse(active.battlefield[0].get("tapped", False))
+        self.assertTrue(
+            any(
+                event == "put_land_from_hand_to_battlefield_resolved"
+                and data.get("land") == "Island"
+                and data.get("result") == "land_put_onto_battlefield"
+                for event, data in self.events
+            )
+        )
+
+    def test_draw_put_land_from_hand_spell_respects_tapped_entry(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Forest", "type_line": "Basic Land - Forest"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+            "draw_count": 1,
+            "count": 1,
+            "put_land_from_hand": True,
+            "put_land_tapped": True,
+            "_composite_rule_components": [
+                {"effect": "draw_cards", "count": 1},
+                {
+                    "effect": "put_land_from_hand_onto_battlefield",
+                    "target": "land_card_from_hand",
+                    "destination": "battlefield",
+                    "optional": True,
+                    "put_land_tapped": True,
+                },
+            ],
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Tapped Draw Land",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Draw a card. You may put a land card from your hand onto the battlefield tapped."
+                ),
+            },
+            turn=1,
+            rng=random.Random(1),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card.get("name") for card in active.battlefield], ["Forest"])
+        self.assertTrue(active.battlefield[0].get("tapped"))
+
     def test_fixed_target_player_draw_spell_defaults_to_self(self) -> None:
         active = self.battle.Player(
             "Active",

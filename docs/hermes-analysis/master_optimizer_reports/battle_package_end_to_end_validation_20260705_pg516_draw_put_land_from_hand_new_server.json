@@ -1,0 +1,198 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T16:13:57.181779+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg516_xmage_pg516_draw_put_land_from_hand_new_server_manifest.json",
+  "package_id": "pg516_xmage_pg516_draw_put_land_from_hand_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "card_name": "Embrace the Paradox",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:612d4ce19274ebff28bdc52b5a232e03",
+          "oracle_hash": "91f408bbce4eecf30a06626166e9acf6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "card_name": "Eureka Moment",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71e02e39bcfe3b5632cce138a9fa3d5f",
+          "oracle_hash": "4bf3055106e5ff6ac3bf8f72a4de9d6d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "card_name": "Growth Spiral",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3e11fd5d33b6837c34cc1460a0a7448",
+          "oracle_hash": "fbd075c9cd3cae4b0cd587e19d1805e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "card_name": "Lessons from Life",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1d96fcc38277822e5d2b0222ac3a055d",
+          "oracle_hash": "91f408bbce4eecf30a06626166e9acf6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "card_name": "Embrace the Paradox",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:612d4ce19274ebff28bdc52b5a232e03",
+          "oracle_hash": "91f408bbce4eecf30a06626166e9acf6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "card_name": "Eureka Moment",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:71e02e39bcfe3b5632cce138a9fa3d5f",
+          "oracle_hash": "4bf3055106e5ff6ac3bf8f72a4de9d6d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "card_name": "Growth Spiral",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3e11fd5d33b6837c34cc1460a0a7448",
+          "oracle_hash": "fbd075c9cd3cae4b0cd587e19d1805e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "card_name": "Lessons from Life",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1d96fcc38277822e5d2b0222ac3a055d",
+          "oracle_hash": "91f408bbce4eecf30a06626166e9acf6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Embrace the Paradox",
+          "logical_rule_key": "battle_rule_v1:612d4ce19274ebff28bdc52b5a232e03"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eureka Moment",
+          "logical_rule_key": "battle_rule_v1:71e02e39bcfe3b5632cce138a9fa3d5f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Growth Spiral",
+          "logical_rule_key": "battle_rule_v1:e3e11fd5d33b6837c34cc1460a0a7448"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lessons from Life",
+          "logical_rule_key": "battle_rule_v1:1d96fcc38277822e5d2b0222ac3a055d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Embrace the Paradox",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:612d4ce19274ebff28bdc52b5a232e03"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eureka Moment",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:71e02e39bcfe3b5632cce138a9fa3d5f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Growth Spiral",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:e3e11fd5d33b6837c34cc1460a0a7448"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lessons from Life",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:1d96fcc38277822e5d2b0222ac3a055d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

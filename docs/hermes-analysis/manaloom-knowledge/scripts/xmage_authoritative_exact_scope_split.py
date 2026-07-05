@@ -121,6 +121,7 @@ SUPPORTED_UNITS = {
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
+DRAW_PUT_LAND_SCOPE = "xmage_fixed_draw_put_land_from_hand_spell_v1"
 DRAW_SELF_COST_REDUCTION_SCOPE = "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1"
 STATIC_GENERIC_COST_REDUCTION_SCOPE = "xmage_static_generic_cost_reduction_for_matching_spells_v1"
 TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
@@ -1569,6 +1570,53 @@ def fixed_scry_draw_from_source(source: str) -> tuple[int, int, str] | None:
         return None
     order = "scry_then_draw" if scry_matches[0].start() < draw_matches[0].start() else "draw_then_scry"
     return int(scry_matches[0].group(1)), draw_count, order
+
+
+def fixed_draw_put_land_from_hand_from_oracle(metadata: dict[str, Any]) -> tuple[int, bool] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(
+        r"^draw (a|\d+|one|two|three|four|five) cards?\. "
+        r"(?:then )?you may put a land card from your hand onto the battlefield( tapped)?\.?$",
+        text,
+    )
+    if not match:
+        return None
+    draw_count = word_or_int(match.group(1))
+    if draw_count <= 0:
+        return None
+    return draw_count, bool(match.group(2))
+
+
+def fixed_draw_put_land_from_hand_from_source(source: str) -> tuple[int, bool] | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    draw_matches = list(re.finditer(r"new\s+DrawCardSourceControllerEffect\s*\(", text))
+    put_matches = list(re.finditer(r"new\s+PutCardFromHandOntoBattlefieldEffect\s*\(", text))
+    if len(draw_matches) != 1 or len(put_matches) != 1:
+        return None
+    if draw_matches[0].start() > put_matches[0].start():
+        return None
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count is None or draw_count <= 0:
+        return None
+    put_match = re.search(
+        r"new\s+PutCardFromHandOntoBattlefieldEffect\s*\(\s*"
+        r"StaticFilters\.FILTER_CARD_LAND_A\s*"
+        r"(?:,\s*false\s*,\s*(true|false)\s*)?\)",
+        text,
+        re.S,
+    )
+    if not put_match:
+        return None
+    return draw_count, str(put_match.group(1) or "false").lower() == "true"
 
 
 def fixed_scry_count_match_from_source(source: str) -> tuple[int, int] | None:
@@ -18440,6 +18488,61 @@ def split_row(
                 family_id="xmage_counter_target_draw_card_spell",
             ), "selected_exact_scope"
 
+        if classes == {"DrawCardSourceControllerEffect", "PutCardFromHandOntoBattlefieldEffect"}:
+            if ability_classes(row):
+                return None, "draw_put_land_ability_class_not_simple"
+            if has_oracle_complexity(metadata):
+                return None, "draw_put_land_oracle_not_simple"
+            oracle_draw_land = fixed_draw_put_land_from_hand_from_oracle(metadata)
+            if oracle_draw_land is None:
+                return None, "draw_put_land_oracle_not_exact_fixed"
+            source_draw_land = fixed_draw_put_land_from_hand_from_source(source_text)
+            if source_draw_land is None:
+                return None, "draw_put_land_source_not_fixed_land"
+            if source_draw_land != oracle_draw_land:
+                return None, "draw_put_land_source_oracle_mismatch"
+            draw_count, enters_tapped = oracle_draw_land
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "draw_count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            put_land_component = {
+                "effect": "put_land_from_hand_onto_battlefield",
+                "battle_model_scope": DRAW_PUT_LAND_SCOPE,
+                "target": "land_card_from_hand",
+                "destination": "battlefield",
+                "optional": True,
+                "put_land_tapped": enters_tapped,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": DRAW_PUT_LAND_SCOPE,
+                "draw_count": draw_count,
+                "count": draw_count,
+                "put_land_from_hand": True,
+                "put_land_tapped": enters_tapped,
+                "destination": "battlefield",
+                "resolution_order": "draw_then_put_land_from_hand",
+                "_composite_rule_components": [draw_component, put_land_component],
+                "xmage_effect_classes": [
+                    "DrawCardSourceControllerEffect",
+                    "PutCardFromHandOntoBattlefieldEffect",
+                ],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_draw_put_land_from_hand_spell",
+            ), "selected_exact_scope"
+
         if classes in (
             {"DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"},
             {"DrawCardTargetEffect", "LoseLifeTargetEffect"},
@@ -20699,6 +20802,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one Oracle text, and two fixed alternative graveyard-to-hand components",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with CounterTargetEffect + DrawCardSourceControllerEffect, exact supported counter-target spell Oracle text, and draw-on-counter runtime metadata",
+                "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + PutCardFromHandOntoBattlefieldEffect, exact fixed draw count, exact land-card-from-hand target, optional tapped entry, and draw-then-put-land runtime metadata",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect or fixed DrawCardSourceControllerEffect + DiscardControllerEffect, exact Oracle/source draw-discard order agreement, and optional random discard metadata",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, no extra ability class, exact graveyard-to-library top/bottom Oracle text, and self-graveyard targets only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with RevealLibraryPickControllerEffect, no extra ability class, exact reveal-top-library pick-to-hand Oracle/source agreement, and graveyard rest destination",

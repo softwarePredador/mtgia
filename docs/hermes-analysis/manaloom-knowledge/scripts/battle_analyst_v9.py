@@ -19492,6 +19492,43 @@ def choose_land_for_resource_cost(lands, *, zone):
     return chosen, options, sorted(set(risk_flags)), selection_reason
 
 
+def _land_development_option(land, *, zone):
+    colors = list(source_colors(land)) if isinstance(land, dict) else []
+    type_line = str(land.get("type_line") or "") if isinstance(land, dict) else ""
+    name = land.get("name", "?") if isinstance(land, dict) else str(land)
+    is_basic = "basic" in type_line.lower() or name in BASIC_LAND_COLORS
+    enters_tapped = bool(
+        isinstance(land, dict)
+        and (land.get("enters_tapped") or land.get("enters_battlefield_tapped") or land.get("tapped"))
+    )
+    return {
+        "name": name,
+        "zone": zone,
+        "colors": colors,
+        "is_basic": is_basic,
+        "enters_tapped": enters_tapped,
+        "selection_rank": (
+            0 if not enters_tapped else 1,
+            -len(set(colors)),
+            0 if not is_basic else 1,
+            name,
+        ),
+    }
+
+
+def choose_land_from_hand_to_put_onto_battlefield(player):
+    lands = [
+        candidate
+        for candidate in list(getattr(player, "hand", []) or [])
+        if isinstance(candidate, dict) and is_effective_land(candidate)
+    ]
+    options = [_land_development_option(land, zone="hand") for land in lands]
+    if not lands:
+        return None, [], "no_land_card_in_hand"
+    ranked = sorted(zip(lands, options), key=lambda pair: pair[1]["selection_rank"])
+    return ranked[0][0], options, "prefer_untapped_high_color_land_for_battlefield_development"
+
+
 FETCH_LAND_NAMES = {
     "arid mesa",
     "bloodstained mire",
@@ -52965,6 +53002,72 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
             player.draw(max(0, count), rng)
             outcome = "cards_drawn"
             applied.append({"effect": component_effect, "count": count})
+        elif component_effect == "put_land_from_hand_onto_battlefield":
+            selected_land, land_options, selection_reason = choose_land_from_hand_to_put_onto_battlefield(player)
+            if selected_land is None:
+                outcome = "no_land_card_in_hand"
+                skipped.append({"effect": component_effect, "reason": outcome})
+                emit_replay_event(
+                    "put_land_from_hand_to_battlefield_resolved",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    result="no_land_card_in_hand",
+                    optional=bool(component.get("optional", True)),
+                    land_options=land_options,
+                    component_index=index,
+                    turn=turn,
+                    phase=phase,
+                    **component_fields,
+                )
+            else:
+                if selected_land in player.hand:
+                    player.hand.remove(selected_land)
+                permanent = enrich_card({**selected_land, "effect": "land"})
+                if component.get("put_land_tapped"):
+                    permanent["enters_tapped"] = True
+                permanent = prepare_entering_permanent(
+                    permanent,
+                    controller=player,
+                    all_players=participants,
+                    turn=turn,
+                )
+                initialize_special_land_runtime_state(permanent, turn=turn)
+                player.battlefield.append(permanent)
+                trigger_landfall(
+                    player,
+                    permanent,
+                    turn,
+                    "put_land_from_hand_to_battlefield",
+                    opponents=opponents,
+                    stack=stack,
+                    active_player=player,
+                    all_players=participants,
+                )
+                outcome = "land_put_onto_battlefield"
+                applied.append(
+                    {
+                        "effect": component_effect,
+                        "land": permanent.get("name", "?"),
+                        "destination": "battlefield",
+                        "tapped": bool(permanent.get("tapped")),
+                    }
+                )
+                emit_replay_event(
+                    "put_land_from_hand_to_battlefield_resolved",
+                    player=player.name,
+                    card=card.get("name", "?"),
+                    result="land_put_onto_battlefield",
+                    land=permanent.get("name", "?"),
+                    destination="battlefield",
+                    tapped=bool(permanent.get("tapped")),
+                    optional=bool(component.get("optional", True)),
+                    land_options=land_options,
+                    selection_reason=selection_reason,
+                    component_index=index,
+                    turn=turn,
+                    phase=phase,
+                    **component_fields,
+                )
         elif component_effect == "life_total_change":
             target = _life_total_change_target(player, opponents, component)
             life_before = int(getattr(target, "life", 0) or 0)

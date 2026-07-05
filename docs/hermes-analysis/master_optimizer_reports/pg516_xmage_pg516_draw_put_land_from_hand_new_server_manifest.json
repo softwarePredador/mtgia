@@ -1,0 +1,405 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg516_draw_put_land_from_hand_new_20260705_161259",
+  "deploy_id": "xmage_pg516_draw_put_land_from_hand_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Embrace the Paradox",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:612d4ce19274ebff28bdc52b5a232e03",
+      "min_rule_version": 2,
+      "normalized_name": "embrace the paradox",
+      "oracle_hash": "91f408bbce4eecf30a06626166e9acf6",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "draw_count": 3,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "battlefield",
+            "effect": "put_land_from_hand_onto_battlefield",
+            "optional": true,
+            "put_land_tapped": true,
+            "target": "land_card_from_hand",
+            "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+        "count": 3,
+        "destination": "battlefield",
+        "draw_count": 3,
+        "effect": "composite_resolution",
+        "put_land_from_hand": true,
+        "put_land_tapped": true,
+        "resolution_order": "draw_then_put_land_from_hand"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eureka Moment",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71e02e39bcfe3b5632cce138a9fa3d5f",
+      "min_rule_version": 2,
+      "normalized_name": "eureka moment",
+      "oracle_hash": "4bf3055106e5ff6ac3bf8f72a4de9d6d",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "draw_count": 2,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "battlefield",
+            "effect": "put_land_from_hand_onto_battlefield",
+            "optional": true,
+            "put_land_tapped": false,
+            "target": "land_card_from_hand",
+            "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+        "count": 2,
+        "destination": "battlefield",
+        "draw_count": 2,
+        "effect": "composite_resolution",
+        "put_land_from_hand": true,
+        "put_land_tapped": false,
+        "resolution_order": "draw_then_put_land_from_hand"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Growth Spiral",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e3e11fd5d33b6837c34cc1460a0a7448",
+      "min_rule_version": 2,
+      "normalized_name": "growth spiral",
+      "oracle_hash": "fbd075c9cd3cae4b0cd587e19d1805e2",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "draw_count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "battlefield",
+            "effect": "put_land_from_hand_onto_battlefield",
+            "optional": true,
+            "put_land_tapped": false,
+            "target": "land_card_from_hand",
+            "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "put_land_from_hand": true,
+        "put_land_tapped": false,
+        "resolution_order": "draw_then_put_land_from_hand"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lessons from Life",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d96fcc38277822e5d2b0222ac3a055d",
+      "min_rule_version": 2,
+      "normalized_name": "lessons from life",
+      "oracle_hash": "91f408bbce4eecf30a06626166e9acf6",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "draw_count": 3,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "battlefield",
+            "effect": "put_land_from_hand_onto_battlefield",
+            "optional": true,
+            "put_land_tapped": true,
+            "target": "land_card_from_hand",
+            "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+        "count": 3,
+        "destination": "battlefield",
+        "draw_count": 3,
+        "effect": "composite_resolution",
+        "put_land_from_hand": true,
+        "put_land_tapped": true,
+        "resolution_order": "draw_then_put_land_from_hand"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_draw_put_land_from_hand_spell": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg516_xmage_pg516_draw_put_land_from_hand_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg516_xmage_pg516_draw_put_land_from_hand_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg516_xmage_pg516_draw_put_land_from_hand_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg516_xmage_pg516_draw_put_land_from_hand_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg516_xmage_pg516_draw_put_land_from_hand_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg516_xmage_pg516_draw_put_land_from_hand_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T16:12:59+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Embrace the Paradox"
+      },
+      "card_name": "Embrace the Paradox",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:612d4ce19274ebff28bdc52b5a232e03",
+      "normalized_name": "embrace the paradox",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "draw_count": 3,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "battlefield",
+            "effect": "put_land_from_hand_onto_battlefield",
+            "optional": true,
+            "put_land_tapped": true,
+            "target": "land_card_from_hand",
+            "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+        "count": 3,
+        "destination": "battlefield",
+        "draw_count": 3,
+        "effect": "composite_resolution",
+        "put_land_from_hand": true,
+        "put_land_tapped": true,
+        "resolution_order": "draw_then_put_land_from_hand"
+      }
+    },
+    {
+      "card": {
+        "name": "Eureka Moment"
+      },
+      "card_name": "Eureka Moment",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71e02e39bcfe3b5632cce138a9fa3d5f",
+      "normalized_name": "eureka moment",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 2,
+            "draw_count": 2,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "battlefield",
+            "effect": "put_land_from_hand_onto_battlefield",
+            "optional": true,
+            "put_land_tapped": false,
+            "target": "land_card_from_hand",
+            "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+        "count": 2,
+        "destination": "battlefield",
+        "draw_count": 2,
+        "effect": "composite_resolution",
+        "put_land_from_hand": true,
+        "put_land_tapped": false,
+        "resolution_order": "draw_then_put_land_from_hand"
+      }
+    },
+    {
+      "card": {
+        "name": "Growth Spiral"
+      },
+      "card_name": "Growth Spiral",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e3e11fd5d33b6837c34cc1460a0a7448",
+      "normalized_name": "growth spiral",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "draw_count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "battlefield",
+            "effect": "put_land_from_hand_onto_battlefield",
+            "optional": true,
+            "put_land_tapped": false,
+            "target": "land_card_from_hand",
+            "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "put_land_from_hand": true,
+        "put_land_tapped": false,
+        "resolution_order": "draw_then_put_land_from_hand"
+      }
+    },
+    {
+      "card": {
+        "name": "Lessons from Life"
+      },
+      "card_name": "Lessons from Life",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d96fcc38277822e5d2b0222ac3a055d",
+      "normalized_name": "lessons from life",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 3,
+            "draw_count": 3,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "battlefield",
+            "effect": "put_land_from_hand_onto_battlefield",
+            "optional": true,
+            "put_land_tapped": true,
+            "target": "land_card_from_hand",
+            "xmage_effect_class": "PutCardFromHandOntoBattlefieldEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+        "count": 3,
+        "destination": "battlefield",
+        "draw_count": 3,
+        "effect": "composite_resolution",
+        "put_land_from_hand": true,
+        "put_land_tapped": true,
+        "resolution_order": "draw_then_put_land_from_hand"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Embrace the Paradox",
+    "Eureka Moment",
+    "Growth Spiral",
+    "Lessons from Life"
+  ],
+  "selected_count": 4,
+  "slug": "draw_put_land_from_hand",
+  "snapshot_checks": [
+    {
+      "card_name": "Embrace the Paradox",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:612d4ce19274ebff28bdc52b5a232e03",
+      "min_rule_version": 2,
+      "normalized_name": "embrace the paradox",
+      "oracle_hash": "91f408bbce4eecf30a06626166e9acf6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eureka Moment",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:71e02e39bcfe3b5632cce138a9fa3d5f",
+      "min_rule_version": 2,
+      "normalized_name": "eureka moment",
+      "oracle_hash": "4bf3055106e5ff6ac3bf8f72a4de9d6d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Growth Spiral",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e3e11fd5d33b6837c34cc1460a0a7448",
+      "min_rule_version": 2,
+      "normalized_name": "growth spiral",
+      "oracle_hash": "fbd075c9cd3cae4b0cd587e19d1805e2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lessons from Life",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d96fcc38277822e5d2b0222ac3a055d",
+      "min_rule_version": 2,
+      "normalized_name": "lessons from life",
+      "oracle_hash": "91f408bbce4eecf30a06626166e9acf6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

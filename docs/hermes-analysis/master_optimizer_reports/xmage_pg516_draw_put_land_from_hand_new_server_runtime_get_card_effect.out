@@ -1,0 +1,86 @@
+{
+  "battle_model_scope": "xmage_fixed_draw_put_land_from_hand_spell_v1",
+  "battlefield_after": [
+    {
+      "name": "Island",
+      "tapped": false
+    }
+  ],
+  "card": "Growth Spiral",
+  "composite_events": [
+    {
+      "applied": [
+        {
+          "count": 1,
+          "effect": "draw_cards"
+        },
+        {
+          "destination": "battlefield",
+          "effect": "put_land_from_hand_onto_battlefield",
+          "land": "Island",
+          "tapped": false
+        }
+      ],
+      "card": "Growth Spiral",
+      "components_applied": 2,
+      "components_skipped": 0,
+      "composite_rule_component_count": 2,
+      "player": "Active",
+      "rule_alternative_count": 1,
+      "rule_confidence": 0.96,
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:e3e11fd5d33b6837c34cc1460a0a7448",
+      "rule_oracle_hash": "fbd075c9cd3cae4b0cd587e19d1805e2",
+      "rule_review_status": "verified",
+      "rule_runtime_selection_mode": "single_selected",
+      "rule_source": "curated",
+      "rule_version": 2,
+      "skipped": [],
+      "turn": 1
+    }
+  ],
+  "draw_count": 1,
+  "effect": "composite_resolution",
+  "hand_after": [],
+  "library_after": [],
+  "logical_rule_key": "battle_rule_v1:e3e11fd5d33b6837c34cc1460a0a7448",
+  "put_land_events": [
+    {
+      "card": "Growth Spiral",
+      "component_index": 1,
+      "destination": "battlefield",
+      "land": "Island",
+      "land_options": [
+        {
+          "colors": [
+            "blue"
+          ],
+          "enters_tapped": false,
+          "is_basic": true,
+          "name": "Island",
+          "selection_rank": [
+            0,
+            -1,
+            1,
+            "Island"
+          ],
+          "zone": "hand"
+        }
+      ],
+      "optional": true,
+      "phase": "resolution",
+      "player": "Active",
+      "result": "land_put_onto_battlefield",
+      "rule_confidence": 0.0,
+      "rule_execution_status": "auto",
+      "rule_review_status": "unknown",
+      "rule_source": "unknown",
+      "rule_version": null,
+      "selection_reason": "prefer_untapped_high_color_land_for_battlefield_development",
+      "tapped": false,
+      "turn": 1
+    }
+  ],
+  "put_land_from_hand": true,
+  "put_land_tapped": false
+}

@@ -3048,6 +3048,93 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 2)
         self.assertTrue(proposal["safe_for_batch_pg_package"])
 
+    def test_fixed_draw_put_land_from_hand_spell_maps_growth_spiral(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "DrawCardSourceControllerEffect",
+                "PutCardFromHandOntoBattlefieldEffect",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Draw a card. You may put a land card from your hand onto the battlefield."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+                "this.getSpellAbility().addEffect(new PutCardFromHandOntoBattlefieldEffect("
+                "StaticFilters.FILTER_CARD_LAND_A));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertIsNotNone(proposal)
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.DRAW_PUT_LAND_SCOPE)
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertFalse(effect["put_land_tapped"])
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["draw_cards", "put_land_from_hand_onto_battlefield"],
+        )
+
+    def test_fixed_draw_put_land_from_hand_spell_preserves_tapped_entry(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "DrawCardSourceControllerEffect",
+                "PutCardFromHandOntoBattlefieldEffect",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Draw three cards. You may put a land card from your hand onto the battlefield tapped."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(3));"
+                "this.getSpellAbility().addEffect(new PutCardFromHandOntoBattlefieldEffect("
+                "StaticFilters.FILTER_CARD_LAND_A, false, true));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertIsNotNone(proposal)
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["draw_count"], 3)
+        self.assertTrue(effect["put_land_tapped"])
+
+    def test_fixed_draw_put_land_from_hand_spell_blocks_dynamic_permanent_x(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=[
+                "DrawCardSourceControllerEffect",
+                "PutCardFromHandOntoBattlefieldEffect",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Draw X cards. Then you may put a permanent card with mana value X or less "
+                    "from your hand onto the battlefield tapped."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(GetXValue.instance));"
+                "this.getSpellAbility().addEffect(new PutCardFromHandOntoBattlefieldEffect(filter, false, true));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertIn(reason, {"draw_put_land_oracle_not_simple", "draw_put_land_oracle_not_exact_fixed"})
+
     def test_fixed_draw_spell_with_self_cost_reduction_maps(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,
