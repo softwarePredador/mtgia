@@ -1,0 +1,402 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T06:19:25.868517+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg486_activated_token_new_server_manifest.json",
+  "package_id": "xmage_pg486_activated_token_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Boris Devilboon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:468d87c22f9817cfdc1df08983ee1e90",
+          "oracle_hash": "ee156d1a9f9de0ac0b00c119c247d0a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Centaur Glade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:be9b010644944e8f95d599ae14d72157",
+          "oracle_hash": "c71ea16bf2478802dbb80463a9b17434",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Centaur's Herald",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a46781dd9fb695ca14b2f42d968207f2",
+          "oracle_hash": "c19ce6657b6ddd45469352c8a2a63ea4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Dragon Roost",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3bdc3f45123e9e8caad19e695b41d37",
+          "oracle_hash": "7fc00f0cfe992e03862718b65031223a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Envoy of Okinec Ahau",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:898ca4a76a051e6efb27a22f4968b8cd",
+          "oracle_hash": "15dcbade55b6ec5a28765570f95bca76",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Jade Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:93c7ceebb97fb55fc147d9a09838f9cc",
+          "oracle_hash": "567b55a3f66369035b15dabdf2a26304",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Nuisance Engine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:94025e3fa5486dc829156d669dbea3fc",
+          "oracle_hash": "d097583f36035e918a71948687c1b8f4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Renowned Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6dad9901a00c37a1df73f2667c4b0c13",
+          "oracle_hash": "251a6b32bdd0664bacdbe6f1c33a4932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Sliver Queen",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:70f22893a5b95a0703b214c4b13b82d1",
+          "oracle_hash": "d1dcaa0433db9c061aff735cc0056539",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Whirlermaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:393626171e391f1161d5f29bbf33ac2b",
+          "oracle_hash": "351747c830144be5a4ee380d5a406af8",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Boris Devilboon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:468d87c22f9817cfdc1df08983ee1e90",
+          "oracle_hash": "ee156d1a9f9de0ac0b00c119c247d0a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Centaur Glade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:be9b010644944e8f95d599ae14d72157",
+          "oracle_hash": "c71ea16bf2478802dbb80463a9b17434",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Centaur's Herald",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a46781dd9fb695ca14b2f42d968207f2",
+          "oracle_hash": "c19ce6657b6ddd45469352c8a2a63ea4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Dragon Roost",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3bdc3f45123e9e8caad19e695b41d37",
+          "oracle_hash": "7fc00f0cfe992e03862718b65031223a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Envoy of Okinec Ahau",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:898ca4a76a051e6efb27a22f4968b8cd",
+          "oracle_hash": "15dcbade55b6ec5a28765570f95bca76",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Jade Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:93c7ceebb97fb55fc147d9a09838f9cc",
+          "oracle_hash": "567b55a3f66369035b15dabdf2a26304",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Nuisance Engine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:94025e3fa5486dc829156d669dbea3fc",
+          "oracle_hash": "d097583f36035e918a71948687c1b8f4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Renowned Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6dad9901a00c37a1df73f2667c4b0c13",
+          "oracle_hash": "251a6b32bdd0664bacdbe6f1c33a4932",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Sliver Queen",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:70f22893a5b95a0703b214c4b13b82d1",
+          "oracle_hash": "d1dcaa0433db9c061aff735cc0056539",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "card_name": "Whirlermaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:393626171e391f1161d5f29bbf33ac2b",
+          "oracle_hash": "351747c830144be5a4ee380d5a406af8",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Boris Devilboon",
+          "logical_rule_key": "battle_rule_v1:468d87c22f9817cfdc1df08983ee1e90"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Centaur Glade",
+          "logical_rule_key": "battle_rule_v1:be9b010644944e8f95d599ae14d72157"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Centaur's Herald",
+          "logical_rule_key": "battle_rule_v1:a46781dd9fb695ca14b2f42d968207f2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dragon Roost",
+          "logical_rule_key": "battle_rule_v1:a3bdc3f45123e9e8caad19e695b41d37"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Envoy of Okinec Ahau",
+          "logical_rule_key": "battle_rule_v1:898ca4a76a051e6efb27a22f4968b8cd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jade Mage",
+          "logical_rule_key": "battle_rule_v1:93c7ceebb97fb55fc147d9a09838f9cc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nuisance Engine",
+          "logical_rule_key": "battle_rule_v1:94025e3fa5486dc829156d669dbea3fc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Renowned Weaver",
+          "logical_rule_key": "battle_rule_v1:6dad9901a00c37a1df73f2667c4b0c13"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sliver Queen",
+          "logical_rule_key": "battle_rule_v1:70f22893a5b95a0703b214c4b13b82d1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Whirlermaker",
+          "logical_rule_key": "battle_rule_v1:393626171e391f1161d5f29bbf33ac2b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Boris Devilboon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:468d87c22f9817cfdc1df08983ee1e90"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Centaur Glade",
+          "component_keys": [],
+          "effect": "enchantment",
+          "logical_rule_key": "battle_rule_v1:be9b010644944e8f95d599ae14d72157"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Centaur's Herald",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a46781dd9fb695ca14b2f42d968207f2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dragon Roost",
+          "component_keys": [],
+          "effect": "enchantment",
+          "logical_rule_key": "battle_rule_v1:a3bdc3f45123e9e8caad19e695b41d37"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Envoy of Okinec Ahau",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:898ca4a76a051e6efb27a22f4968b8cd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jade Mage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:93c7ceebb97fb55fc147d9a09838f9cc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nuisance Engine",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:94025e3fa5486dc829156d669dbea3fc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Renowned Weaver",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6dad9901a00c37a1df73f2667c4b0c13"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sliver Queen",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:70f22893a5b95a0703b214c4b13b82d1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Whirlermaker",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:393626171e391f1161d5f29bbf33ac2b"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

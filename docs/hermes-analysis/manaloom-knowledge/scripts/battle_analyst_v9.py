@@ -13950,6 +13950,17 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 check_sbas_until_stable(all_players)
                 flush_triggers_in_apnap(active_player, all_players, stack)
                 return True
+            if activate_best_generic_token_maker_permanent(
+                active_player,
+                opponents,
+                all_players,
+                turn,
+                rng,
+                phase=phase,
+            ):
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
             if activate_best_generic_self_boost_permanent(
                 active_player,
                 all_players,
@@ -42199,6 +42210,7 @@ SIMPLE_ACTIVATED_SELF_BOOST_SCOPE = "xmage_permanent_simple_activated_self_boost
 SIMPLE_ACTIVATED_TARGET_BOOST_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
+SIMPLE_ACTIVATED_TOKEN_SCOPE = "xmage_permanent_simple_activated_create_token_v1"
 SIMPLE_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
 SIMPLE_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = "xmage_permanent_simple_activated_graveyard_to_library_v1"
 SIMPLE_ACTIVATED_TUTOR_BATTLEFIELD_SCOPE = (
@@ -42292,6 +42304,43 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             destroy_effect[key] = permanent.get(key)
         effects.append(destroy_effect)
+    if (
+        not any(effect.get("battle_model_scope") == SIMPLE_ACTIVATED_TOKEN_SCOPE for effect in effects)
+        and permanent.get("activated_effect") == "token_maker"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_TOKEN_SCOPE
+    ):
+        token_effect = {
+            "effect": "token_maker",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "token_count": permanent.get("token_count") or 1,
+            "token_name": permanent.get("token_name") or "Token",
+            "token_subtype": permanent.get("token_subtype"),
+            "token_power": permanent.get("token_power"),
+            "token_toughness": permanent.get("token_toughness"),
+            "token_colors": permanent.get("token_colors") or [],
+            "token_keywords": permanent.get("token_keywords") or [],
+            "token_flying": bool(permanent.get("token_flying")),
+            "token_haste": bool(permanent.get("token_haste")),
+            "artifact_tokens": bool(permanent.get("artifact_tokens")),
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            token_effect[key] = permanent.get(key)
+        effects.append(token_effect)
     if (
         permanent.get("activated_effect") == "self_stat_modifier_until_eot"
         and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_SELF_BOOST_SCOPE
@@ -42940,6 +42989,223 @@ def activate_best_generic_tap_damage_permanent(player, opponents, all_players, t
     return activate_generic_tap_damage_permanent(
         player,
         opponents,
+        options[0][2],
+        turn,
+        rng,
+        phase=phase,
+    )
+
+
+def activated_token_maker_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_TOKEN_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activated_effect") == "token_maker"
+            and effect_data.get("effect") == "token_maker"
+        ):
+            return effect_data
+    return None
+
+
+def _activated_token_activation_cost(player, permanent, effect_data):
+    activation_colors = list((effect_data or {}).get("activation_cost_colors") or [])
+    generic_cost = adjusted_activated_ability_generic_cost(
+        player,
+        permanent,
+        int((effect_data or {}).get("activation_cost_generic") or 0),
+        activation_colors=activation_colors,
+    )
+    cost_text = (effect_data or {}).get("activation_cost_mana")
+    if cost_text and generic_cost == int((effect_data or {}).get("activation_cost_generic") or 0):
+        return str(cost_text), generic_cost, activation_colors
+    return _activation_cost_text(generic_cost, activation_colors), generic_cost, activation_colors
+
+
+def _activated_token_expected_score(effect_data, activation_cost_generic=0):
+    try:
+        token_count = max(1, int((effect_data or {}).get("token_count") or 1))
+    except (TypeError, ValueError):
+        token_count = 1
+    try:
+        token_power = max(0, int((effect_data or {}).get("token_power") or 1))
+        token_toughness = max(0, int((effect_data or {}).get("token_toughness") or token_power or 1))
+    except (TypeError, ValueError):
+        token_power, token_toughness = 1, 1
+    score = token_count * max(1, token_power + token_toughness)
+    if (effect_data or {}).get("token_flying"):
+        score += token_count
+    if (effect_data or {}).get("token_haste"):
+        score += token_count
+    score -= max(0, int(activation_cost_generic or 0))
+    if (effect_data or {}).get("activation_requires_sacrifice"):
+        score -= 2
+    return score
+
+
+def can_activate_generic_token_maker_permanent(player, permanent, *, effect_data=None):
+    effect_data = effect_data or activated_token_maker_effect_for_permanent(permanent)
+    if effect_data is None:
+        return False
+    if permanent not in getattr(player, "battlefield", []):
+        return False
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        return False
+    if (
+        effect_data.get("activation_requires_tap")
+        and is_battlefield_creature(permanent)
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return False
+    activation_cost, _generic_cost, _colors = _activated_token_activation_cost(player, permanent, effect_data)
+    if not player.can_pay(activation_cost):
+        return False
+    try:
+        return int(effect_data.get("token_count") or 1) > 0
+    except (TypeError, ValueError):
+        return False
+
+
+def activate_generic_token_maker_permanent(player, opponents, all_players, permanent, turn, rng, *, phase=None):
+    effect_data = activated_token_maker_effect_for_permanent(permanent)
+    if not can_activate_generic_token_maker_permanent(player, permanent, effect_data=effect_data):
+        return False
+    phase = phase or "precombat_main"
+    activation_cost, activation_cost_generic, activation_colors = _activated_token_activation_cost(
+        player,
+        permanent,
+        effect_data,
+    )
+    if not player.spend_mana(activation_cost):
+        return False
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    sacrificed_source = False
+    if effect_data.get("activation_requires_sacrifice"):
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        player.record_permanent_sacrificed(permanent, turn)
+        sacrificed_source = True
+    token_count = create_creature_tokens_from_effect(
+        player,
+        effect_data,
+        count=int(effect_data.get("token_count") or 1),
+        opponents=opponents,
+        turn=turn,
+        source_event="activated_token_maker",
+        active_player=player,
+        all_players=all_players,
+    )
+    fields = replay_rule_fields(effect_data)
+    expected_score = _activated_token_expected_score(effect_data, activation_cost_generic)
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                permanent,
+                effect_data,
+                action="activate_token_maker",
+                score=expected_score,
+            )
+        ],
+        chosen_option=decision_card_option(
+            permanent,
+            effect_data,
+            action="activate_token_maker",
+            score=expected_score,
+        ),
+        rejected_options=[],
+        score_components={
+            "activation_cost": activation_cost,
+            "activation_cost_generic": activation_cost_generic,
+            "activation_cost_colors": activation_colors,
+            "token_count": token_count,
+            "token_power": effect_data.get("token_power"),
+            "token_toughness": effect_data.get("token_toughness"),
+            "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+            "requires_sacrifice": 1 if sacrificed_source else 0,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=expected_score,
+        actual_outcome="activated_token_maker_used",
+        reason="convert_available_activation_into_board_presence",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -(activation_cost_generic + len(activation_colors)),
+            "tokens": token_count,
+            "permanents": -1 if sacrificed_source else 0,
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "sacrifice_source": sacrificed_source,
+                "token_cap_possible": token_count > 20,
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect="token_maker",
+        activation_kind="simple_activated_create_token",
+        activation_cost=activation_cost,
+        tapped=bool(permanent.get("tapped")),
+        sacrificed_source=sacrificed_source,
+        mana_paid=activation_cost_generic + len(activation_colors),
+        tokens_requested=token_count,
+        tokens_created=min(max(0, token_count), 20),
+        token_name=effect_data.get("token_name") or "Token",
+        token_power=effect_data.get("token_power"),
+        token_toughness=effect_data.get("token_toughness"),
+        token_subtype=effect_data.get("token_subtype"),
+        token_colors=effect_data.get("token_colors") or [],
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    return True
+
+
+def activate_best_generic_token_maker_permanent(player, opponents, all_players, turn, rng, *, phase=None):
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        effect_data = activated_token_maker_effect_for_permanent(permanent)
+        if effect_data is None:
+            continue
+        if artifact_activated_abilities_locked(player, permanent, all_players):
+            continue
+        if not can_activate_generic_token_maker_permanent(player, permanent, effect_data=effect_data):
+            continue
+        _activation_cost, activation_cost_generic, _colors = _activated_token_activation_cost(
+            player,
+            permanent,
+            effect_data,
+        )
+        options.append((
+            _activated_token_expected_score(effect_data, activation_cost_generic),
+            str(permanent.get("name") or ""),
+            permanent,
+        ))
+    if not options:
+        return False
+    options.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return activate_generic_token_maker_permanent(
+        player,
+        opponents,
+        all_players,
         options[0][2],
         turn,
         rng,

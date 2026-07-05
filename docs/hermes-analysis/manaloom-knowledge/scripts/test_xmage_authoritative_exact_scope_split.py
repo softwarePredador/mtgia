@@ -2134,6 +2134,99 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "token_source_create_token_not_fixed")
 
+    def test_permanent_activated_create_token_maps_simple_mana_tap_cost(self) -> None:
+        unit = (
+            split.ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX
+            + "no_target_class::no_condition_class::token,activated_ability"
+        )
+        row = queue_row(
+            unit,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["token", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Mage",
+                type_line="Creature - Human Shaman",
+                oracle_text="{2}{G}, {T}: Create a 1/1 green Saproling creature token.",
+            ),
+            source_text="""
+                SimpleActivatedAbility ability = new SimpleActivatedAbility(
+                    new CreateTokenEffect(new SaprolingToken()),
+                    new ManaCostsImpl<>("{2}{G}")
+                );
+                ability.addCost(new TapSourceCost());
+                this.addAbility(ability);
+                class SaprolingToken extends TokenImpl {
+                    public SaprolingToken() {
+                        super("Saproling Token", "1/1 green Saproling creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SAPROLING);
+                        color.setGreen(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TOKEN_SCOPE)
+        self.assertEqual(effect["activated_effect"], "token_maker")
+        self.assertEqual(effect["activation_cost_mana"], "{2}{G}")
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["token_count"], 1)
+        self.assertEqual(effect["token_name"], "Saproling Token")
+        self.assertEqual(effect["_activated_rule_effects"][0]["effect"], "token_maker")
+
+    def test_permanent_activated_create_token_blocks_discard_cost(self) -> None:
+        unit = (
+            split.ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX
+            + "no_target_class::no_condition_class::token,activated_ability"
+        )
+        row = queue_row(
+            unit,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["token", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Crier",
+                type_line="Creature - Human",
+                oracle_text="{1}{W}, {T}, Discard a card: Create two 1/1 white Citizen creature tokens.",
+            ),
+            source_text="""
+                SimpleActivatedAbility ability = new SimpleActivatedAbility(
+                    new CreateTokenEffect(new CitizenToken(), 2),
+                    new ManaCostsImpl<>("{1}{W}")
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new DiscardCardCost());
+                this.addAbility(ability);
+                class CitizenToken extends TokenImpl {
+                    public CitizenToken() {
+                        super("Citizen Token", "1/1 white Citizen creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.CITIZEN);
+                        color.setWhite(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_token_source_cost_not_supported")
+
     def test_fixed_create_creature_tokens_spell_blocks_additional_tokens(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(

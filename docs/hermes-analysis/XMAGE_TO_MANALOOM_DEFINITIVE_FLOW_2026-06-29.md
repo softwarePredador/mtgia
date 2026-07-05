@@ -11651,6 +11651,56 @@ new server:
   `xmage_authoritative_adapter_required_count=25941`. This reduces
   `direct_damage::targeted_damage_variant_v1` from `811` to `809`.
 
+## 2026-07-05 PG486 Activated Token Permanent Closure
+
+- PG486 closes the narrow permanent activated-token subpattern as ManaLoom
+  scope `xmage_permanent_simple_activated_create_token_v1`.
+- The accepted shape is intentionally limited to permanent sources with a
+  simple activated ability, fixed creature token creation, exact Oracle/source
+  agreement, and conservative activation costs: optional mana, optional tap,
+  and optional source self-sacrifice. Discard costs, pay-life costs, sacrifice
+  target/other-permanent costs, graveyard-exile costs, dynamic token counts,
+  noncreature token makers such as Treasure, custom token text, and ambiguous
+  Oracle wording stay blocked.
+- The batch covers `10` cards: Boris Devilboon, Centaur Glade, Centaur's
+  Herald, Dragon Roost, Envoy of Okinec Ahau, Jade Mage, Nuisance Engine,
+  Renowned Weaver, Sliver Queen, and Whirlermaker.
+- Runtime support now exposes a generic activated token-maker path for
+  permanents: it checks available mana and activation restrictions, pays mana,
+  taps the source when required, sacrifices the source when required, creates
+  the configured creature token(s), and records `activated_ability` replay and
+  decision-trace evidence.
+- Focused validation passed `762` parser/runtime/package-builder tests.
+  `py_compile` also passed for the touched parser, runtime, and focused test
+  files.
+- PostgreSQL package PG486 applied against `143.198.230.247:5433/halder` and
+  promoted `10/10` selected cards as verified/auto rule-version `2` rows with
+  matching Oracle hashes. The apply upserted `10` rows and deprecated `0`
+  shadow rows.
+- Hermes metadata sync matched `5798` PostgreSQL cards, wrote `5709` SQLite
+  cache aliases, updated `108` deck-card ids, and left the known `unresolved=1`
+  residual unchanged. The targeted battle-rule sync loaded `10` PostgreSQL
+  rows and wrote `10` SQLite rows for the selected cards.
+- Generic E2E validation passed across PostgreSQL, SQLite
+  `battle_card_rules`, canonical snapshot, and runtime `get_card_effect` for
+  all `10` selected cards. The manifest does not define battle-execution
+  scenarios for this generic family, so scenario execution remains `0`;
+  concrete activation/token behavior is proven by the focused runtime test.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract with live PostgreSQL connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26245`, `xmage_authoritative_source_count=25931`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25931`. This is an exact
+  reduction of `10` from the post-PG485 queue. The post-PG486 exact split
+  recheck reports `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`.
+- Post-sync global readiness is now `34331` known cards, `4705`
+  `battle_and_oracle_ready`, `29168` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

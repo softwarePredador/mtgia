@@ -3389,6 +3389,65 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_create_token_pays_mana_taps_and_creates_token(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(2)
+        active.mana_pool.add("green", 1)
+        permanent = {
+            "name": "Fixture Mage",
+            "type_line": "Creature - Human Shaman",
+            "effect": "creature",
+            "summoning_sick": False,
+            "_activated_rule_effects": [
+                {
+                    "effect": "token_maker",
+                    "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+                    "ability_kind": "activated",
+                    "activated_effect": "token_maker",
+                    "activation_cost_mana": "{2}{G}",
+                    "activation_cost_generic": 2,
+                    "activation_cost_colors": ["G"],
+                    "activation_requires_tap": True,
+                    "token_count": 1,
+                    "token_name": "Saproling Token",
+                    "token_subtype": "Saproling",
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_colors": ["G"],
+                    "_rule_logical_key": "battle_rule_v1:fixture_activated_token",
+                }
+            ],
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_token_maker_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=3,
+            rng=random.Random(3),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertEqual(active.available_mana(), 0)
+        tokens = [card for card in active.battlefield if card.get("name") == "Saproling Token"]
+        self.assertEqual(len(tokens), 1)
+        self.assertEqual(tokens[0].get("type_line"), "Creature Token — Saproling")
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Mage"
+                and data.get("activation_kind") == "simple_activated_create_token"
+                and data.get("tokens_created") == 1
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_activated_token"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_create_creature_tokens_spell_preserves_static_token_keywords(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -89,6 +89,9 @@ DIES_TOKEN_CREATURE_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::DiesSourceTriggeredAbility::"
     "no_target_class::no_condition_class::token,triggered_ability"
 )
+ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX = (
+    "token_maker::xmage_signature::CreateTokenEffect::SimpleActivatedAbility::"
+)
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
@@ -253,6 +256,7 @@ DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_ha
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
 ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
 DIES_TOKEN_CREATURE_SCOPE = "xmage_creature_dies_create_tokens_v1"
+PERMANENT_ACTIVATED_TOKEN_SCOPE = "xmage_permanent_simple_activated_create_token_v1"
 ETB_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_etb_add_counters_target_creature_v1"
 
 SPELL_UNITS = {
@@ -853,6 +857,110 @@ def dies_create_token_oracle_blocker(
         }
     if phrase not in expected:
         return "dies_token_oracle_not_simple"
+    return None
+
+
+def activated_create_token_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    effect_match = re.search(r"new\s+CreateTokenEffect\s*\(", text)
+    if effect_match is None:
+        return "activated_token_source_no_create_token_effect"
+    ability_index = text.rfind("new SimpleActivatedAbility", 0, effect_match.start())
+    if ability_index < 0:
+        return "activated_token_source_not_simple_activated"
+    window = text[ability_index : effect_match.start() + 1800]
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileFromTopOfLibraryCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "ReturnToHandTargetCost",
+        "RevealTargetFromHandCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+        "UntapSourceCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_token_source_cost_not_supported"
+    mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window, re.S)
+    generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window, re.S)
+    colored_matches = re.findall(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window, re.S)
+    cost_kinds = sum(1 for matches in (mana_matches, generic_matches, colored_matches) if matches)
+    if cost_kinds > 1 or len(mana_matches) > 1 or len(generic_matches) > 1 or len(colored_matches) > 1:
+        return "activated_token_source_cost_not_supported"
+    if mana_matches:
+        cost_text = mana_matches[0]
+    elif generic_matches:
+        cost_text = "{" + generic_matches[0] + "}"
+    elif colored_matches:
+        cost_text = "{" + colored_matches[0] + "}"
+    else:
+        cost_text = "{0}"
+    cost_text = canonical_mana_cost_text(cost_text)
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_token_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+    }
+
+
+def activated_create_token_oracle_blocker(
+    metadata: dict[str, Any],
+    token_data: dict[str, Any],
+    token_count: int,
+    source_activation: dict[str, Any],
+) -> str | None:
+    text = normalized_token_oracle_phrase(oracle_text_after_leading_static_keywords(metadata))
+    if text.count(":") != 1:
+        return "activated_token_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    activation = activation_cost_from_oracle_prefix(cost_text, allow_source_sacrifice=True)
+    if isinstance(activation, str):
+        return activation.replace("activated_self_boost", "activated_token")
+    for key in (
+        "activation_cost_mana",
+        "activation_cost_generic",
+        "activation_cost_colors",
+        "activation_requires_tap",
+        "activation_requires_sacrifice",
+    ):
+        if activation.get(key) != source_activation.get(key):
+            return "activated_token_source_oracle_cost_mismatch"
+    if any(marker in effect_text for marker in (" for each ", " where x ", " equal to ", " then ")):
+        return "activated_token_oracle_not_simple"
+    if not effect_text.startswith("create "):
+        return "activated_token_oracle_not_simple"
+    phrase = effect_text.removeprefix("create ").strip()
+    token_description = normalized_token_oracle_phrase(token_data.get("token_description"))
+    if token_count == 1:
+        expected = {
+            f"a {token_description}",
+            f"an {token_description}",
+            f"one {token_description}",
+        }
+    else:
+        plural_description = plural_token_description(token_description)
+        expected = {
+            f"{token_count} {plural_description}",
+            f"{count_word_for_oracle(token_count)} {plural_description}",
+        }
+    if phrase not in expected:
+        return "activated_token_oracle_not_simple"
     return None
 
 
@@ -5399,6 +5507,15 @@ def is_creature_dies_token_unit(row: dict[str, Any]) -> bool:
         and "DiesSourceTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"token", "triggered_ability"}
+    )
+
+
+def is_permanent_activated_token_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "").startswith(ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX)
+        and effect_classes(row) == {"CreateTokenEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and set(row.get("xmage_signals") or []) == {"token", "activated_ability"}
     )
 
 
@@ -12055,6 +12172,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature dies triggered fixed damage ability"
     elif scope == DIES_TOKEN_CREATURE_SCOPE:
         scope_kind = "creature dies triggered fixed creature-token ability"
+    elif scope == PERMANENT_ACTIVATED_TOKEN_SCOPE:
+        scope_kind = "permanent with a simple activated fixed creature-token ability"
     elif scope == DIES_RECURSION_CREATURE_SCOPE:
         scope_kind = "creature dies triggered graveyard-to-hand ability"
     elif scope == COMBAT_DAMAGE_DRAW_CREATURE_SCOPE:
@@ -12187,6 +12306,7 @@ def split_row(
     etb_tutor_hand_creature_unit = is_creature_etb_tutor_to_hand_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
     dies_token_creature_unit = is_creature_dies_token_unit(row)
+    permanent_activated_token_unit = is_permanent_activated_token_unit(row)
     etb_add_counters_creature_unit = is_creature_etb_add_counters_unit(row)
     permanent_activated_self_add_counters_unit = (
         is_permanent_activated_self_add_counters_unit(row)
@@ -12275,6 +12395,7 @@ def split_row(
         and not etb_tutor_hand_creature_unit
         and not etb_token_creature_unit
         and not dies_token_creature_unit
+        and not permanent_activated_token_unit
         and not etb_add_counters_creature_unit
         and not permanent_activated_self_add_counters_unit
         and not creature_tap_damage_unit
@@ -12340,6 +12461,7 @@ def split_row(
         and not etb_tutor_hand_creature_unit
         and not etb_token_creature_unit
         and not dies_token_creature_unit
+        and not permanent_activated_token_unit
         and not etb_add_counters_creature_unit
         and not permanent_activated_self_add_counters_unit
         and not creature_tap_damage_unit
@@ -14165,6 +14287,74 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_fixed_create_creature_tokens_spell",
+        ), "selected_exact_scope"
+
+    if permanent_activated_token_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_token_not_permanent"
+        parsed_effect = fixed_create_token_effect_from_source(source_text)
+        if isinstance(parsed_effect, str):
+            return None, parsed_effect.replace("token_", "activated_token_", 1)
+        token_class, token_count = parsed_effect
+        token_data, token_reason = parse_simple_token_class(
+            token_class_source(row, source_text, token_class),
+            token_class,
+        )
+        if token_reason:
+            return None, token_reason
+        source_activation = activated_create_token_from_source(source_text)
+        if isinstance(source_activation, str):
+            return None, source_activation
+        oracle_blocker = activated_create_token_oracle_blocker(
+            metadata,
+            token_data,
+            token_count,
+            source_activation,
+        )
+        if oracle_blocker:
+            return None, oracle_blocker
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "planeswalker"
+            if "planeswalker" in type_line
+            else "permanent"
+        )
+        activated_effect = {
+            "effect": "token_maker",
+            "battle_model_scope": PERMANENT_ACTIVATED_TOKEN_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "token_count": token_count,
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **source_activation,
+            **token_data,
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_TOKEN_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "token_maker",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_TOKEN_SCOPE,
+            "activated_create_token": True,
+            "token_count": token_count,
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "_activated_rule_effects": [activated_effect],
+            **source_activation,
+            **token_data,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_create_token",
         ), "selected_exact_scope"
 
     if etb_token_creature_unit:
@@ -18306,6 +18496,7 @@ def build_exact_split_report(
             and not is_creature_tap_damage_unit(row)
             and not is_creature_etb_token_unit(row)
             and not is_creature_dies_token_unit(row)
+            and not is_permanent_activated_token_unit(row)
             and not is_creature_etb_add_counters_unit(row)
             and not is_permanent_activated_self_add_counters_unit(row)
             and not is_permanent_activated_draw_unit(row)
@@ -18416,6 +18607,7 @@ def build_exact_split_report(
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
                 "token_maker CreateTokenEffect rows with DiesSourceTriggeredAbility, a fixed token count, literal safe creature token class, and exact non-conditional dies Oracle text",
+                "token_maker CreateTokenEffect rows with SimpleActivatedAbility, a fixed creature token class, exact Oracle/source token text, and mana/tap/source self-sacrifice costs only",
                 "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text",
             ],
             "blocked_generic_review_scopes_from_pg": True,
