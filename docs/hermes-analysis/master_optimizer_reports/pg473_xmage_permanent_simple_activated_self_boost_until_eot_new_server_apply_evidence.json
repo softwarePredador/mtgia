@@ -1,0 +1,154 @@
+{
+  "status": "pass",
+  "deploy_id": "pg473",
+  "slug": "xmage_permanent_simple_activated_self_boost_until_eot_new_server",
+  "database_target": "143.198.230.247:5433/halder",
+  "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+  "selected_count": 4,
+  "cards": [
+    {
+      "card_name": "Foxfire Oak",
+      "normalized_name": "foxfire oak",
+      "activation_cost_mana": "{R/G}{R/G}{R/G}",
+      "activation_cost_colors": [
+        "R/G",
+        "R/G",
+        "R/G"
+      ],
+      "activation_cost_generic": 0,
+      "activation_requires_tap": false,
+      "power_boost": 3,
+      "toughness_boost": 0,
+      "duration": "until_end_of_turn",
+      "logical_rule_key": "battle_rule_v1:ced93a57e24cd5ee4b9cac99c146e48f"
+    },
+    {
+      "card_name": "Frostburn Weird",
+      "normalized_name": "frostburn weird",
+      "activation_cost_mana": "{U/R}",
+      "activation_cost_colors": [
+        "U/R"
+      ],
+      "activation_cost_generic": 0,
+      "activation_requires_tap": false,
+      "power_boost": 1,
+      "toughness_boost": -1,
+      "duration": "until_end_of_turn",
+      "logical_rule_key": "battle_rule_v1:bfb84f4b62429cb2c15f03c22f13c634"
+    },
+    {
+      "card_name": "Loch Korrigan",
+      "normalized_name": "loch korrigan",
+      "activation_cost_mana": "{U/B}",
+      "activation_cost_colors": [
+        "U/B"
+      ],
+      "activation_cost_generic": 0,
+      "activation_requires_tap": false,
+      "power_boost": 1,
+      "toughness_boost": 1,
+      "duration": "until_end_of_turn",
+      "logical_rule_key": "battle_rule_v1:0910f17fa438b6dd99c27d522d289385"
+    },
+    {
+      "card_name": "Parapet Watchers",
+      "normalized_name": "parapet watchers",
+      "activation_cost_mana": "{W/U}",
+      "activation_cost_colors": [
+        "W/U"
+      ],
+      "activation_cost_generic": 0,
+      "activation_requires_tap": false,
+      "power_boost": 0,
+      "toughness_boost": 1,
+      "duration": "until_end_of_turn",
+      "logical_rule_key": "battle_rule_v1:d91c066b4f00ed65ba374802194ff1c8"
+    }
+  ],
+  "tests": {
+    "focused_unit_checks": 720,
+    "status": "pass"
+  },
+  "postgres_apply": {
+    "precheck": {
+      "row_count": 4,
+      "missing_targets": [],
+      "total_target_card_rows": 4,
+      "existing_expected_rows_before": 0,
+      "would_deprecate_shadow_rows": 0
+    },
+    "postcheck": {
+      "row_count": 4,
+      "promoted_rule_rows": 4,
+      "promoted_verified_auto_rows": 4,
+      "promoted_oracle_hash_rows": 4,
+      "backup_rows": 0,
+      "failed_cards": []
+    },
+    "mutations_performed": [
+      "postgres_apply_pg473_xmage_permanent_simple_activated_self_boost_until_eot_new_server"
+    ]
+  },
+  "sync": {
+    "metadata": {
+      "requested_unique_names": 5497,
+      "postgres_cards_matched": 5682,
+      "sqlite_cache_alias_rows": 5593,
+      "unresolved_count": 1,
+      "deck_cards_rows_total": 2699,
+      "deck_cards_matched_cache_rows": 2699,
+      "deck_cards_card_id_rows_updated": 92,
+      "suspicious_nonland_zero_cmc_after": 19
+    },
+    "pg_to_sqlite": {
+      "pg_rows_loaded": 4519,
+      "sqlite_inserted_or_updated": 4511,
+      "canonical_snapshot_rows_exported": 4486,
+      "generated_rows": 1947,
+      "curated_rows": 145,
+      "oracle_normalized_rows": 274
+    }
+  },
+  "e2e": {
+    "status": "pass",
+    "postgres_source_rows": 4,
+    "sqlite_hermes_cache_rows": 4,
+    "canonical_snapshot_cards": 4,
+    "runtime_get_card_effect_cards": 4,
+    "battle_execution_scenarios": 0,
+    "battle_execution_events": 0
+  },
+  "audits": {
+    "xmage_strategy_consistency": {
+      "status": "pass",
+      "check_count": 26
+    },
+    "operational_surface_alignment": {
+      "status": "pass",
+      "check_count": 39
+    },
+    "legacy_contamination": {
+      "status": "pass",
+      "check_count": 32
+    },
+    "pg_hermes_sqlite_contract": {
+      "status": "pass",
+      "check_count": 51
+    }
+  },
+  "post_sync_queue": {
+    "target_identity_count": 26367,
+    "xmage_authoritative_source_count": 26053,
+    "xmage_missing_source_exception_count": 314,
+    "xmage_authoritative_parser_gap_count": 0,
+    "xmage_authoritative_adapter_required_count": 26053,
+    "proposal_count": 28,
+    "safe_for_batch_pg_package_count": 28,
+    "largest_remaining_exact_families": {
+      "xmage_simple_mana_source_with_etb_draw": 4,
+      "xmage_fixed_damage_draw_card_spell": 3,
+      "xmage_fixed_target_player_draw_spell": 3,
+      "xmage_x_damage_spell": 3
+    }
+  }
+}

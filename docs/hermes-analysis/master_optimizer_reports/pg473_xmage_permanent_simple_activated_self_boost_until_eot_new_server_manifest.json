@@ -1,0 +1,605 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg473_xmage_permanent_simple_activated_self_boost_until_",
+  "deploy_id": "pg473",
+  "expected_rules": [
+    {
+      "card_name": "Foxfire Oak",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ced93a57e24cd5ee4b9cac99c146e48f",
+      "min_rule_version": 2,
+      "normalized_name": "foxfire oak",
+      "oracle_hash": "f92e4e4511fd16e75e835a1f22dbdb96",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "R/G",
+              "R/G",
+              "R/G"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R/G}{R/G}{R/G}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 3,
+            "power_delta": 3,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "R/G",
+          "R/G",
+          "R/G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R/G}{R/G}{R/G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Frostburn Weird",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfb84f4b62429cb2c15f03c22f13c634",
+      "min_rule_version": 2,
+      "normalized_name": "frostburn weird",
+      "oracle_hash": "6631bcede98207ccff056d973ceebfbb",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "U/R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{U/R}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": -1,
+            "toughness_delta": -1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "U/R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{U/R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Loch Korrigan",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0910f17fa438b6dd99c27d522d289385",
+      "min_rule_version": 2,
+      "normalized_name": "loch korrigan",
+      "oracle_hash": "06d2b27101f16017ea92aec1554a69c9",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "U/B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{U/B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "U/B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{U/B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Parapet Watchers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d91c066b4f00ed65ba374802194ff1c8",
+      "min_rule_version": 2,
+      "normalized_name": "parapet watchers",
+      "oracle_hash": "c4393a49dad4b6f0b5b699c2f21396a5",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "W/U"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W/U}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "W/U"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W/U}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_self_boost_until_eot": 4
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg473_xmage_permanent_simple_activated_self_boost_until_eot_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg473_xmage_permanent_simple_activated_self_boost_until_eot_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg473_xmage_permanent_simple_activated_self_boost_until_eot_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg473_xmage_permanent_simple_activated_self_boost_until_eot_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg473_xmage_permanent_simple_activated_self_boost_until_eot_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg473_xmage_permanent_simple_activated_self_boost_until_eot_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T02:26:16+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Foxfire Oak"
+      },
+      "card_name": "Foxfire Oak",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ced93a57e24cd5ee4b9cac99c146e48f",
+      "normalized_name": "foxfire oak",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "R/G",
+              "R/G",
+              "R/G"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R/G}{R/G}{R/G}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 3,
+            "power_delta": 3,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 0,
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "R/G",
+          "R/G",
+          "R/G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R/G}{R/G}{R/G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Frostburn Weird"
+      },
+      "card_name": "Frostburn Weird",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfb84f4b62429cb2c15f03c22f13c634",
+      "normalized_name": "frostburn weird",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "U/R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{U/R}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": -1,
+            "toughness_delta": -1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "U/R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{U/R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Loch Korrigan"
+      },
+      "card_name": "Loch Korrigan",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0910f17fa438b6dd99c27d522d289385",
+      "normalized_name": "loch korrigan",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "U/B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{U/B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 1,
+            "power_delta": 1,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "U/B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{U/B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Parapet Watchers"
+      },
+      "card_name": "Parapet Watchers",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d91c066b4f00ed65ba374802194ff1c8",
+      "normalized_name": "parapet watchers",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_cost_colors": [
+              "W/U"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{W/U}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "power_boost": 0,
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_boost": 1,
+            "toughness_delta": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "BoostSourceEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "activated_effect": "self_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "W/U"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W/U}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+        "effect": "creature",
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostSourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Foxfire Oak",
+    "Frostburn Weird",
+    "Loch Korrigan",
+    "Parapet Watchers"
+  ],
+  "selected_count": 4,
+  "slug": "xmage_permanent_simple_activated_self_boost_until_eot_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Foxfire Oak",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ced93a57e24cd5ee4b9cac99c146e48f",
+      "min_rule_version": 2,
+      "normalized_name": "foxfire oak",
+      "oracle_hash": "f92e4e4511fd16e75e835a1f22dbdb96",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Frostburn Weird",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bfb84f4b62429cb2c15f03c22f13c634",
+      "min_rule_version": 2,
+      "normalized_name": "frostburn weird",
+      "oracle_hash": "6631bcede98207ccff056d973ceebfbb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Loch Korrigan",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0910f17fa438b6dd99c27d522d289385",
+      "min_rule_version": 2,
+      "normalized_name": "loch korrigan",
+      "oracle_hash": "06d2b27101f16017ea92aec1554a69c9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Parapet Watchers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d91c066b4f00ed65ba374802194ff1c8",
+      "min_rule_version": 2,
+      "normalized_name": "parapet watchers",
+      "oracle_hash": "c4393a49dad4b6f0b5b699c2f21396a5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

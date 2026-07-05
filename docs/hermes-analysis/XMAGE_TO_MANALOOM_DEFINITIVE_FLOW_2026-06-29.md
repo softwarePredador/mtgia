@@ -10934,6 +10934,53 @@ new server:
   `xmage_fixed_damage_draw_card_spell`,
   `xmage_fixed_target_player_draw_spell`, and `xmage_x_damage_spell`.
 
+## 2026-07-05 PG473 Permanent Simple Activated Self Boost Closure
+
+- Closed the exact XMage permanent simple activated self-boost family as
+  ManaLoom scope `xmage_permanent_simple_activated_self_boost_until_eot_v1`.
+- The selected package accepted local XMage creature sources whose executable
+  behavior is `SimpleActivatedAbility` with `BoostSourceEffect`, preserving
+  hybrid activation cost, no tap requirement, self target, power/toughness
+  delta, and until-end-of-turn duration.
+- The batch covers `4` cards: Foxfire Oak, Frostburn Weird, Loch Korrigan, and
+  Parapet Watchers.
+- Focused mapper/runtime/package tests covered activated self-boost cost
+  payment, activation gating, automatic profitable use, and cleanup; the
+  focused test lane passed `720` checks.
+- The PostgreSQL package promoted `4` cards. Precheck found `4` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` generated shadow
+  rows to deprecate; apply/postcheck verified `4/4` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `4` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve
+  `battle_model_scope=xmage_permanent_simple_activated_self_boost_until_eot_v1`,
+  activation cost, hybrid color list, no tap requirement, duration, and
+  power/toughness boost values.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `4` selected cards. Generic battle
+  scenario count remained `0`; activated self-boost behavior remains covered by
+  focused runtime tests.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4519` PostgreSQL runtime rows, wrote `4511` SQLite runtime
+  rows, and exported `4486` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26367`, `xmage_authoritative_source_count=26053`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26053`. This is an exact
+  reduction of `4` from the post-PG472 queue.
+- The post-PG473 exact split recheck reports `proposal_count=28` and
+  `safe_for_batch_pg_package_count=28`. The largest remaining exact families
+  are `xmage_simple_mana_source_with_etb_draw`,
+  `xmage_fixed_damage_draw_card_spell`,
+  `xmage_fixed_target_player_draw_spell`, and `xmage_x_damage_spell`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
