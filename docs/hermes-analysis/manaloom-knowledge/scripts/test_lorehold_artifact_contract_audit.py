@@ -536,6 +536,35 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.artifact_kind, "commander_learned_deck_import")
         self.assertEqual(classification.status, "pass")
 
+    def test_topdeck_access_first_sidecar_contract_is_recognized(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_topdeck_access_first_sidecar_shell_contract",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "deck_607_mutated": False,
+            "summary": {
+                "decision_status": (
+                    "topdeck_access_first_sidecar_contract_written_no_matrix_rows_keep_607"
+                ),
+                "contract_key": "topdeck_access_first_sidecar_shell_contract",
+                "candidate_deck_materialization_allowed_now": False,
+            },
+            "contract": {"contract_key": "topdeck_access_first_sidecar_shell_contract"},
+            "decision": {"keep_607_as_protected_baseline": True},
+            "source_evidence": {"input_health": {"missing_inputs": []}},
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "topdeck_contract.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(
+            classification.artifact_kind,
+            "lorehold_topdeck_access_first_sidecar_shell_contract",
+        )
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+
     def test_unknown_schema_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "unknown.json"

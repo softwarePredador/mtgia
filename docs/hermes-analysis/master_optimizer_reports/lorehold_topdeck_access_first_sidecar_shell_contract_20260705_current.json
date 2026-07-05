@@ -1,0 +1,484 @@
+{
+  "artifact_type": "lorehold_topdeck_access_first_sidecar_shell_contract",
+  "contract": {
+    "blocked_staple_policy": [
+      {
+        "card": "Mana Vault",
+        "current_policy": "learning_only_not_607_change",
+        "lane": "early_mana_and_spell_chain_conversion",
+        "reason": "Fast mana is valuable, but current evidence has no same-lane cut that preserves the 607 opponent-turn mana and miracle cadence floors."
+      },
+      {
+        "card": "The One Ring",
+        "current_policy": "learning_only_not_607_change",
+        "lane": "draw_and_resource_density",
+        "reason": "Generic draw is valuable, but prior 607 retests did not beat the protected shell and no current cut model repairs the floor risk."
+      }
+    ],
+    "contract_key": "topdeck_access_first_sidecar_shell_contract",
+    "contract_requirements": [
+      "copy_or_lab_candidate_only; never mutate deck_607",
+      "do_not_materialize_a_100_card_list_until_a_named_add_cut_pair_exists",
+      "preserve Commander 99-plus-1, singleton, and color identity gates",
+      "preserve the current 607 land and ramp floor unless a mana model beats it",
+      "preserve topdeck, miracle, upkeep-rummage, spell-volume, and cost-reduction floors",
+      "preserve Sensei's Divining Top, Scroll Rack, Library of Leng, and Land Tax access",
+      "preserve Bender's Waterskin and Victory Chimes unless same-lane proof beats 607",
+      "declare each add, cut, protected anchor, lane, floor risk, and expected metric lift",
+      "require direct drawn/cast/activated trace for added cards before natural battle",
+      "block forced access unless it has a temporary safe cut manifest",
+      "never treat forced-access success as promotion evidence",
+      "run equal battle gates only after structure matrix and trace floors pass",
+      "include a Winota or fast-pressure slice before any promotion claim"
+    ],
+    "mana_foundation_floor": {
+      "artifact_ramp_quantity": 11,
+      "enchantment_ramp_quantity": 1,
+      "instant_sorcery_ramp_quantity": 3,
+      "interpretation": "The 607 mana plan is not just more fast mana: it combines 34 lands, fetch/dual fixing, artifact ramp, spell ramp, and opponent-turn mana rocks that feed miracle windows.",
+      "land_groups": {
+        "basic_floor": 8,
+        "fetch_or_search_fixing": 8,
+        "typed_dual_or_fetch_target": 5,
+        "untapped_or_multiplayer_fixing": 5,
+        "utility_engine_land": 8
+      },
+      "land_quantity": 34,
+      "land_rows": 28,
+      "mana_sources_land_plus_ramp": 49,
+      "ramp_quantity": 15
+    },
+    "promotion_gate_requirements": [
+      "same_seed_same_opponent_matrix_against_current_deck_607",
+      "candidate_ties_or_beats_607_aggregate",
+      "Winota_fast_pressure_slice_ties_or_improves",
+      "direct_drawn_cast_used_trace_for_added_cards_and_anchors",
+      "closing_window_trace_shows_topdeck_miracle_plan_executed"
+    ],
+    "protected_anchors": [
+      "Approach of the Second Sun",
+      "Bender's Waterskin",
+      "Creative Technique",
+      "Land Tax",
+      "Library of Leng",
+      "Lorehold, the Historian",
+      "Mizzix's Mastery",
+      "Molecule Man",
+      "Scroll Rack",
+      "Sensei's Divining Top",
+      "Storm Herd",
+      "The Mind Stone",
+      "The Scarlet Witch",
+      "Victory Chimes"
+    ],
+    "shell_key": "topdeck_access_first_sidecar_shell",
+    "shell_type": "sidecar_shell_before_structure_matrix",
+    "strategic_goal": "Learn whether a topdeck-access-first Lorehold shell can beat the 607 baseline without cutting protected miracle, mana, topdeck, or fast-pressure floors.",
+    "topdeck_target_blocker_counts": {
+      "missing_named_same_lane_cut": 5,
+      "needs_safe_cut_model": 5,
+      "nonanchor_model_has_no_reviewable_gap": 5,
+      "nonanchor_model_has_no_seed_safe_cut": 5,
+      "prior_reject_requires_new_trace_hypothesis": 4
+    },
+    "topdeck_targets": [
+      {
+        "add_card": "Dragon's Rage Channeler",
+        "blockers": [
+          "missing_named_same_lane_cut",
+          "needs_safe_cut_model",
+          "nonanchor_model_has_no_reviewable_gap",
+          "nonanchor_model_has_no_seed_safe_cut"
+        ],
+        "model_status": "clean_prior_target_blocked_no_nonanchor_cut",
+        "reviewable_nonanchor_gap_count": 0,
+        "same_lane_slot_count": 6,
+        "seed_safe_nonanchor_count": 0
+      },
+      {
+        "add_card": "Galvanoth",
+        "blockers": [
+          "missing_named_same_lane_cut",
+          "needs_safe_cut_model",
+          "nonanchor_model_has_no_reviewable_gap",
+          "nonanchor_model_has_no_seed_safe_cut",
+          "prior_reject_requires_new_trace_hypothesis"
+        ],
+        "model_status": "prior_reject_target_blocked_no_nonanchor_cut",
+        "reviewable_nonanchor_gap_count": 0,
+        "same_lane_slot_count": 8,
+        "seed_safe_nonanchor_count": 0
+      },
+      {
+        "add_card": "Penance",
+        "blockers": [
+          "missing_named_same_lane_cut",
+          "needs_safe_cut_model",
+          "nonanchor_model_has_no_reviewable_gap",
+          "nonanchor_model_has_no_seed_safe_cut",
+          "prior_reject_requires_new_trace_hypothesis"
+        ],
+        "model_status": "prior_reject_target_blocked_no_nonanchor_cut",
+        "reviewable_nonanchor_gap_count": 0,
+        "same_lane_slot_count": 20,
+        "seed_safe_nonanchor_count": 0
+      },
+      {
+        "add_card": "Valakut Awakening // Valakut Stoneforge",
+        "blockers": [
+          "missing_named_same_lane_cut",
+          "needs_safe_cut_model",
+          "nonanchor_model_has_no_reviewable_gap",
+          "nonanchor_model_has_no_seed_safe_cut",
+          "prior_reject_requires_new_trace_hypothesis"
+        ],
+        "model_status": "prior_reject_target_blocked_no_nonanchor_cut",
+        "reviewable_nonanchor_gap_count": 0,
+        "same_lane_slot_count": 13,
+        "seed_safe_nonanchor_count": 0
+      },
+      {
+        "add_card": "Wheel of Fortune",
+        "blockers": [
+          "missing_named_same_lane_cut",
+          "needs_safe_cut_model",
+          "nonanchor_model_has_no_reviewable_gap",
+          "nonanchor_model_has_no_seed_safe_cut",
+          "prior_reject_requires_new_trace_hypothesis"
+        ],
+        "model_status": "prior_reject_target_blocked_no_nonanchor_cut",
+        "reviewable_nonanchor_gap_count": 0,
+        "same_lane_slot_count": 13,
+        "seed_safe_nonanchor_count": 0
+      }
+    ],
+    "value_lanes_to_model": [
+      "topdeck_miracle_setup",
+      "hand_to_library_control",
+      "opponent_turn_mana",
+      "spell_volume_conversion",
+      "same_lane_nonanchor_cut",
+      "nonanchor_cut_model_proof",
+      "fast_pressure_survival"
+    ]
+  },
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "forced_access_allowed_now": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_write_postgresql_or_sqlite",
+      "do_not_materialize_a_sidecar_deck_from_blocked_rows",
+      "mine_named_same_lane_cuts_for_topdeck_targets",
+      "treat Mana Vault and The One Ring as learning-only until lane, cut, trace, and battle proof exist"
+    ],
+    "promotion_allowed": false,
+    "reason": "The sidecar contract can be written, but current rows have zero matrix-eligible add/cut pairs and zero non-anchor safe cuts, so learning must continue at the cut-model layer.",
+    "structure_matrix_allowed_now": false,
+    "structure_matrix_contract_allowed_now": false
+  },
+  "deck_607_mutated": false,
+  "external_research_refresh": [
+    {
+      "contract_use": "Use official Commander deck shape, singleton, and color identity as legality gates only; they do not prove a deckbuilding upgrade.",
+      "source": "Wizards Commander format",
+      "url": "https://magic.wizards.com/en/formats/commander"
+    },
+    {
+      "contract_use": "Lorehold's miracle grant and opponent-upkeep rummage make top-library control and opponent-turn mana first-class deckbuilding lanes.",
+      "source": "Scryfall Lorehold, the Historian",
+      "url": "https://scryfall.com/card/sos/201/lorehold-the-historian"
+    },
+    {
+      "contract_use": "Public topdeck lists are discovery evidence for cards such as Dragon's Rage Channeler; local cut, trace, and battle gates still win.",
+      "source": "EDHREC Lorehold optimized topdeck average deck",
+      "url": "https://edhrec.com/average-decks/lorehold-the-historian/topdeck"
+    },
+    {
+      "contract_use": "Use the article only to reinforce the miracle/topdeck floor; it is not a ManaLoom promotion result.",
+      "source": "EDHREC Miracles Every Turn with Lorehold",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander"
+    },
+    {
+      "contract_use": "Use synergy suggestions as hypotheses. They still need named cuts and 607-preserving trace proof before execution.",
+      "source": "Card Kingdom Lorehold synergy article",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/"
+    }
+  ],
+  "generated_at": "2026-07-05T07:34:30Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "input_health": {
+      "all_required_inputs_present": true,
+      "missing_inputs": []
+    },
+    "miracle_shell_contract_summary": {
+      "aggregate_blocker_count": 28,
+      "avg_607_turn_advantage": 10.15,
+      "closing_window_comparison_count": 13,
+      "contract_written": true,
+      "cut_shortage": 2,
+      "decision_status": "miracle_access_first_contract_written_no_battle_blocked_before_structure_matrix",
+      "deck_action_allowed_now": false,
+      "from_scratch_can_run_next_battle_gate": false,
+      "from_scratch_promotable_shell_signal_count": 0,
+      "miracle_failure_flag_count": 7,
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "preflight_candidate_count": 2,
+      "preflight_gate_ready_now_count": 0,
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "recommended_next_action": "design_micro_shell_structure_matrix_contract_no_battle",
+      "selected_contract_key": "miracle_access_first_shell_contract",
+      "selected_hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+      "structure_matrix_allowed_now": false,
+      "structure_matrix_contract_allowed_now": true
+    },
+    "nonanchor_cut_model_summary": {
+      "candidate_deck_materialization_allowed_now": false,
+      "clean_prior_blocked_target_count": 1,
+      "clean_prior_blocked_targets": [
+        "Dragon's Rage Channeler"
+      ],
+      "decision_status": "topdeck_nonanchor_cut_model_none_found_keep_607",
+      "forced_access_allowed_now": false,
+      "microbenchmark_runnable_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "primary_target": "Dragon's Rage Channeler",
+      "primary_target_model_status": "clean_prior_target_blocked_no_nonanchor_cut",
+      "primary_target_same_lane_slot_count": 6,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "collect_new_cut_evidence_or_define_new_shell_contract_before_execution",
+      "reviewable_nonanchor_gap_count": 0,
+      "seed_safe_nonanchor_count": 0,
+      "status_counts": {
+        "clean_prior_target_blocked_no_nonanchor_cut": 1,
+        "prior_reject_target_blocked_no_nonanchor_cut": 4
+      },
+      "structure_matrix_allowed_now": false,
+      "target_card_count": 5
+    },
+    "post_safe_cut_route_summary": {
+      "closing_router_selected_status": "primary_shell_contract_target_blocked_but_actionable_as_design",
+      "decision_status": "topdeck_post_safe_cut_route_sidecar_shell_required_keep_607",
+      "deck_607_mutated": false,
+      "deck_607_protected": true,
+      "deck_action_allowed_now": false,
+      "external_research_signal_count": 3,
+      "forced_access_runnable_count": 0,
+      "from_scratch_can_run_next_battle_gate": false,
+      "from_scratch_promotable_shell_signal_count": 0,
+      "hypothesis_queue_gate_ready_now_count": 0,
+      "hypothesis_queue_natural_gate_ready_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "nonanchor_clean_prior_blocked_target_count": 1,
+      "nonanchor_primary_target": "Dragon's Rage Channeler",
+      "nonanchor_primary_target_same_lane_slot_count": 6,
+      "nonanchor_primary_target_status": "clean_prior_target_blocked_no_nonanchor_cut",
+      "nonanchor_reviewable_gap_count": 0,
+      "nonanchor_seed_safe_count": 0,
+      "one_for_one_cut_ready_count": 0,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "write_or_refresh_topdeck_access_first_sidecar_shell_contract_before_materialization",
+      "reviewable_same_lane_gap_count": 0,
+      "safe_cut_reviewable_count": 0,
+      "safe_cut_seed_ready_count": 0,
+      "selected_route": "topdeck_access_first_sidecar_shell",
+      "sidecar_shell_contract_required": true,
+      "structure_matrix_allowed_now": false,
+      "structure_matrix_contract_allowed_now": true
+    },
+    "sidecar_queue_summary": {
+      "blocker_counts": {
+        "generic_staple_not_lorehold_specific_until_trace_proof": 2,
+        "missing_named_same_lane_cut": 40,
+        "must_follow_topdeck_miracle_floor": 13,
+        "needs_safe_cut_model": 40,
+        "nonanchor_model_has_no_reviewable_gap": 5,
+        "nonanchor_model_has_no_seed_safe_cut": 5,
+        "prior_reject_requires_new_trace_hypothesis": 13
+      },
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_sidecar_candidate_queue_blocked_no_matrix_rows_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "matrix_candidate_row_eligible_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "nonanchor_clean_prior_blocked_target_count": 1,
+      "nonanchor_primary_target": "Dragon's Rage Channeler",
+      "nonanchor_primary_target_status": "clean_prior_target_blocked_no_nonanchor_cut",
+      "nonanchor_reviewable_gap_count": 0,
+      "nonanchor_seed_safe_count": 0,
+      "post_safe_cut_selected_route": "topdeck_access_first_sidecar_shell",
+      "promotion_allowed_now": false,
+      "queue_row_count": 40,
+      "readiness_counts": {
+        "blocked_prior_reject": 9,
+        "needs_safe_cut_model": 31
+      },
+      "recommended_next_action": "build_named_same_lane_cut_models_for_topdeck_and_mana_rows_before_matrix_scoring",
+      "safe_cut_reviewable_count": 0,
+      "safe_cut_seed_ready_count": 0,
+      "structure_matrix_scoring_allowed_now": false,
+      "tag_counts": {
+        "generic_staple_learning_only": 2,
+        "mana_base_safe_cut_model": 7,
+        "pressure_window_after_topdeck_floor": 5,
+        "sidecar_watchlist": 10,
+        "spell_chain_after_miracle_floor": 8,
+        "topdeck_access_sidecar_primary": 5,
+        "tutor_learning_only_after_prior_reject": 3
+      },
+      "value_model_land_quantity": 34,
+      "value_model_ramp_quantity": 15
+    },
+    "trace_evidence_summary": {
+      "candidate_deck_materialization_allowed_now": false,
+      "cut_safety_blocked_target_count": 5,
+      "cut_safety_blocked_targets": [
+        "Penance",
+        "Galvanoth",
+        "Dragon's Rage Channeler",
+        "Valakut Awakening // Valakut Stoneforge",
+        "Wheel of Fortune"
+      ],
+      "decision_status": "topdeck_floor_trace_evidence_collected_no_execution_keep_607",
+      "forced_access_allowed_now": false,
+      "microbenchmark_runnable_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "prior_reject_target_count": 4,
+      "prior_reject_targets": [
+        "Penance",
+        "Galvanoth",
+        "Valakut Awakening // Valakut Stoneforge",
+        "Wheel of Fortune"
+      ],
+      "promotion_allowed_now": false,
+      "recommended_next_action": "mine_new_nonanchor_same_lane_cut_models_before_any_trace_execution",
+      "seed_safe_same_lane_count": 0,
+      "status_counts": {
+        "prior_reject_requires_new_same_lane_cut_model": 4,
+        "trace_design_ready_but_cut_safety_blocked": 1
+      },
+      "structure_matrix_allowed_now": false,
+      "target_card_count": 5,
+      "trace_collection_allowed_count": 5
+    },
+    "value_model_summary": {
+      "card_rows": 94,
+      "commander_count": 1,
+      "deck_id": 607,
+      "gate_ready_now_count": 0,
+      "keep_607_as_protected_baseline": true,
+      "lane_profile": {
+        "artifact": 17,
+        "basic_floor": 8,
+        "board_wipe": 8,
+        "commander_center": 1,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "fast_pressure_guard": 12,
+        "fetch_or_search_fixing": 8,
+        "format_staple_long_tail": 6,
+        "global_top_100": 17,
+        "global_top_500": 11,
+        "instant_sorcery_spell": 36,
+        "land": 34,
+        "mana_base": 34,
+        "miracle_conversion_finisher": 10,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "structural_ramp_floor": 8,
+        "topdeck_miracle_engine": 9,
+        "tutor": 1,
+        "typed_dual_or_fetch_target": 5,
+        "untapped_or_multiplayer_fixing": 5,
+        "utility_engine_land": 8,
+        "wincon": 9
+      },
+      "mana_foundation": {
+        "artifact_ramp_quantity": 11,
+        "enchantment_ramp_quantity": 1,
+        "instant_sorcery_ramp_quantity": 3,
+        "interpretation": "The 607 mana plan is not just more fast mana: it combines 34 lands, fetch/dual fixing, artifact ramp, spell ramp, and opponent-turn mana rocks that feed miracle windows.",
+        "land_groups": {
+          "basic_floor": 8,
+          "fetch_or_search_fixing": 8,
+          "typed_dual_or_fetch_target": 5,
+          "untapped_or_multiplayer_fixing": 5,
+          "utility_engine_land": 8
+        },
+        "land_quantity": 34,
+        "land_rows": 28,
+        "mana_sources_land_plus_ramp": 49,
+        "ramp_quantity": 15
+      },
+      "preflight_status": "no_current_candidate_passes_miracle_access_first_preflight",
+      "promotion_allowed": false,
+      "quantity_total": 100,
+      "role_profile": {
+        "board_wipe": 8,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "land": 34,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "trace_status": "lorehold_miracle_trace_failure_learning_ready"
+    }
+  },
+  "source_reports": {
+    "miracle_shell_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_shell_contract_20260705_current_relearn.json",
+    "nonanchor_cut_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.json",
+    "post_safe_cut_route": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_post_safe_cut_route_20260705_current.json",
+    "sidecar_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_candidate_queue_20260705_current.json",
+    "trace_evidence": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_evidence_collector_20260705_current.json",
+    "value_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json"
+  },
+  "status": "topdeck_access_first_sidecar_contract_written_no_matrix_rows_keep_607",
+  "summary": {
+    "candidate_deck_materialization_allowed_now": false,
+    "contract_key": "topdeck_access_first_sidecar_shell_contract",
+    "contract_written": true,
+    "decision_status": "topdeck_access_first_sidecar_contract_written_no_matrix_rows_keep_607",
+    "deck_action_allowed_now": false,
+    "forced_access_allowed_now": false,
+    "land_quantity_floor": 34,
+    "mana_sources_land_plus_ramp_floor": 49,
+    "matrix_candidate_row_eligible_count": 0,
+    "microbenchmark_runnable_count": 0,
+    "missing_inputs": [],
+    "natural_battle_gate_allowed_now": false,
+    "nonanchor_primary_target": "Dragon's Rage Channeler",
+    "nonanchor_primary_target_status": "clean_prior_target_blocked_no_nonanchor_cut",
+    "nonanchor_reviewable_gap_count": 0,
+    "nonanchor_seed_safe_count": 0,
+    "promotion_allowed_now": false,
+    "queue_row_count": 40,
+    "ramp_quantity_floor": 15,
+    "recommended_next_action": "build_named_same_lane_cut_models_for_topdeck_and_mana_rows_before_structure_matrix",
+    "selected_route": "topdeck_access_first_sidecar_shell",
+    "shell_key": "topdeck_access_first_sidecar_shell",
+    "sidecar_shell_contract_required": true,
+    "structure_matrix_allowed_now": false,
+    "structure_matrix_contract_allowed_now": false,
+    "topdeck_target_row_count": 5,
+    "trace_collection_allowed_count": 5
+  }
+}

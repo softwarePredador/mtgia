@@ -3082,3 +3082,64 @@ Operational lesson:
 - A sidecar row still needs a named cut model and preserved topdeck/miracle
   floors before structure-matrix scoring. No row is eligible now.
 - Deck `607` remains untouched and protected.
+
+## Topdeck Access-First Sidecar Shell Contract - 2026-07-05
+
+The sidecar shell contract is now explicit:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_access_first_sidecar_shell_contract_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_access_first_sidecar_shell_contract_20260705_current.json`
+
+It consumes:
+
+- `lorehold_topdeck_post_safe_cut_route_20260705_current`;
+- `lorehold_topdeck_sidecar_candidate_queue_20260705_current`;
+- `lorehold_topdeck_nonanchor_cut_model_miner_20260705_current`;
+- `lorehold_miracle_access_first_shell_contract_20260705_current_relearn`;
+- `lorehold_deckbuilding_value_model_20260704_current`;
+- `lorehold_topdeck_floor_trace_evidence_collector_20260705_current`.
+
+Current result:
+
+- status:
+  `topdeck_access_first_sidecar_contract_written_no_matrix_rows_keep_607`;
+- contract key:
+  `topdeck_access_first_sidecar_shell_contract`;
+- shell key:
+  `topdeck_access_first_sidecar_shell`;
+- queue rows: `40`;
+- matrix candidate rows eligible: `0`;
+- topdeck target rows: `5`;
+- trace collection allowed rows: `5`;
+- microbenchmark-runnable rows: `0`;
+- current 607 mana floor: `34` lands, `15` ramp, and `49` land-plus-ramp
+  mana sources;
+- primary non-anchor target:
+  `Dragon's Rage Channeler`;
+- primary target status:
+  `clean_prior_target_blocked_no_nonanchor_cut`;
+- non-anchor seed-safe cuts: `0`;
+- non-anchor reviewable gaps: `0`;
+- structure-matrix contract allowed now: `false`;
+- structure-matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- forced access allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`.
+
+Deckbuilding lesson captured by the contract:
+
+- Lands and ramp are not generic counts only. For current `607`, the protected
+  floor is a `34` land plus `15` ramp package that supports fetch/fixing,
+  artifact ramp, spell ramp, and opponent-turn mana for miracle windows.
+- `Dragon's Rage Channeler` remains the cleanest topdeck-access target by prior
+  history, but it cannot enter a protected-`607` candidate without a named
+  same-lane non-anchor cut and preserved topdeck/miracle floors.
+- `Mana Vault` and `The One Ring` remain real cards to learn from, but they are
+  not available protected-`607` changes right now. They need lane fit, named
+  cut, direct drawn/cast/used trace, no miracle/topdeck regression, and a later
+  same-seed gate before any deck action.
+- The next allowed work is:
+  `build_named_same_lane_cut_models_for_topdeck_and_mana_rows_before_structure_matrix`.
+
+Deck `607` remains untouched and protected.

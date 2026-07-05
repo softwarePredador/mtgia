@@ -1389,5 +1389,46 @@ Learning-frontier closure generated on 2026-07-05:
   rows, and adds non-anchor blockers to all `5` topdeck targets before any
   forced-access or materialization path can open.
 
+Topdeck access-first sidecar shell contract generated on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_access_first_sidecar_shell_contract_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_access_first_sidecar_shell_contract_20260705_current.json`.
+- Status:
+  `topdeck_access_first_sidecar_contract_written_no_matrix_rows_keep_607`.
+- Contract key:
+  `topdeck_access_first_sidecar_shell_contract`.
+- Shell key:
+  `topdeck_access_first_sidecar_shell`.
+- Current counts: `queue_row_count=40`,
+  `matrix_candidate_row_eligible_count=0`, `topdeck_target_row_count=5`,
+  `trace_collection_allowed_count=5`, and `microbenchmark_runnable_count=0`.
+- Mana floor preserved from the current value model: `34` lands, `15` ramp,
+  and `49` land-plus-ramp mana sources. A sidecar cannot reduce that floor
+  unless a later mana model and equal gate prove the replacement.
+- Primary clean-prior target:
+  `Dragon's Rage Channeler`, still blocked as
+  `clean_prior_target_blocked_no_nonanchor_cut` with `0` seed-safe non-anchor
+  cuts and `0` reviewable non-anchor gaps.
+- Contract policy: `Mana Vault` and `The One Ring` remain learning-only, not
+  protected-`607` deck changes, until each has lane fit, named same-lane cut,
+  direct trace proof, preserved miracle/topdeck floors, and same-seed battle
+  evidence.
+- Structure-matrix contract allowed now: `false`; structure-matrix scoring:
+  `false`; candidate deck materialization: `false`; forced access: `false`;
+  natural battle gate: `false`; promotion: `false`.
+- Next allowed work:
+  `build_named_same_lane_cut_models_for_topdeck_and_mana_rows_before_structure_matrix`.
+
+Operational lesson:
+
+- This contract is the learning surface requested for deckbuilding priorities:
+  it records how lands, ramp, topdeck anchors, artifact/staple value, and cut
+  safety are weighed before any list is created.
+- It does not make a better deck yet. It preserves `607` as champion while the
+  system learns which non-anchor cuts could possibly open a fair topdeck
+  challenger.
+
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.
