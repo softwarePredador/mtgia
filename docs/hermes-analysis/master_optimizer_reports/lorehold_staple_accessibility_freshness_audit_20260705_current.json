@@ -1,0 +1,196 @@
+{
+  "artifact_type": "lorehold_staple_accessibility_freshness_audit",
+  "cards": [
+    {
+      "app_accessibility_label": "rules_accessible_collection_missing_promotion_blocked",
+      "bracket": {
+        "allowed_by_bracket": true,
+        "reason": "game_changer_budget_available",
+        "target_bracket": 4
+      },
+      "card_name": "Mana Vault",
+      "collection": {
+        "owned": false,
+        "owned_quantity": 0
+      },
+      "deck_action_allowed_now": false,
+      "discovery": {
+        "battle_rule_active_count": 1,
+        "format_staple_present": true,
+        "format_staples_gap": false,
+        "game_changer_discovery_status": "discovery_ready_in_format_staples",
+        "local_official_game_changer": true
+      },
+      "external": {
+        "commander_legal": true,
+        "game_changer": true,
+        "lorehold_color_allowed": true,
+        "reason": "Wizards grouped Mana Vault with powerful fast-mana pieces that accelerate games.",
+        "role": "fast_mana"
+      },
+      "hypothesis": {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "lanes": [
+          "spell_chain_conversion"
+        ],
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "reason": "internally available and runtime-modeled, but one-card Bender's Waterskin replacement lost",
+        "same_lane_current_607_anchors": [
+          "Molecule Man",
+          "Reforge the Soul",
+          "Call Forth the Tempest",
+          "Hit the Mother Lode",
+          "Creative Technique"
+        ],
+        "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis"
+      },
+      "local_rules": {
+        "color_identity_allowed": true,
+        "commander_legal": true,
+        "commander_status": "legal",
+        "mana_cost": "{1}",
+        "type_line": "Artifact"
+      },
+      "natural_gate_allowed_now": false,
+      "next_action": "do_not_offer_as_available_deck_change_until_collection_and_new_cut_trace_exist",
+      "promotion": {
+        "current_607_accessibility": "legal_not_owned_and_promotion_blocked_current_607",
+        "decision": "blocked_prior_gate_rejected",
+        "replacement_pressure": ""
+      }
+    },
+    {
+      "app_accessibility_label": "rules_collection_accessible_promotion_blocked",
+      "bracket": {
+        "allowed_by_bracket": true,
+        "reason": "game_changer_budget_available",
+        "target_bracket": 4
+      },
+      "card_name": "The One Ring",
+      "collection": {
+        "owned": true,
+        "owned_quantity": 1
+      },
+      "deck_action_allowed_now": false,
+      "discovery": {
+        "battle_rule_active_count": 1,
+        "format_staple_present": false,
+        "format_staples_gap": true,
+        "game_changer_discovery_status": "discovery_gap_missing_format_staples",
+        "local_official_game_changer": true
+      },
+      "external": {
+        "commander_legal": true,
+        "game_changer": true,
+        "lorehold_color_allowed": true,
+        "reason": "Wizards grouped The One Ring with overwhelming resource-advantage cards that can snowball games.",
+        "role": "resource_engine"
+      },
+      "hypothesis": {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "lanes": [
+          "unclassified_variant_watchlist"
+        ],
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "reason": "internally available and runtime-modeled, but tested value/draw cuts lost to 607",
+        "same_lane_current_607_anchors": [],
+        "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis"
+      },
+      "local_rules": {
+        "color_identity_allowed": true,
+        "commander_legal": true,
+        "commander_status": "legal",
+        "mana_cost": "{4}",
+        "type_line": "Legendary Artifact"
+      },
+      "natural_gate_allowed_now": false,
+      "next_action": "show_owned_but_blocked_prior_reject_and_require_new_same_lane_trace",
+      "promotion": {
+        "current_607_accessibility": "legal_owned_but_promotion_blocked_current_607",
+        "decision": "blocked_existing_package_rejected",
+        "replacement_pressure": ""
+      }
+    }
+  ],
+  "current_baseline": "deck_607",
+  "decision": {
+    "app_label_requirement": "Show legal, collection, discovery, bracket, and promotion layers separately. Do not collapse Mana Vault or The One Ring into one accessible/inaccessible flag.",
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_gate_allowed_now": false,
+    "promotion_allowed": false,
+    "reason": "Both reviewed cards are legal and Lorehold-color-compatible by current external rules evidence, but the current 607 evidence has zero natural-gate-ready rows and both cards remain blocked by collection and/or prior promotion evidence.",
+    "rules_legal_is_not_same_as_deck_accessible": true
+  },
+  "deck_607_mutated": false,
+  "external_rules_snapshot": {
+    "cards": {
+      "Mana Vault": {
+        "external_color_identity_allowed_for_lorehold": true,
+        "external_commander_legal": true,
+        "external_game_changer": true,
+        "external_reason": "Wizards grouped Mana Vault with powerful fast-mana pieces that accelerate games.",
+        "external_role": "fast_mana"
+      },
+      "The One Ring": {
+        "external_color_identity_allowed_for_lorehold": true,
+        "external_commander_legal": true,
+        "external_game_changer": true,
+        "external_reason": "Wizards grouped The One Ring with overwhelming resource-advantage cards that can snowball games.",
+        "external_role": "resource_engine"
+      }
+    },
+    "checked_at": "2026-07-05",
+    "latest_wizards_bnr_announcement": {
+      "commander_changes": "none_seen_in_current_announcement",
+      "next_announcement": "2026-08-10",
+      "published": "2026-06-29",
+      "url": "https://magic.wizards.com/en/news/announcements/banned-and-restricted-june-29-2026"
+    },
+    "official_commander_banned_list": {
+      "banned_list_updated_quarterly": true,
+      "interpretation": "The current Commander banned list is format-specific and does not list Mana Vault or The One Ring as Commander-banned cards.",
+      "url": "https://mtgcommander.net/index.php/banned-list/"
+    },
+    "wizards_commander_brackets_beta": {
+      "bracket_4_rule": "no_restrictions_other_than_banned_list",
+      "game_changer_meaning": "Game Changer is a power and matchmaking signal, not a Commander ban.",
+      "url": "https://magic.wizards.com/en/news/announcements/introducing-commander-brackets-beta"
+    }
+  },
+  "generated_at": "2026-07-05T06:02:35Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_reports": {
+    "accessibility": "docs/hermes-analysis/master_optimizer_reports/lorehold_accessibility_layer_matrix_20260705_current.json",
+    "game_changer_audit": "docs/hermes-analysis/master_optimizer_reports/game_changer_discovery_gap_audit_20260705_current.json",
+    "hypothesis_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_hypothesis_queue_from_value_model_20260705_current_relearn.json",
+    "value_priority": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_value_priority_synthesis_20260705_current_relearn.json"
+  },
+  "status": "staple_accessibility_current_legal_but_not_promotion_ready_keep_607",
+  "summary": {
+    "cards_reviewed": 2,
+    "deck_action_allowed_now": false,
+    "external_commander_legal_count": 2,
+    "format_staples_gap_count": 1,
+    "game_changer_count": 2,
+    "game_changer_discovery_status": "game_changer_discovery_gap_found_report_only",
+    "hypothesis_queue_natural_gate_ready_count": 0,
+    "hypothesis_queue_status": "lorehold_hypothesis_queue_ready_no_natural_gate",
+    "label_counts": {
+      "rules_accessible_collection_missing_promotion_blocked": 1,
+      "rules_collection_accessible_promotion_blocked": 1
+    },
+    "local_commander_legal_count": 2,
+    "missing_inputs": [],
+    "natural_gate_allowed_now": false,
+    "natural_gate_ready_count": 0,
+    "owned_count": 1,
+    "promotion_allowed_now": false,
+    "promotion_blocked_count": 2,
+    "recommended_next_action": "surface_accessibility_by_layer_and_require_new_cut_trace_before_retesting_staples",
+    "value_priority_ready_replacement_count": 0
+  }
+}

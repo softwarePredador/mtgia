@@ -2400,3 +2400,71 @@ Operational lesson:
   run a natural Brain battle from this audit. The next valid work is explicit
   PostgreSQL apply approval for the prepared Brain package plus continued
   same-lane cut mining.
+
+## Staple Accessibility Freshness Audit - 2026-07-05
+
+The current staple accessibility freshness artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_staple_accessibility_freshness_audit_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_staple_accessibility_freshness_audit_20260705_current.json`
+
+This audit refreshes the `Mana Vault` and `The One Ring` question with current
+external rules evidence and current local 607 evidence. It consumes:
+
+- `lorehold_accessibility_layer_matrix_20260705_current`;
+- `lorehold_hypothesis_queue_from_value_model_20260705_current_relearn`;
+- `game_changer_discovery_gap_audit_20260705_current`;
+- `lorehold_card_value_priority_synthesis_20260705_current_relearn`.
+
+External freshness snapshot:
+
+- Commander banned list checked on 2026-07-05:
+  `https://mtgcommander.net/index.php/banned-list/`;
+- latest Wizards B&R announcement checked:
+  `https://magic.wizards.com/en/news/announcements/banned-and-restricted-june-29-2026`;
+- Commander Brackets/Game Changers source checked:
+  `https://magic.wizards.com/en/news/announcements/introducing-commander-brackets-beta`.
+
+Current result:
+
+- status:
+  `staple_accessibility_current_legal_but_not_promotion_ready_keep_607`;
+- cards reviewed: `2`;
+- external Commander-legal cards: `2`;
+- local Commander-legal cards: `2`;
+- owned cards: `1`;
+- Game Changers reviewed: `2`;
+- format-staples gaps: `1`;
+- promotion-blocked cards: `2`;
+- natural-gate-ready cards: `0`;
+- deck action allowed now: `false`;
+- natural gate allowed now: `false`;
+- recommended next action:
+  `surface_accessibility_by_layer_and_require_new_cut_trace_before_retesting_staples`.
+
+Card-level labels:
+
+- `Mana Vault`:
+  `rules_accessible_collection_missing_promotion_blocked`.
+  It is legal, colorless, bracket-allowed in bracket 4, a Game Changer, and a
+  format staple, but it is not owned locally and remains
+  `blocked_prior_reject` after the prior replacement route lost. It must not
+  be offered as an available protected-607 deck change until both collection
+  and a materially new cut/trace hypothesis exist.
+- `The One Ring`:
+  `rules_collection_accessible_promotion_blocked`.
+  It is legal, colorless, bracket-allowed in bracket 4, a Game Changer, and
+  owned locally, but it has a local `format_staples` discovery gap and remains
+  `blocked_prior_reject` / `blocked_existing_package_rejected`. It should be
+  displayed as owned but promotion-blocked, not as a deck-ready upgrade.
+
+App/deckbuilder rule:
+
+- Do not collapse legality, ownership, discovery, bracket, runtime, and
+  promotion into one boolean `accessible` flag.
+- `legal` means playable under Commander rules. `owned` means collection
+  availability. `Game Changer` means power/matchmaking pressure. None of those
+  means a protected-`607` replacement without same-lane cut proof, refreshed
+  strategy matrix, and later equal battle traces.
+- Current conclusion remains unchanged: deck `607` is still the protected
+  Lorehold champion.
