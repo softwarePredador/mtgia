@@ -1,8 +1,8 @@
 # Lorehold Artifact Contract Audit
 
-- Generated at: `2026-07-05T08:31:04.364257+00:00`
+- Generated at: `2026-07-05T08:42:54.226991+00:00`
 - Status: `pass`
-- Artifact count: `958`
+- Artifact count: `959`
 - Unknown/invalid artifacts: `0`
 - Artifact contract: `pass`
 - Deck universe: `pass`
@@ -114,6 +114,7 @@
 | `lorehold_miracle_next_route_planner` | 1 |
 | `lorehold_miracle_trace_failure_miner` | 1 |
 | `lorehold_named_same_lane_cut_frontier` | 1 |
+| `lorehold_next_shell_contract_synthesis` | 1 |
 | `lorehold_payoff_finisher_recursion_synthesis` | 1 |
 | `lorehold_post_identity_queue_split` | 1 |
 | `lorehold_post_mana_base_learning_router` | 1 |

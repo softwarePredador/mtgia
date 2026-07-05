@@ -29,7 +29,7 @@
     "reason": "The governed artifact surface is classified, deck_607 ranks first structurally, current sidecar/cut routes have zero eligible rows, and the only positive promotion signal is historical and overridden."
   },
   "deck_607_mutated": false,
-  "generated_at": "2026-07-05T08:31:15Z",
+  "generated_at": "2026-07-05T08:43:08Z",
   "matrix_summary": {
     "live_challenger_ranks": {
       "deck_614": 3,
@@ -77,7 +77,7 @@
   "summary": {
     "artifact_contract_equal_battle_gate_allowed": true,
     "artifact_contract_status": "pass",
-    "artifact_count": 958,
+    "artifact_count": 959,
     "current_positive_signal_count": 0,
     "decision_status": "current_best_baseline_synthesis_keep_607",
     "floor_trace_cut_blocker_count": 6,

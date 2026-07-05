@@ -3373,9 +3373,9 @@ surface instead of leaving historical deckbuilding reports as unknown schemas:
 Current result:
 
 - status: `pass`;
-- artifact count: `958`;
+- artifact count: `959`;
 - unknown or invalid artifacts: `0`;
-- status counts: `957` pass and `1` warn;
+- status counts: `958` pass and `1` warn;
 - artifact contract: `pass`;
 - deck universe: `pass`;
 - current matrix: `pass`;
@@ -3411,7 +3411,7 @@ rows:
 Current result:
 
 - status: `current_best_baseline_synthesis_keep_607`;
-- artifact count: `958`;
+- artifact count: `959`;
 - unknown or invalid artifacts: `0`;
 - protected baseline rank: `1`;
 - strategy top deck is `607`: `true`;
@@ -3439,6 +3439,56 @@ Deckbuilding lesson:
   that gate.
 - The next valid path is a new shell contract or new cut evidence before any
   battle run.
+- Under current evidence, `607` remains the best protected Lorehold baseline.
+
+Deck `607` remains untouched and protected.
+
+## Next Shell Contract Synthesis - 2026-07-05
+
+The next-shell synthesis now combines the current-best baseline, the 607 value
+model, the Guttersnipe + Storm-Kiln hypothesis contract, staple accessibility,
+sidecar cut planning, floor-trace blockers, and the governed artifact audit:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_next_shell_contract_synthesis_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_next_shell_contract_synthesis_20260705_current.json`
+
+Current result:
+
+- status: `next_shell_contract_written_not_materializable_keep_607`;
+- shell key: `engine_preserving_pressure_conversion_shell_v1`;
+- target route: `guttersnipe_storm_kiln_engine_preserving_pair`;
+- target adds: `Guttersnipe` and `Storm-Kiln Artist`;
+- mana floor: `34` lands, `15` ramp, and `49` land+ramp sources;
+- available named seed-safe cuts: `0`;
+- cut shortage: `2`;
+- sidecar safe-cut ready count: `0`;
+- sidecar matrix-eligible rows: `0`;
+- candidate deck materialization: `false`;
+- natural battle gate: `false`;
+- promotion: `false`.
+
+Learning-only staple clarification:
+
+- `Mana Vault` is still legal and useful to learn from, but it remains
+  `rules_accessible_collection_missing_promotion_blocked`: it is not owned
+  locally and the prior promotion route is blocked.
+- `The One Ring` is legal and owned locally, but it remains
+  `rules_collection_accessible_promotion_blocked`: prior value/draw packages
+  did not prove a better protected-`607` swap.
+
+Deckbuilding lesson:
+
+- The next learnable shell is not a new deck yet. It is a pre-materialization
+  contract that requires two named seed-safe non-anchor cuts before any
+  structure matrix or battle gate.
+- External popularity, legality, Game Changer status, or ownership cannot
+  replace cut proof. They only decide what the model should learn about next.
+- Protected anchors and floor-trace blockers cannot be used as generic cuts:
+  `Bender's Waterskin`, `Victory Chimes`, `Molecule Man`,
+  `The Scarlet Witch`, `The Mind Stone`, `Insurrection`, `Storm Herd`,
+  `Creative Technique`, `Call Forth the Tempest`, `Esper Sentinel`,
+  `Everything Comes to Dust`, `Hit the Mother Lode`, `Rise of the Eldrazi`,
+  and `Surge to Victory` require named same-lane replacement proof.
 - Under current evidence, `607` remains the best protected Lorehold baseline.
 
 Deck `607` remains untouched and protected.

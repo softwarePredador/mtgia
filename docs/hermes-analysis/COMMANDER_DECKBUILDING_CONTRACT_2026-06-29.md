@@ -1642,3 +1642,42 @@ Operational lesson:
 
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.
+
+Next shell contract synthesis generated on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_shell_contract_synthesis_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_shell_contract_synthesis_20260705_current.json`.
+- Status:
+  `next_shell_contract_written_not_materializable_keep_607`.
+- Scope: merge current-best baseline evidence, value model mana floors,
+  Guttersnipe + Storm-Kiln hypothesis requirements, staple accessibility,
+  sidecar safe-cut counts, floor-trace blockers, and artifact-contract status
+  into one pre-materialization shell contract.
+- Current target shell:
+  `engine_preserving_pressure_conversion_shell_v1`.
+- Current target adds:
+  `Guttersnipe` plus `Storm-Kiln Artist`.
+- Current mana floor:
+  `34` lands, `15` ramp, and `49` land+ramp sources.
+- Current cut state:
+  `available_named_seed_safe_cut_count=0`, `required_cut_count=2`,
+  and `cut_shortage=2`.
+- Current gates:
+  candidate deck materialization `false`, structure matrix `false`,
+  natural battle gate `false`, deck action `false`, and promotion `false`.
+- Learning-only staples:
+  `Mana Vault` is legal but not owned locally and remains promotion-blocked;
+  `The One Ring` is legal and owned locally but remains promotion-blocked.
+
+Operational lesson:
+
+- A next shell is materializable only after it has named seed-safe non-anchor
+  cuts and preserves the current 607 mana, topdeck, miracle, protection, and
+  fast-pressure floors.
+- External legality, staple rank, Game Changer status, EDHREC popularity, or
+  ownership can raise learning priority, but cannot authorize a protected-607
+  deck change.
+- The next allowed work is:
+  `mine_two_named_seed_safe_nonanchor_cuts_for_engine_preserving_shell`.

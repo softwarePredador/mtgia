@@ -1,0 +1,369 @@
+{
+  "artifact_type": "lorehold_next_shell_contract_synthesis",
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "mine two named seed-safe non-anchor cuts for the engine-preserving pair",
+      "keep Mana Vault and The One Ring as learning-only until new same-lane trace exists",
+      "re-run artifact and current-best synthesis after the shell contract is generated"
+    ],
+    "promotion_allowed": false,
+    "reason": "The next learnable shell is Guttersnipe plus Storm-Kiln Artist, but current evidence has zero named seed-safe cuts and generic staples remain learning-only. Deck 607 stays protected."
+  },
+  "deck_607_mutated": false,
+  "evidence": {
+    "current_best_summary": {
+      "artifact_contract_equal_battle_gate_allowed": true,
+      "artifact_contract_status": "pass",
+      "artifact_count": 959,
+      "current_positive_signal_count": 0,
+      "decision_status": "current_best_baseline_synthesis_keep_607",
+      "floor_trace_cut_blocker_count": 6,
+      "overridden_historical_positive_signal_count": 1,
+      "protected_baseline_rank": 1,
+      "ready_for_real_deck_change_from_artifact_gate": false,
+      "recommended_next_action": "define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate",
+      "sidecar_candidate_deck_materialization_allowed_now": false,
+      "sidecar_matrix_candidate_row_eligible_count": 0,
+      "sidecar_promotion_allowed_now": false,
+      "sidecar_safe_cut_ready_count": 0,
+      "top_deck_is_607": true,
+      "unknown_or_invalid_count": 0,
+      "validation_error_count": 0
+    },
+    "engine_contract_summary": {
+      "available_named_seed_safe_cut_count": 0,
+      "avg_607_turn_advantage": 10.15,
+      "closing_window_comparison_count": 13,
+      "cut_shortage": 2,
+      "decision_status": "hypothesis_contract_written_blocked_no_named_safe_cuts",
+      "hard_blocked_count": 92,
+      "miracle_trace_failure_flag_count": 7,
+      "natural_battle_gate_allowed_now": false,
+      "package_status": "blocked_no_cut_or_hypothesis_capacity",
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "recommended_next_action": "mine_or_create_cut_evidence_for_two_named_same_lane_nonanchor_slots",
+      "required_cut_count": 2,
+      "router_route_status": "best_next_learning_route_contract_required_no_deck_action",
+      "same_lane_only_cut_count": 2,
+      "structure_matrix_allowed_now": false,
+      "target_adds": [
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair"
+    },
+    "sidecar_cut_planner_summary": {
+      "attempted_package_cut_name_count": 7,
+      "blocker_counts": {
+        "mana_source_floor_equivalence_required": 28,
+        "miracle_topdeck_floor_equivalence_required": 20,
+        "requires_exposure_trace_before_safe_cut": 48,
+        "safe_cut_miner_zero_current_ready": 48,
+        "structural_floor_equivalence_required": 28
+      },
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_sidecar_cut_model_planner_review_probes_ready_no_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "floor_trace_blocked_probe_count": 0,
+      "floor_trace_cut_blocker_count": 6,
+      "floor_trace_cut_blocker_names": [
+        "Call Forth the Tempest",
+        "Esper Sentinel",
+        "Everything Comes to Dust",
+        "Hit the Mother Lode",
+        "Rise of the Eldrazi",
+        "Surge to Victory"
+      ],
+      "forced_access_allowed_now": false,
+      "matrix_candidate_row_eligible_count": 0,
+      "missing_inputs": [],
+      "named_cut_probe_count": 48,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "protected_near_miss_count": 25,
+      "recommended_next_action": "collect_probe_evidence_for_non_floor_trace_cut_slots_only",
+      "safe_cut_ready_count": 0,
+      "tag_counts": {
+        "mana_base_safe_cut_model": 7,
+        "topdeck_access_sidecar_primary": 5
+      },
+      "target_row_count": 12
+    },
+    "staple_accessibility_summary": {
+      "cards_reviewed": 2,
+      "deck_action_allowed_now": false,
+      "external_commander_legal_count": 2,
+      "format_staples_gap_count": 1,
+      "game_changer_count": 2,
+      "game_changer_discovery_status": "game_changer_discovery_gap_found_report_only",
+      "hypothesis_queue_natural_gate_ready_count": 0,
+      "hypothesis_queue_status": "lorehold_hypothesis_queue_ready_no_natural_gate",
+      "label_counts": {
+        "rules_accessible_collection_missing_promotion_blocked": 1,
+        "rules_collection_accessible_promotion_blocked": 1
+      },
+      "local_commander_legal_count": 2,
+      "missing_inputs": [],
+      "natural_gate_allowed_now": false,
+      "natural_gate_ready_count": 0,
+      "owned_count": 1,
+      "promotion_allowed_now": false,
+      "promotion_blocked_count": 2,
+      "recommended_next_action": "surface_accessibility_by_layer_and_require_new_cut_trace_before_retesting_staples",
+      "value_priority_ready_replacement_count": 0
+    }
+  },
+  "generated_at": "2026-07-05T08:43:13Z",
+  "postgres_writes": false,
+  "shell_contract": {
+    "external_learning_snapshot": {
+      "card_signals": [
+        {
+          "card_name": "Guttersnipe",
+          "commander_legal": true,
+          "internal_position": "target_add_learning_candidate",
+          "public_role": "noncombat spell pressure"
+        },
+        {
+          "card_name": "Storm-Kiln Artist",
+          "commander_legal": true,
+          "internal_position": "target_add_learning_candidate",
+          "public_role": "spell-chain mana conversion"
+        },
+        {
+          "card_name": "Mana Vault",
+          "commander_legal": true,
+          "internal_position": "learning_only_blocked_prior_gate",
+          "public_role": "fast mana staple"
+        },
+        {
+          "card_name": "The One Ring",
+          "commander_legal": true,
+          "internal_position": "learning_only_blocked_prior_gate",
+          "public_role": "draw/protection resource engine"
+        }
+      ],
+      "checked_at": "2026-07-05",
+      "sources": [
+        {
+          "learning": "Commander legality is an entry gate. Mana Vault and The One Ring are not deck-ready just because they are legal.",
+          "source": "Wizards Commander banned list",
+          "url": "https://magic.wizards.com/en/banned-restricted-list"
+        },
+        {
+          "learning": "Mana Vault, The One Ring, Guttersnipe, and Storm-Kiln Artist are Commander-legal in the current external snapshot.",
+          "source": "Scryfall named-card legalities",
+          "url": "https://scryfall.com"
+        },
+        {
+          "learning": "Public Lorehold spellslinger lists support Storm-Kiln Artist and spell-pressure cards as ideas, but popularity is priority evidence, not promotion permission.",
+          "source": "EDHREC Lorehold optimized spellslinger",
+          "url": "https://edhrec.com/average-decks/lorehold-the-historian/optimized/spellslinger"
+        }
+      ]
+    },
+    "lane_profile": {
+      "artifact": 17,
+      "basic_floor": 8,
+      "board_wipe": 8,
+      "commander_center": 1,
+      "creature": 2,
+      "draw": 9,
+      "engine": 3,
+      "fast_pressure_guard": 12,
+      "fetch_or_search_fixing": 8,
+      "format_staple_long_tail": 6,
+      "global_top_100": 17,
+      "global_top_500": 11,
+      "instant_sorcery_spell": 36,
+      "land": 34,
+      "mana_base": 34,
+      "miracle_conversion_finisher": 10,
+      "protection": 12,
+      "ramp": 15,
+      "removal": 7,
+      "structural_ramp_floor": 8,
+      "topdeck_miracle_engine": 9,
+      "tutor": 1,
+      "typed_dual_or_fetch_target": 5,
+      "untapped_or_multiplayer_fixing": 5,
+      "utility_engine_land": 8,
+      "wincon": 9
+    },
+    "learning_only_staples": [
+      {
+        "app_accessibility_label": "rules_accessible_collection_missing_promotion_blocked",
+        "card_name": "Mana Vault",
+        "commander_legal": true,
+        "game_changer": true,
+        "next_action": "do_not_offer_as_available_deck_change_until_collection_and_new_cut_trace_exist",
+        "owned": false,
+        "promotion_decision": "blocked_prior_gate_rejected",
+        "readiness_status": "blocked_prior_reject"
+      },
+      {
+        "app_accessibility_label": "rules_collection_accessible_promotion_blocked",
+        "card_name": "The One Ring",
+        "commander_legal": true,
+        "game_changer": true,
+        "next_action": "show_owned_but_blocked_prior_reject_and_require_new_same_lane_trace",
+        "owned": true,
+        "promotion_decision": "blocked_existing_package_rejected",
+        "readiness_status": "blocked_prior_reject"
+      }
+    ],
+    "mana_floor": {
+      "artifact_ramp_quantity": 11,
+      "interpretation": "The 607 mana plan is not just more fast mana: it combines 34 lands, fetch/dual fixing, artifact ramp, spell ramp, and opponent-turn mana rocks that feed miracle windows.",
+      "land_groups": {
+        "basic_floor": 8,
+        "fetch_or_search_fixing": 8,
+        "typed_dual_or_fetch_target": 5,
+        "untapped_or_multiplayer_fixing": 5,
+        "utility_engine_land": 8
+      },
+      "land_quantity": 34,
+      "mana_sources_land_plus_ramp": 49,
+      "ramp_quantity": 15,
+      "spell_ramp_quantity": 3
+    },
+    "materialization_requirements": [
+      "find_two_named_seed_safe_nonanchor_cuts",
+      "do_not_cut_floor_trace_blockers_or_protected_anchors_as_generic_slots",
+      "preserve_34_lands_15_ramp_49_land_plus_ramp_sources",
+      "preserve_topdeck_miracle_and_lorehold_upkeep_rummage_floors",
+      "show_direct_guttersnipe_damage_events_and_storm_kiln_treasure_events",
+      "tie_or_improve_winota_fast_pressure_slice",
+      "pass_structure_matrix_before_any_equal_battle_gate",
+      "run_same_seed_same_opponent_gate_against_current_deck_607"
+    ],
+    "protected_core": {
+      "combined_never_generic_cut": [
+        "Bender's Waterskin",
+        "Call Forth the Tempest",
+        "Creative Technique",
+        "Esper Sentinel",
+        "Everything Comes to Dust",
+        "Hit the Mother Lode",
+        "Insurrection",
+        "Molecule Man",
+        "Rise of the Eldrazi",
+        "Storm Herd",
+        "Surge to Victory",
+        "The Mind Stone",
+        "The Scarlet Witch",
+        "Victory Chimes"
+      ],
+      "floor_trace_cut_blockers": [
+        "Call Forth the Tempest",
+        "Esper Sentinel",
+        "Everything Comes to Dust",
+        "Hit the Mother Lode",
+        "Rise of the Eldrazi",
+        "Surge to Victory"
+      ],
+      "protected_anchors": [
+        "Bender's Waterskin",
+        "Victory Chimes",
+        "Molecule Man",
+        "The Scarlet Witch",
+        "The Mind Stone",
+        "Insurrection",
+        "Storm Herd",
+        "Creative Technique"
+      ],
+      "rule": "These cards cannot be treated as generic cuts. A future replacement must be named, same-lane, floor-preserving, and gate-tested."
+    },
+    "purpose": "Learn whether an engine-preserving pressure/conversion pair can challenge protected deck 607 without reducing mana, topdeck, miracle, protection, or fast-pressure floors.",
+    "role_profile": {
+      "board_wipe": 8,
+      "creature": 2,
+      "draw": 9,
+      "engine": 3,
+      "land": 34,
+      "protection": 12,
+      "ramp": 15,
+      "removal": 7,
+      "tutor": 1,
+      "wincon": 9
+    },
+    "shell_key": "engine_preserving_pressure_conversion_shell_v1",
+    "target_adds": [
+      {
+        "card_name": "Guttersnipe",
+        "current_blockers": [
+          "fast_pressure_slice_not_protected",
+          "no_current_positive_guttersnipe_trace",
+          "pressure_causality_unproven",
+          "pressure_conversion_unproven"
+        ],
+        "learning_position": "candidate_add_after_named_safe_cuts",
+        "role": "noncombat_spell_pressure"
+      },
+      {
+        "card_name": "Storm-Kiln Artist",
+        "current_blockers": [
+          "pressure_conversion_unproven",
+          "storm_kiln_arcane_signet_swap_rejected"
+        ],
+        "learning_position": "candidate_add_after_named_safe_cuts",
+        "role": "spell_chain_mana_conversion"
+      }
+    ]
+  },
+  "source_db_mutated": false,
+  "source_reports": {
+    "artifact_audit": "docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260705_governed_learning_artifacts_current.json",
+    "current_best": "docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_current.json",
+    "engine_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_guttersnipe_storm_kiln_hypothesis_contract_20260705_current_relearn.json",
+    "gap_floor_trace_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_gap_floor_trace_miner_20260705_current.json",
+    "sidecar_cut_planner": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.json",
+    "staple_accessibility": "docs/hermes-analysis/master_optimizer_reports/lorehold_staple_accessibility_freshness_audit_20260705_current.json",
+    "value_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json"
+  },
+  "status": "next_shell_contract_written_not_materializable_keep_607",
+  "summary": {
+    "artifact_contract_status": "pass",
+    "artifact_count": 959,
+    "available_named_seed_safe_cut_count": 0,
+    "candidate_deck_materialization_allowed_now": false,
+    "current_best_status": "current_best_baseline_synthesis_keep_607",
+    "current_positive_signal_count": 0,
+    "cut_shortage": 2,
+    "decision_status": "next_shell_contract_written_not_materializable_keep_607",
+    "deck_action_allowed_now": false,
+    "floor_trace_cut_blocker_count": 6,
+    "land_quantity_floor": 34,
+    "learning_only_staple_count": 2,
+    "mana_sources_land_plus_ramp_floor": 49,
+    "natural_battle_gate_allowed_now": false,
+    "promotion_allowed_now": false,
+    "protected_anchor_count": 8,
+    "ramp_quantity_floor": 15,
+    "recommended_next_action": "mine_two_named_seed_safe_nonanchor_cuts_for_engine_preserving_shell",
+    "required_cut_count": 2,
+    "shell_key": "engine_preserving_pressure_conversion_shell_v1",
+    "sidecar_matrix_candidate_row_eligible_count": 0,
+    "sidecar_safe_cut_ready_count": 0,
+    "structure_matrix_allowed_now": false,
+    "target_adds": [
+      "Guttersnipe",
+      "Storm-Kiln Artist"
+    ],
+    "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair",
+    "top_deck_is_607": true,
+    "unknown_or_invalid_count": 0,
+    "validation_error_count": 0
+  },
+  "validation": {
+    "errors": [],
+    "status": "pass"
+  }
+}
