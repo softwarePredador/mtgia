@@ -92,6 +92,8 @@ def _safe_cut_gap(*, active_rules=0, safe=False):
             "brain_active_rule_count": active_rules,
             "apply_ready_for_manual_review": True,
             "apply_executed_by_this_script": False,
+            "postgres_rule_active_confirmed_now": bool(active_rules),
+            "apply_confirmed_outside_package_script": bool(active_rules),
             "brain_pg_package_route_governed": True,
             "safe_cut_count": int(safe),
             "blocked_same_lane_cut_count": len(rows) - int(safe),
@@ -236,6 +238,21 @@ def test_safe_row_with_active_rule_allows_matrix_only_not_battle() -> None:
     )
     assert payload["summary"]["unlockable_now_count"] == 1
     assert payload["summary"]["matrix_scoring_allowed_now"] is True
+    assert payload["summary"]["candidate_deck_materialization_allowed_now"] is False
+    assert payload["summary"]["natural_battle_gate_allowed_now"] is False
+
+
+def test_active_rule_without_safe_cut_does_not_request_pg_apply() -> None:
+    payload = _build(safe_cut_gap=_safe_cut_gap(active_rules=1, safe=False))
+
+    assert payload["summary"]["decision_status"] == (
+        "brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607"
+    )
+    assert payload["summary"]["brain_postgres_rule_active_confirmed_now"] is True
+    assert payload["summary"]["unlockable_now_count"] == 0
+    assert payload["decision"]["pg_apply_requires_explicit_approval"] is False
+    assert "brain_rule_already_active_no_pg_apply_needed" in payload["decision"]["next_actions"]
+    assert "keep_pg_apply_as_explicit_manual_approval_only" not in payload["decision"]["next_actions"]
     assert payload["summary"]["candidate_deck_materialization_allowed_now"] is False
     assert payload["summary"]["natural_battle_gate_allowed_now"] is False
 

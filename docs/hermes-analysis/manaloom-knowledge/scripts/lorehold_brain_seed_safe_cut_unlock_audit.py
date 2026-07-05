@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Classify what would unlock a Brain in a Jar cut without touching deck 607.
 
-The safe-cut gap audit already proves that Brain in a Jar has no active
-PostgreSQL-backed rule and no seed-safe same-lane cut. This read-only audit
-turns that blocker into a learning queue: which current 607 slots are closed
-forever, which need topdeck/role-preservation evidence, which need mana-floor
-evidence, and which prior-rejected rows can only be diagnostic until new trace
-evidence reverses the old decision.
+The safe-cut gap audit tracks whether Brain in a Jar has an active
+PostgreSQL-backed rule and whether any seed-safe same-lane cut exists. This
+read-only audit turns the remaining blockers into a learning queue: which
+current 607 slots are closed forever, which need topdeck/role-preservation
+evidence, which need mana-floor evidence, and which prior-rejected rows can
+only be diagnostic until new trace evidence reverses the old decision.
 """
 
 from __future__ import annotations
@@ -368,6 +368,21 @@ def build_report(
         next_action = "continue_seed_safe_cut_discovery_no_deck_action"
     else:
         next_action = "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action"
+    pg_action = (
+        "brain_rule_already_active_no_pg_apply_needed"
+        if active_rule_count > 0
+        else "keep_pg_apply_as_explicit_manual_approval_only"
+    )
+    reason = (
+        "Brain in a Jar already has an active PostgreSQL-backed rule, but no "
+        "seed-safe cut is unlocked. Current slots are either never-cut, protected "
+        "anchors/floors, or prior-rejected diagnostic rows that need new trace "
+        "evidence before matrix scoring."
+    ) if active_rule_count > 0 else (
+        "No Brain in a Jar seed-safe cut is unlocked. Current slots are either "
+        "never-cut, protected anchors/floors, or prior-rejected diagnostic rows "
+        "that need new trace evidence before matrix scoring."
+    )
     return {
         "generated_at": utc_now(),
         "artifact_type": "lorehold_brain_seed_safe_cut_unlock_audit",
@@ -442,16 +457,12 @@ def build_report(
                 as_int(gap_summary.get("brain_active_rule_count")) <= 0
                 and bool(gap_summary.get("apply_ready_for_manual_review"))
             ),
-            "reason": (
-                "No Brain in a Jar seed-safe cut is unlocked. Current slots are "
-                "either never-cut, protected anchors/floors, or prior-rejected "
-                "diagnostic rows that need new trace evidence before matrix scoring."
-            ),
+            "reason": reason,
             "next_actions": [
                 "do_not_mutate_deck_607",
                 "do_not_materialize_brain_candidate_deck",
                 "do_not_run_natural_battle_from_this_audit",
-                "keep_pg_apply_as_explicit_manual_approval_only",
+                pg_action,
                 (
                     "mine_targeted_floor_trace_for_brain_cut_slots"
                     if target_floor_missing_count

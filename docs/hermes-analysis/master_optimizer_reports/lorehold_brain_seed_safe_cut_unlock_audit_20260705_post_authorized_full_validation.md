@@ -1,6 +1,6 @@
 # Lorehold Brain in a Jar Seed-Safe Cut Unlock Audit
 
-- Generated at: `2026-07-05T11:40:50Z`
+- Generated at: `2026-07-05T11:55:48Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
@@ -61,11 +61,11 @@
 - deck_action_allowed: `false`
 - natural_battle_allowed_now: `false`
 - pg_apply_requires_explicit_approval: `false`
-- reason: No Brain in a Jar seed-safe cut is unlocked. Current slots are either never-cut, protected anchors/floors, or prior-rejected diagnostic rows that need new trace evidence before matrix scoring.
+- reason: Brain in a Jar already has an active PostgreSQL-backed rule, but no seed-safe cut is unlocked. Current slots are either never-cut, protected anchors/floors, or prior-rejected diagnostic rows that need new trace evidence before matrix scoring.
 - next_actions:
   - do_not_mutate_deck_607
   - do_not_materialize_brain_candidate_deck
   - do_not_run_natural_battle_from_this_audit
-  - keep_pg_apply_as_explicit_manual_approval_only
+  - brain_rule_already_active_no_pg_apply_needed
   - use_brain_cut_slot_traces_as_cut_protection_evidence
   - reopen_prior_rejected_slots_only_with_new_same_lane_trace_evidence
