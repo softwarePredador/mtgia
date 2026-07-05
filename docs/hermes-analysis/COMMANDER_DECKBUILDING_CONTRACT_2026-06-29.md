@@ -235,7 +235,13 @@ Operational priority after this pivot:
    lanes, separate format staples and expected package anchors into stage-only
    rows, and keep materialization closed when value-safe cuts or package size
    still fail;
-21. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+21. run `global_commander_value_safe_stage_splitter.py` after cut source-lane
+   expansion; it may open only the next isolated stage-copy gate when a stage
+   has paired value-safe adds/cuts under the package-size limit. It must keep
+   full-package materialization closed while any add is unpaired, and it must
+   keep battle/promotion closed until candidate-copy, strategy-matrix, and
+   replay gates pass;
+22. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -261,6 +267,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -456,6 +463,18 @@ Current external refresh on 2026-07-05:
   `value_safe_cut_shortfall:required_21_ready_18` and
   `full_package_size_exceeds_stage_limit:required_21_limit_8`; the next gate is
   `split_synthesized_package_into_value_safe_stages`.
+- Current value-safe stage splitting is read-only and consumes the synthesized
+  adds plus expanded cut lane in
+  `global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5.md`.
+  It pairs `18` swaps into `3` stages under the `8`-swap limit, with stage 1
+  containing `8` pairs and status `stage_ready_for_candidate_copy`. The full
+  package remains blocked because `The Balrog of Moria`, `Wrathful Red Dragon`,
+  and `Akroma, Angel of Wrath` are still unpaired; blocker
+  `full_package_unpaired_adds:required_21_paired_18` remains active.
+  Therefore `stage_candidate_copy_allowed_now=true` for the next isolated
+  copy gate only, `full_package_candidate_copy_allowed_now=false`,
+  `battle_gate_allowed_now=false`, and the next gate is
+  `materialize_value_safe_stage_1_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 

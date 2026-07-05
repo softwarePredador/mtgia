@@ -1,0 +1,528 @@
+{
+  "artifact_type": "global_commander_value_safe_stage_splitter",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": true,
+  "candidate_copy_blockers": [
+    "full_package_unpaired_adds:required_21_paired_18"
+  ],
+  "deck_action_allowed": false,
+  "full_package_candidate_copy_allowed_now": false,
+  "generated_at": "2026-07-05T20:24:16.776305+00:00",
+  "input_artifacts": {
+    "cut_source_lane_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.json",
+    "package_synthesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "No battle or promotion opens until a stage copy passes strategy matrix and replay gates.",
+    "full_package_boundary": "The full package remains blocked until every add has a value-safe cut.",
+    "stage_boundary": "A ready stage authorizes only an isolated candidate-copy stage, not full package mutation."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "stage_candidate_copy_allowed_now": true,
+  "stages": [
+    {
+      "add_cards": [
+        "Arena of Glory",
+        "Despark",
+        "Anguished Unmaking",
+        "Balefire Dragon",
+        "Ancient Copper Dragon",
+        "Angel of the Ruins",
+        "Hoarding Broodlord",
+        "Goldlust Triad"
+      ],
+      "battle_gate_allowed_now": false,
+      "candidate_copy_allowed_now": true,
+      "cut_cards": [
+        "Archaeomancer's Map",
+        "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+        "Smuggler's Share",
+        "Basalt Monolith",
+        "Monologue Tax",
+        "Grim Tutor",
+        "Necrodominance",
+        "Oswald Fiddlebender"
+      ],
+      "next_gate": "materialize_value_safe_stage_1_candidate_copy",
+      "pair_count": 8,
+      "pairs": [
+        {
+          "add": "Arena of Glory",
+          "add_axis": "commander_attack_window",
+          "add_covered_axes": [
+            "commander_attack_window",
+            "lands"
+          ],
+          "add_score": 135,
+          "cut": "Archaeomancer's Map",
+          "cut_matching_over_target_roles": [
+            "mana_acceleration",
+            "tutors_access"
+          ],
+          "cut_primary_role": "tutors_access",
+          "cut_score": 76,
+          "pair_index": 1,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Despark",
+          "add_axis": "spot_interaction",
+          "add_covered_axes": [
+            "spot_interaction"
+          ],
+          "add_score": 142,
+          "cut": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+          "cut_matching_over_target_roles": [
+            "card_draw_selection",
+            "mana_acceleration"
+          ],
+          "cut_primary_role": "mana_acceleration",
+          "cut_score": 75,
+          "pair_index": 2,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Anguished Unmaking",
+          "add_axis": "spot_interaction",
+          "add_covered_axes": [
+            "spot_interaction"
+          ],
+          "add_score": 130,
+          "cut": "Smuggler's Share",
+          "cut_matching_over_target_roles": [
+            "card_draw_selection",
+            "mana_acceleration"
+          ],
+          "cut_primary_role": "mana_acceleration",
+          "cut_score": 75,
+          "pair_index": 3,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Balefire Dragon",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 127,
+          "cut": "Basalt Monolith",
+          "cut_matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "cut_primary_role": "mana_acceleration",
+          "cut_score": 61,
+          "pair_index": 4,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Ancient Copper Dragon",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 124,
+          "cut": "Monologue Tax",
+          "cut_matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "cut_primary_role": "mana_acceleration",
+          "cut_score": 61,
+          "pair_index": 5,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Angel of the Ruins",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 124,
+          "cut": "Grim Tutor",
+          "cut_matching_over_target_roles": [
+            "tutors_access"
+          ],
+          "cut_primary_role": "tutors_access",
+          "cut_score": 59,
+          "pair_index": 6,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Hoarding Broodlord",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 124,
+          "cut": "Necrodominance",
+          "cut_matching_over_target_roles": [
+            "card_draw_selection"
+          ],
+          "cut_primary_role": "card_draw_selection",
+          "cut_score": 58,
+          "pair_index": 7,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Goldlust Triad",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 111,
+          "cut": "Oswald Fiddlebender",
+          "cut_matching_over_target_roles": [
+            "tutors_access"
+          ],
+          "cut_primary_role": "tutors_access",
+          "cut_score": 55,
+          "pair_index": 8,
+          "status": "review_only_value_safe_stage_pair"
+        }
+      ],
+      "promotion_allowed": false,
+      "stage": 1,
+      "status": "stage_ready_for_candidate_copy"
+    },
+    {
+      "add_cards": [
+        "Hellkite Charger",
+        "Avacyn, Angel of Hope",
+        "Cavern-Hoard Dragon",
+        "Goldspan Dragon",
+        "Scourge of the Throne",
+        "Aurelia, the Law Above",
+        "Starfield Shepherd",
+        "Dragon Mage"
+      ],
+      "battle_gate_allowed_now": false,
+      "candidate_copy_allowed_now": true,
+      "cut_cards": [
+        "Steelshaper's Gift",
+        "Stoneforge Mystic",
+        "Burnt Offering",
+        "Culling the Weak",
+        "Desperate Ritual",
+        "Grim Monolith",
+        "Infernal Plunge",
+        "Trouble in Pairs"
+      ],
+      "next_gate": "materialize_value_safe_stage_2_candidate_copy",
+      "pair_count": 8,
+      "pairs": [
+        {
+          "add": "Hellkite Charger",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 110,
+          "cut": "Steelshaper's Gift",
+          "cut_matching_over_target_roles": [
+            "tutors_access"
+          ],
+          "cut_primary_role": "tutors_access",
+          "cut_score": 55,
+          "pair_index": 9,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Avacyn, Angel of Hope",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 108,
+          "cut": "Stoneforge Mystic",
+          "cut_matching_over_target_roles": [
+            "tutors_access"
+          ],
+          "cut_primary_role": "tutors_access",
+          "cut_score": 55,
+          "pair_index": 10,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Cavern-Hoard Dragon",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 105,
+          "cut": "Burnt Offering",
+          "cut_matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "cut_primary_role": "mana_acceleration",
+          "cut_score": 50,
+          "pair_index": 11,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Goldspan Dragon",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 103,
+          "cut": "Culling the Weak",
+          "cut_matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "cut_primary_role": "mana_acceleration",
+          "cut_score": 50,
+          "pair_index": 12,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Scourge of the Throne",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 103,
+          "cut": "Desperate Ritual",
+          "cut_matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "cut_primary_role": "mana_acceleration",
+          "cut_score": 50,
+          "pair_index": 13,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Aurelia, the Law Above",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 102,
+          "cut": "Grim Monolith",
+          "cut_matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "cut_primary_role": "mana_acceleration",
+          "cut_score": 50,
+          "pair_index": 14,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Starfield Shepherd",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 99,
+          "cut": "Infernal Plunge",
+          "cut_matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "cut_primary_role": "mana_acceleration",
+          "cut_score": 50,
+          "pair_index": 15,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Dragon Mage",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 98,
+          "cut": "Trouble in Pairs",
+          "cut_matching_over_target_roles": [
+            "card_draw_selection"
+          ],
+          "cut_primary_role": "card_draw_selection",
+          "cut_score": 50,
+          "pair_index": 16,
+          "status": "review_only_value_safe_stage_pair"
+        }
+      ],
+      "promotion_allowed": false,
+      "stage": 2,
+      "status": "stage_ready_for_candidate_copy"
+    },
+    {
+      "add_cards": [
+        "Bonehoard Dracosaur",
+        "Drakuseth, Maw of Flames"
+      ],
+      "battle_gate_allowed_now": false,
+      "candidate_copy_allowed_now": true,
+      "cut_cards": [
+        "Imperial Seal",
+        "Wishclaw Talisman"
+      ],
+      "next_gate": "materialize_value_safe_stage_3_candidate_copy",
+      "pair_count": 2,
+      "pairs": [
+        {
+          "add": "Bonehoard Dracosaur",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 97,
+          "cut": "Imperial Seal",
+          "cut_matching_over_target_roles": [
+            "tutors_access"
+          ],
+          "cut_primary_role": "tutors_access",
+          "cut_score": 47,
+          "pair_index": 17,
+          "status": "review_only_value_safe_stage_pair"
+        },
+        {
+          "add": "Drakuseth, Maw of Flames",
+          "add_axis": "angels_demons_dragons_payoffs",
+          "add_covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "add_score": 96,
+          "cut": "Wishclaw Talisman",
+          "cut_matching_over_target_roles": [
+            "tutors_access"
+          ],
+          "cut_primary_role": "tutors_access",
+          "cut_score": 47,
+          "pair_index": 18,
+          "status": "review_only_value_safe_stage_pair"
+        }
+      ],
+      "promotion_allowed": false,
+      "stage": 3,
+      "status": "stage_ready_for_candidate_copy"
+    }
+  ],
+  "status": "commander_value_safe_stage_split_ready_for_stage_candidate_copy",
+  "summary": {
+    "candidate_copy_blocker_count": 1,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "full_package_candidate_copy_allowed_now": false,
+    "next_gate": "materialize_value_safe_stage_1_candidate_copy",
+    "package_size_limit": 8,
+    "paired_swap_count": 18,
+    "ready_stage_count": 3,
+    "selected_add_count": 21,
+    "stage_count": 3,
+    "unpaired_add_count": 3,
+    "value_safe_cut_count": 18
+  },
+  "unpaired_adds": [
+    {
+      "card_name": "The Balrog of Moria",
+      "cmc": 7.0,
+      "color_identity": [
+        "B",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "haste",
+        "combat_keywords",
+        "mana_or_treasure_payload",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "card_draw_selection",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Avatar Demon"
+    },
+    {
+      "card_name": "Wrathful Red Dragon",
+      "cmc": 5.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "removal_payload",
+        "life_total_or_damage_multiplier"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "dedicated_win_conditions"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Akroma, Angel of Wrath",
+      "cmc": 8.0,
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "haste",
+        "combat_keywords",
+        "protection_or_lock_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 95,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Angel"
+    }
+  ]
+}
