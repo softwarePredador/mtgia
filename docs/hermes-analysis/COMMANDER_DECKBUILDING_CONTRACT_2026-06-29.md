@@ -251,7 +251,12 @@ Operational priority after this pivot:
    cuts; it must inspect current deck context, local format-staple context, and
    missing usage/same-lane/replay proof, but it must not reclassify a cut,
    materialize a candidate, run battle, or promote a package;
-24. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+24. run `global_commander_contextual_usage_trace_scout.py` after contextual
+   stage-cut collection; it must search existing local artifacts for current
+   commander/deck usage traces, classify planning/rule-coherence/cross-deck
+   references as non-proof, and keep candidate copy plus reclassification closed
+   when no current-scope trace exists;
+25. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -292,6 +297,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -612,6 +618,17 @@ Current external refresh on 2026-07-05:
   `contextual_stage_cut_evidence_collected_no_value_safe_reclassification` is
   the current status, and the next gate is
   `collect_usage_or_trace_evidence_for_contextual_stage_cuts`.
+- Current contextual usage-trace scouting found no current-scope usage proof.
+  The report
+  `global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  scans existing local artifacts for `Professional Face-Breaker`,
+  `Diabolic Intent`, and `Ornithopter of Paradise`; it records `163`
+  occurrences, but `current_usage_trace_evidence_count=0` because all matches
+  are planning references, rule-coherence/current-scope non-trace references,
+  or historical/cross-deck traces. Therefore
+  `contextual_usage_trace_scout_no_current_trace_evidence` keeps
+  `value_safe_reclassification_allowed_now=false` and routes to
+  `generate_or_import_current_scope_usage_trace_before_reclassification`.
 
 ## Global Commander Rollout - 2026-07-01
 

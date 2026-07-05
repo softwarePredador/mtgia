@@ -1,0 +1,271 @@
+{
+  "artifact_type": "global_commander_contextual_usage_trace_scout",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "battle_run_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "no_current_scope_usage_trace_evidence_for_contextual_stage_cuts"
+  ],
+  "deck_action_allowed": false,
+  "evidence_by_card": {
+    "Diabolic Intent": {
+      "current_usage_trace_count": 0,
+      "non_proof_reference_count": 68
+    },
+    "Ornithopter of Paradise": {
+      "current_usage_trace_count": 0,
+      "non_proof_reference_count": 34
+    },
+    "Professional Face-Breaker": {
+      "current_usage_trace_count": 0,
+      "non_proof_reference_count": 61
+    }
+  },
+  "generated_at": "2026-07-05T21:26:46.549894+00:00",
+  "input_artifacts": {
+    "contextual_evidence_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "scan_roots": [
+      "docs/hermes-analysis/master_optimizer_reports"
+    ]
+  },
+  "mutation_allowed": false,
+  "non_proof_occurrence_sample": [
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "historical_or_cross_deck_trace_reference_not_proof",
+      "excerpt": "\"Diabolic Intent\",",
+      "line": 194,
+      "path": "docs/hermes-analysis/master_optimizer_reports/battle_forensic_audit_local_20260608_seed970_989_after_lorehold_optimizer_blockers_v4.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "historical_or_cross_deck_trace_reference_not_proof",
+      "excerpt": "\"Diabolic Intent\",",
+      "line": 281,
+      "path": "docs/hermes-analysis/master_optimizer_reports/battle_forensic_audit_local_20260608_seed990_1029_after_lorehold_optimizer_blockers_v3.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 1355,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deck619_battle_rule_coherence_pg200_trouble_in_pairs_postsync_v1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "current_scope_non_trace_reference_not_proof",
+      "excerpt": "\"normalized_name\": \"diabolic intent\",",
+      "line": 1378,
+      "path": "docs/hermes-analysis/master_optimizer_reports/deck619_battle_rule_coherence_pg200_trouble_in_pairs_postsync_v1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 61,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 76,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "| `Diabolic Intent` | `tutors_access` | 265 | `contextual_stage_cut_needs_usage_or_trace_evidence` | `usage_or_same_lane_or_replay_proof, format_staple_replacement_risk_review` |",
+      "line": 22,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "- `Diabolic Intent`: `Sorcery`, cmc `2.0`, oracle `As an additional cost to cast this spell, sacrifice a creature. Search your library for a card, put that card into your hand, then shuffle.`",
+      "line": 32,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 1799,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 1807,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "- `Diabolic Intent`: `contextual_staple_requires_stage_review`",
+      "line": 63,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 1613,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 1621,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "- `Diabolic Intent`: `contextual_staple_requires_stage_review`",
+      "line": 56,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1.md"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 1348,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 1356,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "- `Diabolic Intent`: `contextual_staple_requires_stage_review`",
+      "line": 43,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 1381,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_stage2.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 1389,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_stage2.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "- `Diabolic Intent`: `contextual_staple_requires_stage_review`",
+      "line": 44,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_stage2.md"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 872,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"cut\": \"Diabolic Intent\",",
+      "line": 1105,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "| 5 | `Ancient Copper Dragon` | `Diabolic Intent` | over_target_tutors_access, tutor_role_above_target_review |",
+      "line": 65,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 665,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"cut\": \"Diabolic Intent\",",
+      "line": 908,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "| 2 | `Swords to Plowshares` | `Diabolic Intent` | over_target_tutors_access, tutor_role_above_target_review |",
+      "line": 59,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1.md"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 244,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"cut\": \"Diabolic Intent\",",
+      "line": 386,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "| 1 | `Dragon Mage` | `Diabolic Intent` | over_target_tutors_access, tutor_role_above_target_review |",
+      "line": 46,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification": "planning_reference_not_usage_trace",
+      "excerpt": "\"card_name\": \"Diabolic Intent\",",
+      "line": 273,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_stage2.json"
+    }
+  ],
+  "policy": {
+    "proof_boundary": "Planning, rule-coherence, and cross-deck occurrences do not prove a contextual cut is safe.",
+    "reclassification_boundary": "Even current-scope trace evidence requires manual value-safe review before candidate copy.",
+    "scout_boundary": "This scout searches existing artifacts only; it does not run a battle."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "contextual_usage_trace_scout_no_current_trace_evidence",
+  "summary": {
+    "candidate_copy_blocker_count": 1,
+    "classification_counts": {
+      "current_scope_non_trace_reference_not_proof": 8,
+      "historical_or_cross_deck_trace_reference_not_proof": 51,
+      "planning_reference_not_usage_trace": 104
+    },
+    "commander": "Kaalia of the Vast",
+    "contextual_card_count": 3,
+    "current_usage_trace_evidence_count": 0,
+    "deck_id": "619",
+    "next_gate": "generate_or_import_current_scope_usage_trace_before_reclassification",
+    "non_proof_reference_count": 163,
+    "occurrence_count": 163
+  },
+  "usage_trace_occurrences": [],
+  "value_safe_reclassification_allowed_now": false
+}

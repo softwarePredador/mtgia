@@ -70,6 +70,11 @@ before any value-safe reclassification. The collector is read-only: it records
 current deck context, local format-staple context, and missing usage/same-lane
 or replay proof. It must keep candidate copy, battle, and promotion closed.
 
+Then run `global_commander_contextual_usage_trace_scout.py` to search existing
+local artifacts for current-scope replay/trace evidence. Historical planning,
+rule-coherence, Lorehold, or cross-deck occurrences are non-proof references;
+they must not unlock value-safe cuts without current-scope trace review.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

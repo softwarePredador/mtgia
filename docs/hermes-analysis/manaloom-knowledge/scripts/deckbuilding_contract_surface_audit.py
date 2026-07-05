@@ -83,6 +83,12 @@ GLOBAL_COMMANDER_CONTEXTUAL_STAGE_CUT_EVIDENCE_COLLECTOR = (
 GLOBAL_COMMANDER_CONTEXTUAL_STAGE_CUT_EVIDENCE_COLLECTOR_TEST = (
     SCRIPT_DIR / "test_global_commander_contextual_stage_cut_evidence_collector.py"
 )
+GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_SCOUT = (
+    SCRIPT_DIR / "global_commander_contextual_usage_trace_scout.py"
+)
+GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_SCOUT_TEST = (
+    SCRIPT_DIR / "test_global_commander_contextual_usage_trace_scout.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -244,6 +250,10 @@ GLOBAL_COMMANDER_SCOPE1_STAGE_ONLY_CUT_EVIDENCE_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_STAGE_CUT_EVIDENCE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_USAGE_TRACE_SCOUT_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -522,6 +532,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "contextual_stage_cut_evidence_collected_no_value_safe_reclassification",
                 "collect_usage_or_trace_evidence_for_contextual_stage_cuts",
+                "global_commander_contextual_usage_trace_scout.py",
+                "global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "contextual_usage_trace_scout_no_current_trace_evidence",
+                "generate_or_import_current_scope_usage_trace_before_reclassification",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1059,6 +1073,38 @@ def build_audit() -> dict[str, Any]:
                 "Ornithopter of Paradise",
                 "usage_or_same_lane_or_replay_proof",
                 "contextual_stage_cut_evidence_collected_no_value_safe_reclassification",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_SCOUT,
+            [
+                "global_commander_contextual_usage_trace_scout",
+                "contextual_usage_trace_scout_no_current_trace_evidence",
+                "contextual_usage_trace_scout_partial_current_trace_evidence",
+                "contextual_usage_trace_scout_blocks_no_contextual_cards",
+                "current_scope_usage_trace_candidate",
+                "historical_or_cross_deck_trace_reference_not_proof",
+                "planning_reference_not_usage_trace",
+                "generate_or_import_current_scope_usage_trace_before_reclassification",
+                "battle_run_performed",
+                "value_safe_reclassification_allowed_now",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_SCOUT_TEST,
+            [
+                "test_counts_current_scope_usage_trace_without_opening_reclassification",
+                "test_blocks_when_only_non_proof_references_exist",
+                "Diabolic Intent",
+                "Professional Face-Breaker",
+                "Ornithopter of Paradise",
+                "planning_reference_not_usage_trace",
+                "historical_or_cross_deck_trace_reference_not_proof",
             ],
         )
     )
@@ -1674,6 +1720,26 @@ def build_audit() -> dict[str, Any]:
                 "Diabolic Intent",
                 "Ornithopter of Paradise",
                 "usage_or_same_lane_or_replay_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_USAGE_TRACE_SCOUT_REPORT,
+            [
+                "Global Commander Contextual Usage Trace Scout",
+                "contextual_usage_trace_scout_no_current_trace_evidence",
+                "contextual_card_count: `3`",
+                "current_usage_trace_evidence_count: `0`",
+                "non_proof_reference_count: `163`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "battle_run_performed: `false`",
+                "generate_or_import_current_scope_usage_trace_before_reclassification",
+                "Professional Face-Breaker",
+                "Diabolic Intent",
+                "Ornithopter of Paradise",
+                "no_current_scope_usage_trace_evidence_for_contextual_stage_cuts",
             ],
         )
     )
