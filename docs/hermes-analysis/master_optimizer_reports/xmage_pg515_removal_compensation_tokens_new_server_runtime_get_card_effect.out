@@ -1,0 +1,175 @@
+{
+  "execution": {
+    "card": "Angelic Ascension",
+    "created_tokens": [
+      {
+        "colors": [
+          "W"
+        ],
+        "keywords": [
+          "flying"
+        ],
+        "name": "Angel Token",
+        "power": 4,
+        "toughness": 4,
+        "type_line": "Creature Token \u2014 Angel"
+      }
+    ],
+    "events": [
+      {
+        "available_targets": 1,
+        "card": "Angelic Ascension",
+        "compensation_token_name": "Angel Token",
+        "compensation_token_power": 4,
+        "compensation_token_status": "dynamic_creature_token_executor",
+        "compensation_token_toughness": 4,
+        "destination": "exile",
+        "event": "removal_resolved",
+        "player": "Active",
+        "rule_alternative_count": 1,
+        "rule_confidence": 0.96,
+        "rule_execution_status": "auto",
+        "rule_logical_key": "battle_rule_v1:6cc0bba433aa775b820ed771231b51e6",
+        "rule_oracle_hash": "3a82cf60bc614d970705c9fb28ed052c",
+        "rule_review_status": "verified",
+        "rule_runtime_selection_mode": "single_selected",
+        "rule_source": "curated",
+        "rule_version": 2,
+        "target": "Target Knight",
+        "target_controller": "Opponent",
+        "target_controller_creature_tokens": 1,
+        "target_effect": "creature",
+        "target_is_creature": true,
+        "target_legal": true,
+        "target_name": "Target Knight",
+        "target_player": "Opponent",
+        "target_power": 3,
+        "target_toughness": 3,
+        "target_type": "creature_or_planeswalker",
+        "target_type_line": "Creature - Knight",
+        "targeting_pipeline": "targeting_formal_minimal",
+        "turn": 5
+      },
+      {
+        "compensation_token_name": "Angel Token",
+        "compensation_token_power": 4,
+        "compensation_token_status": "dynamic_creature_token_executor",
+        "compensation_token_toughness": 4,
+        "event": "compensation_tokens_created",
+        "player": "Opponent",
+        "rule_alternative_count": 1,
+        "rule_confidence": 0.96,
+        "rule_execution_status": "auto",
+        "rule_logical_key": "battle_rule_v1:6cc0bba433aa775b820ed771231b51e6",
+        "rule_oracle_hash": "3a82cf60bc614d970705c9fb28ed052c",
+        "rule_review_status": "verified",
+        "rule_runtime_selection_mode": "single_selected",
+        "rule_source": "curated",
+        "rule_version": 2,
+        "source": "Angelic Ascension",
+        "target_controller_creature_tokens": 1,
+        "token": "Angel Token",
+        "tokens_created": 1,
+        "turn": 5
+      }
+    ],
+    "executed": true,
+    "target_removed": true,
+    "used_logical_rule_key": null,
+    "used_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1"
+  },
+  "resolved_card_effects": [
+    {
+      "card": "Afterlife",
+      "effect": "remove_creature",
+      "logical_rule_key": null,
+      "scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+      "token_colors": [
+        "W"
+      ],
+      "token_count": 1,
+      "token_keywords": [
+        "flying"
+      ],
+      "token_name": "Spirit Token"
+    },
+    {
+      "card": "Angelic Ascension",
+      "effect": "remove_permanent",
+      "logical_rule_key": null,
+      "scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+      "token_colors": [
+        "W"
+      ],
+      "token_count": 1,
+      "token_keywords": [
+        "flying"
+      ],
+      "token_name": "Angel Token"
+    },
+    {
+      "card": "Beast Within",
+      "effect": "remove_permanent",
+      "logical_rule_key": null,
+      "scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+      "token_colors": [
+        "G"
+      ],
+      "token_count": 1,
+      "token_keywords": null,
+      "token_name": "Beast Token"
+    },
+    {
+      "card": "Bovine Intervention",
+      "effect": "remove_permanent",
+      "logical_rule_key": null,
+      "scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+      "token_colors": [
+        "W"
+      ],
+      "token_count": 1,
+      "token_keywords": null,
+      "token_name": "Ox Token"
+    },
+    {
+      "card": "Harsh Annotation",
+      "effect": "remove_creature",
+      "logical_rule_key": null,
+      "scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+      "token_colors": [
+        "W",
+        "B"
+      ],
+      "token_count": 1,
+      "token_keywords": [
+        "flying"
+      ],
+      "token_name": "Inkling Token"
+    },
+    {
+      "card": "Reduce to Memory",
+      "effect": "remove_permanent",
+      "logical_rule_key": null,
+      "scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+      "token_colors": [
+        "W",
+        "R"
+      ],
+      "token_count": 1,
+      "token_keywords": null,
+      "token_name": "Spirit Token"
+    },
+    {
+      "card": "Secure the Scene",
+      "effect": "remove_permanent",
+      "logical_rule_key": null,
+      "scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+      "token_colors": [
+        "W"
+      ],
+      "token_count": 1,
+      "token_keywords": null,
+      "token_name": "Soldier Token"
+    }
+  ]
+}

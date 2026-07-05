@@ -2560,6 +2560,93 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "token_description_keyword_not_supported")
 
+    def test_destroy_with_controller_creature_token_compensation_maps_beast_within(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect", "CreateTokenControllerTargetEffect"],
+            xmage_signals=["token"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Beast Within",
+                type_line="Instant",
+                oracle_text="Destroy target permanent. Its controller creates a 3/3 green Beast creature token.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DestroyTargetEffect());
+                this.getSpellAbility().addEffect(new CreateTokenControllerTargetEffect(new BeastToken()));
+                this.getSpellAbility().addTarget(new TargetPermanent());
+                class BeastToken extends TokenImpl {
+                    public BeastToken() {
+                        super("Beast Token", "3/3 green Beast creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.BEAST);
+                        color.setGreen(true);
+                        power = new MageInt(3);
+                        toughness = new MageInt(3);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_COMPENSATION_TOKEN_SCOPE)
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(effect["target_controller_creature_tokens"], 1)
+        self.assertEqual(effect["target_controller_token_name"], "Beast Token")
+        self.assertEqual(effect["target_controller_token_subtype"], "Beast")
+        self.assertEqual(effect["target_controller_token_power"], 3)
+        self.assertEqual(effect["target_controller_token_toughness"], 3)
+        self.assertEqual(effect["target_controller_token_colors"], ["G"])
+
+    def test_exile_with_controller_creature_token_compensation_preserves_flying_token(self) -> None:
+        row = queue_row(
+            split.EXILE_UNIT,
+            effect_classes=["ExileTargetEffect", "CreateTokenControllerTargetEffect"],
+            xmage_signals=["token"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Angelic Ascension",
+                type_line="Instant",
+                oracle_text=(
+                    "Exile target creature or planeswalker. Its controller creates "
+                    "a 4/4 white Angel creature token with flying."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ExileTargetEffect());
+                this.getSpellAbility().addEffect(new CreateTokenControllerTargetEffect(new AngelToken()));
+                this.getSpellAbility().addTarget(new TargetCreatureOrPlaneswalker());
+                class AngelToken extends TokenImpl {
+                    public AngelToken() {
+                        super("Angel Token", "4/4 white Angel creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.ANGEL);
+                        color.setWhite(true);
+                        power = new MageInt(4);
+                        toughness = new MageInt(4);
+                        addAbility(FlyingAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_COMPENSATION_TOKEN_SCOPE)
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "creature_or_planeswalker")
+        self.assertEqual(effect["destination"], "exile")
+        self.assertEqual(effect["target_controller_token_name"], "Angel Token")
+        self.assertEqual(effect["target_controller_token_colors"], ["W"])
+        self.assertEqual(effect["target_controller_token_keywords"], ["flying"])
+        self.assertTrue(effect["target_controller_token_flying"])
+
     def test_token_class_parser_accepts_concatenated_java_string_description(self) -> None:
         token_data, reason = split.parse_simple_token_class(
             """

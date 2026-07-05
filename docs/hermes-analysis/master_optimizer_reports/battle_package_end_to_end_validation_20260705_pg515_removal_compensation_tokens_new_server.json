@@ -1,0 +1,300 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T15:51:23.004498+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg515_xmage_pg515_removal_compensation_tokens_new_server_manifest.json",
+  "package_id": "pg515_xmage_pg515_removal_compensation_tokens_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Afterlife",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b545b98212493f34f1c13c86d67cbc2e",
+          "oracle_hash": "0f513e428063d69c22b815c56b77be91",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Angelic Ascension",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6cc0bba433aa775b820ed771231b51e6",
+          "oracle_hash": "3a82cf60bc614d970705c9fb28ed052c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Beast Within",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7dc80aaf4838c847edf216661119d963",
+          "oracle_hash": "2701546210b9dc0d6a680b1f8fe46cf0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Bovine Intervention",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1112500734b3af1f1a3aece56befd3a3",
+          "oracle_hash": "0cbf5f4a1ef9b69dfbf6a9e16cd0c465",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Harsh Annotation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7700cc39f558856bb360b783358b0c1",
+          "oracle_hash": "315d492f666084b88c225662f91b9410",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Reduce to Memory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:06b3bdee931dc6aa31039a007a8de4a2",
+          "oracle_hash": "63c0c321068ea335ec5a8b0521bd5bd7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Secure the Scene",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3d1a7f1c13063a741de09f0e885ba1b6",
+          "oracle_hash": "6c19e67ba34f48807ada1d3dcf4486fc",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Afterlife",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b545b98212493f34f1c13c86d67cbc2e",
+          "oracle_hash": "0f513e428063d69c22b815c56b77be91",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Angelic Ascension",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6cc0bba433aa775b820ed771231b51e6",
+          "oracle_hash": "3a82cf60bc614d970705c9fb28ed052c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Beast Within",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7dc80aaf4838c847edf216661119d963",
+          "oracle_hash": "2701546210b9dc0d6a680b1f8fe46cf0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Bovine Intervention",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1112500734b3af1f1a3aece56befd3a3",
+          "oracle_hash": "0cbf5f4a1ef9b69dfbf6a9e16cd0c465",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Harsh Annotation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7700cc39f558856bb360b783358b0c1",
+          "oracle_hash": "315d492f666084b88c225662f91b9410",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Reduce to Memory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:06b3bdee931dc6aa31039a007a8de4a2",
+          "oracle_hash": "63c0c321068ea335ec5a8b0521bd5bd7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+          "card_name": "Secure the Scene",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3d1a7f1c13063a741de09f0e885ba1b6",
+          "oracle_hash": "6c19e67ba34f48807ada1d3dcf4486fc",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Afterlife",
+          "logical_rule_key": "battle_rule_v1:b545b98212493f34f1c13c86d67cbc2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Angelic Ascension",
+          "logical_rule_key": "battle_rule_v1:6cc0bba433aa775b820ed771231b51e6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Beast Within",
+          "logical_rule_key": "battle_rule_v1:7dc80aaf4838c847edf216661119d963"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bovine Intervention",
+          "logical_rule_key": "battle_rule_v1:1112500734b3af1f1a3aece56befd3a3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Harsh Annotation",
+          "logical_rule_key": "battle_rule_v1:f7700cc39f558856bb360b783358b0c1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Reduce to Memory",
+          "logical_rule_key": "battle_rule_v1:06b3bdee931dc6aa31039a007a8de4a2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Secure the Scene",
+          "logical_rule_key": "battle_rule_v1:3d1a7f1c13063a741de09f0e885ba1b6"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Afterlife",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:b545b98212493f34f1c13c86d67cbc2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Angelic Ascension",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:6cc0bba433aa775b820ed771231b51e6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Beast Within",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:7dc80aaf4838c847edf216661119d963"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bovine Intervention",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:1112500734b3af1f1a3aece56befd3a3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Harsh Annotation",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:f7700cc39f558856bb360b783358b0c1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Reduce to Memory",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:06b3bdee931dc6aa31039a007a8de4a2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Secure the Scene",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:3d1a7f1c13063a741de09f0e885ba1b6"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

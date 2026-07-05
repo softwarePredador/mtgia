@@ -4867,6 +4867,64 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_removal_compensation_creature_token_preserves_keywords_and_colors(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Target Knight",
+            "type_line": "Creature - Knight",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+        }
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_exile_target_with_controller_creature_token_compensation_spell_v1",
+            "target": "creature_or_planeswalker",
+            "target_constraints": {"card_types": ["creature", "planeswalker"]},
+            "destination": "exile",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_name": "Angel Token",
+            "target_controller_token_subtype": "Angel",
+            "target_controller_token_power": 4,
+            "target_controller_token_toughness": 4,
+            "target_controller_token_colors": ["W"],
+            "target_controller_token_keywords": ["flying"],
+            "target_controller_token_flying": True,
+            "declared_targets": [{"target": target, "controller": opponent}],
+        }
+
+        resolved = self.battle.resolve_declared_single_removal(
+            active,
+            [opponent],
+            {"name": "Angelic Ascension", "type_line": "Instant"},
+            effect,
+            turn=4,
+            rng=random.Random(44),
+        )
+
+        self.assertTrue(resolved)
+        self.assertNotIn(target, opponent.battlefield)
+        angel = next(card for card in opponent.battlefield if card.get("name") == "Angel Token")
+        self.assertEqual(angel["type_line"], "Creature Token — Angel")
+        self.assertEqual(angel["power"], 4)
+        self.assertEqual(angel["toughness"], 4)
+        self.assertEqual(angel["colors"], ["W"])
+        self.assertEqual(angel["color_identity"], ["W"])
+        self.assertEqual(angel["keywords"], ["flying"])
+        self.assertTrue(angel["flying"])
+        self.assertTrue(
+            any(
+                event == "compensation_tokens_created"
+                and data.get("card") is None
+                and data.get("source") == "Angelic Ascension"
+                and data.get("token") == "Angel Token"
+                and data.get("tokens_created") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_spell_without_required_sacrifice_land_does_not_damage(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

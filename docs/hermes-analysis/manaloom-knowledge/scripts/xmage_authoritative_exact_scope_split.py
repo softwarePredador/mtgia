@@ -160,6 +160,8 @@ BOOST_DRAW_SCOPE = "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_
 DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
 BOUNCE_DRAW_SCOPE = "xmage_return_target_to_hand_and_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
+DESTROY_COMPENSATION_TOKEN_SCOPE = "xmage_destroy_target_with_controller_creature_token_compensation_spell_v1"
+EXILE_COMPENSATION_TOKEN_SCOPE = "xmage_exile_target_with_controller_creature_token_compensation_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
 MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
@@ -1190,6 +1192,102 @@ def activated_create_token_oracle_blocker(
     if phrase not in expected:
         return "activated_token_oracle_not_simple"
     return None
+
+
+def controller_target_create_token_effect_from_source(source: str) -> tuple[str, int] | str:
+    text = source or ""
+    if len(re.findall(r"new\s+CreateTokenControllerTargetEffect\s*\(", text)) != 1:
+        return "compensation_token_source_not_single_controller_target_effect"
+    match = re.search(
+        r"new\s+CreateTokenControllerTargetEffect\s*\(\s*new\s+(\w+)\s*\([^)]*\)\s*"
+        r"(?:,\s*(\d+)\s*,\s*(true|false)\s*)?\)",
+        text,
+        re.S,
+    )
+    if not match:
+        return "compensation_token_source_create_token_not_fixed"
+    token_class = match.group(1)
+    count = int(match.group(2) or "1")
+    if count <= 0:
+        return "compensation_token_source_count_not_positive"
+    if (match.group(3) or "false") == "true":
+        return "compensation_token_source_tapped_not_supported"
+    return token_class, count
+
+
+def removal_compensation_token_oracle_blocker(
+    metadata: dict[str, Any],
+    *,
+    action: str,
+    token_data: dict[str, Any],
+    token_count: int,
+) -> str | None:
+    text = normalized_token_oracle_phrase(oracle_text_after_leading_static_keywords(metadata))
+    match = re.match(
+        rf"^{re.escape(action)} target .+?(?:\. it can't be regenerated)?\. "
+        r"its controller (?:creates|puts(?: onto the battlefield)?) (?P<phrase>.+)$",
+        text,
+    )
+    if not match:
+        return f"{action}_compensation_token_oracle_not_simple"
+    phrase = match.group("phrase").strip()
+    if any(marker in phrase for marker in (" if ", " for each ", " unless ", " instead ")):
+        return f"{action}_compensation_token_oracle_not_simple"
+    if phrase.startswith("a tapped ") or phrase.startswith("an tapped ") or phrase.startswith("tapped "):
+        return "compensation_token_oracle_tapped_not_supported"
+    token_description = normalized_token_oracle_phrase(token_data.get("token_description"))
+    if token_count == 1:
+        expected = {
+            f"a {token_description}",
+            f"an {token_description}",
+            f"one {token_description}",
+        }
+    else:
+        plural_description = plural_token_description(token_description)
+        expected = {
+            f"{token_count} {plural_description}",
+            f"{count_word_for_oracle(token_count)} {plural_description}",
+        }
+    if phrase not in expected:
+        return f"{action}_compensation_token_oracle_not_simple"
+    return None
+
+
+def compensation_token_fields(token_data: dict[str, Any], token_count: int) -> dict[str, Any]:
+    fields: dict[str, Any] = {
+        "target_controller_creature_tokens": token_count,
+        "compensation_creature_tokens": token_count,
+        "target_controller_token_name": token_data["token_name"],
+        "compensation_token_name": token_data["token_name"],
+        "target_controller_token_power": token_data["token_power"],
+        "compensation_token_power": token_data["token_power"],
+        "target_controller_token_toughness": token_data["token_toughness"],
+        "compensation_token_toughness": token_data["token_toughness"],
+        "compensation_token_status": "dynamic_creature_token_executor",
+    }
+    optional_pairs = {
+        "token_subtype": ("target_controller_token_subtype", "compensation_token_subtype"),
+        "token_colors": ("target_controller_token_colors", "compensation_token_colors"),
+        "token_keywords": ("target_controller_token_keywords", "compensation_token_keywords"),
+        "token_flying": ("target_controller_token_flying", "compensation_token_flying"),
+        "token_haste": ("target_controller_token_haste", "compensation_token_haste"),
+        "token_landwalk": ("target_controller_token_landwalk", "compensation_token_landwalk"),
+        "token_landwalk_land_type": (
+            "target_controller_token_landwalk_land_type",
+            "compensation_token_landwalk_land_type",
+        ),
+        "token_landwalk_land_types": (
+            "target_controller_token_landwalk_land_types",
+            "compensation_token_landwalk_land_types",
+        ),
+        "artifact_tokens": ("target_controller_artifact_tokens", "compensation_artifact_tokens"),
+    }
+    for source_key, target_keys in optional_pairs.items():
+        if source_key not in token_data:
+            continue
+        for target_key in target_keys:
+            fields[target_key] = token_data[source_key]
+    return fields
 
 
 def is_spell(metadata: dict[str, Any]) -> bool:
@@ -13732,6 +13830,10 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed destroy-target plus draw-card spell"
     elif scope == BOUNCE_DRAW_SCOPE:
         scope_kind = "fixed return-target-to-hand plus draw-card spell"
+    elif scope == DESTROY_COMPENSATION_TOKEN_SCOPE:
+        scope_kind = "fixed destroy-target spell with target-controller creature-token compensation"
+    elif scope == EXILE_COMPENSATION_TOKEN_SCOPE:
+        scope_kind = "fixed exile-target spell with target-controller creature-token compensation"
     elif scope == BOOST_KEYWORD_SCOPE:
         scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
     elif scope == BOOST_CONTROLLED_SPELL_SCOPE:
@@ -17707,6 +17809,118 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_damage",
+        ), "selected_exact_scope"
+
+    if unit == DESTROY_UNIT and classes == {"CreateTokenControllerTargetEffect", "DestroyTargetEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "destroy_compensation_token_ability_class_not_simple"
+        if has_additional_cost(source_text):
+            return None, "destroy_compensation_token_additional_cost_not_supported"
+        parsed_token = controller_target_create_token_effect_from_source(source_text)
+        if isinstance(parsed_token, str):
+            return None, parsed_token
+        token_class, token_count = parsed_token
+        token_data, token_reason = parse_simple_token_class(
+            token_class_source(row, source_text, token_class),
+            token_class,
+        )
+        if token_reason is not None:
+            return None, token_reason
+        oracle_blocker = removal_compensation_token_oracle_blocker(
+            metadata,
+            action="destroy",
+            token_data=token_data,
+            token_count=token_count,
+        )
+        if oracle_blocker is not None:
+            return None, oracle_blocker
+        if len(re.findall(r"new\s+DestroyTargetEffect\s*\(", source_text or "", re.S)) != 1:
+            return None, "destroy_compensation_token_source_destroy_not_single"
+        primary_metadata = dict(metadata)
+        primary_metadata["oracle_text"] = re.sub(
+            r"\.\s+its controller (?:creates|puts(?: onto the battlefield)?) .*$",
+            ".",
+            oracle_text(metadata),
+        )
+        target = destroy_target_from_oracle(primary_metadata)
+        if target is None:
+            return None, "destroy_compensation_token_target_not_supported"
+        effect, target_type = target
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "destroy_compensation_token_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
+        effect_json = {
+            "effect": effect,
+            "battle_model_scope": DESTROY_COMPENSATION_TOKEN_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "graveyard",
+            "xmage_effect_classes": ["DestroyTargetEffect", "CreateTokenControllerTargetEffect"],
+            **compensation_token_fields(token_data, token_count),
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_destroy_target_controller_creature_token_compensation_spell",
+        ), "selected_exact_scope"
+
+    if unit == EXILE_UNIT and classes == {"CreateTokenControllerTargetEffect", "ExileTargetEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "exile_compensation_token_ability_class_not_simple"
+        if has_additional_cost(source_text):
+            return None, "exile_compensation_token_additional_cost_not_supported"
+        parsed_token = controller_target_create_token_effect_from_source(source_text)
+        if isinstance(parsed_token, str):
+            return None, parsed_token
+        token_class, token_count = parsed_token
+        token_data, token_reason = parse_simple_token_class(
+            token_class_source(row, source_text, token_class),
+            token_class,
+        )
+        if token_reason is not None:
+            return None, token_reason
+        oracle_blocker = removal_compensation_token_oracle_blocker(
+            metadata,
+            action="exile",
+            token_data=token_data,
+            token_count=token_count,
+        )
+        if oracle_blocker is not None:
+            return None, oracle_blocker
+        if len(re.findall(r"new\s+ExileTargetEffect\s*\(", source_text or "", re.S)) != 1:
+            return None, "exile_compensation_token_source_exile_not_single"
+        primary_metadata = dict(metadata)
+        primary_metadata["oracle_text"] = re.sub(
+            r"\.\s+its controller (?:creates|puts(?: onto the battlefield)?) .*$",
+            ".",
+            oracle_text(metadata),
+        )
+        target = exile_target_from_oracle(primary_metadata)
+        if target is None:
+            return None, "exile_compensation_token_target_not_supported"
+        effect, target_type = target
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "exile_compensation_token_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
+        effect_json = {
+            "effect": effect,
+            "battle_model_scope": EXILE_COMPENSATION_TOKEN_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "exile",
+            "xmage_effect_classes": ["ExileTargetEffect", "CreateTokenControllerTargetEffect"],
+            **compensation_token_fields(token_data, token_count),
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_exile_target_controller_creature_token_compensation_spell",
         ), "selected_exact_scope"
 
     if unit == DAMAGE_UNIT and classes == {"DamageTargetEffect", "ScryEffect"}:

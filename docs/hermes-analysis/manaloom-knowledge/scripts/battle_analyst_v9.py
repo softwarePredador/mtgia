@@ -12070,22 +12070,45 @@ def create_removal_compensation_tokens(effect_data, target_controller, source_ca
             or effect_data.get("compensation_token_toughness")
             or token_power
         ) or token_power
+        token_colors = _as_list(
+            effect_data.get("target_controller_token_colors")
+            or effect_data.get("compensation_token_colors")
+        )
+        token_keywords = _as_list(
+            effect_data.get("target_controller_token_keywords")
+            or effect_data.get("compensation_token_keywords")
+        )
+        token_landwalk_land_types = _as_list(
+            effect_data.get("target_controller_token_landwalk_land_types")
+            or effect_data.get("compensation_token_landwalk_land_types")
+            or effect_data.get("target_controller_token_landwalk_land_type")
+            or effect_data.get("compensation_token_landwalk_land_type")
+        )
         for _ in range(max(0, min(creature_count, 10))):
             token = create_creature_token(
                 target_controller,
                 name=token_name,
                 power=token_power,
                 toughness=token_toughness,
+                haste=bool(
+                    effect_data.get("target_controller_token_haste")
+                    or effect_data.get("compensation_token_haste")
+                ),
+                flying=bool(
+                    effect_data.get("target_controller_token_flying")
+                    or effect_data.get("compensation_token_flying")
+                ),
+                keywords=token_keywords,
+                landwalk_land_types=token_landwalk_land_types,
+                artifact=bool(
+                    effect_data.get("target_controller_artifact_tokens")
+                    or effect_data.get("compensation_artifact_tokens")
+                ),
+                subtype=token_subtype,
+                colors=token_colors,
             )
             if token_subtype:
-                token["type_line"] = f"Creature Token — {token_subtype}"
                 token["subtype"] = token_subtype
-            token_colors = (
-                effect_data.get("target_controller_token_colors")
-                or effect_data.get("compensation_token_colors")
-            )
-            if token_colors:
-                token["colors"] = token_colors
             creature_created.append(token)
             created.append(token)
     if creature_created:

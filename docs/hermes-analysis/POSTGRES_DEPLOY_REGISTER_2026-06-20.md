@@ -15603,3 +15603,75 @@ Register decision:
   promoted cards.
 - The next wave must start from the rebuilt post-PG514 queue and choose a new
   exact subpattern; do not reuse the pre-PG514 candidate queue.
+
+## 2026-07-05 - PG515 removal compensation tokens
+
+- Deploy id: `xmage_pg515_removal_compensation_tokens_new_server`.
+- Runtime families:
+  `xmage_destroy_target_controller_creature_token_compensation_spell` and
+  `xmage_exile_target_controller_creature_token_compensation_spell`.
+- Promoted cards: `7`.
+- Promoted card names: `Afterlife`, `Angelic Ascension`, `Beast Within`,
+  `Bovine Intervention`, `Harsh Annotation`, `Reduce to Memory`, and
+  `Secure the Scene`.
+- Scope boundary: only local-XMage-backed targeted destroy/exile spells where
+  the same target's controller creates a fixed simple creature token are
+  allowed in this package. Non-creature tokens, changeling tokens, unsupported
+  auxiliary abilities, imprecise oracle phrasing, unsafe target classes, and
+  broad `xmage_*_review_v1` rows remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/pg515_xmage_pg515_removal_compensation_tokens_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/pg515_xmage_pg515_removal_compensation_tokens_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg515_xmage_pg515_removal_compensation_tokens_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg515_xmage_pg515_removal_compensation_tokens_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg515_xmage_pg515_removal_compensation_tokens_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg515_xmage_pg515_removal_compensation_tokens_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg515_xmage_pg515_removal_compensation_tokens_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=2`, `upserted_rows=7`, `COMMIT`.
+- Postcheck:
+  all seven promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg515_removal_compensation_tokens_new_server.json`;
+  `selected_card_count=7`, `pg_rows_loaded=7`,
+  `sqlite_inserted_or_updated=9`, and
+  `canonical_snapshot_rows_exported=6024`.
+- Validation:
+  combined exact-scope/runtime suite `829` tests passed, battle package E2E
+  validation `pass`, runtime smoke without rule override created the expected
+  compensation token, XMage strategy `26/26` pass, operational surface `39/39`
+  pass, legacy contamination `32/32` pass, and PG/Hermes/SQLite `51/51` pass.
+- Post-sync queue:
+  `target_identity_count=25992`, `xmage_authoritative_source_count=25678`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25678`.
+- Global readiness:
+  `battle_and_oracle_ready=4958`,
+  `battle_family_mapper_required=28915`,
+  `snapshot_has_any_rule=6027`, and
+  `snapshot_has_verified_rule=4780`.
+- Final exact-scope recheck:
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`, and
+  `adapter_work_unit_counts={}`.
+
+Register decision:
+
+- PG515 is applied and should not be rebuilt.
+- Destroy/exile plus target-controller creature-token compensation is now
+  exact-scope supported for the seven promoted cards.
+- The next wave must start from the rebuilt post-PG515 queue and choose a new
+  exact subpattern; do not reuse the pre-PG515 candidate queue.
