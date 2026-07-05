@@ -4265,7 +4265,12 @@ def choose_add_counters_target(player, opponents, card, effect_data):
     if not candidates:
         return None, None, []
     counter_type = str((effect_data or {}).get("counter_type") or "+1/+1")
+    target_controller = str((effect_data or {}).get("target_controller") or "any").lower()
+    forced_self = target_controller in {"self", "you", "controller", "controlled"}
     if counter_type == "-1/-1":
+        if forced_self:
+            owner, target = min(candidates, key=lambda item: target_priority(item[1]))
+            return owner, target, [target for _owner, target in candidates]
         preferred = [(owner, target) for owner, target in candidates if owner is not player]
     else:
         preferred = [(owner, target) for owner, target in candidates if owner is player]

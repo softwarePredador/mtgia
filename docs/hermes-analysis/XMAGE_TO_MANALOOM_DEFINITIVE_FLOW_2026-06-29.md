@@ -12228,6 +12228,62 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG496 ETB Self-Target Add-Counters Closure
+
+- PG496 extends the PG323 ETB add-counters lane to the exact XMage target
+  shape `TargetControlledCreaturePermanent()`, matching Oracle text
+  `target creature you control`. This is intentionally distinct from
+  unrestricted `target creature`, because negative counters must not be aimed
+  at an opponent when the source forces a self-controlled target.
+- The mapper now extracts a structured ETB counter target spec from both
+  XMage source and Oracle text, including `counter_type`, `counter_count`,
+  `target`, `target_controller`, and `target_constraints`. Exact accepted
+  shapes are still narrow: simple `EntersBattlefieldTriggeredAbility`, pure
+  `AddCountersTargetEffect`, fixed `+1/+1` or `-1/-1` counter count, and exact
+  source/Oracle target agreement.
+- Runtime targeting was tightened for harmful self-target counters. When
+  `target_controller=self` and the counter is `-1/-1`, battle chooses the
+  expendable own creature instead of the best own creature; harmful counters
+  without a self-controller constraint still prefer opponent targets.
+- The batch promoted `5` cards: Baleful Ammit, Crocodile of the Crossing,
+  Kujar Seedsculptor, Ornery Kudu, and Teyo's Lightshield.
+- Deliberately blocked neighbors remain blocked: multi-target counter
+  distribution, subtype-filtered targets, `another` target language,
+  variable counter counts, auxiliary effects, non-simple abilities, and source
+  or Oracle mismatches.
+- Validation passed: `py_compile` for touched parser/runtime/test files, the
+  full exact-scope splitter suite (`495` tests OK), and the full
+  `test_battle_analyst_v10_3.py` suite (`623` PASS lines) with the live
+  PostgreSQL environment loaded.
+- PostgreSQL package PG496 applied against `143.198.230.247:5433/halder`.
+  Precheck found `5/5` target card rows, no existing rule rows, and no shadow
+  rows to deprecate. Apply upserted `5` verified/auto rows. Postcheck confirmed
+  `5/5` promoted rule rows, verified/auto rows, and matching Oracle hashes.
+- Hermes metadata sync matched `5937` PostgreSQL cards, wrote `5848` SQLite
+  cache aliases, updated `108` deck-card ids, and left the known
+  `unresolved=1` residual unchanged. The battle-rule sync loaded `8380`
+  PostgreSQL rows, wrote `8144` SQLite rows, and exported `5914` canonical
+  fallback rows.
+- Generic E2E validation passed across PostgreSQL, SQLite `battle_card_rules`,
+  the default canonical snapshot, and runtime `get_card_effect` for all `5`
+  selected cards. The manifest has no generic battle-execution scenarios, so
+  scenario execution remains `0`; concrete self-negative targeting behavior is
+  covered by the focused PG496 runtime test.
+- Final governance audits passed: XMage strategy (`26/26`), operational
+  surface (`39/39`), legacy contamination (`32/32`), deckbuilding contract
+  surface, and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26111`, `xmage_authoritative_source_count=25797`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25797`. This is an exact
+  reduction of `5` from the post-PG495 queue. The targeted add-counters work
+  unit is now `454`, and `etb_add_counters_counter_not_fixed` is down to `15`.
+- Post-sync global readiness is now `34331` known cards, `4839`
+  `battle_and_oracle_ready`, `29034` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

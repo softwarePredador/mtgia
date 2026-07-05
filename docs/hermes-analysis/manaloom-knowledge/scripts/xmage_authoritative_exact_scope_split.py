@@ -4013,6 +4013,63 @@ def etb_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] 
     return match.group(2), count
 
 
+def etb_counter_target_spec_from_source(source: str) -> dict[str, Any] | None:
+    text = source or ""
+    counter = re.findall(
+        r"AddCountersTargetEffect\s*\(\s*CounterType\.(P1P1|M1M1)\.createInstance\s*\(\s*(\d*)\s*\)",
+        text,
+    )
+    if len(counter) != 1:
+        return None
+    targets = re.findall(r"\.addTarget\s*\(\s*new\s+(TargetControlledCreaturePermanent|TargetCreaturePermanent)\s*\(", text)
+    if len(targets) != 1:
+        return None
+    target_class = targets[0]
+    if not re.search(rf"\.addTarget\s*\(\s*new\s+{target_class}\s*\(\s*\)\s*\)", text):
+        return None
+    counter_class, raw_count = counter[0]
+    target_controller = "self" if target_class == "TargetControlledCreaturePermanent" else "any"
+    constraints = {"card_types": ["creature"]}
+    if target_controller == "self":
+        constraints["controller_scope"] = "self"
+    return {
+        "counter_type": "+1/+1" if counter_class == "P1P1" else "-1/-1",
+        "counter_count": int(raw_count or "1"),
+        "target": "creature",
+        "target_controller": target_controller,
+        "target_constraints": constraints,
+    }
+
+
+def etb_counter_target_spec_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = strip_leading_parenthetical_reminders(
+        re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    )
+    match = re.match(
+        r"^(?:when|whenever) (?:this creature|.+) enters(?: the battlefield)?, put "
+        r"(a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(\+1/\+1|-1/-1) counters? on "
+        r"(target creature|target creature you control)\.?$",
+        text,
+    )
+    if not match:
+        return None
+    count = counter_count_from_text(match.group(1))
+    if count is None or count <= 0:
+        return None
+    target_controller = "self" if match.group(3) == "target creature you control" else "any"
+    constraints = {"card_types": ["creature"]}
+    if target_controller == "self":
+        constraints["controller_scope"] = "self"
+    return {
+        "counter_type": match.group(2),
+        "counter_count": count,
+        "target": "creature",
+        "target_controller": target_controller,
+        "target_constraints": constraints,
+    }
+
+
 def fixed_boost_target_from_source(source: str) -> tuple[int, int] | None:
     matches = re.findall(
         r"new\s+BoostTargetEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*"
@@ -14996,27 +15053,28 @@ def split_row(
     if etb_add_counters_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "etb_add_counters_not_creature"
-        source_counter = fixed_counter_target_from_source(source_text)
+        source_counter = etb_counter_target_spec_from_source(source_text)
         if source_counter is None:
             return None, "etb_add_counters_counter_not_fixed"
-        oracle_counter = etb_counter_target_from_oracle(metadata)
+        oracle_counter = etb_counter_target_spec_from_oracle(metadata)
         if oracle_counter is None:
             return None, "etb_add_counters_target_not_supported"
         if source_counter != oracle_counter:
             return None, "etb_add_counters_source_oracle_mismatch"
-        counter_type, count = oracle_counter
+        counter_type = str(oracle_counter["counter_type"])
+        count = int(oracle_counter["counter_count"])
         keyword_list = ordered_keywords(keywords_from_ability_classes(row))
         effect_json = {
             "effect": "creature",
             "battle_model_scope": ETB_ADD_COUNTERS_CREATURE_SCOPE,
             "ability_kind": "triggered",
             "trigger": "enters_battlefield",
-            "etb_add_counters_target": "creature",
+            "etb_add_counters_target": oracle_counter["target"],
             "etb_add_counters_counter_type": counter_type,
             "etb_add_counters_count": count,
-            "target": "creature",
-            "target_constraints": {"card_types": ["creature"]},
-            "target_controller": "any",
+            "target": oracle_counter["target"],
+            "target_constraints": oracle_counter["target_constraints"],
+            "target_controller": oracle_counter["target_controller"],
             "counter_type": counter_type,
             "counter_count": count,
             "xmage_effect_class": "AddCountersTargetEffect",

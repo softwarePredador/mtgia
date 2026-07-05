@@ -8413,6 +8413,85 @@ def register_tests(battle, player):
         ]
         assert resolved_targets == ["Damaged Engine", "Wounded Planeswalker"]
 
+    def test_pg496_etb_add_counters_self_negative_targets_own_expendable_creature():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Baleful Ammit",
+                "type_line": "Creature - Crocodile Demon",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 3,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            expendable = {
+                "name": "Servo Token",
+                "type_line": "Artifact Creature - Servo",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            opponent_engine = {
+                "name": "Opponent Engine",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 6,
+                "toughness": 6,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            active.battlefield = [source, expendable]
+            opponent.battlefield = [opponent_engine]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_add_counters_target": "creature",
+                    "etb_add_counters_counter_type": "-1/-1",
+                    "etb_add_counters_count": 1,
+                    "target": "creature",
+                    "target_controller": "self",
+                    "target_constraints": {"card_types": ["creature"], "controller_scope": "self"},
+                    "counter_type": "-1/-1",
+                    "counter_count": 1,
+                    "_rule_logical_key": "battle_rule_v1:pg496-etb-self-negative-counter",
+                    "_rule_oracle_hash": "pg496-etb-self-negative-counter-hash",
+                },
+                16,
+                random.Random(496),
+                all_players=[active, opponent],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert source in active.battlefield
+        assert expendable not in active.battlefield
+        assert expendable in active.graveyard
+        assert opponent_engine in opponent.battlefield
+        assert any(
+            event == "trigger_resolved"
+            and data.get("effect") == "add_counters"
+            and data.get("card") == "Baleful Ammit"
+            and data.get("target") == "Servo Token"
+            and data.get("target_controller") == "Active"
+            and data.get("counter_type") == "-1/-1"
+            and data.get("result") == "creature_put_into_graveyard_zero_toughness"
+            and data.get("rule_logical_key") == "battle_rule_v1:pg496-etb-self-negative-counter"
+            for event, data in events
+        )
+
     def test_pg495_exile_target_respects_mana_value_and_nonland_constraints():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -22933,6 +23012,7 @@ def register_tests(battle, player):
         test_pg492_etb_bounce_respects_subtype_and_historic_constraints,
         test_pg493_etb_destroy_respects_extended_target_constraints,
         test_pg494_etb_destroy_requires_damaged_this_turn_target,
+        test_pg496_etb_add_counters_self_negative_targets_own_expendable_creature,
         test_pg495_exile_target_respects_mana_value_and_nonland_constraints,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,

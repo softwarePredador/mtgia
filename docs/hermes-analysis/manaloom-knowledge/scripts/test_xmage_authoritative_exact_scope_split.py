@@ -9956,6 +9956,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["keywords"], ["flying"])
         self.assertTrue(effect["_keywords_are_self"])
 
+    def test_creature_etb_minus_one_counter_target_creature_you_control_maps_self_target(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_TARGET_UNIT,
+            effect_classes=["AddCountersTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "LifelinkAbility"],
+            xmage_signals=["targeting", "counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Baleful Ammit",
+                type_line="Creature - Crocodile Demon",
+                oracle_text=(
+                    "Lifelink\n"
+                    "When this creature enters, put a -1/-1 counter on target creature you control."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(LifelinkAbility.getInstance());"
+                "Ability ability = new EntersBattlefieldTriggeredAbility("
+                "new AddCountersTargetEffect(CounterType.M1M1.createInstance(1)));"
+                "ability.addTarget(new TargetControlledCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_ADD_COUNTERS_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_add_counters_counter_type"], "-1/-1")
+        self.assertEqual(effect["etb_add_counters_count"], 1)
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "controller_scope": "self"})
+        self.assertEqual(effect["keywords"], ["lifelink"])
+
     def test_creature_etb_minus_one_counter_after_reminder_text_maps_to_etb_scope(self) -> None:
         row = queue_row(
             split.ADD_COUNTERS_TARGET_UNIT,
