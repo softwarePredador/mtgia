@@ -1937,3 +1937,66 @@ Operational lesson:
   discovery path that clears the matrix hard gates.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Entreat Same-Lane Cut Scout - 2026-07-05
+
+The next Entreat-specific learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_entreat_same_lane_cut_scout_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_entreat_same_lane_cut_scout_20260705_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_entreat_same_lane_cut_scout_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_entreat_same_lane_cut_scout_current.json`
+
+This scout narrows the miracle-finisher lane after the Entreat runtime work.
+It joins the miracle-access candidate queue, Entreat rule package, Entreat
+runtime preflight, protected `607` value model, and current cut-evidence miner.
+It is read-only and does not materialize a deck.
+
+Current result:
+
+- decision status:
+  `entreat_same_lane_cut_scout_blocked_no_safe_cut_keep_607`;
+- `Entreat the Angels` candidate row found: `true`;
+- package generated: `true`;
+- PostgreSQL writes executed for Entreat package: `false`;
+- runtime primitive ready: `true`;
+- active Entreat rule rows: `0`;
+- same-lane current `607` cuts reviewed: `10`;
+- safe same-lane cuts: `0`;
+- blocked same-lane cuts: `10`;
+- matrix contract blocker count: `28`;
+- matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- recommended next action:
+  `do_not_score_entreat_until_pg_apply_and_safe_cut_evidence`.
+
+Blocked same-lane cut set:
+
+- `Approach of the Second Sun`;
+- `Storm Herd`;
+- `Creative Technique`;
+- `Mizzix's Mastery`;
+- `Rise of the Eldrazi`;
+- `Call Forth the Tempest`;
+- `Hit the Mother Lode`;
+- `Insurrection`;
+- `Surge to Victory`;
+- `Everything Comes to Dust`.
+
+Operational lesson:
+
+- `Entreat the Angels` is now a clearer research candidate, not a promoted
+  deck card.
+- The rule package and X-token runtime primitive remove one old uncertainty,
+  but they do not prove deck fit.
+- Every current miracle-finisher same-lane slot is hard-blocked under the
+  protected `607` evidence. The main blockers are miracle/finisher core status,
+  missing cut-safety proof, prior rejection, protected-anchor status, and
+  measured exposure.
+- Do not run a natural battle for Entreat until both gates are true: an active
+  PostgreSQL-backed Entreat rule exists after approved apply, and at least one
+  named same-lane cut is seed-safe.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.

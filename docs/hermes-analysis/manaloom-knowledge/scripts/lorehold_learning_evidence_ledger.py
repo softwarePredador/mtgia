@@ -16,6 +16,8 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
 CRITICAL_MATCHUP_TERMS = ("Winota", "Vivi", "Sisay")
+CURRENT_BASELINE_DECK_KEY = "deck_607"
+LEGACY_BASELINE_DECK_KEY = "deck_6"
 
 
 def utc_now() -> str:
@@ -241,11 +243,26 @@ def critical_terms_for_opponent(opponent: str) -> list[str]:
     return [term for term in CRITICAL_MATCHUP_TERMS if term.lower() in opponent.lower()]
 
 
+def baseline_result(results: list[Any]) -> tuple[str, dict[str, Any] | None]:
+    for baseline_key in (CURRENT_BASELINE_DECK_KEY, LEGACY_BASELINE_DECK_KEY):
+        row = next(
+            (
+                candidate
+                for candidate in results
+                if isinstance(candidate, dict) and candidate.get("deck_key") == baseline_key
+            ),
+            None,
+        )
+        if isinstance(row, dict):
+            return baseline_key, row
+    return "", None
+
+
 def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     results = payload.get("results") or []
     if not isinstance(results, list):
         return []
-    baseline = next((row for row in results if isinstance(row, dict) and row.get("deck_key") == "deck_6"), None)
+    baseline_key, baseline = baseline_result(results)
     if not isinstance(baseline, dict):
         return []
     observations: list[dict[str, Any]] = []
@@ -253,7 +270,7 @@ def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> li
         if not isinstance(row, dict):
             continue
         deck_key = str(row.get("deck_key") or "")
-        if deck_key == "deck_6" or not deck_key.startswith("candidate_"):
+        if deck_key == baseline_key or not deck_key.startswith("candidate_"):
             continue
         delta_pp = numeric(row.get("win_rate")) - numeric(baseline.get("win_rate"))
         observations.append(
@@ -268,6 +285,8 @@ def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> li
                 "adds": [],
                 "cuts": [],
                 "status": row.get("status"),
+                "baseline_key": baseline_key,
+                "legacy_baseline": baseline_key == LEGACY_BASELINE_DECK_KEY,
                 "baseline": compact_result(baseline),
                 "candidate": compact_result(row),
                 "delta_pp": round(delta_pp, 2),
@@ -315,7 +334,7 @@ def collect_synergy_critical_matchups(reports_dir: Path) -> dict[str, list[dict[
         results = payload.get("results") or []
         if not isinstance(results, list):
             continue
-        baseline = next((row for row in results if isinstance(row, dict) and row.get("deck_key") == "deck_6"), None)
+        baseline_key, baseline = baseline_result(results)
         if not isinstance(baseline, dict):
             continue
         baseline_opponents = {
@@ -356,6 +375,8 @@ def collect_synergy_critical_matchups(reports_dir: Path) -> dict[str, list[dict[
                         "generated_at": payload.get("generated_at"),
                         "package_key": package_key,
                         "deck_key": deck_key,
+                        "baseline_key": baseline_key,
+                        "legacy_baseline": baseline_key == LEGACY_BASELINE_DECK_KEY,
                         "opponent": opponent,
                         "critical_terms": terms,
                         "baseline": baseline_compact,
@@ -422,6 +443,7 @@ def summarize_group(
     winota_rows = [row for row in critical_matchups if "Winota" in (row.get("critical_terms") or [])]
     winota_improvements = [row for row in winota_rows if row.get("result") == "improved"]
     winota_regressions = [row for row in winota_rows if row.get("result") == "regressed"]
+    legacy_baseline_count = sum(1 for row in observations if row.get("legacy_baseline"))
     latest = sorted(
         observations,
         key=lambda row: (
@@ -440,12 +462,14 @@ def summarize_group(
         latest_delta=numeric(latest.get("delta_pp")),
         latest_decision=str(latest.get("decision") or ""),
         critical_regression_count=len(critical_regressions),
+        legacy_baseline_only=legacy_baseline_count == len(observations),
     )
     return {
         "package_key": package_key,
         "classification": classification,
         "registry": registry_row,
         "observation_count": len(observations),
+        "legacy_baseline_count": legacy_baseline_count,
         "positive_count": len(positive),
         "negative_count": len(negative),
         "tie_count": len(ties),
@@ -484,9 +508,12 @@ def classify_group(
     latest_delta: float,
     latest_decision: str,
     critical_regression_count: int = 0,
+    legacy_baseline_only: bool = False,
 ) -> str:
     if registry_status == "promoted_current_champion":
         return "current_champion"
+    if legacy_baseline_only:
+        return "legacy_baseline_observation_only"
     if latest_decision == "preflight_blocked_protected_cut":
         return "preflight_blocked_protected_cut"
     if latest_decision == "blocked_prior_evidence":
