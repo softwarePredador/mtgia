@@ -17956,6 +17956,15 @@ def resolve_generic_permanent_etb(
                 artifact=bool(effect_data.get("etb_artifact_tokens")),
                 subtype=effect_data.get("etb_token_subtype"),
                 colors=list(effect_data.get("etb_token_colors") or []),
+                sacrifice_for_colorless_mana=bool(effect_data.get("etb_token_sacrifice_for_colorless_mana")),
+                mana_activation_requires_sacrifice=bool(
+                    effect_data.get("etb_token_mana_activation_requires_sacrifice")
+                    or effect_data.get("etb_token_sacrifice_for_colorless_mana")
+                ),
+                mana_activation_requires_tap=bool(effect_data.get("etb_token_mana_activation_requires_tap")),
+                mana_produced=effect_data.get("etb_token_mana_produced"),
+                produces=effect_data.get("etb_token_produces"),
+                produced_mana_symbols=effect_data.get("etb_token_produced_mana_symbols"),
                 opponents=opponents,
                 turn=turn,
                 source_event="etb_token_created",
@@ -18772,6 +18781,12 @@ def resolve_permanent_dies_token_maker(
         "dies_token_landwalk": "token_landwalk",
         "dies_token_landwalk_land_type": "token_landwalk_land_type",
         "dies_token_landwalk_land_types": "token_landwalk_land_types",
+        "dies_token_sacrifice_for_colorless_mana": "token_sacrifice_for_colorless_mana",
+        "dies_token_mana_activation_requires_sacrifice": "token_mana_activation_requires_sacrifice",
+        "dies_token_mana_activation_requires_tap": "token_mana_activation_requires_tap",
+        "dies_token_mana_produced": "token_mana_produced",
+        "dies_token_produces": "token_produces",
+        "dies_token_produced_mana_symbols": "token_produced_mana_symbols",
         "dies_artifact_tokens": "artifact_tokens",
     }
     for dies_key, token_key in dies_field_map.items():
@@ -37712,6 +37727,12 @@ def create_creature_token(
     artifact=False,
     subtype=None,
     colors=None,
+    sacrifice_for_colorless_mana=False,
+    mana_activation_requires_sacrifice=False,
+    mana_activation_requires_tap=False,
+    mana_produced=None,
+    produces=None,
+    produced_mana_symbols=None,
     opponents=None,
     turn=None,
     source_event="token_created",
@@ -37734,6 +37755,22 @@ def create_creature_token(
         "summoning_sick": not bool(haste),
         "tapped": False,
     }
+    if sacrifice_for_colorless_mana or mana_activation_requires_sacrifice:
+        produced_amount = max(1, int(mana_produced or 1))
+        token["sacrifice_for_colorless_mana"] = bool(sacrifice_for_colorless_mana)
+        token["battle_model_scope"] = "xmage_self_sacrifice_mana_source_permanent_v1"
+        token["ability_kind"] = "activated_mana"
+        token["is_mana_source"] = True
+        token["mana_source_contextual_only"] = True
+        token["mana_activation_requires_sacrifice"] = True
+        token["activation_requires_sacrifice"] = True
+        token["mana_activation_requires_tap"] = bool(mana_activation_requires_tap)
+        token["activation_requires_tap"] = bool(mana_activation_requires_tap)
+        token["mana_produced"] = produced_amount
+        token["produces"] = produces or "C"
+        token["produced_mana_symbols"] = list(produced_mana_symbols or ["C"])
+        token["xmage_ability_class"] = "SimpleManaAbility"
+        token["xmage_cost_class"] = "SacrificeSourceCost"
     if colors:
         token["colors"] = list(colors)
         token["color_identity"] = list(colors)
@@ -38072,6 +38109,15 @@ def create_creature_tokens_from_effect(
         or (effect_data or {}).get("token_landwalk_land_type")
         or []
     )
+    token_sacrifice_for_colorless_mana = bool((effect_data or {}).get("token_sacrifice_for_colorless_mana"))
+    token_mana_activation_requires_sacrifice = bool(
+        (effect_data or {}).get("token_mana_activation_requires_sacrifice")
+        or token_sacrifice_for_colorless_mana
+    )
+    token_mana_activation_requires_tap = bool((effect_data or {}).get("token_mana_activation_requires_tap"))
+    token_mana_produced = (effect_data or {}).get("token_mana_produced")
+    token_produces = (effect_data or {}).get("token_produces")
+    token_produced_mana_symbols = (effect_data or {}).get("token_produced_mana_symbols")
     if (effect_data or {}).get("token_prowess") and "prowess" not in token_keywords:
         token_keywords.append("prowess")
     artifact_tokens = bool((effect_data or {}).get("artifact_tokens"))
@@ -38105,6 +38151,12 @@ def create_creature_tokens_from_effect(
                     artifact=artifact_tokens,
                     subtype=token_subtype,
                     colors=token_colors,
+                    sacrifice_for_colorless_mana=token_sacrifice_for_colorless_mana,
+                    mana_activation_requires_sacrifice=token_mana_activation_requires_sacrifice,
+                    mana_activation_requires_tap=token_mana_activation_requires_tap,
+                    mana_produced=token_mana_produced,
+                    produces=token_produces,
+                    produced_mana_symbols=token_produced_mana_symbols,
                     opponents=opponents,
                     turn=turn,
                     source_event=source_event,
@@ -38142,6 +38194,12 @@ def create_creature_tokens_from_effect(
             artifact=artifact_tokens,
             subtype=token_subtype,
             colors=token_colors,
+            sacrifice_for_colorless_mana=token_sacrifice_for_colorless_mana,
+            mana_activation_requires_sacrifice=token_mana_activation_requires_sacrifice,
+            mana_activation_requires_tap=token_mana_activation_requires_tap,
+            mana_produced=token_mana_produced,
+            produces=token_produces,
+            produced_mana_symbols=token_produced_mana_symbols,
             opponents=opponents,
             turn=turn,
             source_event=source_event,

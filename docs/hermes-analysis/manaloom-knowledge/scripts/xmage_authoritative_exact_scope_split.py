@@ -410,14 +410,12 @@ TOKEN_COLOR_WORDS = {
 UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS = {
     "when ",
     "whenever ",
-    "it has ",
     "gets ",
     "get +",
     "for each ",
     "infect",
     "prowess",
     "toxic",
-    "sacrifice",
     "banding",
 }
 
@@ -905,15 +903,36 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
     lower_description = description.lower()
     if "creature token" not in lower_description:
         return {}, "token_description_not_creature_token"
+    has_colorless_sacrifice_mana = bool(
+        "SimpleManaAbility" in constructor_source
+        and "SacrificeSourceCost" in constructor_source
+        and re.search(r"Mana\.ColorlessMana\s*\(\s*1\s*\)", constructor_source)
+        and re.search(
+            r"sacrifice this (?:creature|token): add \{c\}",
+            lower_description,
+        )
+    )
+    keyword_description = lower_description
+    if has_colorless_sacrifice_mana:
+        keyword_description = re.sub(
+            r'\s+with\s+"sacrifice this (?:creature|token): add \{c\}\.?"\.?',
+            "",
+            keyword_description,
+        )
+        keyword_description = re.sub(
+            r'\.?\s+it has\s+"sacrifice this (?:creature|token): add \{c\}\.?"\.?',
+            "",
+            keyword_description,
+        )
     unsupported_markers = [
         marker
         for marker in sorted(UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS)
-        if marker in lower_description
+        if marker in keyword_description
     ]
     if unsupported_markers:
         return {}, "token_description_keyword_not_supported"
     description_keywords: list[str] = []
-    with_match = re.search(r"\bwith (?P<keywords>.+)$", lower_description)
+    with_match = re.search(r"\bwith (?P<keywords>.+)$", keyword_description)
     if with_match:
         raw_keywords = with_match.group("keywords")
         keyword_parts = [
@@ -931,7 +950,10 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
     if not power_match or not toughness_match:
         return {}, "token_power_toughness_not_fixed"
     ability_classes = set(re.findall(r"addAbility\s*\(\s*([A-Za-z]+Ability)", constructor_source))
-    unsupported_abilities = ability_classes - set(ALLOWED_TOKEN_ABILITY_KEYWORDS)
+    allowed_ability_classes = set(ALLOWED_TOKEN_ABILITY_KEYWORDS)
+    if has_colorless_sacrifice_mana:
+        allowed_ability_classes.add("SimpleManaAbility")
+    unsupported_abilities = ability_classes - allowed_ability_classes
     if unsupported_abilities:
         return {}, "token_ability_not_supported"
     colors = [
@@ -993,6 +1015,13 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
         token_data["token_landwalk_land_types"] = landwalk_types
         if len(landwalk_types) == 1:
             token_data["token_landwalk_land_type"] = landwalk_types[0]
+    if has_colorless_sacrifice_mana:
+        token_data["token_sacrifice_for_colorless_mana"] = True
+        token_data["token_mana_activation_requires_sacrifice"] = True
+        token_data["token_mana_activation_requires_tap"] = False
+        token_data["token_mana_produced"] = 1
+        token_data["token_produces"] = "C"
+        token_data["token_produced_mana_symbols"] = ["C"]
     if artifact:
         token_data["artifact_tokens"] = True
     return token_data, None
@@ -15635,6 +15664,12 @@ def split_row(
             "token_landwalk": "etb_token_landwalk",
             "token_landwalk_land_type": "etb_token_landwalk_land_type",
             "token_landwalk_land_types": "etb_token_landwalk_land_types",
+            "token_sacrifice_for_colorless_mana": "etb_token_sacrifice_for_colorless_mana",
+            "token_mana_activation_requires_sacrifice": "etb_token_mana_activation_requires_sacrifice",
+            "token_mana_activation_requires_tap": "etb_token_mana_activation_requires_tap",
+            "token_mana_produced": "etb_token_mana_produced",
+            "token_produces": "etb_token_produces",
+            "token_produced_mana_symbols": "etb_token_produced_mana_symbols",
             "artifact_tokens": "etb_artifact_tokens",
         }
         for source_key, target_key in optional_token_fields.items():
@@ -15688,6 +15723,12 @@ def split_row(
             "token_landwalk": "dies_token_landwalk",
             "token_landwalk_land_type": "dies_token_landwalk_land_type",
             "token_landwalk_land_types": "dies_token_landwalk_land_types",
+            "token_sacrifice_for_colorless_mana": "dies_token_sacrifice_for_colorless_mana",
+            "token_mana_activation_requires_sacrifice": "dies_token_mana_activation_requires_sacrifice",
+            "token_mana_activation_requires_tap": "dies_token_mana_activation_requires_tap",
+            "token_mana_produced": "dies_token_mana_produced",
+            "token_produces": "dies_token_produces",
+            "token_produced_mana_symbols": "dies_token_produced_mana_symbols",
             "artifact_tokens": "dies_artifact_tokens",
         }
         for source_key, target_key in optional_token_fields.items():

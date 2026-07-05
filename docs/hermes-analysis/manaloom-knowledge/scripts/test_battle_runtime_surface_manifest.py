@@ -9,27 +9,27 @@ import battle_runtime_surface_manifest as manifest_mod
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-EXPECTED_TOTAL_FILES = 147
+EXPECTED_TOTAL_FILES = 155
 EXPECTED_CATEGORY_COUNTS = {
     "core runtime": 31,
-    "focused evidence/promotion": 29,
+    "focused evidence/promotion": 34,
     "learned-deck source": 16,
-    "optimizer/scorecard": 19,
+    "optimizer/scorecard": 20,
     "recurring audit gate": 30,
     "renderer": 4,
     "review queue": 1,
-    "rule registry/sync": 17,
+    "rule registry/sync": 19,
 }
 EXPECTED_AUTOMATION_COVERAGE_COUNTS = {
     "covered_by_recurring_run": 31,
     "imported_by_core_runtime": 6,
-    "outside_recurring_run": 110,
+    "outside_recurring_run": 118,
 }
 EXPECTED_GATE_EXPECTED_COUNTS = {
     "core_runtime_import_regression": 6,
     "recurring_audit_required": 31,
-    "targeted_manual_gate_required_before_change": 50,
-    "targeted_test_required_before_change": 60,
+    "targeted_manual_gate_required_before_change": 53,
+    "targeted_test_required_before_change": 65,
 }
 REQUIRED_HIGH_SIGNAL_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_adjustment_throughput_benchmark.py",

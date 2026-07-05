@@ -279,6 +279,7 @@ RULE_REGISTRY_BASENAMES = {
     "reviewed_battle_card_rules.py",
     "sync_battle_card_rules.py",
     "sync_battle_card_rules_pg.py",
+    "backfill_battle_rule_oracle_hashes.py",
     "test_audit_handcrafted_battle_rule_canonicalization.py",
     "test_audit_multi_rule_runtime_readiness.py",
     "test_battle_rule_registry_runtime_safe.py",
@@ -288,6 +289,7 @@ RULE_REGISTRY_BASENAMES = {
     "test_runtime_pg_rule_fallback_for_promoted_hotfixes.py",
     "test_sync_battle_card_rules_manual_preserve.py",
     "test_sync_battle_card_rules_pg_selection.py",
+    "test_backfill_battle_rule_oracle_hashes.py",
 }
 
 LEARNED_DECK_BASENAMES = {
@@ -323,6 +325,7 @@ OPTIMIZER_BASENAMES = {
     "slot_optimizer.py",
     "universal_optimizer.py",
     "test_master_optimizer_hashes.py",
+    "test_master_optimizer_common.py",
     "test_master_optimizer_gate_baseline.py",
     "test_slot_optimizer_real_roles.py",
     "test_universal_optimizer_known_cards.py",
@@ -336,6 +339,7 @@ FOCUSED_EVIDENCE_BASENAMES = {
     "battle_card_acceleration_source_audit.py",
     "test_battle_card_acceleration_source_audit.py",
     "battle_package_end_to_end_validation.py",
+    "test_battle_package_end_to_end_validation.py",
     "battle_external_engine_crosscheck.py",
     "test_battle_external_engine_crosscheck.py",
     "battle_mtga_player_log_parser.py",
@@ -356,6 +360,10 @@ FOCUSED_EVIDENCE_BASENAMES = {
     "test_xmage_current_replay_batch_pipeline.py",
     "xmage_local_rule_indexer.py",
     "test_xmage_local_rule_indexer.py",
+    "global_card_oracle_battle_readiness.py",
+    "test_global_card_oracle_battle_readiness.py",
+    "lorehold_entreat_rule_package_preapply.py",
+    "test_lorehold_entreat_rule_package_preapply.py",
 }
 
 

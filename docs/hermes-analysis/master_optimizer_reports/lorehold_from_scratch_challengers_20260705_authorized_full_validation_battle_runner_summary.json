@@ -1,0 +1,66 @@
+{
+  "run_count": 10,
+  "runs": [
+    {
+      "key": "challenger_lorehold_miracle_topdeck_control_v1",
+      "returncode": 0,
+      "seconds": 24.66,
+      "stdout_tail": "Loaded 7 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_607 games=1 opponents=8\nrunning challenger_lorehold_miracle_topdeck_control_v1 games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_miracle_topdeck_control_fixed607_gate.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_miracle_topdeck_control_fixed607_gate.md\"\n}\n"
+    },
+    {
+      "key": "challenger_lorehold_spellchain_big_sorcery_v1",
+      "returncode": 0,
+      "seconds": 24.29,
+      "stdout_tail": "Loaded 7 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_607 games=1 opponents=8\nrunning challenger_lorehold_spellchain_big_sorcery_v1 games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_spellchain_big_sorcery_fixed607_gate.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_spellchain_big_sorcery_fixed607_gate.md\"\n}\n"
+    },
+    {
+      "key": "challenger_lorehold_recursion_discard_engine_v1",
+      "returncode": 0,
+      "seconds": 25.55,
+      "stdout_tail": "Loaded 7 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_607 games=1 opponents=8\nrunning challenger_lorehold_recursion_discard_engine_v1 games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_recursion_discard_engine_fixed607_gate.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_recursion_discard_engine_fixed607_gate.md\"\n}\n"
+    },
+    {
+      "key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+      "returncode": 0,
+      "seconds": 27.71,
+      "stdout_tail": "Loaded 7 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_607 games=1 opponents=8\nrunning challenger_lorehold_recursion_discard_pressure_repair_v1 games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_recursion_discard_pressure_repair_fixed607_gate.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_recursion_discard_pressure_repair_fixed607_gate.md\"\n}\n"
+    },
+    {
+      "key": "challenger_lorehold_miracle_pressure_conversion_v1",
+      "returncode": 0,
+      "seconds": 27.22,
+      "stdout_tail": "Loaded 7 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_607 games=1 opponents=8\nrunning challenger_lorehold_miracle_pressure_conversion_v1 games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_miracle_pressure_conversion_fixed607_gate.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_miracle_pressure_conversion_fixed607_gate.md\"\n}\n"
+    },
+    {
+      "key": "challenger_lorehold_spell_pressure_topdeck_v1",
+      "returncode": 0,
+      "seconds": 29.07,
+      "stdout_tail": "Loaded 7 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_607 games=1 opponents=8\nrunning challenger_lorehold_spell_pressure_topdeck_v1 games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_spell_pressure_topdeck_fixed607_gate.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_spell_pressure_topdeck_fixed607_gate.md\"\n}\n"
+    },
+    {
+      "key": "challenger_lorehold_spell_pressure_mana_conversion_v1",
+      "returncode": 0,
+      "seconds": 25.95,
+      "stdout_tail": "Loaded 7 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_607 games=1 opponents=8\nrunning challenger_lorehold_spell_pressure_mana_conversion_v1 games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_spell_pressure_mana_conversion_fixed607_gate.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_spell_pressure_mana_conversion_fixed607_gate.md\"\n}\n"
+    },
+    {
+      "key": "challenger_lorehold_spell_pressure_mana_conversion_deoverfill_v1",
+      "returncode": 0,
+      "seconds": 32.18,
+      "stdout_tail": "Loaded 7 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_607 games=1 opponents=8\nrunning challenger_lorehold_spell_pressure_mana_conversion_deoverfill_v1 games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_spell_pressure_mana_conversion_deoverfill_fixed607_gate.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_spell_pressure_mana_conversion_deoverfill_fixed607_gate.md\"\n}\n"
+    },
+    {
+      "key": "challenger_lorehold_spell_volume_access_depressure_v1",
+      "returncode": 0,
+      "seconds": 33.79,
+      "stdout_tail": "Loaded 7 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_607 games=1 opponents=8\nrunning challenger_lorehold_spell_volume_access_depressure_v1 games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_spell_volume_access_depressure_fixed607_gate.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_spell_volume_access_depressure_fixed607_gate.md\"\n}\n"
+    },
+    {
+      "key": "challenger_lorehold_access_density_control_v1",
+      "returncode": 0,
+      "seconds": 30.23,
+      "stdout_tail": "Loaded 7 real opponent decks from 96 valid candidates (seed=20260626)\nrunning deck_607 games=1 opponents=8\nrunning challenger_lorehold_access_density_control_v1 games=1 opponents=8\n{\n  \"status\": \"ready\",\n  \"json\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_access_density_control_fixed607_gate.json\",\n  \"markdown\": \"/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260705_authorized_full_validation_access_density_control_fixed607_gate.md\"\n}\n"
+    }
+  ],
+  "status": "ready"
+}

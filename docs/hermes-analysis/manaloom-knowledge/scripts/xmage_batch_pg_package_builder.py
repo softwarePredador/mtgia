@@ -773,7 +773,7 @@ def existing_backup_table_from_manifest(manifest_path: Path) -> str | None:
         return None
     if "." in value:
         value = value.split(".", 1)[1]
-    if not re.search(r"_\d{8}_\d{6}$", value):
+    if re.search(r"_\d{8}_$", value):
         return None
     return safe_ident(value)
 

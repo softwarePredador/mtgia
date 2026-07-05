@@ -1,0 +1,308 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg502_xmage_token_sacrifice_colorless_ma_20260705_111909",
+  "deploy_id": "PG502",
+  "expected_rules": [
+    {
+      "card_name": "Dread Drone",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4977ea2073119ffdc86918b1496b93b1",
+      "min_rule_version": 2,
+      "normalized_name": "dread drone",
+      "oracle_hash": "a779a0fb75b8dac335613d3efa028f75",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 2,
+        "etb_token_name": "Eldrazi Spawn Token",
+        "etb_token_power": 0,
+        "etb_token_toughness": 1,
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Emrakul's Hatcher",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ac512ef260039c67afe5cc63566955c6",
+      "min_rule_version": 2,
+      "normalized_name": "emrakul's hatcher",
+      "oracle_hash": "3b806bf1df091419ed95198da66c165e",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 3,
+        "etb_token_name": "Eldrazi Spawn Token",
+        "etb_token_power": 0,
+        "etb_token_toughness": 1,
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kozilek's Predator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4977ea2073119ffdc86918b1496b93b1",
+      "min_rule_version": 2,
+      "normalized_name": "kozilek's predator",
+      "oracle_hash": "a779a0fb75b8dac335613d3efa028f75",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 2,
+        "etb_token_name": "Eldrazi Spawn Token",
+        "etb_token_power": 0,
+        "etb_token_toughness": 1,
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nest Invader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:78d896732ea9eefc2e22a28974526cd9",
+      "min_rule_version": 2,
+      "normalized_name": "nest invader",
+      "oracle_hash": "ea31a3014a52677b8278f66792c7de2d",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 1,
+        "etb_token_name": "Eldrazi Spawn Token",
+        "etb_token_power": 0,
+        "etb_token_toughness": 1,
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skittering Invasion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1d250018bb56e6a9c6e3fe2143e5568",
+      "min_rule_version": 2,
+      "normalized_name": "skittering invasion",
+      "oracle_hash": "744a28ccbdcf3c2e54fcda739061d6a6",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_create_tokens": 4,
+    "xmage_fixed_create_creature_tokens_spell": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg502_token_sacrifice_colorless_mana_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T11:19:09+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Dread Drone"
+      },
+      "card_name": "Dread Drone",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4977ea2073119ffdc86918b1496b93b1",
+      "normalized_name": "dread drone",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 2,
+        "etb_token_name": "Eldrazi Spawn Token",
+        "etb_token_power": 0,
+        "etb_token_toughness": 1,
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Emrakul's Hatcher"
+      },
+      "card_name": "Emrakul's Hatcher",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ac512ef260039c67afe5cc63566955c6",
+      "normalized_name": "emrakul's hatcher",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 3,
+        "etb_token_name": "Eldrazi Spawn Token",
+        "etb_token_power": 0,
+        "etb_token_toughness": 1,
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kozilek's Predator"
+      },
+      "card_name": "Kozilek's Predator",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4977ea2073119ffdc86918b1496b93b1",
+      "normalized_name": "kozilek's predator",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 2,
+        "etb_token_name": "Eldrazi Spawn Token",
+        "etb_token_power": 0,
+        "etb_token_toughness": 1,
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Nest Invader"
+      },
+      "card_name": "Nest Invader",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:78d896732ea9eefc2e22a28974526cd9",
+      "normalized_name": "nest invader",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 1,
+        "etb_token_name": "Eldrazi Spawn Token",
+        "etb_token_power": 0,
+        "etb_token_toughness": 1,
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Skittering Invasion"
+      },
+      "card_name": "Skittering Invasion",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1d250018bb56e6a9c6e3fe2143e5568",
+      "normalized_name": "skittering invasion",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Dread Drone",
+    "Emrakul's Hatcher",
+    "Kozilek's Predator",
+    "Nest Invader",
+    "Skittering Invasion"
+  ],
+  "selected_count": 5,
+  "slug": "xmage_token_sacrifice_colorless_mana_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Dread Drone",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4977ea2073119ffdc86918b1496b93b1",
+      "min_rule_version": 2,
+      "normalized_name": "dread drone",
+      "oracle_hash": "a779a0fb75b8dac335613d3efa028f75",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Emrakul's Hatcher",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ac512ef260039c67afe5cc63566955c6",
+      "min_rule_version": 2,
+      "normalized_name": "emrakul's hatcher",
+      "oracle_hash": "3b806bf1df091419ed95198da66c165e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kozilek's Predator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4977ea2073119ffdc86918b1496b93b1",
+      "min_rule_version": 2,
+      "normalized_name": "kozilek's predator",
+      "oracle_hash": "a779a0fb75b8dac335613d3efa028f75",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nest Invader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:78d896732ea9eefc2e22a28974526cd9",
+      "min_rule_version": 2,
+      "normalized_name": "nest invader",
+      "oracle_hash": "ea31a3014a52677b8278f66792c7de2d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skittering Invasion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1d250018bb56e6a9c6e3fe2143e5568",
+      "min_rule_version": 2,
+      "normalized_name": "skittering invasion",
+      "oracle_hash": "744a28ccbdcf3c2e54fcda739061d6a6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

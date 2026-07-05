@@ -1275,12 +1275,19 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
     if effect == "topdeck_play" and scope == "look_top_library_play_lands_from_top_if_opponent_more_lands_v1":
         return (
             types == {"CREATURE"}
-            and {
-                "LookAtTopCardOfLibraryAnyTimeEffect",
-                "PlayFromTopOfLibraryEffect",
-                "VergeRangersEffect",
-            }.issubset(effect_classes)
+            and (
+                {
+                    "LookAtTopCardOfLibraryAnyTimeEffect",
+                    "PlayFromTopOfLibraryEffect",
+                    "VergeRangersEffect",
+                }.issubset(effect_classes)
+                or "PlayFromNotOwnHandZoneAllEffect" in effect_classes
+            )
             and "SimpleStaticAbility" in ability_classes
+            and (
+                not xmage_condition_classes(card)
+                or "ControlsMoreLandsThanYouCondition" in xmage_condition_classes(card)
+            )
             and bool(effect_json.get("look_top_library_any_time"))
             and bool(effect_json.get("play_lands_from_top_library"))
             and effect_json.get("play_from_top_condition") == "opponent_controls_more_lands"
@@ -1328,13 +1335,49 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
         )
 
     if (
+        effect == "grant_protection_from_chosen_color"
+        and scope == "target_creature_you_control_protection_from_chosen_color_until_eot_v1"
+    ):
+        return (
+            types == {"INSTANT"}
+            and (
+                "ProtectionFromChosenColorTargetEffect" in effect_classes
+                or "GainProtectionFromColorTargetEffect" in effect_classes
+            )
+            and not ability_classes
+            and "TargetControlledCreaturePermanent" in target_classes
+            and bool(effect_json.get("instant"))
+            and effect_json.get("target") == "creature_you_control"
+            and bool(effect_json.get("protection_from_chosen_color_until_eot"))
+        )
+
+    if effect == "phase_out" and scope == "target_nonland_permanents_you_control_phase_out_v1":
+        return (
+            types == {"INSTANT"}
+            and "PhaseOutTargetEffect" in effect_classes
+            and "ConvokeAbility" in ability_classes
+            and "TargetPermanent" in target_classes
+            and "FilterControlledPermanent" in filter_classes
+            and "FilterPermanent" in filter_classes
+            and bool(effect_json.get("instant"))
+            and bool(effect_json.get("convoke"))
+            and effect_json.get("target") == "nonland_permanents_you_control"
+            and bool(effect_json.get("phase_out_all_permanents_you_control"))
+            and not bool(effect_json.get("phase_out_includes_lands"))
+            and effect_json.get("choice_model") == "phase_out_all_legal_nonland_permanents_you_control"
+        )
+
+    if (
         effect == "damage_modifier"
         and scope == "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1"
     ):
         targets = effect_json.get("damage_modifier_targets") or []
         return (
             types == {"CREATURE"}
-            and "TwinflameTyrantEffect" in effect_classes
+            and (
+                "TwinflameTyrantEffect" in effect_classes
+                or "DamageMultipleReplacementEffect" in effect_classes
+            )
             and "SimpleStaticAbility" in ability_classes
             and int(effect_json.get("damage_multiplier") or 0) == 2
             and effect_json.get("damage_modifier_applies_to") == "sources_you_control"
@@ -4582,9 +4625,9 @@ def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
         return "blocked_missing_xmage_source"
     if not card.get("ready_for_structured_pull"):
         return "mapper_metadata_or_test_scenario_required"
-    if is_generic_xmage_review_scope(scope):
-        return "split_family_scope_review_required"
     if exact_scope_batch_safe(card):
+        return "batch_metadata_candidate_requires_pg_precheck"
+    if family.get("effects") == {"static_cost_reduction"} and static_cost_reducer_batch_safe(card):
         return "batch_metadata_candidate_requires_pg_precheck"
     if generic_runtime_batch_safe(card):
         return "batch_metadata_candidate_requires_pg_precheck"
@@ -4592,6 +4635,8 @@ def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
         return "batch_metadata_candidate_requires_pg_precheck"
     if modal_mana_rock_batch_safe(card):
         return "batch_metadata_candidate_requires_pg_precheck"
+    if is_generic_xmage_review_scope(scope):
+        return "split_family_scope_review_required"
     support_status = str(family.get("support_status") or "")
     if family.get("effects") == {"static_cost_reduction"} and not static_cost_reducer_batch_safe(card):
         return "split_family_scope_review_required"

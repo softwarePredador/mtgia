@@ -19,7 +19,7 @@ MODULE_PATH = SCRIPT_DIR / "universal_optimizer.py"
 def load_prefix_namespace() -> dict[str, object]:
     source = MODULE_PATH.read_text(encoding="utf-8")
     prefix = source.split("# ── Concurrency lock ──", 1)[0]
-    namespace: dict[str, object] = {}
+    namespace: dict[str, object] = {"__file__": str(MODULE_PATH)}
     exec(prefix, namespace)
     return namespace
 

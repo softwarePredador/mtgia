@@ -2371,7 +2371,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(token_data["token_subtype"], "Cleric")
         self.assertEqual(token_data["token_colors"], ["W"])
 
-    def test_token_class_parser_decodes_escaped_quotes_before_keyword_filter(self) -> None:
+    def test_token_class_parser_maps_colorless_sacrifice_mana_token(self) -> None:
         token_data, reason = split.parse_simple_token_class(
             r"""
             public final class FixtureScionToken extends TokenImpl {
@@ -2389,8 +2389,52 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             "FixtureScionToken",
         )
 
-        self.assertEqual(token_data, {})
-        self.assertEqual(reason, "token_description_keyword_not_supported")
+        self.assertIsNone(reason)
+        self.assertEqual(token_data["token_name"], "Eldrazi Scion Token")
+        self.assertEqual(token_data["token_subtype"], "Eldrazi Scion")
+        self.assertEqual(token_data["token_power"], 1)
+        self.assertEqual(token_data["token_toughness"], 1)
+        self.assertTrue(token_data["token_sacrifice_for_colorless_mana"])
+        self.assertTrue(token_data["token_mana_activation_requires_sacrifice"])
+        self.assertFalse(token_data["token_mana_activation_requires_tap"])
+        self.assertEqual(token_data["token_mana_produced"], 1)
+        self.assertEqual(token_data["token_produces"], "C")
+        self.assertEqual(token_data["token_produced_mana_symbols"], ["C"])
+
+    def test_fixed_create_creature_tokens_spell_maps_colorless_sacrifice_mana_token(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Invasion",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Create three 1/1 colorless Eldrazi Scion creature tokens. "
+                    "They have \"Sacrifice this creature: Add {C}.\""
+                ),
+            ),
+            source_text=r"""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new FixtureScionToken(), 3));
+                public final class FixtureScionToken extends TokenImpl {
+                    public FixtureScionToken() {
+                        super("Eldrazi Scion Token", "1/1 colorless Eldrazi Scion creature token with \"Sacrifice this creature: Add {C}.\"");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.ELDRAZI);
+                        subtype.add(SubType.SCION);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, Mana.ColorlessMana(1), new SacrificeSourceCost()));
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_count"], 3)
+        self.assertTrue(effect["token_sacrifice_for_colorless_mana"])
+        self.assertEqual(effect["token_produced_mana_symbols"], ["C"])
 
     def test_dies_create_tokens_matches_plural_keyword_token_description(self) -> None:
         row = queue_row(

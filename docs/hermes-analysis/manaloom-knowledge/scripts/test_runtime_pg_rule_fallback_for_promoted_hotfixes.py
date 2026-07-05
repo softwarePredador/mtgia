@@ -71,7 +71,12 @@ class RuntimePgRuleFallbackForPromotedHotfixesTests(unittest.TestCase):
         self.sqlite_db = Path(self._tmp.name) / "knowledge.db"
         if sync_pg.connect is None:
             raise unittest.SkipTest("PostgreSQL helper unavailable for runtime fallback guardrail")
-        with sync_pg.connect() as pg_conn:
+        try:
+            pg_conn = sync_pg.connect()
+        except RuntimeError as exc:
+            self._tmp.cleanup()
+            raise unittest.SkipTest(str(exc)) from exc
+        with pg_conn:
             with pg_conn.cursor() as cur:
                 sync_pg.ensure_pg_table(cur)
                 rows = sync_pg.load_pg_rules(cur, include_needs_review=True)

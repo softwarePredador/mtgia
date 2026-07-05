@@ -660,6 +660,57 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             },
         )
 
+    if (
+        file_name.startswith("lorehold_from_scratch_authorized_full_validation_")
+        and file_name.endswith("_summary_20260705.json")
+        and "status" in keys
+        and ("summary_rows" in keys or "rows" in keys)
+    ):
+        rows = payload.get("summary_rows") if "summary_rows" in keys else payload.get("rows")
+        rows = rows if isinstance(rows, list) else []
+        return ArtifactClassification(
+            **base,
+            artifact_kind="from_scratch_challenger_summary",
+            schema_version="from_scratch_authorized_validation_summary_v1",
+            status="pass" if payload.get("status") == "ready" and rows else "warn",
+            detail="authorized from-scratch Lorehold validation summary",
+            canonical_summary={
+                "schema_keys": sorted(keys),
+                "row_count": len(rows),
+                "source": payload.get("source"),
+                "postgres_writes": False,
+                "source_db_mutated": False,
+                "deck_607_mutated": False,
+                "candidate_deck_materialization_allowed_now": False,
+                "promotion_allowed_now": False,
+            },
+        )
+
+    if (
+        file_name.startswith("lorehold_from_scratch_")
+        and "runner" in file_name
+        and {"run_count", "runs", "status"} <= keys
+    ):
+        runs = payload.get("runs") if isinstance(payload.get("runs"), list) else []
+        failed_runs = [run for run in runs if isinstance(run, Mapping) and run.get("returncode")]
+        return ArtifactClassification(
+            **base,
+            artifact_kind="from_scratch_challenger_summary",
+            schema_version="from_scratch_authorized_runner_summary_v1",
+            status="pass" if payload.get("status") == "ready" and not failed_runs else "warn",
+            detail="authorized from-scratch Lorehold runner summary",
+            canonical_summary={
+                "schema_keys": sorted(keys),
+                "run_count": payload.get("run_count"),
+                "failed_run_count": len(failed_runs),
+                "postgres_writes": False,
+                "source_db_mutated": False,
+                "deck_607_mutated": False,
+                "candidate_deck_materialization_allowed_now": False,
+                "promotion_allowed_now": False,
+            },
+        )
+
     support_signatures: list[tuple[str, set[str], str]] = [
         ("candidate_matrix", {"rows", "summary"}, "candidate matrix rows"),
         ("variant_staging", {"reports", "valid_count", "invalid_count"}, "variant staging report"),

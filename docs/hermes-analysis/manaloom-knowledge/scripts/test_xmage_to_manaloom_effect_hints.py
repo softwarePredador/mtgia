@@ -7599,7 +7599,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["CREATURE"]},
                 },
                 "token_maker",
-                "xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+                "source_combat_damage_player_roll_d20_create_faerie_dragon_tokens_equal_result_v1",
             ),
             (
                 "BloodMoon",
@@ -7609,7 +7609,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
                 },
                 "passive",
-                "xmage_nonbasic_lands_are_mountains_static_review_v1",
+                "nonbasic_lands_are_mountains_static_v1",
             ),
             (
                 "ChandrasIgnition",
@@ -7620,7 +7620,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["SORCERY"]},
                 },
                 "sweeper_damage",
-                "xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+                "target_controlled_creature_power_damage_each_other_creature_each_opponent_v1",
             ),
             (
                 "DeathbellowWarCry",
@@ -7666,7 +7666,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["PLANESWALKER"]},
                 },
                 "passive",
-                "xmage_artifact_activation_lock_planeswalker_wish_review_v1",
+                "opponent_artifact_activation_lock_planeswalker_wish_v1",
             ),
             (
                 "KaylasMusicBox",
@@ -7779,8 +7779,12 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                 self.assertEqual(primary["battle_model_scope"], expected_scope)
                 self.assertNotEqual(primary["effect"], "external_reference_required_manual_model")
                 if class_name in {
+                    "AncientGoldDragon",
+                    "BloodMoon",
+                    "ChandrasIgnition",
                     "DeathbellowWarCry",
                     "GhoulcallersBell",
+                    "KarnTheGreatCreator",
                     "KaylasMusicBox",
                     "DeathbellowWarCry",
                     "LanternOfInsight",

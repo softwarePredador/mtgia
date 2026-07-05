@@ -60,7 +60,7 @@ def test_repercussion_uses_promoted_pg_runtime_rule():
     assert effect["battle_model_scope"] == "creature_damage_controller_reflect_global_v1"
     assert effect["_rule_oracle_hash"] == "8e1ed4f8063ab89dd8906878a6232862"
     assert effect["_rule_source"] == "curated"
-    assert effect["_rule_logical_key"] == "battle_rule_v1:d1a0c5cc0035945ec8bfd795da52d017"
+    assert effect["_rule_logical_key"] == "battle_rule_v1:9eb5bda15d554b0e5a97637322f4969c"
     waiver = next(
         row
         for row in battle.manual_runtime_waiver_inventory()

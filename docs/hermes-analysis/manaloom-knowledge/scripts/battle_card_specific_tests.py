@@ -19784,6 +19784,73 @@ def register_tests(battle, player):
             "create_eldrazi_scion",
         ]
 
+    def test_xmage_token_sacrifice_colorless_mana_unlocks_contextual_cast():
+        events = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Lorehold")
+            opponent = player("Opponent")
+            active.battlefield = ["land", "land", "land"]
+            active.refresh_mana_sources(turn=4)
+            active.hand = [
+                {
+                    "name": "Four Mana Engine",
+                    "cmc": 4,
+                    "effect": "creature",
+                    "type_line": "Creature - Construct",
+                }
+            ]
+            created = battle.create_creature_tokens_from_effect(
+                active,
+                {
+                    "effect": "token_maker",
+                    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+                    "token_count": 1,
+                    "token_name": "Eldrazi Scion Token",
+                    "token_subtype": "Eldrazi Scion",
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_colors": [],
+                    "token_sacrifice_for_colorless_mana": True,
+                    "token_mana_activation_requires_sacrifice": True,
+                    "token_mana_activation_requires_tap": False,
+                    "token_mana_produced": 1,
+                    "token_produces": "C",
+                    "token_produced_mana_symbols": ["C"],
+                    "_rule_logical_key": "battle_rule_v1:test_scion_token_mana",
+                    "_rule_oracle_hash": "test-scion-token-mana-hash",
+                },
+                opponents=[opponent],
+                turn=4,
+                active_player=active,
+                all_players=[active, opponent],
+            )
+            activated = battle.activate_self_sacrifice_mana_sources(
+                active,
+                [opponent],
+                [active, opponent],
+                4,
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+
+        assert created == 1
+        assert activated == 1
+        assert not any(
+            isinstance(permanent, dict) and permanent.get("name") == "Eldrazi Scion Token"
+            for permanent in active.battlefield
+        )
+        assert active.mana_pool.colorless == 1
+        assert any(
+            event == "self_sacrifice_mana_source_activated"
+            and data.get("card") == "Eldrazi Scion Token"
+            and data.get("destination") == "vanished_token"
+            and data.get("produced") == 1
+            for event, data in events
+        )
+
     def test_eldrazi_confluence_uses_pump_then_blink_then_scion_when_context_exists():
         events = []
         previous_event_handler = battle.REPLAY_EVENT_HANDLER
@@ -23423,6 +23490,7 @@ def register_tests(battle, player):
         test_patrol_signaler_postcombat_activation_creates_token_and_untaps,
         test_patrol_signaler_skips_when_not_tapped_for_untap_activation,
         test_eldrazi_confluence_creates_three_scions_when_no_other_modes_are_live,
+        test_xmage_token_sacrifice_colorless_mana_unlocks_contextual_cast,
         test_eldrazi_confluence_uses_pump_then_blink_then_scion_when_context_exists,
         test_pg091_deck607_token_maker_rules_resolve_from_sqlite_cache,
         test_pg114_emerias_call_creates_angels_and_protects_non_angels_until_next_turn,
