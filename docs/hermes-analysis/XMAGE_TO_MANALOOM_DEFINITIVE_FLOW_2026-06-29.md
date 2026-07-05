@@ -10521,6 +10521,66 @@ new server:
   `xmage_counter_target_draw_card_spell` and
   `xmage_creature_etb_library_search_to_battlefield` with `6` cards each.
 
+## 2026-07-05 PG465 Static Cast Flash Permission Closure
+
+- Closed the exact XMage static cast-as-though-flash permission permanent
+  family as ManaLoom scope `xmage_static_cast_spells_as_flash_permission_v1`.
+- The selected package accepted local XMage static permission sources whose
+  executable behavior is `CastAsThoughItHadFlashAllEffect`, preserving the
+  permitted spell filter, whether the permission applies to self or any player,
+  the any-player flag, permanent type, and any coexisting self keywords.
+- The batch covers `7` cards: High Fae Trickster, Hypersonic Dragon,
+  Quick Sliver, Raff Capashen, Ship's Mage, Shimmer Myr, Vernal Equinox, and
+  Yeva, Nature's Herald.
+- Focused mapper/runtime tests covered cast-as-flash permission extraction,
+  filter preservation, self-vs-any-player scope, keyword preservation, and
+  runtime lookup; PG465 performed no code mutation. The focused test lane
+  passed `718` checks.
+- The PostgreSQL package promoted `7` cards. Precheck found `7` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `7/7` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `7` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve
+  `flash_permission_filter`, `flash_permission_controller`,
+  `flash_permission_any_player`, and keywords. The selected filters are:
+  High Fae Trickster `nonland_spells self`, Hypersonic Dragon
+  `sorcery_spells self`, Quick Sliver `sliver_spells any_player`,
+  Raff Capashen, Ship's Mage `historic_spells self`, Shimmer Myr
+  `artifact_spells self`, Vernal Equinox
+  `creature_or_enchantment_spells any_player`, and Yeva, Nature's Herald
+  `green_creature_spells self`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4482` PostgreSQL runtime rows, wrote `4474` SQLite runtime
+  rows, and exported `4449` canonical fallback rows.
+- PG465 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `7` selected cards. Generic
+  battle scenario count remained `0`; cast-as-flash permission behavior
+  remains covered by focused runtime tests.
+- A stale zero-byte sibling SQLite artifact at
+  `docs/hermes-analysis/manaloom-knowledge/knowledge.db` was removed after the
+  first legacy contamination audit correctly failed on it. The rerun legacy
+  audit passed against the active operational DB under
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`, and the
+  PG/Hermes/SQLite contract rerun used the live PostgreSQL credentials.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  after stale SQLite cleanup (`32/32`), and PG/Hermes/SQLite contract with live
+  PostgreSQL connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26404`, `xmage_authoritative_source_count=26090`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26090`. This is an exact
+  reduction of `7` from the post-PG464 queue.
+- The post-PG465 exact split recheck reports `proposal_count=65` and
+  `safe_for_batch_pg_package_count=65`. The largest remaining exact families
+  are `xmage_counter_target_draw_card_spell` and
+  `xmage_creature_etb_library_search_to_battlefield` with `6` cards each,
+  followed by `xmage_permanent_simple_activated_draw` with `5` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

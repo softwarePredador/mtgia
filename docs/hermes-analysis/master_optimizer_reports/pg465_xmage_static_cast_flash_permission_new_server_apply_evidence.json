@@ -1,0 +1,421 @@
+{
+  "apply": {
+    "backup_rows": 0,
+    "deprecated_shadow_rows": 0,
+    "transaction": "commit",
+    "upserted_rows": 7
+  },
+  "audits": {
+    "legacy_contamination_after_stale_sqlite_cleanup": {
+      "active_file_count": 28,
+      "check_count": 32,
+      "status_counts": {
+        "pass": 32
+      }
+    },
+    "operational_surface": {
+      "check_count": 39,
+      "status_counts": {
+        "pass": 39
+      }
+    },
+    "pg_hermes_sqlite_contract_after_stale_sqlite_cleanup": {
+      "check_count": 51,
+      "status_counts": {
+        "pass": 51
+      }
+    },
+    "xmage_strategy": {
+      "check_count": 26,
+      "status_counts": {
+        "pass": 26
+      }
+    }
+  },
+  "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+  "cleanup": {
+    "removed_stale_zero_byte_sqlite": "docs/hermes-analysis/manaloom-knowledge/knowledge.db"
+  },
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg465",
+  "direct_postgresql_verification": {
+    "all_have_oracle_hash": true,
+    "all_verified_auto_curated": true,
+    "row_count": 7,
+    "rows": [
+      {
+        "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+        "card_name": "High Fae Trickster",
+        "cast_nonland_spells_as_flash": "true",
+        "cast_spells_as_flash": "true",
+        "execution_status": "auto",
+        "flash_permission_any_player": "false",
+        "flash_permission_controller": "self",
+        "flash_permission_filter": "nonland_spells",
+        "has_oracle_hash": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "review_status": "verified",
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+        "card_name": "Hypersonic Dragon",
+        "cast_nonland_spells_as_flash": "false",
+        "cast_spells_as_flash": "true",
+        "execution_status": "auto",
+        "flash_permission_any_player": "false",
+        "flash_permission_controller": "self",
+        "flash_permission_filter": "sorcery_spells",
+        "has_oracle_hash": true,
+        "keywords": [
+          "flying",
+          "haste"
+        ],
+        "review_status": "verified",
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+        "card_name": "Quick Sliver",
+        "cast_nonland_spells_as_flash": "false",
+        "cast_spells_as_flash": "true",
+        "execution_status": "auto",
+        "flash_permission_any_player": "true",
+        "flash_permission_controller": "any_player",
+        "flash_permission_filter": "sliver_spells",
+        "has_oracle_hash": true,
+        "keywords": [
+          "flash"
+        ],
+        "review_status": "verified",
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+        "card_name": "Raff Capashen, Ship's Mage",
+        "cast_nonland_spells_as_flash": "false",
+        "cast_spells_as_flash": "true",
+        "execution_status": "auto",
+        "flash_permission_any_player": "false",
+        "flash_permission_controller": "self",
+        "flash_permission_filter": "historic_spells",
+        "has_oracle_hash": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "review_status": "verified",
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+        "card_name": "Shimmer Myr",
+        "cast_nonland_spells_as_flash": "false",
+        "cast_spells_as_flash": "true",
+        "execution_status": "auto",
+        "flash_permission_any_player": "false",
+        "flash_permission_controller": "self",
+        "flash_permission_filter": "artifact_spells",
+        "has_oracle_hash": true,
+        "keywords": [
+          "flash"
+        ],
+        "review_status": "verified",
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+        "card_name": "Vernal Equinox",
+        "cast_nonland_spells_as_flash": "false",
+        "cast_spells_as_flash": "true",
+        "execution_status": "auto",
+        "flash_permission_any_player": "true",
+        "flash_permission_controller": "any_player",
+        "flash_permission_filter": "creature_or_enchantment_spells",
+        "has_oracle_hash": true,
+        "keywords": null,
+        "review_status": "verified",
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+        "card_name": "Yeva, Nature's Herald",
+        "cast_nonland_spells_as_flash": "false",
+        "cast_spells_as_flash": "true",
+        "execution_status": "auto",
+        "flash_permission_any_player": "false",
+        "flash_permission_controller": "self",
+        "flash_permission_filter": "green_creature_spells",
+        "has_oracle_hash": true,
+        "keywords": [
+          "flash"
+        ],
+        "review_status": "verified",
+        "source": "curated"
+      }
+    ]
+  },
+  "e2e": {
+    "package_id": "pg465_xmage_static_cast_flash_permission_new_server_manifest",
+    "status": "pass"
+  },
+  "family": "xmage_static_cast_spells_as_flash_permission",
+  "generated_at_utc": "2026-07-05T01:29:39.414181+00:00",
+  "post_sync_exact_split": {
+    "adapter_work_unit_counts": {
+      "bounce::targeted_return_to_hand_variant_v1": 2,
+      "direct_damage::targeted_damage_variant_v1": 3,
+      "draw_cards::xmage_draw_card_variant_review_v1": 12,
+      "draw_engine::xmage_draw_card_variant_review_v1": 9,
+      "ramp_permanent::xmage_artifact_mana_source_variant_review_v1": 3,
+      "ramp_permanent::xmage_creature_mana_source_variant_review_v1": 1,
+      "recursion::xmage_graveyard_return_variant_review_v1": 20,
+      "removal_destroy::targeted_destroy_variant_v1": 5,
+      "tutor::xmage_library_search_variant_review_v1": 6,
+      "xmage_signature::BoostSourceEffect::SimpleActivatedAbility::no_target_class::no_condition_class::activated_ability": 4
+    },
+    "largest_remaining_exact_families": [
+      [
+        "xmage_counter_target_draw_card_spell",
+        6
+      ],
+      [
+        "xmage_creature_etb_library_search_to_battlefield",
+        6
+      ],
+      [
+        "xmage_permanent_simple_activated_draw",
+        5
+      ],
+      [
+        "xmage_simple_mana_source_with_etb_draw",
+        4
+      ],
+      [
+        "xmage_destroy_target_spell",
+        4
+      ],
+      [
+        "xmage_creature_etb_dynamic_graveyard_count_damage",
+        4
+      ],
+      [
+        "xmage_creature_etb_draw_lose_life",
+        4
+      ],
+      [
+        "xmage_permanent_simple_activated_self_boost_until_eot",
+        4
+      ],
+      [
+        "xmage_dynamic_graveyard_count_damage_spell",
+        4
+      ],
+      [
+        "xmage_x_damage_spell",
+        3
+      ]
+    ],
+    "proposal_count": 65,
+    "safe_for_batch_pg_package_count": 65
+  },
+  "post_sync_queue": {
+    "adapter_work_unit_count": 11393,
+    "target_identity_count": 26404,
+    "xmage_authoritative_adapter_required_count": 26090,
+    "xmage_authoritative_parser_gap_count": 0,
+    "xmage_authoritative_source_count": 26090,
+    "xmage_missing_source_exception_count": 314
+  },
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "High Fae Trickster",
+      "Hypersonic Dragon",
+      "Quick Sliver",
+      "Raff Capashen, Ship's Mage",
+      "Shimmer Myr",
+      "Vernal Equinox",
+      "Yeva, Nature's Herald"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 7,
+    "promoted_rule_rows": 7,
+    "promoted_verified_auto_rows": 7,
+    "row_count": 7
+  },
+  "precheck": {
+    "cards": [
+      "High Fae Trickster",
+      "Hypersonic Dragon",
+      "Quick Sliver",
+      "Raff Capashen, Ship's Mage",
+      "Shimmer Myr",
+      "Vernal Equinox",
+      "Yeva, Nature's Herald"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 7,
+    "total_target_card_rows": 7,
+    "would_deprecate_shadow_rows": 0
+  },
+  "required_effect_fields": {
+    "High Fae Trickster": {
+      "_keywords_are_self": true,
+      "ability_kind": "static",
+      "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+      "cast_nonland_spells_as_flash": true,
+      "cast_spells_as_flash": true,
+      "effect": "flash_permission",
+      "flash": true,
+      "flash_permission_any_player": false,
+      "flash_permission_controller": "self",
+      "flash_permission_filter": "nonland_spells",
+      "keywords": [
+        "flash",
+        "flying"
+      ],
+      "permanent_type": "creature",
+      "static_effect": "cast_as_though_flash",
+      "xmage_ability_class": "SimpleStaticAbility",
+      "xmage_effect_class": "CastAsThoughItHadFlashAllEffect"
+    },
+    "Hypersonic Dragon": {
+      "_keywords_are_self": true,
+      "ability_kind": "static",
+      "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+      "cast_nonland_spells_as_flash": false,
+      "cast_spells_as_flash": true,
+      "effect": "flash_permission",
+      "flash_permission_any_player": false,
+      "flash_permission_controller": "self",
+      "flash_permission_filter": "sorcery_spells",
+      "keywords": [
+        "flying",
+        "haste"
+      ],
+      "permanent_type": "creature",
+      "static_effect": "cast_as_though_flash",
+      "xmage_ability_class": "SimpleStaticAbility",
+      "xmage_effect_class": "CastAsThoughItHadFlashAllEffect"
+    },
+    "Quick Sliver": {
+      "_keywords_are_self": true,
+      "ability_kind": "static",
+      "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+      "cast_nonland_spells_as_flash": false,
+      "cast_spells_as_flash": true,
+      "effect": "flash_permission",
+      "flash": true,
+      "flash_permission_any_player": true,
+      "flash_permission_controller": "any_player",
+      "flash_permission_filter": "sliver_spells",
+      "keywords": [
+        "flash"
+      ],
+      "permanent_type": "creature",
+      "static_effect": "cast_as_though_flash",
+      "xmage_ability_class": "SimpleStaticAbility",
+      "xmage_effect_class": "CastAsThoughItHadFlashAllEffect"
+    },
+    "Raff Capashen, Ship's Mage": {
+      "_keywords_are_self": true,
+      "ability_kind": "static",
+      "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+      "cast_nonland_spells_as_flash": false,
+      "cast_spells_as_flash": true,
+      "effect": "flash_permission",
+      "flash": true,
+      "flash_permission_any_player": false,
+      "flash_permission_controller": "self",
+      "flash_permission_filter": "historic_spells",
+      "keywords": [
+        "flash",
+        "flying"
+      ],
+      "permanent_type": "creature",
+      "static_effect": "cast_as_though_flash",
+      "xmage_ability_class": "SimpleStaticAbility",
+      "xmage_effect_class": "CastAsThoughItHadFlashAllEffect"
+    },
+    "Shimmer Myr": {
+      "_keywords_are_self": true,
+      "ability_kind": "static",
+      "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+      "cast_nonland_spells_as_flash": false,
+      "cast_spells_as_flash": true,
+      "effect": "flash_permission",
+      "flash": true,
+      "flash_permission_any_player": false,
+      "flash_permission_controller": "self",
+      "flash_permission_filter": "artifact_spells",
+      "keywords": [
+        "flash"
+      ],
+      "permanent_type": "creature",
+      "static_effect": "cast_as_though_flash",
+      "xmage_ability_class": "SimpleStaticAbility",
+      "xmage_effect_class": "CastAsThoughItHadFlashAllEffect"
+    },
+    "Vernal Equinox": {
+      "ability_kind": "static",
+      "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+      "cast_nonland_spells_as_flash": false,
+      "cast_spells_as_flash": true,
+      "effect": "flash_permission",
+      "flash_permission_any_player": true,
+      "flash_permission_controller": "any_player",
+      "flash_permission_filter": "creature_or_enchantment_spells",
+      "permanent_type": "enchantment",
+      "static_effect": "cast_as_though_flash",
+      "xmage_ability_class": "SimpleStaticAbility",
+      "xmage_effect_class": "CastAsThoughItHadFlashAllEffect"
+    },
+    "Yeva, Nature's Herald": {
+      "_keywords_are_self": true,
+      "ability_kind": "static",
+      "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+      "cast_nonland_spells_as_flash": false,
+      "cast_spells_as_flash": true,
+      "effect": "flash_permission",
+      "flash": true,
+      "flash_permission_any_player": false,
+      "flash_permission_controller": "self",
+      "flash_permission_filter": "green_creature_spells",
+      "keywords": [
+        "flash"
+      ],
+      "permanent_type": "creature",
+      "static_effect": "cast_as_though_flash",
+      "xmage_ability_class": "SimpleStaticAbility",
+      "xmage_effect_class": "CastAsThoughItHadFlashAllEffect"
+    }
+  },
+  "selected_card_count": 7,
+  "selected_cards": [
+    "High Fae Trickster",
+    "Hypersonic Dragon",
+    "Quick Sliver",
+    "Raff Capashen, Ship's Mage",
+    "Shimmer Myr",
+    "Vernal Equinox",
+    "Yeva, Nature's Herald"
+  ],
+  "status": "closed",
+  "sync": {
+    "canonical_snapshot_rows_exported": 4449,
+    "curated_rows": 145,
+    "generated_rows": 1947,
+    "metadata_postgres_cards_matched": 5644,
+    "metadata_requested_unique_names": 5459,
+    "metadata_sqlite_cache_alias_rows": 5554,
+    "metadata_unresolved_count": 1,
+    "oracle_normalized_rows": 274,
+    "pg_rows_loaded": 4482,
+    "sqlite_inserted_or_updated": 4474
+  }
+}

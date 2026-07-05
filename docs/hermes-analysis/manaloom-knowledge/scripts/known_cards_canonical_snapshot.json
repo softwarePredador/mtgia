@@ -40053,6 +40053,34 @@
     "battle_rule_logical_key": "battle_rule_v1:6391ead7eef36b3bba201942eb647ba7",
     "battle_rule_oracle_hash": "a1484b981a6059b5363bfa3d1f0f131b"
   },
+  "High Fae Trickster": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+    "cast_nonland_spells_as_flash": true,
+    "cast_spells_as_flash": true,
+    "effect": "flash_permission",
+    "flash": true,
+    "flash_permission_any_player": false,
+    "flash_permission_controller": "self",
+    "flash_permission_filter": "nonland_spells",
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "permanent_type": "creature",
+    "static_effect": "cast_as_though_flash",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "CastAsThoughItHadFlashAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6bd10a81f80c7bbd17d666a850c4520c",
+    "battle_rule_oracle_hash": "572253badba9314cde5c6fdc03511dec"
+  },
   "High Market": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -41359,6 +41387,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:6c21b07e86b0625f859ea8797a5c9a71",
     "battle_rule_oracle_hash": "0b6dfa60b13f980af9cbf9f032d2dbbe"
+  },
+  "Hypersonic Dragon": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+    "cast_nonland_spells_as_flash": false,
+    "cast_spells_as_flash": true,
+    "effect": "flash_permission",
+    "flash_permission_any_player": false,
+    "flash_permission_controller": "self",
+    "flash_permission_filter": "sorcery_spells",
+    "flying": true,
+    "haste": true,
+    "keywords": [
+      "flying",
+      "haste"
+    ],
+    "permanent_type": "creature",
+    "static_effect": "cast_as_though_flash",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "CastAsThoughItHadFlashAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fb124a02d6a37bc79aedb10df58ba1d9",
+    "battle_rule_oracle_hash": "7e47a005dffa0831100f100dfe67f60c"
   },
   "Hypothesizzle": {
     "battle_model_scope": "draw_two_optional_discard_damage_v1",
@@ -62835,6 +62891,32 @@
     "battle_rule_logical_key": "battle_rule_v1:2df5942a4afe369ac6448ff6cba57f94",
     "battle_rule_oracle_hash": "83272aece045b20eeef2cd70f2d7b80a"
   },
+  "Quick Sliver": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+    "cast_nonland_spells_as_flash": false,
+    "cast_spells_as_flash": true,
+    "effect": "flash_permission",
+    "flash": true,
+    "flash_permission_any_player": true,
+    "flash_permission_controller": "any_player",
+    "flash_permission_filter": "sliver_spells",
+    "keywords": [
+      "flash"
+    ],
+    "permanent_type": "creature",
+    "static_effect": "cast_as_though_flash",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "CastAsThoughItHadFlashAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b036645e49a5ca7424c4f27d58d25c93",
+    "battle_rule_oracle_hash": "f2c32bf4b04621526ca050501bc253a1"
+  },
   "Quick Study": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
     "count": 2,
@@ -63114,6 +63196,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:37e6267e75385fb0731d4c0d47d837cd",
     "battle_rule_oracle_hash": "e773c9acd9bb77f304e17b2ecd0892ae"
+  },
+  "Raff Capashen, Ship's Mage": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+    "cast_nonland_spells_as_flash": false,
+    "cast_spells_as_flash": true,
+    "effect": "flash_permission",
+    "flash": true,
+    "flash_permission_any_player": false,
+    "flash_permission_controller": "self",
+    "flash_permission_filter": "historic_spells",
+    "flying": true,
+    "keywords": [
+      "flash",
+      "flying"
+    ],
+    "permanent_type": "creature",
+    "static_effect": "cast_as_though_flash",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "CastAsThoughItHadFlashAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bba49e7921dea07b1448fa76e8297475",
+    "battle_rule_oracle_hash": "81f88dd9406c4ef0e8189bc1071c2670"
   },
   "Raffine's Tower": {
     "effect": "land",
@@ -74754,6 +74864,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "7e45a299c372ee5ad105e82a2305d58a"
+  },
+  "Shimmer Myr": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+    "cast_nonland_spells_as_flash": false,
+    "cast_spells_as_flash": true,
+    "effect": "flash_permission",
+    "flash": true,
+    "flash_permission_any_player": false,
+    "flash_permission_controller": "self",
+    "flash_permission_filter": "artifact_spells",
+    "keywords": [
+      "flash"
+    ],
+    "permanent_type": "creature",
+    "static_effect": "cast_as_though_flash",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "CastAsThoughItHadFlashAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:007474402d8a3f7cc66d62b9b3853aba",
+    "battle_rule_oracle_hash": "3f7693d00f1b35bec96c1dea4118dce3"
   },
   "Shimmerdrift Vale": {
     "effect": "land",
@@ -92270,6 +92406,27 @@
     "battle_rule_logical_key": "battle_rule_v1:ea3402c83a775c8f219f253347e038e2",
     "battle_rule_oracle_hash": "bfd583dfcfc9007d5900720e29e4499e"
   },
+  "Vernal Equinox": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+    "cast_nonland_spells_as_flash": false,
+    "cast_spells_as_flash": true,
+    "effect": "flash_permission",
+    "flash_permission_any_player": true,
+    "flash_permission_controller": "any_player",
+    "flash_permission_filter": "creature_or_enchantment_spells",
+    "permanent_type": "enchantment",
+    "static_effect": "cast_as_though_flash",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "CastAsThoughItHadFlashAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fa82c1fc528ef736dd325f1c6151aebb",
+    "battle_rule_oracle_hash": "526d6d37bf9ebf99f174ac9dc59182d3"
+  },
   "Vernal Fen": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -97820,6 +97977,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
     "battle_rule_oracle_hash": "8019586c29deff0d4a5543ee4d4f2726"
+  },
+  "Yeva, Nature's Herald": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_cast_spells_as_flash_permission_v1",
+    "cast_nonland_spells_as_flash": false,
+    "cast_spells_as_flash": true,
+    "effect": "flash_permission",
+    "flash": true,
+    "flash_permission_any_player": false,
+    "flash_permission_controller": "self",
+    "flash_permission_filter": "green_creature_spells",
+    "keywords": [
+      "flash"
+    ],
+    "permanent_type": "creature",
+    "static_effect": "cast_as_though_flash",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "CastAsThoughItHadFlashAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f5d926550a88a536437fbf494284474b",
+    "battle_rule_oracle_hash": "4ba84a36268272ffdd2e46ff3c4deab3"
   },
   "Yotian Medic": {
     "_keywords_are_self": true,
