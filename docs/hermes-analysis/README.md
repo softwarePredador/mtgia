@@ -374,6 +374,19 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     pacote passa do limite de `8` swaps, `candidate_copy_allowed_now=false`,
     `battle_gate_allowed_now=false` e o proximo gate e
     `expand_commander_cut_source_lane_for_full_profile_package`.
+    A expansao da source lane de cortes fica em
+    `manaloom-knowledge/scripts/global_commander_cut_source_lane_expander.py`
+    com evidencia local
+    `master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md`.
+    Resultado: `commander_cut_source_lane_expanded_stage_split_required`.
+    O modelo ampliou de `10` para `18` cuts value-safe, mas ainda falta `3`
+    para cobrir os `21` adds. Ele mantem `17` cuts como stage-only por staple,
+    ancora do pacote esperado ou feedback de batalha, incluindo `Birgi`,
+    `Necropotence`, `Demonic Tutor`, `Vampiric Tutor`, `Enlightened Tutor`,
+    `Esper Sentinel`, `Smothering Tithe`, `Mana Vault`, `Arcane Signet` e
+    `Sol Ring`. Portanto `candidate_copy_allowed_now=false`,
+    `battle_gate_allowed_now=false` e o proximo gate e
+    `split_synthesized_package_into_value_safe_stages`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

@@ -229,7 +229,13 @@ Operational priority after this pivot:
    cross-axis cards such as attack-window lands, pair every add with a reviewed
    cut, enforce package-size limits, and keep materialization closed when cuts
    or stage sizing are insufficient;
-20. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+20. run `global_commander_cut_source_lane_expander.py` when a synthesized
+   package has too few reviewed cuts; it must scan the current deck for
+   above-target role pressure, protect lands/payoffs/interaction/attack-window
+   lanes, separate format staples and expected package anchors into stage-only
+   rows, and keep materialization closed when value-safe cuts or package size
+   still fail;
+21. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -254,6 +260,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -433,6 +440,22 @@ Current external refresh on 2026-07-05:
   blocker `insufficient_reviewable_cuts_for_full_profile_package:required_21_ready_10`,
   `candidate_copy_allowed_now=false`, `battle_gate_allowed_now=false`, and the
   next gate is `expand_commander_cut_source_lane_for_full_profile_package`.
+- Current cut source-lane expansion is read-only and consumes the synthesized
+  package in
+  `global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md`.
+  The scan expands from `10` previous review cuts to `18` value-safe cuts, with
+  role budgets `mana_acceleration=9`, `card_draw_selection=2`, and
+  `tutors_access=10`. It keeps `17` additional cuts in stage-only status,
+  including `Birgi, God of Storytelling // Harnfel, Horn of Bounty` due global
+  battle feedback, `Necropotence` due expected-package anchor protection, and
+  structural staples such as `Demonic Tutor`, `Vampiric Tutor`, `Enlightened
+  Tutor`, `Esper Sentinel`, `Smothering Tithe`, `Mana Vault`, `Arcane Signet`,
+  and `Sol Ring`. Because the full package still needs `21` cuts and the
+  stage limit is `8`, the status is
+  `commander_cut_source_lane_expanded_stage_split_required`; blockers are
+  `value_safe_cut_shortfall:required_21_ready_18` and
+  `full_package_size_exceeds_stage_limit:required_21_limit_8`; the next gate is
+  `split_synthesized_package_into_value_safe_stages`.
 
 ## Global Commander Rollout - 2026-07-01
 

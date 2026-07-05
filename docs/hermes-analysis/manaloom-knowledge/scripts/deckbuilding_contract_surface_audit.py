@@ -60,6 +60,9 @@ GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_EXPANDER = (
 GLOBAL_COMMANDER_PAYOFF_PACKAGE_SYNTHESIZER = (
     SCRIPT_DIR / "global_commander_payoff_package_synthesizer.py"
 )
+GLOBAL_COMMANDER_CUT_SOURCE_LANE_EXPANDER = (
+    SCRIPT_DIR / "global_commander_cut_source_lane_expander.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -153,6 +156,10 @@ GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_REPORT = (
 GLOBAL_COMMANDER_PAYOFF_PACKAGE_SYNTHESIS_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md"
+)
+GLOBAL_COMMANDER_CUT_SOURCE_LANE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -353,6 +360,11 @@ def build_audit() -> dict[str, Any]:
                 "commander_payoff_package_synthesis_blocks_candidate_copy",
                 "insufficient_reviewable_cuts_for_full_profile_package",
                 "expand_commander_cut_source_lane_for_full_profile_package",
+                "global_commander_cut_source_lane_expander.py",
+                "global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md",
+                "commander_cut_source_lane_expanded_stage_split_required",
+                "value_safe_cut_shortfall:required_21_ready_18",
+                "split_synthesized_package_into_value_safe_stages",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -551,6 +563,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md",
                 "commander_payoff_package_synthesis_blocks_candidate_copy",
                 "expand_commander_cut_source_lane_for_full_profile_package",
+                "global_commander_cut_source_lane_expander.py",
+                "global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md",
+                "commander_cut_source_lane_expanded_stage_split_required",
+                "split_synthesized_package_into_value_safe_stages",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -883,6 +899,26 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CUT_SOURCE_LANE_EXPANDER,
+            [
+                "global_commander_cut_source_lane_expander",
+                "commander_cut_source_lane_expanded_stage_split_required",
+                "commander_cut_source_lane_still_blocks_full_package",
+                "commander_cut_source_lane_ready_for_candidate_copy",
+                "review_only_expanded_cut_source_candidate",
+                "stage_only_commander_cut_source_candidate",
+                "blocked_commander_cut_source_candidate",
+                "structural_foundation_staple_requires_same_lane_or_battle_proof",
+                "commander_expected_package_anchor_requires_stage_proof",
+                "global_battle_feedback_requires_new_same_lane_or_gate",
+                "split_synthesized_package_into_value_safe_stages",
+                "battle_or_optimization_performed",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -1060,6 +1096,28 @@ def build_audit() -> dict[str, Any]:
                 "Arena of Glory",
                 "Despark",
                 "Balefire Dragon",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CUT_SOURCE_LANE_REPORT,
+            [
+                "Global Commander Cut Source Lane Expander",
+                "commander_cut_source_lane_expanded_stage_split_required",
+                "required_cut_count: `21`",
+                "value_safe_cut_count: `18`",
+                "stage_only_cut_count: `17`",
+                "blocked_cut_count: `48`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "value_safe_cut_shortfall:required_21_ready_18",
+                "full_package_size_exceeds_stage_limit:required_21_limit_8",
+                "split_synthesized_package_into_value_safe_stages",
+                "Archaeomancer's Map",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "Necropotence",
             ],
         )
     )
