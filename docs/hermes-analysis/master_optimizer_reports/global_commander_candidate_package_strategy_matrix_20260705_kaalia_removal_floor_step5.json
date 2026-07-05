@@ -1,0 +1,501 @@
+{
+  "artifact_type": "global_commander_candidate_package_strategy_matrix",
+  "base_expected_package_presence": {
+    "angels_demons_dragons_payoffs": {
+      "expected_count": 11,
+      "missing_cards": [
+        "Avacyn, Angel of Hope",
+        "Balefire Dragon",
+        "Ancient Copper Dragon",
+        "Aurelia, the Warleader",
+        "Hoarding Broodlord",
+        "Angel of Serenity",
+        "Angel of the Ruins"
+      ],
+      "present_cards": [
+        "Master of Cruelties",
+        "Rune-Scarred Demon",
+        "Razaketh, the Foulblooded",
+        "Bloodthirster"
+      ],
+      "present_count": 4
+    },
+    "card_flow_and_access": {
+      "expected_count": 7,
+      "missing_cards": [
+        "Night's Whisper"
+      ],
+      "present_cards": [
+        "Demonic Tutor",
+        "Vampiric Tutor",
+        "Enlightened Tutor",
+        "Rune-Scarred Demon",
+        "Necropotence",
+        "Esper Sentinel"
+      ],
+      "present_count": 6
+    },
+    "commander_attack_enablers": {
+      "expected_count": 12,
+      "missing_cards": [
+        "Swiftfoot Boots",
+        "Hall of the Bandit Lord",
+        "Arena of Glory",
+        "Teferi's Protection",
+        "Boros Charm",
+        "Akroma's Will",
+        "Deflecting Swat",
+        "Flawless Maneuver"
+      ],
+      "present_cards": [
+        "Lightning Greaves",
+        "Grand Abolisher",
+        "Silence",
+        "Ranger-Captain of Eos"
+      ],
+      "present_count": 4
+    },
+    "interaction_and_resets": {
+      "expected_count": 11,
+      "missing_cards": [
+        "Swords to Plowshares",
+        "Path to Exile",
+        "Feed the Swarm",
+        "Anguished Unmaking",
+        "Despark",
+        "Terminate",
+        "Bedevil",
+        "Vindicate",
+        "Damn",
+        "Farewell",
+        "Ruinous Ultimatum"
+      ],
+      "present_cards": [],
+      "present_count": 0
+    },
+    "mana_ramp_foundation": {
+      "expected_count": 11,
+      "missing_cards": [
+        "Fellwar Stone",
+        "Boros Signet",
+        "Orzhov Signet",
+        "Rakdos Signet",
+        "Talisman of Conviction",
+        "Talisman of Hierarchy",
+        "Talisman of Indulgence",
+        "Sword of the Animist"
+      ],
+      "present_cards": [
+        "Sol Ring",
+        "Arcane Signet",
+        "Ancient Tomb"
+      ],
+      "present_count": 3
+    },
+    "reanimation_plan_b": {
+      "expected_count": 7,
+      "missing_cards": [
+        "Reanimate",
+        "Animate Dead",
+        "Necromancy",
+        "Living Death",
+        "Karmic Guide",
+        "Sneak Attack",
+        "Incarnation Technique"
+      ],
+      "present_cards": [],
+      "present_count": 0
+    }
+  },
+  "base_profile_role_counts": {
+    "angels_demons_dragons_payoffs": 4,
+    "board_wipes_resets": 2,
+    "card_draw_selection": 13,
+    "dedicated_win_conditions": 6,
+    "haste_protection_silence": 10,
+    "lands": 34,
+    "mana_acceleration": 24,
+    "reanimation_plan_b": 3,
+    "spot_interaction": 1,
+    "tutors_access": 20
+  },
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "blocker_reasons": [
+    "profile_lands_below_target",
+    "profile_angels_demons_dragons_payoffs_below_target",
+    "profile_spot_interaction_below_target",
+    "attack_window_cut_without_replacement"
+  ],
+  "candidate_expected_package_presence": {
+    "angels_demons_dragons_payoffs": {
+      "expected_count": 11,
+      "missing_cards": [
+        "Avacyn, Angel of Hope",
+        "Balefire Dragon",
+        "Ancient Copper Dragon",
+        "Aurelia, the Warleader",
+        "Hoarding Broodlord",
+        "Angel of Serenity",
+        "Angel of the Ruins"
+      ],
+      "present_cards": [
+        "Master of Cruelties",
+        "Rune-Scarred Demon",
+        "Razaketh, the Foulblooded",
+        "Bloodthirster"
+      ],
+      "present_count": 4
+    },
+    "card_flow_and_access": {
+      "expected_count": 7,
+      "missing_cards": [
+        "Night's Whisper"
+      ],
+      "present_cards": [
+        "Demonic Tutor",
+        "Vampiric Tutor",
+        "Enlightened Tutor",
+        "Rune-Scarred Demon",
+        "Necropotence",
+        "Esper Sentinel"
+      ],
+      "present_count": 6
+    },
+    "commander_attack_enablers": {
+      "expected_count": 12,
+      "missing_cards": [
+        "Swiftfoot Boots",
+        "Hall of the Bandit Lord",
+        "Arena of Glory",
+        "Teferi's Protection",
+        "Boros Charm",
+        "Akroma's Will",
+        "Deflecting Swat",
+        "Flawless Maneuver"
+      ],
+      "present_cards": [
+        "Lightning Greaves",
+        "Grand Abolisher",
+        "Silence",
+        "Ranger-Captain of Eos"
+      ],
+      "present_count": 4
+    },
+    "interaction_and_resets": {
+      "expected_count": 11,
+      "missing_cards": [
+        "Anguished Unmaking",
+        "Despark",
+        "Bedevil",
+        "Vindicate",
+        "Damn",
+        "Farewell",
+        "Ruinous Ultimatum"
+      ],
+      "present_cards": [
+        "Swords to Plowshares",
+        "Path to Exile",
+        "Feed the Swarm",
+        "Terminate"
+      ],
+      "present_count": 4
+    },
+    "mana_ramp_foundation": {
+      "expected_count": 11,
+      "missing_cards": [
+        "Fellwar Stone",
+        "Boros Signet",
+        "Orzhov Signet",
+        "Rakdos Signet",
+        "Talisman of Conviction",
+        "Talisman of Hierarchy",
+        "Talisman of Indulgence",
+        "Sword of the Animist"
+      ],
+      "present_cards": [
+        "Sol Ring",
+        "Arcane Signet",
+        "Ancient Tomb"
+      ],
+      "present_count": 3
+    },
+    "reanimation_plan_b": {
+      "expected_count": 7,
+      "missing_cards": [
+        "Reanimate",
+        "Animate Dead",
+        "Necromancy",
+        "Living Death",
+        "Karmic Guide",
+        "Sneak Attack",
+        "Incarnation Technique"
+      ],
+      "present_cards": [],
+      "present_count": 0
+    }
+  },
+  "candidate_profile_role_counts": {
+    "angels_demons_dragons_payoffs": 4,
+    "board_wipes_resets": 3,
+    "card_draw_selection": 13,
+    "dedicated_win_conditions": 6,
+    "haste_protection_silence": 10,
+    "lands": 34,
+    "mana_acceleration": 23,
+    "reanimation_plan_b": 3,
+    "spot_interaction": 6,
+    "tutors_access": 18
+  },
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T19:30:16.661955+00:00",
+  "input_artifacts": {
+    "base_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_path_feed_swords_rakdos_terminate_package_step5_candidate/knowledge_candidate.db",
+    "package_chain_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.json"
+  },
+  "mutation_allowed": false,
+  "package_delta": [
+    {
+      "action": "add",
+      "card": "Path to Exile",
+      "present": true,
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "risk_flags": []
+    },
+    {
+      "action": "add",
+      "card": "Feed the Swarm",
+      "present": true,
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "risk_flags": []
+    },
+    {
+      "action": "add",
+      "card": "Swords to Plowshares",
+      "present": true,
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "risk_flags": []
+    },
+    {
+      "action": "add",
+      "card": "Rakdos Charm",
+      "present": true,
+      "profile_roles": [
+        "board_wipes_resets",
+        "spot_interaction"
+      ],
+      "risk_flags": []
+    },
+    {
+      "action": "add",
+      "card": "Terminate",
+      "present": true,
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "risk_flags": []
+    },
+    {
+      "action": "cut",
+      "card": "Archaeomancer's Map",
+      "present": true,
+      "profile_roles": [
+        "mana_acceleration",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut",
+        "tutor_access_cut"
+      ]
+    },
+    {
+      "action": "cut",
+      "card": "Genji Glove",
+      "present": true,
+      "profile_roles": [],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut"
+      ]
+    },
+    {
+      "action": "cut",
+      "card": "Karlach, Fury of Avernus",
+      "present": true,
+      "profile_roles": [],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut"
+      ]
+    },
+    {
+      "action": "cut",
+      "card": "Ardenn, Intrepid Archaeologist",
+      "present": true,
+      "profile_roles": [],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut"
+      ]
+    },
+    {
+      "action": "cut",
+      "card": "Grim Tutor",
+      "present": true,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ]
+    }
+  ],
+  "policy": {
+    "battle_boundary": "Only a strategy-ready package can open an equal battle probe; this matrix never promotes a deck.",
+    "cut_boundary": "Interaction upgrades cannot hide cuts that weaken the commander's attack window or source-lane plan.",
+    "profile_gate": "Commander-specific role targets and package risks are checked after generic core floors."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "package_strategy_blocks_battle",
+  "summary": {
+    "blocker_count": 4,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "next_gate": "repair_commander_profile_blockers_before_battle",
+    "package_adds": [
+      "Path to Exile",
+      "Feed the Swarm",
+      "Swords to Plowshares",
+      "Rakdos Charm",
+      "Terminate"
+    ],
+    "package_cuts": [
+      "Archaeomancer's Map",
+      "Genji Glove",
+      "Karlach, Fury of Avernus",
+      "Ardenn, Intrepid Archaeologist",
+      "Grim Tutor"
+    ],
+    "profile_source": "server/lib/ai/commander_reference_profile_support.dart",
+    "profile_version": "kaalia_of_the_vast_reference_profile_v1_2026-07-05",
+    "target_count": 10
+  },
+  "target_evaluations": [
+    {
+      "base_count": 34,
+      "base_status": "below_target",
+      "candidate_count": 34,
+      "candidate_status": "below_target",
+      "delta": 0,
+      "hard_floor": true,
+      "max": 37,
+      "min": 35,
+      "role": "lands"
+    },
+    {
+      "base_count": 24,
+      "base_status": "above_target_review",
+      "candidate_count": 23,
+      "candidate_status": "above_target_review",
+      "delta": -1,
+      "hard_floor": true,
+      "max": 14,
+      "min": 10,
+      "role": "mana_acceleration"
+    },
+    {
+      "base_count": 10,
+      "base_status": "in_range",
+      "candidate_count": 10,
+      "candidate_status": "in_range",
+      "delta": 0,
+      "hard_floor": true,
+      "max": 12,
+      "min": 8,
+      "role": "haste_protection_silence"
+    },
+    {
+      "base_count": 4,
+      "base_status": "below_target",
+      "candidate_count": 4,
+      "candidate_status": "below_target",
+      "delta": 0,
+      "hard_floor": true,
+      "max": 30,
+      "min": 22,
+      "role": "angels_demons_dragons_payoffs"
+    },
+    {
+      "base_count": 1,
+      "base_status": "below_target",
+      "candidate_count": 6,
+      "candidate_status": "below_target",
+      "delta": 5,
+      "hard_floor": true,
+      "max": 12,
+      "min": 8,
+      "role": "spot_interaction"
+    },
+    {
+      "base_count": 2,
+      "base_status": "in_range",
+      "candidate_count": 3,
+      "candidate_status": "in_range",
+      "delta": 1,
+      "hard_floor": true,
+      "max": 4,
+      "min": 2,
+      "role": "board_wipes_resets"
+    },
+    {
+      "base_count": 13,
+      "base_status": "above_target_review",
+      "candidate_count": 13,
+      "candidate_status": "above_target_review",
+      "delta": 0,
+      "hard_floor": true,
+      "max": 11,
+      "min": 7,
+      "role": "card_draw_selection"
+    },
+    {
+      "base_count": 20,
+      "base_status": "above_target_review",
+      "candidate_count": 18,
+      "candidate_status": "above_target_review",
+      "delta": -2,
+      "hard_floor": false,
+      "max": 8,
+      "min": 4,
+      "role": "tutors_access"
+    },
+    {
+      "base_count": 3,
+      "base_status": "in_range",
+      "candidate_count": 3,
+      "candidate_status": "in_range",
+      "delta": 0,
+      "hard_floor": true,
+      "max": 6,
+      "min": 3,
+      "role": "reanimation_plan_b"
+    },
+    {
+      "base_count": 6,
+      "base_status": "in_range",
+      "candidate_count": 6,
+      "candidate_status": "in_range",
+      "delta": 0,
+      "hard_floor": true,
+      "max": 6,
+      "min": 3,
+      "role": "dedicated_win_conditions"
+    }
+  ]
+}

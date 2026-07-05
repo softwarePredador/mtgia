@@ -318,6 +318,18 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `core_floor_repaired=true`, `removal=6`, `strategy_ready=true`, mas
     `battle_gate_allowed_now=false` e `promotion_allowed=false`. Proximo gate:
     `run_commander_specific_strategy_matrix_for_package_before_battle`.
+    A matriz especifica do pacote tambem foi rodada em
+    `manaloom-knowledge/scripts/global_commander_candidate_package_strategy_matrix.py`.
+    Evidencia local atual:
+    `master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.md`.
+    Resultado: `package_strategy_blocks_battle`, com blockers
+    `profile_lands_below_target`, `profile_angels_demons_dragons_payoffs_below_target`,
+    `profile_spot_interaction_below_target` e
+    `attack_window_cut_without_replacement`. Mesmo apos o pacote subir
+    spot interaction de `1` para `6`, Kaalia ainda fica abaixo do alvo `8-12`,
+    com lands `34` contra `35-37` e payoffs Angel/Demon/Dragon `4` contra
+    `22-30`; `battle_gate_allowed_now=false`, `promotion_allowed=false` e o
+    proximo gate passa a ser `repair_commander_profile_blockers_before_battle`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

@@ -45,6 +45,9 @@ GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL = SCRIPT_DIR / "global_commander_battle_f
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_package_chain_audit.py"
 )
+GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_MATRIX = (
+    SCRIPT_DIR / "global_commander_candidate_package_strategy_matrix.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -118,6 +121,10 @@ GLOBAL_COMMANDER_BATTLE_FEEDBACK_REPORT = (
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md"
+)
+GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -223,6 +230,14 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md",
                 "core_floor_repaired",
                 "run_commander_specific_strategy_matrix_for_package_before_battle",
+                "global_commander_candidate_package_strategy_matrix.py",
+                "global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.md",
+                "package_strategy_blocks_battle",
+                "profile_lands_below_target",
+                "profile_angels_demons_dragons_payoffs_below_target",
+                "profile_spot_interaction_below_target",
+                "attack_window_cut_without_replacement",
+                "repair_commander_profile_blockers_before_battle",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -394,6 +409,14 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md",
                 "core_floor_repaired",
                 "run_commander_specific_strategy_matrix_for_package_before_battle",
+                "global_commander_candidate_package_strategy_matrix.py",
+                "global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.md",
+                "package_strategy_blocks_battle",
+                "profile_lands_below_target",
+                "profile_angels_demons_dragons_payoffs_below_target",
+                "profile_spot_interaction_below_target",
+                "attack_window_cut_without_replacement",
+                "repair_commander_profile_blockers_before_battle",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -646,6 +669,22 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_MATRIX,
+            [
+                "global_commander_candidate_package_strategy_matrix",
+                "package_strategy_blocks_battle",
+                "Commander-specific role targets",
+                "battle_gate_allowed_now",
+                "promotion_allowed",
+                "repair_commander_profile_blockers_before_battle",
+                "attack_window_cut_without_replacement",
+                "battle_or_optimization_performed",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -781,6 +820,24 @@ def build_audit() -> dict[str, Any]:
                 "Rakdos Charm",
                 "Terminate",
                 "run_commander_specific_strategy_matrix_for_package_before_battle",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_REPORT,
+            [
+                "Global Commander Candidate Package Strategy Matrix",
+                "package_strategy_blocks_battle",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "profile_lands_below_target",
+                "profile_angels_demons_dragons_payoffs_below_target",
+                "profile_spot_interaction_below_target",
+                "attack_window_cut_without_replacement",
+                "repair_commander_profile_blockers_before_battle",
+                "Path to Exile",
+                "Rakdos Charm",
             ],
         )
     )

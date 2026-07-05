@@ -204,7 +204,12 @@ Operational priority after this pivot:
    final core floors are repaired, strategy readiness exists, and battle plus
    promotion remain closed until a commander-specific package strategy matrix
    and replay-backed equal gate exist;
-15. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+15. run `global_commander_candidate_package_strategy_matrix.py` after a clean
+   package chain and before any battle probe; it must compare the base deck and
+   final copied candidate against the commander's role targets, expected
+   packages, and cut-risk lanes, then keep battle and promotion closed when a
+   package fixes generic core floors but weakens commander-specific strategy;
+16. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -224,6 +229,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
 credentials are unavailable. It must report source lanes as unavailable and route
@@ -335,6 +341,19 @@ Current external refresh on 2026-07-05:
   and `promotion_allowed` remain `false`. The next allowed gate is
   `run_commander_specific_strategy_matrix_for_package_before_battle`, not a
   natural battle or real deck mutation.
+- Current package strategy matrix evidence shows why generic core repair is not
+  enough. The Kaalia step5 package now reports `package_strategy_blocks_battle`
+  in
+  `global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.md`:
+  lands stay `34` against target `35-37`, Angel/Demon/Dragon payoffs stay `4`
+  against target `22-30`, spot interaction rises from `1` to `6` but still
+  misses target `8-12`, and the package cuts attack-window cards without adding
+  a same-lane replacement. Blockers are `profile_lands_below_target`,
+  `profile_angels_demons_dragons_payoffs_below_target`,
+  `profile_spot_interaction_below_target`, and
+  `attack_window_cut_without_replacement`; `battle_gate_allowed_now=false`,
+  `promotion_allowed=false`, and the next gate is
+  `repair_commander_profile_blockers_before_battle`.
 
 ## Global Commander Rollout - 2026-07-01
 
