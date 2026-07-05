@@ -2643,3 +2643,58 @@ Operational lesson:
   or explicitly covered by a new package-shell contract.
 - Until that exists, all five topdeck targets remain learning hypotheses only,
   and deck `607` remains protected.
+
+## Topdeck Post Safe-Cut Route - 2026-07-05
+
+The current post safe-cut routing artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_post_safe_cut_route_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_post_safe_cut_route_20260705_current.json`
+
+This router consumes:
+
+- `lorehold_topdeck_safe_cut_miner_20260705_current`;
+- `lorehold_topdeck_forced_access_microbenchmark_plan_20260705_current`;
+- `lorehold_miracle_access_first_shell_contract_20260705_current_relearn`;
+- `lorehold_from_scratch_shell_failure_synthesis_20260705_current_relearn`;
+- `lorehold_closing_window_next_shell_target_router_20260705_current_relearn`;
+- `lorehold_hypothesis_queue_from_value_model_20260705_current_relearn`.
+
+Current result:
+
+- status:
+  `topdeck_post_safe_cut_route_sidecar_shell_required_keep_607`;
+- selected route:
+  `topdeck_access_first_sidecar_shell`;
+- one-for-one cut-ready count: `0`;
+- reviewable same-lane gaps: `0`;
+- forced-access runnable count: `0`;
+- structure-matrix contract allowed now: `true`;
+- structure-matrix execution allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- deck `607` mutated: `false`;
+- recommended next action:
+  `write_or_refresh_topdeck_access_first_sidecar_shell_contract_before_materialization`.
+
+External research snapshot used for lane weighting:
+
+- official Commander rules are treated as legality gates only:
+  99 cards plus 1 commander, singleton, and color identity;
+- EDHREC current Lorehold signals still point first to topdeck/spellslinger,
+  with `Library of Leng`, `Sensei's Divining Top`, `Approach of the Second Sun`,
+  and `Scroll Rack` as stronger Lorehold-specific anchors than generic staples;
+- EDHREC optimized topdeck lists confirm the topdeck lane, but the sample is
+  small and cannot override ManaLoom runtime traces.
+
+Operational lesson:
+
+- `Mana Vault` and `The One Ring` are not inaccessible because they are illegal;
+  they are inaccessible for a `607` change right now because there is no safe
+  same-lane cut, no proved miracle/topdeck floor improvement, and no equal
+  battle gate beating `607`.
+- The next executable learning step is a copied sidecar shell contract that
+  declares topdeck/miracle, mana, draw, cut, and fast-pressure floors before any
+  100-card materialization.
+- A sidecar shell may learn aggressively, but it cannot mutate or replace
+  `607` until it preserves the protected anchors and wins the same-seed gate.
