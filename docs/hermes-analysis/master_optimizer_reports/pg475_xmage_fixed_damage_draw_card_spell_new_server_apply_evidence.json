@@ -1,0 +1,160 @@
+{
+  "artifact": "pg475_xmage_fixed_damage_draw_card_spell_new_server_apply_evidence",
+  "generated_at_utc": "2026-07-05T02:55:16Z",
+  "status": "pass",
+  "database_target": "143.198.230.247:5433/halder",
+  "package": {
+    "deploy_id": "pg475",
+    "slug": "xmage_fixed_damage_draw_card_spell_new_server",
+    "family": "xmage_fixed_damage_draw_card_spell",
+    "scope": "xmage_fixed_damage_target_and_draw_card_spell_v1",
+    "cards": [
+      "Ember Shot",
+      "Playful Shove",
+      "Zap"
+    ],
+    "selected_count": 3
+  },
+  "runtime_and_builder_validation": {
+    "builder_change": "E2E_REQUIRED_EFFECT_FIELDS now requires _composite_rule_components so composite damage+draw rules cannot pass package validation without component payloads.",
+    "focused_tests": [
+      {
+        "command": "python3 -m unittest test_xmage_authoritative_exact_scope_split.py test_xmage_exact_scope_runtime.py",
+        "result": "722 tests passed"
+      },
+      {
+        "command": "python3 test_xmage_batch_pg_package_builder.py",
+        "result": "pass"
+      },
+      {
+        "command": "python3 -m py_compile xmage_authoritative_exact_scope_split.py battle_analyst_v9.py xmage_batch_pg_package_builder.py battle_package_end_to_end_validation.py sync_battle_card_rules_pg.py sync_pg_card_metadata_to_hermes.py",
+        "result": "pass"
+      }
+    ]
+  },
+  "postgres_apply": {
+    "source": "docs/hermes-analysis/master_optimizer_reports/pg475_xmage_fixed_damage_draw_card_spell_new_server_pg_apply_evidence.json",
+    "precheck": {
+      "row_count": 3,
+      "total_target_card_rows": 3,
+      "missing_targets": [],
+      "existing_expected_rows_before": 0,
+      "would_deprecate_shadow_rows": 2
+    },
+    "postcheck": {
+      "row_count": 3,
+      "promoted_rule_rows": 3,
+      "promoted_verified_auto_rows": 3,
+      "promoted_oracle_hash_rows": 3,
+      "backup_rows": 2,
+      "failed_cards": []
+    },
+    "direct_pg_verification": {
+      "status": "pass",
+      "required_fields": [
+        "effect=composite_resolution",
+        "battle_model_scope=xmage_fixed_damage_target_and_draw_card_spell_v1",
+        "damage",
+        "amount",
+        "draw_count",
+        "count",
+        "target=any_target",
+        "target_constraints.scope=any_target",
+        "_composite_rule_components[0].effect=direct_damage",
+        "_composite_rule_components[1].effect=draw_cards",
+        "review_status=verified",
+        "execution_status=auto",
+        "rule_version=2",
+        "oracle_hash"
+      ]
+    }
+  },
+  "sync_and_e2e": {
+    "metadata_sync": {
+      "source": "docs/hermes-analysis/master_optimizer_reports/pg475_xmage_fixed_damage_draw_card_spell_new_server_metadata_sync_operational.json",
+      "requested_unique_names": 5505,
+      "postgres_cards_matched": 5690,
+      "sqlite_cache_alias_rows": 5601,
+      "deck_cards_rows_total": 2699,
+      "deck_cards_matched_cache_rows": 2699,
+      "deck_cards_card_id_rows_updated": 105
+    },
+    "runtime_sync": {
+      "source": "docs/hermes-analysis/master_optimizer_reports/pg475_xmage_fixed_damage_draw_card_spell_new_server_full_pg_to_sqlite_sync_operational.json",
+      "pg_rows_loaded": 4526,
+      "sqlite_inserted_or_updated": 4518,
+      "canonical_snapshot_rows_exported": 4493
+    },
+    "e2e": {
+      "source": "docs/hermes-analysis/master_optimizer_reports/pg475_xmage_fixed_damage_draw_card_spell_new_server_e2e_validation.json",
+      "status": "pass",
+      "postgres_source_of_truth": 3,
+      "sqlite_hermes_cache": 3,
+      "canonical_snapshot_fallback": 3,
+      "runtime_get_card_effect": 3,
+      "battle_execution_no_override_scenarios": 0
+    },
+    "component_cache_verification": {
+      "status": "pass",
+      "surfaces": [
+        "SQLite battle_card_rules",
+        "known_cards_canonical_snapshot.json"
+      ],
+      "component_effects": [
+        "direct_damage",
+        "draw_cards"
+      ]
+    }
+  },
+  "post_sync_queue": {
+    "source": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg475_fixed_damage_draw_card_spell_new_server_commander_legal.json",
+    "target_identity_count": 26360,
+    "xmage_authoritative_source_count": 26046,
+    "xmage_missing_source_exception_count": 314,
+    "xmage_authoritative_parser_gap_count": 0,
+    "xmage_authoritative_adapter_required_count": 26046,
+    "manual_semantic_decision_units_remaining": 314,
+    "reduction_from_post_pg474": 3
+  },
+  "post_sync_exact_split": {
+    "source": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg475_fixed_damage_draw_card_spell_new_server_recheck.json",
+    "status": "ready",
+    "proposal_count": 21,
+    "safe_for_batch_pg_package_count": 21,
+    "family_counts": {
+      "xmage_bounce_scry_spell": 2,
+      "xmage_creature_combat_damage_graveyard_to_hand": 1,
+      "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell": 2,
+      "xmage_fixed_target_player_draw_spell": 3,
+      "xmage_graveyard_multi_zone_recursion_spell": 2,
+      "xmage_permanent_attack_graveyard_to_hand": 1,
+      "xmage_permanent_simple_activated_destroy_target": 1,
+      "xmage_permanent_simple_activated_graveyard_to_battlefield": 2,
+      "xmage_permanent_simple_activated_graveyard_to_hand": 2,
+      "xmage_static_play_lands_from_graveyard": 2,
+      "xmage_x_damage_spell": 3
+    }
+  },
+  "alignment_audits": {
+    "xmage_strategy": {
+      "source": "docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg475_fixed_damage_draw_card_spell_new_server_final.json",
+      "status": "pass",
+      "check_count": 26
+    },
+    "operational_surface": {
+      "source": "docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg475_fixed_damage_draw_card_spell_new_server_final.json",
+      "status": "pass",
+      "check_count": 39
+    },
+    "legacy_contamination": {
+      "source": "docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg475_fixed_damage_draw_card_spell_new_server_final.json",
+      "status": "pass",
+      "check_count": 32
+    },
+    "pg_hermes_sqlite_contract": {
+      "source": "docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg475_fixed_damage_draw_card_spell_new_server_with_pg.json",
+      "status": "pass",
+      "check_count": 51
+    }
+  }
+}

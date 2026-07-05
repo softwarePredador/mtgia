@@ -1,0 +1,102 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg475",
+  "generated_at": "2026-07-05T02:50:39.381416+00:00",
+  "manifest": "../../master_optimizer_reports/pg475_xmage_fixed_damage_draw_card_spell_new_server_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg475_xmage_fixed_damage_draw_card_spell_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 2,
+    "cards": [
+      "Ember Shot",
+      "Playful Shove",
+      "Zap"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 3,
+    "promoted_rule_rows": 3,
+    "promoted_verified_auto_rows": 3,
+    "row_count": 3
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 2,
+      "card_name": "Ember Shot",
+      "logical_rule_key": "battle_rule_v1:6d22d148e6427e4547df23822d8e737c",
+      "normalized_name": "ember shot",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Playful Shove",
+      "logical_rule_key": "battle_rule_v1:e7a00222152c565ca14b520dbb05825f",
+      "normalized_name": "playful shove",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Zap",
+      "logical_rule_key": "battle_rule_v1:31ce6de3abbfe9af7568a7ba3e20704a",
+      "normalized_name": "zap",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Ember Shot",
+      "Playful Shove",
+      "Zap"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 3,
+    "total_target_card_rows": 3,
+    "would_deprecate_shadow_rows": 2
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "eb9aad34-d74c-448a-9a2a-9e7fa7326771",
+      "card_name": "Ember Shot",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:6d22d148e6427e4547df23822d8e737c",
+      "normalized_name": "ember shot",
+      "oracle_hash": "ef308033ea4f278064135172d1f23f17",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "canonical_card_id": "32ab2946-7432-4a22-9886-8e0f57713293",
+      "card_name": "Playful Shove",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:e7a00222152c565ca14b520dbb05825f",
+      "normalized_name": "playful shove",
+      "oracle_hash": "760e1e2161eec2ad9c8b87bede6caaa3",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "19b19136-5365-4b04-9def-1b28dda177a2",
+      "card_name": "Zap",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:31ce6de3abbfe9af7568a7ba3e20704a",
+      "normalized_name": "zap",
+      "oracle_hash": "f03297ade8a9a5b96d86985f840e7938",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_fixed_damage_draw_card_spell_new_server"
+}

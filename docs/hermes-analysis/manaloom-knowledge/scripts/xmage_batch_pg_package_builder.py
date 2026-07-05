@@ -53,6 +53,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "enters_tapped",
     "exiles_self",
     "mode_selection",
+    "_composite_rule_components",
     "recursion_components",
     "recursion_mana_value_max",
     "recursion_mana_value_max_from_x",

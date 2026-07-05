@@ -26351,6 +26351,52 @@
     "battle_rule_logical_key": "battle_rule_v1:3055ac5244f9cfd8c3575366729be15e",
     "battle_rule_oracle_hash": "5a94850681adebf4628b748abeebd7d7"
   },
+  "Ember Shot": {
+    "_composite_rule_components": [
+      {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "compose_on_resolution": true,
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_and_draw_card_spell_v1",
+    "count": 1,
+    "damage": 3,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6d22d148e6427e4547df23822d8e737c",
+    "battle_rule_oracle_hash": "ef308033ea4f278064135172d1f23f17"
+  },
   "Embodiment of Spring": {
     "_activated_rule_effects": [
       {
@@ -61979,6 +62025,52 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ba65c75fe72d2fdfad569fa0096f1972",
     "battle_rule_oracle_hash": "b2f28fd30e7447849076c50e188370ed"
+  },
+  "Playful Shove": {
+    "_composite_rule_components": [
+      {
+        "amount": 1,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "compose_on_resolution": true,
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "amount": 1,
+    "battle_model_scope": "xmage_fixed_damage_target_and_draw_card_spell_v1",
+    "count": 1,
+    "damage": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": false,
+    "sorcery": true,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e7a00222152c565ca14b520dbb05825f",
+    "battle_rule_oracle_hash": "760e1e2161eec2ad9c8b87bede6caaa3"
   },
   "Plaza of Harmony": {
     "effect": "land",
@@ -99632,6 +99724,52 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "b6e2a18b86163438db02380165f684d0"
+  },
+  "Zap": {
+    "_composite_rule_components": [
+      {
+        "amount": 1,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "compose_on_resolution": true,
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "amount": 1,
+    "battle_model_scope": "xmage_fixed_damage_target_and_draw_card_spell_v1",
+    "count": 1,
+    "damage": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:31ce6de3abbfe9af7568a7ba3e20704a",
+    "battle_rule_oracle_hash": "f03297ade8a9a5b96d86985f840e7938"
   },
   "Zarichi Tiger": {
     "_activated_rule_effects": [

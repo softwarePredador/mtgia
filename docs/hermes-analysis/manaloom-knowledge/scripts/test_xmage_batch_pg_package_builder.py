@@ -399,6 +399,52 @@ def test_manifest_expected_rule_preserves_dynamic_graveyard_damage_fields() -> N
     assert required["graveyard_count_card_types"] == ["instant"]
 
 
+def test_manifest_expected_rule_preserves_composite_damage_draw_components() -> None:
+    components = [
+        {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "compose_on_resolution": True,
+            "xmage_effect_class": "DamageTargetEffect",
+        },
+        {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "count": 1,
+            "compose_on_resolution": True,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+        },
+    ]
+    proposal = {
+        "normalized_name": "ember shot",
+        "card_name": "Ember Shot",
+        "oracle_hash": "hash-ember-shot",
+        "logical_rule_key": "battle_rule_v1:hash-ember-shot",
+        "effect_json": {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_damage_target_and_draw_card_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "draw_count": 1,
+            "count": 1,
+            "_composite_rule_components": components,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    required = expected["required_effect_fields"]
+    assert required["effect"] == "composite_resolution"
+    assert required["battle_model_scope"] == "xmage_fixed_damage_target_and_draw_card_spell_v1"
+    assert required["_composite_rule_components"] == components
+
+
 def test_apply_sql_preserves_existing_backup_table_for_idempotent_rerun() -> None:
     proposal = {
         "normalized_name": "quarry beetle",
