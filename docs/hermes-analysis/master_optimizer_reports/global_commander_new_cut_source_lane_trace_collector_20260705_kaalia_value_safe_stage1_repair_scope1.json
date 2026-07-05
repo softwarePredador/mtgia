@@ -1,0 +1,1953 @@
+{
+  "artifact_type": "global_commander_new_cut_source_lane_trace_collector",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "remaining_cut_cards_used_by_target_deck:Sunforger,Jeska's Will,Smothering Tithe,Demonic Tutor,Enlightened Tutor,Arcane Signet,Mana Vault,Sol Ring,Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+    "remaining_cut_cards_seen_without_usage:Alicia Masters, Skilled Sculptor,Vampiric Tutor",
+    "remaining_cut_cards_not_seen:Dark Ritual",
+    "candidate_copy_closed_until_cut_source_lane_has_value_safe_or_proven_same_lane_cut"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T21:52:53.102057+00:00",
+  "input_artifacts": {
+    "same_lane_model_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "trace_generator_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "reuse_boundary": "This collector reuses existing replay artifacts and does not run a new battle.",
+    "unseen_boundary": "No exposure in existing traces is insufficient proof; force-access or broader replay is required.",
+    "usage_boundary": "A remaining cut used by the target deck is not value-safe from this trace."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Sunforger",
+      "cut_roles": [
+        "tutors_access"
+      ],
+      "decision": "not_value_safe_from_existing_remaining_cut_trace",
+      "decision_trace_count": 19,
+      "event_types": {
+        "cast_announced": 2,
+        "cost_paid": 2,
+        "equipment_attached": 1,
+        "equipment_unattached": 1,
+        "land_played": 1,
+        "priority_pass": 8,
+        "spell_cast": 2,
+        "spell_resolved": 2,
+        "turn_end": 16,
+        "turn_start": 8
+      },
+      "exposure_event_count": 24,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 2
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 2
+      },
+      "first_usage_event": {
+        "card": "Sunforger",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "maximum_evidence_burden": 3,
+      "next_evidence": "find_different_cut_or_same_lane_replacement_proof",
+      "recommended_next_route": "collect_attack_window_same_lane_replacement_trace",
+      "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 8,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Alicia Masters, Skilled Sculptor",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "decision": "manual_negative_trace_review_only",
+      "decision_trace_count": 1,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "maximum_evidence_burden": 3,
+      "next_evidence": "explain_nonuse_or_force_access_before_reclassification",
+      "recommended_next_route": "collect_attack_window_same_lane_replacement_trace",
+      "status": "remaining_cut_seen_without_usage_needs_negative_review",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Jeska's Will",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "decision": "not_value_safe_from_existing_remaining_cut_trace",
+      "decision_trace_count": 11,
+      "event_types": {
+        "cast_announced": 2,
+        "cost_paid": 2,
+        "jeskas_will_resolved": 2,
+        "spell_cast": 2,
+        "spell_resolved": 2,
+        "trigger_resolved": 1,
+        "turn_end": 3,
+        "turn_start": 3
+      },
+      "exposure_event_count": 6,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "first_usage_event": {
+        "card": "Jeska's Will",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "maximum_evidence_burden": 5,
+      "next_evidence": "find_different_cut_or_same_lane_replacement_proof",
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Smothering Tithe",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "decision": "not_value_safe_from_existing_remaining_cut_trace",
+      "decision_trace_count": 25,
+      "event_types": {
+        "cast_announced": 4,
+        "cost_paid": 4,
+        "land_played": 6,
+        "priority_pass": 108,
+        "spell_cast": 4,
+        "trigger_put_on_stack": 75,
+        "trigger_resolved": 76,
+        "turn_end": 34,
+        "turn_start": 12
+      },
+      "exposure_event_count": 46,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Smothering Tithe",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "maximum_evidence_burden": 5,
+      "next_evidence": "find_different_cut_or_same_lane_replacement_proof",
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 163,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Demonic Tutor",
+      "cut_roles": [
+        "tutors_access"
+      ],
+      "decision": "not_value_safe_from_existing_remaining_cut_trace",
+      "decision_trace_count": 18,
+      "event_types": {
+        "cast_announced": 5,
+        "cast_illegal": 4,
+        "cost_paid": 1,
+        "priority_pass": 5,
+        "spell_cast": 1,
+        "spell_resolved": 1,
+        "turn_end": 7,
+        "turn_start": 7,
+        "tutor_resolved": 1
+      },
+      "exposure_event_count": 14,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Demonic Tutor",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "maximum_evidence_burden": 5,
+      "next_evidence": "find_different_cut_or_same_lane_replacement_proof",
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Enlightened Tutor",
+      "cut_roles": [
+        "tutors_access"
+      ],
+      "decision": "not_value_safe_from_existing_remaining_cut_trace",
+      "decision_trace_count": 14,
+      "event_types": {
+        "end_step_instant": 1,
+        "spell_resolved": 1,
+        "turn_end": 5,
+        "turn_start": 5,
+        "tutor_resolved": 1
+      },
+      "exposure_event_count": 10,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Enlightened Tutor",
+        "event": "spell_resolved",
+        "player": "Kaalia of the Vast",
+        "turn": 5
+      },
+      "maximum_evidence_burden": 5,
+      "next_evidence": "find_different_cut_or_same_lane_replacement_proof",
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 2,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Vampiric Tutor",
+      "cut_roles": [
+        "tutors_access"
+      ],
+      "decision": "manual_negative_trace_review_only",
+      "decision_trace_count": 1,
+      "event_types": {
+        "priority_pass": 3
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "maximum_evidence_burden": 5,
+      "next_evidence": "explain_nonuse_or_force_access_before_reclassification",
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "status": "remaining_cut_seen_without_usage_needs_negative_review",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Arcane Signet",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "decision": "not_value_safe_from_existing_remaining_cut_trace",
+      "decision_trace_count": 5,
+      "event_types": {
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "land_played": 2,
+        "mana_refreshed": 7,
+        "spell_cast": 1,
+        "turn_end": 9,
+        "turn_start": 2
+      },
+      "exposure_event_count": 11,
+      "first_decision_trace": {
+        "event": "mulligan_decision",
+        "player": "Kaalia of the Vast",
+        "turn": 0
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Arcane Signet",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 2
+      },
+      "maximum_evidence_burden": 5,
+      "next_evidence": "find_different_cut_or_same_lane_replacement_proof",
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 3,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Dark Ritual",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "decision": "insufficient_existing_trace",
+      "decision_trace_count": 0,
+      "event_types": {},
+      "exposure_event_count": 0,
+      "first_decision_trace": null,
+      "first_exposure_event": null,
+      "first_usage_event": null,
+      "maximum_evidence_burden": 5,
+      "next_evidence": "force_access_or_expand_replay_window_before_reclassification",
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "status": "remaining_cut_not_seen_needs_forced_access_or_more_trace",
+      "usage_event_count": 0,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Mana Vault",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "decision": "not_value_safe_from_existing_remaining_cut_trace",
+      "decision_trace_count": 4,
+      "event_types": {
+        "cast_announced": 3,
+        "cost_paid": 3,
+        "land_played": 3,
+        "spell_cast": 3,
+        "turn_end": 16,
+        "turn_start": 1
+      },
+      "exposure_event_count": 17,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "first_usage_event": {
+        "card": "Mana Vault",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "maximum_evidence_burden": 5,
+      "next_evidence": "find_different_cut_or_same_lane_replacement_proof",
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Sol Ring",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "decision": "not_value_safe_from_existing_remaining_cut_trace",
+      "decision_trace_count": 5,
+      "event_types": {
+        "cast_announced": 5,
+        "cast_illegal": 4,
+        "cost_paid": 1,
+        "land_played": 4,
+        "spell_cast": 1,
+        "turn_end": 12,
+        "turn_start": 2
+      },
+      "exposure_event_count": 14,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 9
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 10
+      },
+      "first_usage_event": {
+        "card": "Sol Ring",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 9
+      },
+      "maximum_evidence_burden": 5,
+      "next_evidence": "find_different_cut_or_same_lane_replacement_proof",
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 7,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "decision": "not_value_safe_from_existing_remaining_cut_trace",
+      "decision_trace_count": 7,
+      "event_types": {
+        "cast_announced": 1,
+        "combat": 8,
+        "combat_step": 8,
+        "cost_paid": 1,
+        "land_played": 2,
+        "multi_defender_attack": 4,
+        "priority_pass": 30,
+        "spell_cast": 1,
+        "trigger_put_on_stack": 9,
+        "trigger_resolved": 9,
+        "turn_end": 11,
+        "turn_start": 2
+      },
+      "exposure_event_count": 13,
+      "first_decision_trace": {
+        "event": "tutor",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_usage_event": {
+        "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 3
+      },
+      "maximum_evidence_burden": 6,
+      "next_evidence": "find_different_cut_or_same_lane_replacement_proof",
+      "recommended_next_route": "collect_new_global_battle_feedback_reopen_proof",
+      "status": "remaining_cut_used_by_target_trace_blocks_value_safe",
+      "usage_event_count": 21,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "seed_reports": [
+    {
+      "cards": {
+        "Alicia Masters, Skilled Sculptor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Dark Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Jeska's Will": {
+          "decision_trace_count": 3,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "jeskas_will_resolved": 1,
+            "spell_cast": 1,
+            "spell_resolved": 1,
+            "turn_end": 1,
+            "turn_start": 1
+          },
+          "exposure_event_count": 2,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 6
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 6
+          },
+          "first_usage_event": {
+            "card": "Jeska's Will",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "reference_event_count": 1,
+          "usage_event_count": 4
+        },
+        "Mana Vault": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Smothering Tithe": {
+          "decision_trace_count": 10,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "land_played": 1,
+            "priority_pass": 17,
+            "spell_cast": 1,
+            "trigger_put_on_stack": 14,
+            "trigger_resolved": 14,
+            "turn_end": 8,
+            "turn_start": 5
+          },
+          "exposure_event_count": 13,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Smothering Tithe",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "reference_event_count": 18,
+          "usage_event_count": 31
+        },
+        "Sol Ring": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Sunforger": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "priority_pass": 1
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 1,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 121,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_42.decision_trace.jsonl",
+      "event_count": 818,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_42.events.jsonl",
+      "seed": 42
+    },
+    {
+      "cards": {
+        "Alicia Masters, Skilled Sculptor": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Arcane Signet": {
+          "decision_trace_count": 4,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "land_played": 2,
+            "mana_refreshed": 7,
+            "spell_cast": 1,
+            "turn_end": 9,
+            "turn_start": 2
+          },
+          "exposure_event_count": 11,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Arcane Signet",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "reference_event_count": 9,
+          "usage_event_count": 3
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Dark Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Jeska's Will": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Mana Vault": {
+          "decision_trace_count": 1,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "land_played": 1,
+            "spell_cast": 1,
+            "turn_end": 7
+          },
+          "exposure_event_count": 7,
+          "first_decision_trace": {
+            "event": "cast_spell",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "first_usage_event": {
+            "card": "Mana Vault",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "reference_event_count": 1,
+          "usage_event_count": 3
+        },
+        "Smothering Tithe": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Sol Ring": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Sunforger": {
+          "decision_trace_count": 3,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "equipment_unattached": 1,
+            "land_played": 1,
+            "priority_pass": 4,
+            "spell_cast": 1,
+            "spell_resolved": 1,
+            "turn_end": 8,
+            "turn_start": 1
+          },
+          "exposure_event_count": 9,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "first_usage_event": {
+            "card": "Sunforger",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "reference_event_count": 6,
+          "usage_event_count": 4
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "priority_pass": 1
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 1,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 138,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.decision_trace.jsonl",
+      "event_count": 832,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_43.events.jsonl",
+      "seed": 43
+    },
+    {
+      "cards": {
+        "Alicia Masters, Skilled Sculptor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Dark Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 11,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "priority_pass": 4,
+            "spell_cast": 1,
+            "spell_resolved": 1,
+            "turn_end": 4,
+            "turn_start": 5,
+            "tutor_resolved": 1
+          },
+          "exposure_event_count": 9,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Demonic Tutor",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "reference_event_count": 4,
+          "usage_event_count": 5
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Jeska's Will": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Mana Vault": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Smothering Tithe": {
+          "decision_trace_count": 3,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "land_played": 2,
+            "priority_pass": 19,
+            "spell_cast": 1,
+            "trigger_put_on_stack": 19,
+            "trigger_resolved": 19,
+            "turn_end": 8,
+            "turn_start": 2
+          },
+          "exposure_event_count": 10,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "first_usage_event": {
+            "card": "Smothering Tithe",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 4
+          },
+          "reference_event_count": 21,
+          "usage_event_count": 41
+        },
+        "Sol Ring": {
+          "decision_trace_count": 3,
+          "event_types": {
+            "cast_announced": 4,
+            "cast_illegal": 4,
+            "turn_end": 1,
+            "turn_start": 1
+          },
+          "exposure_event_count": 2,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 9
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 10
+          },
+          "first_usage_event": {
+            "card": "Sol Ring",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 9
+          },
+          "reference_event_count": 4,
+          "usage_event_count": 4
+        },
+        "Sunforger": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 139,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_44.decision_trace.jsonl",
+      "event_count": 1003,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_44.events.jsonl",
+      "seed": 44
+    },
+    {
+      "cards": {
+        "Alicia Masters, Skilled Sculptor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Arcane Signet": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Dark Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "priority_pass": 1
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 1,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Jeska's Will": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Mana Vault": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Smothering Tithe": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "priority_pass": 8
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 8,
+          "usage_event_count": 0
+        },
+        "Sol Ring": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Sunforger": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 114,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.decision_trace.jsonl",
+      "event_count": 727,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_45.events.jsonl",
+      "seed": 45
+    },
+    {
+      "cards": {
+        "Alicia Masters, Skilled Sculptor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Dark Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 12,
+          "event_types": {
+            "end_step_instant": 1,
+            "spell_resolved": 1,
+            "turn_end": 5,
+            "turn_start": 5,
+            "tutor_resolved": 1
+          },
+          "exposure_event_count": 10,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Enlightened Tutor",
+            "event": "spell_resolved",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "reference_event_count": 1,
+          "usage_event_count": 2
+        },
+        "Jeska's Will": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Mana Vault": {
+          "decision_trace_count": 1,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "spell_cast": 1,
+            "turn_end": 1
+          },
+          "exposure_event_count": 1,
+          "first_decision_trace": {
+            "event": "cast_spell",
+            "player": "Kaalia of the Vast",
+            "turn": 8
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 8
+          },
+          "first_usage_event": {
+            "card": "Mana Vault",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 8
+          },
+          "reference_event_count": 0,
+          "usage_event_count": 3
+        },
+        "Smothering Tithe": {
+          "decision_trace_count": 7,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "priority_pass": 32,
+            "spell_cast": 1,
+            "trigger_put_on_stack": 20,
+            "trigger_resolved": 21,
+            "turn_end": 7,
+            "turn_start": 3
+          },
+          "exposure_event_count": 10,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "first_usage_event": {
+            "card": "Smothering Tithe",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "reference_event_count": 32,
+          "usage_event_count": 44
+        },
+        "Sol Ring": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Sunforger": {
+          "decision_trace_count": 16,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "equipment_attached": 1,
+            "priority_pass": 4,
+            "spell_cast": 1,
+            "spell_resolved": 1,
+            "turn_end": 8,
+            "turn_start": 7
+          },
+          "exposure_event_count": 15,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Sunforger",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "reference_event_count": 5,
+          "usage_event_count": 4
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {
+            "priority_pass": 1
+          },
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 1,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 136,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.decision_trace.jsonl",
+      "event_count": 1074,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_46.events.jsonl",
+      "seed": 46
+    },
+    {
+      "cards": {
+        "Alicia Masters, Skilled Sculptor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "tutor",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Dark Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Jeska's Will": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Mana Vault": {
+          "decision_trace_count": 2,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "land_played": 2,
+            "spell_cast": 1,
+            "turn_end": 8,
+            "turn_start": 1
+          },
+          "exposure_event_count": 9,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Mana Vault",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "reference_event_count": 2,
+          "usage_event_count": 3
+        },
+        "Smothering Tithe": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "tutor",
+            "player": "Kaalia of the Vast",
+            "turn": 7
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Sol Ring": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Sunforger": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 134,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.decision_trace.jsonl",
+      "event_count": 795,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_47.events.jsonl",
+      "seed": 47
+    },
+    {
+      "cards": {
+        "Alicia Masters, Skilled Sculptor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Dark Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 7,
+          "event_types": {
+            "cast_announced": 4,
+            "cast_illegal": 4,
+            "turn_end": 3,
+            "turn_start": 2
+          },
+          "exposure_event_count": 5,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "first_usage_event": {
+            "card": "Demonic Tutor",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 5
+          },
+          "reference_event_count": 4,
+          "usage_event_count": 4
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Jeska's Will": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Mana Vault": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Smothering Tithe": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Sol Ring": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Sunforger": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 99,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_48.decision_trace.jsonl",
+      "event_count": 661,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_48.events.jsonl",
+      "seed": 48
+    },
+    {
+      "cards": {
+        "Alicia Masters, Skilled Sculptor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Arcane Signet": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+          "decision_trace_count": 6,
+          "event_types": {
+            "cast_announced": 1,
+            "combat": 8,
+            "combat_step": 8,
+            "cost_paid": 1,
+            "land_played": 2,
+            "multi_defender_attack": 4,
+            "priority_pass": 30,
+            "spell_cast": 1,
+            "trigger_put_on_stack": 9,
+            "trigger_resolved": 9,
+            "turn_end": 11,
+            "turn_start": 2
+          },
+          "exposure_event_count": 13,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 3
+          },
+          "reference_event_count": 52,
+          "usage_event_count": 21
+        },
+        "Dark Ritual": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Demonic Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Enlightened Tutor": {
+          "decision_trace_count": 1,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Jeska's Will": {
+          "decision_trace_count": 6,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "jeskas_will_resolved": 1,
+            "spell_cast": 1,
+            "spell_resolved": 1,
+            "trigger_resolved": 1,
+            "turn_end": 2,
+            "turn_start": 2
+          },
+          "exposure_event_count": 4,
+          "first_decision_trace": {
+            "event": "pass_no_action",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "first_exposure_event": {
+            "event": "turn_end",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "first_usage_event": {
+            "card": "Jeska's Will",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 4
+          },
+          "reference_event_count": 1,
+          "usage_event_count": 5
+        },
+        "Mana Vault": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Smothering Tithe": {
+          "decision_trace_count": 4,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "land_played": 3,
+            "priority_pass": 32,
+            "spell_cast": 1,
+            "trigger_put_on_stack": 22,
+            "trigger_resolved": 22,
+            "turn_end": 11,
+            "turn_start": 2
+          },
+          "exposure_event_count": 13,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Smothering Tithe",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 2
+          },
+          "reference_event_count": 35,
+          "usage_event_count": 47
+        },
+        "Sol Ring": {
+          "decision_trace_count": 2,
+          "event_types": {
+            "cast_announced": 1,
+            "cost_paid": 1,
+            "land_played": 4,
+            "spell_cast": 1,
+            "turn_end": 11,
+            "turn_start": 1
+          },
+          "exposure_event_count": 12,
+          "first_decision_trace": {
+            "event": "mulligan_decision",
+            "player": "Kaalia of the Vast",
+            "turn": 0
+          },
+          "first_exposure_event": {
+            "event": "turn_start",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "first_usage_event": {
+            "card": "Sol Ring",
+            "event": "cast_announced",
+            "player": "Kaalia of the Vast",
+            "turn": 1
+          },
+          "reference_event_count": 4,
+          "usage_event_count": 3
+        },
+        "Sunforger": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        },
+        "Vampiric Tutor": {
+          "decision_trace_count": 0,
+          "event_types": {},
+          "exposure_event_count": 0,
+          "first_decision_trace": null,
+          "first_exposure_event": null,
+          "first_usage_event": null,
+          "reference_event_count": 0,
+          "usage_event_count": 0
+        }
+      },
+      "decision_count": 147,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_49.decision_trace.jsonl",
+      "event_count": 1061,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_replays_20260705_kaalia_value_safe_stage1_repair_scope1/replay_seed_49.events.jsonl",
+      "seed": 49
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "new_cut_source_lane_trace_blocks_used_remaining_cuts",
+  "summary": {
+    "candidate_copy_blocker_count": 4,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "next_gate": "force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts",
+    "not_seen_count": 1,
+    "remaining_cut_source_count": 12,
+    "seed_report_count": 8,
+    "seen_without_usage_count": 2,
+    "usage_blocked_remaining_cut_count": 9
+  },
+  "value_safe_reclassification_allowed_now": false
+}

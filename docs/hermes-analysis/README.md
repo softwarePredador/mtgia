@@ -514,6 +514,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     lane de `Professional Face-Breaker` ou `Ornithopter of Paradise`; o proximo
     passo e uma new cut-source-lane evidence pass, nao candidate copy, battle
     ou promocao.
+    Essa passagem tambem ja foi coletada sem nova batalha por
+    `manaloom-knowledge/scripts/global_commander_new_cut_source_lane_trace_collector.py`;
+    evidencia:
+    `master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: dos `12` cortes restantes, `9` foram usados pelo deck alvo,
+    `2` foram vistos sem uso e `1` nao apareceu; o proximo gate e
+    `force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

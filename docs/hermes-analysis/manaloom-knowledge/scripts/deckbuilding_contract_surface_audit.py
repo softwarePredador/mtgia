@@ -107,6 +107,12 @@ GLOBAL_COMMANDER_SAME_LANE_REPLACEMENT_MODEL = (
 GLOBAL_COMMANDER_SAME_LANE_REPLACEMENT_MODEL_TEST = (
     SCRIPT_DIR / "test_global_commander_same_lane_replacement_model.py"
 )
+GLOBAL_COMMANDER_NEW_CUT_SOURCE_LANE_TRACE_COLLECTOR = (
+    SCRIPT_DIR / "global_commander_new_cut_source_lane_trace_collector.py"
+)
+GLOBAL_COMMANDER_NEW_CUT_SOURCE_LANE_TRACE_COLLECTOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_new_cut_source_lane_trace_collector.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -284,6 +290,10 @@ GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_USAGE_TRACE_REVIEWER_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_SAME_LANE_REPLACEMENT_MODEL_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_NEW_CUT_SOURCE_LANE_TRACE_COLLECTOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -576,6 +586,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "same_lane_replacement_model_routes_to_new_cut_source_lane",
                 "collect_new_cut_source_lane_evidence_after_contextual_usage_block",
+                "global_commander_new_cut_source_lane_trace_collector.py",
+                "global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "new_cut_source_lane_trace_blocks_used_remaining_cuts",
+                "force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -812,6 +826,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_replacement_model.py",
                 "Incidental role overlap",
                 "new cut-source-lane evidence pass",
+                "global_commander_new_cut_source_lane_trace_collector.py",
+                "force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1232,6 +1248,35 @@ def build_audit() -> dict[str, Any]:
                 "Professional Face-Breaker",
                 "incidental_role_overlap_count",
                 "same_lane_replacement_route_count",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_NEW_CUT_SOURCE_LANE_TRACE_COLLECTOR,
+            [
+                "global_commander_new_cut_source_lane_trace_collector",
+                "new_cut_source_lane_trace_blocks_used_remaining_cuts",
+                "remaining_cut_used_by_target_trace_blocks_value_safe",
+                "remaining_cut_seen_without_usage_needs_negative_review",
+                "remaining_cut_not_seen_needs_forced_access_or_more_trace",
+                "force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts",
+                "battle_replay_performed",
+                "value_safe_reclassification_allowed_now",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_NEW_CUT_SOURCE_LANE_TRACE_COLLECTOR_TEST,
+            [
+                "test_target_usage_blocks_remaining_cut_and_ignores_opponent_event",
+                "test_decision_only_trace_requires_negative_review",
+                "Sunforger",
+                "Dark Ritual",
+                "Opponent",
+                "remaining_cut_used_by_target_trace_blocks_value_safe",
             ],
         )
     )
@@ -1924,6 +1969,25 @@ def build_audit() -> dict[str, Any]:
                 "Diabolic Intent",
                 "Ornithopter of Paradise",
                 "Jeska's Will",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_NEW_CUT_SOURCE_LANE_TRACE_COLLECTOR_REPORT,
+            [
+                "Global Commander New Cut Source Lane Trace Collector",
+                "new_cut_source_lane_trace_blocks_used_remaining_cuts",
+                "remaining_cut_source_count: `12`",
+                "usage_blocked_remaining_cut_count: `9`",
+                "seen_without_usage_count: `2`",
+                "not_seen_count: `1`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts",
+                "Sunforger",
+                "Smothering Tithe",
+                "Dark Ritual",
             ],
         )
     )

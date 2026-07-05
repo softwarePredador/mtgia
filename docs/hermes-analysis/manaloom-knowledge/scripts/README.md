@@ -89,6 +89,12 @@ Incidental role overlap from a payoff card is not same-lane proof; if no
 explicit route exists, candidate copy stays closed and the next gate is a new
 cut-source-lane evidence pass.
 
+Then run `global_commander_new_cut_source_lane_trace_collector.py` before
+starting any new replay. It reuses existing current-scope replay artifacts for
+the remaining stage-only cut pool, counts only target-deck traces, and keeps
+value-safe reclassification closed for cards that were used, merely seen without
+usage, or not seen in that replay window.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

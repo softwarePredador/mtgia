@@ -269,7 +269,12 @@ Operational priority after this pivot:
    same-lane replacement routes from the synthesized package, treat incidental
    role overlap as non-proof, and route to a new cut-source-lane evidence pass
    when no explicit replacement route exists;
-28. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+28. run `global_commander_new_cut_source_lane_trace_collector.py` after the
+   same-lane model routes to new cut-source-lane evidence; it must reuse
+   existing replay artifacts first, count only target-deck traces, and keep
+   value-safe reclassification closed for any remaining cut that was used,
+   merely seen without usage, or not seen in the current replay window;
+29. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -314,6 +319,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -674,6 +680,18 @@ Current external refresh on 2026-07-05:
   Therefore candidate copy, battle, promotion, and value-safe reclassification
   remain closed; the next gate is
   `collect_new_cut_source_lane_evidence_after_contextual_usage_block`.
+- Current new cut-source-lane trace collection reused the existing eight
+  current-scope replays before generating any new battle. The report
+  `global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  returns `new_cut_source_lane_trace_blocks_used_remaining_cuts` over the
+  remaining `12` stage-only cuts: `9` were used by the target deck, `2` were
+  seen only in decision trace, and `1` (`Dark Ritual`) was not seen. Used
+  remaining cuts include `Sunforger`, `Jeska's Will`, `Smothering Tithe`,
+  `Demonic Tutor`, `Enlightened Tutor`, `Arcane Signet`, `Mana Vault`,
+  `Sol Ring`, and `Birgi, God of Storytelling // Harnfel, Horn of Bounty`.
+  Therefore candidate copy, battle, promotion, and value-safe reclassification
+  remain closed; the next gate is
+  `force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts`.
 
 ## Global Commander Rollout - 2026-07-01
 
