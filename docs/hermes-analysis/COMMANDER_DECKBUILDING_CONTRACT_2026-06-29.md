@@ -1586,7 +1586,7 @@ Governed learning artifact audit generated on 2026-07-05:
 - Status: `pass`.
 - Scope: classify all current local `lorehold*.json` artifacts without deleting
   historical evidence or flattening schemas into one shape.
-- Current counts: `artifact_count=958`, `unknown_or_invalid_count=0`,
+- Current counts: `artifact_count=959`, `unknown_or_invalid_count=0`,
   `status_counts={"pass": 957, "warn": 1}`.
 - The single warning is the historical
   `lorehold_role_tag_repair_synthesis_20260704_applied.json`, which declares
@@ -1616,7 +1616,7 @@ Current-best baseline synthesis generated on 2026-07-05:
   `current_best_baseline_synthesis_keep_607`.
 - Scope: scan the governed Lorehold evidence surface for any still-active
   promotion, candidate materialization, natural-gate, or matrix-ready signal.
-- Current counts: `artifact_count=958`, `unknown_or_invalid_count=0`,
+- Current counts: `artifact_count=959`, `unknown_or_invalid_count=0`,
   `protected_baseline_rank=1`, `top_deck_is_607=true`,
   `current_positive_signal_count=0`,
   `overridden_historical_positive_signal_count=1`,
@@ -1650,7 +1650,7 @@ Next shell contract synthesis generated on 2026-07-05:
 - JSON:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_next_shell_contract_synthesis_20260705_current.json`.
 - Status:
-  `next_shell_contract_written_not_materializable_keep_607`.
+  `next_shell_cut_path_closed_route_miracle_access_first_keep_607`.
 - Scope: merge current-best baseline evidence, value model mana floors,
   Guttersnipe + Storm-Kiln hypothesis requirements, staple accessibility,
   sidecar safe-cut counts, floor-trace blockers, and artifact-contract status
@@ -1663,7 +1663,12 @@ Next shell contract synthesis generated on 2026-07-05:
   `34` lands, `15` ramp, and `49` land+ramp sources.
 - Current cut state:
   `available_named_seed_safe_cut_count=0`, `required_cut_count=2`,
-  and `cut_shortage=2`.
+  `cut_shortage=2`, `engine_cut_path_closed=true`,
+  `engine_cut_path_hard_stop_cut_count=94`, and
+  `engine_cut_path_target_lane_evidence_gap_count=0`.
+- Fallback route:
+  `miracle_access_first_shell_contract`, with
+  `structure_matrix_contract_allowed_now=true`.
 - Current gates:
   candidate deck materialization `false`, structure matrix `false`,
   natural battle gate `false`, deck action `false`, and promotion `false`.
@@ -1673,11 +1678,14 @@ Next shell contract synthesis generated on 2026-07-05:
 
 Operational lesson:
 
-- A next shell is materializable only after it has named seed-safe non-anchor
-  cuts and preserves the current 607 mana, topdeck, miracle, protection, and
-  fast-pressure floors.
+- The engine-preserving pressure/conversion shell is closed under current cut
+  evidence because all reviewed `607` cut slots remain hard-stopped or lack a
+  target-lane evidence gap.
+- The fallback learning route is the miracle/topdeck access-first structure
+  matrix contract. Pressure/conversion candidates such as `Guttersnipe` and
+  `Storm-Kiln Artist` must wait until that floor is preserved.
 - External legality, staple rank, Game Changer status, EDHREC popularity, or
   ownership can raise learning priority, but cannot authorize a protected-607
   deck change.
 - The next allowed work is:
-  `mine_two_named_seed_safe_nonanchor_cuts_for_engine_preserving_shell`.
+  `design_micro_shell_structure_matrix_contract_no_battle`.

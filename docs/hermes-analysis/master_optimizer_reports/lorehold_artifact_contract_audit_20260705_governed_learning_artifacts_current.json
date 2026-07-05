@@ -3646,7 +3646,7 @@
         ],
         "source_db_mutated": false,
         "summary": {
-          "artifact_count": 958,
+          "artifact_count": 959,
           "classification_counts": {
             "access_cut_model": 13,
             "action_critic": 1,
@@ -3723,6 +3723,7 @@
             "lorehold_miracle_next_route_planner": 1,
             "lorehold_miracle_trace_failure_miner": 1,
             "lorehold_named_same_lane_cut_frontier": 1,
+            "lorehold_next_shell_contract_synthesis": 1,
             "lorehold_payoff_finisher_recursion_synthesis": 1,
             "lorehold_post_identity_queue_split": 1,
             "lorehold_post_mana_base_learning_router": 1,
@@ -3795,7 +3796,7 @@
             "variant_staging": 10
           },
           "status_counts": {
-            "pass": 957,
+            "pass": 958,
             "warn": 1
           },
           "unknown_or_invalid_count": 0
@@ -6573,7 +6574,7 @@
         "summary": {
           "artifact_contract_equal_battle_gate_allowed": true,
           "artifact_contract_status": "pass",
-          "artifact_count": 958,
+          "artifact_count": 959,
           "current_positive_signal_count": 0,
           "decision_status": "current_best_baseline_synthesis_keep_607",
           "floor_trace_cut_blocker_count": 6,
@@ -28376,24 +28377,31 @@
       "canonical_summary": {
         "artifact_type": "lorehold_next_shell_contract_synthesis",
         "candidate_deck_materialization_allowed_now": false,
-        "decision_status": "next_shell_contract_written_not_materializable_keep_607",
+        "decision_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
         "deck_607_mutated": false,
         "learning_domain": "general_learning",
         "natural_battle_gate_allowed_now": false,
         "postgres_writes": false,
         "promotion_allowed_now": false,
         "source_db_mutated": false,
-        "status": "next_shell_contract_written_not_materializable_keep_607",
+        "status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
         "summary": {
           "artifact_contract_status": "pass",
-          "artifact_count": 958,
+          "artifact_count": 959,
           "available_named_seed_safe_cut_count": 0,
           "candidate_deck_materialization_allowed_now": false,
           "current_best_status": "current_best_baseline_synthesis_keep_607",
           "current_positive_signal_count": 0,
           "cut_shortage": 2,
-          "decision_status": "next_shell_contract_written_not_materializable_keep_607",
+          "decision_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
           "deck_action_allowed_now": false,
+          "engine_cut_path_closed": true,
+          "engine_cut_path_hard_stop_cut_count": 94,
+          "engine_cut_path_status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+          "engine_cut_path_target_lane_evidence_gap_count": 0,
+          "fallback_route_key": "miracle_access_first_shell_contract",
+          "fallback_route_status": "miracle_access_first_contract_written_no_battle_blocked_before_structure_matrix",
+          "fallback_structure_matrix_contract_allowed_now": true,
           "floor_trace_cut_blocker_count": 6,
           "land_quantity_floor": 34,
           "learning_only_staple_count": 2,
@@ -28402,7 +28410,7 @@
           "promotion_allowed_now": false,
           "protected_anchor_count": 8,
           "ramp_quantity_floor": 15,
-          "recommended_next_action": "mine_two_named_seed_safe_nonanchor_cuts_for_engine_preserving_shell",
+          "recommended_next_action": "design_micro_shell_structure_matrix_contract_no_battle",
           "required_cut_count": 2,
           "shell_key": "engine_preserving_pressure_conversion_shell_v1",
           "sidecar_matrix_candidate_row_eligible_count": 0,
@@ -48201,7 +48209,7 @@
     ],
     "status": "pass"
   },
-  "generated_at": "2026-07-05T08:42:54.226991+00:00",
+  "generated_at": "2026-07-05T08:51:59.554636+00:00",
   "postgres_writes": false,
   "source_db_mutated": false,
   "status": "pass",

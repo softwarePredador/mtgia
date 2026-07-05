@@ -8,15 +8,34 @@
     "natural_battle_allowed_now": false,
     "next_actions": [
       "do_not_mutate_deck_607",
-      "mine two named seed-safe non-anchor cuts for the engine-preserving pair",
+      "design_micro_shell_structure_matrix_contract_no_battle",
+      "do_not_test_pressure_conversion_until_miracle_topdeck_floor_contract_passes",
       "keep Mana Vault and The One Ring as learning-only until new same-lane trace exists",
       "re-run artifact and current-best synthesis after the shell contract is generated"
     ],
     "promotion_allowed": false,
-    "reason": "The next learnable shell is Guttersnipe plus Storm-Kiln Artist, but current evidence has zero named seed-safe cuts and generic staples remain learning-only. Deck 607 stays protected."
+    "reason": "The engine-preserving Guttersnipe plus Storm-Kiln shell has no current safe cut path, so the next learning route is the miracle/topdeck access-first contract before any pressure shell."
   },
   "deck_607_mutated": false,
   "evidence": {
+    "closing_router_summary": {
+      "avg_607_turn_advantage": 10.15,
+      "candidate_hypothesis_count": 3,
+      "closing_window_comparison_count": 13,
+      "cut_shortage": 2,
+      "decision_status": "closing_window_shell_target_selected_no_battle",
+      "from_scratch_can_run_next_battle_gate": false,
+      "from_scratch_promotable_shell_signal_count": 0,
+      "miracle_failure_flag_count": 7,
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "ready_micro_package_hypothesis_count": 3,
+      "recommended_next_action": "write_miracle_access_first_shell_contract_no_battle",
+      "selected_hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+      "selected_status": "primary_shell_contract_target_blocked_but_actionable_as_design"
+    },
     "current_best_summary": {
       "artifact_contract_equal_battle_gate_allowed": true,
       "artifact_contract_status": "pass",
@@ -58,6 +77,87 @@
         "Storm-Kiln Artist"
       ],
       "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair"
+    },
+    "engine_cut_miner_summary": {
+      "classification_counts": {
+        "closed_hard_stop_current_607": 94
+      },
+      "contract_status": "hypothesis_contract_written_blocked_no_named_safe_cuts",
+      "cross_lane_excluded_count": 0,
+      "cut_expansion_status": "pressure_cut_expansion_no_seed_safe_cut_keep_607",
+      "cut_shortage": 2,
+      "decision_status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+      "hard_stop_blocker_counts": {
+        "commander_never_cut": 1,
+        "cut_is_early_mana_floor_support": 14,
+        "cut_is_miracle_core_big_spell": 25,
+        "cut_is_protection_shell": 14,
+        "early_mana_floor_support": 18,
+        "mana_base_never_cut": 28,
+        "measured_high_cut_exposure": 34,
+        "miracle_or_finisher_core": 24,
+        "never_cut_lane": 29,
+        "never_cut_or_mana_base": 29,
+        "prior_rejected_cut": 37,
+        "prior_rejected_cut_slot": 24,
+        "prior_rejected_signature": 4,
+        "protected_cut": 22,
+        "protection_shell": 14,
+        "structural_dependency": 24
+      },
+      "hard_stop_cut_count": 94,
+      "lane_counts": {
+        "big_spell_value": 2,
+        "commander": 1,
+        "contextual": 1,
+        "draw": 6,
+        "early_mana": 18,
+        "graveyard_recursion": 1,
+        "hand_filter": 1,
+        "mana_base": 28,
+        "misc": 2,
+        "protection": 13,
+        "removal": 10,
+        "spell_velocity": 5,
+        "wincon": 6
+      },
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "recommended_next_action": "do_not_battle_mine_new_nonanchor_trace_or_new_shell_contract",
+      "router_route_status": "best_next_learning_route_contract_required_no_deck_action",
+      "target_adds": [
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "target_lane_evidence_gap_count": 0,
+      "target_required_cut_count": 2,
+      "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair",
+      "total_cut_slots_reviewed": 94
+    },
+    "miracle_access_contract_summary": {
+      "aggregate_blocker_count": 28,
+      "avg_607_turn_advantage": 10.15,
+      "closing_window_comparison_count": 13,
+      "contract_written": true,
+      "cut_shortage": 2,
+      "decision_status": "miracle_access_first_contract_written_no_battle_blocked_before_structure_matrix",
+      "deck_action_allowed_now": false,
+      "from_scratch_can_run_next_battle_gate": false,
+      "from_scratch_promotable_shell_signal_count": 0,
+      "miracle_failure_flag_count": 7,
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "preflight_candidate_count": 2,
+      "preflight_gate_ready_now_count": 0,
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "recommended_next_action": "design_micro_shell_structure_matrix_contract_no_battle",
+      "selected_contract_key": "miracle_access_first_shell_contract",
+      "selected_hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+      "structure_matrix_allowed_now": false,
+      "structure_matrix_contract_allowed_now": true
     },
     "sidecar_cut_planner_summary": {
       "attempted_package_cut_name_count": 7,
@@ -120,9 +220,18 @@
       "value_priority_ready_replacement_count": 0
     }
   },
-  "generated_at": "2026-07-05T08:43:13Z",
+  "generated_at": "2026-07-05T08:51:03Z",
   "postgres_writes": false,
   "shell_contract": {
+    "engine_cut_path_closure": {
+      "closed": true,
+      "decision_status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+      "hard_stop_cut_count": 94,
+      "named_seed_safe_cut_count": 0,
+      "recommended_next_action": "do_not_battle_mine_new_nonanchor_trace_or_new_shell_contract",
+      "target_lane_evidence_gap_count": 0,
+      "total_cut_slots_reviewed": 94
+    },
     "external_learning_snapshot": {
       "card_signals": [
         {
@@ -167,6 +276,88 @@
           "source": "EDHREC Lorehold optimized spellslinger",
           "url": "https://edhrec.com/average-decks/lorehold-the-historian/optimized/spellslinger"
         }
+      ]
+    },
+    "fallback_learning_route": {
+      "blocked_shortcuts": [
+        {
+          "reason": "Pressure packages such as Guttersnipe or Storm-Kiln cannot be tested as the next shell until miracle/topdeck floors are preserved.",
+          "shortcut_key": "pressure_conversion_blocked_until_miracle_floor"
+        },
+        {
+          "reason": "Forced access can prove visibility or use, but prior forced-access diagnostics still failed to convert into wins.",
+          "shortcut_key": "forced_access_not_promotion_evidence"
+        },
+        {
+          "reason": "Mana Vault, The One Ring, and similar staples stay hypotheses unless same-lane cut proof and equal battle evidence beat protected 607.",
+          "shortcut_key": "global_staple_not_cross_lane_cut_proof"
+        },
+        {
+          "reason": "The current from-scratch shell synthesis shows broad shells below 607 and requires a predeclared trace target before another shell.",
+          "shortcut_key": "broad_from_scratch_shell_blocked"
+        }
+      ],
+      "event_floor_requirements": [
+        {
+          "measurement": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "miracle_cast",
+          "requirement_key": "miracle_cast_floor"
+        },
+        {
+          "measurement": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "topdeck_manipulation_activated",
+          "requirement_key": "topdeck_manipulation_floor"
+        },
+        {
+          "measurement": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "lorehold_spell_cast",
+          "requirement_key": "lorehold_spell_volume_floor"
+        },
+        {
+          "measurement": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "lorehold_upkeep_rummage",
+          "requirement_key": "upkeep_rummage_floor"
+        },
+        {
+          "measurement": "no_regression_against_607_closing_window_trace",
+          "metric": "static_cost_reduction_total",
+          "requirement_key": "static_cost_reduction_floor"
+        },
+        {
+          "measurement": "no_missing_approach_conversion_in_candidate_closing_windows",
+          "metric": "approach_conversion",
+          "requirement_key": "approach_conversion_floor"
+        }
+      ],
+      "natural_battle_gate_allowed_now": false,
+      "protected_anchors": [
+        "Approach of the Second Sun",
+        "Bender's Waterskin",
+        "Creative Technique",
+        "Land Tax",
+        "Library of Leng",
+        "Lorehold, the Historian",
+        "Mizzix's Mastery",
+        "Molecule Man",
+        "Scroll Rack",
+        "Sensei's Divining Top",
+        "Storm Herd",
+        "The Mind Stone",
+        "The Scarlet Witch",
+        "Victory Chimes"
+      ],
+      "recommended_next_action": "design_micro_shell_structure_matrix_contract_no_battle",
+      "route_key": "miracle_access_first_shell_contract",
+      "route_status": "miracle_access_first_contract_written_no_battle_blocked_before_structure_matrix",
+      "selected_hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+      "structure_matrix_allowed_now": false,
+      "structure_matrix_contract_allowed_now": true,
+      "target_metrics": [
+        "miracle_cast",
+        "topdeck_manipulation_activated",
+        "lorehold_spell_cast",
+        "lorehold_upkeep_rummage",
+        "static_cost_reduction_total"
       ]
     },
     "lane_profile": {
@@ -321,14 +512,17 @@
   "source_db_mutated": false,
   "source_reports": {
     "artifact_audit": "docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260705_governed_learning_artifacts_current.json",
+    "closing_router": "docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_next_shell_target_router_20260705_current_relearn.json",
     "current_best": "docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_current.json",
+    "cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json",
     "engine_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_guttersnipe_storm_kiln_hypothesis_contract_20260705_current_relearn.json",
     "gap_floor_trace_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_gap_floor_trace_miner_20260705_current.json",
+    "miracle_access_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_shell_contract_20260705_current_relearn.json",
     "sidecar_cut_planner": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.json",
     "staple_accessibility": "docs/hermes-analysis/master_optimizer_reports/lorehold_staple_accessibility_freshness_audit_20260705_current.json",
     "value_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json"
   },
-  "status": "next_shell_contract_written_not_materializable_keep_607",
+  "status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
   "summary": {
     "artifact_contract_status": "pass",
     "artifact_count": 959,
@@ -337,8 +531,15 @@
     "current_best_status": "current_best_baseline_synthesis_keep_607",
     "current_positive_signal_count": 0,
     "cut_shortage": 2,
-    "decision_status": "next_shell_contract_written_not_materializable_keep_607",
+    "decision_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
     "deck_action_allowed_now": false,
+    "engine_cut_path_closed": true,
+    "engine_cut_path_hard_stop_cut_count": 94,
+    "engine_cut_path_status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+    "engine_cut_path_target_lane_evidence_gap_count": 0,
+    "fallback_route_key": "miracle_access_first_shell_contract",
+    "fallback_route_status": "miracle_access_first_contract_written_no_battle_blocked_before_structure_matrix",
+    "fallback_structure_matrix_contract_allowed_now": true,
     "floor_trace_cut_blocker_count": 6,
     "land_quantity_floor": 34,
     "learning_only_staple_count": 2,
@@ -347,7 +548,7 @@
     "promotion_allowed_now": false,
     "protected_anchor_count": 8,
     "ramp_quantity_floor": 15,
-    "recommended_next_action": "mine_two_named_seed_safe_nonanchor_cuts_for_engine_preserving_shell",
+    "recommended_next_action": "design_micro_shell_structure_matrix_contract_no_battle",
     "required_cut_count": 2,
     "shell_key": "engine_preserving_pressure_conversion_shell_v1",
     "sidecar_matrix_candidate_row_eligible_count": 0,

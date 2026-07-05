@@ -38,10 +38,20 @@ DEFAULT_GAP_FLOOR_TRACE_MINER = (
 DEFAULT_ARTIFACT_AUDIT = (
     REPORT_DIR / "lorehold_artifact_contract_audit_20260705_governed_learning_artifacts_current.json"
 )
+DEFAULT_CUT_MINER = (
+    REPORT_DIR / "lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json"
+)
+DEFAULT_CLOSING_ROUTER = (
+    REPORT_DIR / "lorehold_closing_window_next_shell_target_router_20260705_current_relearn.json"
+)
+DEFAULT_MIRACLE_ACCESS_CONTRACT = (
+    REPORT_DIR / "lorehold_miracle_access_first_shell_contract_20260705_current_relearn.json"
+)
 DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_next_shell_contract_synthesis_20260705_current"
 
 SHELL_KEY = "engine_preserving_pressure_conversion_shell_v1"
 TARGET_ROUTE_KEY = "guttersnipe_storm_kiln_engine_preserving_pair"
+FALLBACK_ROUTE_KEY = "miracle_access_first_shell_contract"
 PROTECTED_ANCHORS = [
     "Bender's Waterskin",
     "Victory Chimes",
@@ -294,6 +304,103 @@ def materialization_status(
     return ("next_shell_contract_written_not_materializable_keep_607", False, False)
 
 
+def cut_path_closure(cut_miner: Mapping[str, Any]) -> dict[str, Any]:
+    cut_summary = summary(cut_miner)
+    hard_stop_count = as_int(cut_summary.get("hard_stop_cut_count"))
+    named_cut_count = as_int(cut_summary.get("named_seed_safe_cut_count"))
+    target_gap_count = as_int(cut_summary.get("target_lane_evidence_gap_count"))
+    decision_status = str(cut_summary.get("decision_status") or cut_miner.get("status") or "")
+    closed = bool(
+        cut_miner
+        and named_cut_count == 0
+        and target_gap_count == 0
+        and hard_stop_count > 0
+        and decision_status == "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607"
+    )
+    return {
+        "closed": closed,
+        "decision_status": decision_status,
+        "named_seed_safe_cut_count": named_cut_count,
+        "target_lane_evidence_gap_count": target_gap_count,
+        "hard_stop_cut_count": hard_stop_count,
+        "total_cut_slots_reviewed": as_int(cut_summary.get("total_cut_slots_reviewed")),
+        "recommended_next_action": cut_summary.get("recommended_next_action") or "",
+    }
+
+
+def fallback_route(
+    *,
+    closing_router: Mapping[str, Any],
+    miracle_access_contract: Mapping[str, Any],
+) -> dict[str, Any]:
+    closing_summary = summary(closing_router)
+    miracle_summary = summary(miracle_access_contract)
+    contract = as_dict(miracle_access_contract.get("contract"))
+    contract_key = (
+        miracle_summary.get("selected_contract_key")
+        or contract.get("contract_key")
+        or closing_summary.get("selected_hypothesis_key")
+        or ""
+    )
+    if not closing_router and not miracle_access_contract:
+        return {}
+    return {
+        "route_key": contract_key,
+        "route_status": miracle_summary.get("decision_status")
+        or closing_summary.get("decision_status")
+        or "",
+        "selected_hypothesis_key": miracle_summary.get("selected_hypothesis_key")
+        or closing_summary.get("selected_hypothesis_key")
+        or "",
+        "recommended_next_action": miracle_summary.get("recommended_next_action")
+        or closing_summary.get("recommended_next_action")
+        or "",
+        "structure_matrix_contract_allowed_now": bool(
+            miracle_summary.get("structure_matrix_contract_allowed_now")
+        ),
+        "structure_matrix_allowed_now": bool(miracle_summary.get("structure_matrix_allowed_now")),
+        "natural_battle_gate_allowed_now": bool(
+            miracle_summary.get("natural_battle_gate_allowed_now")
+            or closing_summary.get("natural_battle_gate_allowed_now")
+        ),
+        "target_metrics": as_list(contract.get("target_metrics_from_router")),
+        "event_floor_requirements": as_list(contract.get("event_floor_requirements")),
+        "protected_anchors": as_list(contract.get("protected_anchors")),
+        "blocked_shortcuts": as_list(contract.get("blocked_shortcuts")),
+    }
+
+
+def final_next_action(
+    *,
+    validation: Sequence[str],
+    materialization_allowed: bool,
+    cut_closure: Mapping[str, Any],
+    fallback: Mapping[str, Any],
+) -> str:
+    if validation:
+        return "review_contract_errors_before_learning_execution"
+    if materialization_allowed:
+        return "run_structure_matrix_review_before_any_battle_gate"
+    if cut_closure.get("closed") and fallback.get("recommended_next_action"):
+        return str(fallback["recommended_next_action"])
+    return "mine_two_named_seed_safe_nonanchor_cuts_for_engine_preserving_shell"
+
+
+def final_status(
+    *,
+    status: str,
+    validation: Sequence[str],
+    materialization_allowed: bool,
+    cut_closure: Mapping[str, Any],
+    fallback: Mapping[str, Any],
+) -> str:
+    if validation or materialization_allowed:
+        return status
+    if cut_closure.get("closed") and fallback:
+        return "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
+    return status
+
+
 def build_report(
     *,
     current_best: Mapping[str, Any],
@@ -303,6 +410,9 @@ def build_report(
     sidecar_cut_planner: Mapping[str, Any],
     gap_floor_trace_miner: Mapping[str, Any],
     artifact_audit: Mapping[str, Any],
+    cut_miner: Mapping[str, Any],
+    closing_router: Mapping[str, Any],
+    miracle_access_contract: Mapping[str, Any],
     paths: Mapping[str, Path],
 ) -> dict[str, Any]:
     current_summary = summary(current_best)
@@ -320,6 +430,24 @@ def build_report(
     status, materialization_allowed, deck_action_allowed = materialization_status(
         validation=validation,
         engine_contract=engine_contract,
+    )
+    cut_closure = cut_path_closure(cut_miner)
+    fallback = fallback_route(
+        closing_router=closing_router,
+        miracle_access_contract=miracle_access_contract,
+    )
+    status = final_status(
+        status=status,
+        validation=validation,
+        materialization_allowed=materialization_allowed,
+        cut_closure=cut_closure,
+        fallback=fallback,
+    )
+    recommended_next_action = final_next_action(
+        validation=validation,
+        materialization_allowed=materialization_allowed,
+        cut_closure=cut_closure,
+        fallback=fallback,
     )
     mana_floor = value_mana_floor(value_model)
     core = protected_core(sidecar_cut_planner, gap_floor_trace_miner)
@@ -361,6 +489,17 @@ def build_report(
             "sidecar_matrix_candidate_row_eligible_count": as_int(
                 planner_summary.get("matrix_candidate_row_eligible_count")
             ),
+            "engine_cut_path_closed": bool(cut_closure.get("closed")),
+            "engine_cut_path_status": cut_closure.get("decision_status") or "",
+            "engine_cut_path_hard_stop_cut_count": as_int(cut_closure.get("hard_stop_cut_count")),
+            "engine_cut_path_target_lane_evidence_gap_count": as_int(
+                cut_closure.get("target_lane_evidence_gap_count")
+            ),
+            "fallback_route_key": fallback.get("route_key") or "",
+            "fallback_route_status": fallback.get("route_status") or "",
+            "fallback_structure_matrix_contract_allowed_now": bool(
+                fallback.get("structure_matrix_contract_allowed_now")
+            ),
             "candidate_deck_materialization_allowed_now": materialization_allowed,
             "structure_matrix_allowed_now": bool(engine_summary.get("structure_matrix_allowed_now"))
             and materialization_allowed,
@@ -368,13 +507,7 @@ def build_report(
             "deck_action_allowed_now": deck_action_allowed,
             "promotion_allowed_now": False,
             "validation_error_count": len(validation),
-            "recommended_next_action": (
-                "mine_two_named_seed_safe_nonanchor_cuts_for_engine_preserving_shell"
-                if not validation and not materialization_allowed
-                else "run_structure_matrix_review_before_any_battle_gate"
-                if materialization_allowed
-                else "review_contract_errors_before_learning_execution"
-            ),
+            "recommended_next_action": recommended_next_action,
         },
         "shell_contract": {
             "shell_key": SHELL_KEY,
@@ -390,6 +523,8 @@ def build_report(
             "protected_core": core,
             "learning_only_staples": staple_rows,
             "external_learning_snapshot": EXTERNAL_LEARNING_SNAPSHOT,
+            "engine_cut_path_closure": cut_closure,
+            "fallback_learning_route": fallback,
             "materialization_requirements": [
                 "find_two_named_seed_safe_nonanchor_cuts",
                 "do_not_cut_floor_trace_blockers_or_protected_anchors_as_generic_slots",
@@ -404,6 +539,9 @@ def build_report(
         "evidence": {
             "current_best_summary": current_summary,
             "engine_contract_summary": engine_summary,
+            "engine_cut_miner_summary": summary(cut_miner),
+            "closing_router_summary": summary(closing_router),
+            "miracle_access_contract_summary": summary(miracle_access_contract),
             "sidecar_cut_planner_summary": planner_summary,
             "staple_accessibility_summary": summary(staple_accessibility),
         },
@@ -414,6 +552,12 @@ def build_report(
             "natural_battle_allowed_now": False,
             "promotion_allowed": False,
             "reason": (
+                "The engine-preserving Guttersnipe plus Storm-Kiln shell has no "
+                "current safe cut path, so the next learning route is the "
+                "miracle/topdeck access-first contract before any pressure shell."
+            )
+            if not validation and not materialization_allowed and cut_closure.get("closed") and fallback
+            else (
                 "The next learnable shell is Guttersnipe plus Storm-Kiln Artist, but "
                 "current evidence has zero named seed-safe cuts and generic staples "
                 "remain learning-only. Deck 607 stays protected."
@@ -424,7 +568,8 @@ def build_report(
             else "One or more upstream contracts failed; review before any learning execution.",
             "next_actions": [
                 "do_not_mutate_deck_607",
-                "mine two named seed-safe non-anchor cuts for the engine-preserving pair",
+                recommended_next_action,
+                "do_not_test_pressure_conversion_until_miracle_topdeck_floor_contract_passes",
                 "keep Mana Vault and The One Ring as learning-only until new same-lane trace exists",
                 "re-run artifact and current-best synthesis after the shell contract is generated",
             ],
@@ -456,6 +601,8 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"`{summary_row.get('mana_sources_land_plus_ramp_floor')}` land+ramp sources",
         f"- Available named seed-safe cuts: `{summary_row.get('available_named_seed_safe_cut_count')}`",
         f"- Cut shortage: `{summary_row.get('cut_shortage')}`",
+        f"- Engine cut path closed: `{str(summary_row.get('engine_cut_path_closed')).lower()}`",
+        f"- Fallback route: `{summary_row.get('fallback_route_key') or '-'}`",
         f"- Candidate deck materialization allowed now: "
         f"`{str(summary_row.get('candidate_deck_materialization_allowed_now')).lower()}`",
         f"- Natural battle gate allowed now: "
@@ -492,6 +639,26 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
             f"owned `{str(row.get('owned')).lower()}`, readiness `{row.get('readiness_status')}`, "
             f"promotion `{row.get('promotion_decision')}`"
         )
+    cut_closure = as_dict(contract.get("engine_cut_path_closure"))
+    fallback = as_dict(contract.get("fallback_learning_route"))
+    lines.extend(["", "## Cut Path Closure", ""])
+    lines.append(f"- Closed: `{str(cut_closure.get('closed')).lower()}`")
+    lines.append(f"- Status: `{cut_closure.get('decision_status') or '-'}`")
+    lines.append(f"- Hard-stop cuts: `{cut_closure.get('hard_stop_cut_count') or 0}`")
+    lines.append(
+        f"- Target-lane evidence gaps: `{cut_closure.get('target_lane_evidence_gap_count') or 0}`"
+    )
+    lines.extend(["", "## Fallback Learning Route", ""])
+    if fallback:
+        lines.append(f"- Route: `{fallback.get('route_key') or '-'}`")
+        lines.append(f"- Status: `{fallback.get('route_status') or '-'}`")
+        lines.append(
+            f"- Structure-matrix contract allowed now: "
+            f"`{str(fallback.get('structure_matrix_contract_allowed_now')).lower()}`"
+        )
+        lines.append(f"- Selected hypothesis: `{fallback.get('selected_hypothesis_key') or '-'}`")
+    else:
+        lines.append("- none")
     lines.extend(["", "## Materialization Requirements", ""])
     for item in as_list(contract.get("materialization_requirements")):
         lines.append(f"- `{item}`")
@@ -541,6 +708,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sidecar-cut-planner", type=Path, default=DEFAULT_SIDECAR_CUT_PLANNER)
     parser.add_argument("--gap-floor-trace-miner", type=Path, default=DEFAULT_GAP_FLOOR_TRACE_MINER)
     parser.add_argument("--artifact-audit", type=Path, default=DEFAULT_ARTIFACT_AUDIT)
+    parser.add_argument("--cut-miner", type=Path, default=DEFAULT_CUT_MINER)
+    parser.add_argument("--closing-router", type=Path, default=DEFAULT_CLOSING_ROUTER)
+    parser.add_argument("--miracle-access-contract", type=Path, default=DEFAULT_MIRACLE_ACCESS_CONTRACT)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     return parser.parse_args()
 
@@ -549,9 +719,12 @@ def main() -> int:
     args = parse_args()
     paths = {
         "artifact_audit": args.artifact_audit,
+        "closing_router": args.closing_router,
         "current_best": args.current_best,
+        "cut_miner": args.cut_miner,
         "engine_contract": args.engine_contract,
         "gap_floor_trace_miner": args.gap_floor_trace_miner,
+        "miracle_access_contract": args.miracle_access_contract,
         "sidecar_cut_planner": args.sidecar_cut_planner,
         "staple_accessibility": args.staple_accessibility,
         "value_model": args.value_model,
@@ -564,6 +737,9 @@ def main() -> int:
         sidecar_cut_planner=read_json(args.sidecar_cut_planner),
         gap_floor_trace_miner=read_json(args.gap_floor_trace_miner),
         artifact_audit=read_json(args.artifact_audit),
+        cut_miner=read_json(args.cut_miner),
+        closing_router=read_json(args.closing_router),
+        miracle_access_contract=read_json(args.miracle_access_contract),
         paths=paths,
     )
     json_path, md_path = write_outputs(payload, args.out_prefix)

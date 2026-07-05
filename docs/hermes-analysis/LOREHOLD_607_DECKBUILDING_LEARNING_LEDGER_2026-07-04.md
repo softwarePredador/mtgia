@@ -3454,13 +3454,18 @@ sidecar cut planning, floor-trace blockers, and the governed artifact audit:
 
 Current result:
 
-- status: `next_shell_contract_written_not_materializable_keep_607`;
+- status: `next_shell_cut_path_closed_route_miracle_access_first_keep_607`;
 - shell key: `engine_preserving_pressure_conversion_shell_v1`;
 - target route: `guttersnipe_storm_kiln_engine_preserving_pair`;
 - target adds: `Guttersnipe` and `Storm-Kiln Artist`;
 - mana floor: `34` lands, `15` ramp, and `49` land+ramp sources;
 - available named seed-safe cuts: `0`;
 - cut shortage: `2`;
+- engine cut path closed: `true`;
+- hard-stop cut slots reviewed by the engine-preserving cut miner: `94`;
+- target-lane evidence gaps: `0`;
+- fallback route: `miracle_access_first_shell_contract`;
+- structure-matrix contract allowed by fallback route: `true`;
 - sidecar safe-cut ready count: `0`;
 - sidecar matrix-eligible rows: `0`;
 - candidate deck materialization: `false`;
@@ -3478,11 +3483,17 @@ Learning-only staple clarification:
 
 Deckbuilding lesson:
 
-- The next learnable shell is not a new deck yet. It is a pre-materialization
-  contract that requires two named seed-safe non-anchor cuts before any
-  structure matrix or battle gate.
+- The engine-preserving pressure/conversion shell is not a new deck yet. The
+  current cut miner closes that path because every reviewed `607` cut slot has
+  a hard-stop blocker or no target-lane evidence gap.
+- The next learning route is therefore the miracle/topdeck access-first
+  contract, with next action:
+  `design_micro_shell_structure_matrix_contract_no_battle`.
 - External popularity, legality, Game Changer status, or ownership cannot
   replace cut proof. They only decide what the model should learn about next.
+- `Guttersnipe` and `Storm-Kiln Artist` remain learning candidates, but
+  pressure/conversion tests must wait until the miracle/topdeck floor route
+  preserves the current `607` engine.
 - Protected anchors and floor-trace blockers cannot be used as generic cuts:
   `Bender's Waterskin`, `Victory Chimes`, `Molecule Man`,
   `The Scarlet Witch`, `The Mind Stone`, `Insurrection`, `Storm Herd`,

@@ -1,27 +1,32 @@
 # Lorehold Next Shell Contract Synthesis
 
-- Generated at: `2026-07-05T08:43:13Z`
+- Generated at: `2026-07-05T08:51:03Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
-- Status: `next_shell_contract_written_not_materializable_keep_607`
+- Status: `next_shell_cut_path_closed_route_miracle_access_first_keep_607`
 - Shell key: `engine_preserving_pressure_conversion_shell_v1`
 - Target route: `guttersnipe_storm_kiln_engine_preserving_pair`
 - Target adds: `Guttersnipe, Storm-Kiln Artist`
 - Mana floor: `34` lands, `15` ramp, `49` land+ramp sources
 - Available named seed-safe cuts: `0`
 - Cut shortage: `2`
+- Engine cut path closed: `true`
+- Fallback route: `miracle_access_first_shell_contract`
 - Candidate deck materialization allowed now: `false`
 - Natural battle gate allowed now: `false`
 - Promotion allowed now: `false`
-- Recommended next action: `mine_two_named_seed_safe_nonanchor_cuts_for_engine_preserving_shell`
+- Recommended next action: `design_micro_shell_structure_matrix_contract_no_battle`
 
 ## Source Reports
 
 - `artifact_audit`: `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260705_governed_learning_artifacts_current.json`
+- `closing_router`: `docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_next_shell_target_router_20260705_current_relearn.json`
 - `current_best`: `docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_current.json`
+- `cut_miner`: `docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json`
 - `engine_contract`: `docs/hermes-analysis/master_optimizer_reports/lorehold_guttersnipe_storm_kiln_hypothesis_contract_20260705_current_relearn.json`
 - `gap_floor_trace_miner`: `docs/hermes-analysis/master_optimizer_reports/lorehold_gap_floor_trace_miner_20260705_current.json`
+- `miracle_access_contract`: `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_shell_contract_20260705_current_relearn.json`
 - `sidecar_cut_planner`: `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.json`
 - `staple_accessibility`: `docs/hermes-analysis/master_optimizer_reports/lorehold_staple_accessibility_freshness_audit_20260705_current.json`
 - `value_model`: `docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json`
@@ -40,6 +45,20 @@
 
 - `Mana Vault`: `rules_accessible_collection_missing_promotion_blocked`, owned `false`, readiness `blocked_prior_reject`, promotion `blocked_prior_gate_rejected`
 - `The One Ring`: `rules_collection_accessible_promotion_blocked`, owned `true`, readiness `blocked_prior_reject`, promotion `blocked_existing_package_rejected`
+
+## Cut Path Closure
+
+- Closed: `true`
+- Status: `no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607`
+- Hard-stop cuts: `94`
+- Target-lane evidence gaps: `0`
+
+## Fallback Learning Route
+
+- Route: `miracle_access_first_shell_contract`
+- Status: `miracle_access_first_contract_written_no_battle_blocked_before_structure_matrix`
+- Structure-matrix contract allowed now: `true`
+- Selected hypothesis: `preserve_topdeck_miracle_floor_micro_package`
 
 ## Materialization Requirements
 
@@ -64,7 +83,7 @@
 - deck_action_allowed: `false`
 - candidate_deck_materialization_allowed_now: `false`
 - promotion_allowed: `false`
-- reason: The next learnable shell is Guttersnipe plus Storm-Kiln Artist, but current evidence has zero named seed-safe cuts and generic staples remain learning-only. Deck 607 stays protected.
+- reason: The engine-preserving Guttersnipe plus Storm-Kiln shell has no current safe cut path, so the next learning route is the miracle/topdeck access-first contract before any pressure shell.
 
 ## Validation
 
