@@ -10303,6 +10303,62 @@ new server:
   `xmage_fixed_draw_spell_self_cost_reduction`, and
   `xmage_static_cast_spells_as_flash_permission` with `7` cards each.
 
+## 2026-07-05 PG461 Fixed Damage Scry Closure
+
+- Closed the exact XMage fixed-damage-then-scry spell family as ManaLoom scope
+  `xmage_fixed_damage_target_and_scry_spell_v1`.
+- The selected package accepted local XMage instant-or-sorcery sources whose
+  executable behavior is a fixed `DamageTargetEffect` followed by fixed
+  `ScryEffect`, preserving damage amount, target type, target constraints,
+  timing, and damage-then-scry resolution order.
+- The batch covers `8` cards: Bolt of Keranos, Fateful End, Jaya's Firenado,
+  Jaya's Greeting, Lightning Javelin, Magma Jet, Piercing Light, and
+  Spark Jolt.
+- Focused mapper/runtime tests covered damage+scry mapping and runtime
+  resolution; PG461 performed no code mutation. The focused test lane passed
+  `718` checks.
+- The PostgreSQL package promoted `8` cards. Precheck found `8` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `8/8` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `8` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve damage amount,
+  target family, target constraints, scry count, timing, and
+  `damage_then_scry` resolution. The selected parameters are:
+  Bolt of Keranos `3 damage any_target scry 1 sorcery`, Fateful End
+  `3 damage any_target scry 1 instant`, Jaya's Firenado
+  `5 damage creature_or_planeswalker scry 1 sorcery`, Jaya's Greeting
+  `3 damage creature scry 1 instant`, Lightning Javelin
+  `3 damage any_target scry 1 sorcery`, Magma Jet
+  `2 damage any_target scry 2 instant`, Piercing Light
+  `2 damage attacking_or_blocking creature scry 1 instant`, and Spark Jolt
+  `1 damage any_target scry 1 instant`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4453` PostgreSQL runtime rows, wrote `4445` SQLite runtime
+  rows, and exported `4420` canonical fallback rows.
+- PG461 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `8` selected cards. Generic
+  battle scenario count remained `0`; damage+scry behavior remains covered by
+  focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26433`, `xmage_authoritative_source_count=26119`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26119`. This is an exact
+  reduction of `8` from the post-PG460 queue.
+- The post-PG461 exact split recheck reports `proposal_count=94` and
+  `safe_for_batch_pg_package_count=94`. The largest remaining exact family is
+  `xmage_static_self_protection_from_subtypes_creature` with `8` cards,
+  followed by `xmage_creature_dies_gain_life`,
+  `xmage_fixed_draw_spell_self_cost_reduction`, and
+  `xmage_static_cast_spells_as_flash_permission` with `7` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
