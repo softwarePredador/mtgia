@@ -1,0 +1,194 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg464",
+  "generated_at": "2026-07-05T01:19:39.598924+00:00",
+  "manifest": "../../master_optimizer_reports/pg464_xmage_fixed_draw_self_cost_reduction_new_server_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg464_xmage_fixed_draw_self_cost_reduction_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Distorted Curiosity",
+      "Draconic Lore",
+      "Into the Story",
+      "Of One Mind",
+      "Pearl of Wisdom",
+      "Scour the Laboratory",
+      "Winged Words"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 7,
+    "promoted_rule_rows": 7,
+    "promoted_verified_auto_rows": 7,
+    "row_count": 7
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Distorted Curiosity",
+      "logical_rule_key": "battle_rule_v1:72bb59188e2df380602ed08f4ee5b827",
+      "normalized_name": "distorted curiosity",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Draconic Lore",
+      "logical_rule_key": "battle_rule_v1:551a3b4152b9cd2bca57277a77c3badf",
+      "normalized_name": "draconic lore",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Into the Story",
+      "logical_rule_key": "battle_rule_v1:7b86830fddab9090f6dba403cd83f0cc",
+      "normalized_name": "into the story",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Of One Mind",
+      "logical_rule_key": "battle_rule_v1:3ed1545be6ac150e060339d3f48b6046",
+      "normalized_name": "of one mind",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Pearl of Wisdom",
+      "logical_rule_key": "battle_rule_v1:849932e4bd730d18b792e48b51206cac",
+      "normalized_name": "pearl of wisdom",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Scour the Laboratory",
+      "logical_rule_key": "battle_rule_v1:f8a458643963c242d23d2ca55cded5cb",
+      "normalized_name": "scour the laboratory",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Winged Words",
+      "logical_rule_key": "battle_rule_v1:1b0b5f6d4f1ab34821f2b3b326e6c684",
+      "normalized_name": "winged words",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Distorted Curiosity",
+      "Draconic Lore",
+      "Into the Story",
+      "Of One Mind",
+      "Pearl of Wisdom",
+      "Scour the Laboratory",
+      "Winged Words"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 7,
+    "total_target_card_rows": 7,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "adaf2083-5e8e-4fab-b4cb-e1dd2d91770c",
+      "card_name": "Distorted Curiosity",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:72bb59188e2df380602ed08f4ee5b827",
+      "normalized_name": "distorted curiosity",
+      "oracle_hash": "96125603ad98c8ef33157389b9d59b62",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "244f2ef0-fdca-4299-aa5f-63619327e7b4",
+      "card_name": "Draconic Lore",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:551a3b4152b9cd2bca57277a77c3badf",
+      "normalized_name": "draconic lore",
+      "oracle_hash": "d784b8e5790077cba8973240f5308d82",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "0c270a24-3f0e-4f29-8418-2f6feca76531",
+      "card_name": "Into the Story",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:7b86830fddab9090f6dba403cd83f0cc",
+      "normalized_name": "into the story",
+      "oracle_hash": "787c2d6c52861f77978fd3b030799117",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "49246199-e1aa-41f6-bf57-fdaa2b6710e9",
+      "card_name": "Of One Mind",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3ed1545be6ac150e060339d3f48b6046",
+      "normalized_name": "of one mind",
+      "oracle_hash": "bb572f4c4e508141df09f5da47bfbf80",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "1adda9ca-f8fb-4c1b-b160-898bdcbe7de8",
+      "card_name": "Pearl of Wisdom",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:849932e4bd730d18b792e48b51206cac",
+      "normalized_name": "pearl of wisdom",
+      "oracle_hash": "37e7cbe4070b00405cdfa36e31691483",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "05fd980d-0b6d-49dc-bfdf-c0678ae3cb81",
+      "card_name": "Scour the Laboratory",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:f8a458643963c242d23d2ca55cded5cb",
+      "normalized_name": "scour the laboratory",
+      "oracle_hash": "a9dc24ac34e23e7ee0c1b9715a510dc0",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "c4372cdd-7eb3-41ca-b7d7-d66eb04835e2",
+      "card_name": "Winged Words",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:1b0b5f6d4f1ab34821f2b3b326e6c684",
+      "normalized_name": "winged words",
+      "oracle_hash": "8f9b430fe2bee3d386c04f85799806a5",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_fixed_draw_self_cost_reduction_new_server"
+}

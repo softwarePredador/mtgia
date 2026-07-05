@@ -22201,6 +22201,30 @@
     "battle_rule_logical_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
     "battle_rule_oracle_hash": "e58ab45fafef354ecc2a21276ec922f3"
   },
+  "Distorted Curiosity": {
+    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+    "cost_reduction_amount_source": "fixed",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_condition": "opponent_poison_counters_at_least",
+    "cost_reduction_generic": 2,
+    "cost_reduction_opponent_poison_counters_min": 3,
+    "count": 2,
+    "draw_count": 2,
+    "effect": "draw_cards",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "SpellCostReductionSourceEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:72bb59188e2df380602ed08f4ee5b827",
+    "battle_rule_oracle_hash": "96125603ad98c8ef33157389b9d59b62"
+  },
   "Dive Bomber": {
     "_activated_rule_effects": [
       {
@@ -22933,6 +22957,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:cc6472595f2f60ee860c1ff9bee7a766",
     "battle_rule_oracle_hash": "14c3b256b0931e55d61cbff122cfcf8b"
+  },
+  "Draconic Lore": {
+    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+    "cost_reduction_amount_source": "fixed",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_condition": "control_subtype",
+    "cost_reduction_generic": 2,
+    "cost_reduction_required_subtype": "dragon",
+    "count": 3,
+    "draw_count": 3,
+    "effect": "draw_cards",
+    "instant": true,
+    "sorcery": false,
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "SpellCostReductionSourceEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:551a3b4152b9cd2bca57277a77c3badf",
+    "battle_rule_oracle_hash": "d784b8e5790077cba8973240f5308d82"
   },
   "Drag Down": {
     "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
@@ -42636,6 +42684,30 @@
     "battle_rule_logical_key": "battle_rule_v1:643cb2ee6b30c8f266da6e0404dae862",
     "battle_rule_oracle_hash": "bc846fd3be2dcc0f1289cb69136332a9"
   },
+  "Into the Story": {
+    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+    "cost_reduction_amount_source": "fixed",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_condition": "opponent_graveyard_cards_at_least",
+    "cost_reduction_generic": 3,
+    "cost_reduction_opponent_graveyard_cards_min": 7,
+    "count": 4,
+    "draw_count": 4,
+    "effect": "draw_cards",
+    "instant": true,
+    "sorcery": false,
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "SpellCostReductionSourceEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7b86830fddab9090f6dba403cd83f0cc",
+    "battle_rule_oracle_hash": "787c2d6c52861f77978fd3b030799117"
+  },
   "Introduction to Prophecy": {
     "_composite_rule_components": [
       {
@@ -56885,6 +56957,29 @@
     "battle_rule_logical_key": "battle_rule_v1:baf5208731a47caf902b797a4015f6c1",
     "battle_rule_oracle_hash": "6b50ed9a786cc4c6a67a39958cde14d5"
   },
+  "Of One Mind": {
+    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+    "cost_reduction_amount_source": "fixed",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_condition": "control_human_and_nonhuman_creature",
+    "cost_reduction_generic": 2,
+    "count": 2,
+    "draw_count": 2,
+    "effect": "draw_cards",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "SpellCostReductionSourceEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3ed1545be6ac150e060339d3f48b6046",
+    "battle_rule_oracle_hash": "bb572f4c4e508141df09f5da47bfbf80"
+  },
   "Ogre Arsonist": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
@@ -58888,6 +58983,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0d857d5b176cc91065a4754f5824ebf2",
     "battle_rule_oracle_hash": "77f7f449ee56143d6b63814fecd37176"
+  },
+  "Pearl of Wisdom": {
+    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+    "cost_reduction_amount_source": "fixed",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_condition": "control_subtype",
+    "cost_reduction_generic": 1,
+    "cost_reduction_required_subtype": "otter",
+    "count": 2,
+    "draw_count": 2,
+    "effect": "draw_cards",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "SpellCostReductionSourceEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:849932e4bd730d18b792e48b51206cac",
+    "battle_rule_oracle_hash": "37e7cbe4070b00405cdfa36e31691483"
   },
   "Peat Bog": {
     "effect": "land",
@@ -71978,6 +72097,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:65a0a297fa7e8450d12dfb9250ad210f",
     "battle_rule_oracle_hash": "0ecf4b83ecfce8cdbbea224f13dccf73"
+  },
+  "Scour the Laboratory": {
+    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+    "cost_reduction_amount_source": "fixed",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_condition": "delirium",
+    "cost_reduction_generic": 2,
+    "cost_reduction_graveyard_card_types_min": 4,
+    "count": 3,
+    "draw_count": 3,
+    "effect": "draw_cards",
+    "instant": true,
+    "sorcery": false,
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "SpellCostReductionSourceEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f8a458643963c242d23d2ca55cded5cb",
+    "battle_rule_oracle_hash": "a9dc24ac34e23e7ee0c1b9715a510dc0"
   },
   "Scoured Barrens": {
     "effect": "land",
@@ -96592,6 +96735,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:37e6267e75385fb0731d4c0d47d837cd",
     "battle_rule_oracle_hash": "f21d37b6afa22fd94ad97e027e4340b0"
+  },
+  "Winged Words": {
+    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1",
+    "cost_reduction_amount_source": "fixed",
+    "cost_reduction_applies_to": "this_spell",
+    "cost_reduction_condition": "control_creature_with_keyword",
+    "cost_reduction_generic": 1,
+    "cost_reduction_required_keyword": "flying",
+    "count": 2,
+    "draw_count": 2,
+    "effect": "draw_cards",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "SpellCostReductionSourceEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1b0b5f6d4f1ab34821f2b3b326e6c684",
+    "battle_rule_oracle_hash": "8f9b430fe2bee3d386c04f85799806a5"
   },
   "Winter's Grasp": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",

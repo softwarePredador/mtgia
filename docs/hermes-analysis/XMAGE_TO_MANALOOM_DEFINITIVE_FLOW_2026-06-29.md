@@ -10463,6 +10463,64 @@ new server:
   by `xmage_counter_target_draw_card_spell` and
   `xmage_creature_etb_library_search_to_battlefield` with `6` cards each.
 
+## 2026-07-05 PG464 Fixed Draw Self Cost Reduction Closure
+
+- Closed the exact XMage fixed source-controller draw spell family with
+  self-only cost-reduction conditions as ManaLoom scope
+  `xmage_fixed_source_controller_draw_spell_self_cost_reduction_v1`.
+- The selected package accepted local XMage instant-or-sorcery sources whose
+  executable behavior is fixed `DrawCardSourceControllerEffect` plus fixed
+  `SpellCostReductionSourceEffect`, preserving draw count, timing,
+  cost-reduction amount, and the exact condition that reduces only the spell
+  itself.
+- The batch covers `7` cards: Distorted Curiosity, Draconic Lore,
+  Into the Story, Of One Mind, Pearl of Wisdom, Scour the Laboratory, and
+  Winged Words.
+- Focused mapper/runtime tests covered fixed draw spell extraction, self
+  cost-reduction condition preservation, runtime lookup, and package
+  generation; PG464 performed no code mutation. The focused test lane passed
+  `718` checks.
+- The PostgreSQL package promoted `7` cards. Precheck found `7` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `7/7` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `7` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve `draw_count`,
+  `cost_reduction_generic`, `cost_reduction_condition`, and timing. The
+  selected parameters are: Distorted Curiosity `draw 2, reduce 2 if opponent
+  has at least 3 poison counters, sorcery`; Draconic Lore `draw 3, reduce 2 if
+  you control a Dragon, instant`; Into the Story `draw 4, reduce 3 if an
+  opponent has at least 7 cards in graveyard, instant`; Of One Mind
+  `draw 2, reduce 2 if you control a Human and a non-Human creature, sorcery`;
+  Pearl of Wisdom `draw 2, reduce 1 if you control an Otter, sorcery`;
+  Scour the Laboratory `draw 3, reduce 2 with delirium, instant`; and
+  Winged Words `draw 2, reduce 1 if you control a creature with flying,
+  sorcery`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4475` PostgreSQL runtime rows, wrote `4467` SQLite runtime
+  rows, and exported `4442` canonical fallback rows.
+- PG464 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `7` selected cards. Generic
+  battle scenario count remained `0`; fixed draw/cost-reduction behavior
+  remains covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26411`, `xmage_authoritative_source_count=26097`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26097`. This is an exact
+  reduction of `7` from the post-PG463 queue.
+- The post-PG464 exact split recheck reports `proposal_count=72` and
+  `safe_for_batch_pg_package_count=72`. The largest remaining exact family is
+  `xmage_static_cast_spells_as_flash_permission` with `7` cards, followed by
+  `xmage_counter_target_draw_card_spell` and
+  `xmage_creature_etb_library_search_to_battlefield` with `6` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
