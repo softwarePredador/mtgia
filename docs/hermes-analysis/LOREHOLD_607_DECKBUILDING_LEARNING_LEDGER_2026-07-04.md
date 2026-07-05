@@ -2698,3 +2698,61 @@ Operational lesson:
   100-card materialization.
 - A sidecar shell may learn aggressively, but it cannot mutate or replace
   `607` until it preserves the protected anchors and wins the same-seed gate.
+
+## Topdeck Sidecar Candidate Queue - 2026-07-05
+
+The current sidecar candidate queue artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_candidate_queue_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_candidate_queue_20260705_current.json`
+
+This queue consumes:
+
+- `lorehold_topdeck_post_safe_cut_route_20260705_current`;
+- `lorehold_hypothesis_queue_from_value_model_20260705_current_relearn`;
+- `lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn`;
+- `lorehold_topdeck_safe_cut_miner_20260705_current`;
+- `lorehold_deckbuilding_value_model_20260704_current`.
+
+Current result:
+
+- status:
+  `topdeck_sidecar_candidate_queue_blocked_no_matrix_rows_keep_607`;
+- queue rows reviewed: `40`;
+- matrix-candidate rows eligible now: `0`;
+- candidate deck materialization allowed now: `false`;
+- forced access allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- readiness counts:
+  `31` rows need a safe-cut model and `9` rows are blocked by prior reject;
+- tag counts:
+  `5` topdeck primary rows, `7` mana-base rows, `5` pressure-window rows,
+  `8` spell-chain rows, `3` tutor rows, `2` generic-staple rows, and `10`
+  sidecar watchlist rows;
+- recommended next action:
+  `build_named_same_lane_cut_models_for_topdeck_and_mana_rows_before_matrix_scoring`.
+
+Priority queue learned from the current model:
+
+- mana-base safe-cut lane: `Plateau`, `Clifftop Retreat`,
+  `Boseiju, Who Shelters All`, `Rugged Prairie`, `Sundown Pass`,
+  `Boros Garrison`, and `Cavern of Souls`;
+- topdeck-access primary lane: `Dragon's Rage Channeler`, `Galvanoth`,
+  `Penance`, `Valakut Awakening // Valakut Stoneforge`, and
+  `Wheel of Fortune`;
+- pressure-window lane after topdeck floor:
+  `Boros Charm`, `Deflecting Palm`, `Grand Abolisher`, `Perch Protection`,
+  and `Silence`;
+- generic-staple learning-only lane:
+  `Mana Vault` and `The One Ring`.
+
+Operational lesson:
+
+- The app/deckbuilder can show these as learning candidates, but must not label
+  them as ready upgrades.
+- A candidate row becomes matrix-eligible only after it has a named same-lane
+  cut, no prior-reject blocker, and an expected metric lift tied to the
+  miracle/topdeck or mana floor.
+- The next real work is not battle; it is cut-model mining for topdeck and mana
+  rows so the structure matrix can score an actual sidecar row.
