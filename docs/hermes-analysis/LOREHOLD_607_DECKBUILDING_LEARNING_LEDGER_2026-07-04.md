@@ -1222,3 +1222,58 @@ Operational lesson:
   protection, and fast-pressure floors before any battle.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Pressure Package Size Router Relearn - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_package_size_router_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_package_size_router_20260705_current_relearn.json`
+
+This router tests whether the pressure lesson from Monastery Mentor, Young
+Pyromancer, Guttersnipe, and Storm-Kiln Artist becomes usable when reduced from
+the failed four-card package to smaller one-card or two-card packages.
+
+Current result:
+
+- decision status: `smaller_pressure_packages_blocked_current_607`;
+- packages evaluated: `10`;
+- singleton packages: `4`;
+- pair packages: `6`;
+- gate-ready packages: `0`;
+- diagnostic-only packages: `0`;
+- gate-ready cut count: `0`;
+- diagnostic cut count: `0`;
+- hypothesis natural gate-ready count: `0`;
+- ready deck changes: `0`;
+- promotion allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- best singleton learning package:
+  `pressure_1_card_young_pyromancer`;
+- recommended next action:
+  `build_single_card_cut_safety_model_or_non_deck_forced_diagnostic`.
+
+External learning used by the router:
+
+- GameTyrant's Lorehold deck tech treats Monastery Mentor and Young Pyromancer
+  as spell-chain body conversion, Guttersnipe as noncombat spell pressure, and
+  Storm-Kiln Artist as Treasure conversion.
+- EDHREC's current Lorehold core spellslinger surface keeps the public build
+  lane tied to topdeck, spellslinger, discard, and reanimator tags.
+- Draftsim's Lorehold guide reinforces that miracle setup and topdeck
+  manipulation remain core value axes, so pressure payoffs cannot be accepted
+  if they dilute those engines.
+
+Operational lesson:
+
+- Smaller package size reduces add pressure, but it does not create valid cuts
+  by itself.
+- Young Pyromancer is now the best singleton learning candidate, but only for
+  cut-safety modeling or non-deck forced diagnostics; it is not a live 607
+  mutation.
+- Guttersnipe and Monastery Mentor remain useful pressure lessons, but they
+  need current hypothesis rows and safe cuts before any natural gate.
+- Storm-Kiln Artist remains blocked by prior rejection and should not be
+  retried as an automatic mana-pressure swap.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.
