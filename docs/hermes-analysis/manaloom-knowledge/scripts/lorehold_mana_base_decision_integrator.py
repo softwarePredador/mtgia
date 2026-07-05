@@ -25,8 +25,9 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_SAFE_CUT_MODEL = REPORT_DIR / "lorehold_mana_base_safe_cut_model_20260705_current.json"
 DEFAULT_DECISION_REPORTS = (
     REPORT_DIR / "lorehold_mana_base_plateau_radiant_decision_20260705_current.json",
+    REPORT_DIR / "lorehold_mana_base_plateau_turbulent_steppe_decision_20260705_current.json",
 )
-DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_mana_base_decision_integrator_20260705_after_plateau_radiant_current"
+DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current"
 
 REJECT_STATUSES = {
     "reject_promotion_keep_607_current_baseline",

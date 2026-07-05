@@ -82,6 +82,15 @@ def create_fixture_db(path: Path, *, include_cut: bool = True) -> None:
                 "({T}: Add {R} or {W}.)\nThis land enters tapped unless you control two or more basic lands.",
                 "[]",
             ),
+            (
+                "turbulent steppe",
+                "Turbulent Steppe",
+                "turbulent-card-id",
+                0,
+                "Land - Mountain Plains",
+                "({T}: Add {R} or {W}.)\nThis land enters tapped unless your opponents control eight or more lands.",
+                "[]",
+            ),
         ],
     )
     conn.execute(
@@ -240,6 +249,74 @@ def create_model_report(path: Path) -> None:
     )
 
 
+def create_decision_integrator_report(path: Path) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "annotated_model_ready_pairs": [
+                    {
+                        "add": "Plateau",
+                        "cut": "Radiant Summit",
+                        "learning_status": "blocked_exact_tested_decision",
+                        "decision_status": "reject_promotion_keep_607_current_baseline",
+                    },
+                    {
+                        "add": "Plateau",
+                        "cut": "Turbulent Steppe",
+                        "learning_status": "eligible_for_materialization_after_prior_decision_filter",
+                        "pair_score": 52,
+                    },
+                ],
+                "best_next_pair": {
+                    "add": "Plateau",
+                    "cut": "Turbulent Steppe",
+                    "learning_status": "eligible_for_materialization_after_prior_decision_filter",
+                    "pair_score": 52,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def create_exhausted_decision_integrator_report(path: Path) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "annotated_model_ready_pairs": [
+                    {
+                        "add": "Plateau",
+                        "cut": "Radiant Summit",
+                        "learning_status": "blocked_exact_tested_decision",
+                    },
+                    {
+                        "add": "Plateau",
+                        "cut": "Turbulent Steppe",
+                        "learning_status": "blocked_exact_tested_decision",
+                    },
+                ],
+                "best_next_pair": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def replace_radiant_with_turbulent(path: Path) -> None:
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            """
+            UPDATE deck_cards
+            SET card_name='Turbulent Steppe',
+                oracle_text='({T}: Add {R} or {W}.)\nThis land enters tapped unless your opponents control eight or more lands.',
+                card_id='turbulent-card-id',
+                battle_rules_json='[{"logical_rule_key":"turbulent-rule"}]'
+            WHERE deck_id=607 AND card_name='Radiant Summit'
+            """
+        )
+        conn.commit()
+
+
 def test_materializes_candidate_without_mutating_source(tmp_path: Path) -> None:
     source_db = tmp_path / "knowledge.db"
     model_report = tmp_path / "safe_model.json"
@@ -287,6 +364,55 @@ def test_materializes_candidate_without_mutating_source(tmp_path: Path) -> None:
     assert plateau[0] == "land"
     assert json.loads(plateau[1]) == ["land"]
     assert json.loads(plateau[2])[0]["logical_rule_key"] == "battle_rule_v1:land"
+
+
+def test_materializes_best_pair_from_decision_integrator_report(tmp_path: Path) -> None:
+    source_db = tmp_path / "knowledge.db"
+    decision_report = tmp_path / "decision_integrator.json"
+    out_prefix = tmp_path / "materializer_report"
+    create_fixture_db(source_db)
+    replace_radiant_with_turbulent(source_db)
+    create_decision_integrator_report(decision_report)
+
+    payload = materializer.build_payload(
+        source_db=source_db,
+        safe_cut_model_path=decision_report,
+        out_prefix=out_prefix,
+    )
+
+    assert payload["status"] == "candidate_materialized_structure_ready_battle_gate_closed"
+    assert payload["summary"]["add"] == "Plateau"
+    assert payload["summary"]["cut"] == "Turbulent Steppe"
+    assert payload["model_pair"]["learning_status"] == "eligible_for_materialization_after_prior_decision_filter"
+
+    candidate_db = out_prefix.parent / f"{out_prefix.name}_candidate" / "knowledge_candidate.db"
+    with sqlite3.connect(candidate_db) as conn:
+        names = {
+            row[0]
+            for row in conn.execute("SELECT card_name FROM deck_cards WHERE deck_id=607")
+        }
+    assert "Plateau" in names
+    assert "Turbulent Steppe" not in names
+
+
+def test_decision_integrator_report_blocks_exact_rejected_pair(tmp_path: Path) -> None:
+    decision_report = tmp_path / "decision_integrator.json"
+    create_decision_integrator_report(decision_report)
+
+    with pytest.raises(RuntimeError, match="pair blocked by prior decision report"):
+        materializer.load_best_pair(
+            decision_report,
+            add="Plateau",
+            cut="Radiant Summit",
+        )
+
+
+def test_exhausted_decision_integrator_report_blocks_default_materialization(tmp_path: Path) -> None:
+    decision_report = tmp_path / "decision_integrator.json"
+    create_exhausted_decision_integrator_report(decision_report)
+
+    with pytest.raises(RuntimeError, match="no model-ready pair found"):
+        materializer.load_best_pair(decision_report)
 
 
 def test_missing_cut_blocks_materialization(tmp_path: Path) -> None:

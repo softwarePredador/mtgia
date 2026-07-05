@@ -25,9 +25,9 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_MATERIALIZER_REPORT = (
-    REPORT_DIR / "lorehold_mana_base_candidate_materializer_20260705_plateau_radiant_current.json"
+    REPORT_DIR / "lorehold_mana_base_candidate_materializer_20260705_plateau_turbulent_current.json"
 )
-DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_mana_base_candidate_preflight_20260705_plateau_radiant_current"
+DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_mana_base_candidate_preflight_20260705_plateau_turbulent_current"
 DEFAULT_DECK_ID = 607
 
 PROTECTED_ANCHORS = (
@@ -71,6 +71,10 @@ def json_list(value: Any) -> list[Any]:
     except Exception:
         return []
     return decoded if isinstance(decoded, list) else []
+
+
+def slug(value: str) -> str:
+    return normalize_name(value).replace(" ", "_").replace("'", "")
 
 
 def card_counter(rows: list[sqlite3.Row]) -> Counter[str]:
@@ -233,6 +237,7 @@ def build_payload(
     summary = materializer_report.get("summary") or {}
     add = str(summary.get("add") or "")
     cut = str(summary.get("cut") or "")
+    candidate_slug = f"{slug(add)}_{slug(cut)}"
     validation = validate_preflight(
         source_db=source_db,
         candidate_db=candidate_db,
@@ -264,10 +269,10 @@ def build_payload(
         "policy": {
             "allowed_gate": "diagnostic smoke battle only",
             "promotion_gate": "closed until same-opponent/seed confirmation, fast-pressure guard, and replay trace evidence pass",
-            "card_level_claim": "a battle aggregate is not enough; Plateau/Radiant access must be inspected in telemetry or focused traces",
+            "card_level_claim": "a battle aggregate is not enough; added/cut land access must be inspected in telemetry or focused traces",
         },
         "recommended_battle_command": [
-            "MANALOOM_FOCUS_ACCESS_CARDS='[\"Plateau\",\"Radiant Summit\"]'",
+            f"MANALOOM_FOCUS_ACCESS_CARDS='{json.dumps([add, cut])}'",
             "python3",
             "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_battle_gate.py",
             "--db",
@@ -277,9 +282,9 @@ def build_payload(
             "--candidate-db",
             rel(candidate_db),
             "--candidate-key",
-            "candidate_607_plateau_radiant_mana_base_v1",
+            f"candidate_607_{candidate_slug}_mana_base_v1",
             "--candidate-name",
-            "Lorehold 607 mana base: Plateau over Radiant Summit",
+            f"Lorehold 607 mana base: {add} over {cut}",
             "--candidate-archetype",
             "mana-base-diagnostic",
             "--candidate-deck-id",
@@ -300,7 +305,7 @@ def build_payload(
             "240",
             "--isolate-deck-process",
             "--stem",
-            "lorehold_mana_base_plateau_radiant_smoke_20260705_current",
+            f"lorehold_mana_base_{candidate_slug}_smoke_20260705_current",
         ],
         "decision": {
             "current_best_baseline": "deck_607",

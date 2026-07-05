@@ -1,0 +1,225 @@
+{
+  "artifact_type": "lorehold_mana_base_candidate_preflight",
+  "candidate_db": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_candidate_materializer_20260705_plateau_turbulent_current_candidate/knowledge_candidate.db",
+  "decision": {
+    "candidate": "+Plateau / -Turbulent Steppe",
+    "current_best_baseline": "deck_607",
+    "next_action": "run_diagnostic_smoke_battle",
+    "promotion_allowed": false
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T00:49:23Z",
+  "policy": {
+    "allowed_gate": "diagnostic smoke battle only",
+    "card_level_claim": "a battle aggregate is not enough; added/cut land access must be inspected in telemetry or focused traces",
+    "promotion_gate": "closed until same-opponent/seed confirmation, fast-pressure guard, and replay trace evidence pass"
+  },
+  "postgres_writes": false,
+  "preflight_validation": {
+    "added_card_runtime": {
+      "active_rule_count": 1,
+      "card_id": "2fe01212-cbd4-44a4-a5b2-cb0402c86db0",
+      "card_name": "Plateau",
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    "candidate_deck_summary": {
+      "avg_cmc": 3.576,
+      "cards": 100,
+      "deck_id": 607,
+      "hash": "1dc2c17a878944d12d4ce1f8bfca5bb7016a921cd4d54a04cf7478576d4d0dc1",
+      "lands": 34,
+      "nonlands": 66,
+      "ruleset_hash": "f959e062bd7046e13ae625150ead99ed6f9c27d4d88e9b502e8bbade29c8ee5d",
+      "semantics_hash": "9a0070366d4eddf3b1190d07103191375714b31f8c36d81cab9e1d425e0b3110"
+    },
+    "checks": {
+      "add_has_active_land_rule": true,
+      "add_has_card_id": true,
+      "add_has_oracle_text": true,
+      "candidate_hash_differs_from_source": true,
+      "candidate_land_quantity_34": true,
+      "candidate_total_cards_100": true,
+      "expected_add_only": true,
+      "expected_cut_only": true,
+      "nonland_role_counts_unchanged": true,
+      "protected_anchors_unchanged": true,
+      "same_lane_land_swap": true,
+      "single_add_single_cut": true,
+      "source_land_quantity_34": true,
+      "source_total_cards_100": true
+    },
+    "diff": {
+      "added": [
+        {
+          "normalized_name": "plateau",
+          "quantity_delta": 1
+        }
+      ],
+      "removed": [
+        {
+          "normalized_name": "turbulent steppe",
+          "quantity_delta": 1
+        }
+      ]
+    },
+    "nonland_role_counts": {
+      "candidate": {
+        "board_wipe": 8,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "source": {
+        "board_wipe": 8,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "tutor": 1,
+        "wincon": 9
+      }
+    },
+    "protected_anchor_status": {
+      "anchor_count": 13,
+      "anchors": [
+        {
+          "card_name": "Bender's Waterskin",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Creative Technique",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Land Tax",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Library of Leng",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Lorehold, the Historian",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Mizzix's Mastery",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Molecule Man",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Storm Herd",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "The Mind Stone",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "The Scarlet Witch",
+          "field_deltas": {},
+          "status": "unchanged"
+        },
+        {
+          "card_name": "Victory Chimes",
+          "field_deltas": {},
+          "status": "unchanged"
+        }
+      ],
+      "changed": [],
+      "missing": [],
+      "status": "pass"
+    },
+    "source_deck_summary": {
+      "avg_cmc": 3.576,
+      "cards": 100,
+      "deck_id": 607,
+      "hash": "3d7bff37eef062768f9caf33fdfaa83c9ea632c150e2d75339c57d66b5a8bbc7",
+      "lands": 34,
+      "nonlands": 66,
+      "ruleset_hash": "71e937a8c7059cd1e91169829757e91b095d03b749b51db9b080a1a3fe39154b",
+      "semantics_hash": "b49cee2b5e54e08a602a470574c61add68b98ded3820d9e35994ed81b03e43eb"
+    },
+    "status": "pass"
+  },
+  "recommended_battle_command": [
+    "MANALOOM_FOCUS_ACCESS_CARDS='[\"Plateau\", \"Turbulent Steppe\"]'",
+    "python3",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_battle_gate.py",
+    "--db",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    "--deck-ids",
+    "607",
+    "--candidate-db",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_candidate_materializer_20260705_plateau_turbulent_current_candidate/knowledge_candidate.db",
+    "--candidate-key",
+    "candidate_607_plateau_turbulent_steppe_mana_base_v1",
+    "--candidate-name",
+    "Lorehold 607 mana base: Plateau over Turbulent Steppe",
+    "--candidate-archetype",
+    "mana-base-diagnostic",
+    "--candidate-deck-id",
+    "607",
+    "--fixed-opponent-deck-ids",
+    "607",
+    "--games",
+    "1",
+    "--opponent-limit",
+    "1",
+    "--opponent-seed",
+    "20260705",
+    "--simulation-seed",
+    "20260705",
+    "--game-timeout-seconds",
+    "30",
+    "--deck-process-timeout-seconds",
+    "240",
+    "--isolate-deck-process",
+    "--stem",
+    "lorehold_mana_base_plateau_turbulent_steppe_smoke_20260705_current"
+  ],
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_candidate_materializer_20260705_plateau_turbulent_current.json"
+  ],
+  "status": "battle_smoke_preflight_ready",
+  "summary": {
+    "add": "Plateau",
+    "allow_promotion_gate": false,
+    "allow_smoke_battle_gate": true,
+    "cut": "Turbulent Steppe",
+    "deck_id": 607,
+    "keep_607_as_protected_baseline": true,
+    "promotion_allowed": false
+  }
+}

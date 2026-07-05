@@ -109,6 +109,27 @@ The practical rule for ManaLoom deckbuilding is:
    commander-context role, same-lane cut status, and battle proof separately in
    the app. Do not collapse them into one "best card" score.
 
+## Mana-Base Learning - 2026-07-05
+
+`Plateau` is Commander legal for Lorehold and is structurally attractive because
+it is an untapped `Mountain Plains`. That still was not enough to replace a land
+in protected `607` without battle proof.
+
+Two exact mana-base hypotheses were materialized only in copied Hermes DBs and
+then rejected:
+
+- `+Plateau / -Radiant Summit`: preflight passed, but natural smoke and forced
+  opening-hand diagnostics both lost to `607`.
+- `+Plateau / -Turbulent Steppe`: preflight passed, natural smoke was
+  inconclusive at `0/1` for both lists, and forced opening-hand diagnostics
+  lost `1/3` versus protected `607` at `2/3`.
+
+The important deckbuilding lesson is that a cleaner untapped dual can be a real
+structural upgrade and still fail the active Lorehold shell if it does not
+improve the actual battle window. The current mana-base model-ready queue is
+closed until new material evidence changes the safe-cut pool or proposes a
+different land package, not another exact retest of these pairs.
+
 Current conclusion: protected deck `607` remains the Lorehold champion under
 the active contract. The learning task stays open because a better deck may
 exist, but it has not been proven by the current evidence.

@@ -34,8 +34,10 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 KNOWLEDGE_DB = SCRIPT_DIR / "knowledge.db"
 
 DEFAULT_DECK_ID = 607
-DEFAULT_SAFE_CUT_MODEL = REPORT_DIR / "lorehold_mana_base_safe_cut_model_20260705_current.json"
-DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_mana_base_candidate_materializer_20260705_plateau_radiant_current"
+DEFAULT_PAIR_SOURCE_REPORT = (
+    REPORT_DIR / "lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current.json"
+)
+DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_mana_base_candidate_materializer_20260705_plateau_turbulent_current"
 
 HASH_COLUMNS = ("deck_hash", "semantics_hash", "ruleset_hash")
 
@@ -74,13 +76,36 @@ def table_columns(conn: sqlite3.Connection, table: str) -> list[str]:
     return [str(row[1]) for row in conn.execute(f"PRAGMA table_info({table})")]
 
 
-def load_best_pair(model_path: Path, *, add: str | None = None, cut: str | None = None) -> dict[str, Any]:
-    model = read_json(model_path)
-    pairs = [
+def load_best_pair(pair_source_path: Path, *, add: str | None = None, cut: str | None = None) -> dict[str, Any]:
+    model = read_json(pair_source_path)
+    blocked_pairs = [
         row
-        for row in model.get("top_model_ready_pairs") or []
-        if isinstance(row, Mapping) and row.get("status") == "model_ready_for_candidate_materialization"
+        for row in model.get("annotated_model_ready_pairs") or []
+        if isinstance(row, Mapping) and row.get("learning_status") == "blocked_exact_tested_decision"
     ]
+    if add and cut:
+        for row in blocked_pairs:
+            if normalize_name(str(row.get("add"))) == normalize_name(add) and normalize_name(
+                str(row.get("cut"))
+            ) == normalize_name(cut):
+                raise RuntimeError(f"pair blocked by prior decision report in {pair_source_path}: +{add} / -{cut}")
+
+    best_next = model.get("best_next_pair")
+    if isinstance(best_next, Mapping):
+        pairs = [dict(best_next)]
+    else:
+        pairs = [
+            row
+            for row in model.get("annotated_model_ready_pairs") or []
+            if isinstance(row, Mapping)
+            and row.get("learning_status") == "eligible_for_materialization_after_prior_decision_filter"
+        ]
+    if not pairs:
+        pairs = [
+            row
+            for row in model.get("top_model_ready_pairs") or []
+            if isinstance(row, Mapping) and row.get("status") == "model_ready_for_candidate_materialization"
+        ]
     if add or cut:
         pairs = [
             row
@@ -89,7 +114,7 @@ def load_best_pair(model_path: Path, *, add: str | None = None, cut: str | None 
             and (not cut or normalize_name(str(row.get("cut"))) == normalize_name(cut))
         ]
     if not pairs:
-        raise RuntimeError(f"no model-ready pair found in {model_path}")
+        raise RuntimeError(f"no model-ready pair found in {pair_source_path}")
     return dict(pairs[0])
 
 
@@ -354,7 +379,7 @@ def build_payload(
     *,
     source_db: Path = KNOWLEDGE_DB,
     deck_id: int = DEFAULT_DECK_ID,
-    safe_cut_model_path: Path = DEFAULT_SAFE_CUT_MODEL,
+    safe_cut_model_path: Path = DEFAULT_PAIR_SOURCE_REPORT,
     out_prefix: Path = DEFAULT_OUT_PREFIX,
     add: str | None = None,
     cut: str | None = None,
@@ -519,7 +544,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", type=Path, default=KNOWLEDGE_DB)
     parser.add_argument("--deck-id", type=int, default=DEFAULT_DECK_ID)
-    parser.add_argument("--safe-cut-model", type=Path, default=DEFAULT_SAFE_CUT_MODEL)
+    parser.add_argument(
+        "--safe-cut-model",
+        "--pair-source-report",
+        dest="safe_cut_model",
+        type=Path,
+        default=DEFAULT_PAIR_SOURCE_REPORT,
+    )
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     parser.add_argument("--add", default=None)
     parser.add_argument("--cut", default=None)

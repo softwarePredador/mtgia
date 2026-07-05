@@ -53,6 +53,18 @@ def rejected_decision_payload() -> dict:
     }
 
 
+def rejected_turbulent_decision_payload() -> dict:
+    return {
+        "status": "reject_promotion_keep_607_current_baseline",
+        "summary": {
+            "candidate": "+Plateau / -Turbulent Steppe",
+            "promotion_allowed": False,
+            "full_confirmation_allowed_now": False,
+            "blockers": ["forced_opening_hand_diagnostic_lost_to_607"],
+        },
+    }
+
+
 def test_integrator_blocks_exact_rejected_pair_and_keeps_distinct_cut_diagnostic(tmp_path: Path) -> None:
     safe_model = write_json(tmp_path / "safe_model.json", safe_model_payload())
     decision = write_json(tmp_path / "decision.json", rejected_decision_payload())
@@ -79,6 +91,23 @@ def test_integrator_blocks_exact_rejected_pair_and_keeps_distinct_cut_diagnostic
     assert "opponents control eight or more lands" in eligible["cut_oracle_text"]
     assert payload["best_next_pair"]["cut"] == "Turbulent Steppe"
     assert payload["decision"]["next_action"] == "materialize_best_next_mana_base_pair_as_diagnostic"
+
+
+def test_integrator_closes_queue_when_all_model_ready_pairs_have_rejected_decisions(tmp_path: Path) -> None:
+    safe_model = write_json(tmp_path / "safe_model.json", safe_model_payload())
+    radiant = write_json(tmp_path / "radiant_decision.json", rejected_decision_payload())
+    turbulent = write_json(tmp_path / "turbulent_decision.json", rejected_turbulent_decision_payload())
+
+    payload = integrator.build_payload(
+        safe_cut_model_path=safe_model,
+        decision_report_paths=[radiant, turbulent],
+    )
+
+    assert payload["status"] == "mana_base_model_ready_queue_exhausted_by_decisions"
+    assert payload["summary"]["exact_rejected_pair_count"] == 2
+    assert payload["summary"]["eligible_model_ready_pair_count"] == 0
+    assert payload["best_next_pair"] is None
+    assert payload["decision"]["next_action"] == "leave_mana_base_queue_closed_until_new_evidence"
 
 
 def test_write_outputs_creates_integrator_report(tmp_path: Path) -> None:
