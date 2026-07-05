@@ -146,6 +146,7 @@ class GlobalCommanderNonlandCoreCandidateModelTests(unittest.TestCase):
                 ("619", "Kaalia of the Vast", 1, "engine", "[]", 1, 4, "Legendary Creature", "Flying", "kaalia"),
                 ("619", "Path to Exile", 1, "removal", '["removal"]', 0, 1, "Instant", "Exile target creature.", "path"),
                 ("619", "Excess Engine", 1, "engine", '["engine"]', 0, 5, "Artifact", "Whenever you cast a spell, draw a card.", "engine"),
+                ("619", "Ramp Engine", 1, "ramp", '["engine","ramp"]', 0, 3, "Artifact", "Whenever you cast a spell, add mana.", "rampengine"),
                 ("619", "Rune-Scarred Demon", 1, "tutor", '["engine","tutor"]', 0, 7, "Creature - Demon", "When this creature enters, search your library for a card.", "runescarred"),
                 ("620", "Sauron, the Dark Lord", 1, "engine", "[]", 1, 6, "Legendary Creature", "Whenever the Ring tempts you, draw cards.", "sauron"),
             ],
@@ -216,10 +217,15 @@ class GlobalCommanderNonlandCoreCandidateModelTests(unittest.TestCase):
         self.assertNotIn("Cloudshift", candidate_names)
         self.assertEqual(pool["top_cut_candidates"][0]["card_name"], "Excess Engine")
         self.assertNotIn("Rune-Scarred Demon", [row["card_name"] for row in pool["top_cut_candidates"]])
-        self.assertEqual(pool["blocked_cut_candidates"][0]["card_name"], "Rune-Scarred Demon")
+        self.assertNotIn("Ramp Engine", [row["card_name"] for row in pool["top_cut_candidates"]])
+        blocked_by_name = {row["card_name"]: row for row in pool["blocked_cut_candidates"]}
         self.assertIn(
             "kaalia_angel_demon_dragon_payoff_requires_source_lane",
-            pool["blocked_cut_candidates"][0]["block_reasons"],
+            blocked_by_name["Rune-Scarred Demon"]["block_reasons"],
+        )
+        self.assertIn(
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate",
+            blocked_by_name["Ramp Engine"]["block_reasons"],
         )
         self.assertTrue(pool["pair_hypotheses"])
 

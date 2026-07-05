@@ -334,6 +334,13 @@ def commander_specific_cut_blockers(commander: str, row: dict[str, Any]) -> list
     return blockers
 
 
+def cross_lane_cut_blockers(target_role: str, roles: set[str]) -> list[str]:
+    blockers: list[str] = []
+    if target_role != "ramp" and "ramp" in roles:
+        blockers.append("cross_lane_ramp_cut_requires_same_lane_source_or_gate")
+    return blockers
+
+
 def cut_candidates_for_hypothesis(
     *,
     conn: sqlite3.Connection,
@@ -354,16 +361,19 @@ def cut_candidates_for_hypothesis(
         roles, source = core_roles.card_roles(row)
         if roles & missing:
             continue
-        commander_blockers = commander_specific_cut_blockers(commander, row)
-        if commander_blockers:
+        cut_blockers = [
+            *commander_specific_cut_blockers(commander, row),
+            *cross_lane_cut_blockers(str(hypothesis.get("role") or ""), roles),
+        ]
+        if cut_blockers:
             blocked.append(
                 {
                     "card_name": row.get("card_name"),
-                    "status": "blocked_commander_specific_payoff_cut",
+                    "status": "blocked_cut_requires_source_lane",
                     "roles": sorted(roles),
                     "classification_source": source,
                     "cmc": row.get("cmc"),
-                    "block_reasons": commander_blockers,
+                    "block_reasons": cut_blockers,
                     "mutation_allowed": False,
                 }
             )
