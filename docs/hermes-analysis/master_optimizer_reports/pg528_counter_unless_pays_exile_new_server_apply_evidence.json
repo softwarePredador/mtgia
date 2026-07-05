@@ -1,0 +1,125 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "PG528",
+  "generated_at": "2026-07-05T20:18:32.053086+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg528_counter_unless_pays_exile_new_server_package_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg528_counter_unless_pays_exile_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "No More Lies",
+      "Reject",
+      "Scatter Ray",
+      "Spectral Interference"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 4,
+    "promoted_rule_rows": 4,
+    "promoted_verified_auto_rows": 4,
+    "row_count": 4
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "No More Lies",
+      "logical_rule_key": "battle_rule_v1:909891bf8700cdfa91cd983ad4e5923b",
+      "normalized_name": "no more lies",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Reject",
+      "logical_rule_key": "battle_rule_v1:4cbd233f7190d3b772b7498252402cbc",
+      "normalized_name": "reject",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Scatter Ray",
+      "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc",
+      "normalized_name": "scatter ray",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Spectral Interference",
+      "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc",
+      "normalized_name": "spectral interference",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "No More Lies",
+      "Reject",
+      "Scatter Ray",
+      "Spectral Interference"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 4,
+    "total_target_card_rows": 4,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "ca2fd5ac-2d97-4ca1-aa85-c8b04c9592af",
+      "card_name": "No More Lies",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:909891bf8700cdfa91cd983ad4e5923b",
+      "normalized_name": "no more lies",
+      "oracle_hash": "3c5074858301b944a71cd8254e2d32a9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "5775076e-9277-44c6-b992-9b850f9a8e3f",
+      "card_name": "Reject",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:4cbd233f7190d3b772b7498252402cbc",
+      "normalized_name": "reject",
+      "oracle_hash": "2c81d02c83ce79a6c5c8f1b68d944515",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "1e9bc274-7b75-4e6b-a84f-1ab05f66e509",
+      "card_name": "Scatter Ray",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc",
+      "normalized_name": "scatter ray",
+      "oracle_hash": "717571524b5db7d31c5bd6b15958ec43",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "e730620f-20fa-4270-9b56-5d7be418cc2f",
+      "card_name": "Spectral Interference",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc",
+      "normalized_name": "spectral interference",
+      "oracle_hash": "717571524b5db7d31c5bd6b15958ec43",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "counter_unless_pays_exile_new_server"
+}

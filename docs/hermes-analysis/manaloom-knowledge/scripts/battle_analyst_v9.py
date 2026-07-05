@@ -8626,6 +8626,8 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "life_gain_on_counter",
     "counter_unless_pays_generic",
     "countered_spell_to_top_library",
+    "countered_spell_to_exile",
+    "countered_spell_to_exile_reason",
     "counter_own_approach_to_top",
     "xmage_effect_class",
     "xmage_effect_classes",
@@ -9042,6 +9044,10 @@ def _counter_target_label_constraints(target_label):
     constraints = {"zone": "stack", "stack_object": "spell"} if target.endswith("spell") else {}
     if target == "artifact_or_enchantment_spell":
         constraints["card_types"] = ["artifact", "enchantment"]
+    elif target == "artifact_or_creature_spell":
+        constraints["card_types"] = ["artifact", "creature"]
+    elif target == "creature_or_planeswalker_spell":
+        constraints["card_types"] = ["creature", "planeswalker"]
     elif target == "instant_or_sorcery_spell":
         constraints["spell_types"] = ["instant", "sorcery"]
     elif target == "noncreature_spell":
@@ -10102,6 +10108,13 @@ class Player:
         if countered_to_top and isinstance(target_card, dict):
             target_card["_countered_to_top_library"] = True
             target_card["_countered_to_top_library_by"] = counter.get("name", "?")
+        countered_to_exile = bool(effect.get("countered_spell_to_exile")) and not counter_tax_paid
+        if countered_to_exile and isinstance(target_card, dict):
+            target_card["_exile_on_resolution"] = True
+            target_card["_exile_on_resolution_reason"] = (
+                effect.get("countered_spell_to_exile_reason")
+                or "counter_unless_pays_exile_replacement"
+            )
         target_name = (target_card or {}).get("name", "?")
         target_controller = getattr(target_controller_obj, "name", None)
         target_effect = (getattr(stack_item, "effect_data", None) or {}).get("effect")
@@ -10127,6 +10140,7 @@ class Player:
             phase=phase,
             priority_window=priority_window or "stack_response",
             countered_spell_to_top_library=countered_to_top,
+            countered_spell_to_exile=countered_to_exile,
             counter_unless_pays_generic=counter_unless_pays_generic,
             counter_tax_paid=counter_tax_paid,
             counter_tax_paid_by=counter_tax_paid_by,

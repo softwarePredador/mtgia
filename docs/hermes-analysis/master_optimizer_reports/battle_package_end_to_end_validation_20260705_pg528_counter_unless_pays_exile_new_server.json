@@ -1,0 +1,198 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T20:19:14.647891+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg528_counter_unless_pays_exile_new_server_package_manifest.json",
+  "package_id": "pg528_counter_unless_pays_exile_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "No More Lies",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:909891bf8700cdfa91cd983ad4e5923b",
+          "oracle_hash": "3c5074858301b944a71cd8254e2d32a9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Reject",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4cbd233f7190d3b772b7498252402cbc",
+          "oracle_hash": "2c81d02c83ce79a6c5c8f1b68d944515",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Scatter Ray",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc",
+          "oracle_hash": "717571524b5db7d31c5bd6b15958ec43",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Spectral Interference",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc",
+          "oracle_hash": "717571524b5db7d31c5bd6b15958ec43",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "No More Lies",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:909891bf8700cdfa91cd983ad4e5923b",
+          "oracle_hash": "3c5074858301b944a71cd8254e2d32a9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Reject",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4cbd233f7190d3b772b7498252402cbc",
+          "oracle_hash": "2c81d02c83ce79a6c5c8f1b68d944515",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Scatter Ray",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc",
+          "oracle_hash": "717571524b5db7d31c5bd6b15958ec43",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "card_name": "Spectral Interference",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc",
+          "oracle_hash": "717571524b5db7d31c5bd6b15958ec43",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "No More Lies",
+          "logical_rule_key": "battle_rule_v1:909891bf8700cdfa91cd983ad4e5923b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "Reject",
+          "logical_rule_key": "battle_rule_v1:4cbd233f7190d3b772b7498252402cbc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scatter Ray",
+          "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spectral Interference",
+          "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "No More Lies",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:909891bf8700cdfa91cd983ad4e5923b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Reject",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:4cbd233f7190d3b772b7498252402cbc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scatter Ray",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spectral Interference",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:e7b82482944f444a554485c286834efc"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

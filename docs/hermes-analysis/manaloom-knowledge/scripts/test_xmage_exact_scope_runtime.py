@@ -10016,6 +10016,126 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_unless_pays_exiles_countered_spell_when_tax_unpaid(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        responder.mana_pool.add("white", 1)
+        responder.mana_pool.add("blue", 1)
+        counter = {
+            "name": "Fixture No More Lies",
+            "type_line": "Instant",
+            "mana_cost": "{W}{U}",
+            "cmc": 2,
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+            "target": "spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell"},
+            "counter_unless_pays_generic": 3,
+            "countered_spell_to_exile": True,
+            "countered_spell_to_exile_reason": "counter_unless_pays_exile_replacement",
+            "instant": True,
+        }
+        responder.hand.append(counter)
+        target_spell = {
+            "name": "Target Finisher",
+            "type_line": "Creature - Dragon",
+            "cmc": 7,
+            "effect": "finisher",
+        }
+        stack = self.battle.Stack()
+        stack.push(target_spell, active, {"effect": "finisher"})
+
+        self.assertTrue(
+            self.battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                turn=8,
+                rng=random.Random(8),
+                phase="precombat_main",
+            )
+        )
+
+        self.assertTrue(stack.items[-1].countered)
+        self.assertTrue(target_spell.get("_exile_on_resolution"))
+        self.assertTrue(
+            any(
+                event == "spell_countered"
+                and data.get("counter") == "Fixture No More Lies"
+                and data.get("result") == "countered"
+                and data.get("countered_spell_to_exile") is True
+                and data.get("counter_tax_paid") is False
+                for event, data in self.events
+            )
+        )
+
+        self.assertIsNone(stack.resolve_top())
+        self.assertEqual([card["name"] for card in active.exile], ["Target Finisher"])
+        self.assertEqual(active.graveyard, [])
+        self.assertTrue(
+            any(
+                event == "countered_spell_moved_to_exile"
+                and data.get("card") == "Target Finisher"
+                and data.get("replacement_reason") == "counter_unless_pays_exile_replacement"
+                for event, data in self.events
+            )
+        )
+
+    def test_counter_unless_pays_exile_replacement_does_not_apply_when_tax_paid(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.mana_pool.add_generic(3)
+        responder = self.battle.Player("Responder", None, [])
+        responder.mana_pool.add("white", 1)
+        responder.mana_pool.add("blue", 1)
+        counter = {
+            "name": "Fixture No More Lies",
+            "type_line": "Instant",
+            "mana_cost": "{W}{U}",
+            "cmc": 2,
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+            "target": "spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell"},
+            "counter_unless_pays_generic": 3,
+            "countered_spell_to_exile": True,
+            "countered_spell_to_exile_reason": "counter_unless_pays_exile_replacement",
+            "instant": True,
+        }
+        responder.hand.append(counter)
+        target_spell = {
+            "name": "Target Finisher",
+            "type_line": "Creature - Dragon",
+            "cmc": 7,
+            "effect": "finisher",
+        }
+        stack = self.battle.Stack()
+        stack.push(target_spell, active, {"effect": "finisher"})
+
+        self.assertTrue(
+            self.battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                turn=8,
+                rng=random.Random(8),
+                phase="precombat_main",
+            )
+        )
+
+        self.assertFalse(stack.items[-1].countered)
+        self.assertFalse(target_spell.get("_exile_on_resolution", False))
+        self.assertEqual(active.exile, [])
+        self.assertTrue(
+            any(
+                event == "spell_countered"
+                and data.get("counter") == "Fixture No More Lies"
+                and data.get("result") == "not_countered_tax_paid"
+                and data.get("countered_spell_to_exile") is False
+                and data.get("counter_tax_paid") is True
+                for event, data in self.events
+            )
+        )
+
     def test_return_target_creature_to_owner_hand_moves_from_battlefield_to_hand(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

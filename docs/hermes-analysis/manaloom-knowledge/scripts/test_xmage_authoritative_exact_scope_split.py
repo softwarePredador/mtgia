@@ -9015,7 +9015,64 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "stack", "stack_object": "spell", "exclude_card_types": ["artifact"]},
         )
 
-    def test_counter_unless_pays_blocks_dynamic_or_exile_variants(self) -> None:
+    def test_counter_unless_pays_fixed_generic_exile_replacement_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.COUNTER_UNLESS_PAYS_UNIT,
+            effect_classes=["CounterUnlessPaysEffect"],
+            xmage_signals=["targeting", "counter"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Counter target creature or planeswalker spell unless its controller pays {3}. "
+                    "If that spell is countered this way, exile it instead of putting into its owner's graveyard."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect("
+                "new CounterUnlessPaysEffect(new GenericManaCost(3), true));"
+                "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature_or_planeswalker_spell")
+        self.assertEqual(effect["counter_unless_pays_generic"], 3)
+        self.assertTrue(effect["countered_spell_to_exile"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "stack", "stack_object": "spell", "card_types": ["creature", "planeswalker"]},
+        )
+
+    def test_counter_unless_pays_fixed_generic_artifact_or_creature_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.COUNTER_UNLESS_PAYS_UNIT,
+            effect_classes=["CounterUnlessPaysEffect"],
+            xmage_signals=["targeting", "counter"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target artifact or creature spell unless its controller pays {4}."),
+            source_text=(
+                "this.getSpellAbility().addEffect("
+                "new CounterUnlessPaysEffect(new GenericManaCost(4)));"
+                "this.getSpellAbility().addTarget(new TargetSpell(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "artifact_or_creature_spell")
+        self.assertEqual(effect["counter_unless_pays_generic"], 4)
+        self.assertNotIn("countered_spell_to_exile", effect)
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "stack", "stack_object": "spell", "card_types": ["artifact", "creature"]},
+        )
+
+    def test_counter_unless_pays_blocks_dynamic_variant(self) -> None:
         row = queue_row(
             split.COUNTER_UNLESS_PAYS_UNIT,
             effect_classes=["CounterUnlessPaysEffect"],
@@ -9030,25 +9087,9 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 "this.getSpellAbility().addTarget(new TargetSpell());"
             ),
         )
-        exile_proposal, exile_reason = split.split_row(
-            row,
-            metadata(
-                oracle_text=(
-                    "Counter target spell unless its controller pays {3}. "
-                    "If that spell is countered this way, exile it instead of putting it into its owner's graveyard."
-                ),
-            ),
-            source_text=(
-                "this.getSpellAbility().addEffect("
-                "new CounterUnlessPaysEffect(new GenericManaCost(3), true));"
-                "this.getSpellAbility().addTarget(new TargetSpell());"
-            ),
-        )
 
         self.assertIsNone(dynamic_proposal)
         self.assertEqual(dynamic_reason, "counter_unless_pays_source_not_fixed_generic")
-        self.assertIsNone(exile_proposal)
-        self.assertEqual(exile_reason, "counter_unless_pays_oracle_not_exact_fixed_generic")
 
     def test_counter_draw_spell_with_activated_ability_target_stays_blocked(self) -> None:
         row = queue_row(

@@ -2044,6 +2044,8 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
         (r"^counter target creature or sorcery spell\.?$", "creature_or_sorcery_spell"),
         (r"^counter target creature or aura spell\.?$", "creature_or_aura_spell"),
         (r"^counter target spirit or arcane spell\.?$", "spirit_or_arcane_spell"),
+        (r"^counter target artifact or creature spell\.?$", "artifact_or_creature_spell"),
+        (r"^counter target creature or planeswalker spell\.?$", "creature_or_planeswalker_spell"),
         (r"^counter target artifact or enchantment spell\.?$", "artifact_or_enchantment_spell"),
         (r"^counter target instant or sorcery spell\.?$", "instant_or_sorcery_spell"),
         (r"^counter target noncreature spell\.?$", "noncreature_spell"),
@@ -2105,10 +2107,11 @@ def fixed_counter_gain_life_from_source(source_text: str) -> tuple[int, str] | N
     return life_gain, target
 
 
-def fixed_counter_unless_pays_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+def fixed_counter_unless_pays_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
     text = oracle_text(metadata)
     match = re.match(
-        r"^(?P<counter>counter target .+?) unless its controller pays \{(?P<cost>\d+)\}\.?$",
+        r"^(?P<counter>counter target .+?) unless its controller pays \{(?P<cost>\d+)\}"
+        r"(?P<exile>\. if that spell is countered this way, exile it instead of putting (?:it )?into its owner's graveyard)?\.?$",
         text,
     )
     if not match:
@@ -2116,23 +2119,23 @@ def fixed_counter_unless_pays_from_oracle(metadata: dict[str, Any]) -> tuple[str
     target = counter_target_from_oracle({"oracle_text": match.group("counter")})
     if target is None:
         return None
-    return target, int(match.group("cost"))
+    return target, int(match.group("cost")), bool(match.group("exile"))
 
 
-def fixed_counter_unless_pays_from_source(source_text: str) -> int | None:
+def fixed_counter_unless_pays_from_source(source_text: str) -> tuple[int, bool] | None:
     text = str(source_text or "")
     effect_matches = list(re.finditer(r"new\s+CounterUnlessPaysEffect\s*\(", text))
     if len(effect_matches) != 1:
         return None
     match = re.search(
-        r"new\s+CounterUnlessPaysEffect\s*\(\s*new\s+GenericManaCost\s*\(\s*(?P<cost>\d+)\s*\)\s*\)",
+        r"new\s+CounterUnlessPaysEffect\s*\(\s*new\s+GenericManaCost\s*\(\s*(?P<cost>\d+)\s*\)\s*(?:,\s*(?P<exile>true|false)\s*)?\)",
         text,
     )
     if not match:
         return None
     if "new TargetSpell" not in text:
         return None
-    return int(match.group("cost"))
+    return int(match.group("cost")), match.group("exile") == "true"
 
 
 def counter_target_constraints_for(target: str) -> dict[str, Any]:
@@ -2164,6 +2167,10 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
         ]
     elif target == "spirit_or_arcane_spell":
         constraints["spell_subtypes"] = ["spirit", "arcane"]
+    elif target == "artifact_or_creature_spell":
+        constraints["card_types"] = ["artifact", "creature"]
+    elif target == "creature_or_planeswalker_spell":
+        constraints["card_types"] = ["creature", "planeswalker"]
     elif target == "artifact_or_enchantment_spell":
         constraints["card_types"] = ["artifact", "enchantment"]
     elif target == "instant_or_sorcery_spell":
@@ -19926,11 +19933,12 @@ def split_row(
         oracle_pair = fixed_counter_unless_pays_from_oracle(metadata)
         if oracle_pair is None:
             return None, "counter_unless_pays_oracle_not_exact_fixed_generic"
-        source_cost = fixed_counter_unless_pays_from_source(source_text)
-        if source_cost is None:
+        source_pair = fixed_counter_unless_pays_from_source(source_text)
+        if source_pair is None:
             return None, "counter_unless_pays_source_not_fixed_generic"
-        target, pay_generic = oracle_pair
-        if pay_generic != source_cost:
+        target, pay_generic, exile_if_countered = oracle_pair
+        source_cost, source_exile_if_countered = source_pair
+        if pay_generic != source_cost or exile_if_countered != source_exile_if_countered:
             return None, "counter_unless_pays_source_oracle_mismatch"
         effect_json = {
             "effect": "counter",
@@ -19941,6 +19949,9 @@ def split_row(
             "xmage_effect_class": "CounterUnlessPaysEffect",
             **flags,
         }
+        if exile_if_countered:
+            effect_json["countered_spell_to_exile"] = True
+            effect_json["countered_spell_to_exile_reason"] = "counter_unless_pays_exile_replacement"
         if target == "blue_spell":
             effect_json["requires_blue_target"] = True
         return build_proposal(

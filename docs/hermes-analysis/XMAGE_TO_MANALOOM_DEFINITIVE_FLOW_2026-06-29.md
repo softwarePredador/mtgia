@@ -14081,6 +14081,67 @@ authorize modal boosts, dynamic `X` boosts, additional-cost boosts, other
 colors/subtypes/card types, modified-creature or counter-type-specific filters,
 static lord effects, or `BoostAllEffect` permanents.
 
+### PG528 - CounterUnlessPays fixed generic tax with exile replacement and spell-type filters
+
+Applied on 2026-07-05 against PostgreSQL `143.198.230.247:5433/halder`.
+
+Cards promoted:
+
+- `No More Lies`
+- `Reject`
+- `Scatter Ray`
+- `Spectral Interference`
+
+Runtime scope:
+
+- `xmage_counter_target_spell_unless_controller_pays_generic_v1`
+
+Supported exact forms:
+
+- `CounterUnlessPaysEffect(new GenericManaCost(N))` for one-shot instant/sorcery
+  stack counters;
+- optional XMage exile replacement
+  `CounterUnlessPaysEffect(new GenericManaCost(N), true)`;
+- target `spell`;
+- target `artifact or creature spell`;
+- target `creature or planeswalker spell`.
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg528_counter_unless_exile_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg528_counter_unless_pays_exile_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg528_counter_unless_pays_exile_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg528_counter_unless_pays_exile_new_server.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/battle_package_end_to_end_validation_20260705_pg528_counter_unless_pays_exile_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg528_counter_unless_pays_exile_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg528_counter_unless_pays_exile_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg528_counter_unless_pays_exile_new_server.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=5021`
+- `battle_family_mapper_required=28852`
+- `target_identity_count=25929`
+- `xmage_authoritative_source_count=25615`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25615`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+
+Residual boundary: PG528 does not authorize dynamic tax counters such as `{X}`,
+party/domain/devotion/count-based tax values, additional counter riders beyond
+the exact exile replacement above, activated/triggered ability counters, or
+unsupported stack target classes.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
