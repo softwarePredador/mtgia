@@ -195,6 +195,13 @@ value-safe pairs exist, candidate copy, battle, promotion, and value-safe
 reclassification remain closed and the next route is
 `collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes`.
 
+Then run `global_commander_same_lane_cut_evidence_plan.py`. It converts
+stage-only same-lane cut blockers into required evidence lanes: protected-lane
+trace/equal-gate proof, structural-staple proof, expected-package anchor proof,
+cross-role risk review, contextual staple review, or prior failed-gate reopen
+proof. This plan still does not reclassify cuts, copy a deck, run battle, or
+promote anything.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

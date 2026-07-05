@@ -1,0 +1,1492 @@
+{
+  "artifact_type": "global_commander_same_lane_cut_evidence_plan",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "candidate_copy_closed_until_value_safe_same_lane_pair_exists",
+    "value_safe_reclassification_closed_until_evidence_plan_is_satisfied",
+    "same_lane_stage_only_cut_evidence_required:28",
+    "hard_blocked_same_lane_cut_candidates:19"
+  ],
+  "deck_action_allowed": false,
+  "evidence_plan_rows": [
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Diabolic Intent",
+      "evidence_lanes": [
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "maximum_evidence_burden": 4,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "requirements": [
+        "check current deck usage and replacement coverage before treating the contextual staple as value-safe"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Ornithopter of Paradise",
+      "evidence_lanes": [
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "maximum_evidence_burden": 4,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "check current deck usage and replacement coverage before treating the contextual staple as value-safe"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Professional Face-Breaker",
+      "evidence_lanes": [
+        "cross_role_risk_trace_or_new_cut_source",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "prove the non-target role is redundant or find a cut without cross-role risk",
+        "check current deck usage and replacement coverage before treating the contextual staple as value-safe"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut",
+        "card_flow_cut"
+      ],
+      "score": 52,
+      "stage_reasons": [
+        "non_target_cut_risk:card_flow_cut",
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Sunforger",
+      "evidence_lanes": [
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "card_draw_selection",
+        "tutors_access"
+      ],
+      "requirements": [
+        "prove the non-target role is redundant or find a cut without cross-role risk"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "tutor_access_cut",
+        "card_flow_cut"
+      ],
+      "score": 50,
+      "stage_reasons": [
+        "non_target_cut_risk:attack_window_or_extra_combat_cut,card_flow_cut"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "evidence_lanes": [
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "board_wipes_resets",
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "prove the non-target role is redundant or find a cut without cross-role risk"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "mana_acceleration_cut"
+      ],
+      "score": 45,
+      "stage_reasons": [
+        "non_target_cut_risk:attack_window_or_extra_combat_cut"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Grand Abolisher",
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "expected_package_anchor_replacement_proof",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "requirements": [
+        "prove the protected lane is preserved by the add and that cutting this card does not weaken the commander attack window",
+        "prove the expected commander package function remains covered after the cut",
+        "check current deck usage and replacement coverage before treating the contextual staple as value-safe"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "commander_expected_package_anchor_requires_stage_proof",
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Ragavan, Nimble Pilferer",
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "cross_role_risk_trace_or_new_cut_source",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "card_draw_selection",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "prove the protected lane is preserved by the add and that cutting this card does not weaken the commander attack window",
+        "prove the non-target role is redundant or find a cut without cross-role risk",
+        "check current deck usage and replacement coverage before treating the contextual staple as value-safe"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut",
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "score": 45,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:card_flow_cut,mana_acceleration_cut",
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Ragavan, Nimble Pilferer",
+      "evidence_lanes": [
+        "multi_role_protected_lane_replacement_proof",
+        "cross_role_risk_trace_or_new_cut_source",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "card_draw_selection",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "prove every protected secondary role is replaced before any value-safe reclassification",
+        "prove the non-target role is redundant or find a cut without cross-role risk",
+        "check current deck usage and replacement coverage before treating the contextual staple as value-safe"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut",
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "score": 45,
+      "stage_reasons": [
+        "other_protected_profile_role_haste_protection_silence",
+        "non_target_cut_risk:card_flow_cut,haste_or_protection_cut",
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Arcane Signet",
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "prove the expected commander package function remains covered after the cut",
+        "prove same-lane replacement or replay-backed equal gate before cutting a structural format staple"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Demonic Tutor",
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "requirements": [
+        "prove the expected commander package function remains covered after the cut",
+        "prove same-lane replacement or replay-backed equal gate before cutting a structural format staple"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Enlightened Tutor",
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "requirements": [
+        "prove the expected commander package function remains covered after the cut",
+        "prove same-lane replacement or replay-backed equal gate before cutting a structural format staple"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Lightning Greaves",
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "expected_package_anchor_replacement_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "requirements": [
+        "prove the protected lane is preserved by the add and that cutting this card does not weaken the commander attack window",
+        "prove the expected commander package function remains covered after the cut"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Sol Ring",
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "prove the expected commander package function remains covered after the cut",
+        "prove same-lane replacement or replay-backed equal gate before cutting a structural format staple"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Vampiric Tutor",
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "requirements": [
+        "prove the expected commander package function remains covered after the cut",
+        "prove same-lane replacement or replay-backed equal gate before cutting a structural format staple"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "The One Ring",
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "card_draw_selection",
+        "haste_protection_silence"
+      ],
+      "requirements": [
+        "prove the protected lane is preserved by the add and that cutting this card does not weaken the commander attack window",
+        "prove the non-target role is redundant or find a cut without cross-role risk"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "score": 51,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:card_flow_cut"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Ranger-Captain of Eos",
+      "evidence_lanes": [
+        "multi_role_protected_lane_replacement_proof",
+        "cross_role_risk_trace_or_new_cut_source",
+        "expected_package_anchor_replacement_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "requirements": [
+        "prove every protected secondary role is replaced before any value-safe reclassification",
+        "prove the non-target role is redundant or find a cut without cross-role risk",
+        "prove the expected commander package function remains covered after the cut"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "score": 50,
+      "stage_reasons": [
+        "other_protected_profile_role_haste_protection_silence",
+        "non_target_cut_risk:haste_or_protection_cut",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "The Seriema",
+      "evidence_lanes": [
+        "multi_role_protected_lane_replacement_proof",
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "requirements": [
+        "prove every protected secondary role is replaced before any value-safe reclassification",
+        "prove the non-target role is redundant or find a cut without cross-role risk"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "score": 50,
+      "stage_reasons": [
+        "other_protected_profile_role_haste_protection_silence",
+        "non_target_cut_risk:haste_or_protection_cut"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "tutors_access",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Silence",
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "expected_package_anchor_replacement_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "requirements": [
+        "prove the protected lane is preserved by the add and that cutting this card does not weaken the commander attack window",
+        "prove the expected commander package function remains covered after the cut"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 49,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Ranger-Captain of Eos",
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "cross_role_risk_trace_or_new_cut_source",
+        "expected_package_anchor_replacement_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "requirements": [
+        "prove the protected lane is preserved by the add and that cutting this card does not weaken the commander attack window",
+        "prove the non-target role is redundant or find a cut without cross-role risk",
+        "prove the expected commander package function remains covered after the cut"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "score": 45,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:tutor_access_cut",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "The Seriema",
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "haste_protection_silence",
+        "tutors_access"
+      ],
+      "requirements": [
+        "prove the protected lane is preserved by the add and that cutting this card does not weaken the commander attack window",
+        "prove the non-target role is redundant or find a cut without cross-role risk"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut",
+        "tutor_access_cut"
+      ],
+      "score": 45,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:tutor_access_cut"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Smothering Tithe",
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 6,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "prove same-lane replacement or replay-backed equal gate before cutting a structural format staple"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 70,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Jeska's Will",
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 6,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "prove same-lane replacement or replay-backed equal gate before cutting a structural format staple"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 64,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Hammer of Nazahn",
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 6,
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "requirements": [
+        "prove the protected lane is preserved by the add and that cutting this card does not weaken the commander attack window"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 63,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Dark Ritual",
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 6,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "prove same-lane replacement or replay-backed equal gate before cutting a structural format staple"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Mana Vault",
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 6,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "prove same-lane replacement or replay-backed equal gate before cutting a structural format staple"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Voice of Victory",
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 6,
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "requirements": [
+        "prove the protected lane is preserved by the add and that cutting this card does not weaken the commander attack window"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 57,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Blightsteel Colossus // Blightsteel Colossus",
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 6,
+      "profile_roles": [
+        "dedicated_win_conditions",
+        "haste_protection_silence"
+      ],
+      "requirements": [
+        "prove the protected lane is preserved by the add and that cutting this card does not weaken the commander attack window"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 51,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "haste_protection_silence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "evidence_lanes": [
+        "prior_failed_gate_reopen_proof"
+      ],
+      "maximum_evidence_burden": 7,
+      "minimum_evidence_burden": 7,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "requirements": [
+        "show materially new same-lane evidence because prior global feedback already blocked this cut"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 64,
+      "stage_reasons": [
+        "global_battle_feedback_requires_new_same_lane_or_gate"
+      ],
+      "status": "same_lane_stage_only_cut_needs_evidence",
+      "target_cut_role": "mana_acceleration",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "generated_at": "2026-07-05T23:51:41.506402+00:00",
+  "hard_blocked_cut_sample": [
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Ancient Copper Dragon",
+      "cmc": 6.0,
+      "cut_reasons": [
+        "same_lane_mana_acceleration",
+        "higher_curve_cut_pressure",
+        "slower_ramp_replacement_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut"
+      ],
+      "score": 58,
+      "stage_reasons": [
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Elder Dragon"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Angel of the Ruins",
+      "cmc": 7.0,
+      "cut_reasons": [
+        "same_lane_tutors_access",
+        "higher_curve_cut_pressure",
+        "high_curve_tutor_replacement_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 56,
+      "stage_reasons": [
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "tutors_access",
+      "type_line": "Artifact Creature \u2014 Angel"
+    },
+    {
+      "block_reasons": [
+        "land_slot_not_cut_by_nonland_same_lane_pair"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Arena of Glory",
+      "cmc": 0.0,
+      "cut_reasons": [
+        "same_lane_haste_protection_silence"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "haste_protection_silence",
+        "lands"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 45,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "land_slot_not_cut_by_nonland_same_lane_pair"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Arid Mesa",
+      "cmc": 0.0,
+      "cut_reasons": [
+        "same_lane_tutors_access"
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Arid Mesa",
+        "category": "",
+        "edhrec_rank": 55
+      },
+      "mutation_allowed": false,
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 45,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "tutors_access",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Aurelia, the Law Above",
+      "cmc": 5.0,
+      "cut_reasons": [
+        "same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "board_wipes_resets",
+        "card_draw_selection",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "score": 51,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut,card_flow_cut"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Creature \u2014 Angel"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Avacyn, Angel of Hope",
+      "cmc": 8.0,
+      "cut_reasons": [
+        "same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure",
+        "format_staple_requires_extra_review"
+      ],
+      "format_staple": {
+        "archetype": "commanders",
+        "card_name": "Avacyn, Angel of Hope",
+        "category": "",
+        "edhrec_rank": 755
+      },
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 43,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "staple_tier": "format_staple_reviewable",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Legendary Creature \u2014 Angel"
+    },
+    {
+      "block_reasons": [
+        "land_slot_not_cut_by_nonland_same_lane_pair"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Bloodstained Mire",
+      "cmc": 0.0,
+      "cut_reasons": [
+        "same_lane_tutors_access"
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Bloodstained Mire",
+        "category": "",
+        "edhrec_rank": 43
+      },
+      "mutation_allowed": false,
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 45,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "tutors_access",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Cavern-Hoard Dragon",
+      "cmc": 9.0,
+      "cut_reasons": [
+        "same_lane_mana_acceleration",
+        "higher_curve_cut_pressure",
+        "slower_ramp_replacement_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 58,
+      "stage_reasons": [
+        "other_protected_profile_role_haste_protection_silence",
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut,haste_or_protection_cut"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Cavern-Hoard Dragon",
+      "cmc": 9.0,
+      "cut_reasons": [
+        "same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 51,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut,mana_acceleration_cut"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "land_slot_not_cut_by_nonland_same_lane_pair"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Fabled Passage",
+      "cmc": 0.0,
+      "cut_reasons": [
+        "same_lane_tutors_access"
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Fabled Passage",
+        "category": "",
+        "edhrec_rank": 60
+      },
+      "mutation_allowed": false,
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 45,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "tutors_access",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Goldlust Triad",
+      "cmc": 5.0,
+      "cut_reasons": [
+        "same_lane_mana_acceleration",
+        "higher_curve_cut_pressure",
+        "slower_ramp_replacement_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut"
+      ],
+      "score": 58,
+      "stage_reasons": [
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Goldspan Dragon",
+      "cmc": 5.0,
+      "cut_reasons": [
+        "same_lane_mana_acceleration",
+        "higher_curve_cut_pressure",
+        "slower_ramp_replacement_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 58,
+      "stage_reasons": [
+        "other_protected_profile_role_haste_protection_silence",
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut,haste_or_protection_cut"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "mana_acceleration",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Goldspan Dragon",
+      "cmc": 5.0,
+      "cut_reasons": [
+        "same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 51,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut,mana_acceleration_cut"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Hellkite Charger",
+      "cmc": 6.0,
+      "cut_reasons": [
+        "same_lane_haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "attack_window_or_extra_combat_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 51,
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "haste_protection_silence",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Hoarding Broodlord",
+      "cmc": 8.0,
+      "cut_reasons": [
+        "same_lane_tutors_access",
+        "higher_curve_cut_pressure",
+        "high_curve_tutor_replacement_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 56,
+      "stage_reasons": [
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "land_slot_not_cut_by_nonland_same_lane_pair"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Marsh Flats",
+      "cmc": 0.0,
+      "cut_reasons": [
+        "same_lane_tutors_access"
+      ],
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Marsh Flats",
+        "category": "",
+        "edhrec_rank": 51
+      },
+      "mutation_allowed": false,
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 45,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "staple_tier": "structural_foundation_anchor",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "tutors_access",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Razaketh, the Foulblooded",
+      "cmc": 8.0,
+      "cut_reasons": [
+        "same_lane_tutors_access",
+        "higher_curve_cut_pressure",
+        "high_curve_tutor_replacement_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 56,
+      "stage_reasons": [
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "tutors_access",
+      "type_line": "Legendary Creature \u2014 Demon"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Rune-Scarred Demon",
+      "cmc": 7.0,
+      "cut_reasons": [
+        "same_lane_tutors_access",
+        "higher_curve_cut_pressure",
+        "high_curve_tutor_replacement_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 56,
+      "stage_reasons": [
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Demon"
+    },
+    {
+      "block_reasons": [
+        "commander_payoff_slot_protected"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Starfield Shepherd",
+      "cmc": 5.0,
+      "cut_reasons": [
+        "same_lane_tutors_access",
+        "higher_curve_cut_pressure",
+        "high_curve_tutor_replacement_pressure"
+      ],
+      "format_staple": {},
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 56,
+      "stage_reasons": [
+        "non_target_cut_risk:angel_demon_dragon_payoff_cut"
+      ],
+      "staple_tier": "not_format_staple",
+      "status": "blocked_same_lane_cut_candidate",
+      "target_cut_role": "tutors_access",
+      "type_line": "Creature \u2014 Angel"
+    }
+  ],
+  "input_artifacts": {
+    "cut_pair_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "No battle or promotion opens from this evidence plan.",
+    "evidence_boundary": "This plan names missing proof; it does not reclassify stage-only cuts.",
+    "hard_block_boundary": "Lands and commander payoff slots remain blocked, not stage-only candidates.",
+    "same_lane_boundary": "Same-lane cuts still need trace, staple, anchor, or equal-gate proof when stage-only reasons exist."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "same_lane_cut_evidence_plan_ready_no_deck_action",
+  "summary": {
+    "blocked_reason_counts": {
+      "commander_payoff_slot_protected": 14,
+      "land_slot_not_cut_by_nonland_same_lane_pair": 5
+    },
+    "candidate_copy_blocker_count": 4,
+    "commander": "Kaalia of the Vast",
+    "cut_pair_status": "same_lane_cut_pair_collection_blocks_candidate_copy",
+    "deck_id": "619",
+    "evidence_lane_counts": {
+      "contextual_staple_usage_and_replacement_review": 6,
+      "cross_role_risk_trace_or_new_cut_source": 10,
+      "expected_package_anchor_replacement_proof": 10,
+      "multi_role_protected_lane_replacement_proof": 3,
+      "prior_failed_gate_reopen_proof": 1,
+      "protected_same_lane_usage_trace_or_equal_gate": 10,
+      "structural_staple_same_lane_or_equal_gate_proof": 9
+    },
+    "hard_blocked_cut_count": 19,
+    "next_gate": "collect_trace_or_external_evidence_for_same_lane_stage_only_cuts",
+    "ready_pair_count": 0,
+    "reason_counts": {
+      "commander_expected_package_anchor_requires_stage_proof": 10,
+      "contextual_staple_requires_stage_review": 6,
+      "global_battle_feedback_requires_new_same_lane_or_gate": 1,
+      "non_target_cut_risk:attack_window_or_extra_combat_cut": 1,
+      "non_target_cut_risk:attack_window_or_extra_combat_cut,card_flow_cut": 1,
+      "non_target_cut_risk:card_flow_cut": 2,
+      "non_target_cut_risk:card_flow_cut,haste_or_protection_cut": 1,
+      "non_target_cut_risk:card_flow_cut,mana_acceleration_cut": 1,
+      "non_target_cut_risk:haste_or_protection_cut": 2,
+      "non_target_cut_risk:tutor_access_cut": 2,
+      "other_protected_profile_role_haste_protection_silence": 3,
+      "structural_foundation_staple_requires_same_lane_or_battle_proof": 9,
+      "target_role_is_protected_profile_lane_requires_trace_or_equal_gate": 10
+    },
+    "selected_add_count": 8,
+    "stage_only_cut_evidence_count": 28,
+    "target_role_counts": {
+      "haste_protection_silence": 10,
+      "mana_acceleration": 11,
+      "tutors_access": 7
+    },
+    "unpaired_add_count": 8
+  },
+  "value_safe_reclassification_allowed_now": false
+}

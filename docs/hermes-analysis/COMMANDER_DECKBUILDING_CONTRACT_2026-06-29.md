@@ -352,7 +352,12 @@ Operational priority after this pivot:
     cuts as stage-only or blocked, and keep candidate copy, battle, promotion,
     and value-safe reclassification closed when no same-lane value-safe pairs
     exist;
-44. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+44. run `global_commander_same_lane_cut_evidence_plan.py` when same-lane cut
+    pairing finds only stage-only or hard-blocked cuts; it must map every
+    stage-only reason to trace, staple, anchor, prior-gate, cross-role, or
+    manual evidence lanes without reclassifying cuts or opening candidate copy,
+    battle, promotion, or value-safe reclassification;
+45. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -414,6 +419,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -920,6 +926,15 @@ Current external refresh on 2026-07-05:
   blocks candidate copy, battle, promotion, and value-safe reclassification.
   The next gate is
   `collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes`.
+- Current same-lane cut evidence planning returns
+  `same_lane_cut_evidence_plan_ready_no_deck_action` with
+  `stage_only_cut_evidence_count=28`, `hard_blocked_cut_count=19`, and
+  `ready_pair_count=0`. The largest evidence lanes are protected same-lane
+  usage/equal-gate proof, expected-package anchor replacement, structural
+  staple proof, cross-role risk review, contextual staple review, multi-role
+  protected-lane proof, and one prior failed-gate reopen proof. Candidate copy,
+  battle, promotion, and value-safe reclassification remain closed. The next
+  gate is `collect_trace_or_external_evidence_for_same_lane_stage_only_cuts`.
 
 ## Global Commander Rollout - 2026-07-01
 

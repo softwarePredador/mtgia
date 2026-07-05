@@ -198,6 +198,12 @@ GLOBAL_COMMANDER_SAME_LANE_CUT_PAIR_COLLECTOR = (
 GLOBAL_COMMANDER_SAME_LANE_CUT_PAIR_COLLECTOR_TEST = (
     SCRIPT_DIR / "test_global_commander_same_lane_cut_pair_collector.py"
 )
+GLOBAL_COMMANDER_SAME_LANE_CUT_EVIDENCE_PLAN = (
+    SCRIPT_DIR / "global_commander_same_lane_cut_evidence_plan.py"
+)
+GLOBAL_COMMANDER_SAME_LANE_CUT_EVIDENCE_PLAN_TEST = (
+    SCRIPT_DIR / "test_global_commander_same_lane_cut_evidence_plan.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -443,6 +449,10 @@ GLOBAL_COMMANDER_SCOPE1_SAME_LANE_PACKAGE_SOURCE_SYNTHESIZER_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_SAME_LANE_CUT_PAIR_COLLECTOR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_SAME_LANE_CUT_EVIDENCE_PLAN_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -796,6 +806,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "same_lane_cut_pair_collection_blocks_candidate_copy",
                 "collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes",
+                "global_commander_same_lane_cut_evidence_plan.py",
+                "global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_cut_evidence_plan_ready_no_deck_action",
+                "collect_trace_or_external_evidence_for_same_lane_stage_only_cuts",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1091,6 +1105,10 @@ def build_audit() -> dict[str, Any]:
                 "ready_pair_count=0",
                 "stage_only_cut_candidate_count=28",
                 "collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes",
+                "global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_cut_evidence_plan_ready_no_deck_action",
+                "stage_only_cut_evidence_count=28",
+                "collect_trace_or_external_evidence_for_same_lane_stage_only_cuts",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1805,6 +1823,36 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_cut_pairs_ready_for_scope_reducer",
                 "same_lane_cut_pair_collection_blocks_candidate_copy",
                 "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_CUT_EVIDENCE_PLAN,
+            [
+                "global_commander_same_lane_cut_evidence_plan",
+                "same_lane_cut_evidence_plan_ready_no_deck_action",
+                "same_lane_cut_evidence_plan_ready_pairs_need_scope_reducer",
+                "same_lane_cut_evidence_plan_blocks_no_stage_only_lane",
+                "collect_trace_or_external_evidence_for_same_lane_stage_only_cuts",
+                "protected_same_lane_usage_trace_or_equal_gate",
+                "structural_staple_same_lane_or_equal_gate_proof",
+                "prior_failed_gate_reopen_proof",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_CUT_EVIDENCE_PLAN_TEST,
+            [
+                "test_plans_evidence_for_stage_only_same_lane_cuts",
+                "test_ready_pairs_route_to_scope_reducer",
+                "test_no_stage_only_lane_routes_to_broader_research",
+                "same_lane_cut_evidence_plan_ready_no_deck_action",
+                "collect_trace_or_external_evidence_for_same_lane_stage_only_cuts",
+                "structural_staple_same_lane_or_equal_gate_proof",
             ],
         )
     )
@@ -2895,6 +2943,27 @@ def build_audit() -> dict[str, Any]:
                 "Gamble",
                 "Smothering Tithe",
                 "structural_foundation_staple_requires_same_lane_or_battle_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_SAME_LANE_CUT_EVIDENCE_PLAN_REPORT,
+            [
+                "Global Commander Same-Lane Cut Evidence Plan",
+                "same_lane_cut_evidence_plan_ready_no_deck_action",
+                "selected_add_count: `8`",
+                "ready_pair_count: `0`",
+                "unpaired_add_count: `8`",
+                "stage_only_cut_evidence_count: `28`",
+                "hard_blocked_cut_count: `19`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "collect_trace_or_external_evidence_for_same_lane_stage_only_cuts",
+                "protected_same_lane_usage_trace_or_equal_gate",
+                "structural_staple_same_lane_or_equal_gate_proof",
+                "prior_failed_gate_reopen_proof",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
             ],
         )
     )

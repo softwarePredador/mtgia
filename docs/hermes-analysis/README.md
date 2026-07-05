@@ -649,6 +649,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `blocked_cut_candidate_count=19`. Nenhum add pode ser copiado ainda; o
     proximo gate e
     `collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes`.
+    O plano de evidencia desses cortes fica em
+    `global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `same_lane_cut_evidence_plan_ready_no_deck_action`, com
+    `stage_only_cut_evidence_count=28`, `hard_blocked_cut_count=19` e
+    `ready_pair_count=0`. O proximo gate e
+    `collect_trace_or_external_evidence_for_same_lane_stage_only_cuts`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
