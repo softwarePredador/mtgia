@@ -37,7 +37,10 @@ class BattleAnalystCliHelpTests(unittest.TestCase):
                     f"sys.path.insert(0, {str(SCRIPT_DIR)!r}); "
                     "import battle_analyst_v9 as b; "
                     "print(b.target_player_name_for_commander({'name':'Kaalia of the Vast'})); "
-                    "print(b.target_player_name_for_commander({'name':'Lorehold, the Historian'}))"
+                    "print(b.target_player_name_for_commander({'name':'Lorehold, the Historian'})); "
+                    "print(b.commander_log_slug({'name':'Kaalia of the Vast'})); "
+                    "print(b.commander_log_slug({'name':'Lorehold, the Historian'})); "
+                    "print(b.battle_log_path_for_commander({'name':'Kaalia of the Vast'}).endswith('/decks/kaalia-of-the-vast/BATTLE_LOG.md'))"
                 ),
             ],
             capture_output=True,
@@ -46,7 +49,16 @@ class BattleAnalystCliHelpTests(unittest.TestCase):
         )
 
         self.assertEqual(completed.returncode, 0, msg=completed.stderr)
-        self.assertEqual(completed.stdout.splitlines(), ["Kaalia of the Vast", "Lorehold"])
+        self.assertEqual(
+            completed.stdout.splitlines(),
+            [
+                "Kaalia of the Vast",
+                "Lorehold",
+                "kaalia-of-the-vast",
+                "lorehold-the-historian",
+                "True",
+            ],
+        )
 
 
 if __name__ == "__main__":

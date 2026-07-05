@@ -118,6 +118,7 @@ KNOWLEDGE_DIR = os.environ.get(
     str(_resolve_knowledge_dir()),
 )
 LOG_PATH = f"{KNOWLEDGE_DIR}/decks/lorehold-the-historian/BATTLE_LOG.md"
+LOG_PATH_ENV = "MANALOOM_BATTLE_LOG_PATH"
 
 REPLAY_EVENT_HANDLER = None
 DECISION_TRACE_HANDLER = None
@@ -232,6 +233,24 @@ def target_player_name_for_commander(commander):
     if name.lower().startswith("lorehold, the historian"):
         return "Lorehold"
     return name
+
+
+def commander_log_slug(commander):
+    if isinstance(commander, dict):
+        name = str(commander.get("oracle_name") or commander.get("name") or "").strip()
+    else:
+        name = str(commander or "").strip()
+    if not name:
+        return "target-deck"
+    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    return slug or "target-deck"
+
+
+def battle_log_path_for_commander(commander):
+    explicit = os.environ.get(LOG_PATH_ENV)
+    if explicit:
+        return explicit
+    return f"{KNOWLEDGE_DIR}/decks/{commander_log_slug(commander)}/BATTLE_LOG.md"
 
 
 def set_default_evaluation_target_for_commander(commander):
@@ -60249,9 +60268,10 @@ def main(argv=None):
     avg_wr = total_wins / total_g * 100
     print(f"\n  OVERALL v9: WR={avg_wr:.1f}% ({total_wins}W/{total_losses}L/{total_stalls}S)")
 
-    os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+    log_path = battle_log_path_for_commander(commander)
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    with open(LOG_PATH, "a") as f:
+    with open(log_path, "a") as f:
         f.write(f"\n## [{ts}] Battle Analyst v9 — Interactive Commander\n")
         f.write(f"Games: {GAMES} 4-player | Deck: L={lands} R={ramp} X={removal} CMC={avg_cmc:.2f} Instants={instants_in_deck}\n")
         f.write(f"Opponents: {len(opponent_sources)} ({opponent_kind})\n\n")
@@ -60265,7 +60285,7 @@ def main(argv=None):
             reason_str = ", ".join(f"{k}={v}" for k, v in r["win_reasons"].items())
             f.write(f"| {r['opponent']} | {r['win_rate']:.1f}% | {r['wins']} | {r['losses']} | {r['stalls']} | {r['avg_win_turn']:.1f} | {reason_str} |\n")
         f.write(f"\n**Overall WR: {avg_wr:.1f}%** ({total_wins}W/{total_losses}L/{total_stalls}S)\n")
-    print(f"\nLog: {LOG_PATH}")
+    print(f"\nLog: {log_path}")
     if metrics_path:
         write_engine_metrics_snapshot(
             metrics_path,
