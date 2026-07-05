@@ -150,6 +150,11 @@ named cut hypothesis. External absence is not proof that a used card is safe to
 cut; external presence protects or routes review, and the next step is mapping
 the corpus into internal cut policy before rerunning the miner.
 
+Use `global_commander_external_corpus_cut_policy_mapper.py` for that mapping.
+It emits explicit exclusions and negative-review holds for the next miner pass.
+The miner must consume those exclusions before re-emitting any of the same
+cards as fresh value-safe hypotheses.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

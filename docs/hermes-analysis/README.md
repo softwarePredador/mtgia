@@ -587,6 +587,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     deck alvo, e a presenca externa exige prova same-lane/equal-gate ou revisao
     negativa antes de corte. Proximo gate:
     `map_external_corpus_to_cut_policy_before_rerun_miner`.
+    O mapper de politica fica em
+    `global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `external_corpus_cut_policy_blocks_current_hypotheses`, com
+    `excluded_from_rerun_miner_count=6`,
+    `held_for_negative_review_count=2` e
+    `rerun_miner_allowed_card_count=0`. O proximo minerador precisa consumir
+    essas exclusoes antes de emitir novas hipoteses.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

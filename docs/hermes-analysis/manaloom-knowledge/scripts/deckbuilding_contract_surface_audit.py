@@ -162,6 +162,12 @@ GLOBAL_COMMANDER_EXTERNAL_REFERENCE_CORPUS_COLLECTOR = (
 GLOBAL_COMMANDER_EXTERNAL_REFERENCE_CORPUS_COLLECTOR_TEST = (
     SCRIPT_DIR / "test_global_commander_external_reference_corpus_collector.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_CORPUS_CUT_POLICY_MAPPER = (
+    SCRIPT_DIR / "global_commander_external_corpus_cut_policy_mapper.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_CORPUS_CUT_POLICY_MAPPER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_corpus_cut_policy_mapper.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -379,6 +385,10 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_CUT_SOURCE_RESEARCH_PLAN_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_REFERENCE_CORPUS_COLLECTOR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_CORPUS_CUT_POLICY_MAPPER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -704,6 +714,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "external_reference_corpus_collected_no_cut_permission",
                 "map_external_corpus_to_cut_policy_before_rerun_miner",
+                "global_commander_external_corpus_cut_policy_mapper.py",
+                "global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_corpus_cut_policy_blocks_current_hypotheses",
+                "rerun_value_safe_cut_source_miner_with_external_policy_exclusions",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -969,6 +983,11 @@ def build_audit() -> dict[str, Any]:
                 "corpus_present_count=3",
                 "corpus_absent_count=5",
                 "map_external_corpus_to_cut_policy_before_rerun_miner",
+                "global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_corpus_cut_policy_blocks_current_hypotheses",
+                "excluded_from_rerun_miner_count=6",
+                "held_for_negative_review_count=2",
+                "rerun_miner_allowed_card_count=0",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1644,6 +1663,35 @@ def build_audit() -> dict[str, Any]:
                 "external_corpus_supports_preserve_or_strict_same_lane_proof",
                 "external_absence_cannot_override_target_usage",
                 "external_absence_plus_seen_without_usage_requires_negative_review",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_CORPUS_CUT_POLICY_MAPPER,
+            [
+                "global_commander_external_corpus_cut_policy_mapper",
+                "external_corpus_cut_policy_blocks_current_hypotheses",
+                "rerun_value_safe_cut_source_miner_with_external_policy_exclusions",
+                "exclude_from_rerun_miner_until_new_internal_evidence",
+                "protect_from_rerun_miner_until_same_lane_or_equal_gate",
+                "hold_for_negative_trace_review_before_rerun_miner",
+                "miner_must_consume_policy_exclusions_before_reusing_current_hypotheses",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_CORPUS_CUT_POLICY_MAPPER_TEST,
+            [
+                "test_policy_blocks_current_hypotheses_from_rerun_miner",
+                "external_corpus_cut_policy_blocks_current_hypotheses",
+                "rerun_value_safe_cut_source_miner_with_external_policy_exclusions",
+                "protect_from_rerun_miner_until_same_lane_or_equal_gate",
+                "exclude_from_rerun_miner_until_new_internal_evidence",
+                "hold_for_negative_trace_review_before_rerun_miner",
             ],
         )
     )
@@ -2549,6 +2597,27 @@ def build_audit() -> dict[str, Any]:
                 "Biotransference",
                 "external_absence_cannot_override_target_usage",
                 "external_corpus_supports_preserve_or_strict_same_lane_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_CORPUS_CUT_POLICY_MAPPER_REPORT,
+            [
+                "Global Commander External Corpus Cut Policy Mapper",
+                "external_corpus_cut_policy_blocks_current_hypotheses",
+                "policy_row_count: `8`",
+                "excluded_from_rerun_miner_count: `6`",
+                "held_for_negative_review_count: `2`",
+                "rerun_miner_allowed_card_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "rerun_value_safe_cut_source_miner_with_external_policy_exclusions",
+                "Biotransference",
+                "Necropotence",
+                "Trouble in Pairs",
+                "exclude_from_rerun_miner_until_new_internal_evidence",
+                "protect_from_rerun_miner_until_same_lane_or_equal_gate",
             ],
         )
     )

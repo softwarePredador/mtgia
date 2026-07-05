@@ -312,7 +312,11 @@ Operational priority after this pivot:
     bracket context, and strategy-article signals back to named cut candidates,
     while preserving the rule that external absence cannot override target-deck
     usage and external presence cannot replace same-lane/equal-gate proof;
-37. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+37. run `global_commander_external_corpus_cut_policy_mapper.py` after corpus
+    collection; it must convert corpus rows into explicit miner exclusions and
+    negative-review holds so the next miner pass cannot recycle the same
+    blocked hypotheses as fresh value-safe cuts without new evidence;
+38. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -367,6 +371,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -815,6 +820,13 @@ Current external refresh on 2026-07-05:
   Presence protects/routes review, and absence is not cut permission when the
   target deck used the card. The next gate is
   `map_external_corpus_to_cut_policy_before_rerun_miner`.
+- Current external corpus cut-policy mapping returns
+  `external_corpus_cut_policy_blocks_current_hypotheses` with
+  `policy_row_count=8`, `excluded_from_rerun_miner_count=6`,
+  `held_for_negative_review_count=2`, and `rerun_miner_allowed_card_count=0`.
+  The next miner pass must consume these policy exclusions before it can claim
+  fresh value-safe cut hypotheses. The next gate is
+  `rerun_value_safe_cut_source_miner_with_external_policy_exclusions`.
 
 ## Global Commander Rollout - 2026-07-01
 

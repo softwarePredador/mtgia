@@ -1,0 +1,211 @@
+{
+  "artifact_type": "global_commander_external_corpus_cut_policy_mapper",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "all_current_external_corpus_hypotheses_blocked_or_held",
+    "candidate_copy_closed_until_fresh_value_safe_cut_pair_exists",
+    "miner_must_consume_policy_exclusions_before_reusing_current_hypotheses"
+  ],
+  "cut_policy_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_status": "external_absence_cannot_override_target_usage",
+      "cut_card": "Biotransference",
+      "cut_policy": "exclude_from_rerun_miner_until_new_internal_evidence",
+      "cut_roles": [],
+      "policy_reason": "Target-deck usage blocks value-safe reclassification even when checked external corpus is absent.",
+      "required_evidence": [
+        "new_target_deck_negative_trace",
+        "same_lane_replacement_proof",
+        "equal_gate_with_cut_lane_exercised"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "source_support_level": "absent_from_checked_kaalia_sources",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_status": "external_absence_cannot_override_target_usage",
+      "cut_card": "Maskwood Nexus",
+      "cut_policy": "exclude_from_rerun_miner_until_new_internal_evidence",
+      "cut_roles": [],
+      "policy_reason": "Target-deck usage blocks value-safe reclassification even when checked external corpus is absent.",
+      "required_evidence": [
+        "new_target_deck_negative_trace",
+        "same_lane_replacement_proof",
+        "equal_gate_with_cut_lane_exercised"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "source_support_level": "absent_from_checked_kaalia_sources",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_status": "external_corpus_supports_preserve_or_strict_same_lane_proof",
+      "cut_card": "Necromancy",
+      "cut_policy": "protect_from_rerun_miner_until_same_lane_or_equal_gate",
+      "cut_roles": [
+        "reanimation_plan_b"
+      ],
+      "policy_reason": "External corpus presence plus target usage makes this a protected review card, not value-safe cut fodder.",
+      "required_evidence": [
+        "same_lane_replacement_proof",
+        "strategy_matrix_recheck",
+        "equal_gate_with_card_lane_exercised"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "source_support_level": "commander_corpus_present",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_status": "external_corpus_supports_preserve_or_strict_same_lane_proof",
+      "cut_card": "Necropotence",
+      "cut_policy": "protect_from_rerun_miner_until_same_lane_or_equal_gate",
+      "cut_roles": [
+        "card_draw_selection",
+        "reanimation_plan_b"
+      ],
+      "policy_reason": "External corpus presence plus target usage makes this a protected review card, not value-safe cut fodder.",
+      "required_evidence": [
+        "same_lane_replacement_proof",
+        "strategy_matrix_recheck",
+        "equal_gate_with_card_lane_exercised"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "source_support_level": "commander_corpus_present_high_power",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_status": "external_absence_plus_seen_without_usage_requires_negative_review",
+      "cut_card": "Puresteel Paladin",
+      "cut_policy": "hold_for_negative_or_force_access_review_before_rerun_miner",
+      "cut_roles": [
+        "card_draw_selection"
+      ],
+      "policy_reason": "Seen-without-usage is not a negative trace; absence from checked corpus is not enough.",
+      "required_evidence": [
+        "manual_negative_trace_review_or_force_access"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "source_support_level": "absent_from_checked_kaalia_sources",
+      "trace_group": "seen_without_usage",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_status": "external_absence_cannot_override_target_usage",
+      "cut_card": "Sigarda's Aid",
+      "cut_policy": "exclude_from_rerun_miner_until_new_internal_evidence",
+      "cut_roles": [],
+      "policy_reason": "Target-deck usage blocks value-safe reclassification even when checked external corpus is absent.",
+      "required_evidence": [
+        "new_target_deck_negative_trace",
+        "same_lane_replacement_proof",
+        "equal_gate_with_cut_lane_exercised"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "source_support_level": "absent_from_checked_kaalia_sources",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_status": "external_absence_cannot_override_target_usage",
+      "cut_card": "Sram, Senior Edificer",
+      "cut_policy": "exclude_from_rerun_miner_until_new_internal_evidence",
+      "cut_roles": [
+        "card_draw_selection"
+      ],
+      "policy_reason": "Target-deck usage blocks value-safe reclassification even when checked external corpus is absent.",
+      "required_evidence": [
+        "new_target_deck_negative_trace",
+        "same_lane_replacement_proof",
+        "equal_gate_with_cut_lane_exercised"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "source_support_level": "absent_from_checked_kaalia_sources",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_status": "external_presence_requires_negative_trace_before_cut",
+      "cut_card": "Trouble in Pairs",
+      "cut_policy": "hold_for_negative_trace_review_before_rerun_miner",
+      "cut_roles": [
+        "card_draw_selection",
+        "dedicated_win_conditions"
+      ],
+      "policy_reason": "External corpus presence and seen-without-usage trace require negative review before cut consideration.",
+      "required_evidence": [
+        "manual_negative_trace_review_or_force_access",
+        "external_corpus_interpretation_for_current_bracket"
+      ],
+      "rerun_miner_allowed_for_card": false,
+      "source_support_level": "commander_corpus_present",
+      "trace_group": "seen_without_usage",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "deck_action_allowed": false,
+  "excluded_from_rerun_miner": [
+    "Biotransference",
+    "Maskwood Nexus",
+    "Necromancy",
+    "Necropotence",
+    "Sigarda's Aid",
+    "Sram, Senior Edificer"
+  ],
+  "generated_at": "2026-07-05T22:56:36.933360+00:00",
+  "held_for_negative_review": [
+    "Puresteel Paladin",
+    "Trouble in Pairs"
+  ],
+  "input_artifacts": {
+    "corpus_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "mutation_boundary": "This mapper does not copy decks, mutate DBs, run battles, or promote a package.",
+    "rerun_boundary": "The next miner pass must not re-emit excluded cards as fresh hypotheses without new evidence.",
+    "review_boundary": "Held cards need negative or force-access review before any cut consideration."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "external_corpus_cut_policy_blocks_current_hypotheses",
+  "summary": {
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "excluded_from_rerun_miner_count": 6,
+    "held_for_negative_review_count": 2,
+    "next_gate": "rerun_value_safe_cut_source_miner_with_external_policy_exclusions",
+    "policy_counts": {
+      "exclude_from_rerun_miner_until_new_internal_evidence": 4,
+      "hold_for_negative_or_force_access_review_before_rerun_miner": 1,
+      "hold_for_negative_trace_review_before_rerun_miner": 1,
+      "protect_from_rerun_miner_until_same_lane_or_equal_gate": 2
+    },
+    "policy_row_count": 8,
+    "rerun_miner_allowed_card_count": 0
+  },
+  "value_safe_reclassification_allowed_now": false
+}
