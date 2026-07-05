@@ -1786,3 +1786,42 @@ Operational lesson:
   governed by the routed miracle-access matrix.
 - The next allowed work is:
   `draft_brain_in_a_jar_runtime_contract_and_cut_miner_no_deck_action`.
+
+Brain route-governed runtime/package preflight refreshed on 2026-07-05:
+
+- Runtime preflight:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_current.md`.
+- Package preflight:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_pg_package_preflight_20260705_current.md`.
+- Runtime status:
+  `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`.
+- Package status:
+  `prepared_read_only_pending_apply_approval`, with
+  `apply_executed_by_this_script=false` and PostgreSQL writes still approval
+  gated.
+- Route gate:
+  `route_gate_valid=true`,
+  `route_planner_status=miracle_next_route_planner_selected_brain_runtime_learning_keep_607`,
+  `route_planner_candidate_queue_governed=true`,
+  and
+  `route_planner_candidate_queue_next_shell_status=next_shell_cut_path_closed_route_miracle_access_first_keep_607`.
+- Package readiness is valid only when the current runtime preflight carries the
+  governed miracle route. A stale Brain preflight, missing route gate, open deck
+  action, open natural battle, open promotion, or PostgreSQL write flag must
+  block package readiness.
+- The Brain safe-cut gap audit must also surface
+  `brain_pg_package_route_governed=true`; if a package claims review readiness
+  without that inherited route gate, the deckbuilding decision must remain
+  blocked and rerun the governed runtime/package preflights.
+- Remaining blockers:
+  active Brain rule rows `0`, named seed-safe cuts `0`, safe same-lane cuts `0`,
+  matrix scoring `false`, candidate deck materialization `false`, natural battle
+  `false`, deck action `false`, and promotion `false`.
+
+Operational lesson:
+
+- Brain in a Jar is now a useful runtime learning target with a review-only
+  PostgreSQL package, but it is still not a Lorehold deck edit.
+- No Brain candidate list may be materialized until the active rule exists,
+  Hermes is synced, the Brain runtime preflight is rerun, and a named same-lane
+  seed-safe cut exists.

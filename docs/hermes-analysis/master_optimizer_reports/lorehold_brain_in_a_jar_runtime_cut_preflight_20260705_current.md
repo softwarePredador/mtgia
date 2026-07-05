@@ -1,11 +1,14 @@
 # Lorehold Brain in a Jar Runtime/Cut Preflight
 
-- Generated at: `2026-07-05T05:44:03Z`
+- Generated at: `2026-07-05T09:13:35Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
 - Decision status: `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`
+- Route planner status: `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`
 - Route planner selected Brain: `true`
+- Route planner candidate queue governed: `true`
+- Route gate valid: `true`
 - Brain candidate row found: `true`
 - Brain contract found: `true`
 - XMage class found: `true`
@@ -63,9 +66,15 @@
 ## External Confirmation
 
 - source_lane: `official_card_text_and_rulings`
+- oracle_id: `321dbd10-1d48-49fc-ba6a-1df241a53338`
+- commander_legality: `legal`
 - learning_signal: Brain is not generic ramp; its value depends on modeling charge counters, exact mana-value spell selection from hand, free casting, and X-counter scry.
+- oracle_key_points: `artifact_mana_cost_2, first_ability_cost_1_tap, first_ability_adds_charge_counter_before_selection, free_cast_from_hand_instant_or_sorcery_by_exact_mana_value, second_ability_cost_3_tap_remove_x_charge_counters, second_ability_scry_x`
+- ruling_key_points: `newly_placed_charge_counter_counts_for_spell_selection, no_priority_between_counter_addition_and_spell_choice, uses_last_known_counters_if_brain_leaves_before_resolution, alternative_costs_not_payable_when_cast_without_mana_cost, additional_costs_remain_payable_or_mandatory, x_in_mana_cost_must_be_zero`
 - gatherer: https://gatherer.wizards.com/SOI/en-us/252/brain-in-a-jar
 - scryfall: https://scryfall.com/card/soi/252/brain-in-a-jar
+- scryfall_api: https://api.scryfall.com/cards/named?exact=Brain%20in%20a%20Jar
+- scryfall_rulings_api: https://api.scryfall.com/cards/88ecfcbe-e8db-4f08-aa8b-5b7b3e6c6ce7/rulings
 
 ## Decision
 

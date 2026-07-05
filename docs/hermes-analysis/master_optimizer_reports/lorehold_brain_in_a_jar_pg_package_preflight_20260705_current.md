@@ -1,6 +1,6 @@
 # Lorehold Brain in a Jar PostgreSQL Package Preflight
 
-- Generated at: `2026-07-05T05:44:07Z`
+- Generated at: `2026-07-05T09:17:30Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
@@ -8,6 +8,13 @@
 - Apply ready for manual review: `true`
 - Apply executed by this script: `false`
 - Brain exact adapter present: `true`
+- Runtime preflight status: `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`
+- Runtime preflight required status: `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`
+- Runtime route gate valid: `true`
+- Runtime route planner status: `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`
+- Runtime candidate queue governed: `true`
+- Runtime candidate queue next-shell status: `next_shell_cut_path_closed_route_miracle_access_first_keep_607`
+- Runtime candidate queue matrix-route governed: `true`
 - Active Brain rule count before apply: `0`
 - Safe cut count before apply: `0`
 - Logical rule key: `battle_rule_v1:aedfa4929249f55c1d607effe109f3f3`

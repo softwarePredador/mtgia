@@ -2138,10 +2138,18 @@ deck `607`, or write PostgreSQL.
 Current result:
 
 - decision status:
-  `brain_in_a_jar_runtime_cut_preflight_blocked_no_active_rule_no_safe_cut_keep_607`;
+  `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`;
 - route planner selected Brain: `true`;
+- route planner status:
+  `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`;
+- route gate valid: `true`;
+- route planner candidate queue governed: `true`;
+- route planner candidate queue next-shell status:
+  `next_shell_cut_path_closed_route_miracle_access_first_keep_607`;
+- candidate queue matrix-route governed: `true`;
 - Brain candidate row found: `true`;
 - Brain contract found: `true`;
+- Brain exact adapter present: `true`;
 - XMage class found: `true`;
 - XMage signal hits: `5`;
 - required runtime slices: `5`;
@@ -2154,7 +2162,12 @@ Current result:
 - natural battle gate allowed now: `false`;
 - PostgreSQL writes allowed now: `false`;
 - recommended next action:
-  `draft_exact_mana_value_free_cast_runtime_family_before_any_brain_deck_action`.
+  `prepare_brain_in_a_jar_pg_package_precheck_and_mine_seed_safe_cut_no_deck_action`.
+- external confirmation: Scryfall/Gatherer source lane confirms Oracle ID
+  `321dbd10-1d48-49fc-ba6a-1df241a53338`, Commander legality `legal`,
+  first activation `{1}, tap`, charge counter added before matching an
+  instant/sorcery by exact mana value from hand, and second activation
+  `{3}, tap`, remove X charge counters to scry X.
 
 Blocked same-lane cut set:
 
@@ -2177,9 +2190,8 @@ Operational lesson:
 - Every current same-lane slot is hard-blocked under protected `607` evidence:
   commander, mana base, protected anchor, early-mana support, prior rejection,
   missing cut-safety proof, or measured high exposure.
-- The next implementation step is runtime-family work for exact mana-value
-  free-cast from hand plus replay fields, then rerun this preflight. It is not
-  a deck mutation or natural battle.
+- The next implementation step is package review/apply approval plus renewed
+  seed-safe cut mining. It is not a deck mutation or natural battle.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion.
 
@@ -2337,6 +2349,15 @@ Current package result:
 - apply ready for manual review: `true`;
 - apply executed by this script: `false`;
 - Brain exact adapter present: `true`;
+- runtime preflight required status:
+  `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`;
+- runtime preflight route gate valid: `true`;
+- runtime preflight route planner status:
+  `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`;
+- runtime preflight candidate queue governed: `true`;
+- runtime preflight candidate queue next-shell status:
+  `next_shell_cut_path_closed_route_miracle_access_first_keep_607`;
+- runtime preflight candidate queue matrix-route governed: `true`;
 - active Brain rule rows before apply: `0`;
 - safe same-lane cuts before apply: `0`;
 - proposed scope:
@@ -2364,6 +2385,8 @@ Package safety notes:
   matching instant/sorcery from hand, casts during ability resolution, and
   still needs explicit follow-up for nontrivial additional-cost/X edge cases
   before Brain can be used as broad deck-quality proof.
+- the package now refuses readiness when the runtime preflight is stale or not
+  governed by the routed miracle-access queue.
 
 Operational lesson:
 
@@ -2375,25 +2398,27 @@ Operational lesson:
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion.
 
-Validation after package generation:
+Validation after route-governed package/safe-cut refresh:
 
-- `python3 -m pytest -q
-  docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_brain_in_a_jar_exact_runtime_contract.py
-  docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_brain_in_a_jar_runtime_cut_preflight.py
-  docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_brain_in_a_jar_pg_package_preflight.py`
-  returned `15 passed`;
+- focused pytest set covering Brain exact contract, runtime/cut preflight,
+  PostgreSQL package preflight, safe-cut gap audit, miracle route planner,
+  current-best synthesis, artifact contract, operational surface, legacy
+  contamination, and XMage strategy consistency returned `73 passed`;
 - `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_brain_in_a_jar_runtime.py`
   returned `PASS test_brain_in_a_jar_runtime`;
 - `python3 -m pytest -q
-  docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_exact_scope_runtime.py`
-  returned `281 passed, 3 subtests passed`;
-- `python3 -m pytest -q
+  docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_exact_scope_runtime.py
   docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_batch_pg_package_builder.py`
-  returned `15 passed`;
-- `deckbuilding_contract_surface_audit_20260705_brain_pg_package_current`,
-  `xmage_strategy_consistency_audit_20260705_brain_pg_package_current`,
-  `operational_surface_alignment_audit_20260705_brain_pg_package_current`,
-  and `legacy_contamination_audit_20260705_brain_pg_package_current` all
+  returned `301 passed, 3 subtests passed`;
+- `lorehold_current_best_baseline_synthesis_20260705_brain_route_governed_current`
+  returned `current_best_baseline_synthesis_keep_607`, `top_deck_is_607=true`,
+  `protected_baseline_rank=1`, `sidecar_safe_cut_ready_count=0`, and
+  `ready_for_real_deck_change_from_artifact_gate=false`;
+- `lorehold_artifact_contract_audit_20260705_brain_route_governed_current`,
+  `deckbuilding_contract_surface_audit_20260705_brain_route_governed_current`,
+  `operational_surface_alignment_audit_20260705_brain_route_governed_current`,
+  `legacy_contamination_audit_20260705_brain_route_governed_current`, and
+  `xmage_strategy_consistency_audit_20260705_brain_route_governed_current` all
   returned `pass`.
 
 ## Brain in a Jar Safe-Cut Gap Audit - 2026-07-05
@@ -2417,6 +2442,16 @@ Current result:
   `prepared_read_only_pending_apply_approval`;
 - apply ready for manual review: `true`;
 - apply executed by this script: `false`;
+- Brain PG package route governed: `true`;
+- runtime preflight status:
+  `brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607`;
+- runtime route gate valid: `true`;
+- runtime route planner status:
+  `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`;
+- runtime candidate queue governed: `true`;
+- runtime candidate queue next-shell status:
+  `next_shell_cut_path_closed_route_miracle_access_first_keep_607`;
+- runtime candidate queue matrix-route governed: `true`;
 - active Brain rule count: `0`;
 - safe same-lane cuts: `0`;
 - blocked same-lane cuts: `9`;

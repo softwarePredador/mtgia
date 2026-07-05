@@ -42,6 +42,9 @@ DEFAULT_OUT_PREFIX = (
 
 BRAIN = "Brain in a Jar"
 BRAIN_LANE = "topdeck_miracle_engine"
+TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_runtime_learning_keep_607"
+TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
+TARGET_MATRIX_CONTRACT = "miracle_access_first_shell_contract"
 BRAIN_SAME_LANE_PRIORITY = {
     "Scroll Rack": 1,
     "Sensei's Divining Top": 2,
@@ -59,10 +62,30 @@ BLOCKER_FIELDS = ("hard_stop_blockers", "soft_evidence_blockers", "other_blocker
 
 EXTERNAL_EVIDENCE = {
     "source_lane": "official_card_text_and_rulings",
+    "oracle_id": "321dbd10-1d48-49fc-ba6a-1df241a53338",
+    "commander_legality": "legal",
     "links": {
+        "scryfall_api": "https://api.scryfall.com/cards/named?exact=Brain%20in%20a%20Jar",
+        "scryfall_rulings_api": "https://api.scryfall.com/cards/88ecfcbe-e8db-4f08-aa8b-5b7b3e6c6ce7/rulings",
         "scryfall": "https://scryfall.com/card/soi/252/brain-in-a-jar",
         "gatherer": "https://gatherer.wizards.com/SOI/en-us/252/brain-in-a-jar",
     },
+    "oracle_key_points": [
+        "artifact_mana_cost_2",
+        "first_ability_cost_1_tap",
+        "first_ability_adds_charge_counter_before_selection",
+        "free_cast_from_hand_instant_or_sorcery_by_exact_mana_value",
+        "second_ability_cost_3_tap_remove_x_charge_counters",
+        "second_ability_scry_x",
+    ],
+    "ruling_key_points": [
+        "newly_placed_charge_counter_counts_for_spell_selection",
+        "no_priority_between_counter_addition_and_spell_choice",
+        "uses_last_known_counters_if_brain_leaves_before_resolution",
+        "alternative_costs_not_payable_when_cast_without_mana_cost",
+        "additional_costs_remain_payable_or_mandatory",
+        "x_in_mana_cost_must_be_zero",
+    ],
     "learning_signal": (
         "Brain is not generic ramp; its value depends on modeling charge counters, "
         "exact mana-value spell selection from hand, free casting, and X-counter scry."
@@ -139,6 +162,33 @@ def brain_route_row(route_planner: Mapping[str, Any]) -> dict[str, Any]:
     if normalize(str(selected.get("card_name") or "")) == normalize(BRAIN):
         return selected
     return find_named(as_list(route_planner.get("route_rows")), BRAIN, "card_name")
+
+
+def route_planner_governed(route_planner: Mapping[str, Any]) -> bool:
+    route_summary = summary(route_planner)
+    return bool(
+        route_summary.get("decision_status") == TARGET_ROUTE_PLANNER_STATUS
+        and route_summary.get("selected_card") == BRAIN
+        and route_summary.get("candidate_queue_matrix_route_governed") is True
+        and route_summary.get("candidate_queue_matrix_next_shell_status") == TARGET_NEXT_SHELL_STATUS
+        and route_summary.get("candidate_queue_matrix_fallback_route_key") == TARGET_MATRIX_CONTRACT
+        and route_summary.get("candidate_deck_materialization_allowed_now") is False
+        and route_summary.get("natural_battle_gate_allowed_now") is False
+        and route_summary.get("promotion_allowed_now") is False
+        and route_summary.get("postgres_writes_allowed_now") is False
+    )
+
+
+def candidate_queue_governed(candidate_queue: Mapping[str, Any]) -> bool:
+    candidate_summary = summary(candidate_queue)
+    return bool(
+        candidate_summary.get("matrix_route_governed") is True
+        and candidate_summary.get("matrix_next_shell_status") == TARGET_NEXT_SHELL_STATUS
+        and candidate_summary.get("matrix_fallback_route_key") == TARGET_MATRIX_CONTRACT
+        and candidate_summary.get("candidate_deck_materialization_allowed_now") is False
+        and candidate_summary.get("natural_battle_gate_allowed_now") is False
+        and candidate_summary.get("promotion_allowed_now") is False
+    )
 
 
 def same_lane_value_rows(value_model: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -268,11 +318,18 @@ def exact_contract_state(exact_contract: Mapping[str, Any]) -> dict[str, Any]:
 
 def decision_status(
     *,
+    route_gate_valid: bool,
     state: Mapping[str, Any],
     exact_state: Mapping[str, Any],
     safe_cut_count: int,
     matrix_blocker_count: int,
 ) -> tuple[str, str, bool]:
+    if not route_gate_valid:
+        return (
+            "brain_in_a_jar_runtime_cut_preflight_blocked_route_not_governed_keep_607",
+            "rerun_governed_miracle_next_route_planner_before_brain_preflight",
+            False,
+        )
     if not state.get("contract_found"):
         return (
             "brain_in_a_jar_runtime_cut_preflight_blocked_missing_runtime_contract",
@@ -348,11 +405,13 @@ def build_report(
     route_row = brain_route_row(route_planner)
     state = runtime_state(contract)
     exact_state = exact_contract_state(exact_runtime_contract)
+    route_gate_valid = route_planner_governed(route_planner) and candidate_queue_governed(candidate_queue)
     same_lane_rows = build_same_lane_rows(value_model, cut_miner)
     safe_rows = [row for row in same_lane_rows if row["scout_status"] == "safe_same_lane_cut_candidate"]
     blocked_rows = [row for row in same_lane_rows if row["scout_status"] != "safe_same_lane_cut_candidate"]
     matrix_blocker_count = as_int(summary(candidate_queue).get("matrix_contract_blocker_count"))
     status, next_action, matrix_allowed = decision_status(
+        route_gate_valid=route_gate_valid,
         state=state,
         exact_state=exact_state,
         safe_cut_count=len(safe_rows),
@@ -398,7 +457,17 @@ def build_report(
         "source_reports": {key: rel(path) for key, path in paths.items()},
         "summary": {
             "decision_status": status,
+            "route_planner_status": summary(route_planner).get("decision_status") or "",
             "route_planner_selected_brain": normalize(str(route_row.get("card_name") or "")) == normalize(BRAIN),
+            "route_planner_candidate_queue_governed": bool(
+                summary(route_planner).get("candidate_queue_matrix_route_governed")
+            ),
+            "route_planner_candidate_queue_next_shell_status": summary(route_planner).get(
+                "candidate_queue_matrix_next_shell_status"
+            )
+            or "",
+            "route_gate_valid": route_gate_valid,
+            "candidate_queue_matrix_route_governed": bool(summary(candidate_queue).get("matrix_route_governed")),
             "brain_candidate_row_found": bool(candidate_row),
             "brain_contract_found": bool(contract),
             "xmage_class_found": bool(state.get("xmage_class_found")),
@@ -448,16 +517,19 @@ def build_report(
             "promotion_allowed": False,
             "postgres_writes_allowed": False,
             "runtime_family_required_before_battle": (
-                as_int(state.get("active_rule_count")) <= 0
+                route_gate_valid
+                and as_int(state.get("active_rule_count")) <= 0
                 and not bool(exact_state.get("contract_drafted"))
             ),
             "runtime_adapter_required_before_battle": (
-                as_int(state.get("active_rule_count")) <= 0
+                route_gate_valid
+                and as_int(state.get("active_rule_count")) <= 0
                 and bool(exact_state.get("contract_drafted"))
                 and not bool(exact_state.get("adapter_present"))
             ),
-            "active_rule_required_before_battle": as_int(state.get("active_rule_count")) <= 0,
-            "named_safe_cut_required_before_scoring": len(safe_rows) == 0,
+            "active_rule_required_before_battle": route_gate_valid
+            and as_int(state.get("active_rule_count")) <= 0,
+            "named_safe_cut_required_before_scoring": route_gate_valid and len(safe_rows) == 0,
             "reason": decision_reason,
             "next_actions": [
                 "do_not_mutate_deck_607",
@@ -484,7 +556,10 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "- Source DB mutated: `false`",
         "- Deck 607 mutated: `false`",
         f"- Decision status: `{summary_row['decision_status']}`",
+        f"- Route planner status: `{summary_row['route_planner_status']}`",
         f"- Route planner selected Brain: `{str(summary_row['route_planner_selected_brain']).lower()}`",
+        f"- Route planner candidate queue governed: `{str(summary_row['route_planner_candidate_queue_governed']).lower()}`",
+        f"- Route gate valid: `{str(summary_row['route_gate_valid']).lower()}`",
         f"- Brain candidate row found: `{str(summary_row['brain_candidate_row_found']).lower()}`",
         f"- Brain contract found: `{str(summary_row['brain_contract_found']).lower()}`",
         f"- XMage class found: `{str(summary_row['xmage_class_found']).lower()}`",
@@ -546,7 +621,11 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
     lines.extend(["", "## External Confirmation", ""])
     external = as_dict(as_dict(payload.get("source_evidence")).get("external_confirmation"))
     lines.append(f"- source_lane: `{external.get('source_lane') or '-'}`")
+    lines.append(f"- oracle_id: `{external.get('oracle_id') or '-'}`")
+    lines.append(f"- commander_legality: `{external.get('commander_legality') or '-'}`")
     lines.append(f"- learning_signal: {external.get('learning_signal') or '-'}")
+    lines.append(f"- oracle_key_points: `{', '.join(as_list(external.get('oracle_key_points')))}`")
+    lines.append(f"- ruling_key_points: `{', '.join(as_list(external.get('ruling_key_points')))}`")
     for key, link in sorted(as_dict(external.get("links")).items()):
         lines.append(f"- {key}: {link}")
     lines.extend(["", "## Decision", ""])

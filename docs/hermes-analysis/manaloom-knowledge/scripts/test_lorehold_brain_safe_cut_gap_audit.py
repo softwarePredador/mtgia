@@ -72,6 +72,12 @@ def _package(*, active_rules=0, ready=True, applied=False):
         "summary": {
             "apply_ready_for_manual_review": ready,
             "apply_executed_by_this_script": applied,
+            "runtime_preflight_status": audit.TARGET_RUNTIME_PREFLIGHT_STATUS,
+            "runtime_preflight_route_gate_valid": True,
+            "runtime_preflight_route_planner_status": audit.TARGET_ROUTE_PLANNER_STATUS,
+            "runtime_preflight_candidate_queue_governed": True,
+            "runtime_preflight_candidate_queue_next_shell_status": audit.TARGET_NEXT_SHELL_STATUS,
+            "runtime_preflight_candidate_queue_matrix_route_governed": True,
             "brain_active_rule_count_before_apply": active_rules,
             "brain_exact_adapter_present": True,
             "oracle_hash": "41468898bf6400763de517269fdeb456",
@@ -109,6 +115,8 @@ def test_current_like_state_blocks_brain_and_keeps_607() -> None:
         "brain_safe_cut_gap_no_active_rule_no_seed_safe_cut_keep_607"
     )
     assert payload["summary"]["safe_cut_count"] == 0
+    assert payload["summary"]["brain_pg_package_route_governed"] is True
+    assert payload["summary"]["runtime_preflight_route_gate_valid"] is True
     assert payload["summary"]["candidate_deck_materialization_allowed_now"] is False
     assert payload["summary"]["natural_battle_gate_allowed_now"] is False
     assert payload["decision"]["keep_607_as_protected_baseline"] is True
@@ -127,6 +135,22 @@ def test_active_rule_and_safe_cut_allow_only_matrix_not_battle() -> None:
     assert payload["summary"]["matrix_scoring_allowed_now"] is True
     assert payload["summary"]["candidate_deck_materialization_allowed_now"] is False
     assert payload["summary"]["natural_battle_gate_allowed_now"] is False
+
+
+def test_ready_package_without_governed_route_blocks_pg_review_path() -> None:
+    stale_package = _package()
+    stale_package["summary"]["runtime_preflight_route_gate_valid"] = False
+
+    payload = _build(brain_pg_package=stale_package)
+
+    assert payload["summary"]["decision_status"] == (
+        "brain_safe_cut_gap_pg_package_route_not_governed_keep_607"
+    )
+    assert payload["summary"]["brain_pg_package_route_governed"] is False
+    assert payload["summary"]["recommended_next_action"] == (
+        "rerun_governed_brain_runtime_and_package_preflight"
+    )
+    assert payload["summary"]["matrix_scoring_allowed_now"] is False
 
 
 def test_external_brain_signal_is_low_context_not_staple_proof() -> None:
@@ -157,6 +181,8 @@ def test_markdown_surfaces_external_evidence_and_closed_gates() -> None:
 
     assert "PostgreSQL writes: `false`" in markdown
     assert "Deck 607 mutated: `false`" in markdown
+    assert "Brain PG package route governed: `true`" in markdown
+    assert audit.TARGET_ROUTE_PLANNER_STATUS in markdown
     assert "Natural battle gate allowed now: `false`" in markdown
     assert "Brain EDHREC global inclusion: `0.03%`" in markdown
     assert "https://edhrec.com/cards/brain-in-a-jar" in markdown

@@ -34,13 +34,25 @@ def _exact_contract(*, adapter_present=True):
     }
 
 
-def _preflight():
+def _preflight(*, governed=True):
+    route_status = pkg.TARGET_ROUTE_PLANNER_STATUS if governed else "stale_route_planner"
+    next_shell_status = pkg.TARGET_NEXT_SHELL_STATUS if governed else "stale_next_shell"
     return {
-        "status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607",
+        "status": pkg.TARGET_RUNTIME_PREFLIGHT_STATUS,
         "summary": {
+            "decision_status": pkg.TARGET_RUNTIME_PREFLIGHT_STATUS,
+            "route_gate_valid": governed,
+            "route_planner_status": route_status,
+            "route_planner_candidate_queue_governed": governed,
+            "route_planner_candidate_queue_next_shell_status": next_shell_status,
+            "candidate_queue_matrix_route_governed": governed,
             "brain_active_rule_count": 0,
             "safe_cut_count": 0,
             "brain_exact_adapter_present": True,
+            "postgres_writes_allowed_now": False,
+            "deck_action_allowed_now": False,
+            "natural_battle_gate_allowed_now": False,
+            "promotion_allowed_now": False,
         },
     }
 
@@ -72,6 +84,9 @@ def test_manifest_is_review_only_and_keeps_deck_607_closed() -> None:
     assert manifest["summary"]["apply_ready_for_manual_review"] is True
     assert manifest["summary"]["postgres_writes_allowed_now"] is False
     assert manifest["summary"]["deck_action_allowed_now"] is False
+    assert manifest["summary"]["runtime_preflight_route_gate_valid"] is True
+    assert manifest["summary"]["runtime_preflight_route_planner_status"] == pkg.TARGET_ROUTE_PLANNER_STATUS
+    assert manifest["summary"]["runtime_preflight_candidate_queue_governed"] is True
     assert manifest["decision"]["package_apply_requires_explicit_approval"] is True
     assert "Nontrivial additional costs" in manifest["decision"]["known_runtime_followup"]
 
@@ -85,6 +100,21 @@ def test_adapter_missing_blocks_apply_readiness() -> None:
 
     assert manifest["status"] == "blocked_adapter_missing_no_pg_package_apply"
     assert manifest["summary"]["apply_ready_for_manual_review"] is False
+
+
+def test_ungoverned_runtime_preflight_blocks_apply_readiness() -> None:
+    manifest = pkg.build_manifest(
+        exact_contract=_exact_contract(),
+        preflight=_preflight(governed=False),
+        paths={},
+    )
+
+    assert manifest["status"] == "blocked_runtime_preflight_not_governed_keep_607"
+    assert manifest["summary"]["apply_ready_for_manual_review"] is False
+    assert manifest["summary"]["runtime_preflight_route_gate_valid"] is False
+    assert manifest["summary"]["recommended_next_action"] == (
+        "rerun_governed_brain_runtime_cut_preflight_before_pg_package"
+    )
 
 
 def test_sql_package_has_precheck_upsert_postcheck_and_narrow_rollback() -> None:
@@ -117,5 +147,7 @@ def test_markdown_surfaces_closed_gates_and_files() -> None:
     assert "PostgreSQL writes: `false`" in markdown
     assert "Deck 607 mutated: `false`" in markdown
     assert "package_apply_requires_explicit_approval: `true`" in markdown
+    assert "Runtime route gate valid: `true`" in markdown
+    assert pkg.TARGET_ROUTE_PLANNER_STATUS in markdown
     assert "Brain in a Jar" in markdown
     assert "41468898bf6400763de517269fdeb456" in markdown

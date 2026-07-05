@@ -32,6 +32,11 @@ DEFAULT_VALUE_MODEL = REPORT_DIR / "lorehold_deckbuilding_value_model_20260704_c
 DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_brain_safe_cut_gap_audit_20260705_current"
 
 BRAIN = "Brain in a Jar"
+TARGET_RUNTIME_PREFLIGHT_STATUS = (
+    "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607"
+)
+TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_runtime_learning_keep_607"
+TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
 TOPDECK_CORE_ANCHORS = {
     "Sensei's Divining Top",
     "Scroll Rack",
@@ -257,8 +262,15 @@ def decision_status(
     safe_cut_count: int,
     package_apply_ready: bool,
     package_apply_executed: bool,
+    package_route_governed: bool,
 ) -> tuple[str, str, bool]:
     if active_rule_count <= 0 and safe_cut_count == 0:
+        if package_apply_ready and not package_route_governed:
+            return (
+                "brain_safe_cut_gap_pg_package_route_not_governed_keep_607",
+                "rerun_governed_brain_runtime_and_package_preflight",
+                False,
+            )
         if package_apply_ready and not package_apply_executed:
             return (
                 "brain_safe_cut_gap_no_active_rule_no_seed_safe_cut_keep_607",
@@ -289,6 +301,18 @@ def decision_status(
     )
 
 
+def package_runtime_preflight_governed(package_summary: Mapping[str, Any]) -> bool:
+    return (
+        package_summary.get("runtime_preflight_status") == TARGET_RUNTIME_PREFLIGHT_STATUS
+        and bool(package_summary.get("runtime_preflight_route_gate_valid"))
+        and package_summary.get("runtime_preflight_route_planner_status") == TARGET_ROUTE_PLANNER_STATUS
+        and bool(package_summary.get("runtime_preflight_candidate_queue_governed"))
+        and package_summary.get("runtime_preflight_candidate_queue_next_shell_status")
+        == TARGET_NEXT_SHELL_STATUS
+        and bool(package_summary.get("runtime_preflight_candidate_queue_matrix_route_governed"))
+    )
+
+
 def build_report(
     *,
     brain_preflight: Mapping[str, Any],
@@ -305,6 +329,7 @@ def build_report(
     )
     package_apply_ready = bool(package_summary.get("apply_ready_for_manual_review"))
     package_apply_executed = bool(package_summary.get("apply_executed_by_this_script"))
+    package_route_governed = package_runtime_preflight_governed(package_summary)
     rows = enriched_cut_rows(
         brain_preflight=brain_preflight,
         active_rule_count=active_rule_count,
@@ -321,6 +346,7 @@ def build_report(
         safe_cut_count=len(safe_rows),
         package_apply_ready=package_apply_ready,
         package_apply_executed=package_apply_executed,
+        package_route_governed=package_route_governed,
     )
     category_counts = Counter(str(row.get("gap_category") or "") for row in rows)
     blocker_counts = Counter(blocker for row in rows for blocker in as_list(row.get("blockers")))
@@ -339,6 +365,25 @@ def build_report(
             "brain_pg_package_status": brain_pg_package.get("status") or "",
             "apply_ready_for_manual_review": package_apply_ready,
             "apply_executed_by_this_script": package_apply_executed,
+            "brain_pg_package_route_governed": package_route_governed,
+            "runtime_preflight_status": package_summary.get("runtime_preflight_status") or "",
+            "runtime_preflight_route_gate_valid": bool(
+                package_summary.get("runtime_preflight_route_gate_valid")
+            ),
+            "runtime_preflight_route_planner_status": package_summary.get(
+                "runtime_preflight_route_planner_status"
+            )
+            or "",
+            "runtime_preflight_candidate_queue_governed": bool(
+                package_summary.get("runtime_preflight_candidate_queue_governed")
+            ),
+            "runtime_preflight_candidate_queue_next_shell_status": package_summary.get(
+                "runtime_preflight_candidate_queue_next_shell_status"
+            )
+            or "",
+            "runtime_preflight_candidate_queue_matrix_route_governed": bool(
+                package_summary.get("runtime_preflight_candidate_queue_matrix_route_governed")
+            ),
             "brain_active_rule_count": active_rule_count,
             "brain_exact_adapter_present": bool(package_summary.get("brain_exact_adapter_present")),
             "brain_oracle_hash": package_summary.get("oracle_hash") or "",
@@ -417,6 +462,16 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Brain PG package status: `{summary_row['brain_pg_package_status'] or '-'}`",
         f"- Apply ready for manual review: `{str(summary_row['apply_ready_for_manual_review']).lower()}`",
         f"- Apply executed by this script: `{str(summary_row['apply_executed_by_this_script']).lower()}`",
+        f"- Brain PG package route governed: `{str(summary_row['brain_pg_package_route_governed']).lower()}`",
+        f"- Runtime preflight status: `{summary_row['runtime_preflight_status'] or '-'}`",
+        f"- Runtime route gate valid: `{str(summary_row['runtime_preflight_route_gate_valid']).lower()}`",
+        f"- Runtime route planner status: `{summary_row['runtime_preflight_route_planner_status'] or '-'}`",
+        "- Runtime candidate queue governed: "
+        f"`{str(summary_row['runtime_preflight_candidate_queue_governed']).lower()}`",
+        "- Runtime candidate queue next-shell status: "
+        f"`{summary_row['runtime_preflight_candidate_queue_next_shell_status'] or '-'}`",
+        "- Runtime candidate queue matrix-route governed: "
+        f"`{str(summary_row['runtime_preflight_candidate_queue_matrix_route_governed']).lower()}`",
         f"- Active Brain rule count: `{summary_row['brain_active_rule_count']}`",
         f"- Safe same-lane cuts: `{summary_row['safe_cut_count']}`",
         f"- Blocked same-lane cuts: `{summary_row['blocked_same_lane_cut_count']}`",

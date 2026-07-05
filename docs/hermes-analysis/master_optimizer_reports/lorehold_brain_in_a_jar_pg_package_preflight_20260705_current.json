@@ -20,7 +20,7 @@
     "promotion_allowed": false
   },
   "deck_607_mutated": false,
-  "generated_at": "2026-07-05T05:44:07Z",
+  "generated_at": "2026-07-05T09:17:30Z",
   "postgres_writes": false,
   "proposed_rule": {
     "card_name": "Brain in a Jar",
@@ -139,6 +139,7 @@
       "brain_contract_found": true,
       "brain_exact_adapter_present": true,
       "candidate_deck_materialization_allowed_now": false,
+      "candidate_queue_matrix_route_governed": true,
       "decision_status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607",
       "deck_action_allowed_now": false,
       "exact_runtime_contract_drafted": true,
@@ -151,7 +152,11 @@
       "promotion_allowed_now": false,
       "recommended_next_action": "prepare_brain_in_a_jar_pg_package_precheck_and_mine_seed_safe_cut_no_deck_action",
       "required_runtime_slice_count": 5,
+      "route_gate_valid": true,
+      "route_planner_candidate_queue_governed": true,
+      "route_planner_candidate_queue_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
       "route_planner_selected_brain": true,
+      "route_planner_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
       "safe_cut_count": 0,
       "same_lane_candidate_count": 9,
       "status_counts": {
@@ -198,6 +203,13 @@
     "postgres_writes_allowed_now": false,
     "promotion_allowed_now": false,
     "recommended_next_action": "review_precheck_then_request_explicit_postgresql_apply_if_approved",
+    "runtime_preflight_candidate_queue_governed": true,
+    "runtime_preflight_candidate_queue_matrix_route_governed": true,
+    "runtime_preflight_candidate_queue_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+    "runtime_preflight_required_status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607",
+    "runtime_preflight_route_gate_valid": true,
+    "runtime_preflight_route_planner_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
+    "runtime_preflight_status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607",
     "safe_cut_count_before_apply": 0,
     "sql_file_count": 4
   }

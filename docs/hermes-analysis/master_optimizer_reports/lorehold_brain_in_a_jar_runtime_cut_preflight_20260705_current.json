@@ -387,7 +387,7 @@
     "runtime_family_required_before_battle": false
   },
   "deck_607_mutated": false,
-  "generated_at": "2026-07-05T05:44:03Z",
+  "generated_at": "2026-07-05T09:13:35Z",
   "postgres_writes": false,
   "safe_same_lane_cut_candidates": [],
   "same_lane_cut_rows": [
@@ -667,7 +667,12 @@
       "decision_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
       "deck_action_allowed_now": false,
       "matrix_contract_blocker_count": 28,
+      "matrix_engine_cut_path_closed": true,
+      "matrix_fallback_route_key": "miracle_access_first_shell_contract",
+      "matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+      "matrix_route_governed": true,
       "matrix_scoring_allowed_now": false,
+      "matrix_status": "miracle_access_structure_matrix_template_ready_no_candidate_no_battle",
       "named_seed_safe_cut_count": 0,
       "natural_battle_gate_allowed_now": false,
       "promotion_allowed_now": false,
@@ -753,15 +758,40 @@
       "xmage_signal_count": 13
     },
     "external_confirmation": {
+      "commander_legality": "legal",
       "learning_signal": "Brain is not generic ramp; its value depends on modeling charge counters, exact mana-value spell selection from hand, free casting, and X-counter scry.",
       "links": {
         "gatherer": "https://gatherer.wizards.com/SOI/en-us/252/brain-in-a-jar",
-        "scryfall": "https://scryfall.com/card/soi/252/brain-in-a-jar"
+        "scryfall": "https://scryfall.com/card/soi/252/brain-in-a-jar",
+        "scryfall_api": "https://api.scryfall.com/cards/named?exact=Brain%20in%20a%20Jar",
+        "scryfall_rulings_api": "https://api.scryfall.com/cards/88ecfcbe-e8db-4f08-aa8b-5b7b3e6c6ce7/rulings"
       },
+      "oracle_id": "321dbd10-1d48-49fc-ba6a-1df241a53338",
+      "oracle_key_points": [
+        "artifact_mana_cost_2",
+        "first_ability_cost_1_tap",
+        "first_ability_adds_charge_counter_before_selection",
+        "free_cast_from_hand_instant_or_sorcery_by_exact_mana_value",
+        "second_ability_cost_3_tap_remove_x_charge_counters",
+        "second_ability_scry_x"
+      ],
+      "ruling_key_points": [
+        "newly_placed_charge_counter_counts_for_spell_selection",
+        "no_priority_between_counter_addition_and_spell_choice",
+        "uses_last_known_counters_if_brain_leaves_before_resolution",
+        "alternative_costs_not_payable_when_cast_without_mana_cost",
+        "additional_costs_remain_payable_or_mandatory",
+        "x_in_mana_cost_must_be_zero"
+      ],
       "source_lane": "official_card_text_and_rulings"
     },
     "route_planner_summary": {
       "candidate_deck_materialization_allowed_now": false,
+      "candidate_queue_matrix_fallback_route_key": "miracle_access_first_shell_contract",
+      "candidate_queue_matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+      "candidate_queue_matrix_route_governed": true,
+      "candidate_queue_scoreable_row_count": 0,
+      "candidate_queue_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
       "decision_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
       "deck_action_allowed_now": false,
       "entreat_active_rule_count": 0,
@@ -886,6 +916,7 @@
     "brain_contract_found": true,
     "brain_exact_adapter_present": true,
     "candidate_deck_materialization_allowed_now": false,
+    "candidate_queue_matrix_route_governed": true,
     "decision_status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607",
     "deck_action_allowed_now": false,
     "exact_runtime_contract_drafted": true,
@@ -898,7 +929,11 @@
     "promotion_allowed_now": false,
     "recommended_next_action": "prepare_brain_in_a_jar_pg_package_precheck_and_mine_seed_safe_cut_no_deck_action",
     "required_runtime_slice_count": 5,
+    "route_gate_valid": true,
+    "route_planner_candidate_queue_governed": true,
+    "route_planner_candidate_queue_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
     "route_planner_selected_brain": true,
+    "route_planner_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
     "safe_cut_count": 0,
     "same_lane_candidate_count": 9,
     "status_counts": {

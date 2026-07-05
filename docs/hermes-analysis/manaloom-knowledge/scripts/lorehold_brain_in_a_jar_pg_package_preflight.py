@@ -44,6 +44,11 @@ BRAIN_ORACLE_HASH = "41468898bf6400763de517269fdeb456"
 BRAIN_SCRYFALL_ID = "88ecfcbe-e8db-4f08-aa8b-5b7b3e6c6ce7"
 BRAIN_ORACLE_ID = "321dbd10-1d48-49fc-ba6a-1df241a53338"
 BRAIN_SCOPE = "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1"
+TARGET_RUNTIME_PREFLIGHT_STATUS = (
+    "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607"
+)
+TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_runtime_learning_keep_607"
+TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
 BACKUP_TABLE = (
     "manaloom_deploy_audit."
     "lorehold_brain_in_a_jar_pg_package_20260705_current_backup"
@@ -474,18 +479,48 @@ COMMIT;
 """
 
 
+def runtime_preflight_governed(preflight: Mapping[str, Any]) -> bool:
+    summary = as_dict(preflight.get("summary"))
+    return (
+        bool(preflight)
+        and (preflight.get("status") or summary.get("decision_status")) == TARGET_RUNTIME_PREFLIGHT_STATUS
+        and bool(summary.get("route_gate_valid"))
+        and summary.get("route_planner_status") == TARGET_ROUTE_PLANNER_STATUS
+        and bool(summary.get("route_planner_candidate_queue_governed"))
+        and summary.get("route_planner_candidate_queue_next_shell_status") == TARGET_NEXT_SHELL_STATUS
+        and bool(summary.get("candidate_queue_matrix_route_governed"))
+        and bool(summary.get("brain_exact_adapter_present"))
+        and int(summary.get("brain_active_rule_count") or 0) == 0
+        and int(summary.get("safe_cut_count") or 0) == 0
+        and not bool(summary.get("postgres_writes_allowed_now"))
+        and not bool(summary.get("deck_action_allowed_now"))
+        and not bool(summary.get("natural_battle_gate_allowed_now"))
+        and not bool(summary.get("promotion_allowed_now"))
+    )
+
+
 def package_status(exact_contract: Mapping[str, Any], preflight: Mapping[str, Any]) -> tuple[str, bool]:
     exact_summary = as_dict(exact_contract.get("summary"))
-    preflight_summary = as_dict(preflight.get("summary"))
     adapter_present = bool(exact_summary.get("brain_exact_scope_adapter_present"))
-    preflight_status = preflight.get("status") or preflight_summary.get("decision_status") or ""
     if not exact_contract or not exact_summary.get("contract_drafted"):
         return "blocked_missing_exact_runtime_contract", False
     if not adapter_present:
         return "blocked_adapter_missing_no_pg_package_apply", False
-    if "adapter_present_no_active_rule" not in preflight_status:
-        return "prepared_manual_review_verify_current_preflight_before_apply", True
+    if not runtime_preflight_governed(preflight):
+        return "blocked_runtime_preflight_not_governed_keep_607", False
     return "prepared_read_only_pending_apply_approval", True
+
+
+def recommended_next_action(status: str) -> str:
+    if status == "prepared_read_only_pending_apply_approval":
+        return "review_precheck_then_request_explicit_postgresql_apply_if_approved"
+    if status == "blocked_missing_exact_runtime_contract":
+        return "finish_exact_runtime_contract_before_pg_package"
+    if status == "blocked_adapter_missing_no_pg_package_apply":
+        return "finish_runtime_adapter_before_pg_package"
+    if status == "blocked_runtime_preflight_not_governed_keep_607":
+        return "rerun_governed_brain_runtime_cut_preflight_before_pg_package"
+    return "finish_runtime_contract_and_adapter_before_pg_package"
 
 
 def build_manifest(
@@ -516,17 +551,28 @@ def build_manifest(
             "natural_battle_gate_allowed_now": False,
             "promotion_allowed_now": False,
             "brain_exact_adapter_present": bool(exact_summary.get("brain_exact_scope_adapter_present")),
+            "runtime_preflight_required_status": TARGET_RUNTIME_PREFLIGHT_STATUS,
+            "runtime_preflight_status": preflight.get("status")
+            or preflight_summary.get("decision_status")
+            or "",
+            "runtime_preflight_route_gate_valid": bool(preflight_summary.get("route_gate_valid")),
+            "runtime_preflight_route_planner_status": preflight_summary.get("route_planner_status"),
+            "runtime_preflight_candidate_queue_governed": bool(
+                preflight_summary.get("route_planner_candidate_queue_governed")
+            ),
+            "runtime_preflight_candidate_queue_next_shell_status": preflight_summary.get(
+                "route_planner_candidate_queue_next_shell_status"
+            ),
+            "runtime_preflight_candidate_queue_matrix_route_governed": bool(
+                preflight_summary.get("candidate_queue_matrix_route_governed")
+            ),
             "brain_active_rule_count_before_apply": int(preflight_summary.get("brain_active_rule_count") or 0),
             "safe_cut_count_before_apply": int(preflight_summary.get("safe_cut_count") or 0),
             "logical_rule_key": rule["logical_rule_key"],
             "oracle_hash": rule["oracle_hash"],
             "battle_model_scope": as_dict(rule["effect_json"]).get("battle_model_scope"),
             "sql_file_count": 4,
-            "recommended_next_action": (
-                "review_precheck_then_request_explicit_postgresql_apply_if_approved"
-                if apply_ready
-                else "finish_runtime_contract_and_adapter_before_pg_package"
-            ),
+            "recommended_next_action": recommended_next_action(status),
         },
         "proposed_rule": rule,
         "source_evidence": {
@@ -575,6 +621,16 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Apply ready for manual review: `{str(summary.get('apply_ready_for_manual_review')).lower()}`",
         f"- Apply executed by this script: `{str(summary.get('apply_executed_by_this_script')).lower()}`",
         f"- Brain exact adapter present: `{str(summary.get('brain_exact_adapter_present')).lower()}`",
+        f"- Runtime preflight status: `{summary.get('runtime_preflight_status')}`",
+        f"- Runtime preflight required status: `{summary.get('runtime_preflight_required_status')}`",
+        f"- Runtime route gate valid: `{str(summary.get('runtime_preflight_route_gate_valid')).lower()}`",
+        f"- Runtime route planner status: `{summary.get('runtime_preflight_route_planner_status')}`",
+        "- Runtime candidate queue governed: "
+        f"`{str(summary.get('runtime_preflight_candidate_queue_governed')).lower()}`",
+        "- Runtime candidate queue next-shell status: "
+        f"`{summary.get('runtime_preflight_candidate_queue_next_shell_status')}`",
+        "- Runtime candidate queue matrix-route governed: "
+        f"`{str(summary.get('runtime_preflight_candidate_queue_matrix_route_governed')).lower()}`",
         f"- Active Brain rule count before apply: `{summary.get('brain_active_rule_count_before_apply')}`",
         f"- Safe cut count before apply: `{summary.get('safe_cut_count_before_apply')}`",
         f"- Logical rule key: `{summary.get('logical_rule_key')}`",
