@@ -1,0 +1,402 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-04T23:56:12.777709+00:00",
+  "manifest": "../../master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_manifest.json",
+  "package_id": "pg453_xmage_attack_target_keyword_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Aerial Guide",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae",
+          "oracle_hash": "359dc35b02c01fd10a6820d8dde25980",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Chasm Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ad55b4397b12dbadea41d4cfa871303",
+          "oracle_hash": "e4d468a8984897ccfa30beecdf24acd8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Garrison Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1ba8a066eb595bfa68fa0f7ac649110e",
+          "oracle_hash": "cd663e02090ca20aca08c426e43ea1a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Heavenly Qilin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8",
+          "oracle_hash": "13953e4a3d0fdf170153301322a294cd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Kinsbaile Balloonist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cb7b0244b42311b6450eaaeae4f608b8",
+          "oracle_hash": "bdc2c420cceff82e0249aadb336da4f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Majestic Heliopterus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:58b134e8facaa8950c16c360702ef77b",
+          "oracle_hash": "789df848e690eb4720490ba73b04608e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Pegasus Courser",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae",
+          "oracle_hash": "359dc35b02c01fd10a6820d8dde25980",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Roc Charger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d",
+          "oracle_hash": "ad767ca9ad8c91ba639f3bc0c6f871e1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Trained Condor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8",
+          "oracle_hash": "9f01e8733bf327bbeb7ab09cc5023979",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Trusted Pegasus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d",
+          "oracle_hash": "de5a2fde355df00b1c8c5cd5dcb5cdb5",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 10
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Aerial Guide",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae",
+          "oracle_hash": "359dc35b02c01fd10a6820d8dde25980",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Chasm Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ad55b4397b12dbadea41d4cfa871303",
+          "oracle_hash": "e4d468a8984897ccfa30beecdf24acd8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Garrison Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1ba8a066eb595bfa68fa0f7ac649110e",
+          "oracle_hash": "cd663e02090ca20aca08c426e43ea1a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Heavenly Qilin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8",
+          "oracle_hash": "13953e4a3d0fdf170153301322a294cd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Kinsbaile Balloonist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cb7b0244b42311b6450eaaeae4f608b8",
+          "oracle_hash": "bdc2c420cceff82e0249aadb336da4f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Majestic Heliopterus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:58b134e8facaa8950c16c360702ef77b",
+          "oracle_hash": "789df848e690eb4720490ba73b04608e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Pegasus Courser",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae",
+          "oracle_hash": "359dc35b02c01fd10a6820d8dde25980",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Roc Charger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d",
+          "oracle_hash": "ad767ca9ad8c91ba639f3bc0c6f871e1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Trained Condor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8",
+          "oracle_hash": "9f01e8733bf327bbeb7ab09cc5023979",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "card_name": "Trusted Pegasus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d",
+          "oracle_hash": "de5a2fde355df00b1c8c5cd5dcb5cdb5",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aerial Guide",
+          "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Chasm Drake",
+          "logical_rule_key": "battle_rule_v1:9ad55b4397b12dbadea41d4cfa871303"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Garrison Griffin",
+          "logical_rule_key": "battle_rule_v1:1ba8a066eb595bfa68fa0f7ac649110e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Heavenly Qilin",
+          "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kinsbaile Balloonist",
+          "logical_rule_key": "battle_rule_v1:cb7b0244b42311b6450eaaeae4f608b8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Majestic Heliopterus",
+          "logical_rule_key": "battle_rule_v1:58b134e8facaa8950c16c360702ef77b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pegasus Courser",
+          "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Roc Charger",
+          "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Trained Condor",
+          "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Trusted Pegasus",
+          "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 10
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aerial Guide",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Chasm Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9ad55b4397b12dbadea41d4cfa871303"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Garrison Griffin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1ba8a066eb595bfa68fa0f7ac649110e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Heavenly Qilin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kinsbaile Balloonist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cb7b0244b42311b6450eaaeae4f608b8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Majestic Heliopterus",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:58b134e8facaa8950c16c360702ef77b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pegasus Courser",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Roc Charger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Trained Condor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Trusted Pegasus",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

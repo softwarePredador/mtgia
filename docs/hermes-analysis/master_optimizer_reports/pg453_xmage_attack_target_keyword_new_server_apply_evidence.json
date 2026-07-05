@@ -1,0 +1,163 @@
+{
+  "generated_at_utc": "2026-07-04T23:58:42Z",
+  "status": "closed",
+  "deploy_id": "pg453",
+  "slug": "xmage_attack_target_keyword_new_server",
+  "family": "xmage_creature_attack_target_keyword_until_eot",
+  "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+  "database_target": "143.198.230.247:5433/halder",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "selected_count": 10,
+  "selected_cards": [
+    "Aerial Guide",
+    "Chasm Drake",
+    "Garrison Griffin",
+    "Heavenly Qilin",
+    "Kinsbaile Balloonist",
+    "Majestic Heliopterus",
+    "Pegasus Courser",
+    "Roc Charger",
+    "Trained Condor",
+    "Trusted Pegasus"
+  ],
+  "attack_keyword_parameters": {
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "attack_trigger_target_keyword": true,
+    "target_controller_counts": {
+      "any": 4,
+      "self": 6
+    }
+  },
+  "precheck": {
+    "target_rows": 10,
+    "missing_targets": 0,
+    "existing_expected_rows_before": 0,
+    "would_deprecate_shadow_rows": 0
+  },
+  "apply": {
+    "transaction": "commit",
+    "backup_rows": 0,
+    "deprecated_shadow_rows": 0,
+    "upserted_rows": 10
+  },
+  "postcheck": {
+    "validated_cards": 10,
+    "promoted_rule_rows": 10,
+    "promoted_verified_auto_rows": 10,
+    "promoted_oracle_hash_rows": 10,
+    "failed_cards": []
+  },
+  "direct_postgresql_verification": {
+    "validated_cards": 10,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "source": "curated",
+    "has_oracle_hash": true,
+    "battle_model_scope": "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1",
+    "attack_trigger_target_keyword": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ]
+  },
+  "sync": {
+    "metadata_requested_unique_names": 5365,
+    "metadata_postgres_cards_matched": 5550,
+    "metadata_sqlite_cache_alias_rows": 5460,
+    "metadata_deck_cards_rows_total": 2699,
+    "metadata_deck_cards_matched_cache_rows": 2699,
+    "metadata_card_id_rows_updated": 107,
+    "metadata_unresolved_count": 1,
+    "metadata_unresolved_sample": [
+      "Surgical Suite/Hospital Room"
+    ],
+    "pg_rows_loaded": 4383,
+    "sqlite_inserted_or_updated": 4375,
+    "canonical_snapshot_rows_exported": 4350,
+    "generated_rows": 1947,
+    "curated_rows": 145,
+    "oracle_normalized_rows": 274
+  },
+  "validation": {
+    "focused_tests": {
+      "status": "pass",
+      "checks": 718
+    },
+    "e2e": {
+      "status": "pass",
+      "postgres_source_of_truth_rows": 10,
+      "sqlite_hermes_cache_rows": 10,
+      "canonical_snapshot_cards": 10,
+      "runtime_get_card_effect_cards": 10,
+      "battle_execution_events": 0,
+      "battle_execution_scenarios": 0
+    },
+    "audits": {
+      "xmage_strategy_consistency": {
+        "status": "pass",
+        "checks": 26
+      },
+      "operational_surface_alignment": {
+        "status": "pass",
+        "checks": 39
+      },
+      "legacy_contamination": {
+        "status": "pass",
+        "checks": 32
+      },
+      "pg_hermes_sqlite_contract": {
+        "status": "pass",
+        "checks": 51
+      }
+    }
+  },
+  "post_sync_queue": {
+    "target_identity_count": 26503,
+    "xmage_authoritative_source_count": 26189,
+    "xmage_missing_source_exception_count": 314,
+    "xmage_authoritative_parser_gap_count": 0,
+    "xmage_authoritative_adapter_required_count": 26189,
+    "adapter_work_unit_count": 11398
+  },
+  "post_sync_exact_split": {
+    "proposal_count": 164,
+    "safe_for_batch_pg_package_count": 164,
+    "largest_remaining_families": [
+      {
+        "family": "xmage_fixed_damage_spell",
+        "count": 10
+      },
+      {
+        "family": "xmage_static_self_horsemanship_creature",
+        "count": 10
+      },
+      {
+        "family": "xmage_fixed_draw_discard_spell",
+        "count": 9
+      },
+      {
+        "family": "xmage_fixed_scry_draw_card_spell",
+        "count": 9
+      },
+      {
+        "family": "xmage_creature_dies_fixed_damage_target",
+        "count": 8
+      }
+    ]
+  },
+  "artifacts": {
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_package.md",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_manifest.json",
+    "precheck_sql": "docs/hermes-analysis/master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_precheck.sql",
+    "apply_sql": "docs/hermes-analysis/master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_apply.sql",
+    "rollback_sql": "docs/hermes-analysis/master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_rollback.sql",
+    "postcheck_sql": "docs/hermes-analysis/master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_postcheck.sql",
+    "raw_pg_apply_evidence": "docs/hermes-analysis/master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_pg_apply_evidence.json",
+    "metadata_sync": "docs/hermes-analysis/master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_metadata_sync_operational.json",
+    "full_pg_to_sqlite_sync": "docs/hermes-analysis/master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_full_pg_to_sqlite_sync_operational.json",
+    "e2e_validation": "docs/hermes-analysis/master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_e2e_validation.json",
+    "post_sync_queue": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg453_attack_target_keyword_new_server_commander_legal.md",
+    "post_sync_exact_split": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg453_attack_target_keyword_new_server_recheck.md"
+  }
+}

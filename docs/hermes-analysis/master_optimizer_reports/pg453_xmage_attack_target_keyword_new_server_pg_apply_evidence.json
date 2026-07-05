@@ -1,0 +1,263 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg453",
+  "generated_at": "2026-07-04T23:55:47.805132+00:00",
+  "manifest": "../../master_optimizer_reports/pg453_xmage_attack_target_keyword_new_server_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg453_xmage_attack_target_keyword_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Aerial Guide",
+      "Chasm Drake",
+      "Garrison Griffin",
+      "Heavenly Qilin",
+      "Kinsbaile Balloonist",
+      "Majestic Heliopterus",
+      "Pegasus Courser",
+      "Roc Charger",
+      "Trained Condor",
+      "Trusted Pegasus"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 10,
+    "promoted_rule_rows": 10,
+    "promoted_verified_auto_rows": 10,
+    "row_count": 10
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Aerial Guide",
+      "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae",
+      "normalized_name": "aerial guide",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Chasm Drake",
+      "logical_rule_key": "battle_rule_v1:9ad55b4397b12dbadea41d4cfa871303",
+      "normalized_name": "chasm drake",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Garrison Griffin",
+      "logical_rule_key": "battle_rule_v1:1ba8a066eb595bfa68fa0f7ac649110e",
+      "normalized_name": "garrison griffin",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Heavenly Qilin",
+      "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8",
+      "normalized_name": "heavenly qilin",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Kinsbaile Balloonist",
+      "logical_rule_key": "battle_rule_v1:cb7b0244b42311b6450eaaeae4f608b8",
+      "normalized_name": "kinsbaile balloonist",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Majestic Heliopterus",
+      "logical_rule_key": "battle_rule_v1:58b134e8facaa8950c16c360702ef77b",
+      "normalized_name": "majestic heliopterus",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Pegasus Courser",
+      "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae",
+      "normalized_name": "pegasus courser",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Roc Charger",
+      "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d",
+      "normalized_name": "roc charger",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Trained Condor",
+      "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8",
+      "normalized_name": "trained condor",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Trusted Pegasus",
+      "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d",
+      "normalized_name": "trusted pegasus",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Aerial Guide",
+      "Chasm Drake",
+      "Garrison Griffin",
+      "Heavenly Qilin",
+      "Kinsbaile Balloonist",
+      "Majestic Heliopterus",
+      "Pegasus Courser",
+      "Roc Charger",
+      "Trained Condor",
+      "Trusted Pegasus"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 10,
+    "total_target_card_rows": 10,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "8dedf2c7-d26e-49e9-a789-0e3b9976282f",
+      "card_name": "Aerial Guide",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae",
+      "normalized_name": "aerial guide",
+      "oracle_hash": "359dc35b02c01fd10a6820d8dde25980",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "1dd13a63-a178-4ec8-97f2-d5c24c367241",
+      "card_name": "Chasm Drake",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:9ad55b4397b12dbadea41d4cfa871303",
+      "normalized_name": "chasm drake",
+      "oracle_hash": "e4d468a8984897ccfa30beecdf24acd8",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "b118b473-1b1c-4a0b-a809-f05db2d3e21d",
+      "card_name": "Garrison Griffin",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:1ba8a066eb595bfa68fa0f7ac649110e",
+      "normalized_name": "garrison griffin",
+      "oracle_hash": "cd663e02090ca20aca08c426e43ea1a6",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "9e62e3f7-f2a8-48c5-88ee-3243f0ae4368",
+      "card_name": "Heavenly Qilin",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8",
+      "normalized_name": "heavenly qilin",
+      "oracle_hash": "13953e4a3d0fdf170153301322a294cd",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "271ac5aa-41c1-472b-9dfc-7b063a4d611c",
+      "card_name": "Kinsbaile Balloonist",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:cb7b0244b42311b6450eaaeae4f608b8",
+      "normalized_name": "kinsbaile balloonist",
+      "oracle_hash": "bdc2c420cceff82e0249aadb336da4f2",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "23cd99e5-ca86-4d14-9806-91a372cff1df",
+      "card_name": "Majestic Heliopterus",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:58b134e8facaa8950c16c360702ef77b",
+      "normalized_name": "majestic heliopterus",
+      "oracle_hash": "789df848e690eb4720490ba73b04608e",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "008dd285-504d-42e3-99aa-8f5e7aac3ff0",
+      "card_name": "Pegasus Courser",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:12b85a7674e4bb9e3f0d2aa2fb3a57ae",
+      "normalized_name": "pegasus courser",
+      "oracle_hash": "359dc35b02c01fd10a6820d8dde25980",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "59323ecb-faa6-442d-96ee-be74178f928b",
+      "card_name": "Roc Charger",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d",
+      "normalized_name": "roc charger",
+      "oracle_hash": "ad767ca9ad8c91ba639f3bc0c6f871e1",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "110189b4-bcb5-4370-afdc-4f5b31ad52e4",
+      "card_name": "Trained Condor",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3952493f0cdb04be711443c2c17cedf8",
+      "normalized_name": "trained condor",
+      "oracle_hash": "9f01e8733bf327bbeb7ab09cc5023979",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "24e33f71-14fd-4cda-8ffe-21df8492fa4f",
+      "card_name": "Trusted Pegasus",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b9129a702bfa00117bb569f97997384d",
+      "normalized_name": "trusted pegasus",
+      "oracle_hash": "de5a2fde355df00b1c8c5cd5dcb5cdb5",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_attack_target_keyword_new_server"
+}
