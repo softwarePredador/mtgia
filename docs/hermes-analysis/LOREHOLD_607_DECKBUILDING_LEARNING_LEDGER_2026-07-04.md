@@ -2053,3 +2053,64 @@ Operational lesson:
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion until a candidate ties or beats it under the same strategy,
   matrix, battle, and trace gates.
+
+## Brain in a Jar Runtime/Cut Preflight - 2026-07-05
+
+The Brain-specific learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_runtime_cut_preflight_20260705_current.json`
+
+This preflight follows the route planner recommendation. It checks the Brain
+runtime contract, candidate row, protected `607` value model, and cut miner. It
+also records the official card-text/ruling source lane for Brain. It is
+read-only and cannot score a deck, materialize a candidate, run battle, mutate
+deck `607`, or write PostgreSQL.
+
+Current result:
+
+- decision status:
+  `brain_in_a_jar_runtime_cut_preflight_blocked_no_active_rule_no_safe_cut_keep_607`;
+- route planner selected Brain: `true`;
+- Brain candidate row found: `true`;
+- Brain contract found: `true`;
+- XMage class found: `true`;
+- XMage signal hits: `5`;
+- required runtime slices: `5`;
+- active Brain rule rows: `0`;
+- same-lane current `607` cuts reviewed: `9`;
+- safe same-lane cuts: `0`;
+- blocked same-lane cuts: `9`;
+- matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- PostgreSQL writes allowed now: `false`;
+- recommended next action:
+  `draft_exact_mana_value_free_cast_runtime_family_before_any_brain_deck_action`.
+
+Blocked same-lane cut set:
+
+- `Scroll Rack`;
+- `Sensei's Divining Top`;
+- `Library of Leng`;
+- `Molecule Man`;
+- `The Scarlet Witch`;
+- `The Mind Stone`;
+- `Land Tax`;
+- `Urza's Saga`;
+- `Lorehold, the Historian`.
+
+Operational lesson:
+
+- Brain is not a generic two-mana artifact or ramp card in this shell. Its
+  value must be measured as a topdeck/miracle-access engine that adds charge
+  counters, casts exact mana-value instants or sorceries from hand without
+  paying mana cost, and can scry by removing counters.
+- Every current same-lane slot is hard-blocked under protected `607` evidence:
+  commander, mana base, protected anchor, early-mana support, prior rejection,
+  missing cut-safety proof, or measured high exposure.
+- The next implementation step is runtime-family work for exact mana-value
+  free-cast from hand plus replay fields, then rerun this preflight. It is not
+  a deck mutation or natural battle.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion.
