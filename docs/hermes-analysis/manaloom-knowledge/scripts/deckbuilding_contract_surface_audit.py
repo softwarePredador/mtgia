@@ -192,6 +192,12 @@ GLOBAL_COMMANDER_SAME_LANE_PACKAGE_SOURCE_SYNTHESIZER = (
 GLOBAL_COMMANDER_SAME_LANE_PACKAGE_SOURCE_SYNTHESIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_same_lane_package_source_synthesizer.py"
 )
+GLOBAL_COMMANDER_SAME_LANE_CUT_PAIR_COLLECTOR = (
+    SCRIPT_DIR / "global_commander_same_lane_cut_pair_collector.py"
+)
+GLOBAL_COMMANDER_SAME_LANE_CUT_PAIR_COLLECTOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_same_lane_cut_pair_collector.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -433,6 +439,10 @@ GLOBAL_COMMANDER_SCOPE1_SAME_LANE_ADD_SOURCE_LANE_EXPANDER_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_SAME_LANE_PACKAGE_SOURCE_SYNTHESIZER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_SAME_LANE_CUT_PAIR_COLLECTOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -782,6 +792,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "same_lane_source_package_synthesized_no_cut_pairs",
                 "collect_value_safe_same_lane_cut_pairs_for_resynthesized_package",
+                "global_commander_same_lane_cut_pair_collector.py",
+                "global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_cut_pair_collection_blocks_candidate_copy",
+                "collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1072,6 +1086,11 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_source_package_synthesized_no_cut_pairs",
                 "selected_add_count=8",
                 "collect_value_safe_same_lane_cut_pairs_for_resynthesized_package",
+                "global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_cut_pair_collection_blocks_candidate_copy",
+                "ready_pair_count=0",
+                "stage_only_cut_candidate_count=28",
+                "collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1757,6 +1776,35 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_source_package_synthesized_no_cut_pairs",
                 "collect_value_safe_same_lane_cut_pairs_for_resynthesized_package",
                 "external_same_lane_source_research_for_missing_axes",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_CUT_PAIR_COLLECTOR,
+            [
+                "global_commander_same_lane_cut_pair_collector",
+                "same_lane_cut_pair_collection_blocks_candidate_copy",
+                "same_lane_cut_pair_collection_partial_scope_reducer_required",
+                "same_lane_cut_pairs_ready_for_scope_reducer",
+                "collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes",
+                "review_only_value_safe_same_lane_pair",
+                "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_CUT_PAIR_COLLECTOR_TEST,
+            [
+                "test_collects_exact_same_lane_pairs_without_opening_candidate_copy",
+                "test_protected_haste_lane_stays_stage_only",
+                "test_blocks_when_no_same_lane_cut_exists",
+                "same_lane_cut_pairs_ready_for_scope_reducer",
+                "same_lane_cut_pair_collection_blocks_candidate_copy",
+                "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
             ],
         )
     )
@@ -2824,6 +2872,29 @@ def build_audit() -> dict[str, Any]:
                 "Gamble",
                 "Wishclaw Talisman",
                 "selected_adds_are_unpaired",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_SAME_LANE_CUT_PAIR_COLLECTOR_REPORT,
+            [
+                "Global Commander Same-Lane Cut Pair Collector",
+                "same_lane_cut_pair_collection_blocks_candidate_copy",
+                "selected_add_count: `8`",
+                "required_pair_count: `8`",
+                "ready_pair_count: `0`",
+                "unpaired_add_count: `8`",
+                "stage_only_cut_candidate_count: `28`",
+                "blocked_cut_candidate_count: `19`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes",
+                "Fellwar Stone",
+                "Boros Charm",
+                "Gamble",
+                "Smothering Tithe",
+                "structural_foundation_staple_requires_same_lane_or_battle_proof",
             ],
         )
     )

@@ -346,7 +346,13 @@ Operational priority after this pivot:
     unpaired until value-safe cuts are proven, and route to same-lane cut-pair
     collection without opening candidate copy, battle, promotion, or value-safe
     reclassification;
-43. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+43. run `global_commander_same_lane_cut_pair_collector.py` after same-lane
+    package source synthesis; it must pair each selected add only with a cut in
+    the exact `replaces_cut_role`, classify protected/staple/expected-package
+    cuts as stage-only or blocked, and keep candidate copy, battle, promotion,
+    and value-safe reclassification closed when no same-lane value-safe pairs
+    exist;
+44. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -407,6 +413,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -903,6 +910,16 @@ Current external refresh on 2026-07-05:
   `Diabolic Tutor`. Candidate copy, battle, promotion, and value-safe
   reclassification remain closed. The next gate is
   `collect_value_safe_same_lane_cut_pairs_for_resynthesized_package`.
+- Current same-lane cut-pair collection returns
+  `same_lane_cut_pair_collection_blocks_candidate_copy` with
+  `selected_add_count=8`, `required_pair_count=8`, `ready_pair_count=0`,
+  `unpaired_add_count=8`, `stage_only_cut_candidate_count=28`, and
+  `blocked_cut_candidate_count=19`. Every selected add remains unpaired because
+  the available same-lane cuts are protected, structural staples, expected
+  package anchors, prior failed-gate cuts, lands, or Kaalia payoff slots. This
+  blocks candidate copy, battle, promotion, and value-safe reclassification.
+  The next gate is
+  `collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes`.
 
 ## Global Commander Rollout - 2026-07-01
 

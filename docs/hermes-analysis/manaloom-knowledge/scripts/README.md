@@ -187,6 +187,14 @@ unpaired until a later cut-pairing gate proves value-safe same-lane cuts. The
 next route is `collect_value_safe_same_lane_cut_pairs_for_resynthesized_package`,
 not candidate copy or battle.
 
+Then run `global_commander_same_lane_cut_pair_collector.py`. It pairs selected
+adds only against cuts in the exact `replaces_cut_role`; protected commander
+lanes, structural staples, expected package anchors, prior failed-gate cuts,
+lands, and payoff slots stay stage-only or blocked. If no review-only
+value-safe pairs exist, candidate copy, battle, promotion, and value-safe
+reclassification remain closed and the next route is
+`collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes`.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

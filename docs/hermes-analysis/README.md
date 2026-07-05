@@ -641,6 +641,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Wishclaw Talisman`, `Entomb`, `Imperial Seal` e `Diabolic Tutor`.
     Proximo gate:
     `collect_value_safe_same_lane_cut_pairs_for_resynthesized_package`.
+    A coleta de pares same-lane fica em
+    `global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `same_lane_cut_pair_collection_blocks_candidate_copy`, com
+    `selected_add_count=8`, `required_pair_count=8`, `ready_pair_count=0`,
+    `unpaired_add_count=8`, `stage_only_cut_candidate_count=28` e
+    `blocked_cut_candidate_count=19`. Nenhum add pode ser copiado ainda; o
+    proximo gate e
+    `collect_more_same_lane_cut_evidence_or_broaden_cut_source_lanes`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
