@@ -291,7 +291,11 @@ Operational priority after this pivot:
    recovery routes to a fresh cut source; it may mine hypotheses from the
    current deck, but fresh hypotheses are not value-safe cuts until trace,
    same-lane, or equal-gate proof is collected;
-33. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+33. run `global_commander_cut_source_hypothesis_trace_collector.py` after fresh
+   hypotheses exist; it must reuse current replay artifacts first, count only
+   target-deck usage, and keep candidate copy closed when a hypothesis was used
+   or only seen without a negative proof;
+34. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -342,6 +346,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -752,6 +757,15 @@ Current external refresh on 2026-07-05:
   `Biotransference`, `Maskwood Nexus`, `Sigarda's Aid`, `Necromancy`,
   `Necropotence`, `Trouble in Pairs`, `Puresteel Paladin`, and
   `Sram, Senior Edificer`. These are trace targets only; candidate copy, battle,
+  promotion, and value-safe reclassification remain closed.
+- Current hypothesis trace collection reuses the existing `8` replay seeds and
+  returns `cut_source_hypothesis_trace_blocks_used_hypotheses` with
+  `usage_blocked_hypothesis_count=6`, `seen_without_usage_count=2`, and
+  `not_seen_count=0`. `Biotransference`, `Maskwood Nexus`, `Sigarda's Aid`,
+  `Necromancy`, `Necropotence`, and `Sram, Senior Edificer` were used by the
+  target deck; `Trouble in Pairs` and `Puresteel Paladin` were seen in decision
+  traces without usage and still require negative review. The next gate is
+  `mine_more_hypotheses_or_build_same_lane_proof`; candidate copy, battle,
   promotion, and value-safe reclassification remain closed.
 
 ## Global Commander Rollout - 2026-07-01

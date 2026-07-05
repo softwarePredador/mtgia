@@ -125,6 +125,12 @@ trace targets only. Candidate copy and value-safe reclassification stay closed
 until the follow-up trace proves a named hypothesis is unused/safe or has
 same-lane/equal-gate proof.
 
+Then run `global_commander_cut_source_hypothesis_trace_collector.py` before any
+new replay. It reuses existing current-scope replay artifacts for mined
+hypotheses. If it returns `cut_source_hypothesis_trace_blocks_used_hypotheses`,
+the used hypotheses are not value-safe cuts; rows merely seen in decision trace
+need manual negative review or force-access before reclassification.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

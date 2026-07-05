@@ -138,6 +138,12 @@ GLOBAL_COMMANDER_VALUE_SAFE_CUT_SOURCE_MINER = (
 GLOBAL_COMMANDER_VALUE_SAFE_CUT_SOURCE_MINER_TEST = (
     SCRIPT_DIR / "test_global_commander_value_safe_cut_source_miner.py"
 )
+GLOBAL_COMMANDER_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR = (
+    SCRIPT_DIR / "global_commander_cut_source_hypothesis_trace_collector.py"
+)
+GLOBAL_COMMANDER_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_cut_source_hypothesis_trace_collector.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -339,6 +345,10 @@ GLOBAL_COMMANDER_SCOPE1_POST_FORCED_RECOVERY_SYNTHESIZER_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_VALUE_SAFE_CUT_SOURCE_MINER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -649,6 +659,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "value_safe_cut_source_hypotheses_ready_for_trace",
                 "collect_usage_trace_for_new_cut_source_hypotheses",
+                "global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "cut_source_hypothesis_trace_blocks_used_hypotheses",
+                "mine_more_hypotheses_or_build_same_lane_proof",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -898,6 +911,9 @@ def build_audit() -> dict[str, Any]:
                 "mine_new_value_safe_cut_source_before_package_resynthesis",
                 "global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "collect_usage_trace_for_new_cut_source_hypotheses",
+                "global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "usage_blocked_hypothesis_count=6",
+                "mine_more_hypotheses_or_build_same_lane_proof",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1458,6 +1474,34 @@ def build_audit() -> dict[str, Any]:
                 "Off Profile Relic",
                 "value_safe_cut_source_hypotheses_ready_for_trace",
                 "collect_usage_trace_for_new_cut_source_hypotheses",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR,
+            [
+                "global_commander_cut_source_hypothesis_trace_collector",
+                "cut_source_hypothesis_trace_blocks_used_hypotheses",
+                "hypothesis_used_by_target_trace_blocks_value_safe",
+                "hypothesis_seen_without_usage_needs_negative_review",
+                "hypothesis_not_seen_needs_more_trace_or_force_access",
+                "mine_more_hypotheses_or_build_same_lane_proof",
+                "value_safe_reclassification_allowed_now",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR_TEST,
+            [
+                "test_target_usage_blocks_hypothesis_value_safe_reclassification",
+                "test_unseen_hypotheses_require_more_trace",
+                "Biotransference",
+                "Maskwood Nexus",
+                "cut_source_hypothesis_trace_blocks_used_hypotheses",
+                "expand_replay_window_or_force_access_for_unseen_hypotheses",
             ],
         )
     )
@@ -2276,6 +2320,25 @@ def build_audit() -> dict[str, Any]:
                 "Sigarda's Aid",
                 "Necromancy",
                 "Sram, Senior Edificer",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR_REPORT,
+            [
+                "Global Commander Cut-Source Hypothesis Trace Collector",
+                "cut_source_hypothesis_trace_blocks_used_hypotheses",
+                "hypothesis_count: `8`",
+                "usage_blocked_hypothesis_count: `6`",
+                "seen_without_usage_count: `2`",
+                "not_seen_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "mine_more_hypotheses_or_build_same_lane_proof",
+                "Biotransference",
+                "Trouble in Pairs",
+                "Puresteel Paladin",
             ],
         )
     )

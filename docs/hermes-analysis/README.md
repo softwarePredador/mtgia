@@ -551,6 +551,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Puresteel Paladin` e `Sram, Senior Edificer`. Elas ainda nao sao cortes
     value-safe; o proximo gate e
     `collect_usage_trace_for_new_cut_source_hypotheses`.
+    Esse trace foi coletado por
+    `global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+    usando os `8` replay seeds existentes. Resultado:
+    `usage_blocked_hypothesis_count=6`, `seen_without_usage_count=2`,
+    `not_seen_count=0`; `Biotransference`, `Maskwood Nexus`, `Sigarda's Aid`,
+    `Necromancy`, `Necropotence` e `Sram, Senior Edificer` foram usados pelo deck
+    alvo. Proximo gate: `mine_more_hypotheses_or_build_same_lane_proof`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
