@@ -100,36 +100,43 @@ def newest_report(pattern: str, fallback: Path, *, report_dir: Path = REPORT_DIR
 
 def default_mana_sequence_report() -> Path:
     return newest_report(
-        "lorehold_mana_sequence_policy_synthesis_20260704*.json",
+        "lorehold_mana_sequence_policy_synthesis_*.json",
         REPORT_DIR / "lorehold_mana_sequence_policy_synthesis_20260704_learning.json",
     )
 
 
 def default_staple_policy_report() -> Path:
     return newest_report(
-        "lorehold_staple_policy_synthesis_20260704*.json",
+        "lorehold_staple_policy_synthesis_*.json",
         REPORT_DIR / "lorehold_staple_policy_synthesis_20260704_learning.json",
     )
 
 
 def default_selection_report() -> Path:
     return newest_report(
-        "lorehold_selection_access_synthesis_20260704*.json",
+        "lorehold_selection_access_synthesis_*.json",
         REPORT_DIR / "lorehold_selection_access_synthesis_20260704_learning.json",
     )
 
 
 def default_interaction_report() -> Path:
     return newest_report(
-        "lorehold_interaction_resilience_synthesis_20260704*.json",
+        "lorehold_interaction_resilience_synthesis_*.json",
         REPORT_DIR / "lorehold_interaction_resilience_synthesis_20260704_learning.json",
     )
 
 
 def default_payoff_report() -> Path:
     return newest_report(
-        "lorehold_payoff_finisher_recursion_synthesis_20260704*.json",
+        "lorehold_payoff_finisher_recursion_synthesis_*.json",
         REPORT_DIR / "lorehold_payoff_finisher_recursion_synthesis_20260704_learning.json",
+    )
+
+
+def default_game_changer_report() -> Path:
+    return newest_report(
+        "game_changer_discovery_gap_audit_*.json",
+        REPORT_DIR / "game_changer_discovery_gap_audit_20260705_current.json",
     )
 
 
@@ -353,6 +360,24 @@ def collect_candidate_rows(reports: Mapping[str, Mapping[str, Any]]) -> list[dic
                         "in_protected_607": bool(row.get("in_protected_607") or row.get("in_607")),
                     }
                 )
+    for row in (reports.get("game_changer") or {}).get(
+        "lorehold_legal_color_allowed_missing_format_staples"
+    ) or []:
+        if isinstance(row, Mapping) and row.get("card_name"):
+            in_deck = bool(row.get("present_in_deck"))
+            rows.append(
+                {
+                    "source": "game_changer",
+                    "card_name": row.get("card_name"),
+                    "decision": (
+                        "already_in_607_game_changer_metadata_gap"
+                        if in_deck
+                        else "game_changer_discovery_metadata_only_not_promotion"
+                    ),
+                    "lane": "game_changer_discovery_metadata",
+                    "in_protected_607": in_deck,
+                }
+            )
     return rows
 
 
@@ -588,6 +613,7 @@ def build_synthesis(
     selection_report_path: Path,
     interaction_report_path: Path,
     payoff_report_path: Path,
+    game_changer_report_path: Path,
 ) -> dict[str, Any]:
     cards = load_deck_cards(conn, deck_id)
     reports = {
@@ -596,6 +622,7 @@ def build_synthesis(
         "selection": read_json_if_exists(selection_report_path),
         "interaction": read_json_if_exists(interaction_report_path),
         "payoff": read_json_if_exists(payoff_report_path),
+        "game_changer": read_json_if_exists(game_changer_report_path),
     }
     memberships = build_memberships(reports)
     card_rows = [classify_card(conn, card, memberships) for card in cards]
@@ -620,6 +647,7 @@ def build_synthesis(
             "selection_access": rel(selection_report_path),
             "interaction_resilience": rel(interaction_report_path),
             "payoff_finisher_recursion": rel(payoff_report_path),
+            "game_changer_discovery": rel(game_changer_report_path),
         },
         "summary": {
             "total_rows": len(cards),
@@ -633,6 +661,9 @@ def build_synthesis(
             "source_statuses": {
                 key: value.get("status") for key, value in reports.items()
             },
+            "game_changer_metadata_rows_considered": sum(
+                1 for row in candidate_rows if row.get("source") == "game_changer"
+            ),
         },
         "external_learning": EXTERNAL_LEARNING,
         "current_card_priorities": sorted(
@@ -732,6 +763,7 @@ def main() -> int:
     parser.add_argument("--selection-report", type=Path, default=None)
     parser.add_argument("--interaction-report", type=Path, default=None)
     parser.add_argument("--payoff-report", type=Path, default=None)
+    parser.add_argument("--game-changer-report", type=Path, default=None)
     parser.add_argument(
         "--out-prefix",
         type=Path,
@@ -748,6 +780,7 @@ def main() -> int:
             selection_report_path=args.selection_report or default_selection_report(),
             interaction_report_path=args.interaction_report or default_interaction_report(),
             payoff_report_path=args.payoff_report or default_payoff_report(),
+            game_changer_report_path=args.game_changer_report or default_game_changer_report(),
         )
     json_path, md_path = write_outputs(payload, args.out_prefix)
     print(json.dumps({"status": payload["status"], "json": str(json_path), "markdown": str(md_path)}, indent=2))

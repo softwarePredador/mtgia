@@ -903,3 +903,64 @@ Operational lesson:
 - Future land/ramp challengers must name the exact sequencing failure they fix
   and the exact current land/ramp slot they cut. Prestige, Game Changer status,
   ownership, or global staple rank is not sufficient.
+
+## Card Value Priority Relearn - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_card_value_priority_synthesis_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_card_value_priority_synthesis_20260705_current_relearn.json`
+
+This synthesis converts the current mana, staple, selection, interaction,
+payoff, and Game Changer evidence into a deckbuilder-facing priority map for
+protected deck `607`. It is read-only: no PostgreSQL writes, no source SQLite
+writes, and no mutation of protected deck `607`.
+
+Current result:
+
+- status: `card_value_priority_no_direct_cut_ready_current_607`;
+- total cards: `100`;
+- evaluated deck rows: `94`;
+- ready replacement candidates: `0`;
+- role mapping watch cards: `0`;
+- candidate pressure rows considered: `173`;
+- Game Changer metadata rows considered: `12`.
+
+Source alignment:
+
+- the value synthesis now consumes the latest matching report families instead
+  of hardcoding `20260704`, so it picks up the current
+  `lorehold_mana_sequence_policy_synthesis_20260705_current_relearn` evidence;
+- `game_changer_discovery_gap_audit_20260705_current` is now a supplemental
+  discovery source for candidate pressure, but its rows are classified as
+  metadata unless separate cut/gate evidence exists;
+- current source statuses all keep `607`: mana sequence, staple policy,
+  selection/access, interaction/resilience, payoff/finisher/recursion, and
+  Game Changer discovery do not produce a direct swap.
+
+Priority lesson:
+
+- `Land Tax`, `Library of Leng`, `Scroll Rack`, and
+  `Sensei's Divining Top` remain protected topdeck/miracle access anchors.
+- `Bender's Waterskin` and `Victory Chimes` remain protected
+  turn-cycle-miracle mana, not generic ramp slots.
+- `Creative Technique`, `Mizzix's Mastery`, `Approach of the Second Sun`,
+  `Insurrection`, `Storm Herd`, and related finishers remain protected payoff
+  or conversion anchors unless a challenger names the same lane and proves the
+  tradeoff.
+- Interaction and resilience cards such as `Swords to Plowshares`,
+  `Path to Exile`, `Generous Gift`, `Deflecting Swat`,
+  `Flawless Maneuver`, and `Teferi's Protection` remain floor protection, not
+  casual flex slots.
+
+Product/deckbuilder contract:
+
+- Do not collapse legality, ownership, Game Changer status, public staple
+  rank, commander-context synergy, and battle promotion into one score.
+- A powerful missing card should enter the app as explainable candidate
+  pressure first, with its lane, accessibility layer, and blocker displayed.
+- A card becomes promotion-ready only after it names the current `607` slot it
+  challenges, preserves the protected lane, and passes equal-gate battle/card
+  use evidence.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and the learning task remains open.

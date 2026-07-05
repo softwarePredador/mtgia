@@ -130,7 +130,24 @@ def reports(tmp_path: Path, *, ready_candidate: bool = False) -> dict[str, Path]
             ],
         },
     )
-    return {"mana": mana, "staple": staple, "selection": selection, "interaction": interaction, "payoff": payoff}
+    game_changer = write(
+        tmp_path / "game_changer.json",
+        {
+            "status": "game_changer_discovery_gap_found_report_only",
+            "lorehold_legal_color_allowed_missing_format_staples": [
+                {"card_name": "The One Ring", "present_in_deck": False},
+                {"card_name": "Ancient Tomb", "present_in_deck": True},
+            ],
+        },
+    )
+    return {
+        "mana": mana,
+        "staple": staple,
+        "selection": selection,
+        "interaction": interaction,
+        "payoff": payoff,
+        "game_changer": game_changer,
+    }
 
 
 def build_payload(tmp_path: Path, *, ready_candidate: bool = False) -> dict:
@@ -145,6 +162,7 @@ def build_payload(tmp_path: Path, *, ready_candidate: bool = False) -> dict:
             selection_report_path=paths["selection"],
             interaction_report_path=paths["interaction"],
             payoff_report_path=paths["payoff"],
+            game_changer_report_path=paths["game_changer"],
         )
 
 
@@ -175,6 +193,14 @@ def test_ready_candidate_changes_status_without_cutting_current_card(tmp_path):
     assert payload["summary"]["ready_replacement_candidate_count"] == 1
 
 
+def test_game_changer_gap_is_metadata_not_ready_candidate(tmp_path):
+    payload = build_payload(tmp_path)
+
+    assert payload["summary"]["game_changer_metadata_rows_considered"] == 2
+    assert payload["summary"]["ready_replacement_candidate_count"] == 0
+    assert payload["candidate_replacement_pressure"]["blocked_or_hypothesis_count"] == 5
+
+
 def test_markdown_surfaces_policy_and_external_sources(tmp_path):
     payload = build_payload(tmp_path)
     markdown = synth.render_markdown(payload)
@@ -182,3 +208,20 @@ def test_markdown_surfaces_policy_and_external_sources(tmp_path):
     assert "keep_607_card_value_policy: `true`" in markdown
     assert "Role Mapping Watch" in markdown
     assert "Card Kingdom staples article" in markdown
+
+
+def test_newest_report_uses_current_family_not_hardcoded_day(tmp_path):
+    old = tmp_path / "lorehold_card_value_priority_synthesis_20260704_learning.json"
+    current = tmp_path / "lorehold_card_value_priority_synthesis_20260705_current_relearn.json"
+    fallback = tmp_path / "fallback.json"
+    old.write_text("{}", encoding="utf-8")
+    current.write_text("{}", encoding="utf-8")
+    fallback.write_text("{}", encoding="utf-8")
+
+    selected = synth.newest_report(
+        "lorehold_card_value_priority_synthesis_*.json",
+        fallback,
+        report_dir=tmp_path,
+    )
+
+    assert selected == current
