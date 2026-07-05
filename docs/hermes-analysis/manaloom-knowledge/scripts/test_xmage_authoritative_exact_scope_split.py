@@ -43,6 +43,143 @@ def metadata(name: str = "Fixture Spell", *, type_line: str = "Instant", oracle_
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_fixed_equipment_static_attachment_maps_exact_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostEquippedEffect,GainAbilityAttachedEffect::"
+            "EquipAbility,SimpleStaticAbility,VigilanceAbility::no_target_class::"
+            "no_condition_class::static_ability",
+            effect_classes=["BoostEquippedEffect", "GainAbilityAttachedEffect"],
+            ability_kind="static",
+            ability_classes=["EquipAbility", "SimpleStaticAbility", "VigilanceAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Accorder's Shield",
+                type_line="Artifact - Equipment",
+                oracle_text=(
+                    "Equipped creature gets +0/+3 and has vigilance.\n"
+                    "Equip {3} ({3}: Attach to target creature you control. Equip only as a sorcery.)"
+                ),
+            ),
+            source_text="""
+                this.subtype.add(SubType.EQUIPMENT);
+                Ability ability = new SimpleStaticAbility(new BoostEquippedEffect(0, 3));
+                ability.addEffect(new GainAbilityAttachedEffect(
+                    VigilanceAbility.getInstance(), AttachmentType.EQUIPMENT));
+                this.addAbility(ability);
+                this.addAbility(new EquipAbility(3));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "equipment_static_attachment")
+        self.assertEqual(effect["battle_model_scope"], split.EQUIPMENT_STATIC_ATTACHMENT_SCOPE)
+        self.assertEqual(effect["power_boost"], 0)
+        self.assertEqual(effect["toughness_boost"], 3)
+        self.assertEqual(effect["attached_keywords"], ["vigilance"])
+        self.assertTrue(effect["grants_vigilance"])
+
+    def test_fixed_equipment_static_attachment_blocks_extra_granted_trigger(self) -> None:
+        row = queue_row(
+            "xmage_signature::BoostEquippedEffect,GainAbilityAttachedEffect::"
+            "EquipAbility,ReachAbility,SimpleStaticAbility::no_target_class::"
+            "no_condition_class::static_ability",
+            effect_classes=["BoostEquippedEffect", "GainAbilityAttachedEffect"],
+            ability_kind="static",
+            ability_classes=["EquipAbility", "ReachAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Web-Shooters",
+                type_line="Artifact - Equipment",
+                oracle_text=(
+                    "Equipped creature gets +1/+1 and has reach and "
+                    "\"Whenever this creature attacks, tap target creature an opponent controls.\"\n"
+                    "Equip {2}"
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleStaticAbility(new BoostEquippedEffect(1, 1));
+                ability.addEffect(new GainAbilityAttachedEffect(
+                    ReachAbility.getInstance(), AttachmentType.EQUIPMENT));
+                ability.addEffect(new GainAbilityAttachedEffect(gainedAbility, AttachmentType.EQUIPMENT));
+                this.addAbility(ability);
+                this.addAbility(new EquipAbility(2));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "equipment_static_oracle_keyword_not_supported")
+
+    def test_fixed_aura_static_power_toughness_attachment_maps_exact_scope(self) -> None:
+        row = queue_row(
+            "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"
+            "TargetCreaturePermanent,TargetPermanent::no_condition_class::targeting,static_ability",
+            effect_classes=["AttachEffect", "BoostEnchantedEffect"],
+            ability_kind="static",
+            ability_classes=["EnchantAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dead Weight",
+                type_line="Enchantment - Aura",
+                oracle_text="Enchant creature\nEnchanted creature gets -2/-2.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AttachEffect(Outcome.Detriment));
+                Ability ability = new EnchantAbility(new TargetCreaturePermanent());
+                this.addAbility(ability);
+                this.addAbility(new SimpleStaticAbility(new BoostEnchantedEffect(-2, -2, Duration.WhileOnBattlefield)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "aura_static_attachment")
+        self.assertEqual(effect["battle_model_scope"], split.AURA_STATIC_PT_ATTACHMENT_SCOPE)
+        self.assertEqual(effect["power_boost"], -2)
+        self.assertEqual(effect["toughness_boost"], -2)
+        self.assertEqual(effect["enchant_target_controller"], "any")
+        self.assertEqual(effect["xmage_effect_classes"], ["AttachEffect", "BoostEnchantedEffect"])
+
+    def test_fixed_aura_static_power_toughness_blocks_dynamic_source(self) -> None:
+        row = queue_row(
+            "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"
+            "TargetCreaturePermanent,TargetPermanent::no_condition_class::targeting,static_ability",
+            effect_classes=["AttachEffect", "BoostEnchantedEffect"],
+            ability_kind="static",
+            ability_classes=["EnchantAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ancestral Mask",
+                type_line="Enchantment - Aura",
+                oracle_text=(
+                    "Enchant creature\n"
+                    "Enchanted creature gets +2/+2 for each other enchantment on the battlefield."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new AttachEffect(Outcome.BoostCreature));
+                this.addAbility(new EnchantAbility(new TargetCreaturePermanent()));
+                DynamicValue countEnchantments = new PermanentsOnBattlefieldCount(filter);
+                this.addAbility(new SimpleStaticAbility(
+                    new BoostEnchantedEffect(countEnchantments, countEnchantments, Duration.WhileOnBattlefield)));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "aura_static_pt_oracle_not_exact_fixed")
+
     def test_static_cast_as_flash_permission_maps_artifact_filter(self) -> None:
         row = queue_row(
             split.FLASH_PERMISSION_UNIT,

@@ -253,6 +253,8 @@ STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
 STATIC_GRAVEYARD_COUNT_BOOST_SCOPE = "xmage_static_source_boost_equal_graveyard_count_v1"
+AURA_STATIC_PT_ATTACHMENT_SCOPE = "xmage_aura_static_power_toughness_attachment_v1"
+EQUIPMENT_STATIC_ATTACHMENT_SCOPE = "xmage_equipment_static_power_toughness_attachment_v1"
 PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
 PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE = "xmage_permanent_simple_activated_draw_discard_v1"
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
@@ -657,6 +659,192 @@ def default_source_reader(row: dict[str, Any]) -> str:
     if not path.is_file():
         return ""
     return path.read_text(encoding="utf-8", errors="replace")
+
+
+def fixed_aura_static_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = oracle_text(metadata)
+    text = re.sub(r"\s*\([^)]*\)", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(
+        r"^(?P<flash>flash )?enchant creature(?P<controller> you control| an opponent controls)? "
+        r"enchanted creature gets (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+)\.?$",
+        text,
+    )
+    if not match:
+        return None
+    controller = (match.group("controller") or "").strip()
+    target_controller = "any"
+    if controller == "you control":
+        target_controller = "self"
+    elif controller == "an opponent controls":
+        target_controller = "opponent"
+    return {
+        "power_boost": int(match.group("power")),
+        "toughness_boost": int(match.group("toughness")),
+        "enchant_target_controller": target_controller,
+        "has_flash": bool(match.group("flash")),
+    }
+
+
+def fixed_aura_static_pt_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if len(re.findall(r"\bAttachEffect\s*\(", text)) != 1:
+        return "aura_static_pt_source_attach_not_single"
+    if len(re.findall(r"\bBoostEnchantedEffect\s*\(", text)) != 1:
+        return "aura_static_pt_source_boost_not_single_fixed"
+    if "new SimpleActivatedAbility" in text:
+        return "aura_static_pt_source_extra_activated_ability"
+    blocked_markers = (
+        "UmbraArmorAbility",
+        "CyclingAbility",
+        "EscapeAbility",
+        "MadnessAbility",
+        "SuspendAbility",
+        "RippleAbility",
+        "CumulativeUpkeepAbility",
+        "DynamicValue",
+        "PermanentsOnBattlefieldCount",
+        "DomainValue",
+        "StaticValue.get",
+    )
+    if any(marker in text for marker in blocked_markers):
+        return "aura_static_pt_source_dynamic_or_auxiliary_not_supported"
+    match = re.search(
+        r"new\s+BoostEnchantedEffect\s*\(\s*(?P<power>[+-]?\d+)\s*,\s*"
+        r"(?P<toughness>[+-]?\d+)(?:\s*,\s*Duration\.WhileOnBattlefield)?\s*\)",
+        text,
+        re.S,
+    )
+    if not match:
+        return "aura_static_pt_source_boost_not_single_fixed"
+    target_controller = "any"
+    if "TargetControlledCreaturePermanent" in text:
+        target_controller = "self"
+    elif "TargetOpponentsCreaturePermanent" in text or "TargetOpponent" in text:
+        target_controller = "opponent"
+    return {
+        "power_boost": int(match.group("power")),
+        "toughness_boost": int(match.group("toughness")),
+        "enchant_target_controller": target_controller,
+    }
+
+
+EQUIPMENT_ATTACHED_KEYWORD_CLASSES = {
+    "FlyingAbility": "flying",
+    "VigilanceAbility": "vigilance",
+    "FirstStrikeAbility": "first_strike",
+    "DoubleStrikeAbility": "double_strike",
+    "TrampleAbility": "trample",
+    "MenaceAbility": "menace",
+    "ReachAbility": "reach",
+    "DeathtouchAbility": "deathtouch",
+    "LifelinkAbility": "lifelink",
+    "HasteAbility": "haste",
+    "HexproofAbility": "hexproof",
+    "ShroudAbility": "shroud",
+    "IndestructibleAbility": "indestructible",
+}
+
+EQUIPMENT_ATTACHED_KEYWORD_WORDS = {
+    keyword.replace("_", " "): keyword
+    for keyword in EQUIPMENT_ATTACHED_KEYWORD_CLASSES.values()
+}
+
+
+def _equipment_oracle_keyword_list(value: str) -> list[str] | None:
+    if not value:
+        return []
+    if '"' in value or " and is " in value or " can " in value or " can't " in value or " must " in value:
+        return None
+    normalized = (
+        value.strip()
+        .rstrip(".")
+        .replace(", and ", ", ")
+        .replace(" and ", ", ")
+    )
+    keywords: list[str] = []
+    for raw_part in [part.strip() for part in normalized.split(",") if part.strip()]:
+        keyword = EQUIPMENT_ATTACHED_KEYWORD_WORDS.get(raw_part)
+        if not keyword:
+            return None
+        keywords.append(keyword)
+    return sorted(set(keywords))
+
+
+def fixed_equipment_static_attachment_from_oracle(
+    metadata: dict[str, Any],
+) -> dict[str, Any] | str | None:
+    text = re.sub(r"\s*\([^)]*\)", "", str(metadata.get("oracle_text") or ""))
+    lines = [
+        re.sub(r"\s+", " ", line.strip().lower()).rstrip(".")
+        for line in text.splitlines()
+        if line.strip()
+    ]
+    static_lines: list[str] = []
+    for line in lines:
+        if line.startswith("equip "):
+            continue
+        static_lines.append(line)
+    if len(static_lines) != 1:
+        return None
+    match = re.match(
+        r"^equipped creature gets (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+)(?P<tail>.*)$",
+        static_lines[0],
+    )
+    if not match:
+        return None
+    tail = match.group("tail").strip()
+    keyword_text = ""
+    if tail:
+        if tail.startswith("and has "):
+            keyword_text = tail[len("and has ") :].strip()
+        elif tail.startswith(", has "):
+            keyword_text = tail[len(", has ") :].strip()
+        elif tail.startswith(", and has "):
+            keyword_text = tail[len(", and has ") :].strip()
+        else:
+            return None
+    keywords = _equipment_oracle_keyword_list(keyword_text)
+    if keywords is None:
+        return "equipment_static_oracle_keyword_not_supported"
+    return {
+        "power_boost": int(match.group("power")),
+        "toughness_boost": int(match.group("toughness")),
+        "attached_keywords": keywords,
+    }
+
+
+def fixed_equipment_static_attachment_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    boost_matches = re.findall(
+        r"new\s+BoostEquippedEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)"
+        r"\s*(?:,\s*Duration\.WhileOnBattlefield)?\s*\)",
+        text,
+        re.S,
+    )
+    if len(boost_matches) != 1:
+        return "equipment_static_source_boost_not_single_fixed"
+    attached_effect_blocks = re.findall(
+        r"GainAbilityAttachedEffect\s*\(\s*(.*?)AttachmentType\.EQUIPMENT",
+        text,
+        re.S,
+    )
+    keywords: set[str] = set()
+    for block in attached_effect_blocks:
+        found = False
+        for class_name, keyword in EQUIPMENT_ATTACHED_KEYWORD_CLASSES.items():
+            if re.search(rf"\b(?:new\s+)?{re.escape(class_name)}\b", block):
+                keywords.add(keyword)
+                found = True
+                break
+        if not found:
+            return "equipment_static_source_keyword_not_supported"
+    power_raw, toughness_raw = boost_matches[0]
+    return {
+        "power_boost": int(power_raw),
+        "toughness_boost": int(toughness_raw),
+        "attached_keywords": sorted(keywords),
+    }
 
 
 def java_constructor_int(source: str, class_name: str, *, default: int | None = None) -> int | None:
@@ -6348,6 +6536,35 @@ def is_static_controlled_pt_unit(row: dict[str, Any]) -> bool:
         and effect_classes(row) == {"BoostControlledEffect"}
         and ability_classes(row) == {"SimpleStaticAbility"}
         and set(row.get("xmage_signals") or []) == {"static_ability"}
+    )
+
+
+def is_simple_aura_static_pt_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    return (
+        effect_classes(row) == {"AttachEffect", "BoostEnchantedEffect"}
+        and {"EnchantAbility", "SimpleStaticAbility"}.issubset(abilities)
+        and abilities.issubset({"EnchantAbility", "SimpleStaticAbility", "FlashAbility"})
+        and set(row.get("xmage_signals") or []).issubset({"targeting", "static_ability"})
+    )
+
+
+def is_simple_equipment_static_attachment_unit(row: dict[str, Any]) -> bool:
+    effects = effect_classes(row)
+    abilities = ability_classes(row)
+    allowed_effects = {"BoostEquippedEffect", "GainAbilityAttachedEffect"}
+    allowed_abilities = {
+        "EquipAbility",
+        "SimpleStaticAbility",
+        "AddAbility",
+        *EQUIPMENT_ATTACHED_KEYWORD_CLASSES.keys(),
+    }
+    return (
+        "BoostEquippedEffect" in effects
+        and effects.issubset(allowed_effects)
+        and {"EquipAbility", "SimpleStaticAbility"}.issubset(abilities)
+        and abilities.issubset(allowed_abilities)
+        and set(row.get("xmage_signals") or []).issubset({"targeting", "static_ability"})
     )
 
 
@@ -14458,6 +14675,10 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature static source power/toughness boost gated by graveyard card count"
     elif scope == STATIC_GRAVEYARD_COUNT_BOOST_SCOPE:
         scope_kind = "creature static source power/toughness boost equal to graveyard card count"
+    elif scope == AURA_STATIC_PT_ATTACHMENT_SCOPE:
+        scope_kind = "fixed Aura attachment with static enchanted-creature power/toughness modifier"
+    elif scope == EQUIPMENT_STATIC_ATTACHMENT_SCOPE:
+        scope_kind = "fixed Equipment attachment with static equipped-creature power/toughness and keyword modifier"
     elif scope == STATIC_GENERIC_COST_REDUCTION_SCOPE:
         scope_kind = "permanent static generic cost reduction for matching spells you cast"
     elif scope == STATIC_CAST_AS_FLASH_PERMISSION_SCOPE:
@@ -14655,6 +14876,8 @@ def split_row(
     permanent_activated_tutor_battlefield_unit = is_permanent_activated_tutor_battlefield_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
+    simple_aura_static_pt_unit = is_simple_aura_static_pt_unit(row)
+    simple_equipment_static_attachment_unit = is_simple_equipment_static_attachment_unit(row)
     static_generic_cost_reduction_unit = is_static_generic_cost_reduction_unit(row)
     static_graveyard_count_pt_unit = is_static_graveyard_count_pt_unit(row)
     static_graveyard_threshold_boost_unit = is_static_graveyard_threshold_boost_unit(row)
@@ -14762,6 +14985,8 @@ def split_row(
         and not permanent_activated_tutor_battlefield_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
+        and not simple_aura_static_pt_unit
+        and not simple_equipment_static_attachment_unit
         and not static_generic_cost_reduction_unit
         and not static_graveyard_count_pt_unit
         and not static_graveyard_threshold_boost_unit
@@ -14833,6 +15058,8 @@ def split_row(
         and not permanent_activated_tutor_battlefield_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
+        and not simple_aura_static_pt_unit
+        and not simple_equipment_static_attachment_unit
         and not static_generic_cost_reduction_unit
         and not static_graveyard_count_pt_unit
         and not static_graveyard_threshold_boost_unit
@@ -14865,6 +15092,99 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if simple_equipment_static_attachment_unit:
+        type_line = str(metadata.get("type_line") or "").lower()
+        if "artifact" not in type_line or "equipment" not in type_line:
+            return None, "equipment_static_not_artifact_equipment_type"
+        oracle_equipment = fixed_equipment_static_attachment_from_oracle(metadata)
+        if oracle_equipment is None:
+            return None, "equipment_static_oracle_not_exact_fixed"
+        if isinstance(oracle_equipment, str):
+            return None, oracle_equipment
+        source_equipment = fixed_equipment_static_attachment_from_source(source_text)
+        if source_equipment is None:
+            return None, "equipment_static_source_not_exact_fixed"
+        if isinstance(source_equipment, str):
+            return None, source_equipment
+        if source_equipment != oracle_equipment:
+            return None, "equipment_static_source_oracle_mismatch"
+        effect_json = {
+            "effect": "equipment_static_attachment",
+            "battle_model_scope": EQUIPMENT_STATIC_ATTACHMENT_SCOPE,
+            "ability_kind": "equipment_static",
+            "target": "creature_you_control",
+            "target_constraints": {
+                "controller": "self",
+                "card_types": ["creature"],
+                "zone": "battlefield",
+            },
+            "power_boost": int(oracle_equipment["power_boost"]),
+            "toughness_boost": int(oracle_equipment["toughness_boost"]),
+            "static_power_bonus": int(oracle_equipment["power_boost"]),
+            "static_toughness_bonus": int(oracle_equipment["toughness_boost"]),
+            "attached_keywords": list(oracle_equipment["attached_keywords"]),
+            "equipment": True,
+            "xmage_effect_classes": sorted(effect_classes(row)),
+            "xmage_ability_classes": sorted(ability_classes(row)),
+            **flags,
+        }
+        for keyword in oracle_equipment["attached_keywords"]:
+            effect_json[f"grants_{keyword}"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_equipment_static_power_toughness_attachment",
+        ), "selected_exact_scope"
+
+    if simple_aura_static_pt_unit:
+        if "aura" not in str(metadata.get("type_line") or "").lower():
+            return None, "aura_static_pt_not_aura_type"
+        oracle_aura = fixed_aura_static_pt_from_oracle(metadata)
+        if oracle_aura is None:
+            return None, "aura_static_pt_oracle_not_exact_fixed"
+        if isinstance(oracle_aura, str):
+            return None, oracle_aura
+        source_aura = fixed_aura_static_pt_from_source(source_text)
+        if source_aura is None:
+            return None, "aura_static_pt_source_not_exact_fixed"
+        if isinstance(source_aura, str):
+            return None, source_aura
+        source_without_flash = dict(source_aura)
+        oracle_without_flash = {
+            key: value
+            for key, value in oracle_aura.items()
+            if key != "has_flash"
+        }
+        if source_without_flash != oracle_without_flash:
+            return None, "aura_static_pt_source_oracle_mismatch"
+        effect_json = {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": AURA_STATIC_PT_ATTACHMENT_SCOPE,
+            "ability_kind": "aura_static",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "zone": "battlefield"},
+            "enchant_target": "creature",
+            "enchant_target_controller": oracle_aura["enchant_target_controller"],
+            "power_boost": int(oracle_aura["power_boost"]),
+            "toughness_boost": int(oracle_aura["toughness_boost"]),
+            "static_power_bonus": int(oracle_aura["power_boost"]),
+            "static_toughness_bonus": int(oracle_aura["toughness_boost"]),
+            "aura": True,
+            "xmage_effect_classes": ["AttachEffect", "BoostEnchantedEffect"],
+            "xmage_ability_classes": sorted(ability_classes(row)),
+            **flags,
+        }
+        if oracle_aura.get("has_flash"):
+            effect_json["has_flash"] = True
+            effect_json["flash"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_aura_static_power_toughness_attachment",
+        ), "selected_exact_scope"
 
     if etb_fixed_mana_creature_unit:
         if not is_creature_metadata(metadata):
@@ -21725,6 +22045,7 @@ def build_exact_split_report(
             and not is_permanent_activated_target_keyword_unit(row)
             and not is_creature_attack_target_keyword_unit(row)
             and not is_static_controlled_pt_unit(row)
+            and not is_simple_equipment_static_attachment_unit(row)
             and not is_static_generic_cost_reduction_unit(row)
             and not is_static_graveyard_count_pt_unit(row)
             and not is_static_graveyard_threshold_boost_unit(row)
@@ -21808,6 +22129,7 @@ def build_exact_split_report(
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
+                "xmage_signature BoostEquippedEffect Equipment rows with exact fixed equipped-creature power/toughness boost, supported attached combat keywords, and no auxiliary non-static effects",
                 "xmage_signature SpellsCostReductionControllerEffect + SimpleStaticAbility rows with exact generic cost reduction for spells you cast by card type, subtype, color, or minimum mana value",
                 "SetBasePowerToughnessSourceEffect + SimpleStaticAbility creature rows whose source and Oracle both set source power/toughness to a direct controller/all-graveyards card-type count",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",

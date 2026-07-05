@@ -136,6 +136,7 @@ HIGH_IMPACT_PAYOFF_EFFECTS = {
     "attack_limit",
     "attack_tax",
     "approach",
+    "aura_static_attachment",
     "board_wipe",
     "brain_freeze",
     "copy_creature_token",
@@ -25816,7 +25817,7 @@ def current_state_unlock_candidates(
         elif effect in ("remove_creature", "remove_permanent", "counter", "protect_creature", "cannot_lose_turn"):
             score += 20
             reason = "unlock_interaction"
-        elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
+        elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment", "aura_static_attachment"):
             score += 16 if cmc <= 4 else 8
             reason = "unlock_board_or_engine_development"
         elif effect in (
@@ -25915,7 +25916,7 @@ def ancient_tomb_unlock_candidates(player, opponents, all_players, turn):
         elif effect in ("remove_creature", "remove_permanent", "counter", "protect_creature", "cannot_lose_turn"):
             score += 22
             reason = "unlock_interaction"
-        elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
+        elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment", "aura_static_attachment"):
             score += 18 if cmc <= 4 else 10
             reason = "unlock_board_or_engine_development"
         elif effect in (
@@ -26053,7 +26054,7 @@ def sacrifice_mana_unlock_candidates(
         elif effect in ("remove_creature", "remove_permanent", "counter", "protect_creature", "cannot_lose_turn"):
             score += 20
             reason = "unlock_interaction"
-        elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment"):
+        elif effect in ("creature", "draw_engine", "topdeck_manipulation", "attack_limit", "attack_tax", "equipment_static_attachment", "aura_static_attachment"):
             score += 16 if cmc <= 4 else 8
             reason = "unlock_board_or_engine_development"
         elif effect in (
@@ -33491,6 +33492,7 @@ def discard_replacement_priority(card, player):
         "protection",
         "phase_out",
         "equipment_static_attachment",
+        "aura_static_attachment",
         "tutor",
     }:
         return 140 + min(cmc, 6) * 3
@@ -41466,8 +41468,27 @@ def apply_equipment_static_attachment(player, card, effect_data, turn):
         target["power"] = int(target.get("power") or 0) + power_boost
     if toughness_boost:
         target["toughness"] = int(target.get("toughness") or 0) + toughness_boost
-    for keyword in ("haste", "hexproof", "shroud", "indestructible"):
-        if effect_data.get(f"grants_{keyword}"):
+    attached_keywords = {
+        str(keyword).strip().lower().replace(" ", "_")
+        for keyword in (effect_data.get("attached_keywords") or [])
+        if str(keyword).strip()
+    }
+    for keyword in (
+        "flying",
+        "reach",
+        "trample",
+        "deathtouch",
+        "first_strike",
+        "double_strike",
+        "lifelink",
+        "indestructible",
+        "haste",
+        "vigilance",
+        "hexproof",
+        "shroud",
+        "menace",
+    ):
+        if effect_data.get(f"grants_{keyword}") or keyword in attached_keywords:
             target[keyword] = True
             grants.append(keyword)
     if effect_data.get("grants_haste"):
@@ -41492,6 +41513,145 @@ def apply_equipment_static_attachment(player, card, effect_data, turn):
         turn=turn,
         **replay_rule_fields(effect_data),
     )
+
+
+def aura_static_attachment_candidates(player, opponents, effect_data):
+    target_controller = str(effect_data.get("enchant_target_controller") or "any").lower()
+    participants = []
+    if target_controller in {"self", "you", "controller"}:
+        participants = [player]
+    elif target_controller in {"opponent", "opponents"}:
+        participants = list(opponents or [])
+    else:
+        participants = [player] + list(opponents or [])
+    candidates = []
+    for controller in participants:
+        for permanent in getattr(controller, "battlefield", []) or []:
+            if is_battlefield_creature(permanent):
+                candidates.append((controller, permanent))
+    return candidates
+
+
+def choose_aura_static_attachment_target(player, opponents, effect_data):
+    candidates = aura_static_attachment_candidates(player, opponents, effect_data)
+    if not candidates:
+        return None, None
+    power_boost = _static_pt_int(effect_data.get("power_boost"), default=0)
+    toughness_boost = _static_pt_int(effect_data.get("toughness_boost"), default=0)
+    is_debuff = toughness_boost < 0 or (power_boost < 0 and toughness_boost <= 0)
+    if is_debuff:
+        opponent_candidates = [
+            (controller, permanent)
+            for controller, permanent in candidates
+            if controller is not player
+        ]
+        if opponent_candidates:
+            candidates = opponent_candidates
+    else:
+        own_candidates = [
+            (controller, permanent)
+            for controller, permanent in candidates
+            if controller is player
+        ]
+        if own_candidates:
+            candidates = own_candidates
+    candidates.sort(
+        key=lambda item: (
+            tuple(-part for part in target_priority(item[1])),
+            -_static_pt_int(item[1].get("power"), default=0),
+            str(item[1].get("name") or ""),
+        )
+    )
+    return candidates[0]
+
+
+def apply_aura_static_pt_modifier(target, aura, effect_data):
+    power_boost = _static_pt_int(effect_data.get("power_boost"), default=0)
+    toughness_boost = _static_pt_int(effect_data.get("toughness_boost"), default=0)
+    source_key = str(
+        aura.get("_rule_logical_key")
+        or effect_data.get("_rule_logical_key")
+        or aura.get("name")
+        or effect_data.get("name")
+        or "aura_static_attachment"
+    )
+    modifier_map = target.setdefault("_aura_static_pt_modifiers", {})
+    previous = modifier_map.get(source_key) or {"power": 0, "toughness": 0}
+    base_power = _static_pt_int(target.get("power", target.get("base_power")), default=1) - _static_pt_int(
+        previous.get("power"), default=0
+    )
+    base_toughness = _static_pt_int(
+        target.get("toughness", target.get("base_toughness")),
+        default=base_power or 1,
+    ) - _static_pt_int(previous.get("toughness"), default=0)
+    target["power"] = base_power + power_boost
+    target["toughness"] = base_toughness + toughness_boost
+    modifier_map[source_key] = {
+        "source": aura.get("name", "?"),
+        "power": power_boost,
+        "toughness": toughness_boost,
+    }
+    source_names = [
+        entry.get("source")
+        for entry in modifier_map.values()
+        if isinstance(entry, dict) and entry.get("source")
+    ]
+    target["aura_static_power_toughness_sources"] = source_names
+    return power_boost, toughness_boost
+
+
+def apply_aura_static_attachment(player, opponents, card, effect_data, turn, rng):
+    aura = enrich_card({**card, **effect_data})
+    aura["effect"] = "aura_static_attachment"
+    player.battlefield.append(aura)
+    target_controller, target = choose_aura_static_attachment_target(player, opponents, effect_data)
+    if target is None or target_controller is None:
+        emit_replay_event(
+            "aura_unattached",
+            player=player.name,
+            card=card.get("name", "?"),
+            effect="aura_static_attachment",
+            reason="no_legal_creature_target",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        return
+
+    before = {"power": target.get("power"), "toughness": target.get("toughness")}
+    power_boost, toughness_boost = apply_aura_static_pt_modifier(target, aura, effect_data)
+    aura["attached_to"] = target.get("name", "?")
+    aura["attached_to_controller"] = getattr(target_controller, "name", "?")
+    emit_replay_event(
+        "aura_attached_static_pt",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_player=getattr(target_controller, "name", "?"),
+        target=target.get("name", "?"),
+        power_before=before["power"],
+        toughness_before=before["toughness"],
+        power_after=target.get("power"),
+        toughness_after=target.get("toughness"),
+        power_boost=power_boost,
+        toughness_boost=toughness_boost,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    if _static_pt_int(target.get("toughness"), default=1) <= 0:
+        move_permanent_from_battlefield(
+            target_controller,
+            target,
+            reason="zero_toughness",
+            source=aura,
+            all_players=[player] + list(opponents or []),
+        )
+        if aura in (getattr(player, "battlefield", []) or []):
+            move_permanent_from_battlefield(
+                player,
+                aura,
+                reason="attached_target_left_battlefield",
+                source=target,
+                all_players=[player] + list(opponents or []),
+            )
 
 
 def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn):
@@ -55400,6 +55560,8 @@ def apply_effect_immediate(
         apply_equipment_haste_shroud(player, card, effect_data, turn)
     elif effect == "equipment_static_attachment":
         apply_equipment_static_attachment(player, card, effect_data, turn)
+    elif effect == "aura_static_attachment":
+        apply_aura_static_attachment(player, opponents, card, effect_data, turn, rng)
     elif effect == "vow_counter_each_player_sacrifice_rest":
         resolve_promise_of_loyalty(player, opponents, card, effect_data, turn)
     elif effect == "single_combat":

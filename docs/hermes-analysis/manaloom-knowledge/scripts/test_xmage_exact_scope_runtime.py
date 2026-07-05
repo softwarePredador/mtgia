@@ -736,6 +736,97 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(goblin["power"], 1)
         self.assertEqual(goblin["toughness"], 1)
 
+    def test_equipment_static_attachment_applies_power_toughness_and_keywords(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        target = {"name": "Ally Soldier", "type_line": "Creature - Soldier", "power": 2, "toughness": 2}
+        active.battlefield = [target]
+        equipment = {"name": "Accorder's Shield", "type_line": "Artifact - Equipment"}
+        effect = {
+            "effect": "equipment_static_attachment",
+            "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+            "power_boost": 0,
+            "toughness_boost": 3,
+            "attached_keywords": ["vigilance", "reach"],
+        }
+
+        self.battle.apply_equipment_static_attachment(active, equipment, effect, turn=2)
+
+        attached = next(card for card in active.battlefield if card.get("name") == "Accorder's Shield")
+        self.assertEqual(attached["attached_to"], "Ally Soldier")
+        self.assertEqual(target["power"], 2)
+        self.assertEqual(target["toughness"], 5)
+        self.assertTrue(target["vigilance"])
+        self.assertTrue(target["reach"])
+        self.assertTrue(
+            any(
+                event == "equipment_attached"
+                and data.get("card") == "Accorder's Shield"
+                and data.get("target") == "Ally Soldier"
+                and set(data.get("grants") or []) == {"vigilance", "reach"}
+                for event, data in self.events
+            )
+        )
+
+    def test_aura_static_power_toughness_attachment_boosts_own_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        target = {"name": "Trained Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield = [target]
+        aura = {"name": "Giant Strength", "type_line": "Enchantment - Aura"}
+        effect = {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+            "power_boost": 2,
+            "toughness_boost": 2,
+            "enchant_target_controller": "self",
+        }
+
+        self.battle.apply_aura_static_attachment(active, [], aura, effect, turn=2, rng=random.Random(1))
+
+        attached = next(card for card in active.battlefield if card.get("name") == "Giant Strength")
+        self.assertEqual(attached["attached_to"], "Trained Bear")
+        self.assertEqual(target["power"], 4)
+        self.assertEqual(target["toughness"], 4)
+        self.assertEqual(target["aura_static_power_toughness_sources"], ["Giant Strength"])
+        self.assertTrue(
+            any(
+                event == "aura_attached_static_pt"
+                and data.get("card") == "Giant Strength"
+                and data.get("target") == "Trained Bear"
+                and data.get("power_after") == 4
+                for event, data in self.events
+            )
+        )
+
+    def test_aura_static_power_toughness_debuff_moves_zero_toughness_target_and_aura(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        opponent.battlefield = [target]
+        aura = {"name": "Dead Weight", "type_line": "Enchantment - Aura"}
+        effect = {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+            "power_boost": -2,
+            "toughness_boost": -2,
+            "enchant_target_controller": "any",
+        }
+
+        self.battle.apply_aura_static_attachment(active, [opponent], aura, effect, turn=3, rng=random.Random(2))
+
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(any(card.get("name") == "Dead Weight" for card in active.graveyard))
+        self.assertFalse(any(card.get("name") == "Dead Weight" for card in active.battlefield))
+        self.assertTrue(
+            any(
+                event == "aura_attached_static_pt"
+                and data.get("card") == "Dead Weight"
+                and data.get("target") == "Enemy Bear"
+                and data.get("toughness_after") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_static_graveyard_count_power_toughness_counts_controller_graveyard_and_counters(self) -> None:
         active = self.battle.Player("Active", None, [])
         active.graveyard = [

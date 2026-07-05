@@ -75,6 +75,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "cantrip_mana_filter_artifact": "draw",
     "draw_engine": "draw",
     "equipment_static_attachment": "protection",
+    "aura_static_attachment": "support",
     "topdeck_manipulation": "draw",
     "loot": "draw",
     "tutor": "tutor",
@@ -326,6 +327,18 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
             subtype = "temporary_debuff"
         else:
             subtype = "temporary_pump"
+    elif effect == "aura_static_attachment":
+        power_delta = int(effect_json.get("power_boost") or effect_json.get("static_power_bonus") or 0)
+        toughness_delta = int(effect_json.get("toughness_boost") or effect_json.get("static_toughness_bonus") or 0)
+        if toughness_delta < 0 or (power_delta < 0 and toughness_delta <= 0):
+            category = "removal"
+            subtype = "aura_debuff"
+        else:
+            category = "support"
+            subtype = "aura_static_pump"
+    elif effect == "equipment_static_attachment":
+        category = "support"
+        subtype = "equipment_static_pump"
     elif effect == "graveyard_exile":
         subtype = "graveyard_hate"
     role = {

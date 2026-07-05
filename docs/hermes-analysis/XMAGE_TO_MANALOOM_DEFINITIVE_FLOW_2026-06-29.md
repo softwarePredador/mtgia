@@ -14142,6 +14142,68 @@ party/domain/devotion/count-based tax values, additional counter riders beyond
 the exact exile replacement above, activated/triggered ability counters, or
 unsupported stack target classes.
 
+### PG530 - Equipment static equipped-creature power/toughness and keywords
+
+Applied on 2026-07-05 against PostgreSQL `143.198.230.247:5433/halder`.
+
+Cards promoted:
+
+- `47` exact Equipment rows with fixed `BoostEquippedEffect` and optional
+  supported `GainAbilityAttachedEffect` keyword grants.
+
+Runtime scope:
+
+- `xmage_equipment_static_power_toughness_attachment_v1`
+
+Supported exact forms:
+
+- artifact Equipment permanents with `SimpleStaticAbility` and `EquipAbility`;
+- fixed `BoostEquippedEffect` power/toughness modifiers for the equipped
+  creature;
+- optional attached keyword grants for supported keywords such as flying,
+  reach, trample, deathtouch, first strike, double strike, lifelink,
+  indestructible, haste, vigilance, hexproof, shroud, and menace;
+- target scope `creature_you_control`.
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg529_equipment_static_pt_candidate_v2.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg530_equipment_static_pt_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg530_equipment_static_pt_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg530_equipment_static_pt_new_server_pg_to_sqlite_sync.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg530_equipment_static_pt_new_server_e2e_validation.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg530_equipment_static_pt_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg530_equipment_static_pt_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg530_equipment_static_pt_new_server_recheck.md`
+- final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg530_equipment_static_pt_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg530_equipment_static_pt_new_server_final_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg530_equipment_static_pt_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg530_equipment_static_pt_new_server_final.md`
+
+Post-sync queue evidence:
+
+- `target_identity_count=25882`
+- `xmage_authoritative_source_count=25568`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_adapter_required_count=25568`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+
+Residual boundary: PG530 does not authorize dynamic Equipment boosts, `X` or
+count-based modifiers, non-Equipment attachments, triggered/activated Equipment
+riders, unsupported keyword grants, reconfigure variants, or source/Oracle
+mismatches such as rows blocked by `equipment_static_oracle_not_exact_fixed` or
+`equipment_static_source_oracle_mismatch`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

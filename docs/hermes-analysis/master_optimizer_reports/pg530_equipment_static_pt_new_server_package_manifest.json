@@ -1,0 +1,3701 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg530_equipment_static_pt_new_server_20260705_205635",
+  "deploy_id": "PG530",
+  "expected_rules": [
+    {
+      "card_name": "Accorder's Shield",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b6f6fa8e47edfe0298f7855d15f5f9a0",
+      "min_rule_version": 2,
+      "normalized_name": "accorder's shield",
+      "oracle_hash": "0b3f02d4f74937a81d42166f2d74dc84",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 0,
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 3,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 3,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Aeronaut's Wings",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a8cf5429f08d610c05f70b5c8e95d9e8",
+      "min_rule_version": 2,
+      "normalized_name": "aeronaut's wings",
+      "oracle_hash": "a81c0c71d6ec284b77eb6d9f7b2d9510",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "FlyingAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Barbed Battlegear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7750a0eb1a920a4bf6d814d8bb440864",
+      "min_rule_version": 2,
+      "normalized_name": "barbed battlegear",
+      "oracle_hash": "8ec0d6194096ffb19dbdedeb54d8f350",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 4,
+        "static_power_bonus": 4,
+        "static_toughness_bonus": -1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": -1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Behemoth Sledge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7c6bdbd622c89bb79be13ccf48e89395",
+      "min_rule_version": 2,
+      "normalized_name": "behemoth sledge",
+      "oracle_hash": "a0a9902db1eb94614c21ac8b269d3f9a",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "LifelinkAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bone Saw",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5729838bd088fe9d89833602a9aa84c6",
+      "min_rule_version": 2,
+      "normalized_name": "bone saw",
+      "oracle_hash": "944fc2122aba550b22113832f3c8f1be",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bonesplitter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ad127781fd9151de4c372f122955402",
+      "min_rule_version": 2,
+      "normalized_name": "bonesplitter",
+      "oracle_hash": "dc0b19a8ef9721e78e8194d37e13fe60",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Brawler's Plate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e10f291f56a59316a03be39e36f5f50d",
+      "min_rule_version": 2,
+      "normalized_name": "brawler's plate",
+      "oracle_hash": "ba89ade93d4005952d31643b89dc3101",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bronze Sword",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "min_rule_version": 2,
+      "normalized_name": "bronze sword",
+      "oracle_hash": "08fef89d4b5729df408ba35f474b96a8",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cathar's Shield",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:467f55455f924c898c4e6007b9423604",
+      "min_rule_version": 2,
+      "normalized_name": "cathar's shield",
+      "oracle_hash": "820fa183b98330828b9125dbd38e61b6",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 0,
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 3,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 3,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ceremonial Groundbreaker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8213ac0a9070d2e5b770dc5ace46d605",
+      "min_rule_version": 2,
+      "normalized_name": "ceremonial groundbreaker",
+      "oracle_hash": "d3e56c38294127a7522263e0c2685c5f",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chitinous Cloak",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bb86d7f80ef80fb45d03d9cc4f632fb7",
+      "min_rule_version": 2,
+      "normalized_name": "chitinous cloak",
+      "oracle_hash": "6a7bf3d5af59dafe10ff70a3cf068474",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "MenaceAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crystal Slipper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3446416c027923c276d6b8a7e62e33cc",
+      "min_rule_version": 2,
+      "normalized_name": "crystal slipper",
+      "oracle_hash": "93dcb240a5ebd1209fdc3afa694342d6",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "HasteAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cultist's Staff",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "min_rule_version": 2,
+      "normalized_name": "cultist's staff",
+      "oracle_hash": "7ce241131c5af84aa0d88bfed685afb6",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "D\u00fanedain Blade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1578e231f7cb23a2c4211fa2e08e51c",
+      "min_rule_version": 2,
+      "normalized_name": "d\u00fanedain blade",
+      "oracle_hash": "bb982222df2ef0e0ac798b4fe85483d8",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gorgon Flail",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cf9849e9ee288886884d19193acd64e0",
+      "min_rule_version": 2,
+      "normalized_name": "gorgon flail",
+      "oracle_hash": "976a58d23601bfb7c2c9ec45faa95392",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Greataxe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9304ffb950c30191e8c27ad04fdb89cf",
+      "min_rule_version": 2,
+      "normalized_name": "greataxe",
+      "oracle_hash": "d0abfd58dc96080174a155024d93ba49",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 4,
+        "static_power_bonus": 4,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Greatsword",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5dd89a2ca146889cbfc8fe0a6c140c90",
+      "min_rule_version": 2,
+      "normalized_name": "greatsword",
+      "oracle_hash": "99ec13507fad5f0216d81991794a6435",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 3,
+        "static_power_bonus": 3,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Honed Khopesh",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "min_rule_version": 2,
+      "normalized_name": "honed khopesh",
+      "oracle_hash": "57effd31f212a578a808b7afefd04c34",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kite Shield",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d7c2d95e8d1e98678932549b46dacdf",
+      "min_rule_version": 2,
+      "normalized_name": "kite shield",
+      "oracle_hash": "cece8ea7c226fbe333dcb8c6a2356d60",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 0,
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 3,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 3,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kitesail",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a37d15929b3c2b679ac536fdb402d99c",
+      "min_rule_version": 2,
+      "normalized_name": "kitesail",
+      "oracle_hash": "a81c0c71d6ec284b77eb6d9f7b2d9510",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "FlyingAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kor Halberd",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a21b7384373d9e25027a959181a750a6",
+      "min_rule_version": 2,
+      "normalized_name": "kor halberd",
+      "oracle_hash": "78e8a20f4d141d8002c7d47b879c3b21",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leonin Scimitar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "min_rule_version": 2,
+      "normalized_name": "leonin scimitar",
+      "oracle_hash": "57effd31f212a578a808b7afefd04c34",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Loxodon Warhammer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e194416a5e7d39ab567a4139e0e72910",
+      "min_rule_version": 2,
+      "normalized_name": "loxodon warhammer",
+      "oracle_hash": "19693a5259c1b6dda2312351ae5803d1",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 3,
+        "static_power_bonus": 3,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "LifelinkAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Marauder's Axe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "min_rule_version": 2,
+      "normalized_name": "marauder's axe",
+      "oracle_hash": "5ab873a233c209de97166c218dbe3bfa",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mask of Avacyn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:55ec973987eb1816390ee15f69f3a755",
+      "min_rule_version": 2,
+      "normalized_name": "mask of avacyn",
+      "oracle_hash": "8d5a3ebf48e7ff72f9146abec59dfc0e",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "HexproofAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "No-Dachi",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cd3accd4661319292af0c57b300a8138",
+      "min_rule_version": 2,
+      "normalized_name": "no-dachi",
+      "oracle_hash": "10a6c8904a9390dd4d23bb9cd33eb9d6",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "FirstStrikeAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ogre's Cleaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a5c8d010a0dcc877f5cb2131bfe29e2f",
+      "min_rule_version": 2,
+      "normalized_name": "ogre's cleaver",
+      "oracle_hash": "45285353902acce4d11a22b17682ba60",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 5,
+        "static_power_bonus": 5,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Riot Gear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6b6e8bbcba152b6a111abe37470a80a",
+      "min_rule_version": 2,
+      "normalized_name": "riot gear",
+      "oracle_hash": "9a75a22fa98a4cf08ce2be177cda8b2a",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Short Bow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5353634ee6e58ce13db89a01c1319716",
+      "min_rule_version": 2,
+      "normalized_name": "short bow",
+      "oracle_hash": "d16c00688d922d3c187514fed55b1fbb",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "ReachAbility",
+          "SimpleStaticAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Short Sword",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "min_rule_version": 2,
+      "normalized_name": "short sword",
+      "oracle_hash": "57effd31f212a578a808b7afefd04c34",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shuko",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30760df004c87d3347742a95c36ecb1f",
+      "min_rule_version": 2,
+      "normalized_name": "shuko",
+      "oracle_hash": "b7bd7de7be9743cebcdccce7cad811c5",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Slagwurm Armor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:83f09969b2e434de863abb14ac2a779a",
+      "min_rule_version": 2,
+      "normalized_name": "slagwurm armor",
+      "oracle_hash": "d981af5a4982f22c433c5e74ab005785",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 0,
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 6,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 6,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spidersilk Net",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:08c3a3ef173831432fd940c4336517b3",
+      "min_rule_version": 2,
+      "normalized_name": "spidersilk net",
+      "oracle_hash": "af2d366a3096bfc1f98e346b542a5021",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 0,
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "ReachAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Steelclaw Lance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "min_rule_version": 2,
+      "normalized_name": "steelclaw lance",
+      "oracle_hash": "848fff12e23a7acd80dec722deccf305",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Strider Harness",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:634539f2242bfe097c9d2c11739aeb7a",
+      "min_rule_version": 2,
+      "normalized_name": "strider harness",
+      "oracle_hash": "5ff8197c57cbb1842fbc39eb10390d51",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "HasteAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sword of Vengeance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fb6e726eb709b2ee0534059688ce65d1",
+      "min_rule_version": 2,
+      "normalized_name": "sword of vengeance",
+      "oracle_hash": "e33ba5ec7f44f5b30703a3d534ec3590",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "FirstStrikeAbility",
+          "HasteAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Team Pennant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bc838c6350a3c239f916775b70ff2629",
+      "min_rule_version": 2,
+      "normalized_name": "team pennant",
+      "oracle_hash": "f5637346c0b6fe26d550786c8c8c3b36",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thinking Cap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6b6e8bbcba152b6a111abe37470a80a",
+      "min_rule_version": 2,
+      "normalized_name": "thinking cap",
+      "oracle_hash": "0c7dd9fc54088c8881a5a2b886207fd3",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Torch Gauntlet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "min_rule_version": 2,
+      "normalized_name": "torch gauntlet",
+      "oracle_hash": "5ab873a233c209de97166c218dbe3bfa",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Trusty Machete",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6580d878c1b361bba349208942c592c1",
+      "min_rule_version": 2,
+      "normalized_name": "trusty machete",
+      "oracle_hash": "e812d5d69c90f9a0e64043eb7a91ff0a",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vanquisher's Axe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "min_rule_version": 2,
+      "normalized_name": "vanquisher's axe",
+      "oracle_hash": "5ab873a233c209de97166c218dbe3bfa",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Veteran's Powerblade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "min_rule_version": 2,
+      "normalized_name": "veteran's powerblade",
+      "oracle_hash": "883d863e645a2bb5b79f0d172d2c86ef",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Veteran's Sidearm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "min_rule_version": 2,
+      "normalized_name": "veteran's sidearm",
+      "oracle_hash": "57effd31f212a578a808b7afefd04c34",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Viridian Claw",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:409716971f67fe9f5d3afc6402fe621e",
+      "min_rule_version": 2,
+      "normalized_name": "viridian claw",
+      "oracle_hash": "f8b71ef9d3a84cd75dc53d72192b100d",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "FirstStrikeAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vulshok Battlegear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7fb40814fd09fa6cb2f85297a2c52f5f",
+      "min_rule_version": 2,
+      "normalized_name": "vulshok battlegear",
+      "oracle_hash": "4225af4a7e52152841253eb5a10ca9b6",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 3,
+        "static_power_bonus": 3,
+        "static_toughness_bonus": 3,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 3,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vulshok Morningstar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "min_rule_version": 2,
+      "normalized_name": "vulshok morningstar",
+      "oracle_hash": "3ec5a7e0b5f971452526ad0da6913d14",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Warlord's Axe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:47db148a0d23ba0513df52101b1fb9e8",
+      "min_rule_version": 2,
+      "normalized_name": "warlord's axe",
+      "oracle_hash": "96812e134ca19a689e2c517622ed4406",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 3,
+        "static_power_bonus": 3,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_equipment_static_power_toughness_attachment": 47
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg530_equipment_static_pt_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg530_equipment_static_pt_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg530_equipment_static_pt_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg530_equipment_static_pt_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg530_equipment_static_pt_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg530_equipment_static_pt_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-05T20:56:35+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Accorder's Shield"
+      },
+      "card_name": "Accorder's Shield",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b6f6fa8e47edfe0298f7855d15f5f9a0",
+      "normalized_name": "accorder's shield",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 0,
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 3,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 3,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Aeronaut's Wings"
+      },
+      "card_name": "Aeronaut's Wings",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a8cf5429f08d610c05f70b5c8e95d9e8",
+      "normalized_name": "aeronaut's wings",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "FlyingAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Barbed Battlegear"
+      },
+      "card_name": "Barbed Battlegear",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7750a0eb1a920a4bf6d814d8bb440864",
+      "normalized_name": "barbed battlegear",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 4,
+        "static_power_bonus": 4,
+        "static_toughness_bonus": -1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": -1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Behemoth Sledge"
+      },
+      "card_name": "Behemoth Sledge",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7c6bdbd622c89bb79be13ccf48e89395",
+      "normalized_name": "behemoth sledge",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "LifelinkAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Bone Saw"
+      },
+      "card_name": "Bone Saw",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5729838bd088fe9d89833602a9aa84c6",
+      "normalized_name": "bone saw",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Bonesplitter"
+      },
+      "card_name": "Bonesplitter",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ad127781fd9151de4c372f122955402",
+      "normalized_name": "bonesplitter",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Brawler's Plate"
+      },
+      "card_name": "Brawler's Plate",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e10f291f56a59316a03be39e36f5f50d",
+      "normalized_name": "brawler's plate",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Bronze Sword"
+      },
+      "card_name": "Bronze Sword",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "normalized_name": "bronze sword",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Cathar's Shield"
+      },
+      "card_name": "Cathar's Shield",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:467f55455f924c898c4e6007b9423604",
+      "normalized_name": "cathar's shield",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 0,
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 3,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 3,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Ceremonial Groundbreaker"
+      },
+      "card_name": "Ceremonial Groundbreaker",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8213ac0a9070d2e5b770dc5ace46d605",
+      "normalized_name": "ceremonial groundbreaker",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Chitinous Cloak"
+      },
+      "card_name": "Chitinous Cloak",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bb86d7f80ef80fb45d03d9cc4f632fb7",
+      "normalized_name": "chitinous cloak",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "MenaceAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Crystal Slipper"
+      },
+      "card_name": "Crystal Slipper",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3446416c027923c276d6b8a7e62e33cc",
+      "normalized_name": "crystal slipper",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "HasteAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Cultist's Staff"
+      },
+      "card_name": "Cultist's Staff",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "normalized_name": "cultist's staff",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "D\u00fanedain Blade"
+      },
+      "card_name": "D\u00fanedain Blade",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1578e231f7cb23a2c4211fa2e08e51c",
+      "normalized_name": "d\u00fanedain blade",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Gorgon Flail"
+      },
+      "card_name": "Gorgon Flail",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cf9849e9ee288886884d19193acd64e0",
+      "normalized_name": "gorgon flail",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Greataxe"
+      },
+      "card_name": "Greataxe",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9304ffb950c30191e8c27ad04fdb89cf",
+      "normalized_name": "greataxe",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 4,
+        "static_power_bonus": 4,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Greatsword"
+      },
+      "card_name": "Greatsword",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5dd89a2ca146889cbfc8fe0a6c140c90",
+      "normalized_name": "greatsword",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 3,
+        "static_power_bonus": 3,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Honed Khopesh"
+      },
+      "card_name": "Honed Khopesh",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "normalized_name": "honed khopesh",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Kite Shield"
+      },
+      "card_name": "Kite Shield",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d7c2d95e8d1e98678932549b46dacdf",
+      "normalized_name": "kite shield",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 0,
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 3,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 3,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Kitesail"
+      },
+      "card_name": "Kitesail",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a37d15929b3c2b679ac536fdb402d99c",
+      "normalized_name": "kitesail",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "FlyingAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Kor Halberd"
+      },
+      "card_name": "Kor Halberd",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a21b7384373d9e25027a959181a750a6",
+      "normalized_name": "kor halberd",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Leonin Scimitar"
+      },
+      "card_name": "Leonin Scimitar",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "normalized_name": "leonin scimitar",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Loxodon Warhammer"
+      },
+      "card_name": "Loxodon Warhammer",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e194416a5e7d39ab567a4139e0e72910",
+      "normalized_name": "loxodon warhammer",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 3,
+        "static_power_bonus": 3,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "LifelinkAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Marauder's Axe"
+      },
+      "card_name": "Marauder's Axe",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "normalized_name": "marauder's axe",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Mask of Avacyn"
+      },
+      "card_name": "Mask of Avacyn",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:55ec973987eb1816390ee15f69f3a755",
+      "normalized_name": "mask of avacyn",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "HexproofAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "No-Dachi"
+      },
+      "card_name": "No-Dachi",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cd3accd4661319292af0c57b300a8138",
+      "normalized_name": "no-dachi",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "FirstStrikeAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Ogre's Cleaver"
+      },
+      "card_name": "Ogre's Cleaver",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a5c8d010a0dcc877f5cb2131bfe29e2f",
+      "normalized_name": "ogre's cleaver",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 5,
+        "static_power_bonus": 5,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Riot Gear"
+      },
+      "card_name": "Riot Gear",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6b6e8bbcba152b6a111abe37470a80a",
+      "normalized_name": "riot gear",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Short Bow"
+      },
+      "card_name": "Short Bow",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5353634ee6e58ce13db89a01c1319716",
+      "normalized_name": "short bow",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "ReachAbility",
+          "SimpleStaticAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Short Sword"
+      },
+      "card_name": "Short Sword",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "normalized_name": "short sword",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Shuko"
+      },
+      "card_name": "Shuko",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30760df004c87d3347742a95c36ecb1f",
+      "normalized_name": "shuko",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Slagwurm Armor"
+      },
+      "card_name": "Slagwurm Armor",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:83f09969b2e434de863abb14ac2a779a",
+      "normalized_name": "slagwurm armor",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 0,
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 6,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 6,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Spidersilk Net"
+      },
+      "card_name": "Spidersilk Net",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:08c3a3ef173831432fd940c4336517b3",
+      "normalized_name": "spidersilk net",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 0,
+        "static_power_bonus": 0,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "ReachAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Steelclaw Lance"
+      },
+      "card_name": "Steelclaw Lance",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "normalized_name": "steelclaw lance",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Strider Harness"
+      },
+      "card_name": "Strider Harness",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:634539f2242bfe097c9d2c11739aeb7a",
+      "normalized_name": "strider harness",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "HasteAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Sword of Vengeance"
+      },
+      "card_name": "Sword of Vengeance",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fb6e726eb709b2ee0534059688ce65d1",
+      "normalized_name": "sword of vengeance",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "FirstStrikeAbility",
+          "HasteAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Team Pennant"
+      },
+      "card_name": "Team Pennant",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bc838c6350a3c239f916775b70ff2629",
+      "normalized_name": "team pennant",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility",
+          "TrampleAbility",
+          "VigilanceAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Thinking Cap"
+      },
+      "card_name": "Thinking Cap",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6b6e8bbcba152b6a111abe37470a80a",
+      "normalized_name": "thinking cap",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Torch Gauntlet"
+      },
+      "card_name": "Torch Gauntlet",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "normalized_name": "torch gauntlet",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Trusty Machete"
+      },
+      "card_name": "Trusty Machete",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6580d878c1b361bba349208942c592c1",
+      "normalized_name": "trusty machete",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Vanquisher's Axe"
+      },
+      "card_name": "Vanquisher's Axe",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "normalized_name": "vanquisher's axe",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Veteran's Powerblade"
+      },
+      "card_name": "Veteran's Powerblade",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "normalized_name": "veteran's powerblade",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Veteran's Sidearm"
+      },
+      "card_name": "Veteran's Sidearm",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "normalized_name": "veteran's sidearm",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Viridian Claw"
+      },
+      "card_name": "Viridian Claw",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:409716971f67fe9f5d3afc6402fe621e",
+      "normalized_name": "viridian claw",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 1,
+        "static_power_bonus": 1,
+        "static_toughness_bonus": 0,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 0,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "FirstStrikeAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Vulshok Battlegear"
+      },
+      "card_name": "Vulshok Battlegear",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7fb40814fd09fa6cb2f85297a2c52f5f",
+      "normalized_name": "vulshok battlegear",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 3,
+        "static_power_bonus": 3,
+        "static_toughness_bonus": 3,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 3,
+        "xmage_ability_classes": [
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Vulshok Morningstar"
+      },
+      "card_name": "Vulshok Morningstar",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "normalized_name": "vulshok morningstar",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 2,
+        "static_power_bonus": 2,
+        "static_toughness_bonus": 2,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 2,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Warlord's Axe"
+      },
+      "card_name": "Warlord's Axe",
+      "effect": "equipment_static_attachment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:47db148a0d23ba0513df52101b1fb9e8",
+      "normalized_name": "warlord's axe",
+      "required_effect_fields": {
+        "ability_kind": "equipment_static",
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1",
+        "effect": "equipment_static_attachment",
+        "power_boost": 3,
+        "static_power_bonus": 3,
+        "static_toughness_bonus": 1,
+        "target": "creature_you_control",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "battlefield"
+        },
+        "toughness_boost": 1,
+        "xmage_ability_classes": [
+          "AddAbility",
+          "EquipAbility",
+          "SimpleStaticAbility"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Accorder's Shield",
+    "Aeronaut's Wings",
+    "Barbed Battlegear",
+    "Behemoth Sledge",
+    "Bone Saw",
+    "Bonesplitter",
+    "Brawler's Plate",
+    "Bronze Sword",
+    "Cathar's Shield",
+    "Ceremonial Groundbreaker",
+    "Chitinous Cloak",
+    "Crystal Slipper",
+    "Cultist's Staff",
+    "D\u00fanedain Blade",
+    "Gorgon Flail",
+    "Greataxe",
+    "Greatsword",
+    "Honed Khopesh",
+    "Kite Shield",
+    "Kitesail",
+    "Kor Halberd",
+    "Leonin Scimitar",
+    "Loxodon Warhammer",
+    "Marauder's Axe",
+    "Mask of Avacyn",
+    "No-Dachi",
+    "Ogre's Cleaver",
+    "Riot Gear",
+    "Short Bow",
+    "Short Sword",
+    "Shuko",
+    "Slagwurm Armor",
+    "Spidersilk Net",
+    "Steelclaw Lance",
+    "Strider Harness",
+    "Sword of Vengeance",
+    "Team Pennant",
+    "Thinking Cap",
+    "Torch Gauntlet",
+    "Trusty Machete",
+    "Vanquisher's Axe",
+    "Veteran's Powerblade",
+    "Veteran's Sidearm",
+    "Viridian Claw",
+    "Vulshok Battlegear",
+    "Vulshok Morningstar",
+    "Warlord's Axe"
+  ],
+  "selected_count": 47,
+  "slug": "equipment_static_pt_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Accorder's Shield",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b6f6fa8e47edfe0298f7855d15f5f9a0",
+      "min_rule_version": 2,
+      "normalized_name": "accorder's shield",
+      "oracle_hash": "0b3f02d4f74937a81d42166f2d74dc84",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Aeronaut's Wings",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a8cf5429f08d610c05f70b5c8e95d9e8",
+      "min_rule_version": 2,
+      "normalized_name": "aeronaut's wings",
+      "oracle_hash": "a81c0c71d6ec284b77eb6d9f7b2d9510",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Barbed Battlegear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7750a0eb1a920a4bf6d814d8bb440864",
+      "min_rule_version": 2,
+      "normalized_name": "barbed battlegear",
+      "oracle_hash": "8ec0d6194096ffb19dbdedeb54d8f350",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Behemoth Sledge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7c6bdbd622c89bb79be13ccf48e89395",
+      "min_rule_version": 2,
+      "normalized_name": "behemoth sledge",
+      "oracle_hash": "a0a9902db1eb94614c21ac8b269d3f9a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bone Saw",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5729838bd088fe9d89833602a9aa84c6",
+      "min_rule_version": 2,
+      "normalized_name": "bone saw",
+      "oracle_hash": "944fc2122aba550b22113832f3c8f1be",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bonesplitter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ad127781fd9151de4c372f122955402",
+      "min_rule_version": 2,
+      "normalized_name": "bonesplitter",
+      "oracle_hash": "dc0b19a8ef9721e78e8194d37e13fe60",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Brawler's Plate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e10f291f56a59316a03be39e36f5f50d",
+      "min_rule_version": 2,
+      "normalized_name": "brawler's plate",
+      "oracle_hash": "ba89ade93d4005952d31643b89dc3101",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bronze Sword",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "min_rule_version": 2,
+      "normalized_name": "bronze sword",
+      "oracle_hash": "08fef89d4b5729df408ba35f474b96a8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cathar's Shield",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:467f55455f924c898c4e6007b9423604",
+      "min_rule_version": 2,
+      "normalized_name": "cathar's shield",
+      "oracle_hash": "820fa183b98330828b9125dbd38e61b6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ceremonial Groundbreaker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8213ac0a9070d2e5b770dc5ace46d605",
+      "min_rule_version": 2,
+      "normalized_name": "ceremonial groundbreaker",
+      "oracle_hash": "d3e56c38294127a7522263e0c2685c5f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chitinous Cloak",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bb86d7f80ef80fb45d03d9cc4f632fb7",
+      "min_rule_version": 2,
+      "normalized_name": "chitinous cloak",
+      "oracle_hash": "6a7bf3d5af59dafe10ff70a3cf068474",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crystal Slipper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3446416c027923c276d6b8a7e62e33cc",
+      "min_rule_version": 2,
+      "normalized_name": "crystal slipper",
+      "oracle_hash": "93dcb240a5ebd1209fdc3afa694342d6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cultist's Staff",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "min_rule_version": 2,
+      "normalized_name": "cultist's staff",
+      "oracle_hash": "7ce241131c5af84aa0d88bfed685afb6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "D\u00fanedain Blade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1578e231f7cb23a2c4211fa2e08e51c",
+      "min_rule_version": 2,
+      "normalized_name": "d\u00fanedain blade",
+      "oracle_hash": "bb982222df2ef0e0ac798b4fe85483d8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gorgon Flail",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cf9849e9ee288886884d19193acd64e0",
+      "min_rule_version": 2,
+      "normalized_name": "gorgon flail",
+      "oracle_hash": "976a58d23601bfb7c2c9ec45faa95392",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Greataxe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9304ffb950c30191e8c27ad04fdb89cf",
+      "min_rule_version": 2,
+      "normalized_name": "greataxe",
+      "oracle_hash": "d0abfd58dc96080174a155024d93ba49",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Greatsword",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5dd89a2ca146889cbfc8fe0a6c140c90",
+      "min_rule_version": 2,
+      "normalized_name": "greatsword",
+      "oracle_hash": "99ec13507fad5f0216d81991794a6435",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Honed Khopesh",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "min_rule_version": 2,
+      "normalized_name": "honed khopesh",
+      "oracle_hash": "57effd31f212a578a808b7afefd04c34",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kite Shield",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5d7c2d95e8d1e98678932549b46dacdf",
+      "min_rule_version": 2,
+      "normalized_name": "kite shield",
+      "oracle_hash": "cece8ea7c226fbe333dcb8c6a2356d60",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kitesail",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a37d15929b3c2b679ac536fdb402d99c",
+      "min_rule_version": 2,
+      "normalized_name": "kitesail",
+      "oracle_hash": "a81c0c71d6ec284b77eb6d9f7b2d9510",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kor Halberd",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a21b7384373d9e25027a959181a750a6",
+      "min_rule_version": 2,
+      "normalized_name": "kor halberd",
+      "oracle_hash": "78e8a20f4d141d8002c7d47b879c3b21",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leonin Scimitar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "min_rule_version": 2,
+      "normalized_name": "leonin scimitar",
+      "oracle_hash": "57effd31f212a578a808b7afefd04c34",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Loxodon Warhammer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e194416a5e7d39ab567a4139e0e72910",
+      "min_rule_version": 2,
+      "normalized_name": "loxodon warhammer",
+      "oracle_hash": "19693a5259c1b6dda2312351ae5803d1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Marauder's Axe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "min_rule_version": 2,
+      "normalized_name": "marauder's axe",
+      "oracle_hash": "5ab873a233c209de97166c218dbe3bfa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mask of Avacyn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:55ec973987eb1816390ee15f69f3a755",
+      "min_rule_version": 2,
+      "normalized_name": "mask of avacyn",
+      "oracle_hash": "8d5a3ebf48e7ff72f9146abec59dfc0e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "No-Dachi",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cd3accd4661319292af0c57b300a8138",
+      "min_rule_version": 2,
+      "normalized_name": "no-dachi",
+      "oracle_hash": "10a6c8904a9390dd4d23bb9cd33eb9d6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ogre's Cleaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a5c8d010a0dcc877f5cb2131bfe29e2f",
+      "min_rule_version": 2,
+      "normalized_name": "ogre's cleaver",
+      "oracle_hash": "45285353902acce4d11a22b17682ba60",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Riot Gear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6b6e8bbcba152b6a111abe37470a80a",
+      "min_rule_version": 2,
+      "normalized_name": "riot gear",
+      "oracle_hash": "9a75a22fa98a4cf08ce2be177cda8b2a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Short Bow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5353634ee6e58ce13db89a01c1319716",
+      "min_rule_version": 2,
+      "normalized_name": "short bow",
+      "oracle_hash": "d16c00688d922d3c187514fed55b1fbb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Short Sword",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "min_rule_version": 2,
+      "normalized_name": "short sword",
+      "oracle_hash": "57effd31f212a578a808b7afefd04c34",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shuko",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30760df004c87d3347742a95c36ecb1f",
+      "min_rule_version": 2,
+      "normalized_name": "shuko",
+      "oracle_hash": "b7bd7de7be9743cebcdccce7cad811c5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Slagwurm Armor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:83f09969b2e434de863abb14ac2a779a",
+      "min_rule_version": 2,
+      "normalized_name": "slagwurm armor",
+      "oracle_hash": "d981af5a4982f22c433c5e74ab005785",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spidersilk Net",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:08c3a3ef173831432fd940c4336517b3",
+      "min_rule_version": 2,
+      "normalized_name": "spidersilk net",
+      "oracle_hash": "af2d366a3096bfc1f98e346b542a5021",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Steelclaw Lance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "min_rule_version": 2,
+      "normalized_name": "steelclaw lance",
+      "oracle_hash": "848fff12e23a7acd80dec722deccf305",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Strider Harness",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:634539f2242bfe097c9d2c11739aeb7a",
+      "min_rule_version": 2,
+      "normalized_name": "strider harness",
+      "oracle_hash": "5ff8197c57cbb1842fbc39eb10390d51",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sword of Vengeance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fb6e726eb709b2ee0534059688ce65d1",
+      "min_rule_version": 2,
+      "normalized_name": "sword of vengeance",
+      "oracle_hash": "e33ba5ec7f44f5b30703a3d534ec3590",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Team Pennant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bc838c6350a3c239f916775b70ff2629",
+      "min_rule_version": 2,
+      "normalized_name": "team pennant",
+      "oracle_hash": "f5637346c0b6fe26d550786c8c8c3b36",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thinking Cap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6b6e8bbcba152b6a111abe37470a80a",
+      "min_rule_version": 2,
+      "normalized_name": "thinking cap",
+      "oracle_hash": "0c7dd9fc54088c8881a5a2b886207fd3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Torch Gauntlet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "min_rule_version": 2,
+      "normalized_name": "torch gauntlet",
+      "oracle_hash": "5ab873a233c209de97166c218dbe3bfa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Trusty Machete",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6580d878c1b361bba349208942c592c1",
+      "min_rule_version": 2,
+      "normalized_name": "trusty machete",
+      "oracle_hash": "e812d5d69c90f9a0e64043eb7a91ff0a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vanquisher's Axe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "min_rule_version": 2,
+      "normalized_name": "vanquisher's axe",
+      "oracle_hash": "5ab873a233c209de97166c218dbe3bfa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Veteran's Powerblade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5ab4051fd3c2a14c0c5cfc8eb3e87ab",
+      "min_rule_version": 2,
+      "normalized_name": "veteran's powerblade",
+      "oracle_hash": "883d863e645a2bb5b79f0d172d2c86ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Veteran's Sidearm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c267352673367337645a72227e31fe3b",
+      "min_rule_version": 2,
+      "normalized_name": "veteran's sidearm",
+      "oracle_hash": "57effd31f212a578a808b7afefd04c34",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Viridian Claw",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:409716971f67fe9f5d3afc6402fe621e",
+      "min_rule_version": 2,
+      "normalized_name": "viridian claw",
+      "oracle_hash": "f8b71ef9d3a84cd75dc53d72192b100d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vulshok Battlegear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7fb40814fd09fa6cb2f85297a2c52f5f",
+      "min_rule_version": 2,
+      "normalized_name": "vulshok battlegear",
+      "oracle_hash": "4225af4a7e52152841253eb5a10ca9b6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vulshok Morningstar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d207c85ffb0121236b7c49f49361f2aa",
+      "min_rule_version": 2,
+      "normalized_name": "vulshok morningstar",
+      "oracle_hash": "3ec5a7e0b5f971452526ad0da6913d14",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Warlord's Axe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:47db148a0d23ba0513df52101b1fb9e8",
+      "min_rule_version": 2,
+      "normalized_name": "warlord's axe",
+      "oracle_hash": "96812e134ca19a689e2c517622ed4406",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_equipment_static_power_toughness_attachment_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
