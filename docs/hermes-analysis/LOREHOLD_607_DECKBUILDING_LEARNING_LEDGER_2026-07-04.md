@@ -1800,3 +1800,77 @@ Operational lesson:
   not allow battle, promotion, or mutation.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Miracle Access Structure Matrix Contract - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn.json`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_access_structure_matrix_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_access_structure_matrix_current.json`
+
+This matrix is the first scoring surface after the miracle-access-first
+contract. It defines how a future candidate row will be scored, but it still
+does not generate a deck, mutate deck `607`, write a database, or run battle.
+
+Current result:
+
+- decision status:
+  `miracle_access_structure_matrix_template_ready_no_candidate_no_battle`;
+- selected contract:
+  `miracle_access_first_shell_contract`;
+- matrix cells: `6`;
+- candidate rows: `0`;
+- matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- named seed-safe cuts: `0`;
+- cut shortage: `2`;
+- aggregate contract blockers: `28`;
+- blocking hard gates: `3`;
+- current `607` value-model facts carried into the matrix:
+  quantity total `100`, lands `34`, ramp `15`;
+- recommended next action:
+  `declare_candidate_rows_with_named_same_lane_cuts_before_scoring`.
+
+Matrix cells and weights:
+
+- `topdeck_miracle_access`: weight `30`, metrics `miracle_cast` and
+  `topdeck_manipulation_activated`;
+- `turn_cycle_miracle_mana`: weight `20`, metrics
+  `static_cost_reduction_total` and `lorehold_cost_paid`;
+- `spell_volume_density`: weight `15`, metric `lorehold_spell_cast`;
+- `approach_finisher_conversion`: weight `15`, metrics `approach_conversion`
+  and `miracle_cast:Approach of the Second Sun`;
+- `pressure_survival_floor`: weight `10`, Winota/closing-window survival;
+- `same_lane_cut_safety`: weight `25`, named same-lane cuts and cut shortage.
+
+Hard gates currently blocking matrix scoring:
+
+- `candidate_rows_declared`;
+- `named_same_lane_cuts_exist`;
+- `aggregate_blockers_cleared_or_explained`.
+
+Candidate-row schema required before scoring:
+
+- `candidate_key`;
+- `add_card`;
+- `cut_card`;
+- `lane`;
+- `same_lane_cut_reason`;
+- `protected_anchor_impact`;
+- `expected_metric_lift`;
+- `rule_runtime_status`;
+- `source_provenance`;
+- `floor_risk`.
+
+Operational lesson:
+
+- The project now has a real ranking rubric for miracle-access-first learning,
+  but the rubric cannot create truth by itself.
+- No deck can be materialized from this template alone; a future candidate must
+  name adds and same-lane cuts first.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.
