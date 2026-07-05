@@ -174,6 +174,7 @@ MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_dr
 MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
 ETB_FIXED_MANA_CREATURE_SCOPE = "xmage_creature_etb_add_fixed_mana_v1"
 SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_self_sacrifice_mana_source_permanent_v1"
+TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_tap_and_self_sacrifice_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 COUNTER_DRAW_SCOPE = "xmage_counter_target_and_draw_card_spell_v1"
 COUNTER_GAIN_LIFE_SCOPE = "xmage_counter_target_and_controller_gain_life_spell_v1"
@@ -13165,6 +13166,54 @@ def java_any_color_mana_amount_from_source(source_text: str) -> int | None:
     return None
 
 
+MANA_ABILITY_CLASS_SYMBOLS = {
+    "WhiteManaAbility": "W",
+    "BlueManaAbility": "U",
+    "BlackManaAbility": "B",
+    "RedManaAbility": "R",
+    "GreenManaAbility": "G",
+    "ColorlessManaAbility": "C",
+}
+
+
+def fixed_mana_symbols_from_ability_classes(ability_class_values: set[str]) -> list[str]:
+    return [
+        symbol
+        for ability_class, symbol in MANA_ABILITY_CLASS_SYMBOLS.items()
+        if ability_class in ability_class_values
+    ]
+
+
+def tap_and_self_sacrifice_mana_source_source_blocker(
+    source_text: str,
+    ability_class_values: set[str],
+    tap_detail: dict[str, Any],
+    sacrifice_detail: dict[str, Any],
+) -> str | None:
+    text = source_text or ""
+    normal_symbols = fixed_mana_symbols_from_ability_classes(ability_class_values)
+    expected_tap_symbols = list(tap_detail.get("produced_mana_symbols") or [])
+    if len(normal_symbols) != 1 or len(expected_tap_symbols) != 1:
+        return "tap_sacrifice_mana_source_normal_mana_not_single_fixed"
+    if Counter(normal_symbols) != Counter(expected_tap_symbols):
+        return "tap_sacrifice_mana_source_normal_mana_mismatch"
+    if len(re.findall(r"new\s+SimpleManaAbility\s*\(", text)) != 1:
+        return "tap_sacrifice_mana_source_sacrifice_not_single_simple_mana"
+    if "SacrificeSourceCost" not in text:
+        return "tap_sacrifice_mana_source_sacrifice_cost_missing"
+    if "TapSourceCost" in text:
+        return "tap_sacrifice_mana_source_sacrifice_tap_cost_not_supported"
+    if sacrifice_detail.get("activation_mana_cost"):
+        return "tap_sacrifice_mana_source_sacrifice_activation_cost_not_supported"
+    source_symbols = java_simple_mana_symbols_from_source(text)
+    expected_sacrifice_symbols = list(sacrifice_detail.get("produced_mana_symbols") or [])
+    if source_symbols is None or not expected_sacrifice_symbols:
+        return "tap_sacrifice_mana_source_sacrifice_mana_not_fixed"
+    if Counter(source_symbols) != Counter(expected_sacrifice_symbols):
+        return "tap_sacrifice_mana_source_sacrifice_mana_mismatch"
+    return None
+
+
 def sacrifice_mana_source_source_blocker(source_text: str, detail: dict[str, Any]) -> str | None:
     text = source_text or ""
     simple_ability_count = len(re.findall(r"new\s+SimpleManaAbility\s*\(", text))
@@ -14109,6 +14158,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "mana-source permanent with fixed enter-the-battlefield draw trigger"
     elif scope == ETB_FIXED_MANA_CREATURE_SCOPE:
         scope_kind = "creature with fixed enter-the-battlefield mana trigger"
+    elif scope == TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE:
+        scope_kind = "tap mana-source permanent with separate self-sacrifice mana ability"
     elif str(row.get("adapter_work_unit") or "") in RAMP_UNITS:
         scope_kind = "activated mana-source permanent"
     elif scope == TOKEN_SPELL_SCOPE:
@@ -21079,6 +21130,80 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_simple_mana_source_with_etb_draw",
+            ), "selected_exact_scope"
+        tap_and_self_sacrifice_mana_source = (
+            classes <= {"BasicManaEffect"}
+            and bool(mana_ability_classes & set(MANA_ABILITY_CLASS_SYMBOLS))
+            and "SimpleManaAbility" in mana_ability_classes
+            and not (
+                mana_ability_classes
+                - SAFE_MANA_ABILITY_CLASSES
+                - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+            )
+            and "SacrificeSourceCost" in source_text
+        )
+        if tap_and_self_sacrifice_mana_source:
+            tap_mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
+            sacrifice_mana_source_detail = sacrifice_mana_source_detail_from_oracle(metadata)
+            if tap_mana_source_detail is None:
+                return None, "tap_sacrifice_mana_source_tap_oracle_not_simple"
+            if sacrifice_mana_source_detail is None:
+                return None, "tap_sacrifice_mana_source_sacrifice_oracle_not_simple"
+            source_blocker = tap_and_self_sacrifice_mana_source_source_blocker(
+                source_text,
+                mana_ability_classes,
+                tap_mana_source_detail,
+                sacrifice_mana_source_detail,
+            )
+            if source_blocker:
+                return None, source_blocker
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(tap_mana_source_detail["mana_produced"]),
+                "produces": str(tap_mana_source_detail["produces"]),
+                "activation_requires_tap": True,
+                "mana_activation_requires_tap": True,
+                "sacrifice_mana_source_contextual_only": True,
+                "sacrifice_mana_produced": int(sacrifice_mana_source_detail["mana_produced"]),
+                "sacrifice_produces": str(sacrifice_mana_source_detail["produces"]),
+                "sacrifice_mana_activation_requires_tap": bool(
+                    sacrifice_mana_source_detail.get("mana_activation_requires_tap", False)
+                ),
+                "sacrifice_activation_requires_tap": bool(
+                    sacrifice_mana_source_detail.get("mana_activation_requires_tap", False)
+                ),
+                "sacrifice_mana_activation_requires_sacrifice": True,
+                "sacrifice_activation_requires_sacrifice": True,
+                "permanent_type": permanent_type,
+                "ability_kind": "mana_and_sacrifice_mana",
+                "xmage_mana_ability_classes": sorted(mana_ability_classes),
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+                "xmage_cost_class": "SacrificeSourceCost",
+            }
+            if tap_mana_source_detail.get("produced_mana_symbols"):
+                effect_json["produced_mana_symbols"] = list(
+                    tap_mana_source_detail["produced_mana_symbols"]
+                )
+            if sacrifice_mana_source_detail.get("produced_mana_symbols"):
+                effect_json["sacrifice_produced_mana_symbols"] = list(
+                    sacrifice_mana_source_detail["produced_mana_symbols"]
+                )
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_tap_and_self_sacrifice_mana_source_permanent",
             ), "selected_exact_scope"
         self_sacrifice_mana_source = (
             classes <= {"AddManaOfAnyColorEffect"}

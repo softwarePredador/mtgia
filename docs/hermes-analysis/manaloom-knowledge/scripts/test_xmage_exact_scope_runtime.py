@@ -9030,6 +9030,118 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.mana_pool.generic, 1)
         self.assertEqual(active.conditional_mana_sources, [])
 
+    def test_tap_and_self_sacrifice_mana_source_unlocks_after_normal_tap_mana(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        unlock_card = {
+            "name": "Fixture Double Blue",
+            "type_line": "Instant",
+            "effect": "draw",
+            "cmc": 2,
+            "mana_cost": "{U}{U}",
+        }
+        active.hand.append(unlock_card)
+        eye = {
+            "name": "Eye of Ramos",
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "U",
+            "produced_mana_symbols": ["U"],
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "sacrifice_mana_source_contextual_only": True,
+            "sacrifice_mana_produced": 1,
+            "sacrifice_produces": "U",
+            "sacrifice_produced_mana_symbols": ["U"],
+            "sacrifice_mana_activation_requires_tap": False,
+            "sacrifice_activation_requires_tap": False,
+            "sacrifice_mana_activation_requires_sacrifice": True,
+            "sacrifice_activation_requires_sacrifice": True,
+            "permanent_type": "artifact",
+            "_rule_logical_key": "battle_rule_v1:fixture_eye_of_ramos",
+        }
+        active.battlefield.append(eye)
+        active.refresh_mana_sources(turn=6)
+
+        self.assertTrue(eye.get("tapped"))
+        self.assertEqual(active.mana_pool.blue, 1)
+        self.assertFalse(active.can_pay_card(unlock_card))
+
+        activated = self.battle.activate_self_sacrifice_mana_sources(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=6,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertIn(eye, active.graveyard)
+        self.assertEqual(active.mana_pool.blue, 2)
+        self.assertTrue(active.can_pay_card(unlock_card))
+        self.assertTrue(
+            any(
+                event == "self_sacrifice_mana_source_activated"
+                and data.get("card") == "Eye of Ramos"
+                and data.get("produced") == 1
+                and data.get("bonus_color") == "blue"
+                and data.get("unlock_target") == "Fixture Double Blue"
+                for event, data in self.events
+            )
+        )
+
+    def test_tap_and_self_sacrifice_mana_source_does_not_cash_in_without_unlock(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand.append(
+            {
+                "name": "Fixture Triple Blue",
+                "type_line": "Instant",
+                "effect": "draw",
+                "cmc": 3,
+                "mana_cost": "{U}{U}{U}",
+            }
+        )
+        eye = {
+            "name": "Eye of Ramos",
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "U",
+            "produced_mana_symbols": ["U"],
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "sacrifice_mana_source_contextual_only": True,
+            "sacrifice_mana_produced": 1,
+            "sacrifice_produces": "U",
+            "sacrifice_produced_mana_symbols": ["U"],
+            "sacrifice_mana_activation_requires_tap": False,
+            "sacrifice_activation_requires_tap": False,
+            "sacrifice_mana_activation_requires_sacrifice": True,
+            "sacrifice_activation_requires_sacrifice": True,
+            "permanent_type": "artifact",
+        }
+        active.battlefield.append(eye)
+        active.refresh_mana_sources(turn=6)
+
+        activated = self.battle.activate_self_sacrifice_mana_sources(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=6,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertIn(eye, active.battlefield)
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual(active.mana_pool.blue, 1)
+
     def test_mana_source_with_self_sacrifice_draw_refreshes_then_cashes_in(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

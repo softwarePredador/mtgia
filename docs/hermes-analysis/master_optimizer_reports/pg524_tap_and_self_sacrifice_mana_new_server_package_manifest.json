@@ -1,0 +1,479 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg524_tap_and_self_sacrifice_mana_20260705_190617",
+  "deploy_id": "xmage_pg524_tap_and_self_sacrifice_mana_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Eye of Ramos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cebb0acee193419e9fdc9340f293e607",
+      "min_rule_version": 2,
+      "normalized_name": "eye of ramos",
+      "oracle_hash": "6f652cb7ac056ddfc5e4213753f0df80",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_sacrifice_mana",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produced_mana_symbols": [
+          "U"
+        ],
+        "produces": "U",
+        "sacrifice_activation_requires_sacrifice": true,
+        "sacrifice_activation_requires_tap": false,
+        "sacrifice_mana_activation_requires_sacrifice": true,
+        "sacrifice_mana_activation_requires_tap": false,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_mana_source_contextual_only": true,
+        "sacrifice_produced_mana_symbols": [
+          "U"
+        ],
+        "sacrifice_produces": "U",
+        "xmage_ability_classes": [
+          "BlueManaAbility",
+          "SimpleManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heart of Ramos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1af4e70352a8b7e668917359f2c020f",
+      "min_rule_version": 2,
+      "normalized_name": "heart of ramos",
+      "oracle_hash": "26b3e2b5a380b8d9998b1054fc500690",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_sacrifice_mana",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produced_mana_symbols": [
+          "R"
+        ],
+        "produces": "R",
+        "sacrifice_activation_requires_sacrifice": true,
+        "sacrifice_activation_requires_tap": false,
+        "sacrifice_mana_activation_requires_sacrifice": true,
+        "sacrifice_mana_activation_requires_tap": false,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_mana_source_contextual_only": true,
+        "sacrifice_produced_mana_symbols": [
+          "R"
+        ],
+        "sacrifice_produces": "R",
+        "xmage_ability_classes": [
+          "RedManaAbility",
+          "SimpleManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Horn of Ramos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:149688a3e0852130a77d37a899da3ede",
+      "min_rule_version": 2,
+      "normalized_name": "horn of ramos",
+      "oracle_hash": "291e4d62cfb289ce58695ddaf27db585",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_sacrifice_mana",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produced_mana_symbols": [
+          "G"
+        ],
+        "produces": "G",
+        "sacrifice_activation_requires_sacrifice": true,
+        "sacrifice_activation_requires_tap": false,
+        "sacrifice_mana_activation_requires_sacrifice": true,
+        "sacrifice_mana_activation_requires_tap": false,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_mana_source_contextual_only": true,
+        "sacrifice_produced_mana_symbols": [
+          "G"
+        ],
+        "sacrifice_produces": "G",
+        "xmage_ability_classes": [
+          "GreenManaAbility",
+          "SimpleManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skull of Ramos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9ea6c346cb56167508e401c63aac6e5f",
+      "min_rule_version": 2,
+      "normalized_name": "skull of ramos",
+      "oracle_hash": "f5afc49a19163867d1d6ed10a9bd7192",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_sacrifice_mana",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produced_mana_symbols": [
+          "B"
+        ],
+        "produces": "B",
+        "sacrifice_activation_requires_sacrifice": true,
+        "sacrifice_activation_requires_tap": false,
+        "sacrifice_mana_activation_requires_sacrifice": true,
+        "sacrifice_mana_activation_requires_tap": false,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_mana_source_contextual_only": true,
+        "sacrifice_produced_mana_symbols": [
+          "B"
+        ],
+        "sacrifice_produces": "B",
+        "xmage_ability_classes": [
+          "BlackManaAbility",
+          "SimpleManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tooth of Ramos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51cc15772f2a262e43a834ecc03b9c7d",
+      "min_rule_version": 2,
+      "normalized_name": "tooth of ramos",
+      "oracle_hash": "b24169ac0da54a32bade58cc60a0b2ef",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_sacrifice_mana",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produced_mana_symbols": [
+          "W"
+        ],
+        "produces": "W",
+        "sacrifice_activation_requires_sacrifice": true,
+        "sacrifice_activation_requires_tap": false,
+        "sacrifice_mana_activation_requires_sacrifice": true,
+        "sacrifice_mana_activation_requires_tap": false,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_mana_source_contextual_only": true,
+        "sacrifice_produced_mana_symbols": [
+          "W"
+        ],
+        "sacrifice_produces": "W",
+        "xmage_ability_classes": [
+          "SimpleManaAbility",
+          "WhiteManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_tap_and_self_sacrifice_mana_source_permanent": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg524_tap_and_self_sacrifice_mana_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg524_tap_and_self_sacrifice_mana_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg524_tap_and_self_sacrifice_mana_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg524_tap_and_self_sacrifice_mana_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg524_tap_and_self_sacrifice_mana_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg524_tap_and_self_sacrifice_mana_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-05T19:06:17+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Eye of Ramos"
+      },
+      "card_name": "Eye of Ramos",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cebb0acee193419e9fdc9340f293e607",
+      "normalized_name": "eye of ramos",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_sacrifice_mana",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produced_mana_symbols": [
+          "U"
+        ],
+        "produces": "U",
+        "sacrifice_activation_requires_sacrifice": true,
+        "sacrifice_activation_requires_tap": false,
+        "sacrifice_mana_activation_requires_sacrifice": true,
+        "sacrifice_mana_activation_requires_tap": false,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_mana_source_contextual_only": true,
+        "sacrifice_produced_mana_symbols": [
+          "U"
+        ],
+        "sacrifice_produces": "U",
+        "xmage_ability_classes": [
+          "BlueManaAbility",
+          "SimpleManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Heart of Ramos"
+      },
+      "card_name": "Heart of Ramos",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1af4e70352a8b7e668917359f2c020f",
+      "normalized_name": "heart of ramos",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_sacrifice_mana",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produced_mana_symbols": [
+          "R"
+        ],
+        "produces": "R",
+        "sacrifice_activation_requires_sacrifice": true,
+        "sacrifice_activation_requires_tap": false,
+        "sacrifice_mana_activation_requires_sacrifice": true,
+        "sacrifice_mana_activation_requires_tap": false,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_mana_source_contextual_only": true,
+        "sacrifice_produced_mana_symbols": [
+          "R"
+        ],
+        "sacrifice_produces": "R",
+        "xmage_ability_classes": [
+          "RedManaAbility",
+          "SimpleManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Horn of Ramos"
+      },
+      "card_name": "Horn of Ramos",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:149688a3e0852130a77d37a899da3ede",
+      "normalized_name": "horn of ramos",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_sacrifice_mana",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produced_mana_symbols": [
+          "G"
+        ],
+        "produces": "G",
+        "sacrifice_activation_requires_sacrifice": true,
+        "sacrifice_activation_requires_tap": false,
+        "sacrifice_mana_activation_requires_sacrifice": true,
+        "sacrifice_mana_activation_requires_tap": false,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_mana_source_contextual_only": true,
+        "sacrifice_produced_mana_symbols": [
+          "G"
+        ],
+        "sacrifice_produces": "G",
+        "xmage_ability_classes": [
+          "GreenManaAbility",
+          "SimpleManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Skull of Ramos"
+      },
+      "card_name": "Skull of Ramos",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9ea6c346cb56167508e401c63aac6e5f",
+      "normalized_name": "skull of ramos",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_sacrifice_mana",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produced_mana_symbols": [
+          "B"
+        ],
+        "produces": "B",
+        "sacrifice_activation_requires_sacrifice": true,
+        "sacrifice_activation_requires_tap": false,
+        "sacrifice_mana_activation_requires_sacrifice": true,
+        "sacrifice_mana_activation_requires_tap": false,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_mana_source_contextual_only": true,
+        "sacrifice_produced_mana_symbols": [
+          "B"
+        ],
+        "sacrifice_produces": "B",
+        "xmage_ability_classes": [
+          "BlackManaAbility",
+          "SimpleManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Tooth of Ramos"
+      },
+      "card_name": "Tooth of Ramos",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51cc15772f2a262e43a834ecc03b9c7d",
+      "normalized_name": "tooth of ramos",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_sacrifice_mana",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produced_mana_symbols": [
+          "W"
+        ],
+        "produces": "W",
+        "sacrifice_activation_requires_sacrifice": true,
+        "sacrifice_activation_requires_tap": false,
+        "sacrifice_mana_activation_requires_sacrifice": true,
+        "sacrifice_mana_activation_requires_tap": false,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_mana_source_contextual_only": true,
+        "sacrifice_produced_mana_symbols": [
+          "W"
+        ],
+        "sacrifice_produces": "W",
+        "xmage_ability_classes": [
+          "SimpleManaAbility",
+          "WhiteManaAbility"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Eye of Ramos",
+    "Heart of Ramos",
+    "Horn of Ramos",
+    "Skull of Ramos",
+    "Tooth of Ramos"
+  ],
+  "selected_count": 5,
+  "slug": "pg524_tap_and_self_sacrifice_mana_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Eye of Ramos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cebb0acee193419e9fdc9340f293e607",
+      "min_rule_version": 2,
+      "normalized_name": "eye of ramos",
+      "oracle_hash": "6f652cb7ac056ddfc5e4213753f0df80",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heart of Ramos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e1af4e70352a8b7e668917359f2c020f",
+      "min_rule_version": 2,
+      "normalized_name": "heart of ramos",
+      "oracle_hash": "26b3e2b5a380b8d9998b1054fc500690",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Horn of Ramos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:149688a3e0852130a77d37a899da3ede",
+      "min_rule_version": 2,
+      "normalized_name": "horn of ramos",
+      "oracle_hash": "291e4d62cfb289ce58695ddaf27db585",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skull of Ramos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9ea6c346cb56167508e401c63aac6e5f",
+      "min_rule_version": 2,
+      "normalized_name": "skull of ramos",
+      "oracle_hash": "f5afc49a19163867d1d6ed10a9bd7192",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tooth of Ramos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51cc15772f2a262e43a834ecc03b9c7d",
+      "min_rule_version": 2,
+      "normalized_name": "tooth of ramos",
+      "oracle_hash": "b24169ac0da54a32bade58cc60a0b2ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

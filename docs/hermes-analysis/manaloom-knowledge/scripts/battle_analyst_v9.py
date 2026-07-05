@@ -28033,6 +28033,35 @@ def activate_sacrifice_mana_artifacts(
     return 0
 
 
+def self_sacrifice_mana_activation_source(permanent):
+    if not isinstance(permanent, dict):
+        return permanent
+    if permanent.get("battle_model_scope") != "xmage_tap_and_self_sacrifice_mana_source_permanent_v1":
+        return permanent
+    source = dict(permanent)
+    source["mana_produced"] = int(
+        permanent.get("sacrifice_mana_produced")
+        or permanent.get("mana_produced")
+        or 0
+    )
+    source["produces"] = permanent.get("sacrifice_produces") or permanent.get("produces")
+    if permanent.get("sacrifice_produced_mana_symbols") is not None:
+        source["produced_mana_symbols"] = permanent.get("sacrifice_produced_mana_symbols")
+    else:
+        source.pop("produced_mana_symbols", None)
+    source["mana_activation_requires_tap"] = bool(
+        permanent.get("sacrifice_mana_activation_requires_tap")
+    )
+    source["activation_requires_tap"] = bool(permanent.get("sacrifice_activation_requires_tap"))
+    source["mana_activation_requires_sacrifice"] = True
+    source["activation_requires_sacrifice"] = True
+    if permanent.get("sacrifice_activation_mana_cost"):
+        source["activation_mana_cost"] = permanent.get("sacrifice_activation_mana_cost")
+    else:
+        source.pop("activation_mana_cost", None)
+    return source
+
+
 def activate_self_sacrifice_mana_sources(
     player,
     opponents,
@@ -28044,12 +28073,20 @@ def activate_self_sacrifice_mana_sources(
     if not player.is_alive() or phase not in MAIN_PHASES:
         return 0
 
+    self_sacrifice_scopes = {
+        "xmage_self_sacrifice_mana_source_permanent_v1",
+        "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+    }
+
     sources = [
         permanent
         for permanent in player.battlefield
         if isinstance(permanent, dict)
-        and permanent.get("battle_model_scope") == "xmage_self_sacrifice_mana_source_permanent_v1"
-        and permanent.get("mana_activation_requires_sacrifice")
+        and permanent.get("battle_model_scope") in self_sacrifice_scopes
+        and (
+            permanent.get("mana_activation_requires_sacrifice")
+            or permanent.get("sacrifice_mana_activation_requires_sacrifice")
+        )
         and not permanent.get("self_sacrifice_mana_used_this_turn")
     ]
     if not sources:
@@ -28063,24 +28100,25 @@ def activate_self_sacrifice_mana_sources(
         )
     )
     for permanent in sources:
-        if permanent.get("mana_activation_requires_tap") and permanent.get("tapped"):
+        activation_source = self_sacrifice_mana_activation_source(permanent)
+        if activation_source.get("mana_activation_requires_tap") and permanent.get("tapped"):
             continue
         if (
-            permanent.get("mana_activation_requires_tap")
+            activation_source.get("mana_activation_requires_tap")
             and is_battlefield_creature(permanent)
             and permanent.get("summoning_sick")
             and not has_haste(permanent)
         ):
             continue
 
-        produced = mana_source_production_for_state(player, permanent)
+        produced = mana_source_production_for_state(player, activation_source)
         if produced <= 0:
             continue
-        activation_cost = permanent.get("activation_mana_cost")
+        activation_cost = activation_source.get("activation_mana_cost")
         if activation_cost and not player.can_pay(activation_cost):
             continue
 
-        colors = source_colors(permanent)
+        colors = source_colors(activation_source)
         bonus_color = colors[0] if len(colors) == 1 else "generic"
         candidates = sacrifice_mana_unlock_candidates(
             player,
@@ -28089,13 +28127,13 @@ def activate_self_sacrifice_mana_sources(
             turn,
             bonus_amount=produced,
             bonus_color=bonus_color,
-            bonus_source=permanent,
+            bonus_source=activation_source,
             activation_cost=activation_cost,
         )
         if not candidates:
             continue
 
-        if not pay_mana_source_activation_costs(player, permanent, turn=turn):
+        if not pay_mana_source_activation_costs(player, activation_source, turn=turn):
             continue
 
         chosen = candidates[0]
@@ -28106,7 +28144,7 @@ def activate_self_sacrifice_mana_sources(
             source=permanent,
             all_players=all_players,
         )
-        if not add_player_mana_source_to_pool(player, permanent, turn=turn):
+        if not add_player_mana_source_to_pool(player, activation_source, turn=turn):
             continue
         permanent["self_sacrifice_mana_used_this_turn"] = True
 

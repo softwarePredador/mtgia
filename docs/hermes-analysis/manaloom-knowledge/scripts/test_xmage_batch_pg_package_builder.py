@@ -760,6 +760,56 @@ def test_manifest_expected_rule_preserves_contextual_mana_source_field() -> None
     }
 
 
+def test_manifest_expected_rule_preserves_tap_and_sacrifice_mana_fields() -> None:
+    proposal = {
+        "normalized_name": "eye of ramos",
+        "card_name": "Eye of Ramos",
+        "oracle_hash": "hash-ramos",
+        "logical_rule_key": "battle_rule_v1:hash-ramos",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "U",
+            "produced_mana_symbols": ["U"],
+            "mana_activation_requires_tap": True,
+            "sacrifice_mana_source_contextual_only": True,
+            "sacrifice_mana_produced": 1,
+            "sacrifice_produces": "U",
+            "sacrifice_produced_mana_symbols": ["U"],
+            "sacrifice_mana_activation_requires_tap": False,
+            "sacrifice_activation_requires_tap": False,
+            "sacrifice_mana_activation_requires_sacrifice": True,
+            "sacrifice_activation_requires_sacrifice": True,
+            "permanent_type": "artifact",
+            "ability_kind": "mana_and_sacrifice_mana",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"] == {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_tap_and_self_sacrifice_mana_source_permanent_v1",
+        "is_mana_source": True,
+        "mana_produced": 1,
+        "produces": "U",
+        "produced_mana_symbols": ["U"],
+        "mana_activation_requires_tap": True,
+        "sacrifice_mana_source_contextual_only": True,
+        "sacrifice_mana_produced": 1,
+        "sacrifice_produces": "U",
+        "sacrifice_produced_mana_symbols": ["U"],
+        "sacrifice_mana_activation_requires_tap": False,
+        "sacrifice_activation_requires_tap": False,
+        "sacrifice_mana_activation_requires_sacrifice": True,
+        "sacrifice_activation_requires_sacrifice": True,
+        "permanent_type": "artifact",
+        "ability_kind": "mana_and_sacrifice_mana",
+    }
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",

@@ -8671,7 +8671,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produced_mana_symbols"], ["R", "G", "W"])
         self.assertEqual(effect["produces"], "RGW")
 
-    def test_sacrifice_mana_source_with_multiple_mana_abilities_stays_blocked(self) -> None:
+    def test_tap_and_self_sacrifice_mana_source_maps_combined_scope(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
             effect_classes=[],
@@ -8692,8 +8692,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TAP_AND_SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertTrue(effect["is_mana_source"])
+        self.assertEqual(effect["produces"], "U")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["produced_mana_symbols"], ["U"])
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertTrue(effect["sacrifice_mana_source_contextual_only"])
+        self.assertEqual(effect["sacrifice_produces"], "U")
+        self.assertEqual(effect["sacrifice_mana_produced"], 1)
+        self.assertEqual(effect["sacrifice_produced_mana_symbols"], ["U"])
+        self.assertFalse(effect["sacrifice_mana_activation_requires_tap"])
+        self.assertTrue(effect["sacrifice_mana_activation_requires_sacrifice"])
+        self.assertEqual(effect["ability_kind"], "mana_and_sacrifice_mana")
+
+    def test_etb_draw_sacrifice_mana_source_stays_out_of_tap_sacrifice_scope(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Kaleidostone",
+                type_line="Artifact",
+                oracle_text=(
+                    "When this artifact enters, draw a card.\n"
+                    "{5}, {T}, Sacrifice this artifact: Add {W}{U}{B}{R}{G}."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new DrawCardSourceControllerEffect(1)));"
+                "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new Mana(1, 1, 1, 1, 1, 0, 0, 0), new GenericManaCost(5));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+            ),
+        )
+
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "mana_source_source_sacrifice_cost_not_supported")
+        self.assertIn(
+            reason,
+            {
+                "mana_source_sacrifice_oracle_not_simple",
+                "mana_source_source_sacrifice_cost_not_supported",
+                "tap_sacrifice_mana_source_tap_oracle_not_simple",
+            },
+        )
 
     def test_conditional_simple_mana_source_stays_blocked(self) -> None:
         row = queue_row(
