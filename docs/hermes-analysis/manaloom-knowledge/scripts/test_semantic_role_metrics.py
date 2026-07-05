@@ -144,6 +144,28 @@ class SemanticRoleMetricsTests(unittest.TestCase):
         self.assertEqual(deck["unknown_tag"], 1)
         conn.close()
 
+    def test_loot_and_wheel_tags_normalize_to_draw(self) -> None:
+        conn = self._base_schema()
+        conn.executemany(
+            """
+            INSERT INTO deck_cards
+              (deck_id, card_name, quantity, functional_tag,
+               functional_tags_json, type_line, cmc)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                (1, "Wheel", 1, "loot", '["loot"]', "Sorcery", 3),
+                (1, "Rummage", 1, "", '["rummage"]', "Instant", 2),
+            ],
+        )
+
+        [deck] = load_deck_metric_rows(conn)
+
+        self.assertEqual(deck["total_cards"], 2)
+        self.assertEqual(deck["draw_tag"], 2)
+        self.assertEqual(deck["unknown_tag"], 0)
+        conn.close()
+
 
 if __name__ == "__main__":
     unittest.main()

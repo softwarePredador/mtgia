@@ -96,11 +96,18 @@ def infer_roles_from_text(row: Mapping[str, Any]) -> set[str]:
     if not is_land and text_contains(
         text,
         "add one mana",
+        "adds one mana",
         "add two mana",
+        "adds two mana",
         "{t}: add",
         "treasure token",
         "create a treasure",
         "costs less to cast",
+    ):
+        roles.add("ramp")
+    if not is_land and (
+        re.search(r"\badds? (?:x mana|(?:\{[cwubrg]\})+)", text)
+        or re.search(r"cost \{?[x0-9cwubrg]+\}? less to cast", text)
     ):
         roles.add("ramp")
     if text_contains(
@@ -108,25 +115,46 @@ def infer_roles_from_text(row: Mapping[str, Any]) -> set[str]:
         "draw a card",
         "draw two cards",
         "draw three cards",
+        "draw four cards",
+        "draw seven cards",
         "draw cards",
+        "draws two cards",
+        "draws seven cards",
+        "draws cards equal",
+        "draws that many",
         "draw that many",
         "exile the top card",
         "play that card",
         "cast that card",
+        "you may play cards you own exiled",
     ):
         roles.add("draw")
     if text_contains(
         text,
+        "counter target",
         "destroy target",
         "exile target",
         "counter target spell",
         "return target",
         "deals damage to any target",
         "deals x damage",
+        "shuffles it into their library",
+        "destroy the chosen creatures",
+        "sacrifices a nontoken creature",
     ):
         roles.add("removal")
+    if re.search(r"target creature gets -\d+/-\d+", text):
+        roles.add("removal")
     if (
-        text_contains(text, "destroy all", "exile all", "all creatures", "each creature")
+        text_contains(
+            text,
+            "destroy all",
+            "exile all",
+            "destroy each",
+            "exile each",
+            "all creatures",
+            "each creature",
+        )
         or re.search(r"deals? \d+ damage to each", text)
     ):
         roles.add("board_wipe")
@@ -134,19 +162,34 @@ def infer_roles_from_text(row: Mapping[str, Any]) -> set[str]:
         text,
         "hexproof",
         "indestructible",
+        "shroud",
         "protection from",
         "prevent all damage",
+        "prevent that damage",
         "can't be countered",
+        "opponents can't cast",
+        "can't cast spells or activate abilities",
+        "opponents control can't be activated",
         "phase out",
         "change the target",
+        "no more than two creatures can attack you",
     ):
         roles.add("protection")
     if text_contains(
         text,
         "from your graveyard",
         "from a graveyard",
+        "from all graveyards",
         "return target card",
         "return target creature card",
+        "return enchanted creature card to the battlefield",
+        "return that card to the battlefield",
+        "return it to the battlefield",
+        "return the chosen cards to the battlefield",
+        "returns all artifact cards from their graveyard",
+        "put all creature cards from all graveyards onto the battlefield",
+        "put target creature card exiled",
+        "put an instant or sorcery card milled this way into your hand",
         "flashback",
         "escape",
         "retrace",
@@ -176,6 +219,15 @@ def infer_roles_from_text(row: Mapping[str, Any]) -> set[str]:
         "copy that spell",
         "magecraft",
         "storm",
+        "triggers an additional time",
+        "create a token that's a copy",
+        "creatures you control are every creature type",
+        "top card of their libraries revealed",
+        "look at the top",
+        "each player mills a card",
+        "puts all permanent cards among them onto the battlefield",
+        "abilities you activate",
+        "creatures you control have haste",
     ):
         roles.add("engine")
 

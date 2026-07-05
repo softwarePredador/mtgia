@@ -65,6 +65,78 @@ class GlobalCommanderCoreRoleAuditTests(unittest.TestCase):
         self.assertEqual(source, "text_inferred")
         self.assertIn("board_wipe", roles)
 
+    def test_common_commander_oracle_patterns_reduce_unknown_roles(self) -> None:
+        cases = [
+            (
+                "Dark Ritual",
+                "Instant",
+                "Add {B}{B}{B}.",
+                {"ramp"},
+            ),
+            (
+                "Windfall",
+                "Sorcery",
+                "Each player discards their hand, then draws cards equal to the greatest number discarded.",
+                {"draw"},
+            ),
+            (
+                "Dark Deal",
+                "Sorcery",
+                "Each player discards all the cards in their hand, then draws that many cards minus one.",
+                {"draw"},
+            ),
+            (
+                "Swan Song",
+                "Instant",
+                "Counter target enchantment, instant, or sorcery spell.",
+                {"removal"},
+            ),
+            (
+                "Lightning Greaves",
+                "Artifact — Equipment",
+                "Equipped creature has haste and shroud.",
+                {"protection"},
+            ),
+            (
+                "Animate Dead",
+                "Enchantment — Aura",
+                "Return enchanted creature card to the battlefield under your control.",
+                {"recursion"},
+            ),
+            (
+                "Karn's Sylex",
+                "Legendary Artifact",
+                "Exile Karn's Sylex: Destroy each nonland permanent with mana value X or less.",
+                {"board_wipe"},
+            ),
+            (
+                "Kayla's Music Box",
+                "Legendary Artifact",
+                "Until end of turn, you may play cards you own exiled with Kayla's Music Box.",
+                {"draw"},
+            ),
+            (
+                "Zirda, the Dawnwaker",
+                "Legendary Creature — Elemental Fox",
+                "Abilities you activate that aren't mana abilities cost {2} less to activate.",
+                {"engine"},
+            ),
+        ]
+
+        for name, type_line, oracle_text, expected_roles in cases:
+            with self.subTest(name=name):
+                roles, source = audit.card_roles(
+                    {
+                        "functional_tag": "",
+                        "functional_tags_json": "[]",
+                        "type_line": type_line,
+                        "oracle_text": oracle_text,
+                    }
+                )
+
+                self.assertEqual(source, "text_inferred")
+                self.assertTrue(expected_roles.issubset(roles))
+
     def test_build_report_marks_role_data_incomplete_before_strategy_matrix(self) -> None:
         card_rows = []
         for index in range(35):
