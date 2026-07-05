@@ -7539,6 +7539,7 @@ def restricted_target_base(target: str) -> str:
         "creature_power_4_or_greater",
         "creature_power_1_or_less",
         "creature_toughness_2_or_less",
+        "creature_damaged_this_turn",
         "creature_damaged_this_turn_opponent_controls",
         "creature_mana_value_3_or_greater",
         "non_angel_demon_devil_dragon_creature",
@@ -7646,6 +7647,7 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target nonwhite permanent", "nonwhite_permanent"),
         (r"target creature with power 3 or greater", "creature_power_3_or_greater"),
         (r"target creature with power 4 or greater", "creature_power_4_or_greater"),
+        (r"target creature that was dealt damage this turn", "creature_damaged_this_turn"),
         (r"target creature with (?:mana value|converted mana cost) 3 or greater", "creature_mana_value_3_or_greater"),
     ]
     for target_pattern, target in patterns:
@@ -7793,6 +7795,8 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "creature_power_3_or_greater"
     if re.search(r"PowerPredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*3\s*\)", text):
         return "creature_power_4_or_greater"
+    if "FILTER_CREATURE_DAMAGED_THIS_TURN" in text:
+        return "creature_damaged_this_turn"
     if "ManaValuePredicate(ComparisonType.MORE_THAN, 2)" in text:
         return "creature_mana_value_3_or_greater"
     return None
@@ -13388,6 +13392,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "power_max": 1}
     if target == "creature_toughness_2_or_less":
         return {"card_types": ["creature"], "toughness_max": 2}
+    if target == "creature_damaged_this_turn":
+        return {"card_types": ["creature"], "damaged_this_turn": True}
     if target == "creature_damaged_this_turn_opponent_controls":
         return {"card_types": ["creature"], "controller_scope": "opponent", "damaged_this_turn": True}
     if target == "creature_or_planeswalker_damaged_this_turn_opponent_controls":

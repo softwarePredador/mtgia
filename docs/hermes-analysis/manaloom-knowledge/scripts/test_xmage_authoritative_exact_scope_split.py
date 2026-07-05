@@ -5591,6 +5591,37 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             },
         )
 
+    def test_permanent_activated_damage_maps_damaged_this_turn_creature_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Opportunist",
+                type_line="Creature - Human Soldier",
+                oracle_text="{T}: This creature deals 1 damage to target creature that was dealt damage this turn.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new DamageTargetEffect(1), new TapSourceCost());
+                ability.addTarget(new TargetPermanent(StaticFilters.FILTER_CREATURE_DAMAGED_THIS_TURN));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 1)
+        self.assertEqual(effect["target"], "creature_damaged_this_turn")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "damaged_this_turn": True})
+        self.assertEqual(effect["activation_cost_mana"], "{0}")
+        self.assertTrue(effect["activation_requires_tap"])
+
     def test_permanent_activated_damage_blocks_dynamic_amount(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,
@@ -6253,6 +6284,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(power_reason, "selected_exact_scope")
         self.assertEqual(power_proposal["effect_json"]["activated_remove_target"], "creature_power_4_or_greater")
         self.assertEqual(power_proposal["effect_json"]["target_constraints"], {"card_types": ["creature"], "power_min": 4})
+
+    def test_permanent_activated_destroy_maps_damaged_this_turn_creature_target(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Witch's Mist",
+                type_line="Enchantment",
+                oracle_text="{2}{B}, {T}: Destroy target creature that was dealt damage this turn.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new ManaCostsImpl<>("{2}{B}")
+                );
+                ability.addTarget(new TargetPermanent(StaticFilters.FILTER_CREATURE_DAMAGED_THIS_TURN));
+                ability.addCost(new TapSourceCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_remove_target"], "creature_damaged_this_turn")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "damaged_this_turn": True})
+        self.assertEqual(effect["activation_cost_mana"], "{2}{B}")
+        self.assertTrue(effect["activation_requires_tap"])
 
     def test_permanent_activated_destroy_blocks_sacrifice_target_cost(self) -> None:
         row = queue_row(

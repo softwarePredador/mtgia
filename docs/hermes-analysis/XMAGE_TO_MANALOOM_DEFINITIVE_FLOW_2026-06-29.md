@@ -12883,6 +12883,58 @@ destroy-target parser shapes above. It does not authorize broad activated
 destroy review rows, modal abilities, unsupported target predicates, or
 non-matching Oracle/XMage target pairs.
 
+## 2026-07-05 Checkpoint: PG506 Activated Damaged-Creature Target Parser
+
+PG506 closed the next exact activated damaged-creature target parser expansion
+for supported simple XMage activated abilities. The package promoted
+`Ogre Siegebreaker`, `Opportunist`, and `Witch's Mist`.
+
+Runtime and mapper changes:
+
+- `xmage_authoritative_exact_scope_split.py` now recognizes
+  `FILTER_CREATURE_DAMAGED_THIS_TURN` and Oracle text
+  `target creature that was dealt damage this turn`.
+- The exact target maps to `creature_damaged_this_turn` with
+  `target_constraints={"card_types":["creature"],"damaged_this_turn":true}`.
+- `battle_analyst_v9.py` already enforces `damaged_this_turn` target
+  constraints, and PG506 adds a focused positive/negative runtime test for the
+  generic creature-damaged-this-turn predicate.
+
+PostgreSQL and cache evidence:
+
+- Precheck: 3 target card rows, 0 existing active same-scope rules, and 0
+  shadow rows to deprecate.
+- Apply: `deprecated_shadow_rows=0`, `upserted_rows=3`, `COMMIT`.
+- Postcheck: all 3 rows have promoted rule, verified-auto status, and Oracle
+  hash matches.
+- PG -> Hermes/SQLite sync:
+  `pg_rows_loaded=3`, `sqlite_inserted_or_updated=3`, and
+  `canonical_snapshot_rows_exported=5982`.
+- Runtime lookup:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg506_activated_damaged_creature_target_new_server_runtime_get_card_effect.out`
+  resolves all 3 cards to the expected runtime scope and damaged-creature
+  target constraint.
+- Battle/runtime validation:
+  splitter unit suite passed `526` tests, focused target-legality runtime test
+  exited `0`, and the full battle runtime output has `632` PASS lines.
+- Contract/alignment audits passed: PG/Hermes/SQLite `51/51`, XMage strategy
+  `26/26`, deckbuilding contract `pass`, operational surface `39/39`, and
+  legacy contamination `32/32`.
+
+Post-sync queue evidence:
+
+- `target_identity_count=26035`
+- `xmage_authoritative_source_count=25721`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25721`
+- final exact-scope recheck `proposal_count=0`
+
+Residual boundary: PG506 only closes the exact supported
+creature-damaged-this-turn target predicate above. It does not authorize broad
+damaged-creature review rows, modal abilities, unsupported activation costs, or
+non-matching Oracle/XMage target pairs.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

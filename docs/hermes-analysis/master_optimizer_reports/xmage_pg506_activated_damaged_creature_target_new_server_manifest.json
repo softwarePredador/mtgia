@@ -1,0 +1,434 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg506_xmage_pg506_activated_damaged_crea_20260705_124220",
+  "deploy_id": "PG506",
+  "expected_rules": [
+    {
+      "card_name": "Ogre Siegebreaker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:034bd4c748e35fe57e52d223c648e8fd",
+      "min_rule_version": 2,
+      "normalized_name": "ogre siegebreaker",
+      "oracle_hash": "d9fe6fc297eeb748b517f9c308c77065",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "destroy_target",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "creature_damaged_this_turn",
+            "activation_cost_colors": [
+              "B",
+              "R"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{B}{R}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "damaged_this_turn": true
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activation_cost_colors": [
+          "B",
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{B}{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "damaged_this_turn": true
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Opportunist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:06261c009c5bcea9c7932e535c7b3359",
+      "min_rule_version": 2,
+      "normalized_name": "opportunist",
+      "oracle_hash": "aba5ffef49bc71c0b02a3ce50eca9c8c",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "creature_damaged_this_turn",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "damaged_this_turn": true
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "creature_damaged_this_turn",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "damaged_this_turn": true
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Witch's Mist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9b34535f520f3ad0fd7e365e758a83b0",
+      "min_rule_version": 2,
+      "normalized_name": "witch's mist",
+      "oracle_hash": "6feafae65830ccd4967852c92320404b",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "destroy_target",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "creature_damaged_this_turn",
+            "activation_cost_colors": [
+              "B"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "damaged_this_turn": true
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "enchantment",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "damaged_this_turn": true
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_damage": 1,
+    "xmage_permanent_simple_activated_destroy_target": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg506_activated_damaged_creature_target_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg506_activated_damaged_creature_target_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg506_activated_damaged_creature_target_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg506_activated_damaged_creature_target_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg506_activated_damaged_creature_target_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg506_activated_damaged_creature_target_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T12:42:20+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Ogre Siegebreaker"
+      },
+      "card_name": "Ogre Siegebreaker",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:034bd4c748e35fe57e52d223c648e8fd",
+      "normalized_name": "ogre siegebreaker",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "destroy_target",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "creature_damaged_this_turn",
+            "activation_cost_colors": [
+              "B",
+              "R"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{B}{R}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "damaged_this_turn": true
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activation_cost_colors": [
+          "B",
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{B}{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "damaged_this_turn": true
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Opportunist"
+      },
+      "card_name": "Opportunist",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:06261c009c5bcea9c7932e535c7b3359",
+      "normalized_name": "opportunist",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "creature_damaged_this_turn",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "damaged_this_turn": true
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "creature_damaged_this_turn",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "damaged_this_turn": true
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Witch's Mist"
+      },
+      "card_name": "Witch's Mist",
+      "effect": "enchantment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9b34535f520f3ad0fd7e365e758a83b0",
+      "normalized_name": "witch's mist",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "destroy_target",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "creature_damaged_this_turn",
+            "activation_cost_colors": [
+              "B"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "damaged_this_turn": true
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "enchantment",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "damaged_this_turn": true
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Ogre Siegebreaker",
+    "Opportunist",
+    "Witch's Mist"
+  ],
+  "selected_count": 3,
+  "slug": "xmage_pg506_activated_damaged_creature_target_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Ogre Siegebreaker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:034bd4c748e35fe57e52d223c648e8fd",
+      "min_rule_version": 2,
+      "normalized_name": "ogre siegebreaker",
+      "oracle_hash": "d9fe6fc297eeb748b517f9c308c77065",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Opportunist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:06261c009c5bcea9c7932e535c7b3359",
+      "min_rule_version": 2,
+      "normalized_name": "opportunist",
+      "oracle_hash": "aba5ffef49bc71c0b02a3ce50eca9c8c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Witch's Mist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9b34535f520f3ad0fd7e365e758a83b0",
+      "min_rule_version": 2,
+      "normalized_name": "witch's mist",
+      "oracle_hash": "6feafae65830ccd4967852c92320404b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -1,0 +1,6 @@
+     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Ogre Siegebreaker | ogre siegebreaker | battle_rule_v1:034bd4c748e35fe57e52d223c648e8fd |                  1 |                           1 |                         1 |           0
+ Opportunist       | opportunist       | battle_rule_v1:06261c009c5bcea9c7932e535c7b3359 |                  1 |                           1 |                         1 |           0
+ Witch's Mist      | witch's mist      | battle_rule_v1:9b34535f520f3ad0fd7e365e758a83b0 |                  1 |                           1 |                         1 |           0
+(3 rows)

@@ -7909,6 +7909,18 @@ def register_tests(battle, player):
         assert not battle.is_legal_target(combat_filter, large_attacker, controller, target_type="creature")
         assert not battle.is_legal_target(combat_filter, resting_small, controller, target_type="creature")
 
+        damaged_filter = {
+            "name": "Fixture Activated Destroy",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "damaged_this_turn": True},
+        }
+        healthy = {"name": "Healthy Creature", "type_line": "Creature", "effect": "creature"}
+        wounded = {"name": "Wounded Creature", "type_line": "Creature", "effect": "creature"}
+        battle.mark_permanent_dealt_damage_this_turn(wounded, 1, 489)
+        assert not battle.is_legal_target(damaged_filter, healthy, controller, target_type="creature")
+        assert battle.is_legal_target(damaged_filter, wounded, controller, target_type="creature")
+
     def test_pg490_creature_etb_bounce_returns_opponent_creature_to_hand():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
