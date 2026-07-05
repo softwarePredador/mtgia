@@ -4296,6 +4296,47 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_conditional_creature_etb_create_treasure_skips_without_land_advantage(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.append({"name": "Active Land", "type_line": "Land"})
+        opponent.battlefield.append({"name": "Opponent Land", "type_line": "Land"})
+        permanent = {"name": "Ticket Tortoise", "type_line": "Creature - Turtle Performer"}
+        active.battlefield.append(permanent)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_treasure_count": 1,
+            "treasure_count": 1,
+            "etb_treasure_condition": "opponent_controls_more_lands",
+            "treasure_recipient": "controller",
+            "treasure_trigger": "enters_battlefield",
+            "_rule_logical_key": "battle_rule_v1:fixture_conditional_etb_treasure",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=3,
+            rng=random.Random(3),
+        )
+
+        self.assertEqual(active.treasures, 0)
+        self.assertTrue(
+            any(
+                event == "etb_treasure_skipped"
+                and data.get("card") == "Ticket Tortoise"
+                and data.get("reason") == "opponent_does_not_control_more_lands"
+                and data.get("rule_logical_key")
+                == "battle_rule_v1:fixture_conditional_etb_treasure"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_target_spell_deals_numeric_damage_to_player(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

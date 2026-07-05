@@ -953,6 +953,7 @@ def test_creature_etb_create_treasure_execution_scenario() -> None:
             "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
             "etb_treasure_count": 2,
             "treasure_count": 2,
+            "keywords": ["defender"],
         },
     }
 
@@ -967,8 +968,31 @@ def test_creature_etb_create_treasure_execution_scenario() -> None:
             "effect": "creature",
         },
         "expected_treasure_count": 2,
+        "expected_keywords": ["defender"],
         "logical_rule_key": "battle_rule_v1:prosperous-pirates",
     }
+
+
+def test_conditional_creature_etb_create_treasure_execution_scenario_sets_lands() -> None:
+    rule = {
+        "normalized_name": "ticket tortoise",
+        "card_name": "Ticket Tortoise",
+        "logical_rule_key": "battle_rule_v1:ticket-tortoise",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+            "etb_treasure_count": 1,
+            "treasure_count": 1,
+            "etb_treasure_condition": "opponent_controls_more_lands",
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "creature_etb_create_treasure"
+    assert scenario["expected_condition"] == "opponent_controls_more_lands"
+    assert scenario["controller_land_count"] == 1
+    assert scenario["opponent_land_count"] == 2
 
 
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:

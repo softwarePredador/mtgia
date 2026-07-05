@@ -100,12 +100,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_remove_effect",
     "etb_remove_target",
     "etb_treasure_count",
+    "etb_treasure_condition",
     "etb_token_count",
     "token_count",
     "token_count_source",
     "token_count_per_x",
     "token_component_count",
     "token_total_count",
+    "xmage_token_class",
     "xmage_token_classes",
     "token_name",
     "token_power",
@@ -981,7 +983,8 @@ def creature_etb_create_treasure_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") != "xmage_creature_etb_create_treasure_v1":
         return None
-    return {
+    expected_condition = required.get("etb_treasure_condition")
+    scenario = {
         "name": f"{rule['card_name']} ETB creates Treasure",
         "type": "creature_etb_create_treasure",
         "card": {
@@ -994,8 +997,15 @@ def creature_etb_create_treasure_execution_scenario_from_expected_rule(
             or required.get("treasure_count")
             or 1
         ),
+        "expected_keywords": list(required.get("keywords") or []),
         "logical_rule_key": rule["logical_rule_key"],
     }
+    if expected_condition:
+        scenario["expected_condition"] = expected_condition
+        if expected_condition == "opponent_controls_more_lands":
+            scenario["controller_land_count"] = 1
+            scenario["opponent_land_count"] = 2
+    return scenario
 
 
 def fixed_create_creature_tokens_execution_scenario_from_expected_rule(

@@ -14601,6 +14601,73 @@ spells, triggered or activated Treasure makers outside creature ETB, dynamic
 Treasure counts, choice/optional Treasure creation, or Treasure effects with
 additional non-Treasure behavior.
 
+## 2026-07-05 PG537 Conditional Creature ETB Treasure Checkpoint
+
+Applied package: `PG537 etb_treasure_condition_new_server`.
+
+Scope closed:
+
+- Added exact XMage -> ManaLoom mapping for creature ETB Treasure creation with
+  the Oracle condition `opponent_controls_more_lands`.
+- Promoted `Ticket Tortoise` from the local XMage source class
+  `TicketTortoise.java`.
+- Preserved self static keyword metadata from XMage (`defender`) while keeping
+  the ETB Treasure trigger executable.
+- Added runtime handling so the battle executor emits `etb_treasure_skipped`
+  when no live opponent controls more lands than the controller.
+- Added package E2E setup for conditional ETB Treasure scenarios so the card is
+  tested with the condition satisfied.
+
+Evidence:
+
+- exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg537_treasure_etb_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg537_etb_treasure_condition_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg537_etb_treasure_condition_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg537_etb_treasure_condition_new_server_pg_to_sqlite_sync.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg537_etb_treasure_condition_new_server_e2e_validation.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg537_etb_treasure_condition_new_server_commander_legal.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg537_etb_treasure_condition_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg537_etb_treasure_condition_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg537_etb_treasure_condition_new_server_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg537_etb_treasure_condition_new_server.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg537_etb_treasure_condition_new_server.md`
+
+Validation:
+
+- focused mapper/runtime tests: `910` tests passed;
+- builder focused scenario checks passed;
+- package E2E: `status=pass`, `scenario_count=1`, `treasures_created=1`,
+  `validated_condition=opponent_controls_more_lands`,
+  `validated_keywords=["defender"]`;
+- PostgreSQL row has `etb_treasure_condition=opponent_controls_more_lands` and
+  `xmage_token_class=TreasureToken`;
+- PG -> SQLite sync loaded `1` PostgreSQL row and updated `1` SQLite row;
+- final audits passed: XMage strategy `26/26`, PG-Hermes-SQLite `51/51`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25815`
+- post-cycle `target_identity_count=25814`
+- post-cycle `xmage_authoritative_source_count=25500`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_adapter_required_count=25500`
+- `treasure_maker::single_treasure_creation_v1` reduced from `32` to `31`
+
+Residual boundary: PG537 does not authorize Treasure makers whose condition is
+not `opponent_controls_more_lands`, Treasure creation from spells, Treasure
+creation attached to destroy/removal spells, activated Treasure makers, dynamic
+Treasure counts, optional/choice Treasure creation, or Treasure effects with
+additional non-Treasure behavior.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

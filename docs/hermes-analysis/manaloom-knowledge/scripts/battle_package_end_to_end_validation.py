@@ -814,6 +814,31 @@ def run_creature_etb_create_treasure(
     active = battle.Player(str(scenario.get("player") or "Treasure Controller"), None, [])
     opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
     effect_data = battle.get_card_effect(card)
+    expected_condition = scenario.get("expected_condition")
+    actual_condition = effect_data.get("etb_treasure_condition")
+    if expected_condition and actual_condition != expected_condition:
+        fail(
+            "battle_execution",
+            f"{card['name']} condition={actual_condition!r}, expected {expected_condition!r}",
+        )
+    controller_land_count = int(scenario.get("controller_land_count") or 0)
+    opponent_land_count = int(scenario.get("opponent_land_count") or 0)
+    active.battlefield.extend(
+        {
+            "name": f"Controller Test Land {index + 1}",
+            "type_line": "Land",
+            "controller": active.name,
+        }
+        for index in range(controller_land_count)
+    )
+    opponent.battlefield.extend(
+        {
+            "name": f"Opponent Test Land {index + 1}",
+            "type_line": "Land",
+            "controller": opponent.name,
+        }
+        for index in range(opponent_land_count)
+    )
     permanent = battle.prepare_entering_permanent(
         battle.enrich_card({**card, **effect_data}),
         controller=active,
@@ -821,6 +846,14 @@ def run_creature_etb_create_treasure(
         turn=int(scenario.get("turn") or 6),
     )
     active.battlefield.append(permanent)
+    expected_keywords = [str(value) for value in (scenario.get("expected_keywords") or [])]
+    permanent_keywords = [str(value) for value in (permanent.get("keywords") or [])]
+    missing_keywords = [keyword for keyword in expected_keywords if keyword not in permanent_keywords]
+    if missing_keywords:
+        fail(
+            "battle_execution",
+            f"{card['name']} missing expected ETB permanent keywords: {missing_keywords}",
+        )
     before_treasures = int(getattr(active, "treasures", 0) or 0)
     before_events = len(events)
     expected_treasure_count = int(scenario.get("expected_treasure_count") or 1)
@@ -863,6 +896,8 @@ def run_creature_etb_create_treasure(
         "card_name": card["name"],
         "treasures_created": treasure_delta,
         "controller_treasures_after": active.treasures,
+        "validated_condition": expected_condition,
+        "validated_keywords": expected_keywords,
     }
 
 

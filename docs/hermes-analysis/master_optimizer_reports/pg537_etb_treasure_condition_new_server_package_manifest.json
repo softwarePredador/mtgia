@@ -1,0 +1,118 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg537_etb_treasure_condition_new_server_20260705_235035",
+  "deploy_id": "pg537",
+  "execution_scenarios": [
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Ticket Tortoise",
+        "type_line": "Creature - Pirate"
+      },
+      "controller_land_count": 1,
+      "expected_condition": "opponent_controls_more_lands",
+      "expected_keywords": [
+        "defender"
+      ],
+      "expected_treasure_count": 1,
+      "logical_rule_key": "battle_rule_v1:aa5cc0d612888c3a8c595cdf287e7d47",
+      "name": "Ticket Tortoise ETB creates Treasure",
+      "opponent_land_count": 2,
+      "type": "creature_etb_create_treasure"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Ticket Tortoise",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa5cc0d612888c3a8c595cdf287e7d47",
+      "min_rule_version": 2,
+      "normalized_name": "ticket tortoise",
+      "oracle_hash": "9c9b59ad3fbc24b087496fe9805a2494",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+        "effect": "creature",
+        "etb_treasure_condition": "opponent_controls_more_lands",
+        "etb_treasure_count": 1,
+        "keywords": [
+          "defender"
+        ],
+        "treasure_count": 1,
+        "treasure_recipient": "controller",
+        "treasure_trigger": "enters_battlefield",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "TreasureToken"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_create_treasure": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg537_etb_treasure_condition_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg537_etb_treasure_condition_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg537_etb_treasure_condition_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg537_etb_treasure_condition_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg537_etb_treasure_condition_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg537_etb_treasure_condition_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-05T23:52:44+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Ticket Tortoise"
+      },
+      "card_name": "Ticket Tortoise",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa5cc0d612888c3a8c595cdf287e7d47",
+      "normalized_name": "ticket tortoise",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+        "effect": "creature",
+        "etb_treasure_condition": "opponent_controls_more_lands",
+        "etb_treasure_count": 1,
+        "keywords": [
+          "defender"
+        ],
+        "treasure_count": 1,
+        "treasure_recipient": "controller",
+        "treasure_trigger": "enters_battlefield",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "TreasureToken"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Ticket Tortoise"
+  ],
+  "selected_count": 1,
+  "slug": "etb_treasure_condition_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Ticket Tortoise",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa5cc0d612888c3a8c595cdf287e7d47",
+      "min_rule_version": 2,
+      "normalized_name": "ticket tortoise",
+      "oracle_hash": "9c9b59ad3fbc24b087496fe9805a2494",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

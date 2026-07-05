@@ -18318,23 +18318,43 @@ def resolve_generic_permanent_etb(
     if effect_data.get("etb_treasure_count"):
         treasure_count = max(0, int(effect_data.get("etb_treasure_count") or 0))
         if treasure_count > 0:
-            treasures_before = int(getattr(player, "treasures", 0) or 0)
-            player.treasures = treasures_before + treasure_count
-            emit_replay_event(
-                "treasure_created",
-                player=player.name,
-                card=permanent.get("name", "?"),
-                trigger="enters_battlefield",
-                effect="create_treasure",
-                treasures_created=treasure_count,
-                treasures_before=treasures_before,
-                treasures=player.treasures,
-                treasures_after=player.treasures,
-                treasure_recipient="controller",
-                turn=turn,
-                phase=phase,
-                **replay_rule_fields(effect_data),
-            )
+            condition = effect_data.get("etb_treasure_condition")
+            if (
+                condition == "opponent_controls_more_lands"
+                and not any(
+                    controlled_land_count(opponent) > controlled_land_count(player)
+                    for opponent in opponents or []
+                    if getattr(opponent, "is_alive", lambda: True)()
+                )
+            ):
+                emit_replay_event(
+                    "etb_treasure_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    reason="opponent_does_not_control_more_lands",
+                    trigger="enters_battlefield",
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(effect_data),
+                )
+            else:
+                treasures_before = int(getattr(player, "treasures", 0) or 0)
+                player.treasures = treasures_before + treasure_count
+                emit_replay_event(
+                    "treasure_created",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger="enters_battlefield",
+                    effect="create_treasure",
+                    treasures_created=treasure_count,
+                    treasures_before=treasures_before,
+                    treasures=player.treasures,
+                    treasures_after=player.treasures,
+                    treasure_recipient="controller",
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(effect_data),
+                )
     if effect_data.get("etb_token_count"):
         for _ in range(min(int(effect_data.get("etb_token_count") or 1), 20)):
             create_creature_token(

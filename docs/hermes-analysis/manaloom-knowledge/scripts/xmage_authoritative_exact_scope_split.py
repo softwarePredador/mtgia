@@ -1751,8 +1751,8 @@ def destroy_target_create_treasure_from_source(source: str) -> int | str:
     return int(token_count)
 
 
-def creature_etb_create_treasure_from_oracle(metadata: dict[str, Any]) -> int | str:
-    text = normalized_token_oracle_phrase(oracle_text(metadata))
+def creature_etb_create_treasure_from_oracle(metadata: dict[str, Any]) -> int | dict[str, Any] | str:
+    text = normalized_token_oracle_phrase(oracle_text_after_leading_static_keywords(metadata))
     match = re.fullmatch(
         r"when (?:this creature|[a-z0-9 ,'-]+) enters(?: the battlefield)?, create "
         r"(?P<count>a|an|one|two|three|four|five|\d+) treasure tokens?",
@@ -1764,6 +1764,38 @@ def creature_etb_create_treasure_from_oracle(metadata: dict[str, Any]) -> int | 
     if count is None or count <= 0:
         return "etb_treasure_oracle_count_not_fixed_positive"
     return int(count)
+
+
+def conditional_creature_etb_create_treasure_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = normalized_token_oracle_phrase(oracle_text_after_leading_static_keywords(metadata))
+    match = re.fullmatch(
+        r"when (?:this creature|[a-z0-9 ,'-]+) enters(?: the battlefield)?, "
+        r"if an opponent controls more lands than you, you create "
+        r"(?P<count>a|an|one|two|three|four|five|\d+) treasure tokens?",
+        text,
+    )
+    if not match:
+        return "etb_treasure_oracle_not_exact"
+    count = fixed_treasure_count_word(match.group("count"))
+    if count is None or count <= 0:
+        return "etb_treasure_oracle_count_not_fixed_positive"
+    return {
+        "count": int(count),
+        "condition": "opponent_controls_more_lands",
+    }
+
+
+def creature_etb_treasure_count_and_condition_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[int, str | None] | str:
+    parsed = creature_etb_create_treasure_from_oracle(metadata)
+    if parsed == "etb_treasure_oracle_not_exact":
+        parsed = conditional_creature_etb_create_treasure_from_oracle(metadata)
+    if isinstance(parsed, str):
+        return parsed
+    if isinstance(parsed, dict):
+        return int(parsed["count"]), str(parsed.get("condition") or "") or None
+    return int(parsed), None
 
 
 def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
@@ -15350,6 +15382,11 @@ def split_row(
         and next(iter(ability_classes(row))) in TARGET_GRANT_KEYWORD_ABILITY_CLASSES
     )
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
+    treasure_etb_creature_unit = (
+        unit == TREASURE_UNIT
+        and effect_classes(row) == {"CreateTokenEffect"}
+        and "EntersBattlefieldTriggeredAbility" in ability_classes(row)
+    )
     draw_self_cost_reduction_spell_unit = (
         unit == DRAW_UNIT
         and effect_classes(row) == {"DrawCardSourceControllerEffect", "SpellCostReductionSourceEffect"}
@@ -15499,6 +15536,7 @@ def split_row(
         and not draw_self_cost_reduction_spell_unit
         and not keyword_draw_spell_unit
         and not boost_keyword_draw_spell_unit
+        and not treasure_etb_creature_unit
         and not counter_unless_pays_spell_unit
     ):
         if not is_spell(metadata):
@@ -17630,9 +17668,10 @@ def split_row(
             return None, parsed_parts
         token_class, token_count, parsed_token_fields = parsed_parts
         if token_class == "TreasureToken":
-            oracle_treasure_count = creature_etb_create_treasure_from_oracle(metadata)
-            if isinstance(oracle_treasure_count, str):
-                return None, oracle_treasure_count
+            oracle_treasure = creature_etb_treasure_count_and_condition_from_oracle(metadata)
+            if isinstance(oracle_treasure, str):
+                return None, oracle_treasure
+            oracle_treasure_count, oracle_treasure_condition = oracle_treasure
             if int(token_count) != int(oracle_treasure_count):
                 return None, "etb_treasure_source_oracle_count_mismatch"
             effect_json = {
@@ -17648,6 +17687,8 @@ def split_row(
                 "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
                 "xmage_token_class": "TreasureToken",
             }
+            if oracle_treasure_condition:
+                effect_json["etb_treasure_condition"] = oracle_treasure_condition
             return build_proposal(
                 row,
                 metadata,
@@ -19406,6 +19447,55 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == TREASURE_UNIT:
+        if classes == {"CreateTokenEffect"} and "EntersBattlefieldTriggeredAbility" in ability_classes(row):
+            abilities = ability_classes(row)
+            allowed_abilities = {"EntersBattlefieldTriggeredAbility"} | set(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+            if abilities - allowed_abilities:
+                return None, "etb_treasure_ability_class_not_simple"
+            if not is_creature_metadata(metadata):
+                return None, "etb_treasure_not_creature"
+            parsed_effect = fixed_create_token_effect_from_source(source_text)
+            if isinstance(parsed_effect, str):
+                return None, parsed_effect
+            parsed_parts = fixed_literal_token_parts(parsed_effect)
+            if isinstance(parsed_parts, str):
+                return None, parsed_parts
+            token_class, token_count, _parsed_token_fields = parsed_parts
+            if token_class != "TreasureToken":
+                return None, "etb_treasure_source_token_not_treasure"
+            oracle_treasure = creature_etb_treasure_count_and_condition_from_oracle(metadata)
+            if isinstance(oracle_treasure, str):
+                return None, oracle_treasure
+            oracle_treasure_count, oracle_treasure_condition = oracle_treasure
+            if int(token_count) != int(oracle_treasure_count):
+                return None, "etb_treasure_source_oracle_count_mismatch"
+            keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": ETB_TREASURE_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "etb_treasure_count": int(oracle_treasure_count),
+                "treasure_count": int(oracle_treasure_count),
+                "treasure_recipient": "controller",
+                "treasure_trigger": "enters_battlefield",
+                "xmage_effect_class": "CreateTokenEffect",
+                "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+                "xmage_token_class": "TreasureToken",
+            }
+            if oracle_treasure_condition:
+                effect_json["etb_treasure_condition"] = oracle_treasure_condition
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_etb_create_treasure",
+            ), "selected_exact_scope"
         if classes != {"CreateTokenEffect", "DestroyTargetEffect"}:
             return None, "destroy_treasure_effect_classes_not_exact"
         if ability_classes(row):
