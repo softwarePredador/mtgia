@@ -2538,3 +2538,60 @@ Operational lesson:
 - The app/deckbuilder must keep showing `607` as the protected Lorehold
   baseline until a candidate has named same-lane cut proof, non-regressed
   miracle/topdeck floors, and equal battle traces.
+
+## Topdeck Forced Access Microbenchmark Plan - 2026-07-05
+
+The current microbenchmark plan artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_forced_access_microbenchmark_plan_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_forced_access_microbenchmark_plan_20260705_current.json`
+
+This plan consumes:
+
+- `lorehold_topdeck_forced_access_audit_20260705_current`;
+- `lorehold_607_unprotected_staple_relearn_preflight_20260704_current`.
+
+Current result:
+
+- status:
+  `topdeck_microbenchmark_plan_ready_but_no_executable_package_keep_607`;
+- target cards reviewed: `5`;
+- microbenchmark designs available: `5`;
+- runnable-now commands: `0`;
+- natural-promotion-allowed rows: `0`;
+- primary forced-access mode for all five current targets:
+  `opening_hand`;
+- deck action allowed now: `false`;
+- recommended next action:
+  `mine_new_safe_cut_models_before_running_topdeck_forced_access`.
+
+Per-card execution state:
+
+- `Penance`: design is valid, but existing packages are blocked by prior reject
+  plus cut safety. Do not reuse `Hexing Squelcher` or `Promise of Loyalty`
+  style protected cuts without a new same-lane cut model.
+- `Galvanoth`: design is valid, but existing packages are blocked by prior
+  reject plus cut safety. Do not reuse `Bender's Waterskin`, `Victory Chimes`,
+  `Thor, God of Thunder`, or `Hexing Squelcher` as shortcut cuts.
+- `Dragon's Rage Channeler`: design is valid, but the current tested cut
+  `The Scarlet Witch` is protected by cut safety. It needs a different
+  nonprotected same-lane cut before a forced-access run.
+- `Valakut Awakening // Valakut Stoneforge`: design is valid, but the previous
+  `Big Score` pair is a prior reject. Do not rerun that exact pair; only retest
+  with a new hand-filter hypothesis that explains the prior miracle collapse.
+- `Wheel of Fortune`: design is valid, but the previous `Big Score` pair is a
+  prior reject. Do not rerun that exact pair; only retest with a new
+  hand-filter hypothesis that protects the miracle/topdeck floor.
+
+Runtime contract:
+
+- Use existing forced-focus support: `MANALOOM_FORCE_FOCUS_ACCESS_MODE` and
+  `MANALOOM_FOCUS_ACCESS_CARDS`.
+- Current targets are enablers or hand filters, so the primary mode is
+  `opening_hand`, not `library_top`.
+- `library_top` remains useful for future payoff/miracle-card visibility tests,
+  but it is not the primary test for these five enablers.
+- Any future command must use a copied lab candidate with a declared package
+  manifest and safe temporary cut. It must not mutate deck `607`.
+- A forced-access result can prove visibility/use, but cannot promote a deck or
+  replace `607` without a later natural gate.
