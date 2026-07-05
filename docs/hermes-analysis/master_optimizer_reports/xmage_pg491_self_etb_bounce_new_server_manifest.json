@@ -1,0 +1,527 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg491_self_etb_bounce_new_server_20260705_075431",
+  "deploy_id": "PG491",
+  "expected_rules": [
+    {
+      "card_name": "Deputy of Acquittals",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:493e0ab5c91fdbd60a0fda3532814452",
+      "min_rule_version": 2,
+      "normalized_name": "deputy of acquittals",
+      "oracle_hash": "8658050003924c8990794806bcf34c88",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Exosuit Savior",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:692686d146f19ec536fb0704620e44cd",
+      "min_rule_version": 2,
+      "normalized_name": "exosuit savior",
+      "oracle_hash": "4b1f906a2af79e08338a65d5700bc5cd",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_permanent",
+        "etb_remove_target": "permanent",
+        "keywords": [
+          "flying"
+        ],
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jeskai Barricade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:661b62cfa162aee53b66adff80c17e78",
+      "min_rule_version": 2,
+      "normalized_name": "jeskai barricade",
+      "oracle_hash": "ca71ecc80d1273684e448324fdfd168a",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "defender"
+        ],
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mischievous Pup",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d59845fceced1b041f0de871f39d129",
+      "min_rule_version": 2,
+      "normalized_name": "mischievous pup",
+      "oracle_hash": "ea8a2a09c160913a1ad518e6b9d3711b",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_permanent",
+        "etb_remove_target": "permanent",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rimekin Recluse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471",
+      "min_rule_version": 2,
+      "normalized_name": "rimekin recluse",
+      "oracle_hash": "79d7243258226d60ebdf5c3170702002",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stickytongue Sentinel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6768ad939d7a940cece11d406c451774",
+      "min_rule_version": 2,
+      "normalized_name": "stickytongue sentinel",
+      "oracle_hash": "4b53aac3ac2fe4a7437abe425ee751f6",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_permanent",
+        "etb_remove_target": "permanent",
+        "keywords": [
+          "reach"
+        ],
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_return_target_to_hand": 6
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg491_self_etb_bounce_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg491_self_etb_bounce_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg491_self_etb_bounce_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg491_self_etb_bounce_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg491_self_etb_bounce_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg491_self_etb_bounce_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T07:54:31+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Deputy of Acquittals"
+      },
+      "card_name": "Deputy of Acquittals",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:493e0ab5c91fdbd60a0fda3532814452",
+      "normalized_name": "deputy of acquittals",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Exosuit Savior"
+      },
+      "card_name": "Exosuit Savior",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:692686d146f19ec536fb0704620e44cd",
+      "normalized_name": "exosuit savior",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_permanent",
+        "etb_remove_target": "permanent",
+        "keywords": [
+          "flying"
+        ],
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Jeskai Barricade"
+      },
+      "card_name": "Jeskai Barricade",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:661b62cfa162aee53b66adff80c17e78",
+      "normalized_name": "jeskai barricade",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "defender"
+        ],
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mischievous Pup"
+      },
+      "card_name": "Mischievous Pup",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d59845fceced1b041f0de871f39d129",
+      "normalized_name": "mischievous pup",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_permanent",
+        "etb_remove_target": "permanent",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rimekin Recluse"
+      },
+      "card_name": "Rimekin Recluse",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471",
+      "normalized_name": "rimekin recluse",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Stickytongue Sentinel"
+      },
+      "card_name": "Stickytongue Sentinel",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6768ad939d7a940cece11d406c451774",
+      "normalized_name": "stickytongue sentinel",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "etb_remove_effect": "remove_permanent",
+        "etb_remove_target": "permanent",
+        "keywords": [
+          "reach"
+        ],
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "controller_scope": "self",
+          "exclude_source": true
+        },
+        "target_controller": "self",
+        "trigger": "enters_battlefield",
+        "up_to_count": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Deputy of Acquittals",
+    "Exosuit Savior",
+    "Jeskai Barricade",
+    "Mischievous Pup",
+    "Rimekin Recluse",
+    "Stickytongue Sentinel"
+  ],
+  "selected_count": 6,
+  "slug": "self_etb_bounce_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Deputy of Acquittals",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:493e0ab5c91fdbd60a0fda3532814452",
+      "min_rule_version": 2,
+      "normalized_name": "deputy of acquittals",
+      "oracle_hash": "8658050003924c8990794806bcf34c88",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Exosuit Savior",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:692686d146f19ec536fb0704620e44cd",
+      "min_rule_version": 2,
+      "normalized_name": "exosuit savior",
+      "oracle_hash": "4b1f906a2af79e08338a65d5700bc5cd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jeskai Barricade",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:661b62cfa162aee53b66adff80c17e78",
+      "min_rule_version": 2,
+      "normalized_name": "jeskai barricade",
+      "oracle_hash": "ca71ecc80d1273684e448324fdfd168a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mischievous Pup",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7d59845fceced1b041f0de871f39d129",
+      "min_rule_version": 2,
+      "normalized_name": "mischievous pup",
+      "oracle_hash": "ea8a2a09c160913a1ad518e6b9d3711b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rimekin Recluse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471",
+      "min_rule_version": 2,
+      "normalized_name": "rimekin recluse",
+      "oracle_hash": "79d7243258226d60ebdf5c3170702002",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stickytongue Sentinel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6768ad939d7a940cece11d406c451774",
+      "min_rule_version": 2,
+      "normalized_name": "stickytongue sentinel",
+      "oracle_hash": "4b53aac3ac2fe4a7437abe425ee751f6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

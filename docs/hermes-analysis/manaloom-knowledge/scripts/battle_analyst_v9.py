@@ -12454,9 +12454,14 @@ def prepare_declared_removal_targets(player, opponents, card, effect_data):
     except Exception:
         max_targets = 1
     max_targets = max(1, max_targets)
-    for opponent in prioritize_evaluation_target_opponents(player, opponents):
+    target_controller_scope = str((effect_data or {}).get("target_controller") or "opponent").lower()
+    if target_controller_scope in {"self", "you", "controller", "controlled"}:
+        target_controllers = [player]
+    else:
+        target_controllers = prioritize_evaluation_target_opponents(player, opponents)
+    for target_controller in target_controllers:
         candidates = removal_target_candidates(
-            opponent,
+            target_controller,
             effect_data,
             controller=player,
             source=card,
@@ -12471,13 +12476,13 @@ def prepare_declared_removal_targets(player, opponents, card, effect_data):
                 card,
                 target,
                 player,
-                target_controller=opponent,
+                target_controller=target_controller,
                 target_type=target_type,
             )
             declared_targets.append(
                 {
                     "target": target,
-                    "controller": opponent,
+                    "controller": target_controller,
                     "target_type": target_type,
                     "declared_by": player,
                 }
@@ -19054,6 +19059,8 @@ def removal_target_candidates(player, effect_data=None, *, controller=None, sour
     candidates = []
     for card in player.battlefield:
         if not isinstance(card, dict):
+            continue
+        if _target_constraints_dict(effect_data).get("exclude_source") and source is card:
             continue
         targeting_source = target_constraint_source(source, effect_data)
         if (

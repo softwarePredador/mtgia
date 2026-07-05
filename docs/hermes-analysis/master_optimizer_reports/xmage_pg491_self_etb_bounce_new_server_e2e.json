@@ -1,0 +1,266 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T07:55:49.955699+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg491_self_etb_bounce_new_server_manifest.json",
+  "package_id": "xmage_pg491_self_etb_bounce_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Deputy of Acquittals",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:493e0ab5c91fdbd60a0fda3532814452",
+          "oracle_hash": "8658050003924c8990794806bcf34c88",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Exosuit Savior",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:692686d146f19ec536fb0704620e44cd",
+          "oracle_hash": "4b1f906a2af79e08338a65d5700bc5cd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Jeskai Barricade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:661b62cfa162aee53b66adff80c17e78",
+          "oracle_hash": "ca71ecc80d1273684e448324fdfd168a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Mischievous Pup",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d59845fceced1b041f0de871f39d129",
+          "oracle_hash": "ea8a2a09c160913a1ad518e6b9d3711b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Rimekin Recluse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471",
+          "oracle_hash": "79d7243258226d60ebdf5c3170702002",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Stickytongue Sentinel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6768ad939d7a940cece11d406c451774",
+          "oracle_hash": "4b53aac3ac2fe4a7437abe425ee751f6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Deputy of Acquittals",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:493e0ab5c91fdbd60a0fda3532814452",
+          "oracle_hash": "8658050003924c8990794806bcf34c88",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Exosuit Savior",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:692686d146f19ec536fb0704620e44cd",
+          "oracle_hash": "4b1f906a2af79e08338a65d5700bc5cd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Jeskai Barricade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:661b62cfa162aee53b66adff80c17e78",
+          "oracle_hash": "ca71ecc80d1273684e448324fdfd168a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Mischievous Pup",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7d59845fceced1b041f0de871f39d129",
+          "oracle_hash": "ea8a2a09c160913a1ad518e6b9d3711b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Rimekin Recluse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471",
+          "oracle_hash": "79d7243258226d60ebdf5c3170702002",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "card_name": "Stickytongue Sentinel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6768ad939d7a940cece11d406c451774",
+          "oracle_hash": "4b53aac3ac2fe4a7437abe425ee751f6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deputy of Acquittals",
+          "logical_rule_key": "battle_rule_v1:493e0ab5c91fdbd60a0fda3532814452"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Exosuit Savior",
+          "logical_rule_key": "battle_rule_v1:692686d146f19ec536fb0704620e44cd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jeskai Barricade",
+          "logical_rule_key": "battle_rule_v1:661b62cfa162aee53b66adff80c17e78"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mischievous Pup",
+          "logical_rule_key": "battle_rule_v1:7d59845fceced1b041f0de871f39d129"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rimekin Recluse",
+          "logical_rule_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Stickytongue Sentinel",
+          "logical_rule_key": "battle_rule_v1:6768ad939d7a940cece11d406c451774"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Deputy of Acquittals",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:493e0ab5c91fdbd60a0fda3532814452"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Exosuit Savior",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:692686d146f19ec536fb0704620e44cd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jeskai Barricade",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:661b62cfa162aee53b66adff80c17e78"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mischievous Pup",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7d59845fceced1b041f0de871f39d129"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rimekin Recluse",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Stickytongue Sentinel",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6768ad939d7a940cece11d406c451774"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

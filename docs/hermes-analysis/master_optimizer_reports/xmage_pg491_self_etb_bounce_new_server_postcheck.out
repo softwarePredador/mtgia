@@ -1,0 +1,9 @@
+       card_name       |    normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-----------------------+-----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Deputy of Acquittals  | deputy of acquittals  | battle_rule_v1:493e0ab5c91fdbd60a0fda3532814452 |                  1 |                           1 |                         1 |           0
+ Exosuit Savior        | exosuit savior        | battle_rule_v1:692686d146f19ec536fb0704620e44cd |                  1 |                           1 |                         1 |           0
+ Jeskai Barricade      | jeskai barricade      | battle_rule_v1:661b62cfa162aee53b66adff80c17e78 |                  1 |                           1 |                         1 |           0
+ Mischievous Pup       | mischievous pup       | battle_rule_v1:7d59845fceced1b041f0de871f39d129 |                  1 |                           1 |                         1 |           0
+ Rimekin Recluse       | rimekin recluse       | battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471 |                  1 |                           1 |                         1 |           0
+ Stickytongue Sentinel | stickytongue sentinel | battle_rule_v1:6768ad939d7a940cece11d406c451774 |                  1 |                           1 |                         1 |           0
+(6 rows)

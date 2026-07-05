@@ -22835,6 +22835,41 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "1d870a3923afa50684ad395def0ac1b7"
   },
+  "Deputy of Acquittals": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_optional": true,
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "exclude_source": true,
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller_scope": "self",
+      "exclude_source": true
+    },
+    "target_controller": "self",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:493e0ab5c91fdbd60a0fda3532814452",
+    "battle_rule_oracle_hash": "8658050003924c8990794806bcf34c88"
+  },
   "Deranged Whelp": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -30169,6 +30204,42 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1",
     "battle_rule_oracle_hash": "76f53944b3d17a8a5820ee2a6f5edc32"
+  },
+  "Exosuit Savior": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "permanent",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "permanent",
+    "exclude_source": true,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ],
+      "controller_scope": "self",
+      "exclude_source": true
+    },
+    "target_controller": "self",
+    "target_count": 1,
+    "trigger": "enters_battlefield",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:692686d146f19ec536fb0704620e44cd",
+    "battle_rule_oracle_hash": "4b1f906a2af79e08338a65d5700bc5cd"
   },
   "Exotic Orchard": {
     "ability_kind": "activated",
@@ -49215,6 +49286,43 @@
     "battle_rule_logical_key": "battle_rule_v1:87d0cd4c67b1a35e64e7801c1efc57e6",
     "battle_rule_oracle_hash": "b47b6f42efd194958cc14355634e62a5"
   },
+  "Jeskai Barricade": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "defender": true,
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_optional": true,
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "exclude_source": true,
+    "flash": true,
+    "keywords": [
+      "flash",
+      "defender"
+    ],
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller_scope": "self",
+      "exclude_source": true
+    },
+    "target_controller": "self",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:661b62cfa162aee53b66adff80c17e78",
+    "battle_rule_oracle_hash": "ca71ecc80d1273684e448324fdfd168a"
+  },
   "Jetmir's Garden": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -58485,6 +58593,42 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3c9a71293fcab9fdbd66cd5099141f41",
     "battle_rule_oracle_hash": "dff145f1eaaa76d6f9e44e688bb29726"
+  },
+  "Mischievous Pup": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "permanent",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "permanent",
+    "exclude_source": true,
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ],
+      "controller_scope": "self",
+      "exclude_source": true
+    },
+    "target_controller": "self",
+    "target_count": 1,
+    "trigger": "enters_battlefield",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7d59845fceced1b041f0de871f39d129",
+    "battle_rule_oracle_hash": "ea8a2a09c160913a1ad518e6b9d3711b"
   },
   "Misdirection": {
     "effect": "redirect_removal",
@@ -75814,6 +75958,36 @@
     "battle_rule_logical_key": "battle_rule_v1:7bb31532956d7658387aa79047990b07",
     "battle_rule_oracle_hash": "efa3de01048e0b5a07672b743e5323e4"
   },
+  "Rimekin Recluse": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "exclude_source": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "target_count": 1,
+    "trigger": "enters_battlefield",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2f1ca7f8841212e091a523ec4c6d1471",
+    "battle_rule_oracle_hash": "79d7243258226d60ebdf5c3170702002"
+  },
   "Rimewood Falls": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -89994,6 +90168,42 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eadf67fc1cb7f3af1815c990dcc877ef",
     "battle_rule_oracle_hash": "66bd94130c3b840b17efe71562caaa52"
+  },
+  "Stickytongue Sentinel": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_bounce_target": "permanent",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "permanent",
+    "exclude_source": true,
+    "keywords": [
+      "reach"
+    ],
+    "reach": true,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ],
+      "controller_scope": "self",
+      "exclude_source": true
+    },
+    "target_controller": "self",
+    "target_count": 1,
+    "trigger": "enters_battlefield",
+    "up_to_count": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6768ad939d7a940cece11d406c451774",
+    "battle_rule_oracle_hash": "4b53aac3ac2fe4a7437abe425ee751f6"
   },
   "Stinging Barrier": {
     "_activated_rule_effects": [

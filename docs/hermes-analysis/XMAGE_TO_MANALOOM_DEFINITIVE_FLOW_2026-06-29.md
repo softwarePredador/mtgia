@@ -11942,6 +11942,65 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG491 Self/Other ETB Bounce Closure
+
+- PG491 extends the PG490 creature ETB bounce scope for `other target` and
+  `another target` cases, including self-controller rescue text such as
+  "another target creature you control" and "other target permanent you
+  control". The executable scope remains
+  `xmage_creature_etb_return_target_to_hand_v1`.
+- The mapper now accepts `TargetControlledPermanent`,
+  `FilterControlledPermanent`, and XMage's
+  `FILTER_ANOTHER_TARGET_CREATURE*` filters when Oracle/source agreement proves
+  one `ReturnToHandTargetEffect` on `EntersBattlefieldTriggeredAbility`. It
+  still blocks self-bounce unless the Oracle text excludes the source with
+  `other` or `another`.
+- The battle runtime now respects `target_controller=self` when declaring
+  removal-style ETB targets and enforces `exclude_source` against the actual
+  source object before the target-constraint copy is built. This keeps the ETB
+  source on the battlefield while allowing a legal owned permanent to move to
+  hand.
+- The batch covers `6` cards: Deputy of Acquittals, Exosuit Savior, Jeskai
+  Barricade, Mischievous Pup, Rimekin Recluse, and Stickytongue Sentinel. The
+  complete list lives in
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg491_self_etb_bounce_new_server_manifest.json`
+  under `selected_card_names`.
+- Focused validation passed `772` parser/runtime/package-builder tests,
+  `py_compile` passed for the touched parser/runtime/test files, the focused
+  PG490/PG491 ETB-bounce runtime tests passed, and the full
+  `test_battle_analyst_v10_3.py` suite passed with the live PostgreSQL
+  environment loaded.
+- PostgreSQL package PG491 applied against `143.198.230.247:5433/halder` and
+  promoted `6/6` selected cards as verified/auto rule-version `2` rows with
+  matching Oracle hashes. The apply upserted `6` rows and deprecated `0`
+  shadow rows.
+- Hermes metadata sync matched `5910` PostgreSQL cards, wrote `5821` SQLite
+  cache aliases, updated `76` deck-card ids, and left the known
+  `unresolved=1` residual unchanged. The targeted battle-rule sync loaded `6`
+  PostgreSQL rows, wrote `6` SQLite rows, exported `4720` canonical fallback
+  rows, and refreshed the tracked default canonical snapshot.
+- Generic E2E validation passed across PostgreSQL, SQLite
+  `battle_card_rules`, the default canonical snapshot, and runtime
+  `get_card_effect` for all `6` selected cards. The manifest does not define
+  battle-execution scenarios for this generic family, so scenario execution
+  remains `0`; concrete self-target/exclude-source behavior is covered by the
+  focused PG491 runtime test.
+- Final governance audits passed: XMage strategy (`26/26`), operational
+  surface (`39/39`), deckbuilding contract surface, legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26137`, `xmage_authoritative_source_count=25823`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25823`. This is an exact
+  reduction of `6` from the post-PG490 queue. The bounce work unit fell from
+  `245` before PG491 to `239` after PG491, and the post-PG491 exact split
+  recheck reports `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+- Post-sync global readiness is now `34331` known cards, `4813`
+  `battle_and_oracle_ready`, `29060` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

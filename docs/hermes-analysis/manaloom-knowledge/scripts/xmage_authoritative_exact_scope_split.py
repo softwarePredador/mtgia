@@ -1435,11 +1435,17 @@ def source_matches_bounce_target(source: str, target: str) -> bool:
             or "FILTER_PERMANENT_CREATURE" in text
             or "FILTER_OPPONENTS_PERMANENT_CREATURE" in text
             or "FILTER_ANOTHER_CREATURE" in text
+            or "FILTER_ANOTHER_TARGET_CREATURE" in text
         )
     if target == "nonland_permanent":
         return "TargetNonlandPermanent" in text or "FilterNonlandPermanent" in text or "nonland permanent" in text
     if target == "permanent":
-        return "TargetPermanent" in text or "FilterPermanent" in text
+        return (
+            "TargetPermanent" in text
+            or "TargetControlledPermanent" in text
+            or "FilterPermanent" in text
+            or "FilterControlledPermanent" in text
+        )
     if target == "artifact":
         return "TargetArtifactPermanent" in text or "FilterArtifactPermanent" in text or "artifact" in text
     if target == "enchantment":
@@ -1502,8 +1508,8 @@ def etb_bounce_source_supported(source: str, oracle_spec: dict[str, Any]) -> str
         return "etb_bounce_source_multi_target_not_supported"
     if ".withInterveningIf" in text or "InterveningIf" in text:
         return "etb_bounce_source_condition_not_supported"
-    if oracle_spec.get("target_controller") == "self":
-        return "etb_bounce_target_controller_not_supported"
+    if oracle_spec.get("target_controller") == "self" and not oracle_spec.get("exclude_source"):
+        return "etb_bounce_self_without_exclude_source_not_supported"
     target = str(oracle_spec.get("target") or "")
     if not source_matches_bounce_target(text, target):
         return "etb_bounce_source_target_not_supported"
@@ -1514,6 +1520,13 @@ def etb_bounce_source_supported(source: str, oracle_spec: dict[str, Any]) -> str
         or "FILTER_OPPONENTS_PERMANENT_CREATURE" in text
         or "TargetController.OPPONENT" in text
         or "opponent controls" in text
+    ):
+        return "etb_bounce_source_controller_mismatch"
+    if oracle_spec.get("target_controller") == "self" and not (
+        "TargetControlledPermanent" in text
+        or "FilterControlledPermanent" in text
+        or "FILTER_ANOTHER_TARGET_CREATURE_YOU_CONTROL" in text
+        or "you control" in text
     ):
         return "etb_bounce_source_controller_mismatch"
     return None
@@ -15554,8 +15567,8 @@ def split_row(
             return None, source_blocker
         target_type = str(oracle_bounce["target"])
         target_constraints = target_constraints_for(target_type)
-        if oracle_bounce.get("target_controller") == "opponent":
-            target_constraints["controller_scope"] = "opponent"
+        if oracle_bounce.get("target_controller") in {"opponent", "self"}:
+            target_constraints["controller_scope"] = oracle_bounce["target_controller"]
         if oracle_bounce.get("exclude_source"):
             target_constraints["exclude_source"] = True
         keyword_list = ordered_keywords(keywords_from_ability_classes(row))

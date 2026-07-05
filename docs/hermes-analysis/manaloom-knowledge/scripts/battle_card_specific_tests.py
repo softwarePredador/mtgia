@@ -7893,6 +7893,87 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg491_self_etb_bounce_respects_controller_and_exclude_source():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Deputy of Acquittals",
+                "type_line": "Creature - Human Wizard",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            own_target = {
+                "name": "Wall of Omens",
+                "type_line": "Creature - Wall",
+                "effect": "draw_engine",
+                "power": 0,
+                "toughness": 4,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            opponent_target = {
+                "name": "Opponent Engine",
+                "type_line": "Creature - Wizard",
+                "effect": "draw_engine",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            active.battlefield = [source, own_target]
+            opponent.battlefield = [opponent_target]
+            effect_data = {
+                **source,
+                "battle_model_scope": "xmage_creature_etb_return_target_to_hand_v1",
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "etb_remove_effect": "remove_creature",
+                "etb_remove_target": "creature",
+                "target": "creature",
+                "target_controller": "self",
+                "target_constraints": {
+                    "card_types": ["creature"],
+                    "controller_scope": "self",
+                    "exclude_source": True,
+                },
+                "destination": "hand",
+                "_rule_logical_key": "battle_rule_v1:pg491-self-etb-bounce-test",
+                "_rule_oracle_hash": "pg491-self-etb-bounce-test-hash",
+            }
+
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                effect_data,
+                9,
+                random.Random(491),
+                all_players=[active, opponent],
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert source in active.battlefield
+        assert own_target not in active.battlefield
+        assert own_target in active.hand
+        assert opponent_target in opponent.battlefield
+        assert opponent_target not in opponent.hand
+        assert any(
+            event == "etb_removal_resolved"
+            and data.get("card") == "Deputy of Acquittals"
+            and data.get("target_controller") == "Active"
+            and data.get("target") == "Wall of Omens"
+            and data.get("rule_logical_key") == "battle_rule_v1:pg491-self-etb-bounce-test"
+            for event, data in events
+        )
+
     def test_pg086_removal_targets_filter_nontoken_and_mana_value_max():
         active = player("Active")
         opponent = player("Opponent")
@@ -22326,6 +22407,7 @@ def register_tests(battle, player):
         test_pg488_counter_target_filters_color_mana_value_and_alternative_spell_types,
         test_pg489_destroy_target_extended_static_target_filters_runtime,
         test_pg490_creature_etb_bounce_returns_opponent_creature_to_hand,
+        test_pg491_self_etb_bounce_respects_controller_and_exclude_source,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
         test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,
