@@ -434,3 +434,39 @@ Current conclusion remains unchanged: protected deck `607` is still the
 Lorehold champion. The next valid step is
 `prepare_reviewed_sqlite_identity_cache_apply_package_without_deck_mutation`;
 identity readiness is not deck-promotion evidence.
+
+## External Identity Cache Apply Package - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_apply_sqlite.sql`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_rollback_sqlite.sql`
+
+It prepares a reviewed SQLite cache package for the seven Scryfall-resolved
+external identities. The package was generated but not executed.
+
+Current result:
+
+- status: `external_identity_cache_apply_package_prepared_not_applied_keep_607`;
+- cache-insert ready rows: `7`;
+- SQLite apply executed: `false`;
+- deck-test ready: `0`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`.
+
+Safety notes:
+
+- The apply SQL inserts only into `card_oracle_cache`.
+- It does not alter `deck_cards`, `battle_card_rules`, or PostgreSQL.
+- It uses plain `INSERT`, not `ON CONFLICT DO UPDATE`; if any target identity
+  already exists, the apply should fail rather than overwrite local cache data.
+- The rollback deletes only rows with source marker
+  `lorehold_external_identity_resolution_queue_20260705_current`.
+
+Current conclusion remains unchanged: protected deck `607` is still the
+Lorehold champion. Applying identity cache rows, if later approved, is a data
+readiness step only; it does not prove any deck change.

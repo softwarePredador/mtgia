@@ -1,0 +1,97 @@
+{
+  "generated_at": "2026-07-05T01:45:52Z",
+  "artifact_type": "lorehold_external_identity_cache_apply_package",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "deck_607_mutated": false,
+  "sqlite_apply_executed": false,
+  "source_reports": {
+    "identity_resolution_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_resolution_queue_20260705_current.json"
+  },
+  "sql_files": {
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_precheck.sql",
+    "apply": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_apply_sqlite.sql",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_postcheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_rollback_sqlite.sql"
+  },
+  "status": "external_identity_cache_apply_package_prepared_not_applied_keep_607",
+  "summary": {
+    "current_baseline": "deck_607",
+    "cache_insert_ready_count": 7,
+    "sqlite_apply_executed": false,
+    "deck_test_ready_count": 0,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "recommended_next_action": "review_and_apply_sqlite_identity_cache_package_only_if_cache_update_is_approved"
+  },
+  "package_rows": [
+    {
+      "card_name": "Anointed Procession",
+      "post_import_status": "identity_ready_then_shell_contract_required",
+      "scryfall_id": "9a52c265-6920-4929-ba0a-70da08df01f1",
+      "oracle_id": "7246d45b-2185-4cdd-981b-5419b7d52bce",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true
+    },
+    {
+      "card_name": "Brain in a Jar",
+      "post_import_status": "identity_ready_then_runtime_or_cut_safety_required",
+      "scryfall_id": "88ecfcbe-e8db-4f08-aa8b-5b7b3e6c6ce7",
+      "oracle_id": "321dbd10-1d48-49fc-ba6a-1df241a53338",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true
+    },
+    {
+      "card_name": "Entreat the Angels",
+      "post_import_status": "identity_ready_then_runtime_or_cut_safety_required",
+      "scryfall_id": "ff4411bc-ed4e-4d54-9e1b-21fc77b0e415",
+      "oracle_id": "b349f018-c20b-48b0-9e65-d5fd56b24b88",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true
+    },
+    {
+      "card_name": "Haze of Rage",
+      "post_import_status": "identity_ready_then_combo_runtime_and_cut_safety_required",
+      "scryfall_id": "c344b885-68c6-43d2-b6c1-6c89b3c94983",
+      "oracle_id": "f17d0fb8-c157-43b8-be26-f5ba4c6aed14",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true
+    },
+    {
+      "card_name": "Late to Dinner",
+      "post_import_status": "identity_ready_then_shell_contract_required",
+      "scryfall_id": "6633cab9-23f9-474e-96f1-ca7c0c67691c",
+      "oracle_id": "31bf199b-dfb1-428e-96a5-eb25104e2b43",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true
+    },
+    {
+      "card_name": "Miraculous Recovery",
+      "post_import_status": "identity_ready_then_shell_contract_required",
+      "scryfall_id": "2b3459d9-a667-4cee-9b39-844013576d0b",
+      "oracle_id": "cea73a4b-e10a-4517-a92b-24a08321009f",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true
+    },
+    {
+      "card_name": "Strata Scythe",
+      "post_import_status": "identity_ready_then_shell_contract_required",
+      "scryfall_id": "4d623951-3896-494d-bcc5-6caf3cc74bc6",
+      "oracle_id": "a500b724-bf28-47a3-b434-6efdebbcc04c",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true
+    }
+  ],
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "next_actions": [
+      "do_not_mutate_or_replace_deck_607",
+      "review SQL precheck/apply/rollback before any SQLite cache update",
+      "if applied, run postcheck and rerun identity/import preflight",
+      "do not route shell-contract cards into one-for-one 607 swap gates"
+    ],
+    "reason": "The package is ready for human/apply review, but it has not been executed. Identity cache readiness is not deck-quality or battle promotion evidence."
+  }
+}
