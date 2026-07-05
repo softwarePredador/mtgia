@@ -559,6 +559,67 @@ RESEARCH_PLANS = {
     },
 }
 
+DRC_EXTERNAL_SOURCE_URLS = [
+    "https://edhrec.com/commanders/lorehold-the-historian",
+    "https://edhrec.com/commanders/lorehold-the-historian/core/spellslinger",
+    "https://scryfall.com/card/mh2/121/dragons-rage-channeler",
+]
+
+DRC_EXPLORATORY_CUTS = {
+    "drc_hexing_squelcher_v1": {
+        "removed": "Hexing Squelcher",
+        "lane": "topdeck-removal spell slot",
+    },
+    "drc_call_forth_the_tempest_v1": {
+        "removed": "Call Forth the Tempest",
+        "lane": "topdeck big-spell slot",
+    },
+    "drc_everything_comes_to_dust_v1": {
+        "removed": "Everything Comes to Dust",
+        "lane": "board-wipe removal slot",
+    },
+    "drc_blasphemous_act_v1": {
+        "removed": "Blasphemous Act",
+        "lane": "board-wipe removal slot",
+    },
+    "drc_farewell_v1": {
+        "removed": "Farewell",
+        "lane": "board-wipe exile slot",
+    },
+    "drc_starfall_invocation_v1": {
+        "removed": "Starfall Invocation",
+        "lane": "board-wipe miracle slot",
+    },
+}
+
+for drc_plan_key, drc_cut in DRC_EXPLORATORY_CUTS.items():
+    removed_card = str(drc_cut["removed"])
+    lane = str(drc_cut["lane"])
+    RESEARCH_PLANS[drc_plan_key] = {
+        "base_deck_id": 607,
+        "candidate_deck_id": 607,
+        "candidate_key": f"candidate_607_{drc_plan_key}",
+        "candidate_name": f"Lorehold 607 + Dragon's Rage Channeler over {removed_card} v1",
+        "candidate_archetype": "607-drc-exploratory-topdeck-access",
+        "added": [{"card_name": "Dragon's Rage Channeler", "source_deck_id": 609}],
+        "removed": [removed_card],
+        "promotion_status": "exploratory_equal_gate_only_not_promotable_from_structure",
+        "source_evidence_urls": DRC_EXTERNAL_SOURCE_URLS,
+        "intent": (
+            "Test Dragon's Rage Channeler as an external topdeck/access signal "
+            f"against the current 607 {lane}. This is deliberately exploratory: "
+            "the previous safe-cut model did not approve any DRC cut, so even a "
+            "positive battle result must be followed by card-event and trace "
+            "review before promotion."
+        ),
+        "external_signals": [
+            "EDHREC currently shows Dragon's Rage Channeler as a real Lorehold signal, not generic Boros filler.",
+            "Scryfall current card data confirms Dragon's Rage Channeler is red identity and legal in Commander.",
+            f"The cut target {removed_card} is one of the current same-neighborhood DRC probe slots, but it remains hard-blocked for automatic promotion until equal-gate and event-trace evidence both improve.",
+            "This candidate must preserve the protected 607 baseline by running only in an isolated SQLite copy.",
+        ],
+    }
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -772,6 +833,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- commander_intent_score: `{report['commander_intent_alignment']['score']}`",
         "- postgres_writes: `false`",
         "- source_db_mutated: `false`",
+        f"- promotion_status: `{report.get('promotion_status', 'candidate_requires_equal_gate')}`",
         "",
         "## Intent",
         "",
@@ -782,6 +844,10 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     ]
     for signal in report.get("external_signals") or []:
         lines.append(f"- {signal}")
+    if report.get("source_evidence_urls"):
+        lines.extend(["", "## Source Evidence", ""])
+        for url in report.get("source_evidence_urls") or []:
+            lines.append(f"- {url}")
     lines.extend(["", "## Swaps", "", "| In | Out |", "| --- | --- |"])
     added_names = [str(item["card_name"]) for item in report["added"]]
     for add, remove in zip(added_names, report["removed"]):
@@ -853,6 +919,8 @@ def main() -> int:
         "plan": args.plan,
         "intent": plan["intent"],
         "external_signals": plan["external_signals"],
+        "promotion_status": plan.get("promotion_status", "candidate_requires_equal_gate"),
+        "source_evidence_urls": list(plan.get("source_evidence_urls") or []),
         **metadata,
         **summarize_cards(rows),
     }

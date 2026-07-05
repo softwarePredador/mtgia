@@ -306,6 +306,46 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
             }.intersection(plan["removed"])
         )
 
+    def test_drc_exploratory_plans_are_isolated_non_promotable_probes(self):
+        expected_cuts = {
+            "drc_hexing_squelcher_v1": "Hexing Squelcher",
+            "drc_call_forth_the_tempest_v1": "Call Forth the Tempest",
+            "drc_everything_comes_to_dust_v1": "Everything Comes to Dust",
+            "drc_blasphemous_act_v1": "Blasphemous Act",
+            "drc_farewell_v1": "Farewell",
+            "drc_starfall_invocation_v1": "Starfall Invocation",
+        }
+        protected_cards = {
+            "Bender's Waterskin",
+            "Victory Chimes",
+            "Molecule Man",
+            "The Scarlet Witch",
+            "The Mind Stone",
+            "Insurrection",
+            "Storm Herd",
+            "Creative Technique",
+            "Tibalt's Trickery",
+            "Stroke of Midnight",
+            "Generous Gift",
+            "Path to Exile",
+            "Swords to Plowshares",
+            "Winds of Abandon",
+            "High Noon",
+        }
+        for plan_key, cut_card in expected_cuts.items():
+            with self.subTest(plan_key=plan_key):
+                plan = research.RESEARCH_PLANS[plan_key]
+                self.assertEqual(plan["base_deck_id"], 607)
+                self.assertEqual(plan["candidate_deck_id"], 607)
+                self.assertEqual(plan["added"], [{"card_name": "Dragon's Rage Channeler", "source_deck_id": 609}])
+                self.assertEqual(plan["removed"], [cut_card])
+                self.assertEqual(
+                    plan["promotion_status"],
+                    "exploratory_equal_gate_only_not_promotable_from_structure",
+                )
+                self.assertIn("https://scryfall.com/card/mh2/121/dragons-rage-channeler", plan["source_evidence_urls"])
+                self.assertFalse(protected_cards.intersection(plan["removed"]))
+
     def test_render_markdown_includes_final_decklist_sections(self):
         report = {
             "plan": "test",
@@ -317,6 +357,8 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
             "commander_intent_alignment": {"score": 100},
             "intent": "intent",
             "external_signals": [],
+            "promotion_status": "test_status",
+            "source_evidence_urls": ["https://example.test/source"],
             "added": [{"card_name": "Mana Vault"}],
             "removed": ["Bender's Waterskin"],
             "row_count": 3,
@@ -334,6 +376,8 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
         markdown = research.render_markdown(report)
 
         self.assertIn("## Final Decklist", markdown)
+        self.assertIn("promotion_status: `test_status`", markdown)
+        self.assertIn("https://example.test/source", markdown)
         self.assertIn("### Commander", markdown)
         self.assertIn("1 Lorehold, the Historian", markdown)
         self.assertIn("### Nonlands", markdown)
