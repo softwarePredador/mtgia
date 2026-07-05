@@ -9468,6 +9468,76 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_gain_life_scope_is_stack_response_and_gains_life_on_counter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player("Responder", None, [])
+        responder.life = 12
+        responder.mana_pool.add_generic(1)
+        responder.mana_pool.add("white", 1)
+        responder.mana_pool.add("blue", 2)
+        counter = {
+            "name": "Fixture Absorb",
+            "type_line": "Instant",
+            "mana_cost": "{W}{U}{U}",
+            "cmc": 3,
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_and_controller_gain_life_spell_v1",
+            "target": "spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell"},
+            "life_gain_on_counter": 3,
+            "_composite_rule_components": [
+                {
+                    "effect": "counter",
+                    "battle_model_scope": "xmage_counter_target_spell_v1",
+                    "target": "spell",
+                    "target_constraints": {"zone": "stack", "stack_object": "spell"},
+                },
+                {
+                    "effect": "life_total_change",
+                    "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+                    "life_gain_amount": 3,
+                    "target": "self",
+                    "compose_on_resolution": True,
+                },
+            ],
+            "instant": True,
+        }
+        responder.hand.append(counter)
+        target_spell = {
+            "name": "Target Threat",
+            "type_line": "Creature - Dragon",
+            "cmc": 7,
+            "effect": "finisher",
+        }
+        stack = self.battle.Stack()
+        stack.push(target_spell, active, {"effect": "finisher"})
+
+        self.assertTrue(
+            self.battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                turn=8,
+                rng=random.Random(8),
+                phase="precombat_main",
+            )
+        )
+
+        self.assertTrue(stack.items[-1].countered)
+        self.assertEqual(responder.life, 15)
+        self.assertEqual([card["name"] for card in responder.graveyard], ["Fixture Absorb"])
+        self.assertTrue(
+            any(
+                event == "spell_countered"
+                and data.get("counter") == "Fixture Absorb"
+                and data.get("target") == "Target Threat"
+                and data.get("life_gain_on_counter") == 3
+                and data.get("life_gained") == 3
+                and data.get("life_after") == 15
+                for event, data in self.events
+            )
+        )
+
     def test_return_target_creature_to_owner_hand_moves_from_battlefield_to_hand(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

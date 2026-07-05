@@ -8687,6 +8687,54 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ["counter", "draw_cards"],
         )
 
+    def test_counter_gain_life_spell_maps_to_counter_runtime_with_life_gain(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["CounterTargetEffect", "GainLifeEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target spell. You gain 3 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(3));"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "spell")
+        self.assertEqual(effect["life_gain_on_counter"], 3)
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "stack", "stack_object": "spell"},
+        )
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["counter", "life_total_change"],
+        )
+
+    def test_counter_gain_life_spell_blocks_dynamic_life_gain(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["CounterTargetEffect", "GainLifeEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target spell. You gain 3 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(TargetManaValue.instance));"
+                "this.getSpellAbility().addTarget(new TargetSpell());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "counter_life_gain_source_not_fixed")
+
     def test_counter_draw_spell_with_activated_ability_target_stays_blocked(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

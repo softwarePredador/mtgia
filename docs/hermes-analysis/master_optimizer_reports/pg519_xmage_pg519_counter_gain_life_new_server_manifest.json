@@ -1,0 +1,213 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg519_counter_gain_life_new_server_20260705_172315",
+  "deploy_id": "xmage_pg519_counter_gain_life_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Absorb",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fbbc536e3a889f0fb71f35f12977444c",
+      "min_rule_version": 2,
+      "normalized_name": "absorb",
+      "oracle_hash": "c089c209f48f8142b1f2e2f6a043a9e5",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+            "compose_on_resolution": true,
+            "effect": "life_total_change",
+            "life_gain_amount": 3,
+            "target": "self",
+            "xmage_effect_class": "GainLifeEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_controller_gain_life_spell_v1",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fall of the Gavel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16ab616ae83f6d4f783c45bd3c994955",
+      "min_rule_version": 2,
+      "normalized_name": "fall of the gavel",
+      "oracle_hash": "4a5ea16da7b4f40d712e0de8d6f23bd0",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+            "compose_on_resolution": true,
+            "effect": "life_total_change",
+            "life_gain_amount": 5,
+            "target": "self",
+            "xmage_effect_class": "GainLifeEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_controller_gain_life_spell_v1",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        }
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_counter_target_gain_life_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg519_xmage_pg519_counter_gain_life_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg519_xmage_pg519_counter_gain_life_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg519_xmage_pg519_counter_gain_life_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg519_xmage_pg519_counter_gain_life_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg519_xmage_pg519_counter_gain_life_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg519_xmage_pg519_counter_gain_life_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T17:23:15+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Absorb"
+      },
+      "card_name": "Absorb",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fbbc536e3a889f0fb71f35f12977444c",
+      "normalized_name": "absorb",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+            "compose_on_resolution": true,
+            "effect": "life_total_change",
+            "life_gain_amount": 3,
+            "target": "self",
+            "xmage_effect_class": "GainLifeEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_controller_gain_life_spell_v1",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Fall of the Gavel"
+      },
+      "card_name": "Fall of the Gavel",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16ab616ae83f6d4f783c45bd3c994955",
+      "normalized_name": "fall of the gavel",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "effect": "counter",
+            "target": "spell",
+            "target_constraints": {
+              "stack_object": "spell",
+              "zone": "stack"
+            },
+            "xmage_effect_class": "CounterTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+            "compose_on_resolution": true,
+            "effect": "life_total_change",
+            "life_gain_amount": 5,
+            "target": "self",
+            "xmage_effect_class": "GainLifeEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_counter_target_and_controller_gain_life_spell_v1",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        }
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Absorb",
+    "Fall of the Gavel"
+  ],
+  "selected_count": 2,
+  "slug": "pg519_counter_gain_life_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Absorb",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fbbc536e3a889f0fb71f35f12977444c",
+      "min_rule_version": 2,
+      "normalized_name": "absorb",
+      "oracle_hash": "c089c209f48f8142b1f2e2f6a043a9e5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fall of the Gavel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16ab616ae83f6d4f783c45bd3c994955",
+      "min_rule_version": 2,
+      "normalized_name": "fall of the gavel",
+      "oracle_hash": "4a5ea16da7b4f40d712e0de8d6f23bd0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_and_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

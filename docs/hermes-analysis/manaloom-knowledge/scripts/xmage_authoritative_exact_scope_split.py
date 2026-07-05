@@ -172,6 +172,7 @@ ETB_FIXED_MANA_CREATURE_SCOPE = "xmage_creature_etb_add_fixed_mana_v1"
 SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_self_sacrifice_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 COUNTER_DRAW_SCOPE = "xmage_counter_target_and_draw_card_spell_v1"
+COUNTER_GAIN_LIFE_SCOPE = "xmage_counter_target_and_controller_gain_life_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_MILL_RETURN_SCOPE = "xmage_mill_then_return_graveyard_card_to_hand_spell_v1"
@@ -2023,6 +2024,35 @@ def counter_draw_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     if not text.endswith(" draw a card."):
         return None
     return counter_target_from_oracle({"oracle_text": text.removesuffix(" draw a card.").strip()})
+
+
+def fixed_counter_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+    text = oracle_text(metadata)
+    match = re.match(r"^(?P<counter>counter target .+?)\. you gain (?P<life>\d+) life\.?$", text)
+    if not match:
+        return None
+    target = counter_target_from_oracle({"oracle_text": match.group("counter")})
+    if target is None:
+        return None
+    return target, int(match.group("life"))
+
+
+def fixed_counter_gain_life_from_source(source_text: str) -> tuple[int, str] | None:
+    text = str(source_text or "")
+    counter_matches = list(re.finditer(r"new\s+CounterTargetEffect\s*\(", text))
+    gain_matches = list(re.finditer(r"new\s+GainLifeEffect\s*\(", text))
+    if len(counter_matches) != 1 or len(gain_matches) != 1:
+        return None
+    if counter_matches[0].start() > gain_matches[0].start():
+        return None
+    life_gain = java_constructor_int(text, "GainLifeEffect")
+    if life_gain is None or life_gain <= 0:
+        return None
+    if "new TargetSpell()" in text:
+        target = "spell"
+    else:
+        return None
+    return life_gain, target
 
 
 def counter_target_constraints_for(target: str) -> dict[str, Any]:
@@ -19337,6 +19367,54 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_fixed_life_gain_draw_card_spell",
+        ), "selected_exact_scope"
+
+    if unit == LIFE_UNIT and classes == {"CounterTargetEffect", "GainLifeEffect"}:
+        if ability_classes(row):
+            return None, "counter_life_gain_ability_class_not_simple"
+        if has_oracle_complexity(metadata):
+            return None, "counter_life_gain_oracle_not_simple"
+        oracle_pair = fixed_counter_gain_life_from_oracle(metadata)
+        if oracle_pair is None:
+            return None, "counter_life_gain_oracle_not_exact_fixed"
+        source_pair = fixed_counter_gain_life_from_source(source_text)
+        if source_pair is None:
+            return None, "counter_life_gain_source_not_fixed"
+        target, life_gain = oracle_pair
+        source_life_gain, source_target = source_pair
+        if life_gain != source_life_gain or target != source_target:
+            return None, "counter_life_gain_source_oracle_mismatch"
+        counter_component = {
+            "effect": "counter",
+            "battle_model_scope": COUNTER_SCOPE,
+            "target": target,
+            "target_constraints": counter_target_constraints_for(target),
+            "xmage_effect_class": "CounterTargetEffect",
+        }
+        life_component = {
+            "effect": "life_total_change",
+            "battle_model_scope": LIFE_SCOPE,
+            "life_gain_amount": life_gain,
+            "target": "self",
+            "compose_on_resolution": True,
+            "xmage_effect_class": "GainLifeEffect",
+        }
+        effect_json = {
+            "effect": "counter",
+            "battle_model_scope": COUNTER_GAIN_LIFE_SCOPE,
+            "target": target,
+            "target_constraints": counter_target_constraints_for(target),
+            "life_gain_on_counter": life_gain,
+            "life_gain_amount": life_gain,
+            "_composite_rule_components": [counter_component, life_component],
+            "xmage_effect_classes": ["CounterTargetEffect", "GainLifeEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_counter_target_gain_life_spell",
         ), "selected_exact_scope"
 
     if unit == LIFE_UNIT:

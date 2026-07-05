@@ -8449,6 +8449,7 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "counter_target_cmc_min",
     "counter_target_mana_value_min",
     "draw_on_counter",
+    "life_gain_on_counter",
     "countered_spell_to_top_library",
     "counter_own_approach_to_top",
     "xmage_effect_class",
@@ -9902,6 +9903,11 @@ class Player:
         draw_count = int(effect.get("draw_on_counter") or 0)
         if draw_count:
             self.draw(draw_count, random.Random(turn or 0))
+        life_gain_on_counter = int(effect.get("life_gain_on_counter") or 0)
+        life_before = int(getattr(self, "life", 0) or 0)
+        if life_gain_on_counter:
+            gain_life(self, life_gain_on_counter, cap=999)
+        life_after = int(getattr(self, "life", life_before) or 0)
         countered_to_top = bool(effect.get("countered_spell_to_top_library"))
         if countered_to_top and isinstance(target_card, dict):
             target_card["_countered_to_top_library"] = True
@@ -9934,6 +9940,10 @@ class Player:
             countered_spell_to_top_library=countered_to_top,
             cost=cost,
             cards_drawn=draw_count,
+            life_gain_on_counter=life_gain_on_counter,
+            life_before=life_before,
+            life_after=life_after,
+            life_gained=max(0, life_after - life_before),
             turn=turn,
             **replay_rule_fields(effect),
         )

@@ -1,0 +1,102 @@
+{
+  "acted": true,
+  "effect": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "compose_on_resolution": true,
+        "effect": "life_total_change",
+        "life_gain_amount": 3,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      }
+    ],
+    "_rule_alternatives": [
+      {
+        "category": "protection",
+        "confidence": 0.96,
+        "effect": "counter",
+        "execution_status": "auto",
+        "logical_rule_key": "battle_rule_v1:fbbc536e3a889f0fb71f35f12977444c",
+        "review_status": "verified",
+        "source": "curated"
+      }
+    ],
+    "_rule_confidence": 0.96,
+    "_rule_execution_status": "auto",
+    "_rule_logical_key": "battle_rule_v1:fbbc536e3a889f0fb71f35f12977444c",
+    "_rule_oracle_hash": "c089c209f48f8142b1f2e2f6a043a9e5",
+    "_rule_review_status": "verified",
+    "_rule_runtime_selection": {
+      "rule_count": 1,
+      "selected_effect": "counter",
+      "selected_logical_rule_key": "battle_rule_v1:fbbc536e3a889f0fb71f35f12977444c",
+      "selected_target": "spell",
+      "selection_mode": "single_selected"
+    },
+    "_rule_source": "curated",
+    "_rule_version": 2,
+    "battle_model_scope": "xmage_counter_target_and_controller_gain_life_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "life_gain_amount": 3,
+    "life_gain_on_counter": 3,
+    "sorcery": false,
+    "target": "spell",
+    "target_constraints": {
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_classes": [
+      "CounterTargetEffect",
+      "GainLifeEffect"
+    ]
+  },
+  "responder_graveyard": [
+    "Absorb"
+  ],
+  "responder_life": 15,
+  "spell_countered_events": [
+    {
+      "cards_drawn": 0,
+      "composite_rule_component_count": 2,
+      "cost": 3,
+      "counter": "Absorb",
+      "countered_spell_to_top_library": false,
+      "life_after": 15,
+      "life_before": 12,
+      "life_gain_on_counter": 3,
+      "life_gained": 3,
+      "phase": "precombat_main",
+      "player": "Responder",
+      "priority_window": "stack_response",
+      "result": "countered",
+      "rule_alternative_count": 1,
+      "rule_confidence": 0.96,
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:fbbc536e3a889f0fb71f35f12977444c",
+      "rule_oracle_hash": "c089c209f48f8142b1f2e2f6a043a9e5",
+      "rule_review_status": "verified",
+      "rule_runtime_selection_mode": "single_selected",
+      "rule_source": "curated",
+      "rule_version": 2,
+      "stack_depth": 1,
+      "stack_object": "Target Finisher",
+      "target": "Target Finisher",
+      "target_controller": "Active",
+      "target_effect": "finisher",
+      "turn": 9
+    }
+  ],
+  "target_countered": true
+}
