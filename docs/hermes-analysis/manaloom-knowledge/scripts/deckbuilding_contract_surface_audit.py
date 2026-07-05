@@ -370,6 +370,10 @@ GLOBAL_COMMANDER_SCOPE1_VALUE_SAFE_CUT_SOURCE_MINER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
+GLOBAL_COMMANDER_SCOPE1_VALUE_SAFE_CUT_SOURCE_MINER_EXTERNAL_POLICY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md"
+)
 GLOBAL_COMMANDER_SCOPE1_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
@@ -718,6 +722,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "external_corpus_cut_policy_blocks_current_hypotheses",
                 "rerun_value_safe_cut_source_miner_with_external_policy_exclusions",
+                "global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md",
+                "external_policy_exclusion_count=8",
+                "broaden_commander_package_axis_or_external_cut_research",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -988,6 +995,10 @@ def build_audit() -> dict[str, Any]:
                 "excluded_from_rerun_miner_count=6",
                 "held_for_negative_review_count=2",
                 "rerun_miner_allowed_card_count=0",
+                "global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md",
+                "value_safe_cut_source_mining_blocks_package_resynthesis",
+                "external_policy_exclusion_count=8",
+                "hypothesis_count=0",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1535,6 +1546,9 @@ def build_audit() -> dict[str, Any]:
                 "collect_usage_trace_for_new_cut_source_hypotheses",
                 "value_safe_reclassification_allowed_now",
                 "candidate_copy_allowed_now",
+                "external-cut-policy-report",
+                "external_policy_exclusions_consumed",
+                "external_corpus_policy:",
                 "protected_profile_role_",
             ],
         )
@@ -1548,6 +1562,8 @@ def build_audit() -> dict[str, Any]:
                 "Off Profile Relic",
                 "value_safe_cut_source_hypotheses_ready_for_trace",
                 "collect_usage_trace_for_new_cut_source_hypotheses",
+                "test_external_policy_exclusion_blocks_reusing_fresh_hypothesis",
+                "external_corpus_policy:exclude_from_rerun_miner_until_new_internal_evidence",
             ],
         )
     )
@@ -2510,6 +2526,23 @@ def build_audit() -> dict[str, Any]:
                 "Sigarda's Aid",
                 "Necromancy",
                 "Sram, Senior Edificer",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_VALUE_SAFE_CUT_SOURCE_MINER_EXTERNAL_POLICY_REPORT,
+            [
+                "Global Commander Value-Safe Cut Source Miner",
+                "value_safe_cut_source_mining_blocks_package_resynthesis",
+                "hypothesis_count: `0`",
+                "blocked_hypothesis_count: `88`",
+                "external_policy_exclusion_count: `8`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "broaden_commander_package_axis_or_external_cut_research",
+                "external_policy_exclusions_consumed:8",
+                "external_policy_boundary",
             ],
         )
     )

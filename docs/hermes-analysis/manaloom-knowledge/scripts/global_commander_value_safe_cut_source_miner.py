@@ -30,6 +30,9 @@ DEFAULT_RECOVERY_REPORT = (
 DEFAULT_CUT_SOURCE_REPORT = (
     REPORT_DIR / "global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.json"
 )
+DEFAULT_EXTERNAL_CUT_POLICY_REPORT = (
+    REPORT_DIR / "global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+)
 DEFAULT_OUT_PREFIX = (
     REPORT_DIR / "global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1"
 )
@@ -92,6 +95,25 @@ def recovery_target_roles(recovery_payload: Mapping[str, Any], cut_payload: Mapp
     return {str(role): int(count or 0) for role, count in budgets.items() if int(count or 0) > 0}
 
 
+def external_policy_blocks(policy_payload: Mapping[str, Any]) -> dict[str, list[str]]:
+    blocks: dict[str, list[str]] = {}
+    for row in policy_payload.get("cut_policy_rows") or []:
+        if not isinstance(row, Mapping) or not row.get("cut_card"):
+            continue
+        if row.get("rerun_miner_allowed_for_card") is True:
+            continue
+        key = normalize_name(str(row.get("cut_card") or ""))
+        policy = str(row.get("cut_policy") or "external_corpus_policy_blocks_rerun_hypothesis")
+        if key:
+            blocks.setdefault(key, []).append(policy)
+    for field in ("excluded_from_rerun_miner", "held_for_negative_review"):
+        for card in policy_payload.get(field) or []:
+            key = normalize_name(str(card or ""))
+            if key:
+                blocks.setdefault(key, []).append("external_corpus_policy_blocks_rerun_hypothesis")
+    return {key: sorted(set(reasons)) for key, reasons in blocks.items()}
+
+
 def score_hypothesis(
     *,
     row: Mapping[str, Any],
@@ -129,6 +151,7 @@ def classify_row(
     stage_only_names: set[str],
     forced_focus_names: set[str],
     target_roles: Mapping[str, int],
+    external_policy_blocks_by_name: Mapping[str, list[str]] | None = None,
 ) -> dict[str, Any]:
     name = str(row.get("card_name") or "")
     key = normalize_name(name)
@@ -143,6 +166,9 @@ def classify_row(
         block_reasons.append("already_stage_only_cut_source_requires_proof")
     if key in forced_focus_names:
         block_reasons.append("forced_access_used_cut_blocks_reclassification")
+    policy_reasons = (external_policy_blocks_by_name or {}).get(key) or []
+    for reason in policy_reasons:
+        block_reasons.append("external_corpus_policy:" + reason)
     protected = sorted(profile_roles & cut_expander.PROTECTED_PROFILE_ROLES)
     if protected:
         block_reasons.append("protected_profile_role_" + ",".join(protected))
@@ -189,9 +215,11 @@ def build_report(
     recovery_report: Path,
     cut_source_report: Path,
     sqlite_db: Path | None = None,
+    external_cut_policy_report: Path | None = None,
 ) -> dict[str, Any]:
     recovery_payload = load_json(recovery_report)
     cut_payload = load_json(cut_source_report)
+    policy_payload = load_json(external_cut_policy_report) if external_cut_policy_report else {}
     recovery_summary = recovery_payload.get("summary") or {}
     cut_summary = cut_payload.get("summary") or {}
     deck_id = str(recovery_summary.get("deck_id") or cut_summary.get("deck_id") or "")
@@ -203,6 +231,7 @@ def build_report(
         for card in (cut_summary.get("forced_focus_cards") or recovery_summary.get("forced_focus_cards") or [])
         if card
     }
+    external_policy_blocks_by_name = external_policy_blocks(policy_payload)
     with sqlite3.connect(db_path) as conn:
         rows = cut_expander.deck_rows(conn, deck_id)
         staples = cut_expander.format_staples_by_name(conn)
@@ -213,6 +242,7 @@ def build_report(
             stage_only_names=stage_only_names,
             forced_focus_names=forced_focus_names,
             target_roles=target_roles,
+            external_policy_blocks_by_name=external_policy_blocks_by_name,
         )
         for row in rows
         if not int(row.get("is_commander") or 0)
@@ -247,6 +277,11 @@ def build_report(
             "recovery_report": rel(recovery_report),
             "cut_source_report": rel(cut_source_report),
             "selected_db": rel(db_path),
+            **(
+                {"external_cut_policy_report": rel(external_cut_policy_report)}
+                if external_cut_policy_report
+                else {}
+            ),
         },
         "db_resolution": db_resolution,
         "summary": {
@@ -258,6 +293,7 @@ def build_report(
             "blocked_hypothesis_count": len(blocked),
             "stage_only_cut_count": len(stage_only_names),
             "forced_focus_count": len(forced_focus_names),
+            "external_policy_exclusion_count": len(external_policy_blocks_by_name),
             "next_gate": (
                 "collect_usage_trace_for_new_cut_source_hypotheses"
                 if hypotheses
@@ -267,12 +303,18 @@ def build_report(
         "candidate_copy_blockers": [
             "hypotheses_require_trace_before_value_safe_reclassification",
             "candidate_copy_closed_until_value_safe_cut_pair_exists",
+            *(
+                ["external_policy_exclusions_consumed:" + str(len(external_policy_blocks_by_name))]
+                if external_policy_blocks_by_name
+                else []
+            ),
         ],
         "fresh_cut_source_hypotheses": hypotheses[:20],
         "blocked_hypothesis_sample": blocked[:40],
         "policy": {
             "miner_boundary": "Fresh hypotheses are not value-safe cuts until trace or same-lane proof is collected.",
             "protected_role_boundary": "Protected commander lanes, lands, structural staples, contextual staples, and stage-only cuts remain blocked.",
+            "external_policy_boundary": "When provided, external corpus policy exclusions block reusing current cards as fresh hypotheses.",
             "battle_boundary": "This miner does not run battle or open promotion.",
         },
     }
@@ -289,6 +331,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- deck_id: `{summary['deck_id']}`",
         f"- hypothesis_count: `{summary['hypothesis_count']}`",
         f"- blocked_hypothesis_count: `{summary['blocked_hypothesis_count']}`",
+        f"- external_policy_exclusion_count: `{summary['external_policy_exclusion_count']}`",
         f"- candidate_copy_allowed_now: `{str(payload['candidate_copy_allowed_now']).lower()}`",
         f"- value_safe_reclassification_allowed_now: `{str(payload['value_safe_reclassification_allowed_now']).lower()}`",
         f"- battle_gate_allowed_now: `{str(payload['battle_gate_allowed_now']).lower()}`",
@@ -344,6 +387,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--recovery-report", type=Path, default=DEFAULT_RECOVERY_REPORT)
     parser.add_argument("--cut-source-report", type=Path, default=DEFAULT_CUT_SOURCE_REPORT)
+    parser.add_argument("--external-cut-policy-report", type=Path)
     parser.add_argument("--db", type=Path)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     args = parser.parse_args()
@@ -351,6 +395,7 @@ def main() -> int:
         recovery_report=args.recovery_report,
         cut_source_report=args.cut_source_report,
         sqlite_db=args.db,
+        external_cut_policy_report=args.external_cut_policy_report,
     )
     json_path, md_path = write_outputs(payload, args.out_prefix)
     print(

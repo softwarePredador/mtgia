@@ -316,7 +316,12 @@ Operational priority after this pivot:
     collection; it must convert corpus rows into explicit miner exclusions and
     negative-review holds so the next miner pass cannot recycle the same
     blocked hypotheses as fresh value-safe cuts without new evidence;
-38. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+38. rerun `global_commander_value_safe_cut_source_miner.py` with
+    `--external-cut-policy-report` after policy mapping; if the policy consumes
+    all current hypotheses and no fresh value-safe cut source remains, the route
+    must broaden the package axis or external cut research rather than opening
+    candidate copy, battle, or promotion;
+39. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -372,6 +377,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -827,6 +833,11 @@ Current external refresh on 2026-07-05:
   The next miner pass must consume these policy exclusions before it can claim
   fresh value-safe cut hypotheses. The next gate is
   `rerun_value_safe_cut_source_miner_with_external_policy_exclusions`.
+- Current value-safe cut-source mining with external policy consumed all `8`
+  policy exclusions and returned `value_safe_cut_source_mining_blocks_package_resynthesis`
+  with `hypothesis_count=0`, `blocked_hypothesis_count=88`, and
+  `external_policy_exclusion_count=8`. The current cut lane is exhausted; the
+  next gate is `broaden_commander_package_axis_or_external_cut_research`.
 
 ## Global Commander Rollout - 2026-07-01
 

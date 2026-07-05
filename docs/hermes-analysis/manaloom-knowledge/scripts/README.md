@@ -155,6 +155,11 @@ It emits explicit exclusions and negative-review holds for the next miner pass.
 The miner must consume those exclusions before re-emitting any of the same
 cards as fresh value-safe hypotheses.
 
+Rerun `global_commander_value_safe_cut_source_miner.py` with
+`--external-cut-policy-report` after the mapper. If the rerun returns no fresh
+hypotheses, the current cut lane is exhausted and the next route is to broaden
+the package axis or external cut research, not candidate copy or battle.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

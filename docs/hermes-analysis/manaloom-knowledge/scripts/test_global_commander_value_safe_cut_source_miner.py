@@ -96,6 +96,20 @@ def cut_payload() -> dict[str, object]:
     }
 
 
+def external_policy_payload() -> dict[str, object]:
+    return {
+        "cut_policy_rows": [
+            {
+                "cut_card": "Off Profile Relic",
+                "rerun_miner_allowed_for_card": False,
+                "cut_policy": "exclude_from_rerun_miner_until_new_internal_evidence",
+            }
+        ],
+        "excluded_from_rerun_miner": ["Off Profile Relic"],
+        "held_for_negative_review": [],
+    }
+
+
 class GlobalCommanderValueSafeCutSourceMinerTests(unittest.TestCase):
     def test_mines_fresh_nonprotected_hypothesis_for_trace(self) -> None:
         tmp = tempfile.TemporaryDirectory()
@@ -135,6 +149,28 @@ class GlobalCommanderValueSafeCutSourceMinerTests(unittest.TestCase):
         blocked = {row["card_name"]: row["block_reasons"] for row in report["blocked_hypothesis_sample"]}
         self.assertIn("protected_profile_role_lands", blocked["Ancient Tomb"])
         self.assertIn("structural_foundation_staple_requires_same_lane_or_battle_proof", blocked["Sol Ring"])
+
+    def test_external_policy_exclusion_blocks_reusing_fresh_hypothesis(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        db = build_db(root, include_fresh=True)
+
+        report = miner.build_report(
+            recovery_report=write_json(root, "recovery.json", recovery_payload()),
+            cut_source_report=write_json(root, "cut.json", cut_payload()),
+            sqlite_db=db,
+            external_cut_policy_report=write_json(root, "policy.json", external_policy_payload()),
+        )
+
+        self.assertEqual(report["status"], "value_safe_cut_source_mining_blocks_package_resynthesis")
+        self.assertEqual(report["summary"]["hypothesis_count"], 0)
+        self.assertEqual(report["summary"]["external_policy_exclusion_count"], 1)
+        blocked = {row["card_name"]: row["block_reasons"] for row in report["blocked_hypothesis_sample"]}
+        self.assertIn(
+            "external_corpus_policy:exclude_from_rerun_miner_until_new_internal_evidence",
+            blocked["Off Profile Relic"],
+        )
 
 
 if __name__ == "__main__":

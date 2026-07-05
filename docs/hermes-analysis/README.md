@@ -594,6 +594,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `held_for_negative_review_count=2` e
     `rerun_miner_allowed_card_count=0`. O proximo minerador precisa consumir
     essas exclusoes antes de emitir novas hipoteses.
+    O rerun do minerador com politica externa fica em
+    `global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md`.
+    Resultado: `value_safe_cut_source_mining_blocks_package_resynthesis`, com
+    `hypothesis_count=0`, `blocked_hypothesis_count=88` e
+    `external_policy_exclusion_count=8`. Proximo gate:
+    `broaden_commander_package_axis_or_external_cut_research`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
