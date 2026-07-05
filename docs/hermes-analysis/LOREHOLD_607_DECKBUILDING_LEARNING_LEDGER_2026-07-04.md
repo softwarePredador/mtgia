@@ -2055,17 +2055,32 @@ The next route-selection artifacts are:
 
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_next_route_planner_20260705_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_next_route_planner_20260705_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_route_planner_governed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_route_planner_governed_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_miracle_route_planner_governed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_miracle_route_planner_governed_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_route_planner_governed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_route_planner_governed_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_route_planner_governed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_route_planner_governed_current.json`
 
 This planner ranks the current post-identity miracle/topdeck candidates after
 the Entreat same-lane scout. It uses the candidate queue, Brain/Entreat/Haze
 runtime contracts, Entreat cut scout, protected `607` cut miner, and external
 card/combo source lanes. It is read-only and cannot score a deck, materialize a
-candidate, run battle, mutate deck `607`, or write PostgreSQL.
+candidate, run battle, mutate deck `607`, or write PostgreSQL. The planner now
+requires the candidate queue to be matrix-route governed before selecting any
+next card.
 
 Current result:
 
 - decision status:
   `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`;
+- candidate queue status:
+  `miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607`;
+- candidate queue matrix route governed: `true`;
+- candidate queue next-shell status:
+  `next_shell_cut_path_closed_route_miracle_access_first_keep_607`;
 - route candidates reviewed: `5`;
 - selected card: `Brain in a Jar`;
 - selected lane: `topdeck_miracle_access`;
@@ -2098,6 +2113,11 @@ Operational lesson:
 
 - The persistent goal should continue with a Brain in a Jar runtime contract
   and cut miner, not by modifying `607` or forcing a battle.
+- The planner must not select a route from a stale queue that lacks the governed
+  miracle-access matrix route.
+- The governed route-planner audit set passes after this change: deckbuilding
+  contract surface, operational surface alignment, legacy contamination, and
+  XMage strategy consistency.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion until a candidate ties or beats it under the same strategy,
   matrix, battle, and trace gates.

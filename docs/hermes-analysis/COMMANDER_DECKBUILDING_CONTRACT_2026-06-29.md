@@ -1758,3 +1758,31 @@ Operational lesson:
   same-lane non-anchor cuts before scoring.
 - The next allowed work is:
   `resolve_runtime_and_named_same_lane_cut_before_matrix_scoring`.
+
+Miracle next route planner refreshed on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_next_route_planner_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_next_route_planner_20260705_current.json`.
+- Status:
+  `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`.
+- Candidate queue gate:
+  `candidate_queue_matrix_route_governed=true`,
+  `candidate_queue_matrix_next_shell_status=next_shell_cut_path_closed_route_miracle_access_first_keep_607`,
+  and `candidate_queue_scoreable_row_count=0`.
+- Selected route:
+  `Brain in a Jar`, lane `topdeck_miracle_access`, route state
+  `next_single_card_runtime_lesson`, learning score `104`.
+- Current blockers remain:
+  `named_seed_safe_cut_count=0`, Entreat safe cuts `0`, Entreat active rule
+  rows `0`, matrix scoring `false`, natural battle `false`, deck action
+  `false`, PostgreSQL writes `false`, and promotion `false`.
+
+Operational lesson:
+
+- The route planner chooses the next learning target, not a deck edit.
+- The planner must block route selection when the candidate queue is not
+  governed by the routed miracle-access matrix.
+- The next allowed work is:
+  `draft_brain_in_a_jar_runtime_contract_and_cut_miner_no_deck_action`.

@@ -19,7 +19,7 @@
     "reason": "Entreat remains blocked by named safe-cut and unapplied-rule gates; Brain in a Jar is the next best learning route because it teaches charge-counter/free-cast/scry timing for the miracle-access thesis without mutating deck 607."
   },
   "deck_607_mutated": false,
-  "generated_at": "2026-07-05T05:01:35Z",
+  "generated_at": "2026-07-05T09:06:42Z",
   "postgres_writes": false,
   "route_rows": [
     {
@@ -210,7 +210,12 @@
       "decision_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
       "deck_action_allowed_now": false,
       "matrix_contract_blocker_count": 28,
+      "matrix_engine_cut_path_closed": true,
+      "matrix_fallback_route_key": "miracle_access_first_shell_contract",
+      "matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+      "matrix_route_governed": true,
       "matrix_scoring_allowed_now": false,
+      "matrix_status": "miracle_access_structure_matrix_template_ready_no_candidate_no_battle",
       "named_seed_safe_cut_count": 0,
       "natural_battle_gate_allowed_now": false,
       "promotion_allowed_now": false,
@@ -377,6 +382,11 @@
   "status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
   "summary": {
     "candidate_deck_materialization_allowed_now": false,
+    "candidate_queue_matrix_fallback_route_key": "miracle_access_first_shell_contract",
+    "candidate_queue_matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+    "candidate_queue_matrix_route_governed": true,
+    "candidate_queue_scoreable_row_count": 0,
+    "candidate_queue_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
     "decision_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
     "deck_action_allowed_now": false,
     "entreat_active_rule_count": 0,

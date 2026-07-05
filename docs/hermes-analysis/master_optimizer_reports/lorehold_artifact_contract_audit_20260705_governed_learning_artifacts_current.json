@@ -26643,6 +26643,11 @@
         "status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
         "summary": {
           "candidate_deck_materialization_allowed_now": false,
+          "candidate_queue_matrix_fallback_route_key": "miracle_access_first_shell_contract",
+          "candidate_queue_matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
+          "candidate_queue_matrix_route_governed": true,
+          "candidate_queue_scoreable_row_count": 0,
+          "candidate_queue_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
           "decision_status": "miracle_next_route_planner_selected_brain_runtime_learning_keep_607",
           "deck_action_allowed_now": false,
           "entreat_active_rule_count": 0,
@@ -48222,7 +48227,7 @@
     ],
     "status": "pass"
   },
-  "generated_at": "2026-07-05T09:03:29.023368+00:00",
+  "generated_at": "2026-07-05T09:07:38.616316+00:00",
   "postgres_writes": false,
   "source_db_mutated": false,
   "status": "pass",

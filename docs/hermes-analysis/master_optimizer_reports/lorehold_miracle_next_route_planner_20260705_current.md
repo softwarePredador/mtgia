@@ -1,10 +1,13 @@
 # Lorehold Miracle Next Route Planner
 
-- Generated at: `2026-07-05T05:01:35Z`
+- Generated at: `2026-07-05T09:06:42Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
 - Decision status: `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`
+- Candidate queue status: `miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607`
+- Candidate queue matrix route governed: `true`
+- Candidate queue matrix next-shell status: `next_shell_cut_path_closed_route_miracle_access_first_keep_607`
 - Route candidates: `5`
 - Selected card: `Brain in a Jar`
 - Selected lane: `topdeck_miracle_access`

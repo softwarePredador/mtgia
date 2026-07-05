@@ -101,9 +101,19 @@ def _runtime_contract():
     }
 
 
-def _candidate_queue():
+def _candidate_queue(*, governed=True):
     return {
-        "summary": {"blocked_candidate_row_count": 3},
+        "summary": {
+            "decision_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
+            "blocked_candidate_row_count": 3,
+            "scoreable_candidate_row_count": 0,
+            "matrix_route_governed": governed,
+            "matrix_next_shell_status": planner.TARGET_NEXT_SHELL_STATUS if governed else "",
+            "matrix_fallback_route_key": planner.TARGET_MATRIX_CONTRACT if governed else "",
+            "candidate_deck_materialization_allowed_now": False,
+            "natural_battle_gate_allowed_now": False,
+            "promotion_allowed_now": False,
+        },
         "blocked_candidate_rows": [
             {
                 "add_card": "Brain in a Jar",
@@ -167,6 +177,10 @@ def test_current_like_state_selects_brain_without_deck_action() -> None:
     assert payload["summary"]["decision_status"] == (
         "miracle_next_route_planner_selected_brain_runtime_learning_keep_607"
     )
+    assert payload["summary"]["candidate_queue_matrix_route_governed"] is True
+    assert payload["summary"]["candidate_queue_matrix_next_shell_status"] == (
+        planner.TARGET_NEXT_SHELL_STATUS
+    )
     assert payload["summary"]["selected_card"] == "Brain in a Jar"
     assert payload["summary"]["candidate_deck_materialization_allowed_now"] is False
     assert payload["summary"]["natural_battle_gate_allowed_now"] is False
@@ -209,9 +223,24 @@ def test_no_candidates_blocks_route_planner() -> None:
     assert payload["decision"]["deck_action_allowed"] is False
 
 
+def test_ungoverned_candidate_queue_blocks_selection() -> None:
+    payload = _build(candidate_queue=_candidate_queue(governed=False))
+
+    assert payload["summary"]["decision_status"] == (
+        "miracle_next_route_planner_blocked_candidate_queue_not_governed_keep_607"
+    )
+    assert payload["summary"]["selected_card"] == ""
+    assert payload["summary"]["candidate_queue_matrix_route_governed"] is False
+    assert payload["summary"]["recommended_next_action"] == (
+        "rerun_routed_candidate_row_queue_before_route_selection"
+    )
+    assert payload["decision"]["deck_action_allowed"] is False
+
+
 def test_markdown_surfaces_selected_route_and_closed_gates() -> None:
     markdown = planner.render_markdown(_build())
 
+    assert "Candidate queue matrix route governed: `true`" in markdown
     assert "Selected card: `Brain in a Jar`" in markdown
     assert "Deck 607 mutated: `false`" in markdown
     assert "Natural battle gate allowed now: `false`" in markdown

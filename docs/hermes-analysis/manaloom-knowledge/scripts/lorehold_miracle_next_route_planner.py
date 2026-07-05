@@ -40,6 +40,8 @@ DEFAULT_OUT_PREFIX = (
 ENTREAT = "Entreat the Angels"
 BRAIN = "Brain in a Jar"
 HAZE = "Haze of Rage"
+TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
+TARGET_MATRIX_CONTRACT = "miracle_access_first_shell_contract"
 
 LANE_BASE_SCORE = {
     "miracle_finisher": 96,
@@ -155,6 +157,17 @@ def candidate_cards(post_identity: Mapping[str, Any]) -> list[dict[str, Any]]:
         )
     )
     return rows
+
+
+def candidate_queue_route_governed(candidate_summary: Mapping[str, Any]) -> bool:
+    return bool(
+        candidate_summary.get("matrix_route_governed") is True
+        and candidate_summary.get("matrix_next_shell_status") == TARGET_NEXT_SHELL_STATUS
+        and candidate_summary.get("matrix_fallback_route_key") == TARGET_MATRIX_CONTRACT
+        and candidate_summary.get("candidate_deck_materialization_allowed_now") is False
+        and candidate_summary.get("natural_battle_gate_allowed_now") is False
+        and candidate_summary.get("promotion_allowed_now") is False
+    )
 
 
 def route_state(
@@ -330,7 +343,17 @@ def select_route(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return {}
 
 
-def decision_status(selected: Mapping[str, Any], rows: list[Mapping[str, Any]]) -> tuple[str, str]:
+def decision_status(
+    selected: Mapping[str, Any],
+    rows: list[Mapping[str, Any]],
+    *,
+    candidate_queue_governed: bool,
+) -> tuple[str, str]:
+    if not candidate_queue_governed:
+        return (
+            "miracle_next_route_planner_blocked_candidate_queue_not_governed_keep_607",
+            "rerun_routed_candidate_row_queue_before_route_selection",
+        )
     if not rows:
         return (
             "miracle_next_route_planner_blocked_no_candidates_keep_607",
@@ -366,6 +389,8 @@ def build_report(
     cut_miner: Mapping[str, Any],
     paths: Mapping[str, Path],
 ) -> dict[str, Any]:
+    candidate_summary = summary(candidate_queue)
+    candidate_queue_governed = candidate_queue_route_governed(candidate_summary)
     route_rows = build_route_rows(
         post_identity=post_identity,
         runtime_contract=runtime_contract,
@@ -373,8 +398,12 @@ def build_report(
         entreat_scout=entreat_scout,
         cut_miner=cut_miner,
     )
-    selected = select_route(route_rows)
-    status, next_action = decision_status(selected, route_rows)
+    selected = select_route(route_rows) if candidate_queue_governed else {}
+    status, next_action = decision_status(
+        selected,
+        route_rows,
+        candidate_queue_governed=candidate_queue_governed,
+    )
     state_counts = Counter(str(row.get("route_state") or "") for row in route_rows)
     blocker_counts = Counter(blocker for row in route_rows for blocker in as_list(row.get("blockers")))
     return {
@@ -388,6 +417,13 @@ def build_report(
         "status": status,
         "summary": {
             "decision_status": status,
+            "candidate_queue_status": candidate_summary.get("decision_status") or "",
+            "candidate_queue_matrix_route_governed": candidate_queue_governed,
+            "candidate_queue_matrix_next_shell_status": candidate_summary.get("matrix_next_shell_status") or "",
+            "candidate_queue_matrix_fallback_route_key": candidate_summary.get("matrix_fallback_route_key") or "",
+            "candidate_queue_scoreable_row_count": as_int(
+                candidate_summary.get("scoreable_candidate_row_count")
+            ),
             "route_candidate_count": len(route_rows),
             "selected_card": selected.get("card_name") or "",
             "selected_lane": selected.get("lane") or "",
@@ -411,7 +447,7 @@ def build_report(
         "source_evidence": {
             "post_identity_summary": summary(post_identity),
             "runtime_contract_summary": summary(runtime_contract),
-            "candidate_queue_summary": summary(candidate_queue),
+            "candidate_queue_summary": candidate_summary,
             "entreat_scout_summary": summary(entreat_scout),
             "cut_miner_summary": summary(cut_miner),
             "external_sources_consulted": EXTERNAL_EVIDENCE,
@@ -425,6 +461,11 @@ def build_report(
             "promotion_allowed": False,
             "postgres_writes_allowed": False,
             "reason": (
+                "The candidate queue is missing the governed matrix route, so the planner "
+                "cannot select a runtime or cut lane."
+            )
+            if not candidate_queue_governed
+            else (
                 "Entreat remains blocked by named safe-cut and unapplied-rule gates; "
                 "Brain in a Jar is the next best learning route because it teaches "
                 "charge-counter/free-cast/scry timing for the miracle-access thesis "
@@ -461,6 +502,9 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "- Source DB mutated: `false`",
         "- Deck 607 mutated: `false`",
         f"- Decision status: `{summary_row['decision_status']}`",
+        f"- Candidate queue status: `{summary_row['candidate_queue_status']}`",
+        f"- Candidate queue matrix route governed: `{str(summary_row['candidate_queue_matrix_route_governed']).lower()}`",
+        f"- Candidate queue matrix next-shell status: `{summary_row['candidate_queue_matrix_next_shell_status'] or '-'}`",
         f"- Route candidates: `{summary_row['route_candidate_count']}`",
         f"- Selected card: `{summary_row['selected_card'] or '-'}`",
         f"- Selected lane: `{summary_row['selected_lane'] or '-'}`",
