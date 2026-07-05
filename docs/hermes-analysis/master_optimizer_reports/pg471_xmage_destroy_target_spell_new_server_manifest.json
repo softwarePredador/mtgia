@@ -1,0 +1,295 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg471_xmage_destroy_target_spell_new_server_20260705_021",
+  "deploy_id": "pg471",
+  "expected_rules": [
+    {
+      "card_name": "Bone Splinters",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f4fb67d9af26b5ed562b437b85d0e3d3",
+      "min_rule_version": 2,
+      "normalized_name": "bone splinters",
+      "oracle_hash": "5b0fa8f1b681a6327b1ffe89ef0ffbc9",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_creature",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "requires_sacrifice_creature": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "creature",
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Embrace Oblivion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1330d6b65c530f0725148ec8f4e16576",
+      "min_rule_version": 2,
+      "normalized_name": "embrace oblivion",
+      "oracle_hash": "05e8fd4bf8fae8602b5883385f75a6aa",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_artifact_or_creature",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "requires_sacrifice_artifact_or_creature": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "artifact_or_creature",
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Powerstone Fracture",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:142000d6120e9a04710f8a2cc31524b2",
+      "min_rule_version": 2,
+      "normalized_name": "powerstone fracture",
+      "oracle_hash": "a5c06a971f3a0473c0568aba333cf79a",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_artifact_or_creature",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "requires_sacrifice_artifact_or_creature": true,
+        "target": "creature_or_planeswalker",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "planeswalker"
+          ]
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "artifact_or_creature",
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Raze",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:476f315b753e08d325a53d881500898a",
+      "min_rule_version": 2,
+      "normalized_name": "raze",
+      "oracle_hash": "e0d0084f1ad04bd705cf38689a523622",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_land",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "requires_sacrifice_land": true,
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "land",
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_destroy_target_spell": 4
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg471_xmage_destroy_target_spell_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg471_xmage_destroy_target_spell_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg471_xmage_destroy_target_spell_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg471_xmage_destroy_target_spell_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg471_xmage_destroy_target_spell_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg471_xmage_destroy_target_spell_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T02:14:06+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Bone Splinters"
+      },
+      "card_name": "Bone Splinters",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f4fb67d9af26b5ed562b437b85d0e3d3",
+      "normalized_name": "bone splinters",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_creature",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "requires_sacrifice_creature": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "creature",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Embrace Oblivion"
+      },
+      "card_name": "Embrace Oblivion",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1330d6b65c530f0725148ec8f4e16576",
+      "normalized_name": "embrace oblivion",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_artifact_or_creature",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "requires_sacrifice_artifact_or_creature": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "artifact_or_creature",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Powerstone Fracture"
+      },
+      "card_name": "Powerstone Fracture",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:142000d6120e9a04710f8a2cc31524b2",
+      "normalized_name": "powerstone fracture",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_artifact_or_creature",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "requires_sacrifice_artifact_or_creature": true,
+        "target": "creature_or_planeswalker",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "planeswalker"
+          ]
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "artifact_or_creature",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Raze"
+      },
+      "card_name": "Raze",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:476f315b753e08d325a53d881500898a",
+      "normalized_name": "raze",
+      "required_effect_fields": {
+        "additional_cost": "sacrifice_land",
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "requires_sacrifice_land": true,
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "xmage_additional_cost_class": "SacrificeTargetCost",
+        "xmage_additional_cost_target": "land",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Bone Splinters",
+    "Embrace Oblivion",
+    "Powerstone Fracture",
+    "Raze"
+  ],
+  "selected_count": 4,
+  "slug": "xmage_destroy_target_spell_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Bone Splinters",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f4fb67d9af26b5ed562b437b85d0e3d3",
+      "min_rule_version": 2,
+      "normalized_name": "bone splinters",
+      "oracle_hash": "5b0fa8f1b681a6327b1ffe89ef0ffbc9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Embrace Oblivion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1330d6b65c530f0725148ec8f4e16576",
+      "min_rule_version": 2,
+      "normalized_name": "embrace oblivion",
+      "oracle_hash": "05e8fd4bf8fae8602b5883385f75a6aa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Powerstone Fracture",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:142000d6120e9a04710f8a2cc31524b2",
+      "min_rule_version": 2,
+      "normalized_name": "powerstone fracture",
+      "oracle_hash": "a5c06a971f3a0473c0568aba333cf79a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Raze",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:476f315b753e08d325a53d881500898a",
+      "min_rule_version": 2,
+      "normalized_name": "raze",
+      "oracle_hash": "e0d0084f1ad04bd705cf38689a523622",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

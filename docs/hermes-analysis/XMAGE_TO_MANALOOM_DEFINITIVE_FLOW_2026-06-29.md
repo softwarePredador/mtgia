@@ -10828,6 +10828,59 @@ new server:
   `xmage_fixed_damage_draw_card_spell`,
   `xmage_fixed_target_player_draw_spell`, and `xmage_x_damage_spell`.
 
+## 2026-07-05 PG471 Destroy Target Spell Closure
+
+- Closed the exact XMage destroy-target spell family as ManaLoom scope
+  `xmage_destroy_target_spell_v1`.
+- The selected package accepted local XMage spell sources whose executable
+  behavior is `DestroyTargetEffect`, preserving target constraints,
+  destination, and spell additional sacrifice costs.
+- The batch covers `4` cards: Bone Splinters, Embrace Oblivion, Powerstone
+  Fracture, and Raze.
+- The package builder E2E manifest was tightened to require spell
+  additional-cost fields (`additional_cost`, `requires_sacrifice_*`,
+  `xmage_additional_cost_class`, and `xmage_additional_cost_target`) so future
+  package validation cannot prove only the removal target while missing the
+  casting cost behavior.
+- Focused mapper/runtime/package tests covered destroy-target sacrifice-cost
+  behavior and manifest preservation; the focused test lane passed `719`
+  checks.
+- The PostgreSQL package promoted `4` cards. Precheck found `4` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` generated shadow
+  rows to deprecate; apply/postcheck verified `4/4` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `4` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve
+  `battle_model_scope=xmage_destroy_target_spell_v1`, target constraints,
+  `additional_cost`, `xmage_additional_cost_class=SacrificeTargetCost`, and
+  the expected sacrifice target.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `4` selected cards. Generic battle
+  scenario count remained `0`; destroy-target sacrifice-cost behavior remains
+  covered by focused runtime tests.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4511` PostgreSQL runtime rows, wrote `4503` SQLite runtime
+  rows, and exported `4478` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26375`, `xmage_authoritative_source_count=26061`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26061`. This is an exact
+  reduction of `4` from the post-PG470 queue.
+- The post-PG471 exact split recheck reports `proposal_count=36` and
+  `safe_for_batch_pg_package_count=36`. The largest remaining exact families
+  are `xmage_dynamic_graveyard_count_damage_spell`,
+  `xmage_permanent_simple_activated_self_boost_until_eot`,
+  `xmage_simple_mana_source_with_etb_draw`,
+  `xmage_fixed_damage_draw_card_spell`,
+  `xmage_fixed_target_player_draw_spell`, and `xmage_x_damage_spell`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

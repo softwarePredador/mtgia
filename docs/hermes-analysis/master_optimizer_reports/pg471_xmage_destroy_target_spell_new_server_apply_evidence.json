@@ -1,0 +1,174 @@
+{
+  "status": "pass",
+  "deploy_id": "pg471",
+  "slug": "xmage_destroy_target_spell_new_server",
+  "database_target": "143.198.230.247:5433/halder",
+  "battle_model_scope": "xmage_destroy_target_spell_v1",
+  "selected_count": 4,
+  "cards": [
+    {
+      "card_name": "Bone Splinters",
+      "normalized_name": "bone splinters",
+      "effect": "remove_creature",
+      "target": "creature",
+      "target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "additional_cost": "sacrifice_creature",
+      "xmage_additional_cost_class": "SacrificeTargetCost",
+      "xmage_additional_cost_target": "creature",
+      "requires_sacrifice_creature": true,
+      "logical_rule_key": "battle_rule_v1:f4fb67d9af26b5ed562b437b85d0e3d3"
+    },
+    {
+      "card_name": "Embrace Oblivion",
+      "normalized_name": "embrace oblivion",
+      "effect": "remove_creature",
+      "target": "creature",
+      "target_constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "additional_cost": "sacrifice_artifact_or_creature",
+      "xmage_additional_cost_class": "SacrificeTargetCost",
+      "xmage_additional_cost_target": "artifact_or_creature",
+      "requires_sacrifice_artifact_or_creature": true,
+      "logical_rule_key": "battle_rule_v1:1330d6b65c530f0725148ec8f4e16576"
+    },
+    {
+      "card_name": "Powerstone Fracture",
+      "normalized_name": "powerstone fracture",
+      "effect": "remove_permanent",
+      "target": "creature_or_planeswalker",
+      "target_constraints": {
+        "card_types": [
+          "creature",
+          "planeswalker"
+        ]
+      },
+      "additional_cost": "sacrifice_artifact_or_creature",
+      "xmage_additional_cost_class": "SacrificeTargetCost",
+      "xmage_additional_cost_target": "artifact_or_creature",
+      "requires_sacrifice_artifact_or_creature": true,
+      "logical_rule_key": "battle_rule_v1:142000d6120e9a04710f8a2cc31524b2"
+    },
+    {
+      "card_name": "Raze",
+      "normalized_name": "raze",
+      "effect": "remove_permanent",
+      "target": "land",
+      "target_constraints": {
+        "card_types": [
+          "land"
+        ]
+      },
+      "additional_cost": "sacrifice_land",
+      "xmage_additional_cost_class": "SacrificeTargetCost",
+      "xmage_additional_cost_target": "land",
+      "requires_sacrifice_land": true,
+      "logical_rule_key": "battle_rule_v1:476f315b753e08d325a53d881500898a"
+    }
+  ],
+  "code_changes": {
+    "package_manifest_required_effect_fields": [
+      "additional_cost",
+      "requires_sacrifice_creature",
+      "requires_sacrifice_artifact_or_creature",
+      "requires_sacrifice_land",
+      "xmage_additional_cost_class",
+      "xmage_additional_cost_target"
+    ],
+    "test_added": "test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields"
+  },
+  "tests": {
+    "focused_unit_checks": 719,
+    "status": "pass"
+  },
+  "postgres_apply": {
+    "precheck": {
+      "row_count": 4,
+      "missing_targets": [],
+      "total_target_card_rows": 4,
+      "existing_expected_rows_before": 0,
+      "would_deprecate_shadow_rows": 0
+    },
+    "postcheck": {
+      "row_count": 4,
+      "promoted_rule_rows": 4,
+      "promoted_verified_auto_rows": 4,
+      "promoted_oracle_hash_rows": 4,
+      "backup_rows": 0,
+      "failed_cards": []
+    },
+    "mutations_performed": [
+      "postgres_apply_pg471_xmage_destroy_target_spell_new_server"
+    ]
+  },
+  "sync": {
+    "metadata": {
+      "requested_unique_names": 5489,
+      "postgres_cards_matched": 5674,
+      "sqlite_cache_alias_rows": 5585,
+      "unresolved_count": 1,
+      "deck_cards_rows_total": 2699,
+      "deck_cards_matched_cache_rows": 2699,
+      "deck_cards_card_id_rows_updated": 108,
+      "suspicious_nonland_zero_cmc_after": 19
+    },
+    "pg_to_sqlite": {
+      "pg_rows_loaded": 4511,
+      "sqlite_inserted_or_updated": 4503,
+      "canonical_snapshot_rows_exported": 4478,
+      "generated_rows": 1947,
+      "curated_rows": 145,
+      "oracle_normalized_rows": 274
+    }
+  },
+  "e2e": {
+    "status": "pass",
+    "postgres_source_rows": 4,
+    "sqlite_hermes_cache_rows": 4,
+    "canonical_snapshot_cards": 4,
+    "runtime_get_card_effect_cards": 4,
+    "battle_execution_scenarios": 0,
+    "battle_execution_events": 0
+  },
+  "audits": {
+    "xmage_strategy_consistency": {
+      "status": "pass",
+      "check_count": 26
+    },
+    "operational_surface_alignment": {
+      "status": "pass",
+      "check_count": 39
+    },
+    "legacy_contamination": {
+      "status": "pass",
+      "check_count": 32
+    },
+    "pg_hermes_sqlite_contract": {
+      "status": "pass",
+      "check_count": 51
+    }
+  },
+  "post_sync_queue": {
+    "target_identity_count": 26375,
+    "xmage_authoritative_source_count": 26061,
+    "xmage_missing_source_exception_count": 314,
+    "xmage_authoritative_parser_gap_count": 0,
+    "xmage_authoritative_adapter_required_count": 26061,
+    "proposal_count": 36,
+    "safe_for_batch_pg_package_count": 36,
+    "largest_remaining_exact_families": {
+      "xmage_dynamic_graveyard_count_damage_spell": 4,
+      "xmage_permanent_simple_activated_self_boost_until_eot": 4,
+      "xmage_simple_mana_source_with_etb_draw": 4,
+      "xmage_fixed_damage_draw_card_spell": 3,
+      "xmage_fixed_target_player_draw_spell": 3,
+      "xmage_x_damage_spell": 3
+    }
+  }
+}

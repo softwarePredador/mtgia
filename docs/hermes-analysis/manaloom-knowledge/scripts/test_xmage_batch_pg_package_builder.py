@@ -338,6 +338,33 @@ def test_manifest_expected_rule_preserves_activation_discard_cost_fields() -> No
     assert expected["required_effect_fields"]["activation_requires_discard_card"] is True
 
 
+def test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields() -> None:
+    proposal = {
+        "normalized_name": "bone splinters",
+        "card_name": "Bone Splinters",
+        "oracle_hash": "hash-bone-splinters",
+        "logical_rule_key": "battle_rule_v1:hash-bone-splinters",
+        "effect_json": {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "graveyard",
+            "additional_cost": "sacrifice_creature",
+            "requires_sacrifice_creature": True,
+            "xmage_additional_cost_class": "SacrificeTargetCost",
+            "xmage_additional_cost_target": "creature",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"]["additional_cost"] == "sacrifice_creature"
+    assert expected["required_effect_fields"]["requires_sacrifice_creature"] is True
+    assert expected["required_effect_fields"]["xmage_additional_cost_class"] == "SacrificeTargetCost"
+    assert expected["required_effect_fields"]["xmage_additional_cost_target"] == "creature"
+
+
 def test_apply_sql_preserves_existing_backup_table_for_idempotent_rerun() -> None:
     proposal = {
         "normalized_name": "quarry beetle",
