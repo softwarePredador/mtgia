@@ -387,6 +387,19 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Sol Ring`. Portanto `candidate_copy_allowed_now=false`,
     `battle_gate_allowed_now=false` e o proximo gate e
     `split_synthesized_package_into_value_safe_stages`.
+    O split de estagios value-safe fica em
+    `manaloom-knowledge/scripts/global_commander_value_safe_stage_splitter.py`
+    com evidencia local
+    `master_optimizer_reports/global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5.md`.
+    Resultado: `commander_value_safe_stage_split_ready_for_stage_candidate_copy`.
+    O modelo pareou `18` swaps em `3` estagios sob limite `8`; stage 1 tem `8`
+    pares e pode seguir apenas para copia candidata isolada. O pacote completo
+    segue bloqueado porque `The Balrog of Moria`, `Wrathful Red Dragon` e
+    `Akroma, Angel of Wrath` estao sem cuts. Portanto
+    `stage_candidate_copy_allowed_now=true`,
+    `full_package_candidate_copy_allowed_now=false`,
+    `battle_gate_allowed_now=false` e o proximo gate e
+    `materialize_value_safe_stage_1_candidate_copy`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

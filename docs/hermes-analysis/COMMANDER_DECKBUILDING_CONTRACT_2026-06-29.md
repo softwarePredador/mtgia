@@ -466,10 +466,12 @@ Current external refresh on 2026-07-05:
 - Current value-safe stage splitting is read-only and consumes the synthesized
   adds plus expanded cut lane in
   `global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5.md`.
-  It pairs `18` swaps into `3` stages under the `8`-swap limit, with stage 1
-  containing `8` pairs and status `stage_ready_for_candidate_copy`. The full
-  package remains blocked because `The Balrog of Moria`, `Wrathful Red Dragon`,
-  and `Akroma, Angel of Wrath` are still unpaired; blocker
+  Its status is
+  `commander_value_safe_stage_split_ready_for_stage_candidate_copy`; it pairs
+  `18` swaps into `3` stages under the `8`-swap limit, with stage 1 containing
+  `8` pairs and status `stage_ready_for_candidate_copy`. The full package
+  remains blocked because `The Balrog of Moria`, `Wrathful Red Dragon`, and
+  `Akroma, Angel of Wrath` are still unpaired; blocker
   `full_package_unpaired_adds:required_21_paired_18` remains active.
   Therefore `stage_candidate_copy_allowed_now=true` for the next isolated
   copy gate only, `full_package_candidate_copy_allowed_now=false`,

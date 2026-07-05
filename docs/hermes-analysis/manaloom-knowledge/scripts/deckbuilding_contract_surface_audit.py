@@ -63,6 +63,9 @@ GLOBAL_COMMANDER_PAYOFF_PACKAGE_SYNTHESIZER = (
 GLOBAL_COMMANDER_CUT_SOURCE_LANE_EXPANDER = (
     SCRIPT_DIR / "global_commander_cut_source_lane_expander.py"
 )
+GLOBAL_COMMANDER_VALUE_SAFE_STAGE_SPLITTER = (
+    SCRIPT_DIR / "global_commander_value_safe_stage_splitter.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -160,6 +163,10 @@ GLOBAL_COMMANDER_PAYOFF_PACKAGE_SYNTHESIS_REPORT = (
 GLOBAL_COMMANDER_CUT_SOURCE_LANE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md"
+)
+GLOBAL_COMMANDER_VALUE_SAFE_STAGE_SPLITTER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -365,6 +372,11 @@ def build_audit() -> dict[str, Any]:
                 "commander_cut_source_lane_expanded_stage_split_required",
                 "value_safe_cut_shortfall:required_21_ready_18",
                 "split_synthesized_package_into_value_safe_stages",
+                "global_commander_value_safe_stage_splitter.py",
+                "global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5.md",
+                "commander_value_safe_stage_split_ready_for_stage_candidate_copy",
+                "full_package_unpaired_adds:required_21_paired_18",
+                "materialize_value_safe_stage_1_candidate_copy",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -567,6 +579,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md",
                 "commander_cut_source_lane_expanded_stage_split_required",
                 "split_synthesized_package_into_value_safe_stages",
+                "global_commander_value_safe_stage_splitter.py",
+                "global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5.md",
+                "commander_value_safe_stage_split_ready_for_stage_candidate_copy",
+                "materialize_value_safe_stage_1_candidate_copy",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -919,6 +935,22 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_VALUE_SAFE_STAGE_SPLITTER,
+            [
+                "global_commander_value_safe_stage_splitter",
+                "commander_value_safe_stage_split_ready_for_stage_candidate_copy",
+                "commander_value_safe_stage_split_blocks_candidate_copy",
+                "review_only_value_safe_stage_pair",
+                "stage_ready_for_candidate_copy",
+                "full_package_unpaired_adds",
+                "materialize_value_safe_stage_1_candidate_copy",
+                "battle_or_optimization_performed",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -1118,6 +1150,29 @@ def build_audit() -> dict[str, Any]:
                 "Archaeomancer's Map",
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
                 "Necropotence",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_VALUE_SAFE_STAGE_SPLITTER_REPORT,
+            [
+                "Global Commander Value-Safe Stage Splitter",
+                "commander_value_safe_stage_split_ready_for_stage_candidate_copy",
+                "selected_add_count: `21`",
+                "value_safe_cut_count: `18`",
+                "paired_swap_count: `18`",
+                "unpaired_add_count: `3`",
+                "stage_count: `3`",
+                "stage_candidate_copy_allowed_now: `true`",
+                "full_package_candidate_copy_allowed_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "full_package_unpaired_adds:required_21_paired_18",
+                "materialize_value_safe_stage_1_candidate_copy",
+                "Arena of Glory",
+                "Archaeomancer's Map",
+                "The Balrog of Moria",
             ],
         )
     )
