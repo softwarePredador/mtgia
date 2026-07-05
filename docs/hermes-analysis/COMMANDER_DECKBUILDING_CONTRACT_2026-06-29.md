@@ -279,6 +279,13 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -566,6 +573,29 @@ Current external refresh on 2026-07-05:
   `angels_demons_dragons_payoffs` is only `16` against the `22-30` target.
   Therefore the next gate remains `repair_commander_profile_blockers_before_battle`,
   focused on payoff density, not battle or promotion.
+- Current payoff-density follow-up is still blocked by cut evidence, not by ADD
+  candidates. The repair plan
+  `global_commander_profile_blocker_repair_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  has one action, `repair_commander_payoff_density_with_legal_source_lanes`, for
+  shortfall `6`. The narrow profile candidate model routes to
+  `expand_commander_payoff_source_lane_before_candidate_copy`; the expanded
+  source lane finds `30` legal WBR Angel/Demon/Dragon candidates and covers the
+  shortfall. The synthesized package selects `Dragon Mage`,
+  `Bonehoard Dracosaur`, `Drakuseth, Maw of Flames`, `The Balrog of Moria`,
+  `Wrathful Red Dragon`, and `Akroma, Angel of Wrath`, but has only `5`
+  tentative cuts and remains blocked by
+  `insufficient_reviewable_cuts_for_full_profile_package:required_6_ready_5`.
+  The current cut-source expander over the scope1 copied DB finds
+  `value_safe_cut_count=0`, `stage_only_cut_count=15`, and blocker
+  `value_safe_cut_shortfall:required_6_ready_0`; rerunning the scope reducer
+  correctly returns `commander_package_scope_reduction_blocks_candidate_copy`
+  with `no_value_safe_reduced_scope_pair_ready`. The stage-only evidence plan
+  `global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  names the lowest-burden evidence rows as `Professional Face-Breaker`,
+  `Diabolic Intent`, and `Ornithopter of Paradise`, all under
+  `contextual_staple_same_lane_usage_review`. This still does not reclassify a
+  cut or open battle; the next gate is
+  `collect_stage_only_cut_evidence_before_value_safe_reclassification`.
 
 ## Global Commander Rollout - 2026-07-01
 

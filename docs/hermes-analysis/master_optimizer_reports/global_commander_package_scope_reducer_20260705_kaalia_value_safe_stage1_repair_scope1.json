@@ -1,0 +1,276 @@
+{
+  "artifact_type": "global_commander_package_scope_reducer",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "insufficient_reviewable_cuts_for_full_profile_package:required_6_ready_5",
+    "value_safe_cut_shortfall:required_6_ready_0",
+    "reduced_scope_dropped_adds:6",
+    "no_value_safe_reduced_scope_pair_ready"
+  ],
+  "deck_action_allowed": false,
+  "dropped_adds": [
+    {
+      "card_name": "Dragon Mage",
+      "cmc": 7.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_damage_trigger",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "card_draw_selection"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 98,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon Wizard"
+    },
+    {
+      "card_name": "Bonehoard Dracosaur",
+      "cmc": 5.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_keywords",
+        "mana_or_treasure_payload",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 97,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dinosaur Dragon"
+    },
+    {
+      "card_name": "Drakuseth, Maw of Flames",
+      "cmc": 7.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "attack_trigger",
+        "removal_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "The Balrog of Moria",
+      "cmc": 7.0,
+      "color_identity": [
+        "B",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "haste",
+        "combat_keywords",
+        "mana_or_treasure_payload",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "card_draw_selection",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Avatar Demon"
+    },
+    {
+      "card_name": "Wrathful Red Dragon",
+      "cmc": 5.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "removal_payload",
+        "life_total_or_damage_multiplier"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "dedicated_win_conditions"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Akroma, Angel of Wrath",
+      "cmc": 8.0,
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "haste",
+        "combat_keywords",
+        "protection_or_lock_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 95,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Angel"
+    }
+  ],
+  "full_package_candidate_copy_allowed_now": false,
+  "generated_at": "2026-07-05T21:08:34.676779+00:00",
+  "input_artifacts": {
+    "cut_source_lane_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "package_synthesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "Battle and promotion remain closed until candidate copy, strategy matrix, and replay gates pass.",
+    "full_package_boundary": "The original package remains blocked until every add has a value-safe cut.",
+    "scope_boundary": "Only the reduced paired scope may move to copied-DB materialization.",
+    "selection_policy": "Prefer closing a whole blocker axis when scarce cuts cannot support the full package."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "reduced_scope_candidate_copy_allowed_now": false,
+  "scoped_pairs": [],
+  "selected_value_safe_cuts": [],
+  "source_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+  "source_db_mutated": false,
+  "status": "commander_package_scope_reduction_blocks_candidate_copy",
+  "summary": {
+    "candidate_copy_blocker_count": 4,
+    "closed_axis_count": 0,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "dropped_add_count": 6,
+    "initial_axis_requirements": {
+      "angels_demons_dragons_payoffs": 6,
+      "commander_attack_window": 0,
+      "lands": 0,
+      "reanimation_plan_b": 0,
+      "spot_interaction": 0
+    },
+    "next_gate": "backfill_value_safe_cuts_or_reduce_package_scope",
+    "original_add_count": 6,
+    "remaining_axis_requirements": {
+      "angels_demons_dragons_payoffs": 6,
+      "commander_attack_window": 0,
+      "lands": 0,
+      "reanimation_plan_b": 0,
+      "spot_interaction": 0
+    },
+    "scoped_pair_count": 0,
+    "value_safe_cut_count": 0
+  }
+}

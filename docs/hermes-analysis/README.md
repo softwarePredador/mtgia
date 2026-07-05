@@ -474,6 +474,32 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `angels_demons_dragons_payoffs` segue `16` contra alvo `22-30`, entao o
     battle continua fechado e o proximo gate e
     `repair_commander_profile_blockers_before_battle`.
+    Esse gate ja foi seguido em modo read-only: o plano
+    `master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+    mostra um unico eixo, `angels_demons_dragons_payoffs`, com shortfall `6`.
+    O modelo estreito
+    `master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+    bloqueia materializacao e manda expandir a source lane; a expansao
+    `master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+    encontra `30` candidatos prontos. A sintese
+    `master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+    seleciona `Dragon Mage`, `Bonehoard Dracosaur`,
+    `Drakuseth, Maw of Flames`, `The Balrog of Moria`,
+    `Wrathful Red Dragon` e `Akroma, Angel of Wrath`, mas so tem `5` cortes
+    tentativos. O cut expander
+    `master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+    confirma `value_safe_cut_count=0` e `stage_only_cut_count=15`; o reducer
+    `master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+    bloqueia ate escopo reduzido com `no_value_safe_reduced_scope_pair_ready`.
+    O novo planner
+    `manaloom-knowledge/scripts/global_commander_stage_only_cut_evidence_plan.py`
+    gera
+    `master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Menor onus de aprendizado: `Professional Face-Breaker`, `Diabolic Intent`
+    e `Ornithopter of Paradise` precisam de
+    `contextual_staple_same_lane_usage_review` antes de qualquer
+    reclassificacao value-safe. Proximo gate:
+    `collect_stage_only_cut_evidence_before_value_safe_reclassification`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

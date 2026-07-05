@@ -1,0 +1,429 @@
+{
+  "artifact_type": "global_commander_stage_only_cut_evidence_plan",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "stage_only_cuts_require_evidence_before_value_safe_reclassification"
+  ],
+  "deck_action_allowed": false,
+  "evidence_plan_rows": [
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Professional Face-Breaker",
+      "evidence_lanes": [
+        "contextual_staple_same_lane_usage_review"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "maximum_evidence_burden": 1,
+      "minimum_evidence_burden": 1,
+      "profile_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "prove the card is replaceable in its over-target lane without weakening current profile floors"
+      ],
+      "score": 61,
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Diabolic Intent",
+      "evidence_lanes": [
+        "contextual_staple_same_lane_usage_review"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "maximum_evidence_burden": 1,
+      "minimum_evidence_burden": 1,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "prove the card is replaceable in its over-target lane without weakening current profile floors"
+      ],
+      "score": 55,
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Ornithopter of Paradise",
+      "evidence_lanes": [
+        "contextual_staple_same_lane_usage_review"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "maximum_evidence_burden": 1,
+      "minimum_evidence_burden": 1,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "prove the card is replaceable in its over-target lane without weakening current profile floors"
+      ],
+      "score": 50,
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Sunforger",
+      "evidence_lanes": [
+        "attack_window_same_lane_replacement_trace"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "maximum_evidence_burden": 3,
+      "minimum_evidence_burden": 3,
+      "profile_roles": [
+        "card_draw_selection",
+        "tutors_access"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "name a same-lane attack-window replacement and prove haste/protection/extracombat floor is preserved"
+      ],
+      "score": 59,
+      "stage_reasons": [
+        "attack_window_cut_requires_same_lane_stage_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "evidence_lanes": [
+        "attack_window_same_lane_replacement_trace"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "maximum_evidence_burden": 3,
+      "minimum_evidence_burden": 3,
+      "profile_roles": [
+        "board_wipes_resets",
+        "mana_acceleration"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "name a same-lane attack-window replacement and prove haste/protection/extracombat floor is preserved"
+      ],
+      "score": 50,
+      "stage_reasons": [
+        "attack_window_cut_requires_same_lane_stage_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Demonic Tutor",
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "prove the expected package function is replaced before the card can be cut",
+        "provide same-lane replacement proof or a replay-backed equal gate before cutting a structural staple"
+      ],
+      "score": 55,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Enlightened Tutor",
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "prove the expected package function is replaced before the card can be cut",
+        "provide same-lane replacement proof or a replay-backed equal gate before cutting a structural staple"
+      ],
+      "score": 55,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Vampiric Tutor",
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "prove the expected package function is replaced before the card can be cut",
+        "provide same-lane replacement proof or a replay-backed equal gate before cutting a structural staple"
+      ],
+      "score": 55,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Arcane Signet",
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "prove the expected package function is replaced before the card can be cut",
+        "provide same-lane replacement proof or a replay-backed equal gate before cutting a structural staple"
+      ],
+      "score": 50,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Sol Ring",
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 4,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "prove the expected package function is replaced before the card can be cut",
+        "provide same-lane replacement proof or a replay-backed equal gate before cutting a structural staple"
+      ],
+      "score": 50,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Jeska's Will",
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "provide same-lane replacement proof or a replay-backed equal gate before cutting a structural staple"
+      ],
+      "score": 61,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Smothering Tithe",
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "provide same-lane replacement proof or a replay-backed equal gate before cutting a structural staple"
+      ],
+      "score": 61,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Dark Ritual",
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "provide same-lane replacement proof or a replay-backed equal gate before cutting a structural staple"
+      ],
+      "score": 50,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Mana Vault",
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "maximum_evidence_burden": 5,
+      "minimum_evidence_burden": 5,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "provide same-lane replacement proof or a replay-backed equal gate before cutting a structural staple"
+      ],
+      "score": 50,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    },
+    {
+      "candidate_copy_allowed_now": false,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "evidence_lanes": [
+        "global_battle_feedback_reopen_proof"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "maximum_evidence_burden": 6,
+      "minimum_evidence_burden": 6,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reclassification_allowed_now": false,
+      "requirements": [
+        "show a materially new source lane or battle gate because prior global feedback blocks this cut"
+      ],
+      "score": 61,
+      "stage_reasons": [
+        "global_battle_feedback_requires_new_same_lane_or_gate"
+      ],
+      "status": "stage_only_cut_needs_evidence_before_value_safe"
+    }
+  ],
+  "generated_at": "2026-07-05T21:10:28.979256+00:00",
+  "input_artifacts": {
+    "cut_source_lane_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "Battle remains closed until a candidate copy, strategy matrix, and replay gates pass.",
+    "evidence_boundary": "This plan names evidence to collect; it does not reclassify any cut as value-safe.",
+    "staple_boundary": "Structural staples and expected package anchors require stronger proof than contextual staples."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "stage_only_cut_evidence_plan_ready",
+  "summary": {
+    "blocked_cut_count": 73,
+    "commander": "Kaalia of the Vast",
+    "cut_source_status": "commander_cut_source_lane_still_blocks_full_package",
+    "deck_id": "619",
+    "evidence_lane_counts": {
+      "attack_window_same_lane_replacement_trace": 2,
+      "contextual_staple_same_lane_usage_review": 3,
+      "expected_package_anchor_replacement_proof": 5,
+      "global_battle_feedback_reopen_proof": 1,
+      "structural_staple_same_lane_or_equal_gate_proof": 9
+    },
+    "next_gate": "collect_stage_only_cut_evidence_before_value_safe_reclassification",
+    "reason_counts": {
+      "attack_window_cut_requires_same_lane_stage_proof": 2,
+      "commander_expected_package_anchor_requires_stage_proof": 5,
+      "contextual_staple_requires_stage_review": 3,
+      "global_battle_feedback_requires_new_same_lane_or_gate": 1,
+      "structural_foundation_staple_requires_same_lane_or_battle_proof": 9
+    },
+    "required_cut_count": 6,
+    "stage_only_cut_count": 15,
+    "value_safe_cut_count": 0
+  },
+  "value_safe_reclassification_allowed_now": false
+}

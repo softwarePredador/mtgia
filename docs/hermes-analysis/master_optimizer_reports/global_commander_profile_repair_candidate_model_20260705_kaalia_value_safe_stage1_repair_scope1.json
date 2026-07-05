@@ -1,0 +1,538 @@
+{
+  "artifact_type": "global_commander_profile_repair_candidate_model",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "blocked_cut_review_pool": [
+    {
+      "block_reasons": [
+        "attack_window_cut_not_allowed"
+      ],
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "core_roles": [
+        "board_wipe",
+        "engine",
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "board_wipes_resets",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "mana_acceleration_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_angels_demons_dragons_payoffs",
+        "add_payoff_cut_not_allowed"
+      ],
+      "card_name": "Ancient Copper Dragon",
+      "core_roles": [
+        "engine",
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_angels_demons_dragons_payoffs",
+        "add_payoff_cut_not_allowed"
+      ],
+      "card_name": "Angel of the Ruins",
+      "core_roles": [
+        "tutor"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_spot_interaction"
+      ],
+      "card_name": "Anguished Unmaking",
+      "core_roles": [
+        "removal"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "risk_flags": [],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "card_name": "Arcane Signet",
+      "core_roles": [
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "attack_window_cut_not_allowed"
+      ],
+      "card_name": "Ardenn, Intrepid Archaeologist",
+      "core_roles": [
+        "engine"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_angels_demons_dragons_payoffs",
+        "carries_blocked_role_haste_protection_silence",
+        "add_payoff_cut_not_allowed"
+      ],
+      "card_name": "Aurelia, the Law Above",
+      "core_roles": [
+        "board_wipe",
+        "draw",
+        "engine"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "board_wipes_resets",
+        "card_draw_selection",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_angels_demons_dragons_payoffs",
+        "carries_blocked_role_haste_protection_silence",
+        "add_payoff_cut_not_allowed"
+      ],
+      "card_name": "Avacyn, Angel of Hope",
+      "core_roles": [
+        "protection"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "haste_or_protection_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_angels_demons_dragons_payoffs",
+        "add_payoff_cut_not_allowed"
+      ],
+      "card_name": "Balefire Dragon",
+      "core_roles": [
+        "board_wipe",
+        "engine",
+        "wincon"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "board_wipes_resets",
+        "dedicated_win_conditions"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "global_battle_feedback_requires_new_same_lane_or_gate"
+      ],
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "core_roles": [
+        "engine",
+        "ramp"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_haste_protection_silence"
+      ],
+      "card_name": "Blightsteel Colossus // Blightsteel Colossus",
+      "core_roles": [
+        "protection",
+        "wincon"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "dedicated_win_conditions",
+        "haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    },
+    {
+      "block_reasons": [
+        "carries_blocked_role_angels_demons_dragons_payoffs",
+        "attack_window_cut_not_allowed",
+        "add_payoff_cut_not_allowed"
+      ],
+      "card_name": "Bloodthirster",
+      "core_roles": [
+        "engine"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "attack_window_or_extra_combat_cut"
+      ],
+      "status": "blocked_profile_repair_cut_candidate"
+    }
+  ],
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "angels_demons_dragons_payoffs:needs_broader_commander_payoff_source_lane_before_materialization"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T21:07:32.675019+00:00",
+  "global_cut_review_pool": [
+    {
+      "card_name": "Diabolic Intent",
+      "classification_source": "text_inferred",
+      "cmc": 2.0,
+      "core_roles": [
+        "tutor"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "score": 50,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Jeska's Will",
+      "classification_source": "text_inferred",
+      "cmc": 3.0,
+      "core_roles": [
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_mana_acceleration"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "score": 43,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Professional Face-Breaker",
+      "classification_source": "text_inferred",
+      "cmc": 3.0,
+      "core_roles": [
+        "draw",
+        "engine",
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_mana_acceleration"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "score": 43,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Ornithopter of Paradise",
+      "classification_source": "text_inferred",
+      "cmc": 2.0,
+      "core_roles": [
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_mana_acceleration"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "score": 42,
+      "status": "review_only_profile_repair_cut_candidate"
+    },
+    {
+      "card_name": "Dark Ritual",
+      "classification_source": "text_inferred",
+      "cmc": 1.0,
+      "core_roles": [
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_mana_acceleration"
+      ],
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "score": 41,
+      "status": "review_only_profile_repair_cut_candidate"
+    }
+  ],
+  "input_artifacts": {
+    "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+    "repair_plan_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "strategy_matrix_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "materialization_boundary": "Candidate copy opens only when every blocker axis has enough legal candidates and reviewable cuts.",
+    "payoff_boundary": "Large commander payoff shortfalls require a broader commander source lane, not a narrow interaction-style swap.",
+    "repair_boundary": "Candidates are review-only source-lane rows, not deck changes."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "repair_axis_pools": [
+    {
+      "blocker": "profile_angels_demons_dragons_payoffs_below_target",
+      "candidate_count": 0,
+      "candidate_source_axis": "angels_demons_dragons_payoffs",
+      "mutation_allowed": false,
+      "repair_axis": "angels_demons_dragons_payoffs",
+      "shortfall_to_min": 6,
+      "status": "needs_broader_commander_payoff_source_lane_before_materialization",
+      "top_add_candidates": [
+        {
+          "axis": "angels_demons_dragons_payoffs",
+          "card_name": "Angel of Serenity",
+          "cmc": null,
+          "color_identity": [],
+          "color_identity_allowed": true,
+          "commander_legality": "legal",
+          "fit_reasons": [
+            "commander_reference_profile_expected_package",
+            "profile_expected_package"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [],
+          "score": 80,
+          "source": "commander_reference_profile_expected_package",
+          "status": "blocked_not_commander_payoff_role",
+          "type_line": ""
+        },
+        {
+          "axis": "angels_demons_dragons_payoffs",
+          "card_name": "Aurelia, the Warleader",
+          "cmc": null,
+          "color_identity": [],
+          "color_identity_allowed": true,
+          "commander_legality": "legal",
+          "fit_reasons": [
+            "commander_reference_profile_expected_package",
+            "profile_expected_package"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [],
+          "score": 80,
+          "source": "commander_reference_profile_expected_package",
+          "status": "blocked_not_commander_payoff_role",
+          "type_line": ""
+        }
+      ],
+      "top_cut_candidates": [
+        {
+          "card_name": "Diabolic Intent",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "core_roles": [
+            "tutor"
+          ],
+          "cut_reasons": [
+            "over_target_tutors_access",
+            "tutor_role_above_target_review"
+          ],
+          "matching_over_target_roles": [
+            "tutors_access"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "score": 50,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Jeska's Will",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "core_roles": [
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_acceleration"
+          ],
+          "matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "score": 43,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Professional Face-Breaker",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "core_roles": [
+            "draw",
+            "engine",
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_acceleration"
+          ],
+          "matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "card_draw_selection",
+            "mana_acceleration"
+          ],
+          "score": 43,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Ornithopter of Paradise",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "core_roles": [
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_acceleration"
+          ],
+          "matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "score": 42,
+          "status": "review_only_profile_repair_cut_candidate"
+        },
+        {
+          "card_name": "Dark Ritual",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "core_roles": [
+            "ramp"
+          ],
+          "cut_reasons": [
+            "over_target_mana_acceleration"
+          ],
+          "matching_over_target_roles": [
+            "mana_acceleration"
+          ],
+          "mutation_allowed": false,
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "score": 41,
+          "status": "review_only_profile_repair_cut_candidate"
+        }
+      ]
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "profile_repair_candidate_model_blocks_materialization",
+  "summary": {
+    "blocked_cut_candidate_count": 12,
+    "candidate_copy_blocker_count": 1,
+    "commander": "Kaalia of the Vast",
+    "commander_color_identity": [
+      "W",
+      "B",
+      "R"
+    ],
+    "cut_candidate_count": 5,
+    "deck_id": "619",
+    "next_gate": "expand_commander_payoff_source_lane_before_candidate_copy",
+    "repair_axis_count": 1
+  }
+}

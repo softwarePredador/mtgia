@@ -71,6 +71,12 @@ GLOBAL_COMMANDER_VALUE_SAFE_STAGE_SPLITTER = (
 )
 GLOBAL_COMMANDER_PACKAGE_SCOPE_REDUCER = SCRIPT_DIR / "global_commander_package_scope_reducer.py"
 GLOBAL_COMMANDER_PACKAGE_SCOPE_REDUCER_TEST = SCRIPT_DIR / "test_global_commander_package_scope_reducer.py"
+GLOBAL_COMMANDER_STAGE_ONLY_CUT_EVIDENCE_PLAN = (
+    SCRIPT_DIR / "global_commander_stage_only_cut_evidence_plan.py"
+)
+GLOBAL_COMMANDER_STAGE_ONLY_CUT_EVIDENCE_PLAN_TEST = (
+    SCRIPT_DIR / "test_global_commander_stage_only_cut_evidence_plan.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -200,6 +206,34 @@ GLOBAL_COMMANDER_REPAIR_SCOPE1_CHAIN_REPORT = (
 GLOBAL_COMMANDER_REPAIR_SCOPE1_STRATEGY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_PROFILE_BLOCKER_REPAIR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_PROFILE_REPAIR_CANDIDATE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_PAYOFF_SOURCE_LANE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_PAYOFF_PACKAGE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_CUT_SOURCE_LANE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_PACKAGE_SCOPE_REDUCER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_STAGE_ONLY_CUT_EVIDENCE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -468,6 +502,12 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "angels_demons_dragons_payoffs` is only `16`",
+                "global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "Professional Face-Breaker",
+                "Diabolic Intent",
+                "Ornithopter of Paradise",
+                "contextual_staple_same_lane_usage_review",
+                "collect_stage_only_cut_evidence_before_value_safe_reclassification",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -694,6 +734,13 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "angels_demons_dragons_payoffs` segue `16`",
+                "global_commander_stage_only_cut_evidence_plan.py",
+                "global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "Professional Face-Breaker",
+                "Diabolic Intent",
+                "Ornithopter of Paradise",
+                "contextual_staple_same_lane_usage_review",
+                "collect_stage_only_cut_evidence_before_value_safe_reclassification",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -938,6 +985,34 @@ def build_audit() -> dict[str, Any]:
                 "Cabal Ritual",
                 "reduced_scope_dropped_adds:1",
                 "no_value_safe_reduced_scope_pair_ready",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_STAGE_ONLY_CUT_EVIDENCE_PLAN,
+            [
+                "global_commander_stage_only_cut_evidence_plan",
+                "stage_only_cut_evidence_plan_ready",
+                "stage_only_cut_evidence_plan_blocks_no_stage_only_rows",
+                "contextual_staple_same_lane_usage_review",
+                "structural_staple_same_lane_or_equal_gate_proof",
+                "global_battle_feedback_reopen_proof",
+                "collect_stage_only_cut_evidence_before_value_safe_reclassification",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_STAGE_ONLY_CUT_EVIDENCE_PLAN_TEST,
+            [
+                "test_prioritizes_contextual_stage_review_before_structural_staples",
+                "test_blocks_when_no_stage_only_rows_exist",
+                "Professional Face-Breaker",
+                "Dark Ritual",
+                "Sunforger",
+                "contextual_staple_same_lane_usage_review",
             ],
         )
     )
@@ -1428,6 +1503,112 @@ def build_audit() -> dict[str, Any]:
                 "repair_commander_profile_blockers_before_battle",
                 "Necromancy",
                 "Cabal Ritual",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_PROFILE_BLOCKER_REPAIR_REPORT,
+            [
+                "Global Commander Profile Blocker Repair Plan",
+                "profile_blocker_repair_plan_ready",
+                "blocker_count: `1`",
+                "repair_action_count: `1`",
+                "profile_angels_demons_dragons_payoffs_below_target",
+                "repair_commander_payoff_density_with_legal_source_lanes",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_PROFILE_REPAIR_CANDIDATE_REPORT,
+            [
+                "Global Commander Profile Repair Candidate Model",
+                "profile_repair_candidate_model_blocks_materialization",
+                "candidate_copy_allowed_now: `false`",
+                "expand_commander_payoff_source_lane_before_candidate_copy",
+                "needs_broader_commander_payoff_source_lane_before_materialization",
+                "Diabolic Intent",
+                "Dark Ritual",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_PAYOFF_SOURCE_LANE_REPORT,
+            [
+                "Global Commander Payoff Source Lane Expander",
+                "commander_payoff_source_lane_expanded",
+                "shortfall_to_min: `6`",
+                "ready_candidate_count: `30`",
+                "ready_candidates_cover_shortfall: `true`",
+                "Dragon Mage",
+                "Bonehoard Dracosaur",
+                "Drakuseth, Maw of Flames",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_PAYOFF_PACKAGE_REPORT,
+            [
+                "Global Commander Payoff Package Synthesizer",
+                "commander_payoff_package_synthesis_blocks_candidate_copy",
+                "selected_add_count: `6`",
+                "selected_cut_count: `5`",
+                "unpaired_add_count: `1`",
+                "insufficient_reviewable_cuts_for_full_profile_package:required_6_ready_5",
+                "Akroma, Angel of Wrath",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_CUT_SOURCE_LANE_REPORT,
+            [
+                "Global Commander Cut Source Lane Expander",
+                "commander_cut_source_lane_still_blocks_full_package",
+                "required_cut_count: `6`",
+                "value_safe_cut_count: `0`",
+                "stage_only_cut_count: `15`",
+                "value_safe_cut_shortfall:required_6_ready_0",
+                "Professional Face-Breaker",
+                "Diabolic Intent",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_PACKAGE_SCOPE_REDUCER_REPORT,
+            [
+                "Global Commander Package Scope Reducer",
+                "commander_package_scope_reduction_blocks_candidate_copy",
+                "value_safe_cut_count: `0`",
+                "scoped_pair_count: `0`",
+                "no_value_safe_reduced_scope_pair_ready",
+                "Dragon Mage",
+                "Akroma, Angel of Wrath",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_STAGE_ONLY_CUT_EVIDENCE_REPORT,
+            [
+                "Global Commander Stage-Only Cut Evidence Plan",
+                "stage_only_cut_evidence_plan_ready",
+                "required_cut_count: `6`",
+                "value_safe_cut_count: `0`",
+                "stage_only_cut_count: `15`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "collect_stage_only_cut_evidence_before_value_safe_reclassification",
+                "Professional Face-Breaker",
+                "Diabolic Intent",
+                "Ornithopter of Paradise",
+                "contextual_staple_same_lane_usage_review",
             ],
         )
     )
