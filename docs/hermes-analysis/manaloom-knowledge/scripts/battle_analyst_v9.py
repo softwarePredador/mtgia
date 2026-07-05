@@ -45111,6 +45111,21 @@ def _dynamic_damage_count_from_source(player, opponents, effect_data):
         if "hand_stat_modifier_count" in replay_fields:
             replay_fields["hand_damage_count"] = replay_fields["hand_stat_modifier_count"]
         return count, replay_fields
+    if amount_source == "target_hand_count":
+        alive_opponents = [opp for opp in opponents or [] if getattr(opp, "is_alive", lambda: True)()]
+        target_player = min(alive_opponents, key=lambda opp: opp.life) if alive_opponents else None
+        count = len(getattr(target_player, "hand", []) or []) if target_player is not None else 0
+        return count, {
+            "damage_amount_source": amount_source,
+            "target_hand_damage_count": count,
+            "target_player_for_dynamic_count": getattr(target_player, "name", None),
+        }
+    if amount_source == "other_spells_cast_this_turn":
+        count = max(0, int(getattr(player, "spells_cast_this_turn", 0) or 0) - 1)
+        return count, {
+            "damage_amount_source": amount_source,
+            "other_spells_cast_this_turn": count,
+        }
     if amount_source == "colors_among_permanents_you_control":
         count = _controlled_permanent_color_count(player)
         return count, {
@@ -45152,6 +45167,8 @@ def dynamic_damage_amount(player, opponents, effect_data):
         "graveyard_card_count",
         "battlefield_permanent_count",
         "controller_hand_count",
+        "target_hand_count",
+        "other_spells_cast_this_turn",
         "domain_basic_land_types",
         "colors_among_permanents_you_control",
         "party_count",

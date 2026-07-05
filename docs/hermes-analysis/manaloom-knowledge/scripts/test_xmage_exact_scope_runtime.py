@@ -4313,6 +4313,100 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dynamic_target_hand_count_damage_uses_target_player_hand_size(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 12
+        opponent.hand = [
+            {"name": "Hidden Card A", "type_line": "Instant"},
+            {"name": "Hidden Card B", "type_line": "Creature"},
+            {"name": "Hidden Card C", "type_line": "Land"},
+            {"name": "Hidden Card D", "type_line": "Sorcery"},
+        ]
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+            "damage_amount_source": "target_hand_count",
+            "damage_base_amount": 0,
+            "damage_per_count": 1,
+            "target": "player",
+            "target_constraints": {"scope": "player"},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Storm Seeker",
+                "type_line": "Instant",
+                "oracle_text": "Storm Seeker deals damage to target player equal to the number of cards in that player's hand.",
+            },
+            turn=2,
+            rng=random.Random(34),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 8)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Storm Seeker"
+                and data.get("amount") == 4
+                and data.get("target_hand_damage_count") == 4
+                and data.get("target_player_for_dynamic_count") == "Opponent"
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_other_spells_cast_damage_excludes_current_spell(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.spells_cast_this_turn = 4
+        opponent.battlefield = [
+            {"name": "Target Behemoth", "type_line": "Creature - Beast", "power": 4, "toughness": 5},
+        ]
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_count_damage_spell_v1",
+            "damage_amount_source": "other_spells_cast_this_turn",
+            "damage_base_amount": 2,
+            "damage_per_count": 1,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Thunder Salvo",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "Thunder Salvo deals X damage to target creature, where X is 2 plus the number "
+                    "of other spells you've cast this turn."
+                ),
+            },
+            turn=2,
+            rng=random.Random(35),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(len(opponent.battlefield), 0)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Thunder Salvo"
+                and data.get("amount") == 5
+                and data.get("other_spells_cast_this_turn") == 3
+                and data.get("target") == "Target Behemoth"
+                and data.get("result") == "creature_destroyed"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_dynamic_count_damage_supports_runtime_count_sources(self) -> None:
         fixtures = [
             {

@@ -7242,6 +7242,12 @@ def _dynamic_damage_count_fields_from_filter(filter_text: str) -> dict[str, Any]
         return {"damage_amount_source": "domain_basic_land_types"}
     if token == "cards in your hand":
         return {"damage_amount_source": "controller_hand_count"}
+    if token in {"cards in that player's hand", "cards in target player's hand"}:
+        return {"damage_amount_source": "target_hand_count"}
+    if token == "other spells you've cast this turn":
+        return {"damage_amount_source": "other_spells_cast_this_turn"}
+    if token == "colors of mana spent to cast this spell":
+        return "dynamic_count_damage_mana_spent_colors_not_supported"
     if token == "colors among permanents you control":
         return {"damage_amount_source": "colors_among_permanents_you_control"}
     if token == "creatures in your party":
@@ -7355,8 +7361,15 @@ def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[
         token = parts[0].strip()
     if "GetXValue" in token or "ManacostVariableValue" in token:
         return "dynamic_count_damage_x_cost_not_supported"
-    if "CardsInTargetHandCount" in token or (token == "xValue" and "CardsInTargetHandCount" in text):
-        return "dynamic_count_damage_target_hand_not_supported"
+    if (
+        "CardsInTargetHandCount" in token
+        or "TargetPlayerCardsInHandCount" in token
+        or (
+            token == "xValue"
+            and ("CardsInTargetHandCount" in text or "TargetPlayerCardsInHandCount" in text)
+        )
+    ):
+        return {"damage_amount_source": "target_hand_count"}
     if (
         "GreatestAmongPermanentsValue" in token
         or "GreatestPowerAmongControlledValue" in token
@@ -7378,12 +7391,6 @@ def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[
             "damage_amount_source": "controlled_permanents_mana_symbol_count",
             "mana_symbol_count_color": "R",
         }
-    if "ThunderSalvoValue" in token or (token == "xValue" and "ThunderSalvoValue" in text):
-        return "dynamic_count_damage_spell_count_not_supported"
-    if "ElectrostaticBoltDamageValue" in token:
-        return "dynamic_count_damage_conditional_target_state_not_supported"
-    if token == "xValue" and "AdditiveDynamicValue" in text:
-        return "dynamic_count_damage_composite_count_not_supported"
     int_plus_args = extract_constructor_args(token, "IntPlusDynamicValue")
     if int_plus_args is not None:
         parts = split_top_level_args(int_plus_args)
@@ -7393,6 +7400,12 @@ def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[
         if isinstance(nested, str) or nested is None:
             return nested
         return {**nested, "damage_base_amount": int(parts[0].strip())}
+    if "ThunderSalvoValue" in token or (token == "xValue" and "ThunderSalvoValue" in text):
+        return {"damage_amount_source": "other_spells_cast_this_turn"}
+    if "ElectrostaticBoltDamageValue" in token:
+        return "dynamic_count_damage_conditional_target_state_not_supported"
+    if token == "xValue" and "AdditiveDynamicValue" in text:
+        return "dynamic_count_damage_composite_count_not_supported"
     if "DomainValue.REGULAR" in token or (token == "xValue" and "DomainValue.REGULAR" in text):
         return {"damage_amount_source": "domain_basic_land_types"}
     if "CardsInControllerHandCount.ANY" in token or (

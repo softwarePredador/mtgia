@@ -15335,3 +15335,71 @@ Register decision:
   cards listed in this package.
 - The next wave must start from the rebuilt post-PG510 queue and choose a new
   exact subpattern; do not reuse the pre-PG510 queue.
+
+## 2026-07-05 - PG511 simple dynamic damage count spells
+
+- Deploy id: `xmage_pg511_simple_dynamic_damage_counts_new_server`.
+- Runtime family: `xmage_dynamic_count_damage_spell_v1`.
+- Promoted cards: `4`.
+- Promoted card names: `Runeflare Trap`, `Storm Seeker`, `Sudden Impact`, and
+  `Thunder Salvo`.
+- Scope boundary: only direct damage spells backed by local XMage
+  `DamageTargetEffect` and exact ManaLoom runtime count sources for target
+  player hand size or other spells cast this turn are allowed in this package.
+  Composite counts, mana-spent color counts, unrelated direct damage rows, and
+  broad review scopes remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg511_simple_dynamic_damage_counts_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg511_simple_dynamic_damage_counts_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg511_simple_dynamic_damage_counts_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg511_simple_dynamic_damage_counts_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg511_simple_dynamic_damage_counts_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg511_simple_dynamic_damage_counts_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg511_simple_dynamic_damage_counts_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=4`, `COMMIT`.
+- Postcheck:
+  all 4 promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg511_simple_dynamic_damage_counts_new_server.json`;
+  `selected_card_count=4`, `pg_rows_loaded=4`,
+  `sqlite_inserted_or_updated=4`, and
+  `canonical_snapshot_rows_exported=6009`.
+- Validation:
+  combined parser/runtime suite `817` tests passed, XMage strategy `26/26`
+  pass, operational surface `pass`, legacy contamination `pass`, and
+  PG/Hermes/SQLite `51/51` pass.
+- Post-sync queue:
+  `target_identity_count=26008`, `xmage_authoritative_source_count=25694`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25694`.
+- Global readiness:
+  `battle_and_oracle_ready=4942`,
+  `battle_family_mapper_required=28931`,
+  `snapshot_has_any_rule=6012`, and
+  `snapshot_has_verified_rule=4764`.
+- Final exact-scope recheck:
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`, and
+  `adapter_work_unit_counts={}`.
+
+Register decision:
+
+- PG511 is applied and should not be rebuilt.
+- The dynamic count damage spell parser/runtime now supports the four exact
+  cards listed in this package.
+- The next wave must start from the rebuilt post-PG511 queue and choose a new
+  exact subpattern; do not reuse the pre-PG511 candidate queue.

@@ -1232,6 +1232,55 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 "count_fields": {},
             },
             {
+                "name": "Storm Seeker",
+                "oracle": "Storm Seeker deals damage to target player equal to the number of cards in that player's hand.",
+                "source": """
+                    Effect effect = new DamageTargetEffect(CardsInTargetHandCount.instance);
+                    effect.setText("{this} deals damage to target player equal to the number of cards in that player's hand.");
+                    this.getSpellAbility().addEffect(effect);
+                    this.getSpellAbility().addTarget(new TargetPlayer());
+                """,
+                "target": "player",
+                "constraints": {"scope": "player"},
+                "amount_source": "target_hand_count",
+                "count_fields": {},
+            },
+            {
+                "name": "Runeflare Trap",
+                "oracle": (
+                    "If an opponent drew three or more cards this turn, you may pay {R} rather than pay this spell's mana cost.\n"
+                    "Runeflare Trap deals damage to target player equal to the number of cards in that player's hand."
+                ),
+                "source": """
+                    this.addAbility(new AlternativeCostSourceAbility(new ManaCostsImpl<>("{R}"), RuneflareTrapCondition.instance), new CardsAmountDrawnThisTurnWatcher());
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(new TargetPlayerCardsInHandCount())
+                            .setText("{this} deals damage to target player equal to the number of cards in that player's hand"));
+                    this.getSpellAbility().addTarget(new TargetPlayer());
+                """,
+                "target": "player",
+                "constraints": {"scope": "player"},
+                "amount_source": "target_hand_count",
+                "count_fields": {},
+            },
+            {
+                "name": "Thunder Salvo",
+                "oracle": (
+                    "Thunder Salvo deals X damage to target creature, where X is 2 plus the number "
+                    "of other spells you've cast this turn."
+                ),
+                "source": """
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(new IntPlusDynamicValue(2, ThunderSalvoValue.instance))
+                            .setText("{this} deals X damage to target creature, where X is 2 plus the number of other spells you've cast this turn."));
+                    this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                    this.getSpellAbility().addHint(new ValueHint("Number of other spells you've cast this turn", ThunderSalvoValue.instance));
+                """,
+                "target": "creature",
+                "constraints": {"card_types": ["creature"]},
+                "amount_source": "other_spells_cast_this_turn",
+                "base": 2,
+                "count_fields": {},
+            },
+            {
                 "name": "Welding Sparks",
                 "oracle": (
                     "Welding Sparks deals X damage to target creature, where X is 3 plus the number "

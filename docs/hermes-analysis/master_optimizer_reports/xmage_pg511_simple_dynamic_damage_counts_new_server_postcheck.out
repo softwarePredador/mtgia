@@ -1,0 +1,7 @@
+   card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Runeflare Trap | runeflare trap  | battle_rule_v1:f86cf719c13e031f50a9270dc8564003 |                  1 |                           1 |                         1 |           0
+ Storm Seeker   | storm seeker    | battle_rule_v1:f86cf719c13e031f50a9270dc8564003 |                  1 |                           1 |                         1 |           0
+ Sudden Impact  | sudden impact   | battle_rule_v1:f86cf719c13e031f50a9270dc8564003 |                  1 |                           1 |                         1 |           0
+ Thunder Salvo  | thunder salvo   | battle_rule_v1:102529d74981d821d4e9827b80d25c5a |                  1 |                           1 |                         1 |           0
+(4 rows)
