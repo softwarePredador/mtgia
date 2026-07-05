@@ -540,3 +540,67 @@ Interpretation:
 Current conclusion remains unchanged: protected deck `607` is still the
 Lorehold champion. This checkpoint improves ManaLoom's card-identity readiness
 for external Lorehold learning, but it is not deck-promotion evidence.
+
+## Post-Identity Queue Split - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_post_identity_queue_split_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_post_identity_queue_split_20260705_current.json`
+
+It consumes the identity-cache simulation and splits the now identity-ready
+external candidates into runtime/manual-review, combo, and full-shell
+contracts. It is report-only: no PostgreSQL writes, no source SQLite writes,
+and no mutation of protected deck `607`.
+
+Current result:
+
+- status: `post_identity_queue_split_no_battle_ready_keep_607`;
+- queue cards: `14`;
+- remaining identity imports: `0`;
+- temporary simulation identities: `6`;
+- source DB identities: `8`;
+- runtime/manual-review routes: `4`;
+- combo runtime contract routes: `1`;
+- full-shell contract routes: `9`;
+- verified auto-rule-ready cards: `1`;
+- battle-ready cards now: `0`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`.
+
+Priority split:
+
+- `Brain in a Jar`: priority runtime contract for
+  `topdeck_miracle_access`; identity is ready only in the temporary
+  simulation, and no verified battle rule or named safe cut exists.
+- `Entreat the Angels`: priority runtime contract for
+  `miracle_finisher`; identity is ready only in the temporary simulation, and
+  miracle/token runtime plus safe-cut proof is still required.
+- `Haze of Rage`: combo runtime contract with `Storm-Kiln Artist`, not a
+  standalone include; storm/buyback/combat-buff runtime and cut safety are
+  both missing.
+- `Burning Prophet`: diagnostic runtime/manual-review lane for spell-scry
+  pressure; no verified battle rule or named safe cut exists.
+- `Inti, Seneschal of the Sun`: diagnostic runtime/manual-review lane for
+  discard/exile access; no verified battle rule or named safe cut exists.
+- `Karmic Guide`: the only card in this split with a verified auto rule, but
+  it is still a `white_reanimator_shell` card and therefore not battle-ready
+  as a one-for-one 607 cut.
+
+Full-shell contracts:
+
+- `token_multiplier_shell`: `Anointed Procession` and `Cathars' Crusade`.
+  This requires token density and cuts before any battle gate.
+- `voltron_equipment_shell`: `Blackblade Reforged`,
+  `Excalibur, Sword of Eden`, and `Strata Scythe`. This requires a commander
+  damage/equipment shell before any battle gate.
+- `white_reanimator_shell`: `Karmic Guide`, `Late to Dinner`,
+  `Miraculous Recovery`, and `Storm of Souls`. This requires creature density,
+  graveyard setup, recursion targets, and cuts before any battle gate.
+- `storm_kiln_haze_combo`: `Storm-Kiln Artist` plus `Haze of Rage`. This
+  requires combo runtime and cut safety before any battle gate.
+
+Current conclusion remains unchanged: protected deck `607` is still the
+Lorehold champion. The next valid learning step is
+`draft_runtime_contracts_for_brain_entreat_haze_before_any_deck_gate`, not a
+natural battle, not a shell promotion, and not a direct mutation of `607`.
