@@ -1,0 +1,869 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg482_self_add_counters_new_server_20260705_044704",
+  "deploy_id": "PG482",
+  "expected_rules": [
+    {
+      "card_name": "Carnivorous Moss-Beast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a782138d8d63502af38d50b5968c239",
+      "min_rule_version": 2,
+      "normalized_name": "carnivorous moss-beast",
+      "oracle_hash": "49068d66e409b3ed3d3a4f7ca7fd4929",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "G",
+          "G"
+        ],
+        "activation_cost_generic": 5,
+        "activation_cost_mana": "{5}{G}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chronomaton",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88916f73f73e2df515bbef6919805dc5",
+      "min_rule_version": 2,
+      "normalized_name": "chronomaton",
+      "oracle_hash": "c36a67be5df8f853c60f592d49b5a615",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Energizer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2c56305f71d41d557570b6ee424d7bc1",
+      "min_rule_version": 2,
+      "normalized_name": "energizer",
+      "oracle_hash": "5a1a86ec889efb431814a500926fab3d",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hungry Megasloth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5c70a79648cdeb0e669a29f1c875f1db",
+      "min_rule_version": 2,
+      "normalized_name": "hungry megasloth",
+      "oracle_hash": "9dacf6afa99ff17f48850d4d29834bd6",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "reach"
+        ],
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jenara, Asura of War",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d1c39ea5aafb1d002bc9cf60583c4388",
+      "min_rule_version": 2,
+      "normalized_name": "jenara, asura of war",
+      "oracle_hash": "385de3d6d2637476db28317157b5c511",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jungle Delver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:233eac8995e59d158cd014a90e5f3a95",
+      "min_rule_version": 2,
+      "normalized_name": "jungle delver",
+      "oracle_hash": "4a2663cf4c2703fd61427c875548ce01",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ruins Recluse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6fcbbccfc5cacd668296e1e1b787d82b",
+      "min_rule_version": 2,
+      "normalized_name": "ruins recluse",
+      "oracle_hash": "50b63a239462d9429bc682b0d99e6a5a",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "reach"
+        ],
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sledding Otter-Penguin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7f62f3608687b28a16eeadafe7efa4c4",
+      "min_rule_version": 2,
+      "normalized_name": "sledding otter-penguin",
+      "oracle_hash": "5d51caebfd5fb3e38af00985b8024ea9",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Unholy Officiant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:314d02cb0db136b0a71adaaffd76e30e",
+      "min_rule_version": 2,
+      "normalized_name": "unholy officiant",
+      "oracle_hash": "748031dc4868a157d229f5d2d746e0b8",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "vigilance"
+        ],
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Verdant Automaton",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:233eac8995e59d158cd014a90e5f3a95",
+      "min_rule_version": 2,
+      "normalized_name": "verdant automaton",
+      "oracle_hash": "4a2663cf4c2703fd61427c875548ce01",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_activated_self_add_counters": 10
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg482_self_add_counters_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg482_self_add_counters_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg482_self_add_counters_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg482_self_add_counters_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg482_self_add_counters_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg482_self_add_counters_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T04:47:04+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Carnivorous Moss-Beast"
+      },
+      "card_name": "Carnivorous Moss-Beast",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a782138d8d63502af38d50b5968c239",
+      "normalized_name": "carnivorous moss-beast",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "G",
+          "G"
+        ],
+        "activation_cost_generic": 5,
+        "activation_cost_mana": "{5}{G}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Chronomaton"
+      },
+      "card_name": "Chronomaton",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88916f73f73e2df515bbef6919805dc5",
+      "normalized_name": "chronomaton",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Energizer"
+      },
+      "card_name": "Energizer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2c56305f71d41d557570b6ee424d7bc1",
+      "normalized_name": "energizer",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hungry Megasloth"
+      },
+      "card_name": "Hungry Megasloth",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5c70a79648cdeb0e669a29f1c875f1db",
+      "normalized_name": "hungry megasloth",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "reach"
+        ],
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Jenara, Asura of War"
+      },
+      "card_name": "Jenara, Asura of War",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d1c39ea5aafb1d002bc9cf60583c4388",
+      "normalized_name": "jenara, asura of war",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Jungle Delver"
+      },
+      "card_name": "Jungle Delver",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:233eac8995e59d158cd014a90e5f3a95",
+      "normalized_name": "jungle delver",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ruins Recluse"
+      },
+      "card_name": "Ruins Recluse",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6fcbbccfc5cacd668296e1e1b787d82b",
+      "normalized_name": "ruins recluse",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "reach"
+        ],
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sledding Otter-Penguin"
+      },
+      "card_name": "Sledding Otter-Penguin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7f62f3608687b28a16eeadafe7efa4c4",
+      "normalized_name": "sledding otter-penguin",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Unholy Officiant"
+      },
+      "card_name": "Unholy Officiant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:314d02cb0db136b0a71adaaffd76e30e",
+      "normalized_name": "unholy officiant",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "vigilance"
+        ],
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Verdant Automaton"
+      },
+      "card_name": "Verdant Automaton",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:233eac8995e59d158cd014a90e5f3a95",
+      "normalized_name": "verdant automaton",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_add_counters": true,
+        "activated_add_counters_count": 1,
+        "activated_add_counters_counter_type": "+1/+1",
+        "activated_add_counters_target": "self",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "activated_effect": "add_counters",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+        "count": 1,
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "target": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Carnivorous Moss-Beast",
+    "Chronomaton",
+    "Energizer",
+    "Hungry Megasloth",
+    "Jenara, Asura of War",
+    "Jungle Delver",
+    "Ruins Recluse",
+    "Sledding Otter-Penguin",
+    "Unholy Officiant",
+    "Verdant Automaton"
+  ],
+  "selected_count": 10,
+  "slug": "self_add_counters_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Carnivorous Moss-Beast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a782138d8d63502af38d50b5968c239",
+      "min_rule_version": 2,
+      "normalized_name": "carnivorous moss-beast",
+      "oracle_hash": "49068d66e409b3ed3d3a4f7ca7fd4929",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chronomaton",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88916f73f73e2df515bbef6919805dc5",
+      "min_rule_version": 2,
+      "normalized_name": "chronomaton",
+      "oracle_hash": "c36a67be5df8f853c60f592d49b5a615",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Energizer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2c56305f71d41d557570b6ee424d7bc1",
+      "min_rule_version": 2,
+      "normalized_name": "energizer",
+      "oracle_hash": "5a1a86ec889efb431814a500926fab3d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hungry Megasloth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5c70a79648cdeb0e669a29f1c875f1db",
+      "min_rule_version": 2,
+      "normalized_name": "hungry megasloth",
+      "oracle_hash": "9dacf6afa99ff17f48850d4d29834bd6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jenara, Asura of War",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d1c39ea5aafb1d002bc9cf60583c4388",
+      "min_rule_version": 2,
+      "normalized_name": "jenara, asura of war",
+      "oracle_hash": "385de3d6d2637476db28317157b5c511",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jungle Delver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:233eac8995e59d158cd014a90e5f3a95",
+      "min_rule_version": 2,
+      "normalized_name": "jungle delver",
+      "oracle_hash": "4a2663cf4c2703fd61427c875548ce01",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ruins Recluse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6fcbbccfc5cacd668296e1e1b787d82b",
+      "min_rule_version": 2,
+      "normalized_name": "ruins recluse",
+      "oracle_hash": "50b63a239462d9429bc682b0d99e6a5a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sledding Otter-Penguin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7f62f3608687b28a16eeadafe7efa4c4",
+      "min_rule_version": 2,
+      "normalized_name": "sledding otter-penguin",
+      "oracle_hash": "5d51caebfd5fb3e38af00985b8024ea9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Unholy Officiant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:314d02cb0db136b0a71adaaffd76e30e",
+      "min_rule_version": 2,
+      "normalized_name": "unholy officiant",
+      "oracle_hash": "748031dc4868a157d229f5d2d746e0b8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Verdant Automaton",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:233eac8995e59d158cd014a90e5f3a95",
+      "min_rule_version": 2,
+      "normalized_name": "verdant automaton",
+      "oracle_hash": "4a2663cf4c2703fd61427c875548ce01",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

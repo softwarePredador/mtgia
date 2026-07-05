@@ -51,6 +51,7 @@ TUTOR_HAND_UNIT = "tutor::any_tutor_to_hand_v1"
 ETB_TUTOR_HAND_CREATURE_UNIT = "creature::etb_tutor_to_hand_creature_variant_v1"
 BOARD_WIPE_UNIT = "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1"
 ADD_COUNTERS_TARGET_UNIT = "add_counters::targeted_add_counters_variant_v1"
+ADD_COUNTERS_SOURCE_UNIT = "add_counters::source_add_counters_variant_v1"
 BOOST_TARGET_UNIT = (
     "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::"
     "no_condition_class::targeting"
@@ -184,6 +185,9 @@ ETB_TUTOR_HAND_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_hand_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
+PERMANENT_ACTIVATED_SELF_ADD_COUNTERS_SCOPE = (
+    "xmage_permanent_simple_activated_self_add_counters_v1"
+)
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 DYNAMIC_GRAVEYARD_COUNT_BOOST_TARGET_SCOPE = (
     "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1"
@@ -263,6 +267,7 @@ SPELL_UNITS = {
     TUTOR_HAND_UNIT,
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
+    ADD_COUNTERS_SOURCE_UNIT,
     BOOST_TARGET_UNIT,
     BOOST_CONTROLLED_SPELL_UNIT,
     TOKEN_SPELL_UNIT,
@@ -3503,6 +3508,18 @@ def fixed_counter_target_from_source(source: str) -> tuple[str, int] | None:
     return counter_type, int(raw_count or "1")
 
 
+def fixed_counter_source_from_source(source: str) -> tuple[str, int] | None:
+    matches = re.findall(
+        r"AddCountersSourceEffect\s*\(\s*CounterType\.(P1P1|M1M1)\.createInstance\s*\(\s*(\d*)\s*\)",
+        source or "",
+    )
+    if len(matches) != 1:
+        return None
+    counter_class, raw_count = matches[0]
+    counter_type = "+1/+1" if counter_class == "P1P1" else "-1/-1"
+    return counter_type, int(raw_count or "1")
+
+
 def fixed_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
     text = oracle_text(metadata)
     match = re.match(
@@ -3516,6 +3533,89 @@ def fixed_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int
     if count is None or count <= 0:
         return None
     return match.group(2), count
+
+
+def activated_self_counter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(
+        r"\s+",
+        " ",
+        oracle_text_after_leading_static_keywords(metadata),
+    ).strip().lower()
+    if text.count(":") != 1:
+        return "activated_self_add_counters_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    normalized_card_name = normalize_name(str(metadata.get("name") or ""))
+    self_aliases = {
+        alias
+        for alias in {
+            normalized_card_name,
+            normalize_name(normalized_card_name.split(",", 1)[0]),
+        }
+        if alias
+    }
+    self_alias_pattern = "|".join(re.escape(alias) for alias in sorted(self_aliases, key=len, reverse=True))
+    match = re.fullmatch(
+        r"put (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(?P<counter>\+1/\+1|-1/-1) counters? on "
+        rf"(?P<target>this (?:creature|artifact|permanent)|it|{self_alias_pattern})\.?",
+        effect_text,
+    )
+    if not match:
+        return "activated_self_add_counters_oracle_not_simple"
+    count = counter_count_from_text(match.group("count"))
+    if count is None or count <= 0:
+        return "activated_self_add_counters_oracle_count_not_supported"
+    activation = activation_cost_from_oracle_prefix(cost_text)
+    if isinstance(activation, str):
+        return str(activation).replace(
+            "activated_self_boost", "activated_self_add_counters"
+        )
+    return {
+        "counter_type": match.group("counter"),
+        "counter_count": count,
+        **activation,
+    }
+
+
+def activated_self_counter_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "SacrificeSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+        "UntapSourceCost",
+    }
+    counter = fixed_counter_source_from_source(text)
+    if counter is None:
+        return "activated_self_add_counters_source_counter_not_fixed"
+    effect_index = text.find("AddCountersSourceEffect")
+    window = text[max(0, effect_index - 500) : effect_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_self_add_counters_source_not_simple_activated"
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_self_add_counters_source_cost_not_supported"
+    activation = activated_self_boost_cost_from_source(window)
+    if isinstance(activation, str):
+        return str(activation).replace(
+            "activated_self_boost", "activated_self_add_counters"
+        )
+    counter_type, count = counter
+    return {
+        "counter_type": counter_type,
+        "counter_count": count,
+        **activation,
+    }
 
 
 def etb_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
@@ -5188,6 +5288,19 @@ def is_creature_etb_add_counters_unit(row: dict[str, Any]) -> bool:
         and "EntersBattlefieldTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "counter", "triggered_ability"}
+    )
+
+
+def is_permanent_activated_self_add_counters_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != ADD_COUNTERS_SOURCE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleActivatedAbility"}
+    return (
+        effect_classes(row) == {"AddCountersSourceEffect"}
+        and "SimpleActivatedAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"counter", "activated_ability"}
     )
 
 
@@ -11757,6 +11870,9 @@ def split_row(
     etb_token_creature_unit = is_creature_etb_token_unit(row)
     dies_token_creature_unit = is_creature_dies_token_unit(row)
     etb_add_counters_creature_unit = is_creature_etb_add_counters_unit(row)
+    permanent_activated_self_add_counters_unit = (
+        is_permanent_activated_self_add_counters_unit(row)
+    )
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
     permanent_activated_draw_unit = is_permanent_activated_draw_unit(row)
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
@@ -11841,6 +11957,7 @@ def split_row(
         and not etb_token_creature_unit
         and not dies_token_creature_unit
         and not etb_add_counters_creature_unit
+        and not permanent_activated_self_add_counters_unit
         and not creature_tap_damage_unit
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
@@ -11904,6 +12021,7 @@ def split_row(
         and not etb_token_creature_unit
         and not dies_token_creature_unit
         and not etb_add_counters_creature_unit
+        and not permanent_activated_self_add_counters_unit
         and not creature_tap_damage_unit
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
@@ -13822,6 +13940,71 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_add_counters_target_creature",
+        ), "selected_exact_scope"
+
+    if permanent_activated_self_add_counters_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_self_add_counters_not_permanent"
+        source_counter = activated_self_counter_from_source(source_text)
+        if isinstance(source_counter, str):
+            return None, source_counter
+        oracle_counter = activated_self_counter_from_oracle(metadata)
+        if isinstance(oracle_counter, str):
+            return None, oracle_counter
+        source_compare = {
+            key: value
+            for key, value in source_counter.items()
+            if key
+            in {
+                "counter_type",
+                "counter_count",
+                "activation_cost_mana",
+                "activation_requires_tap",
+            }
+        }
+        oracle_compare = {
+            key: value
+            for key, value in oracle_counter.items()
+            if key
+            in {
+                "counter_type",
+                "counter_count",
+                "activation_cost_mana",
+                "activation_requires_tap",
+            }
+        }
+        if source_compare != oracle_compare:
+            return None, "activated_self_add_counters_source_oracle_mismatch"
+        counter_type = str(oracle_counter["counter_type"])
+        count = int(oracle_counter["counter_count"])
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature" if is_creature_metadata(metadata) else "permanent",
+            "battle_model_scope": PERMANENT_ACTIVATED_SELF_ADD_COUNTERS_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "add_counters",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_SELF_ADD_COUNTERS_SCOPE,
+            "activated_add_counters": True,
+            "activated_add_counters_target": "self",
+            "activated_add_counters_counter_type": counter_type,
+            "activated_add_counters_count": count,
+            "target": "self",
+            "counter_type": counter_type,
+            "counter_count": count,
+            "count": count,
+            "xmage_effect_class": "AddCountersSourceEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **oracle_counter,
+            **flags,
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_activated_self_add_counters",
         ), "selected_exact_scope"
 
     if static_controlled_pt_unit:
@@ -17741,6 +17924,7 @@ def build_exact_split_report(
             and not is_creature_etb_token_unit(row)
             and not is_creature_dies_token_unit(row)
             and not is_creature_etb_add_counters_unit(row)
+            and not is_permanent_activated_self_add_counters_unit(row)
             and not is_permanent_activated_draw_unit(row)
             and not is_permanent_activated_damage_unit(row)
             and not is_permanent_activated_destroy_unit(row)
@@ -17816,6 +18000,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with one-shot DamageTargetEffect whose amount is an exact supported battlefield/hand/domain count, optional fixed base amount, and supported target constraints",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
+                "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect, SimpleActivatedAbility, exact self-counter Oracle text, and mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with LookLibraryAndPickControllerEffect, EntersBattlefieldTriggeredAbility, exact ETB look-library pick-one-to-hand Oracle/source agreement, and only static self keywords",
                 "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInPlayEffect, EntersBattlefieldTriggeredAbility, exact ETB land tutor-to-battlefield Oracle/source agreement, and only static self keywords",

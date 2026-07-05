@@ -9203,6 +9203,93 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "add_counters_counter_not_fixed")
 
+    def test_activated_self_add_counter_maps_to_source_counter_runtime(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_SOURCE_UNIT,
+            effect_classes=["AddCountersSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["counter", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Carnivorous Moss-Beast",
+                type_line="Creature - Plant Elemental Beast",
+                oracle_text="{5}{G}{G}: Put a +1/+1 counter on Carnivorous Moss-Beast.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new AddCountersSourceEffect(CounterType.P1P1.createInstance()), "
+                "new ManaCostsImpl<>(\"{5}{G}{G}\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_SELF_ADD_COUNTERS_SCOPE)
+        self.assertTrue(effect["activated_add_counters"])
+        self.assertEqual(effect["activated_add_counters_target"], "self")
+        self.assertEqual(effect["activated_add_counters_counter_type"], "+1/+1")
+        self.assertEqual(effect["activated_add_counters_count"], 1)
+        self.assertEqual(effect["counter_count"], 1)
+        self.assertEqual(effect["activation_cost_mana"], "{5}{G}{G}")
+
+    def test_activated_self_add_counter_preserves_static_keyword(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_SOURCE_UNIT,
+            effect_classes=["AddCountersSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["counter", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Jenara, Asura of War",
+                type_line="Legendary Creature - Angel",
+                oracle_text="Flying\n{1}{W}: Put a +1/+1 counter on Jenara.",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new SimpleActivatedAbility("
+                "new AddCountersSourceEffect(CounterType.P1P1.createInstance()), "
+                "new ManaCostsImpl<>(\"{1}{W}\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertEqual(effect["activation_cost_mana"], "{1}{W}")
+
+    def test_activated_self_add_counter_with_sacrifice_cost_stays_blocked(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_SOURCE_UNIT,
+            effect_classes=["AddCountersSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["counter", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bloodflow Connoisseur",
+                type_line="Creature - Vampire",
+                oracle_text="Sacrifice a creature: Put a +1/+1 counter on Bloodflow Connoisseur.",
+            ),
+            source_text=(
+                "Cost abilityCost = new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE);"
+                "Ability ability = new SimpleActivatedAbility("
+                "new AddCountersSourceEffect(CounterType.P1P1.createInstance()), abilityCost);"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_self_add_counters_source_cost_not_supported")
+
     def test_creature_etb_plus_one_counter_target_creature_maps_to_etb_scope(self) -> None:
         row = queue_row(
             split.ADD_COUNTERS_TARGET_UNIT,

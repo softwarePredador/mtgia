@@ -4378,6 +4378,95 @@ def resolve_add_counters_target_effect(
     return target
 
 
+def resolve_add_counters_source_effect(
+    player,
+    permanent,
+    effect_data,
+    turn,
+    *,
+    event_name="self_add_counters_resolved",
+    phase=None,
+):
+    counter_type = str(
+        effect_data.get("activated_add_counters_counter_type")
+        or effect_data.get("counter_type")
+        or "+1/+1"
+    )
+    count = max(
+        0,
+        int(
+            effect_data.get("activated_add_counters_count")
+            or effect_data.get("counter_count")
+            or effect_data.get("count")
+            or 1
+        ),
+    )
+    if count <= 0 or permanent not in getattr(player, "battlefield", []):
+        emit_replay_event(
+            event_name,
+            player=player.name,
+            card=permanent.get("name", "?"),
+            counter_type=counter_type,
+            counters_added=0,
+            result="source_not_on_battlefield_or_zero_count",
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        return None
+
+    power_before = _numeric_card_stat(permanent, "power")
+    toughness_before = _numeric_card_stat(permanent, "toughness", "power")
+    counters_before = (
+        int(permanent.get("plus_one_counters") or 0)
+        if counter_type == "+1/+1"
+        else int(permanent.get("minus_one_counters") or 0)
+        if counter_type == "-1/-1"
+        else get_named_counter_count(permanent, counter_type)
+    )
+    if counter_type == "+1/+1":
+        added = add_plus_one_counters(permanent, count) or count
+    elif counter_type == "-1/-1":
+        added = add_minus_one_counters(permanent, count)
+    else:
+        added = add_named_counters(permanent, counter_type, count)
+
+    destination = None
+    result = "counters_added"
+    toughness_after = _numeric_card_stat(permanent, "toughness", "power")
+    if counter_type == "-1/-1" and is_battlefield_creature(permanent) and toughness_after <= 0:
+        destination = move_creature_from_battlefield(
+            player,
+            permanent,
+            reason="zero_toughness",
+            source=permanent,
+        )
+        result = "source_put_into_graveyard_zero_toughness"
+
+    emit_replay_event(
+        event_name,
+        player=player.name,
+        card=permanent.get("name", "?"),
+        target=permanent.get("name", "?"),
+        target_player=player.name,
+        target_type="self",
+        counter_type=counter_type,
+        counters_before=counters_before,
+        counters_added=added,
+        counters_after=counters_before + added,
+        target_power_before=power_before,
+        target_power_after=_numeric_card_stat(permanent, "power"),
+        target_toughness_before=toughness_before,
+        target_toughness_after=_numeric_card_stat(permanent, "toughness", "power"),
+        result=result,
+        destination=destination,
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return permanent
+
+
 def resolve_add_counters_target_spell(player, opponents, card, effect_data, turn):
     return resolve_add_counters_target_effect(
         player,
@@ -31762,6 +31851,124 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 phase=phase,
                 turn=turn,
                 **replay_rule_fields(permanent),
+            )
+            return 1
+
+    self_counter_permanents = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("activated_add_counters")
+        and str(permanent.get("activated_add_counters_target") or "self") == "self"
+        and not permanent.get("activated_add_counters_used_this_turn")
+    ]
+    if phase == "postcombat_main":
+        for permanent in self_counter_permanents:
+            activation_cost = adjusted_activated_ability_generic_cost(
+                player,
+                permanent,
+                int(permanent.get("activation_cost_generic") or 0),
+            )
+            activation_cost_text = permanent.get("activation_cost_mana") or _activation_cost_text(
+                activation_cost,
+                permanent.get("activation_cost_colors") or [],
+            )
+            activation_mana_paid = _mana_cost_text_value(activation_cost_text)
+            if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "permanent_already_tapped_for_activated_add_counters",
+                    phase=phase,
+                )
+                continue
+            if (
+                permanent.get("activation_requires_tap")
+                and is_battlefield_creature(permanent)
+                and permanent.get("summoning_sick")
+            ):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "creature_summoning_sick_for_activated_add_counters",
+                    phase=phase,
+                )
+                continue
+            if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_activated_add_counters_cost",
+                    phase=phase,
+                )
+                continue
+            if permanent.get("activation_requires_tap"):
+                permanent["tapped"] = True
+            permanent["activated_add_counters_used_this_turn"] = True
+            counter_type = str(
+                permanent.get("activated_add_counters_counter_type")
+                or permanent.get("counter_type")
+                or "+1/+1"
+            )
+            counter_count = max(
+                1,
+                int(
+                    permanent.get("activated_add_counters_count")
+                    or permanent.get("counter_count")
+                    or permanent.get("count")
+                    or 1
+                ),
+            )
+            resolve_add_counters_source_effect(
+                player,
+                permanent,
+                permanent,
+                turn,
+                event_name="utility_permanent_activated",
+                phase=phase,
+            )
+            emit_decision_trace(
+                decision_type="utility_permanent_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        action="add_counters_to_self",
+                        effect=permanent.get("effect", "creature"),
+                        score=14 + counter_count * 4,
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    action="add_counters_to_self",
+                    effect=permanent.get("effect", "creature"),
+                    score=14 + counter_count * 4,
+                ),
+                score_components={
+                    "activation_cost": activation_cost_text,
+                    "counter_type": counter_type,
+                    "counter_count": counter_count,
+                    "tapped": bool(permanent.get("activation_requires_tap")),
+                    "mana_paid": activation_mana_paid,
+                },
+                rule_source="permanent_simple_activated_self_add_counters_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=14 + counter_count * 4,
+                reason="convert_available_postcombat_mana_into_persistent_creature_size",
+                strategic_principle="use safe permanent self-counter activation when mana is available",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "mana": -activation_mana_paid,
+                    "tapped": 1 if permanent.get("activation_requires_tap") else 0,
+                    "counters": counter_count,
+                },
+                risk_flags=["activated_add_counters"],
             )
             return 1
 

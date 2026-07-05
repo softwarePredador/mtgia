@@ -11446,6 +11446,56 @@ new server:
   new subpattern from the remaining blocked reasons, not rerun this ETB draw
   family.
 
+## 2026-07-05 PG482 Self Add Counters Closure
+
+- Closed the exact XMage `AddCountersSourceEffect` +
+  `SimpleActivatedAbility` permanent family as ManaLoom scope
+  `xmage_permanent_simple_activated_self_add_counters_v1`.
+- The selected scope accepts only fixed self-counter activated abilities where
+  Oracle and XMage agree on counter type, counter count, mana/tap activation
+  cost, and self target. It deliberately blocks sacrifice-cost self-counter
+  activations and dynamic `X` counter activations until those costs/counts have
+  their own runtime contracts.
+- The batch covers `10` cards: Carnivorous Moss-Beast, Chronomaton, Energizer,
+  Hungry Megasloth, Jenara, Asura of War, Jungle Delver, Ruins Recluse,
+  Sledding Otter-Penguin, Unholy Officiant, and Verdant Automaton.
+- The runtime now pays the real activation mana cost, respects tap and
+  summoning-sickness restrictions, adds counters to the source permanent,
+  updates creature stats, and emits `utility_permanent_activated` plus
+  `utility_permanent_activation` decision-trace evidence.
+- Focused split/runtime/sync tests passed `774` checks. The package-builder
+  test lane passed after extending the E2E manifest whitelist for
+  `activated_add_counters_*` and `counter_count`, and the touched scripts
+  compiled.
+- The PostgreSQL package promoted `10` cards. Precheck found `10` target rows,
+  `0` existing expected rows, and `0` nonmatching shadow rows to deprecate.
+  Apply/postcheck verified `10/10` promoted rows as `verified`/`auto` with
+  Oracle hashes; backup rows were `0`.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `10` selected cards. Direct
+  verification confirmed all ten expose
+  `battle_model_scope=xmage_permanent_simple_activated_self_add_counters_v1`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. Metadata sync
+  matched `6713` PostgreSQL cards and `6641` SQLite cache aliases. The battle
+  sync loaded `4589` PostgreSQL rows, wrote `4581` SQLite rows, and exported
+  `4560` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`pass`), legacy contamination
+  (`pass`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26297`, `xmage_authoritative_source_count=25983`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25983`. This is an exact
+  reduction of `10` from the post-PG481 queue and reduces
+  `add_counters::source_add_counters_variant_v1` from `795` to `785`.
+- The post-PG482 exact split recheck reports `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`. The next work should continue with the
+  highest-impact remaining family buckets: recursion, draw-engine, protection,
+  direct damage, and the residual add-counter subpatterns.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -10701,6 +10701,102 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_activated_self_add_counter_spends_mana_and_grows_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {
+            "name": "Jenara, Asura of War",
+            "type_line": "Legendary Creature - Angel",
+            "power": 3,
+            "toughness": 3,
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+            "activated_add_counters": True,
+            "activated_add_counters_target": "self",
+            "activated_add_counters_counter_type": "+1/+1",
+            "activated_add_counters_count": 1,
+            "counter_type": "+1/+1",
+            "counter_count": 1,
+            "activation_cost_mana": "{1}{W}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["W"],
+            "activation_requires_tap": False,
+        }
+        active.battlefield.append(permanent)
+        active.mana_pool.add("white", 1)
+        active.mana_pool.add("colorless", 1)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=13,
+            rng=random.Random(13),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(permanent["plus_one_counters"], 1)
+        self.assertEqual(permanent["power"], 4)
+        self.assertEqual(permanent["toughness"], 4)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(permanent["activated_add_counters_used_this_turn"])
+        self.assertTrue(
+            any(
+                event == "utility_permanent_activated"
+                and data.get("card") == "Jenara, Asura of War"
+                and data.get("counter_type") == "+1/+1"
+                and data.get("counters_added") == 1
+                and data.get("result") == "counters_added"
+                and data.get("target") == "Jenara, Asura of War"
+                for event, data in self.events
+            )
+        )
+
+    def test_activated_self_add_counter_tap_cost_respects_summoning_sick(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        permanent = {
+            "name": "Fixture Counter Dork",
+            "type_line": "Creature - Elf",
+            "power": 1,
+            "toughness": 1,
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_add_counters_v1",
+            "activated_add_counters": True,
+            "activated_add_counters_target": "self",
+            "activated_add_counters_counter_type": "+1/+1",
+            "activated_add_counters_count": 1,
+            "activation_cost_mana": "{G}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["G"],
+            "activation_requires_tap": True,
+            "summoning_sick": True,
+        }
+        active.battlefield.append(permanent)
+        active.mana_pool.add("green", 1)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [],
+            [active],
+            turn=14,
+            rng=random.Random(14),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertNotIn("plus_one_counters", permanent)
+        self.assertEqual(active.available_mana(), 1)
+        self.assertTrue(
+            any(
+                event == "activated_ability_skipped"
+                and data.get("card") == "Fixture Counter Dork"
+                and data.get("strategic_guardrail_reason")
+                == "creature_summoning_sick_for_activated_add_counters"
+                for event, data in self.events
+            )
+        )
+
     def test_stat_modifier_until_eot_spell_buffs_own_best_creature_and_cleans_up(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
