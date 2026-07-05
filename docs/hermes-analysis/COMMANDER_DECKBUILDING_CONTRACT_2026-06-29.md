@@ -1332,5 +1332,36 @@ Keep `Bender's Waterskin`, `Victory Chimes`, `Molecule Man`, `The Scarlet
 Witch`, `The Mind Stone`, `Insurrection`, `Storm Herd`, and `Creative
 Technique` protected until a direct same-lane challenger beats `607`.
 
+Learning-frontier closure generated on 2026-07-05:
+
+- Scope: consume the current topdeck sidecar probe evidence miner, sidecar
+  candidate queue, hypothesis queue, from-scratch shell synthesis, post-safe-cut
+  route, and mana-base decision integrator.
+- Result: `probe_row_count=48`, `queue_row_count=40`,
+  `matrix_candidate_row_eligible_count=0`, `safe_cut_ready_count=0`,
+  `mana_eligible_pair_count=0`, `hypothesis_natural_gate_ready_count=0`, and
+  `from_scratch_can_run_next_battle_gate=false`.
+- Decision: all current execution routes are closed. Do not materialize a
+  sidecar deck, run forced access, open a natural battle gate, or retest the
+  exact rejected Plateau pairs from watchlist evidence alone.
+- Next allowed work: write a `topdeck_floor_trace_target_contract` for target
+  cards such as `Penance`, `Galvanoth`, `Dragon's Rage Channeler`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wheel of Fortune`; pressure
+  and spell-chain followups must wait until the topdeck/miracle floor is
+  preserved by trace evidence.
+- The trace target contract is now written with `target_card_count=5` and
+  `trace_collection_allowed_now=true`, but still has
+  `candidate_deck_materialization_allowed_now=false`,
+  `structure_matrix_allowed_now=false`, `forced_access_allowed_now=false`,
+  `natural_battle_gate_allowed_now=false`, and `promotion_allowed_now=false`.
+- Generic staples remain blocked for the current `607` shell: `Mana Vault` and
+  `The One Ring` need same-lane nonanchor cut proof, drawn/cast/used trace, no
+  miracle/topdeck regression, and an equal opponent/seed gate before any real
+  deck action.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_learning_frontier_after_probe_closure_20260705_current.md`.
+- Trace target contract:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_target_contract_20260705_current.md`.
+
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

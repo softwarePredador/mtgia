@@ -1,0 +1,519 @@
+{
+  "artifact_type": "lorehold_topdeck_floor_trace_target_contract",
+  "contract": {
+    "baseline_floor_metrics": [
+      {
+        "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+        "metric": "miracle_cast",
+        "why": "The candidate cannot reduce Lorehold's primary miracle window."
+      },
+      {
+        "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+        "metric": "topdeck_manipulation_activated",
+        "why": "The candidate must preserve active top-library control."
+      },
+      {
+        "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+        "metric": "lorehold_upkeep_rummage",
+        "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+      },
+      {
+        "floor_rule": "no_material_regression_against_607",
+        "metric": "lorehold_spell_cast",
+        "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+      },
+      {
+        "floor_rule": "no_material_regression_against_607",
+        "metric": "static_cost_reduction_total",
+        "why": "Cost reduction is part of converting the miracle window into action."
+      },
+      {
+        "floor_rule": "tie_or_improve_current_607_before_promotion",
+        "metric": "Winota_fast_pressure_slice",
+        "why": "Prior positive-looking packages failed because fast pressure regressed."
+      }
+    ],
+    "contract_key": "topdeck_floor_trace_target_contract",
+    "global_staple_policy": {
+      "Mana Vault": "blocked_until_same_lane_nonanchor_cut_and_no_topdeck_floor_regression",
+      "The One Ring": "blocked_until_same_lane_draw_value_cut_and_fast_pressure_guard"
+    },
+    "promotion_gate_reminder": [
+      "trace evidence is not deck promotion",
+      "forced access is diagnostic only",
+      "structure matrix must pass before battle",
+      "natural battle gate must use same opponents and seeds against current deck_607"
+    ],
+    "protected_anchors": [
+      "Lorehold, the Historian",
+      "Sensei's Divining Top",
+      "Scroll Rack",
+      "Library of Leng",
+      "Land Tax",
+      "Bender's Waterskin",
+      "Victory Chimes",
+      "The Mind Stone",
+      "Approach of the Second Sun"
+    ],
+    "protected_baseline": "deck_607",
+    "purpose": "Define non-promotional trace floors for current topdeck target cards before any matrix row, sidecar shell, forced access, or battle gate.",
+    "target_cards": [
+      {
+        "add_card": "Penance",
+        "baseline_floor_metrics": [
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "miracle_cast",
+            "why": "The candidate cannot reduce Lorehold's primary miracle window."
+          },
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "topdeck_manipulation_activated",
+            "why": "The candidate must preserve active top-library control."
+          },
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "lorehold_upkeep_rummage",
+            "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+          },
+          {
+            "floor_rule": "no_material_regression_against_607",
+            "metric": "lorehold_spell_cast",
+            "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+          },
+          {
+            "floor_rule": "no_material_regression_against_607",
+            "metric": "static_cost_reduction_total",
+            "why": "Cost reduction is part of converting the miracle window into action."
+          },
+          {
+            "floor_rule": "tie_or_improve_current_607_before_promotion",
+            "metric": "Winota_fast_pressure_slice",
+            "why": "Prior positive-looking packages failed because fast pressure regressed."
+          }
+        ],
+        "blocked_before_matrix": [
+          "missing_named_same_lane_cut",
+          "needs_safe_cut_model",
+          "must_preserve_607_topdeck_miracle_floor",
+          "must_preserve_protected_anchors"
+        ],
+        "candidate_key": "sidecar_penance",
+        "candidate_materialization_allowed_now": false,
+        "contract_status": "trace_target_only_not_matrix_row",
+        "expected_metric_lift": "miracle_cast_and_topdeck_manipulation_floor_lift",
+        "floor_risk": "can_improve_visibility_but_still_regress_win_conversion",
+        "forced_access_allowed_now": false,
+        "lane": "topdeck_miracle_setup",
+        "natural_battle_gate_allowed_now": false,
+        "promotion_allowed_now": false,
+        "rule_runtime_status": "requires_xmage_runtime_trace_before_materialization",
+        "source_provenance": "lorehold_hypothesis_queue_from_value_model",
+        "structure_matrix_allowed_now": false,
+        "trace_collection_allowed_now": true,
+        "trace_requirements": [
+          "candidate_card_drawn_or_accessed",
+          "candidate_card_cast_or_activated_when_applicable",
+          "candidate_effect_resolved_or_relevant_static_effect_observed",
+          "protected_topdeck_anchors_still_accessed",
+          "no_miracle_topdeck_floor_regression",
+          "no_fast_pressure_regression_before_promotion"
+        ]
+      },
+      {
+        "add_card": "Galvanoth",
+        "baseline_floor_metrics": [
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "miracle_cast",
+            "why": "The candidate cannot reduce Lorehold's primary miracle window."
+          },
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "topdeck_manipulation_activated",
+            "why": "The candidate must preserve active top-library control."
+          },
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "lorehold_upkeep_rummage",
+            "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+          },
+          {
+            "floor_rule": "no_material_regression_against_607",
+            "metric": "lorehold_spell_cast",
+            "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+          },
+          {
+            "floor_rule": "no_material_regression_against_607",
+            "metric": "static_cost_reduction_total",
+            "why": "Cost reduction is part of converting the miracle window into action."
+          },
+          {
+            "floor_rule": "tie_or_improve_current_607_before_promotion",
+            "metric": "Winota_fast_pressure_slice",
+            "why": "Prior positive-looking packages failed because fast pressure regressed."
+          }
+        ],
+        "blocked_before_matrix": [
+          "missing_named_same_lane_cut",
+          "needs_safe_cut_model",
+          "must_preserve_607_topdeck_miracle_floor",
+          "must_preserve_protected_anchors"
+        ],
+        "candidate_key": "sidecar_galvanoth",
+        "candidate_materialization_allowed_now": false,
+        "contract_status": "trace_target_only_not_matrix_row",
+        "expected_metric_lift": "miracle_cast_and_topdeck_manipulation_floor_lift",
+        "floor_risk": "can_improve_visibility_but_still_regress_win_conversion",
+        "forced_access_allowed_now": false,
+        "lane": "topdeck_miracle_setup",
+        "natural_battle_gate_allowed_now": false,
+        "promotion_allowed_now": false,
+        "rule_runtime_status": "requires_xmage_runtime_trace_before_materialization",
+        "source_provenance": "lorehold_hypothesis_queue_from_value_model",
+        "structure_matrix_allowed_now": false,
+        "trace_collection_allowed_now": true,
+        "trace_requirements": [
+          "candidate_card_drawn_or_accessed",
+          "candidate_card_cast_or_activated_when_applicable",
+          "candidate_effect_resolved_or_relevant_static_effect_observed",
+          "protected_topdeck_anchors_still_accessed",
+          "no_miracle_topdeck_floor_regression",
+          "no_fast_pressure_regression_before_promotion"
+        ]
+      },
+      {
+        "add_card": "Dragon's Rage Channeler",
+        "baseline_floor_metrics": [
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "miracle_cast",
+            "why": "The candidate cannot reduce Lorehold's primary miracle window."
+          },
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "topdeck_manipulation_activated",
+            "why": "The candidate must preserve active top-library control."
+          },
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "lorehold_upkeep_rummage",
+            "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+          },
+          {
+            "floor_rule": "no_material_regression_against_607",
+            "metric": "lorehold_spell_cast",
+            "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+          },
+          {
+            "floor_rule": "no_material_regression_against_607",
+            "metric": "static_cost_reduction_total",
+            "why": "Cost reduction is part of converting the miracle window into action."
+          },
+          {
+            "floor_rule": "tie_or_improve_current_607_before_promotion",
+            "metric": "Winota_fast_pressure_slice",
+            "why": "Prior positive-looking packages failed because fast pressure regressed."
+          }
+        ],
+        "blocked_before_matrix": [
+          "missing_named_same_lane_cut",
+          "needs_safe_cut_model",
+          "must_preserve_607_topdeck_miracle_floor",
+          "must_preserve_protected_anchors"
+        ],
+        "candidate_key": "sidecar_dragon's_rage_channeler",
+        "candidate_materialization_allowed_now": false,
+        "contract_status": "trace_target_only_not_matrix_row",
+        "expected_metric_lift": "miracle_cast_and_topdeck_manipulation_floor_lift",
+        "floor_risk": "can_improve_visibility_but_still_regress_win_conversion",
+        "forced_access_allowed_now": false,
+        "lane": "topdeck_miracle_setup",
+        "natural_battle_gate_allowed_now": false,
+        "promotion_allowed_now": false,
+        "rule_runtime_status": "requires_xmage_runtime_trace_before_materialization",
+        "source_provenance": "lorehold_hypothesis_queue_from_value_model",
+        "structure_matrix_allowed_now": false,
+        "trace_collection_allowed_now": true,
+        "trace_requirements": [
+          "candidate_card_drawn_or_accessed",
+          "candidate_card_cast_or_activated_when_applicable",
+          "candidate_effect_resolved_or_relevant_static_effect_observed",
+          "protected_topdeck_anchors_still_accessed",
+          "no_miracle_topdeck_floor_regression",
+          "no_fast_pressure_regression_before_promotion"
+        ]
+      },
+      {
+        "add_card": "Valakut Awakening // Valakut Stoneforge",
+        "baseline_floor_metrics": [
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "miracle_cast",
+            "why": "The candidate cannot reduce Lorehold's primary miracle window."
+          },
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "topdeck_manipulation_activated",
+            "why": "The candidate must preserve active top-library control."
+          },
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "lorehold_upkeep_rummage",
+            "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+          },
+          {
+            "floor_rule": "no_material_regression_against_607",
+            "metric": "lorehold_spell_cast",
+            "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+          },
+          {
+            "floor_rule": "no_material_regression_against_607",
+            "metric": "static_cost_reduction_total",
+            "why": "Cost reduction is part of converting the miracle window into action."
+          },
+          {
+            "floor_rule": "tie_or_improve_current_607_before_promotion",
+            "metric": "Winota_fast_pressure_slice",
+            "why": "Prior positive-looking packages failed because fast pressure regressed."
+          }
+        ],
+        "blocked_before_matrix": [
+          "missing_named_same_lane_cut",
+          "needs_safe_cut_model",
+          "must_preserve_607_topdeck_miracle_floor",
+          "must_preserve_protected_anchors"
+        ],
+        "candidate_key": "sidecar_valakut_awakening____valakut_stoneforge",
+        "candidate_materialization_allowed_now": false,
+        "contract_status": "trace_target_only_not_matrix_row",
+        "expected_metric_lift": "miracle_cast_and_topdeck_manipulation_floor_lift",
+        "floor_risk": "can_improve_visibility_but_still_regress_win_conversion",
+        "forced_access_allowed_now": false,
+        "lane": "topdeck_miracle_setup",
+        "natural_battle_gate_allowed_now": false,
+        "promotion_allowed_now": false,
+        "rule_runtime_status": "requires_xmage_runtime_trace_before_materialization",
+        "source_provenance": "lorehold_hypothesis_queue_from_value_model",
+        "structure_matrix_allowed_now": false,
+        "trace_collection_allowed_now": true,
+        "trace_requirements": [
+          "candidate_card_drawn_or_accessed",
+          "candidate_card_cast_or_activated_when_applicable",
+          "candidate_effect_resolved_or_relevant_static_effect_observed",
+          "protected_topdeck_anchors_still_accessed",
+          "no_miracle_topdeck_floor_regression",
+          "no_fast_pressure_regression_before_promotion"
+        ]
+      },
+      {
+        "add_card": "Wheel of Fortune",
+        "baseline_floor_metrics": [
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "miracle_cast",
+            "why": "The candidate cannot reduce Lorehold's primary miracle window."
+          },
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "topdeck_manipulation_activated",
+            "why": "The candidate must preserve active top-library control."
+          },
+          {
+            "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+            "metric": "lorehold_upkeep_rummage",
+            "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+          },
+          {
+            "floor_rule": "no_material_regression_against_607",
+            "metric": "lorehold_spell_cast",
+            "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+          },
+          {
+            "floor_rule": "no_material_regression_against_607",
+            "metric": "static_cost_reduction_total",
+            "why": "Cost reduction is part of converting the miracle window into action."
+          },
+          {
+            "floor_rule": "tie_or_improve_current_607_before_promotion",
+            "metric": "Winota_fast_pressure_slice",
+            "why": "Prior positive-looking packages failed because fast pressure regressed."
+          }
+        ],
+        "blocked_before_matrix": [
+          "missing_named_same_lane_cut",
+          "needs_safe_cut_model",
+          "must_preserve_607_topdeck_miracle_floor",
+          "must_preserve_protected_anchors"
+        ],
+        "candidate_key": "sidecar_wheel_of_fortune",
+        "candidate_materialization_allowed_now": false,
+        "contract_status": "trace_target_only_not_matrix_row",
+        "expected_metric_lift": "miracle_cast_and_topdeck_manipulation_floor_lift",
+        "floor_risk": "can_improve_visibility_but_still_regress_win_conversion",
+        "forced_access_allowed_now": false,
+        "lane": "topdeck_miracle_setup",
+        "natural_battle_gate_allowed_now": false,
+        "promotion_allowed_now": false,
+        "rule_runtime_status": "requires_xmage_runtime_trace_before_materialization",
+        "source_provenance": "lorehold_hypothesis_queue_from_value_model",
+        "structure_matrix_allowed_now": false,
+        "trace_collection_allowed_now": true,
+        "trace_requirements": [
+          "candidate_card_drawn_or_accessed",
+          "candidate_card_cast_or_activated_when_applicable",
+          "candidate_effect_resolved_or_relevant_static_effect_observed",
+          "protected_topdeck_anchors_still_accessed",
+          "no_miracle_topdeck_floor_regression",
+          "no_fast_pressure_regression_before_promotion"
+        ]
+      }
+    ]
+  },
+  "current_baseline": "deck_607",
+  "decision": {
+    "allow_candidate_materialization_now": false,
+    "allow_deck_mutation_now": false,
+    "allow_forced_access_now": false,
+    "allow_natural_battle_gate_now": false,
+    "allow_structure_matrix_now": false,
+    "keep_607_as_protected_baseline": true,
+    "next_actions": [
+      "collect_trace_floor_evidence_for_targets_before_matrix_or_sidecar",
+      "do_not_convert_trace_targets_into_deck_changes",
+      "do_not_route pressure or spell-chain followups until topdeck floors pass"
+    ],
+    "promotion_allowed": false,
+    "reason": "The current queue has topdeck target cards but no safe cut or matrix row. The only allowed progress is to collect trace-floor evidence as learning."
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T07:00:57Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "candidate_queue_summary": {
+      "blocker_counts": {
+        "generic_staple_not_lorehold_specific_until_trace_proof": 2,
+        "missing_named_same_lane_cut": 40,
+        "must_follow_topdeck_miracle_floor": 13,
+        "needs_safe_cut_model": 40,
+        "prior_reject_requires_new_trace_hypothesis": 9
+      },
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_sidecar_candidate_queue_blocked_no_matrix_rows_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "matrix_candidate_row_eligible_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "post_safe_cut_selected_route": "topdeck_access_first_sidecar_shell",
+      "promotion_allowed_now": false,
+      "queue_row_count": 40,
+      "readiness_counts": {
+        "blocked_prior_reject": 9,
+        "needs_safe_cut_model": 31
+      },
+      "recommended_next_action": "build_named_same_lane_cut_models_for_topdeck_and_mana_rows_before_matrix_scoring",
+      "safe_cut_reviewable_count": 0,
+      "safe_cut_seed_ready_count": 0,
+      "structure_matrix_scoring_allowed_now": false,
+      "tag_counts": {
+        "generic_staple_learning_only": 2,
+        "mana_base_safe_cut_model": 7,
+        "pressure_window_after_topdeck_floor": 5,
+        "sidecar_watchlist": 10,
+        "spell_chain_after_miracle_floor": 8,
+        "topdeck_access_sidecar_primary": 5,
+        "tutor_learning_only_after_prior_reject": 3
+      },
+      "value_model_land_quantity": 34,
+      "value_model_ramp_quantity": 15
+    },
+    "frontier_summary": {
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "learning_frontier_closed_execution_routes_keep_607",
+      "deck_607_protected": true,
+      "deck_action_allowed_now": false,
+      "execution_ready_route_count": 0,
+      "forced_access_allowed_now": false,
+      "from_scratch_can_run_next_battle_gate": false,
+      "hypothesis_natural_gate_ready_count": 0,
+      "mana_eligible_pair_count": 0,
+      "matrix_candidate_row_eligible_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "natural_ready_route_count": 0,
+      "pressure_followup_target_count": 5,
+      "probe_row_count": 48,
+      "promotion_allowed_now": false,
+      "queue_row_count": 40,
+      "recommended_next_action": "write_topdeck_floor_trace_target_contract_before_any_matrix_row",
+      "recommended_next_artifact": "lorehold_topdeck_floor_trace_target_contract",
+      "safe_cut_ready_count": 0,
+      "selected_next_route": "topdeck_floor_trace_target_contract",
+      "spell_chain_followup_target_count": 8,
+      "structure_matrix_scoring_allowed_now": false,
+      "topdeck_floor_trace_target_count": 5
+    },
+    "probe_evidence_summary": {
+      "blocked_exposed_topdeck_role_probe_count": 20,
+      "blocked_generic_mana_probe_count": 28,
+      "blocker_counts": {
+        "basic_land_floor_not_safe_from_probe": 14,
+        "colored_source_floor_requires_pair_model": 7,
+        "fast_mana_utility_land_not_safe_from_probe": 7,
+        "mana_source_floor_equivalence_required": 28,
+        "miracle_topdeck_floor_equivalence_required": 20,
+        "probe_cut_has_material_exposure": 20,
+        "probe_cut_role_not_low_impact:draw_filter_value": 15,
+        "probe_cut_role_not_low_impact:recursion_engine": 5,
+        "requires_exposure_trace_before_safe_cut": 48,
+        "safe_cut_miner_zero_current_ready": 48,
+        "structural_floor_equivalence_required": 28,
+        "use_dedicated_mana_base_model_before_generic_probe": 28
+      },
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_sidecar_probe_evidence_no_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "mana_model_eligible_pair_count": 0,
+      "mana_model_exact_rejected_pair_count": 2,
+      "mana_model_ready_pair_count": 2,
+      "mana_route_status": "mana_route_closed_by_exact_decisions",
+      "matrix_candidate_row_eligible_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "probe_row_count": 48,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "collect_new_mana_evidence_or_topdeck_floor_traces_before_any_matrix_row",
+      "safe_cut_ready_count": 0,
+      "status_counts": {
+        "blocked_exposed_topdeck_role_probe": 20,
+        "blocked_generic_mana_probe_not_pair_safe": 28
+      }
+    }
+  },
+  "source_reports": {
+    "candidate_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_candidate_queue_20260705_current.json",
+    "frontier": "docs/hermes-analysis/master_optimizer_reports/lorehold_learning_frontier_after_probe_closure_20260705_current.json",
+    "probe_evidence": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_probe_evidence_miner_20260705_current.json"
+  },
+  "status": "topdeck_floor_trace_contract_written_no_deck_action_keep_607",
+  "summary": {
+    "candidate_deck_materialization_allowed_now": false,
+    "decision_status": "topdeck_floor_trace_contract_written_no_deck_action_keep_607",
+    "forced_access_allowed_now": false,
+    "frontier_selected_route": "topdeck_floor_trace_target_contract",
+    "matrix_candidate_row_eligible_count": 0,
+    "missing_inputs": [],
+    "natural_battle_gate_allowed_now": false,
+    "probe_row_count": 48,
+    "promotion_allowed_now": false,
+    "queue_row_count": 40,
+    "recommended_next_action": "collect_trace_floor_evidence_for_targets_before_matrix_or_sidecar",
+    "safe_cut_ready_count": 0,
+    "structure_matrix_allowed_now": false,
+    "target_card_count": 5,
+    "trace_collection_allowed_now": true,
+    "trace_contract_ready": true
+  }
+}

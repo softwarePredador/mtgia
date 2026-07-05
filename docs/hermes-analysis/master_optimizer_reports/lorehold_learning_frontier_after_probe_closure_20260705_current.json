@@ -1,0 +1,392 @@
+{
+  "artifact_type": "lorehold_learning_frontier_after_probe_closure",
+  "current_baseline": "deck_607",
+  "decision": {
+    "allow_candidate_materialization_now": false,
+    "allow_deck_mutation_now": false,
+    "allow_forced_access_now": false,
+    "allow_natural_battle_gate_now": false,
+    "allow_structure_matrix_now": false,
+    "blocked_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_write_postgresql_or_sqlite",
+      "do_not_materialize_sidecar_deck_from_watchlist_only",
+      "do_not_retest_exact_plateau_pairs_without_new_mana_evidence",
+      "do_not_promote_mana_vault_or_the_one_ring_without_same_lane_trace_proof"
+    ],
+    "keep_607_as_protected_baseline": true,
+    "next_actions": [
+      "write_topdeck_floor_trace_target_contract_before_any_matrix_row",
+      "define floor trace metrics for the selected topdeck target cards",
+      "route pressure and spell-chain followups only after the topdeck floor is preserved",
+      "refresh external sources as candidate discovery only, not promotion proof"
+    ],
+    "promotion_allowed": false,
+    "reason": "Current execution frontiers are closed: no safe cut, no matrix row, no eligible mana pair, no runnable natural gate, and no promotable from-scratch shell. The next valid work is learning-only trace targeting before any deck action.",
+    "selected_next_route": "topdeck_floor_trace_target_contract"
+  },
+  "deck_607_mutated": false,
+  "external_learning_refresh": [
+    {
+      "guardrail": "Oracle/ruling data validates behavior, not a replacement decklist.",
+      "learning_use": "Oracle and ruling source for the commander's miracle/topdeck timing.",
+      "source": "Scryfall Lorehold, the Historian",
+      "url": "https://scryfall.com/card/sos/201/lorehold-the-historian"
+    },
+    {
+      "guardrail": "Commander adoption is source evidence, not same-lane cut proof.",
+      "learning_use": "Public topdeck, spellslinger, discard, and combo lanes for candidate discovery.",
+      "source": "EDHREC Lorehold commander pages",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian"
+    },
+    {
+      "guardrail": "Combo existence does not bypass runtime, cut, matrix, or battle gates.",
+      "learning_use": "Combo package discovery for future Storm-Kiln pressure/conversion research.",
+      "source": "Commander Spellbook Storm-Kiln Artist + Haze of Rage",
+      "url": "https://commanderspellbook.com/combo/3940-5195/"
+    }
+  ],
+  "generated_at": "2026-07-05T06:57:58Z",
+  "learning_frontiers": [
+    {
+      "allowed_now": false,
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "eligible_model_ready_pair_count": 0,
+        "exact_rejected_pair_count": 2
+      },
+      "frontier_key": "mana_base_pair_frontier",
+      "natural_battle_allowed_now": false,
+      "reason": "The dedicated mana-base integrator has zero eligible pairs after exact Plateau decisions.",
+      "status": "closed_by_exact_pair_decisions"
+    },
+    {
+      "allowed_now": false,
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "matrix_candidate_row_eligible_count": 0,
+        "queue_row_count": 40
+      },
+      "frontier_key": "topdeck_sidecar_matrix_rows",
+      "natural_battle_allowed_now": false,
+      "reason": "The sidecar queue has no row eligible for matrix scoring or materialization.",
+      "status": "closed_no_matrix_rows"
+    },
+    {
+      "allowed_now": false,
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "safe_cut_reviewable_count": 0,
+        "safe_cut_seed_ready_count": 0
+      },
+      "frontier_key": "one_for_one_safe_cut_frontier",
+      "natural_battle_allowed_now": false,
+      "reason": "The current 607 one-for-one frontier has zero seed-safe cuts.",
+      "status": "closed_zero_seed_safe_cuts"
+    },
+    {
+      "allowed_now": false,
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "natural_gate_ready_count": 0,
+        "status_counts": {
+          "blocked_prior_reject": 9,
+          "needs_safe_cut_model": 31
+        }
+      },
+      "frontier_key": "natural_gate_watchlist",
+      "natural_battle_allowed_now": false,
+      "reason": "The hypothesis queue reports zero current natural-gate-ready packages.",
+      "status": "blocked_no_current_natural_gate"
+    },
+    {
+      "allowed_now": false,
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "forced_access_runnable_count": 0,
+        "sidecar_shell_contract_required": true
+      },
+      "frontier_key": "forced_access_diagnostic_frontier",
+      "natural_battle_allowed_now": false,
+      "reason": "The post-safe-cut route has no runnable forced-access command now.",
+      "status": "closed_no_runnable_forced_access"
+    },
+    {
+      "allowed_now": false,
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "best_forced_delta_wins": -1,
+        "best_natural_delta_wins": -1,
+        "can_run_next_battle_gate": false,
+        "promotable_shell_signal_count": 0
+      },
+      "frontier_key": "from_scratch_shell_frontier",
+      "natural_battle_allowed_now": false,
+      "reason": "Prior from-scratch shells are rejected or non-promotable; a new shell needs a declared trace target.",
+      "status": "blocked_prior_shell_failures"
+    },
+    {
+      "allowed_now": false,
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "required_proof": [
+          "same-lane nonanchor cut",
+          "candidate card drawn/cast/used trace",
+          "no miracle/topdeck floor regression",
+          "same-opponent same-seed gate ties or beats 607"
+        ]
+      },
+      "frontier_key": "generic_staple_frontier",
+      "natural_battle_allowed_now": false,
+      "reason": "Mana Vault and The One Ring remain hypotheses, not accessible deck changes for 607.",
+      "status": "closed_until_same_lane_cut_and_trace_proof"
+    },
+    {
+      "allowed_now": true,
+      "deck_action_allowed_now": false,
+      "evidence": {
+        "pressure_followups_after_floor": [
+          "Boros Charm",
+          "Deflecting Palm",
+          "Grand Abolisher",
+          "Perch Protection",
+          "Silence"
+        ],
+        "spell_chain_followups_after_floor": [
+          "Apex of Power",
+          "Brass's Bounty",
+          "Dance with Calamity",
+          "Goldspan Dragon",
+          "Invoke Calamity",
+          "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "Cloud Key",
+          "Storm-Kiln Artist"
+        ],
+        "target_cards": [
+          "Penance",
+          "Galvanoth",
+          "Dragon's Rage Channeler",
+          "Valakut Awakening // Valakut Stoneforge",
+          "Wheel of Fortune"
+        ]
+      },
+      "frontier_key": "topdeck_floor_trace_target_contract",
+      "natural_battle_allowed_now": false,
+      "reason": "The next valid learning step is to define trace-floor targets for topdeck cards before any matrix row.",
+      "status": "learning_only_next"
+    }
+  ],
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "candidate_queue_summary": {
+      "blocker_counts": {
+        "generic_staple_not_lorehold_specific_until_trace_proof": 2,
+        "missing_named_same_lane_cut": 40,
+        "must_follow_topdeck_miracle_floor": 13,
+        "needs_safe_cut_model": 40,
+        "prior_reject_requires_new_trace_hypothesis": 9
+      },
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_sidecar_candidate_queue_blocked_no_matrix_rows_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "matrix_candidate_row_eligible_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "post_safe_cut_selected_route": "topdeck_access_first_sidecar_shell",
+      "promotion_allowed_now": false,
+      "queue_row_count": 40,
+      "readiness_counts": {
+        "blocked_prior_reject": 9,
+        "needs_safe_cut_model": 31
+      },
+      "recommended_next_action": "build_named_same_lane_cut_models_for_topdeck_and_mana_rows_before_matrix_scoring",
+      "safe_cut_reviewable_count": 0,
+      "safe_cut_seed_ready_count": 0,
+      "structure_matrix_scoring_allowed_now": false,
+      "tag_counts": {
+        "generic_staple_learning_only": 2,
+        "mana_base_safe_cut_model": 7,
+        "pressure_window_after_topdeck_floor": 5,
+        "sidecar_watchlist": 10,
+        "spell_chain_after_miracle_floor": 8,
+        "topdeck_access_sidecar_primary": 5,
+        "tutor_learning_only_after_prior_reject": 3
+      },
+      "value_model_land_quantity": 34,
+      "value_model_ramp_quantity": 15
+    },
+    "hypothesis_queue_summary": {
+      "allow_new_natural_gate_now": false,
+      "blocked_prior_reject_count": 9,
+      "card_value_priority_status": "card_value_priority_no_direct_cut_ready_current_607",
+      "card_value_ready_replacement_count": 0,
+      "game_changer_metadata_rows_considered": 12,
+      "gate_ready_now_count_from_preflight": 0,
+      "hypotheses_with_same_lane_anchor_count": 36,
+      "hypothesis_count": 40,
+      "keep_607_as_protected_baseline": true,
+      "lane_counts": {
+        "combo_finishers": 6,
+        "interaction_pressure": 4,
+        "mana_base_review": 7,
+        "protection_window": 5,
+        "spell_chain_conversion": 9,
+        "topdeck_miracle_setup": 5,
+        "tutors_access": 3,
+        "unclassified_variant_watchlist": 4
+      },
+      "natural_gate_ready_count": 0,
+      "preflight_status": "no_current_candidate_passes_miracle_access_first_preflight",
+      "promotion_allowed": false,
+      "protected_baseline": "deck_607",
+      "status_counts": {
+        "blocked_prior_reject": 9,
+        "needs_safe_cut_model": 31
+      },
+      "trace_status": "lorehold_miracle_trace_failure_learning_ready"
+    },
+    "mana_decision_integrator_summary": {
+      "allow_natural_gate_now": false,
+      "eligible_model_ready_pair_count": 0,
+      "exact_rejected_pair_count": 2,
+      "keep_607_as_protected_baseline": true,
+      "loaded_decision_count": 2,
+      "promotion_allowed": false,
+      "safe_model_ready_pair_count": 2
+    },
+    "post_safe_cut_route_summary": {
+      "closing_router_selected_status": "primary_shell_contract_target_blocked_but_actionable_as_design",
+      "decision_status": "topdeck_post_safe_cut_route_sidecar_shell_required_keep_607",
+      "deck_607_mutated": false,
+      "deck_607_protected": true,
+      "deck_action_allowed_now": false,
+      "external_research_signal_count": 3,
+      "forced_access_runnable_count": 0,
+      "from_scratch_can_run_next_battle_gate": false,
+      "from_scratch_promotable_shell_signal_count": 0,
+      "hypothesis_queue_gate_ready_now_count": 0,
+      "hypothesis_queue_natural_gate_ready_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "one_for_one_cut_ready_count": 0,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "write_or_refresh_topdeck_access_first_sidecar_shell_contract_before_materialization",
+      "reviewable_same_lane_gap_count": 0,
+      "selected_route": "topdeck_access_first_sidecar_shell",
+      "sidecar_shell_contract_required": true,
+      "structure_matrix_allowed_now": false,
+      "structure_matrix_contract_allowed_now": true
+    },
+    "probe_evidence_summary": {
+      "blocked_exposed_topdeck_role_probe_count": 20,
+      "blocked_generic_mana_probe_count": 28,
+      "blocker_counts": {
+        "basic_land_floor_not_safe_from_probe": 14,
+        "colored_source_floor_requires_pair_model": 7,
+        "fast_mana_utility_land_not_safe_from_probe": 7,
+        "mana_source_floor_equivalence_required": 28,
+        "miracle_topdeck_floor_equivalence_required": 20,
+        "probe_cut_has_material_exposure": 20,
+        "probe_cut_role_not_low_impact:draw_filter_value": 15,
+        "probe_cut_role_not_low_impact:recursion_engine": 5,
+        "requires_exposure_trace_before_safe_cut": 48,
+        "safe_cut_miner_zero_current_ready": 48,
+        "structural_floor_equivalence_required": 28,
+        "use_dedicated_mana_base_model_before_generic_probe": 28
+      },
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_sidecar_probe_evidence_no_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "mana_model_eligible_pair_count": 0,
+      "mana_model_exact_rejected_pair_count": 2,
+      "mana_model_ready_pair_count": 2,
+      "mana_route_status": "mana_route_closed_by_exact_decisions",
+      "matrix_candidate_row_eligible_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "probe_row_count": 48,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "collect_new_mana_evidence_or_topdeck_floor_traces_before_any_matrix_row",
+      "safe_cut_ready_count": 0,
+      "status_counts": {
+        "blocked_exposed_topdeck_role_probe": 20,
+        "blocked_generic_mana_probe_not_pair_safe": 28
+      }
+    },
+    "shell_failure_summary": {
+      "best_forced_delta_wins": -1,
+      "best_natural_delta_wins": -1,
+      "blockers": [
+        "all current from-scratch shells are below protected 607",
+        "forced tutor/access evidence still failed to convert into wins",
+        "broad shell changes overfill package lanes or regress miracle/topdeck cadence",
+        "another battle gate without a predeclared trace target would repeat prior work"
+      ],
+      "can_run_next_battle_gate": false,
+      "failure_mode_counts": {
+        "forced_access_no_conversion": 1,
+        "lorehold_spell_floor_regressed": 2,
+        "losses_above_protected_607": 4,
+        "miracle_floor_regressed": 2,
+        "package_lanes_overfilled": 4,
+        "positive_squee_telemetry_not_converting": 3,
+        "topdeck_floor_regressed": 2,
+        "upkeep_rummage_floor_regressed": 4,
+        "wins_below_protected_607": 4
+      },
+      "forced_gate_row_count": 1,
+      "gate_report_count": 4,
+      "natural_gate_row_count": 3,
+      "promotable_shell_signal_count": 0,
+      "recommended_next_action": "mine_closing_window_trace_before_next_shell",
+      "shell_gate_row_count": 4,
+      "status_counts": {
+        "forced_access_rejected": 1,
+        "natural_rejected": 3
+      },
+      "tested_shell_count": 3,
+      "tested_shell_keys": [
+        "challenger_lorehold_access_density_control_v1",
+        "challenger_lorehold_recursion_discard_engine_v1",
+        "challenger_lorehold_recursion_discard_pressure_repair_v1"
+      ]
+    }
+  },
+  "source_reports": {
+    "candidate_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_candidate_queue_20260705_current.json",
+    "hypothesis_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_hypothesis_queue_from_value_model_20260705_current_relearn.json",
+    "mana_decision_integrator": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current.json",
+    "post_safe_cut_route": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_post_safe_cut_route_20260705_current.json",
+    "probe_evidence": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_probe_evidence_miner_20260705_current.json",
+    "shell_failure_synthesis": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_shell_failure_synthesis_20260705_current_relearn.json"
+  },
+  "status": "learning_frontier_closed_execution_routes_keep_607",
+  "summary": {
+    "candidate_deck_materialization_allowed_now": false,
+    "decision_status": "learning_frontier_closed_execution_routes_keep_607",
+    "deck_607_protected": true,
+    "deck_action_allowed_now": false,
+    "execution_ready_route_count": 0,
+    "forced_access_allowed_now": false,
+    "from_scratch_can_run_next_battle_gate": false,
+    "hypothesis_natural_gate_ready_count": 0,
+    "mana_eligible_pair_count": 0,
+    "matrix_candidate_row_eligible_count": 0,
+    "missing_inputs": [],
+    "natural_battle_gate_allowed_now": false,
+    "natural_ready_route_count": 0,
+    "pressure_followup_target_count": 5,
+    "probe_row_count": 48,
+    "promotion_allowed_now": false,
+    "queue_row_count": 40,
+    "recommended_next_action": "write_topdeck_floor_trace_target_contract_before_any_matrix_row",
+    "recommended_next_artifact": "lorehold_topdeck_floor_trace_target_contract",
+    "safe_cut_ready_count": 0,
+    "selected_next_route": "topdeck_floor_trace_target_contract",
+    "spell_chain_followup_target_count": 8,
+    "structure_matrix_scoring_allowed_now": false,
+    "topdeck_floor_trace_target_count": 5
+  }
+}
