@@ -309,6 +309,60 @@ class GlobalCommanderLearningPriorityAuditTests(unittest.TestCase):
         self.assertEqual(row["repair_gate_state"], "nonland_add_cut_pool_ready_review_only")
         self.assertEqual(row["next_action"], "review_top_nonland_add_cut_pair_then_candidate_copy")
 
+    def test_battle_feedback_summary_blocks_exact_pair_requeue(self) -> None:
+        core_payload = {
+            "decks": [
+                {
+                    "deck_id": "619",
+                    "deck_name": "Kaalia Variant",
+                    "commander": "Kaalia of the Vast",
+                    "scope": "hermes_registered_variant",
+                    "shape_status": "structure_ready",
+                    "core_status": "core_role_gap",
+                    "role_bands": [],
+                }
+            ]
+        }
+        strategy_payload = {
+            "commanders": [
+                {
+                    "commander_key": "kaalia of the vast",
+                    "status": "ready_for_strategy_matrix",
+                    "source_lane_count": 1,
+                }
+            ]
+        }
+        feedback_payload = {
+            "status": "pass",
+            "summary": {
+                "pair_count": 3,
+                "blocked_pair_count": 2,
+                "needs_exposure_pair_count": 1,
+                "ready_pair_count": 0,
+                "pair_status_counts": {
+                    "pair_blocked_by_failed_gate": 2,
+                    "pair_needs_exposure_replay_before_gate": 1,
+                },
+            },
+        }
+
+        report = audit.build_report(
+            core_payload=core_payload,
+            strategy_payload=strategy_payload,
+            battle_feedback_payload=feedback_payload,
+            bracket_status=audit.bracket_policy_status_from_text(""),
+            core_report_path=Path("docs/hermes-analysis/master_optimizer_reports/core.json"),
+            strategy_report_path=Path("docs/hermes-analysis/master_optimizer_reports/strategy.json"),
+        )
+
+        self.assertEqual(report["battle_feedback_summary"]["blocked_pair_count"], 2)
+        self.assertEqual(report["summary"]["blocked_exact_add_cut_pair_count"], 2)
+        self.assertIn("battle_feedback_model_before_requeue", report["method"]["priority_order"])
+        self.assertEqual(
+            report["battle_feedback_summary"]["next_gate"],
+            "exclude_blocked_pairs_and_route_unexercised_packages_before_requeue",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

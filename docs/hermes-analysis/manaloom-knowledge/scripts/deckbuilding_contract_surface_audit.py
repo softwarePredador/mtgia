@@ -41,6 +41,7 @@ GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_battle_probe_audit.py"
 )
+GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL = SCRIPT_DIR / "global_commander_battle_feedback_model.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -106,6 +107,10 @@ GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md"
+)
+GLOBAL_COMMANDER_BATTLE_FEEDBACK_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -200,6 +205,13 @@ def build_audit() -> dict[str, Any]:
                 "candidate `33.3%`",
                 "global_commander_candidate_battle_probe_audit.py",
                 "global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md",
+                "global_commander_battle_feedback_model.py",
+                "global_commander_battle_feedback_model_20260705_current.md",
+                "pair_blocked_by_failed_gate",
+                "pair_needs_exposure_replay_before_gate",
+                "block_pair_until_new_source_lane_or_cut",
+                "blocked_by_global_battle_feedback",
+                "blocked_pair_hypotheses",
                 "33.3%",
                 "66.7%",
                 "five Commander",
@@ -357,6 +369,13 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md",
                 "candidato `33.3%` vs",
                 "nenhuma das cinco remocoes adicionadas foi exercida",
+                "global_commander_battle_feedback_model.py",
+                "global_commander_battle_feedback_model_20260705_current.md",
+                "pair_blocked_by_failed_gate",
+                "pair_needs_exposure_replay_before_gate",
+                "block_pair_until_new_source_lane_or_cut",
+                "blocked_by_global_battle_feedback",
+                "blocked_pair_hypotheses",
             ],
         )
     )
@@ -504,6 +523,9 @@ def build_audit() -> dict[str, Any]:
                 "commander_payoff_protection",
                 "cross_lane_ramp_cut_requires_same_lane_source_or_gate",
                 "cross_lane_ramp_protection",
+                "DEFAULT_BATTLE_FEEDBACK_REPORT",
+                "blocked_by_global_battle_feedback",
+                "battle_feedback_pair_memory",
                 "mutation_allowed",
             ],
         )
@@ -518,6 +540,9 @@ def build_audit() -> dict[str, Any]:
                 "nonland_add_cut_pool_ready_review_only",
                 "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only",
                 "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only",
+                "global_commander_battle_feedback_model_20260705_current",
+                "battle_feedback_model_before_requeue",
+                "blocked_exact_add_cut_pair_count",
                 "current_official_bracket_model_has_five_brackets_and_game_changers",
                 "benchmark_regression_only_not_global_template",
                 "battle_or_optimization_performed",
@@ -565,6 +590,21 @@ def build_audit() -> dict[str, Any]:
                 "stale_lorehold_mentions",
                 "promotion_allowed",
                 "larger_battle_gate_required",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL,
+            [
+                "global_commander_battle_feedback_model",
+                "pair_blocked_by_failed_gate",
+                "pair_needs_exposure_replay_before_gate",
+                "failed_exercised_candidate_pair",
+                "ready_for_larger_equal_gate",
+                "block_pair_until_new_source_lane_or_cut",
+                "battle_or_optimization_performed",
+                "mutation_allowed",
             ],
         )
     )
@@ -672,6 +712,21 @@ def build_audit() -> dict[str, Any]:
                 "candidate_underperformed_base_probe",
                 "added_cards_not_exercised_in_replay_events",
                 "stale_lorehold_mentions: `0`",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_BATTLE_FEEDBACK_REPORT,
+            [
+                "Global Commander Battle Feedback Model",
+                "pair_blocked_by_failed_gate",
+                "pair_needs_exposure_replay_before_gate",
+                "block_pair_until_new_source_lane_or_cut",
+                "Feed the Swarm",
+                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                "Archaeomancer's Map",
+                "ready_pair_count: `0`",
             ],
         )
     )

@@ -192,7 +192,13 @@ Operational priority after this pivot:
    candidate metrics, prove replay target identity is commander-specific, and
    require added cards to be exercised in replay events before any larger gate
    can be trusted;
-13. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+13. run `global_commander_battle_feedback_model.py` after battle probe/gate
+   audit artifacts exist; it consolidates exact add/cut signatures into
+   reusable learning feedback, blocks pairs with failed exercised equal-gate
+   evidence, supersedes smaller positive probes when a larger gate rejects the
+   same pair, and routes unexercised packages to exposure replay instead of
+   requeueing them as fresh hypotheses;
+14. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -210,6 +216,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
 credentials are unavailable. It must report source lanes as unavailable and route
@@ -293,6 +300,22 @@ Current external refresh on 2026-07-05:
   `candidate_underperformed_base_probe`, with `Feed the Swarm` exercised in
   replay. The current lesson is not "add Feed anywhere"; it is "interaction is
   useful, but Kaalia needs a safer same-lane cut or a different package."
+- Current battle feedback modeling is read-only and aggregates the existing
+  global candidate battle audits by exact add/cut signature. It found `3`
+  feedback pairs: `2` `pair_blocked_by_failed_gate` rows
+  (`+Feed the Swarm / -Birgi, God of Storytelling // Harnfel, Horn of Bounty`
+  and `+Feed the Swarm / -Archaeomancer's Map`) and `1`
+  `pair_needs_exposure_replay_before_gate` wide package where added removal
+  cards were not exercised. The `+Feed / -Birgi` small positive probe is now
+  explicitly superseded by the larger failed gate, and the reusable
+  recommendation is `block_pair_until_new_source_lane_or_cut`, not requeueing
+  the same pair as a fresh candidate.
+- Current nonland candidate modeling consumes this battle feedback before
+  emitting fresh add/cut hypotheses. Exact pairs marked by feedback are moved to
+  `blocked_by_global_battle_feedback` / `blocked_pair_hypotheses`, so a failed
+  exercised pair such as `+Feed the Swarm / -Archaeomancer's Map` cannot stay
+  as the top review-ready nonland candidate without a new source lane, cut, or
+  package hypothesis.
 
 ## Global Commander Rollout - 2026-07-01
 

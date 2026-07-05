@@ -21,6 +21,7 @@ DEFAULT_CORE_REPORT = REPORT_DIR / "global_commander_core_role_audit_20260705_gl
 DEFAULT_STRATEGY_REPORT = REPORT_DIR / "global_commander_strategy_matrix_20260705_global_core_pivot_hermes_only.json"
 DEFAULT_LAND_CUT_REPORT = REPORT_DIR / "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.json"
 DEFAULT_NONLAND_REPORT = REPORT_DIR / "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.json"
+DEFAULT_BATTLE_FEEDBACK_REPORT = REPORT_DIR / "global_commander_battle_feedback_model_20260705_current.json"
 BRACKET_POLICY_FILE = REPO_ROOT / "server/lib/edh_bracket_policy.dart"
 
 EXTERNAL_RESEARCH_SNAPSHOT = [
@@ -373,17 +374,48 @@ def build_commander_queue(deck_priorities: list[dict[str, Any]]) -> list[dict[st
     return queue
 
 
+def battle_feedback_summary(payload: dict[str, Any] | None) -> dict[str, Any]:
+    if not payload:
+        return {
+            "status": "unavailable",
+            "pair_count": 0,
+            "blocked_pair_count": 0,
+            "needs_exposure_pair_count": 0,
+            "ready_pair_count": 0,
+            "pair_status_counts": {},
+            "next_gate": "run_global_commander_battle_feedback_model_before_requeueing_tested_pairs",
+        }
+    summary = payload.get("summary") or {}
+    pair_status_counts = summary.get("pair_status_counts") or {}
+    blocked = int(summary.get("blocked_pair_count") or 0)
+    needs_exposure = int(summary.get("needs_exposure_pair_count") or 0)
+    next_gate = "exclude_blocked_pairs_and_route_unexercised_packages_before_requeue"
+    if not blocked and not needs_exposure:
+        next_gate = "no_battle_feedback_blockers_currently_known"
+    return {
+        "status": payload.get("status") or "unknown",
+        "pair_count": int(summary.get("pair_count") or 0),
+        "blocked_pair_count": blocked,
+        "needs_exposure_pair_count": needs_exposure,
+        "ready_pair_count": int(summary.get("ready_pair_count") or 0),
+        "pair_status_counts": pair_status_counts,
+        "next_gate": next_gate,
+    }
+
+
 def build_report(
     *,
     core_payload: dict[str, Any],
     strategy_payload: dict[str, Any],
     land_cut_payload: dict[str, Any] | None = None,
     nonland_payload: dict[str, Any] | None = None,
+    battle_feedback_payload: dict[str, Any] | None = None,
     bracket_status: dict[str, Any],
     core_report_path: Path,
     strategy_report_path: Path,
     land_cut_report_path: Path | None = None,
     nonland_report_path: Path | None = None,
+    battle_feedback_report_path: Path | None = None,
 ) -> dict[str, Any]:
     land_cut_payload = land_cut_payload or {}
     nonland_payload = nonland_payload or {}
@@ -399,6 +431,9 @@ def build_report(
         input_artifacts["land_cut_candidate_model"] = artifact_rel(land_cut_report_path)
     if nonland_report_path is not None:
         input_artifacts["nonland_core_candidate_model"] = artifact_rel(nonland_report_path)
+    if battle_feedback_report_path is not None and battle_feedback_report_path.exists():
+        input_artifacts["battle_feedback_model"] = artifact_rel(battle_feedback_report_path)
+    feedback_summary = battle_feedback_summary(battle_feedback_payload)
     return {
         "generated_at": utc_now(),
         "status": "pass",
@@ -422,6 +457,7 @@ def build_report(
                 "commander_profile_and_source_lanes",
                 "commander_specific_strategy_matrix",
                 "battle_gate_with_drawn_cast_used_trace",
+                "battle_feedback_model_before_requeue",
             ],
         },
         "external_research_snapshot": EXTERNAL_RESEARCH_SNAPSHOT,
@@ -433,7 +469,11 @@ def build_report(
             "repair_gate_counts": dict(sorted(repair_gate_counts.items())),
             "top_next_action": commander_queue[0]["next_action"] if commander_queue else "none",
             "bracket_policy_status": bracket_status["status"],
+            "battle_feedback_status": feedback_summary["status"],
+            "blocked_exact_add_cut_pair_count": feedback_summary["blocked_pair_count"],
+            "battle_feedback_pair_status_counts": feedback_summary["pair_status_counts"],
         },
+        "battle_feedback_summary": feedback_summary,
         "commander_queue": commander_queue,
         "deck_priorities": deck_priorities,
     }
@@ -487,6 +527,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
         )
 
     bracket_policy = payload["backend_contract_gaps"]["bracket_policy"]
+    battle_feedback = payload["battle_feedback_summary"]
     lines.extend(
         [
             "",
@@ -495,9 +536,16 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             f"- Bracket policy: `{bracket_policy['status']}`.",
             f"- Next gate: `{bracket_policy['next_gate']}`.",
             "",
+            "## Battle Feedback",
+            "",
+            f"- Status: `{battle_feedback['status']}`.",
+            f"- Pair status counts: `{battle_feedback['pair_status_counts']}`.",
+            f"- Next gate: `{battle_feedback['next_gate']}`.",
+            "",
             "## Method Notes",
             "",
             "- This is a learning queue, not a deck mutation permit.",
+            "- Exact add/cut pairs blocked by battle feedback must not be requeued as fresh hypotheses.",
             "- External sources calibrate priorities; PostgreSQL/backend remains product truth.",
             "- Deck 607 is ranked only as a regression benchmark and must not become the global objective function.",
             "",
@@ -512,6 +560,7 @@ def main() -> int:
     parser.add_argument("--strategy-report", type=Path, default=DEFAULT_STRATEGY_REPORT)
     parser.add_argument("--land-cut-report", type=Path, default=DEFAULT_LAND_CUT_REPORT)
     parser.add_argument("--nonland-report", type=Path, default=DEFAULT_NONLAND_REPORT)
+    parser.add_argument("--battle-feedback-report", type=Path, default=DEFAULT_BATTLE_FEEDBACK_REPORT)
     parser.add_argument(
         "--out-prefix",
         type=Path,
@@ -523,11 +572,13 @@ def main() -> int:
         strategy_payload=load_json(args.strategy_report),
         land_cut_payload=load_optional_json(args.land_cut_report),
         nonland_payload=load_optional_json(args.nonland_report),
+        battle_feedback_payload=load_optional_json(args.battle_feedback_report),
         bracket_status=bracket_policy_status(),
         core_report_path=args.core_report,
         strategy_report_path=args.strategy_report,
         land_cut_report_path=args.land_cut_report,
         nonland_report_path=args.nonland_report,
+        battle_feedback_report_path=args.battle_feedback_report,
     )
     args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
     json_path = args.out_prefix.with_suffix(".json")

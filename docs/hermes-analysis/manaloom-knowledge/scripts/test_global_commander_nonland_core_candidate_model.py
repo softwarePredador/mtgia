@@ -246,6 +246,42 @@ class GlobalCommanderNonlandCoreCandidateModelTests(unittest.TestCase):
         self.assertEqual(pool["pair_hypotheses"], [])
         self.assertEqual(pool["related_source_lanes"][0]["commander"], "Sauron, Lord of the Rings")
 
+    def test_battle_feedback_blocks_exact_nonland_pair_requeue(self) -> None:
+        tmp, path = self._db()
+        self.addCleanup(tmp.cleanup)
+        feedback_payload = {
+            "pair_feedback": [
+                {
+                    "deck_id": "619",
+                    "commander": "Kaalia of the Vast",
+                    "added_cards": ["Swords to Plowshares"],
+                    "cut_cards": ["Excess Engine"],
+                    "pair_status": "pair_blocked_by_failed_gate",
+                    "recommendation": "block_pair_until_new_source_lane_or_cut",
+                }
+            ]
+        }
+
+        payload = audit.build_report(
+            repair_payload={"hypotheses": [removal_hypothesis()]},
+            core_role_payload=core_role_payload(),
+            sqlite_db=path,
+            battle_feedback_payload=feedback_payload,
+            limit=5,
+        )
+
+        [pool] = payload["nonland_pools"]
+        ready_pairs = {(row["add"], row["cut"]) for row in pool["pair_hypotheses"]}
+        blocked_pairs = {(row["add"], row["cut"]) for row in pool["blocked_pair_hypotheses"]}
+        self.assertNotIn(("Swords to Plowshares", "Excess Engine"), ready_pairs)
+        self.assertIn(("Swords to Plowshares", "Excess Engine"), blocked_pairs)
+        self.assertEqual(pool["battle_feedback_blocked_pair_count"], 1)
+        self.assertEqual(payload["summary"]["total_battle_feedback_blocked_pair_count"], 1)
+        self.assertIn(
+            "battle_feedback_failed_exact_pair",
+            pool["blocked_pair_hypotheses"][0]["block_reasons"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

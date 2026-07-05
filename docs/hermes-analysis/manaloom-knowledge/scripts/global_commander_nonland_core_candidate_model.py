@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 import global_commander_core_role_audit as core_roles
+import global_commander_battle_feedback_model as battle_feedback
 import global_commander_land_cut_candidate_model as land_cuts
 import global_commander_named_land_candidate_pool as land_pool
 from global_commander_deck_contract_audit import DEFAULT_SQLITE_DB, REPO_ROOT
@@ -29,6 +30,7 @@ DEFAULT_REPAIR_HYPOTHESIS_REPORT = (
     REPORT_DIR / "global_commander_core_repair_hypothesis_20260705_global_goal_hermes_only.json"
 )
 DEFAULT_CORE_ROLE_REPORT = REPORT_DIR / "global_commander_core_role_audit_20260705_global_goal_hermes_only.json"
+DEFAULT_BATTLE_FEEDBACK_REPORT = REPORT_DIR / "global_commander_battle_feedback_model_20260705_current.json"
 DEFAULT_OUT_PREFIX = REPORT_DIR / "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only"
 
 SUPPORTED_CANDIDATE_ROLES = {"removal", "draw", "ramp", "board_wipe", "protection", "recursion"}
@@ -341,6 +343,45 @@ def cross_lane_cut_blockers(target_role: str, roles: set[str]) -> list[str]:
     return blockers
 
 
+def battle_feedback_pair_key(
+    *,
+    deck_id: str,
+    commander: str,
+    add: str,
+    cut: str,
+) -> tuple[str, str, str, str]:
+    return (
+        str(deck_id),
+        normalize_name(commander),
+        normalize_name(add),
+        normalize_name(cut),
+    )
+
+
+def blocked_pairs_from_battle_feedback(payload: dict[str, Any] | None) -> dict[tuple[str, str, str, str], dict[str, Any]]:
+    if not payload:
+        return {}
+    blocked_statuses = {
+        "pair_blocked_by_failed_gate",
+        "pair_needs_exposure_replay_before_gate",
+    }
+    blocked: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+    for row in payload.get("pair_feedback", []):
+        status = str(row.get("pair_status") or "")
+        added_cards = row.get("added_cards") or []
+        cut_cards = row.get("cut_cards") or []
+        if status not in blocked_statuses or len(added_cards) != 1 or len(cut_cards) != 1:
+            continue
+        key = battle_feedback_pair_key(
+            deck_id=str(row.get("deck_id") or ""),
+            commander=str(row.get("commander") or ""),
+            add=str(added_cards[0]),
+            cut=str(cut_cards[0]),
+        )
+        blocked[key] = row
+    return blocked
+
+
 def cut_candidates_for_hypothesis(
     *,
     conn: sqlite3.Connection,
@@ -437,6 +478,7 @@ def build_pool_for_hypothesis(
     conn: sqlite3.Connection,
     hypothesis: dict[str, Any],
     core_row: dict[str, Any],
+    blocked_battle_pairs: dict[tuple[str, str, str, str], dict[str, Any]] | None = None,
     limit: int,
 ) -> dict[str, Any]:
     deck_id = str(hypothesis.get("deck_id"))
@@ -464,28 +506,62 @@ def build_pool_for_hypothesis(
         )
     elif role in SOURCE_LANE_ONLY_ROLES:
         related_sources = related_learned_sources(conn, commander, limit)
-    pairs = [
-        {
-            "add": candidate["card_name"],
-            "cut": cut["card_name"],
-            "role": role,
-            "status": "review_only_nonland_add_cut_pair",
-            "pair_score": as_int(candidate.get("score")) + as_int(cut.get("score")),
-            "required_gates": [
-                "candidate_copy_only",
-                "structure_and_legality_recheck",
-                "role_floor_recheck",
-                "commander_strategy_matrix_before_battle",
-                "battle_gate_with_drawn_cast_used_trace_before_promotion",
-            ],
-            "mutation_allowed": False,
-        }
-        for candidate in candidates[:3]
-        for cut in cuts[:3]
-    ]
+    pairs: list[dict[str, Any]] = []
+    blocked_pairs: list[dict[str, Any]] = []
+    blocked_battle_pairs = blocked_battle_pairs or {}
+    for candidate in candidates[:3]:
+        for cut in cuts[:3]:
+            add_name = str(candidate["card_name"])
+            cut_name = str(cut["card_name"])
+            pair_score = as_int(candidate.get("score")) + as_int(cut.get("score"))
+            feedback_row = blocked_battle_pairs.get(
+                battle_feedback_pair_key(
+                    deck_id=deck_id,
+                    commander=commander,
+                    add=add_name,
+                    cut=cut_name,
+                )
+            )
+            if feedback_row:
+                blocked_pairs.append(
+                    {
+                        "add": add_name,
+                        "cut": cut_name,
+                        "role": role,
+                        "status": "blocked_by_global_battle_feedback",
+                        "battle_feedback_status": feedback_row.get("pair_status"),
+                        "battle_feedback_recommendation": feedback_row.get("recommendation"),
+                        "pair_score": pair_score,
+                        "block_reasons": [
+                            "battle_feedback_failed_exact_pair"
+                            if feedback_row.get("pair_status") == "pair_blocked_by_failed_gate"
+                            else "battle_feedback_requires_exposure_replay_before_gate"
+                        ],
+                        "mutation_allowed": False,
+                    }
+                )
+                continue
+            pairs.append(
+                {
+                    "add": add_name,
+                    "cut": cut_name,
+                    "role": role,
+                    "status": "review_only_nonland_add_cut_pair",
+                    "pair_score": pair_score,
+                    "required_gates": [
+                        "candidate_copy_only",
+                        "structure_and_legality_recheck",
+                        "role_floor_recheck",
+                        "commander_strategy_matrix_before_battle",
+                        "battle_gate_with_drawn_cast_used_trace_before_promotion",
+                    ],
+                    "mutation_allowed": False,
+                }
+            )
     pairs.sort(key=lambda row: (-as_int(row["pair_score"]), str(row["add"]), str(row["cut"])))
+    blocked_pairs.sort(key=lambda row: (-as_int(row["pair_score"]), str(row["add"]), str(row["cut"])))
     if candidates and cuts:
-        status = "review_nonland_add_cut_pool_ready"
+        status = "review_nonland_add_cut_pool_ready" if pairs else "needs_new_nonland_pair_after_battle_feedback"
     elif role in SOURCE_LANE_ONLY_ROLES:
         status = "needs_commander_specific_source_lane"
     else:
@@ -503,10 +579,12 @@ def build_pool_for_hypothesis(
         "candidate_count": len(candidates),
         "cut_candidate_count": len(cuts),
         "blocked_cut_candidate_count": len(blocked_cuts),
+        "battle_feedback_blocked_pair_count": len(blocked_pairs),
         "top_candidates": candidates,
         "top_cut_candidates": cuts,
         "blocked_cut_candidates": blocked_cuts,
         "pair_hypotheses": pairs[:limit],
+        "blocked_pair_hypotheses": blocked_pairs[:limit],
         "related_source_lanes": related_sources,
         "status": status,
         "mutation_allowed": False,
@@ -520,18 +598,22 @@ def build_report(
     sqlite_db: Path,
     repair_report_path: Path = DEFAULT_REPAIR_HYPOTHESIS_REPORT,
     core_role_report_path: Path = DEFAULT_CORE_ROLE_REPORT,
+    battle_feedback_payload: dict[str, Any] | None = None,
+    battle_feedback_report_path: Path = DEFAULT_BATTLE_FEEDBACK_REPORT,
     limit: int = 12,
 ) -> dict[str, Any]:
     core_by_id = core_deck_by_id(core_role_payload)
     nonland_hypotheses = [
         row for row in repair_payload.get("hypotheses", []) if str(row.get("role") or "") != "land"
     ]
+    blocked_battle_pairs = blocked_pairs_from_battle_feedback(battle_feedback_payload)
     with sqlite3.connect(sqlite_db) as conn:
         pools = [
             build_pool_for_hypothesis(
                 conn=conn,
                 hypothesis=row,
                 core_row=core_by_id.get(str(row.get("deck_id")), {}),
+                blocked_battle_pairs=blocked_battle_pairs,
                 limit=limit,
             )
             for row in nonland_hypotheses
@@ -542,6 +624,7 @@ def build_report(
         "artifact_type": "global_commander_nonland_core_candidate_model",
         "source_repair_hypothesis_report": rel(repair_report_path),
         "source_core_role_report": rel(core_role_report_path),
+        "source_battle_feedback_report": rel(battle_feedback_report_path),
         "source_db": rel(sqlite_db),
         "mutation_allowed": False,
         "postgres_writes": False,
@@ -553,6 +636,9 @@ def build_report(
             "total_candidate_count": sum(as_int(row.get("candidate_count")) for row in pools),
             "total_cut_candidate_count": sum(as_int(row.get("cut_candidate_count")) for row in pools),
             "total_blocked_cut_candidate_count": sum(as_int(row.get("blocked_cut_candidate_count")) for row in pools),
+            "total_battle_feedback_blocked_pair_count": sum(
+                as_int(row.get("battle_feedback_blocked_pair_count")) for row in pools
+            ),
             "total_pair_hypothesis_count": sum(len(row.get("pair_hypotheses") or []) for row in pools),
             "top_next_action": "review_nonland_add_cut_pairs_or_build_commander_source_lane",
         },
@@ -563,6 +649,7 @@ def build_report(
             "floor_protection": "Cards carrying any missing core role are blocked from cut suggestions.",
             "commander_payoff_protection": "Commander-specific payoffs such as Kaalia Angel/Demon/Dragon creatures are blocked from generic excess-role cuts until source-lane review.",
             "cross_lane_ramp_protection": "Ramp cards are blocked from non-ramp repairs unless a same-lane source or later battle gate proves the cut.",
+            "battle_feedback_pair_memory": "Exact add/cut pairs blocked by global battle feedback are removed from fresh nonland pair hypotheses.",
             "promotion_block": "No deck change is promoted without candidate copy, structure/legal recheck, strategy matrix, battle gate, and replay trace.",
         },
     }
@@ -580,6 +667,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
         f"- pool_count: `{payload['summary']['pool_count']}`",
         f"- status_counts: `{json.dumps(payload['summary']['status_counts'], sort_keys=True)}`",
         f"- total_pair_hypothesis_count: `{payload['summary']['total_pair_hypothesis_count']}`",
+        f"- total_battle_feedback_blocked_pair_count: `{payload['summary']['total_battle_feedback_blocked_pair_count']}`",
         "",
         "## Pools",
         "",
@@ -618,6 +706,12 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
                 lines.append(
                     f"| `{row['card_name']}` | `{row['status']}` | {', '.join(row.get('block_reasons') or [])} |"
                 )
+        if pool.get("blocked_pair_hypotheses"):
+            lines.extend(["", "| Battle Feedback Blocked Pair | Status | Reasons |", "| --- | --- | --- |"])
+            for row in pool["blocked_pair_hypotheses"]:
+                lines.append(
+                    f"| `+{row['add']} / -{row['cut']}` | `{row['battle_feedback_status']}` | {', '.join(row.get('block_reasons') or [])} |"
+                )
         if pool["related_source_lanes"]:
             lines.extend(["", "Related source lanes:"])
             for row in pool["related_source_lanes"]:
@@ -645,6 +739,7 @@ def main() -> int:
     parser.add_argument("--db", type=Path, default=DEFAULT_SQLITE_DB)
     parser.add_argument("--repair-hypothesis-report", type=Path, default=DEFAULT_REPAIR_HYPOTHESIS_REPORT)
     parser.add_argument("--core-role-report", type=Path, default=DEFAULT_CORE_ROLE_REPORT)
+    parser.add_argument("--battle-feedback-report", type=Path, default=DEFAULT_BATTLE_FEEDBACK_REPORT)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     parser.add_argument("--limit", type=int, default=12)
     args = parser.parse_args()
@@ -654,6 +749,10 @@ def main() -> int:
         sqlite_db=args.db,
         repair_report_path=args.repair_hypothesis_report,
         core_role_report_path=args.core_role_report,
+        battle_feedback_payload=battle_feedback.load_json(args.battle_feedback_report)
+        if args.battle_feedback_report.exists()
+        else {},
+        battle_feedback_report_path=args.battle_feedback_report,
         limit=args.limit,
     )
     json_path, md_path = write_outputs(payload, args.out_prefix)

@@ -289,6 +289,23 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `33.3%`, blocker `candidate_underperformed_base_probe`, mesmo com `Feed the
     Swarm` exercido no replay. Proxima busca: corte mais seguro de mesma lane ou
     pacote diferente, nao promocao.
+    Depois dos probes/gates, rode
+    `manaloom-knowledge/scripts/global_commander_battle_feedback_model.py` para
+    consolidar o historico por assinatura add/cut exata antes de reabrir a fila
+    de aprendizado. Evidencia local atual:
+    `master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md`.
+    O modelo marcou `2` pares como `pair_blocked_by_failed_gate`
+    (`+Feed the Swarm / -Birgi, God of Storytelling // Harnfel, Horn of Bounty`
+    e `+Feed the Swarm / -Archaeomancer's Map`) e `1` pacote como
+    `pair_needs_exposure_replay_before_gate`. A recomendacao reutilizavel para
+    os pares exercitados que falharam e `block_pair_until_new_source_lane_or_cut`;
+    o probe pequeno positivo de `+Feed / -Birgi` fica supersedido pelo gate maior
+    reprovado.
+    O modelo nonland consome esse feedback antes de emitir pares frescos:
+    pares exatos bloqueados entram em `blocked_by_global_battle_feedback` /
+    `blocked_pair_hypotheses`, entao `+Feed the Swarm / -Archaeomancer's Map`
+    nao deve continuar como top par review-ready sem nova source lane, novo
+    corte ou pacote diferente.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em
