@@ -1,15 +1,13 @@
 {
-  "generated_at": "2026-07-05T20:24:52.299679+00:00",
-  "status": "fail",
+  "generated_at": "2026-07-05T20:25:23.352140+00:00",
+  "status": "pass",
   "contract": "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
   "active_surfaces": [
     {
       "path": "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
       "exists": true,
-      "status": "fail",
-      "missing": [
-        "commander_value_safe_stage_split_ready_for_stage_candidate_copy"
-      ]
+      "status": "pass",
+      "missing": []
     },
     {
       "path": "server/lib/ai/commander_deckbuilding_contract_support.dart",
@@ -230,10 +228,8 @@
     {
       "path": "docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_value_safe_stage_splitter.py",
       "exists": true,
-      "status": "fail",
-      "missing": [
-        "materialize_value_safe_stage_1_candidate_copy"
-      ]
+      "status": "pass",
+      "missing": []
     },
     {
       "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_scope_legalities.md",
@@ -470,22 +466,5 @@
       "reason": "package chain snapshot depends on ignored candidate-copy lineage artifacts"
     }
   ],
-  "failures": [
-    {
-      "path": "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
-      "exists": true,
-      "status": "fail",
-      "missing": [
-        "commander_value_safe_stage_split_ready_for_stage_candidate_copy"
-      ]
-    },
-    {
-      "path": "docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_value_safe_stage_splitter.py",
-      "exists": true,
-      "status": "fail",
-      "missing": [
-        "materialize_value_safe_stage_1_candidate_copy"
-      ]
-    }
-  ]
+  "failures": []
 }

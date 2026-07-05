@@ -8,7 +8,7 @@
   ],
   "deck_action_allowed": false,
   "full_package_candidate_copy_allowed_now": false,
-  "generated_at": "2026-07-05T20:24:16.776305+00:00",
+  "generated_at": "2026-07-05T20:25:23.309862+00:00",
   "input_artifacts": {
     "cut_source_lane_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.json",
     "package_synthesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.json"

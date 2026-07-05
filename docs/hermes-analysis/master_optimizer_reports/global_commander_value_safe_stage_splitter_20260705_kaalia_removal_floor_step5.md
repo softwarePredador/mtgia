@@ -1,6 +1,6 @@
 # Global Commander Value-Safe Stage Splitter
 
-- generated_at: `2026-07-05T20:24:16.776305+00:00`
+- generated_at: `2026-07-05T20:25:23.309862+00:00`
 - status: `commander_value_safe_stage_split_ready_for_stage_candidate_copy`
 - commander: `Kaalia of the Vast`
 - deck_id: `619`

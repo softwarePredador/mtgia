@@ -1,14 +1,14 @@
 # Deckbuilding Contract Surface Audit
 
-- Generated at: `2026-07-05T20:24:52.299679+00:00`
-- Status: `fail`
+- Generated at: `2026-07-05T20:25:23.352140+00:00`
+- Status: `pass`
 - Contract: `docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`
 
 ## Active Surfaces
 
 | Status | Path | Missing |
 | --- | --- | --- |
-| fail | `docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md` | commander_value_safe_stage_split_ready_for_stage_candidate_copy |
+| pass | `docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md` |  |
 | pass | `server/lib/ai/commander_deckbuilding_contract_support.dart` |  |
 | pass | `server/lib/ai/commander_reference_profile_support.dart` |  |
 | pass | `server/lib/ai/commander_staple_impact_policy.dart` |  |
@@ -45,7 +45,7 @@
 | pass | `docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_payoff_source_lane_expander.py` |  |
 | pass | `docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_payoff_package_synthesizer.py` |  |
 | pass | `docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_cut_source_lane_expander.py` |  |
-| fail | `docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_value_safe_stage_splitter.py` | materialize_value_safe_stage_1_candidate_copy |
+| pass | `docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_value_safe_stage_splitter.py` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_scope_legalities.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260701_current.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.md` |  |

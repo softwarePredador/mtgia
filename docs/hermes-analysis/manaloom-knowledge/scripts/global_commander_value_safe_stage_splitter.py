@@ -30,6 +30,7 @@ DEFAULT_CUT_SOURCE_LANE_REPORT = (
 DEFAULT_OUT_PREFIX = (
     REPORT_DIR / "global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5"
 )
+FIRST_STAGE_NEXT_GATE = "materialize_value_safe_stage_1_candidate_copy"
 
 
 def utc_now() -> str:
@@ -106,7 +107,9 @@ def split_stages(pairs: list[dict[str, Any]], limit: int) -> list[dict[str, Any]
                 "candidate_copy_allowed_now": True,
                 "battle_gate_allowed_now": False,
                 "promotion_allowed": False,
-                "next_gate": f"materialize_value_safe_stage_{stage_number}_candidate_copy",
+                "next_gate": FIRST_STAGE_NEXT_GATE
+                if stage_number == 1
+                else f"materialize_value_safe_stage_{stage_number}_candidate_copy",
             }
         )
     return stages
