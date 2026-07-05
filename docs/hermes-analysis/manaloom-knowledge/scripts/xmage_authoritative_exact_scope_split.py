@@ -81,6 +81,10 @@ STATIC_CONTROLLED_PT_UNIT = (
     "xmage_signature::BoostControlledEffect::SimpleStaticAbility::"
     "no_target_class::no_condition_class::static_ability"
 )
+STATIC_GLOBAL_PT_UNIT = (
+    "xmage_signature::BoostAllEffect::SimpleStaticAbility::"
+    "no_target_class::no_condition_class::static_ability"
+)
 STATIC_GENERIC_COST_REDUCTION_UNIT = (
     "xmage_signature::SpellsCostReductionControllerEffect::SimpleStaticAbility::"
     "no_target_class::no_condition_class::cost_reduction,static_ability"
@@ -250,6 +254,7 @@ STATIC_FLYING_CAN_BLOCK_ONLY_FLYING_CREATURE_SCOPE = (
 )
 STATIC_HORSEMANSHIP_CREATURE_SCOPE = "xmage_static_self_horsemanship_creature_v1"
 STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
+STATIC_GLOBAL_PT_SCOPE = "xmage_static_global_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
 STATIC_GRAVEYARD_COUNT_BOOST_SCOPE = "xmage_static_source_boost_equal_graveyard_count_v1"
@@ -5628,6 +5633,266 @@ def static_controlled_pt_from_source(source: str) -> dict[str, Any] | str | None
     }
 
 
+STATIC_GLOBAL_PT_BLOCKED_SOURCE_MARKERS = {
+    "Duration.EndOfTurn",
+    "DynamicValue",
+    "CardsDrawnThisTurnDynamicValue",
+    "CardsInControllerHandCount",
+    "PermanentsOnBattlefieldCount",
+    "FilterBlockingCreature",
+    "FILTER_ATTACKING_CREATURES",
+    "FILTER_BLOCKING_CREATURES",
+    "filterNoAbilities",
+    "ObjectHasNoAbilitiesPredicate",
+}
+
+
+def static_global_pt_filter_label(creature_filter: dict[str, Any] | None) -> str:
+    if not creature_filter:
+        return "creatures"
+    if creature_filter.get("token"):
+        return "creature_tokens"
+    if creature_filter.get("card_types"):
+        return "_".join(str(value).lower() for value in creature_filter["card_types"]) + "_creatures"
+    if creature_filter.get("colors"):
+        return "_".join(str(value).lower() for value in creature_filter["colors"]) + "_creatures"
+    if creature_filter.get("subtypes"):
+        return "_".join(str(value).lower() for value in creature_filter["subtypes"]) + "_creatures"
+    return boost_all_filter_label(creature_filter)
+
+
+def static_global_pt_filter_from_oracle_subject(subject: str) -> dict[str, Any] | str | None:
+    phrase = re.sub(r"\s+", " ", str(subject or "").strip().lower())
+    if not phrase or phrase in {"creature", "creatures", "all creatures"}:
+        return None
+    if phrase == "creature tokens":
+        return {"token": True}
+    if phrase in {"land", "lands", "each land"}:
+        return {"card_types": ["land"]}
+    if phrase.startswith("all "):
+        phrase = phrase[4:].strip()
+    if phrase.endswith(" creatures"):
+        phrase = phrase[: -len(" creatures")].strip()
+    elif phrase.endswith(" creature"):
+        phrase = phrase[: -len(" creature")].strip()
+    if not phrase:
+        return None
+    words = phrase.split()
+    blocked_words = STATIC_CONTROLLED_PT_BLOCKED_ORACLE_WORDS - set(BOOST_ALL_FILTER_COLOR_WORDS)
+    if any(word in blocked_words for word in words):
+        return "static_global_pt_oracle_filter_not_supported"
+    colors = [BOOST_ALL_FILTER_COLOR_WORDS[word] for word in words if word in BOOST_ALL_FILTER_COLOR_WORDS]
+    subtypes = [
+        canonical_static_subtype(word)
+        for word in words
+        if word not in BOOST_ALL_FILTER_COLOR_WORDS
+    ]
+    result: dict[str, Any] = {}
+    if colors:
+        result["colors"] = ordered_color_symbols(colors)
+    if subtypes:
+        result["subtypes"] = sorted({subtype for subtype in subtypes if subtype})
+    return result or None
+
+
+def static_global_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    lowered = text.lower()
+    if any(token in lowered for token in ("+x/", "/+x", "-x/", "/-x", "where x", "for each")):
+        return "static_global_pt_oracle_dynamic_not_supported"
+    land_match = re.match(
+        r"^each land gets (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+) as long as it's a creature\.?$",
+        text,
+        re.I,
+    )
+    if land_match:
+        power = signed_int_from_oracle(land_match.group("power"))
+        toughness = signed_int_from_oracle(land_match.group("toughness"))
+        if power is None or toughness is None:
+            return None
+        return {
+            "static_power_bonus": power,
+            "static_toughness_bonus": toughness,
+            "static_controller_scope": "all",
+            "static_exclude_source": False,
+            "creature_filter": {"card_types": ["land"]},
+        }
+    opponents_match = re.match(
+        r"^creatures your opponents control get (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+)\.?$",
+        text,
+        re.I,
+    )
+    if opponents_match:
+        power = signed_int_from_oracle(opponents_match.group("power"))
+        toughness = signed_int_from_oracle(opponents_match.group("toughness"))
+        if power is None or toughness is None:
+            return None
+        return {
+            "static_power_bonus": power,
+            "static_toughness_bonus": toughness,
+            "static_controller_scope": "opponents",
+            "static_exclude_source": False,
+            "creature_filter": None,
+        }
+    match = re.match(
+        r"^(?P<other>other )?(?P<subject>[a-z0-9' -]+?) "
+        r"get (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+)\.?$",
+        text,
+        re.I,
+    )
+    if not match:
+        return None
+    subject = match.group("subject").strip()
+    creature_filter = static_global_pt_filter_from_oracle_subject(subject)
+    if isinstance(creature_filter, str):
+        return creature_filter
+    power = signed_int_from_oracle(match.group("power"))
+    toughness = signed_int_from_oracle(match.group("toughness"))
+    if power is None or toughness is None:
+        return None
+    return {
+        "static_power_bonus": power,
+        "static_toughness_bonus": toughness,
+        "static_controller_scope": "all",
+        "static_exclude_source": bool(match.group("other")),
+        "creature_filter": creature_filter,
+    }
+
+
+def static_global_pt_filter_from_source(source: str, args: list[str]) -> dict[str, Any] | str | None:
+    text = source or ""
+    if len(args) <= 3:
+        return None
+    filter_args = [arg.strip() for arg in args[3:] if arg.strip() not in {"true", "false"}]
+    if not filter_args:
+        return None
+    filter_text = ", ".join(filter_args)
+    if "StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURES" in filter_text:
+        return None
+    if "StaticFilters.FILTER_PERMANENT_CREATURE" in filter_text:
+        return None
+    if "StaticFilters.FILTER_PERMANENT_ALL_SLIVERS" in filter_text:
+        return {"subtypes": ["sliver"]}
+    inline_subtypes = re.findall(r"SubType\.([A-Z0-9_]+)", filter_text)
+    if inline_subtypes:
+        return {
+            "subtypes": sorted(
+                {canonical_static_subtype(token.replace("_", " ")) for token in inline_subtypes}
+            )
+        }
+    filter_name = filter_args[0] if len(filter_args) == 1 else ""
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", filter_name):
+        return "static_global_pt_source_filter_not_supported"
+    if re.search(rf"\b{re.escape(filter_name)}\.add\s*\(\s*TokenPredicate\.TRUE\s*\)", text):
+        return {"token": True}
+    if re.search(rf"\b{re.escape(filter_name)}\.add\s*\(\s*CardType\.LAND\.getPredicate\s*\(\s*\)\s*\)", text):
+        return {"card_types": ["land"]}
+    color_tokens = re.findall(
+        rf"\b{re.escape(filter_name)}\.add\s*\(\s*new\s+ColorPredicate\s*\(\s*ObjectColor\.([A-Z]+)\s*\)\s*\)",
+        text,
+    )
+    if color_tokens:
+        colors = [
+            OBJECT_COLOR_TO_SYMBOL[token]
+            for token in color_tokens
+            if token in OBJECT_COLOR_TO_SYMBOL
+        ]
+        if colors:
+            return {"colors": ordered_color_symbols(colors)}
+    subtype_tokens = re.findall(
+        rf"\b{re.escape(filter_name)}\.add\s*\(\s*SubType\.([A-Z0-9_]+)\.getPredicate\s*\(\s*\)\s*\)",
+        text,
+    )
+    subtype_tokens += re.findall(
+        rf"\b{re.escape(filter_name)}\s*=\s*new\s+Filter(?:Creature)?Permanent\s*\(\s*SubType\.([A-Z0-9_]+)",
+        text,
+    )
+    if subtype_tokens:
+        return {
+            "subtypes": sorted(
+                {canonical_static_subtype(token.replace("_", " ")) for token in subtype_tokens}
+            )
+        }
+    return "static_global_pt_source_filter_not_supported"
+
+
+def static_global_pt_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if any(marker in text for marker in STATIC_GLOBAL_PT_BLOCKED_SOURCE_MARKERS):
+        return "static_global_pt_source_dynamic_or_phase_not_supported"
+    if len(re.findall(r"\bBoostAllEffect\s*\(", text)) != 1:
+        return "static_global_pt_source_not_single_fixed"
+    args_text = extract_java_call_args(text, "BoostAllEffect")
+    if args_text is None:
+        return "static_global_pt_source_not_single_fixed"
+    args = split_java_args(args_text)
+    if len(args) < 3:
+        return "static_global_pt_source_not_single_fixed"
+    if not re.fullmatch(r"[+-]?\d+", args[0].strip()) or not re.fullmatch(r"[+-]?\d+", args[1].strip()):
+        return "static_global_pt_source_dynamic_or_phase_not_supported"
+    if args[2].strip() != "Duration.WhileOnBattlefield":
+        return "static_global_pt_source_dynamic_or_phase_not_supported"
+    controller_scope = "all"
+    if any("StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURES" in arg for arg in args[3:]):
+        controller_scope = "opponents"
+    bool_args = [arg.strip() for arg in args[3:] if arg.strip() in {"true", "false"}]
+    exclude_source = bool_args[-1] == "true" if bool_args else False
+    creature_filter = static_global_pt_filter_from_source(text, args)
+    if isinstance(creature_filter, str):
+        return creature_filter
+    return {
+        "static_power_bonus": int(args[0].strip()),
+        "static_toughness_bonus": int(args[1].strip()),
+        "static_controller_scope": controller_scope,
+        "static_exclude_source": exclude_source,
+        "creature_filter": creature_filter,
+    }
+
+
+def static_global_pt_source_can_match_filter(metadata: dict[str, Any], creature_filter: dict[str, Any] | None) -> bool:
+    type_line = str(metadata.get("type_line") or "").lower()
+    if "creature" not in type_line:
+        return False
+    if not creature_filter:
+        return True
+    if creature_filter.get("token"):
+        return False
+    for card_type in creature_filter.get("card_types") or []:
+        if str(card_type).lower() not in type_line.replace("—", " ").replace("-", " ").split():
+            return False
+    for subtype in creature_filter.get("subtypes") or []:
+        if canonical_static_subtype(str(subtype)) not in {
+            canonical_static_subtype(part)
+            for part in re.split(r"[\s—-]+", type_line)
+            if part
+        }:
+            return False
+    source_colors = set(ordered_color_symbols(metadata.get("colors") or metadata.get("color_identity") or []))
+    required_colors = set(ordered_color_symbols(creature_filter.get("colors") or []))
+    if required_colors and not source_colors.intersection(required_colors):
+        return False
+    return True
+
+
+def static_global_pt_specs_match(
+    source_static: dict[str, Any],
+    oracle_static: dict[str, Any],
+    metadata: dict[str, Any],
+) -> bool:
+    if source_static == oracle_static:
+        return True
+    normalized_source = dict(source_static)
+    normalized_oracle = dict(oracle_static)
+    if (
+        bool(normalized_source.get("static_exclude_source"))
+        and not bool(normalized_oracle.get("static_exclude_source"))
+        and normalized_source.get("creature_filter") == normalized_oracle.get("creature_filter")
+        and not static_global_pt_source_can_match_filter(metadata, normalized_source.get("creature_filter"))
+    ):
+        normalized_source["static_exclude_source"] = False
+    return normalized_source == normalized_oracle
+
+
 STATIC_GRAVEYARD_COUNT_PT_FILTERS = {
     "StaticFilters.FILTER_CARD_ARTIFACTS": ["artifact"],
     "StaticFilters.FILTER_CARD_CREATURES": ["creature"],
@@ -6534,6 +6799,15 @@ def is_static_controlled_pt_unit(row: dict[str, Any]) -> bool:
     return (
         str(row.get("adapter_work_unit") or "") == STATIC_CONTROLLED_PT_UNIT
         and effect_classes(row) == {"BoostControlledEffect"}
+        and ability_classes(row) == {"SimpleStaticAbility"}
+        and set(row.get("xmage_signals") or []) == {"static_ability"}
+    )
+
+
+def is_static_global_pt_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == STATIC_GLOBAL_PT_UNIT
+        and effect_classes(row) == {"BoostAllEffect"}
         and ability_classes(row) == {"SimpleStaticAbility"}
         and set(row.get("xmage_signals") or []) == {"static_ability"}
     )
@@ -14669,6 +14943,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature attack trigger grants a target creature a keyword until end of turn"
     elif scope == STATIC_CONTROLLED_PT_SCOPE:
         scope_kind = "permanent static controlled-creature power/toughness boost"
+    elif scope == STATIC_GLOBAL_PT_SCOPE:
+        scope_kind = "permanent static global/opponent/filtered creature power/toughness boost"
     elif scope == STATIC_GRAVEYARD_COUNT_PT_SCOPE:
         scope_kind = "creature static source power/toughness equal to graveyard card count"
     elif scope == STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE:
@@ -14876,6 +15152,7 @@ def split_row(
     permanent_activated_tutor_battlefield_unit = is_permanent_activated_tutor_battlefield_unit(row)
     attack_target_keyword_unit = is_creature_attack_target_keyword_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
+    static_global_pt_unit = is_static_global_pt_unit(row)
     simple_aura_static_pt_unit = is_simple_aura_static_pt_unit(row)
     simple_equipment_static_attachment_unit = is_simple_equipment_static_attachment_unit(row)
     static_generic_cost_reduction_unit = is_static_generic_cost_reduction_unit(row)
@@ -14985,6 +15262,7 @@ def split_row(
         and not permanent_activated_tutor_battlefield_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
+        and not static_global_pt_unit
         and not simple_aura_static_pt_unit
         and not simple_equipment_static_attachment_unit
         and not static_generic_cost_reduction_unit
@@ -15058,6 +15336,7 @@ def split_row(
         and not permanent_activated_tutor_battlefield_unit
         and not attack_target_keyword_unit
         and not static_controlled_pt_unit
+        and not static_global_pt_unit
         and not simple_aura_static_pt_unit
         and not simple_equipment_static_attachment_unit
         and not static_generic_cost_reduction_unit
@@ -17425,6 +17704,78 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_controlled_power_toughness_boost",
+        ), "selected_exact_scope"
+
+    if static_global_pt_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "static_global_pt_not_permanent"
+        oracle_static = static_global_pt_from_oracle(metadata)
+        if isinstance(oracle_static, str):
+            return None, oracle_static
+        if oracle_static is None:
+            return None, "static_global_pt_oracle_not_exact"
+        source_static = static_global_pt_from_source(source_text)
+        if isinstance(source_static, str):
+            return None, source_static
+        if source_static is None:
+            return None, "static_global_pt_source_not_exact"
+        if not static_global_pt_specs_match(source_static, oracle_static, metadata):
+            return None, "static_global_pt_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_type = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        creature_filter = source_static.get("creature_filter") or None
+        controller_scope = str(source_static.get("static_controller_scope") or "all")
+        target_constraints: dict[str, Any] = {"card_types": ["creature"]}
+        if controller_scope == "opponents":
+            target_constraints["controller"] = "opponents"
+        elif controller_scope == "self":
+            target_constraints["controller"] = "self"
+        else:
+            target_constraints["controller"] = "all"
+        if creature_filter:
+            target_constraints["creature_filter"] = creature_filter
+            if creature_filter.get("subtypes"):
+                target_constraints["subtypes"] = creature_filter["subtypes"]
+            if creature_filter.get("colors"):
+                target_constraints["colors"] = creature_filter["colors"]
+            if creature_filter.get("token"):
+                target_constraints["token"] = True
+            if creature_filter.get("card_types"):
+                target_constraints["card_types"] = ["creature", *creature_filter["card_types"]]
+        target = (
+            "opponents_creatures"
+            if controller_scope == "opponents"
+            else static_global_pt_filter_label(creature_filter)
+        )
+        effect_json = {
+            "effect": "static_global_power_toughness_boost",
+            "battle_model_scope": STATIC_GLOBAL_PT_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "global_power_toughness_boost",
+            "static_applies_to": target,
+            "target": target,
+            "target_controller": controller_scope,
+            "target_constraints": target_constraints,
+            "xmage_effect_class": "BoostAllEffect",
+            "xmage_ability_class": "SimpleStaticAbility",
+            "permanent_type": permanent_type,
+            **source_static,
+        }
+        if creature_filter:
+            effect_json["creature_filter"] = creature_filter
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_global_power_toughness_boost",
         ), "selected_exact_scope"
 
     if static_generic_cost_reduction_unit:
@@ -22045,6 +22396,7 @@ def build_exact_split_report(
             and not is_permanent_activated_target_keyword_unit(row)
             and not is_creature_attack_target_keyword_unit(row)
             and not is_static_controlled_pt_unit(row)
+            and not is_static_global_pt_unit(row)
             and not is_simple_equipment_static_attachment_unit(row)
             and not is_static_generic_cost_reduction_unit(row)
             and not is_static_graveyard_count_pt_unit(row)
@@ -22129,6 +22481,7 @@ def build_exact_split_report(
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
+                "xmage_signature BoostAllEffect + SimpleStaticAbility rows with exact static fixed creature power/toughness boosts for all, opponent, color, subtype, token, or land-creature filters",
                 "xmage_signature BoostEquippedEffect Equipment rows with exact fixed equipped-creature power/toughness boost, supported attached combat keywords, and no auxiliary non-static effects",
                 "xmage_signature SpellsCostReductionControllerEffect + SimpleStaticAbility rows with exact generic cost reduction for spells you cast by card type, subtype, color, or minimum mana value",
                 "SetBasePowerToughnessSourceEffect + SimpleStaticAbility creature rows whose source and Oracle both set source power/toughness to a direct controller/all-graveyards card-type count",

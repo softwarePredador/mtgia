@@ -736,6 +736,158 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(goblin["power"], 1)
         self.assertEqual(goblin["toughness"], 1)
 
+    def test_static_global_power_toughness_boost_applies_without_accumulating(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        bad_moon = {
+            "name": "Bad Moon",
+            "type_line": "Enchantment",
+            "effect": "static_global_power_toughness_boost",
+            "battle_model_scope": "xmage_static_global_power_toughness_boost_v1",
+            "static_effect": "global_power_toughness_boost",
+            "static_power_bonus": 1,
+            "static_toughness_bonus": 1,
+            "static_controller_scope": "all",
+            "creature_filter": {"colors": ["B"]},
+        }
+        active_black = {
+            "name": "Active Shade",
+            "type_line": "Creature - Shade",
+            "colors": ["B"],
+            "power": 1,
+            "toughness": 1,
+        }
+        enemy_black = {
+            "name": "Enemy Rat",
+            "type_line": "Creature - Rat",
+            "colors": ["B"],
+            "power": 1,
+            "toughness": 1,
+        }
+        enemy_green = {
+            "name": "Enemy Bear",
+            "type_line": "Creature - Bear",
+            "colors": ["G"],
+            "power": 2,
+            "toughness": 2,
+        }
+        active.battlefield = [bad_moon, active_black]
+        opponent.battlefield = [enemy_black, enemy_green]
+
+        self.battle.refresh_all_global_static_power_toughness_bonuses(
+            [active, opponent],
+            turn=1,
+            phase="test",
+            emit_events=True,
+        )
+        self.battle.refresh_all_global_static_power_toughness_bonuses(
+            [active, opponent],
+            turn=1,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertEqual(active_black["power"], 2)
+        self.assertEqual(active_black["toughness"], 2)
+        self.assertEqual(enemy_black["power"], 2)
+        self.assertEqual(enemy_black["toughness"], 2)
+        self.assertEqual(enemy_green["power"], 2)
+        self.assertEqual(enemy_green["toughness"], 2)
+        self.assertEqual(active_black["static_global_power_toughness_sources"], ["Bad Moon"])
+        self.assertTrue(
+            any(
+                event == "static_global_power_toughness_boost_changed"
+                and data.get("card") == "Active Shade"
+                and data.get("power_after") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_static_global_power_toughness_boost_respects_opponents_and_exclude_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        dampening_pulse = {
+            "name": "Dampening Pulse",
+            "type_line": "Enchantment",
+            "effect": "static_global_power_toughness_boost",
+            "battle_model_scope": "xmage_static_global_power_toughness_boost_v1",
+            "static_effect": "global_power_toughness_boost",
+            "static_power_bonus": -1,
+            "static_toughness_bonus": 0,
+            "static_controller_scope": "opponents",
+        }
+        kaervek = {
+            "name": "Kaervek, the Spiteful",
+            "type_line": "Legendary Creature - Human Warlock",
+            "effect": "static_global_power_toughness_boost",
+            "battle_model_scope": "xmage_static_global_power_toughness_boost_v1",
+            "static_effect": "global_power_toughness_boost",
+            "static_power_bonus": -1,
+            "static_toughness_bonus": -1,
+            "static_controller_scope": "all",
+            "static_exclude_source": True,
+            "power": 3,
+            "toughness": 2,
+        }
+        active_bear = {"name": "Active Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        enemy_bear = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 3}
+        active.battlefield = [dampening_pulse, kaervek, active_bear]
+        opponent.battlefield = [enemy_bear]
+
+        self.battle.refresh_all_global_static_power_toughness_bonuses([active, opponent])
+
+        self.assertEqual(kaervek["power"], 3)
+        self.assertEqual(kaervek["toughness"], 2)
+        self.assertEqual(active_bear["power"], 1)
+        self.assertEqual(active_bear["toughness"], 1)
+        self.assertEqual(enemy_bear["power"], 0)
+        self.assertEqual(enemy_bear["toughness"], 2)
+
+    def test_static_global_power_toughness_boost_token_debuff_moves_zero_toughness(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        illness = {
+            "name": "Illness in the Ranks",
+            "type_line": "Enchantment",
+            "effect": "static_global_power_toughness_boost",
+            "battle_model_scope": "xmage_static_global_power_toughness_boost_v1",
+            "static_effect": "global_power_toughness_boost",
+            "static_power_bonus": -1,
+            "static_toughness_bonus": -1,
+            "static_controller_scope": "all",
+            "creature_filter": {"token": True},
+        }
+        token = {
+            "name": "Soldier Token",
+            "type_line": "Token Creature - Soldier",
+            "token": True,
+            "power": 1,
+            "toughness": 1,
+        }
+        nontoken = {"name": "Real Soldier", "type_line": "Creature - Soldier", "power": 1, "toughness": 1}
+        active.battlefield = [illness]
+        opponent.battlefield = [token, nontoken]
+
+        refreshed = self.battle.refresh_all_global_static_power_toughness_bonuses(
+            [active, opponent],
+            turn=2,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertNotIn(token, opponent.battlefield)
+        self.assertIn(token, opponent.graveyard)
+        self.assertIn(nontoken, opponent.battlefield)
+        self.assertEqual(nontoken["power"], 1)
+        self.assertTrue(any(row.get("moved_to_graveyard") for row in refreshed))
+        self.assertTrue(
+            any(
+                event == "state_based_action_zero_toughness"
+                and data.get("card") == "Soldier Token"
+                for event, data in self.events
+            )
+        )
+
     def test_equipment_static_attachment_applies_power_toughness_and_keywords(self) -> None:
         active = self.battle.Player("Active", None, [])
         target = {"name": "Ally Soldier", "type_line": "Creature - Soldier", "power": 2, "toughness": 2}

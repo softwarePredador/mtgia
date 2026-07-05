@@ -29,6 +29,14 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "library_controller",
     "target_constraints",
     "target_preference",
+    "static_effect",
+    "static_applies_to",
+    "static_power_bonus",
+    "static_toughness_bonus",
+    "static_controller_scope",
+    "static_exclude_source",
+    "creature_filter",
+    "permanent_type",
     "counter_unless_pays_generic",
     "power_delta",
     "toughness_delta",
@@ -810,6 +818,65 @@ def runtime_check_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any]:
     return check
 
 
+def static_global_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "static_global_power_toughness_boost":
+        return None
+    creature_filter = required.get("creature_filter") or {}
+    if not isinstance(creature_filter, dict):
+        creature_filter = {}
+    subtypes = [
+        str(value).strip()
+        for value in creature_filter.get("subtypes", []) or []
+        if str(value).strip()
+    ]
+    card_types = [
+        str(value).strip().lower()
+        for value in creature_filter.get("card_types", []) or []
+        if str(value).strip()
+    ]
+    colors = [
+        str(value).strip().upper()
+        for value in creature_filter.get("colors", []) or []
+        if str(value).strip()
+    ]
+    subtype = subtypes[0] if subtypes else "Soldier"
+    type_prefix = "Land Creature" if "land" in card_types else "Creature"
+    target = {
+        "name": f"E2E Target for {rule['card_name']}",
+        "type_line": f"{type_prefix} - {subtype.title()}",
+        "base_power": 2,
+        "base_toughness": 2,
+        "power": 2,
+        "toughness": 2,
+    }
+    if colors:
+        target["colors"] = colors
+        target["mana_cost"] = "".join(f"{{{color}}}" for color in colors)
+    if creature_filter.get("token"):
+        target["token"] = True
+        target["is_token"] = True
+    power_bonus = int(required.get("static_power_bonus") or 0)
+    toughness_bonus = int(required.get("static_toughness_bonus") or 0)
+    expected_toughness = target["base_toughness"] + toughness_bonus
+    return {
+        "name": f"{rule['card_name']} static global P/T applies",
+        "type": "static_global_power_toughness_boost",
+        "card": {"name": rule["card_name"]},
+        "target": target,
+        "target_owner": "opponent" if required.get("static_controller_scope") == "opponents" else "controller",
+        "expected_power": target["base_power"] + power_bonus,
+        "expected_toughness": expected_toughness,
+        "expected_moved_to_graveyard": expected_toughness <= 0,
+        "expected_source": rule["card_name"],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
+def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    return static_global_pt_execution_scenario_from_expected_rule(rule)
+
+
 def markdown_package(manifest: dict[str, Any]) -> str:
     lines = [
         f"# {manifest['deploy_id']} XMage Batch PostgreSQL Package",
@@ -895,6 +962,12 @@ def build_package(
 
     family_counts = Counter(proposal["family_id"] for proposal in selected)
     expected_rules = [expected_rule_from_proposal(proposal) for proposal in selected]
+    execution_scenarios = [
+        scenario
+        for rule in expected_rules
+        for scenario in [execution_scenario_from_expected_rule(rule)]
+        if scenario is not None
+    ]
     manifest = {
         "generated_at": utc_now(),
         "status": "prepared_read_only_pending_apply_approval",
@@ -908,6 +981,7 @@ def build_package(
         "expected_rules": expected_rules,
         "snapshot_checks": [snapshot_check_from_expected_rule(rule) for rule in expected_rules],
         "runtime_checks": [runtime_check_from_expected_rule(rule) for rule in expected_rules],
+        "execution_scenarios": execution_scenarios,
         "files": files,
         "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
     }

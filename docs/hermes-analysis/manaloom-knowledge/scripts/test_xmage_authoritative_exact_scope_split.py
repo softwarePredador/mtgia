@@ -2044,6 +2044,117 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_controlled_pt_oracle_filter_not_supported")
 
+    def test_static_global_power_toughness_boost_slivers_is_package_safe(self) -> None:
+        row = queue_row(
+            split.STATIC_GLOBAL_PT_UNIT,
+            effect_classes=["BoostAllEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Muscle Sliver",
+                type_line="Creature - Sliver",
+                oracle_text="All Sliver creatures get +1/+1.",
+            ),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = "
+                "new FilterCreaturePermanent(SubType.SLIVER, \"All Sliver creatures\");"
+                "this.addAbility(new SimpleStaticAbility(new BoostAllEffect("
+                "1, 1, Duration.WhileOnBattlefield, filter, false)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GLOBAL_PT_SCOPE)
+        self.assertEqual(effect["effect"], "static_global_power_toughness_boost")
+        self.assertEqual(effect["static_power_bonus"], 1)
+        self.assertEqual(effect["static_toughness_bonus"], 1)
+        self.assertEqual(effect["creature_filter"], {"subtypes": ["sliver"]})
+        self.assertEqual(effect["target_controller"], "all")
+
+    def test_static_global_power_toughness_boost_opponents_creatures_is_package_safe(self) -> None:
+        row = queue_row(
+            split.STATIC_GLOBAL_PT_UNIT,
+            effect_classes=["BoostAllEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dampening Pulse",
+                type_line="Enchantment",
+                oracle_text="Creatures your opponents control get -1/-0.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new BoostAllEffect("
+                "-1, -0, Duration.WhileOnBattlefield, "
+                "StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURES, false)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["static_controller_scope"], "opponents")
+        self.assertEqual(effect["target"], "opponents_creatures")
+        self.assertEqual(effect["static_power_bonus"], -1)
+        self.assertEqual(effect["static_toughness_bonus"], 0)
+
+    def test_static_global_power_toughness_boost_token_debuff_is_package_safe(self) -> None:
+        row = queue_row(
+            split.STATIC_GLOBAL_PT_UNIT,
+            effect_classes=["BoostAllEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Virulent Plague",
+                type_line="Enchantment",
+                oracle_text="Creature tokens get -2/-2.",
+            ),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = new FilterCreaturePermanent(\"Creature tokens\");"
+                "filter.add(TokenPredicate.TRUE);"
+                "this.addAbility(new SimpleStaticAbility(new BoostAllEffect("
+                "-2, -2, Duration.WhileOnBattlefield, filter, false)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["creature_filter"], {"token": True})
+        self.assertEqual(effect["target_constraints"]["token"], True)
+
+    def test_static_global_power_toughness_boost_blocks_dynamic_counts(self) -> None:
+        row = queue_row(
+            split.STATIC_GLOBAL_PT_UNIT,
+            effect_classes=["BoostAllEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sliver Legion",
+                type_line="Legendary Creature - Sliver",
+                oracle_text="All Sliver creatures get +1/+1 for each other Sliver on the battlefield.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new BoostAllEffect("
+                "new PermanentsOnBattlefieldCount(countfilter), "
+                "new PermanentsOnBattlefieldCount(countfilter), "
+                "Duration.WhileOnBattlefield, filter, false)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_global_pt_oracle_dynamic_not_supported")
+
     def test_static_graveyard_count_power_toughness_controller_creatures_is_package_safe(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

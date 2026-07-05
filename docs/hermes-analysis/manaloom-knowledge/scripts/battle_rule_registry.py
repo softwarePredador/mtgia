@@ -76,6 +76,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "draw_engine": "draw",
     "equipment_static_attachment": "protection",
     "aura_static_attachment": "support",
+    "static_global_power_toughness_boost": "support",
     "topdeck_manipulation": "draw",
     "loot": "draw",
     "tutor": "tutor",
@@ -339,6 +340,15 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
     elif effect == "equipment_static_attachment":
         category = "support"
         subtype = "equipment_static_pump"
+    elif effect == "static_global_power_toughness_boost":
+        power_delta = int(effect_json.get("static_power_bonus") or effect_json.get("power_boost") or 0)
+        toughness_delta = int(effect_json.get("static_toughness_bonus") or effect_json.get("toughness_boost") or 0)
+        if toughness_delta < 0 or (power_delta < 0 and toughness_delta <= 0):
+            category = "removal"
+            subtype = "static_global_debuff"
+        else:
+            category = "support"
+            subtype = "static_global_pump"
     elif effect == "graveyard_exile":
         subtype = "graveyard_hate"
     role = {

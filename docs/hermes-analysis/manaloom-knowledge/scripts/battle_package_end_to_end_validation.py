@@ -1436,6 +1436,74 @@ def run_nonfliers_cant_block_rider(
     }
 
 
+def run_static_global_power_toughness_boost(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    source = battle.enrich_card({**card, **battle.get_card_effect(card)})
+    active = battle.Player(str(scenario.get("player") or "Static Source Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Static Target Opponent"), None, [])
+    target = dict(scenario["target"])
+    target_owner = str(scenario.get("target_owner") or "controller")
+    target_controller = opponent if target_owner == "opponent" else active
+    active.battlefield = [source]
+    target_controller.battlefield.append(target)
+    participants = [active, opponent]
+    refreshed = battle.refresh_all_global_static_power_toughness_bonuses(
+        participants,
+        turn=int(scenario.get("turn") or 3),
+        phase=str(scenario.get("phase") or "main"),
+        emit_events=True,
+    )
+    expected_moved = bool(scenario.get("expected_moved_to_graveyard"))
+    moved = target not in target_controller.battlefield and target in getattr(target_controller, "graveyard", [])
+    if moved != expected_moved:
+        fail("battle_execution", f"{card['name']} moved_to_graveyard={moved}, expected {expected_moved}")
+    expected_power = int(scenario["expected_power"])
+    expected_toughness = int(scenario["expected_toughness"])
+    if int(target.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} target power={target.get('power')}, expected {expected_power}")
+    if int(target.get("toughness") or 0) != expected_toughness:
+        fail("battle_execution", f"{card['name']} target toughness={target.get('toughness')}, expected {expected_toughness}")
+    source_name = str(scenario.get("expected_source") or card.get("name"))
+    changed_event = next(
+        (
+            data
+            for event, data in events
+            if event == "static_global_power_toughness_boost_changed"
+            and data.get("card") == target.get("name")
+            and source_name in (data.get("source_cards") or [])
+        ),
+        None,
+    )
+    if changed_event is None:
+        fail("battle_events", f"missing {card['name']} static_global_power_toughness_boost_changed event")
+    if expected_moved:
+        zero_event = next(
+            (
+                data
+                for event, data in events
+                if event == "state_based_action_zero_toughness"
+                and data.get("card") == target.get("name")
+            ),
+            None,
+        )
+        if zero_event is None:
+            fail("battle_events", f"missing {card['name']} state_based_action_zero_toughness event")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "target_power": target.get("power"),
+        "target_toughness": target.get("toughness"),
+        "moved_to_graveyard": moved,
+        "refreshed_count": len(refreshed),
+        "source_cards": changed_event.get("source_cards"),
+    }
+
+
 SCENARIO_RUNNERS = {
     "conditional_land_play": run_conditional_land_play,
     "copy_stack_ability_response": run_copy_stack_ability_response,
@@ -1444,6 +1512,7 @@ SCENARIO_RUNNERS = {
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
     "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
+    "static_global_power_toughness_boost": run_static_global_power_toughness_boost,
     "target_creature_cant_block": run_target_creature_cant_block,
     "token_maker_attack_each_opponent": run_token_maker_attack_each_opponent,
     "tempting_offer_decline": run_tempting_offer_decline,
@@ -1564,7 +1633,7 @@ def main() -> int:
                 "rows": runtime_results,
             },
             {
-                "name": "battle_execution_no_override",
+                "name": "battle_execution" if battle_execution["scenario_count"] else "battle_execution_no_override",
                 "status": "pass",
                 "evidence": {
                     "events": battle_execution["event_count"],

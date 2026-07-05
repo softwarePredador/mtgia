@@ -14204,6 +14204,66 @@ riders, unsupported keyword grants, reconfigure variants, or source/Oracle
 mismatches such as rows blocked by `equipment_static_oracle_not_exact_fixed` or
 `equipment_static_source_oracle_mismatch`.
 
+## 2026-07-05 PG531 Static Global Power/Toughness Checkpoint
+
+Applied package: `PG531 static_global_pt_new_server`.
+
+Closed family:
+
+- `18` exact static global power/toughness rows from XMage
+  `BoostAllEffect + SimpleStaticAbility`.
+
+Runtime scope:
+
+- `xmage_static_global_power_toughness_boost_v1`
+
+Supported exact forms:
+
+- permanent static boosts/debuffs for all matching creatures;
+- opponent-only creature debuffs;
+- fixed color, subtype, token, and land-creature filters;
+- `static_exclude_source` where Oracle/XMage require "other";
+- state-based zero-toughness movement after static debuffs.
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg531_static_global_pt_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg531_static_global_pt_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg531_static_global_pt_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg531_static_global_pt_new_server_pg_to_sqlite_sync.json`
+- battle package E2E with runtime scenarios:
+  `docs/hermes-analysis/master_optimizer_reports/pg531_static_global_pt_new_server_e2e_validation.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg531_static_global_pt_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg531_static_global_pt_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg531_static_global_pt_new_server_recheck.md`
+- final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg531_static_global_pt_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg531_static_global_pt_new_server_final_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg531_static_global_pt_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg531_static_global_pt_new_server_final.md`
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25882`
+- post-cycle `target_identity_count=25864`
+- post-cycle `xmage_authoritative_source_count=25550`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_adapter_required_count=25550`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+
+Residual boundary: PG531 does not authorize dynamic global boosts, attacking or
+blocking-only static effects, no-ability filters, variable count-based boosts,
+phase-limited effects, non-permanent effects, or source/Oracle mismatches still
+blocked by `static_global_pt_*` reasons.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
