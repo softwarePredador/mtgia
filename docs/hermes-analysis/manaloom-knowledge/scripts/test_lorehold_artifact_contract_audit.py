@@ -664,6 +664,58 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertFalse(classification.canonical_summary["deck_607_mutated"])
 
+    def test_lorehold_topdeck_new_cut_evidence_scout_is_recognized(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_topdeck_new_cut_evidence_scout",
+            "blocked_internal_near_misses": [],
+            "current_baseline": "deck_607",
+            "decision": {
+                "keep_607_as_protected_baseline": True,
+                "allow_deck_mutation_now": False,
+                "allow_natural_battle_gate_now": False,
+            },
+            "deck_607_mutated": False,
+            "deckbuilding_priority_rules": {
+                "land_quantity_floor": 34,
+                "ramp_quantity_floor": 15,
+            },
+            "evidence_requests": [
+                {
+                    "request_key": "dragon_rage_channeler_new_nonanchor_same_lane_cut_evidence",
+                    "execution_allowed_now": False,
+                }
+            ],
+            "external_research_context": [],
+            "generated_at": "2026-07-05T00:00:00Z",
+            "hard_blocked_same_lane_slots": [],
+            "internal_evidence_targets": [],
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "source_evidence": {"nonanchor_model_summary": {}},
+            "source_reports": {},
+            "status": "topdeck_new_cut_evidence_scout_learning_targets_only_keep_607",
+            "summary": {
+                "primary_target": "Dragon's Rage Channeler",
+                "safe_cut_ready_count": 0,
+                "natural_battle_gate_allowed_now": False,
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lorehold_topdeck_new_cut_evidence_scout.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(
+            classification.artifact_kind,
+            "lorehold_topdeck_new_cut_evidence_scout",
+        )
+        self.assertEqual(
+            classification.schema_version,
+            "lorehold_topdeck_new_cut_evidence_scout_v1",
+        )
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+
     def test_governed_lorehold_learning_artifact_is_recognized(self) -> None:
         payload = {
             "artifact_type": "lorehold_deckbuilding_value_model",

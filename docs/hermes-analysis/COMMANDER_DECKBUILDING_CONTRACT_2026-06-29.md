@@ -1936,3 +1936,45 @@ Post-named frontier next-evidence router added on 2026-07-05:
   `false`, and promotion `false`.
 - Next allowed work:
   `find_new_nonanchor_same_lane_cut_evidence_not_in_current_hard_blocked_slots`.
+
+Topdeck new cut-evidence scout added on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_new_cut_evidence_scout_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_new_cut_evidence_scout_20260705_current.json`.
+- Artifact audit:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260705_topdeck_new_cut_evidence_scout_current.md`.
+- Current-best synthesis:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_topdeck_new_cut_evidence_scout_current.md`.
+- Status:
+  `topdeck_new_cut_evidence_scout_learning_targets_only_keep_607`.
+- Scope: consume the post-named frontier router, non-anchor cut model miner,
+  trace cut evidence expander, deckbuilding value model, and card exposure
+  profile. This is a read-only learning artifact: PostgreSQL writes `false`,
+  source DB mutation `false`, and deck `607` mutation `false`.
+- Current facts: router selected `topdeck_new_cut_evidence_scout`; primary
+  target remains `Dragon's Rage Channeler`; current hard-blocked same-lane slots
+  are `6`; internal review-only targets are `0`; safe cut ready rows are `0`;
+  matrix candidate rows are `0`; microbenchmark runnable rows are `0`; candidate
+  deck materialization `false`; forced access `false`; natural battle gate
+  `false`; and promotion `false`.
+- Hard-blocked current DRC same-lane slots:
+  `Call Forth the Tempest`, `Everything Comes to Dust`, `Hexing Squelcher`,
+  `Blasphemous Act`, `Farewell`, and `Starfall Invocation`.
+- Blocked internal near-misses exist, but they do not open cuts. The scout
+  currently records `12` near-misses blocked by combinations of miracle core,
+  structural dependency, protection shell, floor role, high exposure, protected
+  cut, or prior rejected cut evidence.
+- External research policy:
+  official Commander legality and bracket/Game Changer context, Scryfall card
+  identity, and EDHREC Lorehold public lanes are discovery inputs only. They
+  may prioritize what to learn next, but they cannot bypass local same-lane cut
+  proof, runtime support, matrix review, or equal battle gates.
+- Current-best result after this scout: artifact contract `pass`, artifact count
+  `978`, unknown or invalid artifacts `0`, validation errors `0`, current
+  positive signals `0`, sidecar safe-cut rows `0`, sidecar matrix rows `0`,
+  sidecar promotion `false`, ready-for-real-deck-change `false`, and top deck is
+  still `607`.
+- Next allowed work:
+  `collect_external_or_new_trace_evidence_for_drc_nonanchor_cut`.
