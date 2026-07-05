@@ -21,10 +21,11 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_VALUE_MODEL = REPORT_DIR / "lorehold_deckbuilding_value_model_20260704_current.json"
+FALLBACK_VALUE_MODEL = REPORT_DIR / "lorehold_deckbuilding_value_model_20260704_current.json"
+FALLBACK_CARD_VALUE_PRIORITY = REPORT_DIR / "lorehold_card_value_priority_synthesis_20260704_learning.json"
 DEFAULT_PREFLIGHT = REPORT_DIR / "lorehold_miracle_access_first_preflight_20260704_current.json"
 DEFAULT_TRACE_MINER = REPORT_DIR / "lorehold_miracle_trace_failure_miner_20260704_current.json"
-DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_hypothesis_queue_from_value_model_20260705_current"
+DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_hypothesis_queue_from_value_model_20260705_current_relearn"
 
 PRIOR_REJECT_BLOCKLIST = {
     "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
@@ -141,6 +142,22 @@ EXTERNAL_RESEARCH_REFRESH = [
             "are externally coherent with the miracle setup plan; internal gates still decide final cuts."
         ),
     },
+    {
+        "source": "CoolStuffInc Lorehold commander article",
+        "url": "https://www.coolstuffinc.com/a/stephenjohnson-04202026-lorehold-the-historian-commander",
+        "learning": (
+            "Public Lorehold builds split into spellslinger, combo, token, burn, and Voltron directions; ManaLoom must classify these as shell contracts "
+            "unless they preserve the current 607 miracle/topdeck/protection floor."
+        ),
+    },
+    {
+        "source": "GameTyrant Lorehold deck tech",
+        "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech",
+        "learning": (
+            "Current Lorehold primer evidence still points at Entreat, Approach, Apex of Power, Dance with Calamity, Hit the Mother Lode, and Insurrection "
+            "as payoff hypotheses that must be balanced against topdeck setup and closing-window proof."
+        ),
+    },
 ]
 
 
@@ -158,6 +175,26 @@ def rel(path: Path) -> str:
 def read_json(path: Path) -> dict[str, Any]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     return dict(payload) if isinstance(payload, Mapping) else {}
+
+
+def newest_report(pattern: str, fallback: Path, *, report_dir: Path = REPORT_DIR) -> Path:
+    matches = sorted(
+        report_dir.glob(pattern),
+        key=lambda path: (path.stat().st_mtime, path.name),
+        reverse=True,
+    )
+    return matches[0] if matches else fallback
+
+
+def default_value_model_report() -> Path:
+    return newest_report("lorehold_deckbuilding_value_model_*.json", FALLBACK_VALUE_MODEL)
+
+
+def default_card_value_priority_report() -> Path:
+    return newest_report(
+        "lorehold_card_value_priority_synthesis_*.json",
+        FALLBACK_CARD_VALUE_PRIORITY,
+    )
 
 
 def as_int(value: Any) -> int:
@@ -231,13 +268,91 @@ def allowed_next_test(status: str, lanes: list[str]) -> str:
     return "safe_cut_model_required_before_natural_gate"
 
 
-def classify_hypotheses(value_model: Mapping[str, Any], gate_ready_now_count: int) -> list[dict[str, Any]]:
+def current_priority_lanes(card_value_priority: Mapping[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    by_lane: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for raw in card_value_priority.get("current_card_priorities") or []:
+        if not isinstance(raw, Mapping) or not raw.get("card_name"):
+            continue
+        row = {
+            "card_name": raw.get("card_name"),
+            "primary_value_lane": raw.get("primary_value_lane"),
+            "priority_class": raw.get("priority_class"),
+            "cut_policy": raw.get("cut_policy"),
+            "value_priority_index": as_int(raw.get("value_priority_index")),
+        }
+        lanes = {str(raw.get("primary_value_lane") or "")}
+        lanes.update(str(lane) for lane in (raw.get("value_lanes") or []))
+        for lane in lanes:
+            if lane:
+                by_lane[lane].append(row)
+    for lane_rows in by_lane.values():
+        lane_rows.sort(key=lambda row: (-as_int(row.get("value_priority_index")), str(row.get("card_name"))))
+    return by_lane
+
+
+def candidate_to_current_lanes(hypothesis_lanes: list[str]) -> list[str]:
+    lane_map = {
+        "combo_finishers": ["payoffs_finishers", "topdeck_miracle_setup"],
+        "interaction_pressure": ["interaction_removal", "board_wipes", "protection_resilience"],
+        "mana_base_review": ["mana_base", "ramp"],
+        "protection_window": ["protection_resilience", "interaction_removal"],
+        "spell_chain_conversion": ["payoffs_finishers", "topdeck_miracle_setup", "ramp"],
+        "topdeck_miracle_setup": ["topdeck_miracle_setup"],
+        "tutors_access": ["tutors_access", "topdeck_miracle_setup"],
+        "unclassified_variant_watchlist": [],
+    }
+    lanes: list[str] = []
+    for lane in hypothesis_lanes:
+        lanes.extend(lane_map.get(lane, []))
+    return sorted(set(lanes))
+
+
+def same_lane_anchors(
+    hypothesis_lanes: list[str],
+    priority_by_lane: Mapping[str, list[Mapping[str, Any]]],
+    *,
+    limit: int = 5,
+) -> list[dict[str, Any]]:
+    anchors: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for lane in candidate_to_current_lanes(hypothesis_lanes):
+        for row in priority_by_lane.get(lane, []):
+            name = str(row.get("card_name") or "")
+            if not name or name in seen:
+                continue
+            priority = str(row.get("priority_class") or "")
+            cut_policy = str(row.get("cut_policy") or "")
+            if "protected" not in priority and "protected" not in cut_policy and "same_lane" not in cut_policy:
+                continue
+            seen.add(name)
+            anchors.append(
+                {
+                    "card_name": name,
+                    "primary_value_lane": row.get("primary_value_lane"),
+                    "priority_class": priority,
+                    "cut_policy": cut_policy,
+                    "value_priority_index": as_int(row.get("value_priority_index")),
+                }
+            )
+            if len(anchors) >= limit:
+                return anchors
+    return anchors
+
+
+def classify_hypotheses(
+    value_model: Mapping[str, Any],
+    gate_ready_now_count: int,
+    *,
+    priority_by_lane: Mapping[str, list[Mapping[str, Any]]] | None = None,
+) -> list[dict[str, Any]]:
+    priority_by_lane = priority_by_lane or {}
     hypotheses = []
     for card in value_model.get("variant_watchlist") or []:
         if not isinstance(card, Mapping):
             continue
         lanes = hypothesis_lanes(card)
         status = readiness_status(card, gate_ready_now_count)
+        anchors = same_lane_anchors(lanes, priority_by_lane)
         hypotheses.append(
             {
                 "card_name": card.get("card_name"),
@@ -252,6 +367,12 @@ def classify_hypotheses(value_model: Mapping[str, Any], gate_ready_now_count: in
                 "staple_tier": card.get("staple_tier"),
                 "best_edhrec_rank": card.get("best_edhrec_rank"),
                 "reason": card.get("reason"),
+                "same_lane_current_607_anchors": anchors,
+                "same_lane_cut_contract": (
+                    "named_current_607_slot_and_equal_gate_required"
+                    if status != "blocked_prior_reject"
+                    else "blocked_prior_reject_requires_material_new_hypothesis"
+                ),
             }
         )
     hypotheses.sort(
@@ -292,6 +413,7 @@ def lane_queue(hypotheses: list[Mapping[str, Any]]) -> dict[str, list[dict[str, 
                     "priority": row.get("priority"),
                     "allowed_next_test": row.get("allowed_next_test"),
                     "variant_deck_count": row.get("variant_deck_count"),
+                    "same_lane_current_607_anchors": row.get("same_lane_current_607_anchors") or [],
                 }
             )
     return {lane: rows for lane, rows in sorted(grouped.items())}
@@ -299,17 +421,27 @@ def lane_queue(hypotheses: list[Mapping[str, Any]]) -> dict[str, list[dict[str, 
 
 def build_payload(
     *,
-    value_model_path: Path = DEFAULT_VALUE_MODEL,
+    value_model_path: Path | None = None,
+    card_value_priority_path: Path | None = None,
     preflight_path: Path = DEFAULT_PREFLIGHT,
     trace_path: Path = DEFAULT_TRACE_MINER,
 ) -> dict[str, Any]:
+    value_model_path = value_model_path or default_value_model_report()
+    card_value_priority_path = card_value_priority_path or default_card_value_priority_report()
     value_model = read_json(value_model_path)
+    card_value_priority = read_json(card_value_priority_path)
     preflight = read_json(preflight_path)
     trace = read_json(trace_path)
     gate_ready_now_count = as_int((preflight.get("summary") or {}).get("gate_ready_now_count"))
-    hypotheses = classify_hypotheses(value_model, gate_ready_now_count)
+    priority_by_lane = current_priority_lanes(card_value_priority)
+    hypotheses = classify_hypotheses(
+        value_model,
+        gate_ready_now_count,
+        priority_by_lane=priority_by_lane,
+    )
     natural_gate_ready = [row for row in hypotheses if row["readiness_status"] == "natural_gate_ready"]
     blocked_prior = [row for row in hypotheses if row["readiness_status"] == "blocked_prior_reject"]
+    card_value_summary = card_value_priority.get("summary") or {}
 
     return {
         "generated_at": utc_now(),
@@ -317,7 +449,12 @@ def build_payload(
         "postgres_writes": False,
         "source_db_mutated": False,
         "deck_607_mutated": False,
-        "source_reports": [rel(value_model_path), rel(preflight_path), rel(trace_path)],
+        "source_reports": [
+            rel(value_model_path),
+            rel(card_value_priority_path),
+            rel(preflight_path),
+            rel(trace_path),
+        ],
         "external_research_refresh": EXTERNAL_RESEARCH_REFRESH,
         "status": "lorehold_hypothesis_queue_ready_no_natural_gate",
         "summary": {
@@ -326,8 +463,16 @@ def build_payload(
             "natural_gate_ready_count": len(natural_gate_ready),
             "gate_ready_now_count_from_preflight": gate_ready_now_count,
             "blocked_prior_reject_count": len(blocked_prior),
+            "hypotheses_with_same_lane_anchor_count": sum(
+                1 for row in hypotheses if row.get("same_lane_current_607_anchors")
+            ),
             "status_counts": summarize_by_status(hypotheses),
             "lane_counts": summarize_by_lane(hypotheses),
+            "card_value_priority_status": card_value_priority.get("status"),
+            "card_value_ready_replacement_count": as_int(card_value_summary.get("ready_replacement_candidate_count")),
+            "game_changer_metadata_rows_considered": as_int(
+                card_value_summary.get("game_changer_metadata_rows_considered")
+            ),
             "preflight_status": preflight.get("status"),
             "trace_status": trace.get("status"),
             "promotion_allowed": False,
@@ -338,6 +483,8 @@ def build_payload(
             "natural_gate": "closed until miracle_access_first_shell_v1 floors pass before battle",
             "prior_rejects": "blocked unless a materially new cut model or trace hypothesis is declared",
             "safe_cuts": "required before any candidate can be called a real challenger",
+            "current_607_slots": "every candidate must name the protected 607 slot and lane it challenges before a natural gate can run",
+            "game_changer_metadata": "Game Changer or staple discovery creates explainable candidate pressure, not promotion readiness",
             "forced_access": "allowed only as learning diagnostic; it cannot promote a deck by itself",
             "lands": "review only through a mana-source model that preserves 34 lands and protected utility anchors",
         },
@@ -392,6 +539,9 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- hypothesis_count: `{summary['hypothesis_count']}`",
         f"- natural_gate_ready_count: `{summary['natural_gate_ready_count']}`",
         f"- gate_ready_now_count_from_preflight: `{summary['gate_ready_now_count_from_preflight']}`",
+        f"- card_value_priority_status: `{summary['card_value_priority_status']}`",
+        f"- card_value_ready_replacement_count: `{summary['card_value_ready_replacement_count']}`",
+        f"- game_changer_metadata_rows_considered: `{summary['game_changer_metadata_rows_considered']}`",
         f"- promotion_allowed: `{str(summary['promotion_allowed']).lower()}`",
         f"- allow_new_natural_gate_now: `{str(summary['allow_new_natural_gate_now']).lower()}`",
         "",
@@ -416,13 +566,20 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
     lines.append("| --- | --- | --- | --- | --- |")
     for row in payload["hypotheses"]:
         lanes = ", ".join(row.get("hypothesis_lanes") or [])
+        anchors = ", ".join(
+            str(anchor.get("card_name"))
+            for anchor in (row.get("same_lane_current_607_anchors") or [])[:3]
+        )
+        next_test = row["allowed_next_test"]
+        if anchors:
+            next_test = f"{next_test}; named slot required near: {anchors}"
         lines.append(
             "| `{priority}` | `{status}` | `{lanes}` | `{card}` | `{next_test}` |".format(
                 priority=row["priority"],
                 status=row["readiness_status"],
                 lanes=lanes,
                 card=row["card_name"],
-                next_test=row["allowed_next_test"],
+                next_test=next_test,
             )
         )
 
@@ -455,13 +612,15 @@ def write_outputs(payload: Mapping[str, Any], out_prefix: Path) -> tuple[Path, P
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--value-model", type=Path, default=DEFAULT_VALUE_MODEL)
+    parser.add_argument("--value-model", type=Path, default=None)
+    parser.add_argument("--card-value-priority", type=Path, default=None)
     parser.add_argument("--preflight", type=Path, default=DEFAULT_PREFLIGHT)
     parser.add_argument("--trace", type=Path, default=DEFAULT_TRACE_MINER)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     args = parser.parse_args()
     payload = build_payload(
         value_model_path=args.value_model,
+        card_value_priority_path=args.card_value_priority,
         preflight_path=args.preflight,
         trace_path=args.trace,
     )

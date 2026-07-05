@@ -44,6 +44,44 @@ def test_no_natural_gate_ready_when_preflight_count_is_zero():
     assert "topdeck_miracle_setup" in hypotheses[0]["hypothesis_lanes"]
 
 
+def test_current_priority_map_names_same_lane_607_anchors_before_gate():
+    value_model = {"variant_watchlist": [card("Penance", tag="draw", variants=4)]}
+    priority_by_lane = queue.current_priority_lanes(
+        {
+            "current_card_priorities": [
+                {
+                    "card_name": "Sensei's Divining Top",
+                    "primary_value_lane": "topdeck_miracle_setup",
+                    "value_lanes": ["topdeck_miracle_setup"],
+                    "priority_class": "protected_topdeck_access_anchor",
+                    "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+                    "value_priority_index": 100,
+                },
+                {
+                    "card_name": "Land Tax",
+                    "primary_value_lane": "topdeck_miracle_setup",
+                    "value_lanes": ["topdeck_miracle_setup", "tutors_access"],
+                    "priority_class": "protected_topdeck_access_anchor",
+                    "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+                    "value_priority_index": 99,
+                },
+            ]
+        }
+    )
+
+    hypotheses = queue.classify_hypotheses(
+        value_model,
+        gate_ready_now_count=0,
+        priority_by_lane=priority_by_lane,
+    )
+
+    assert hypotheses[0]["same_lane_cut_contract"] == "named_current_607_slot_and_equal_gate_required"
+    assert [row["card_name"] for row in hypotheses[0]["same_lane_current_607_anchors"]] == [
+        "Sensei's Divining Top",
+        "Land Tax",
+    ]
+
+
 def test_real_payload_keeps_607_protected_and_has_no_natural_gate():
     payload = queue.build_payload()
 
@@ -55,6 +93,10 @@ def test_real_payload_keeps_607_protected_and_has_no_natural_gate():
     assert payload["decision"]["current_best_baseline"] == "deck_607"
     assert payload["decision"]["natural_gate_ready_now"] is False
     assert payload["summary"]["blocked_prior_reject_count"] >= len(queue.PRIOR_REJECT_BLOCKLIST)
+    assert payload["summary"]["card_value_priority_status"] == "card_value_priority_no_direct_cut_ready_current_607"
+    assert payload["summary"]["card_value_ready_replacement_count"] == 0
+    assert payload["summary"]["game_changer_metadata_rows_considered"] == 12
+    assert payload["summary"]["hypotheses_with_same_lane_anchor_count"] > 0
 
 
 def test_lane_queue_exposes_protection_and_spell_chain_work():
@@ -64,3 +106,7 @@ def test_lane_queue_exposes_protection_and_spell_chain_work():
     assert "spell_chain_conversion" in payload["lane_queue"]
     assert any(row["card_name"] == "Boros Charm" for row in payload["lane_queue"]["protection_window"])
     assert any(row["card_name"] == "Apex of Power" for row in payload["lane_queue"]["spell_chain_conversion"])
+    assert all(
+        "same_lane_current_607_anchors" in row
+        for row in payload["lane_queue"]["spell_chain_conversion"]
+    )

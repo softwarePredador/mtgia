@@ -231,3 +231,13 @@ def test_default_pressure_report_prefers_micro_package_planner(tmp_path, monkeyp
     monkeypatch.setattr(synth, "REPORT_DIR", report_dir)
 
     assert synth.default_pressure_report() == micro
+
+
+def test_default_card_value_report_uses_current_family_not_hardcoded_day(tmp_path, monkeypatch):
+    old = tmp_path / "lorehold_card_value_priority_synthesis_20260704_learning.json"
+    current = tmp_path / "lorehold_card_value_priority_synthesis_20260705_current_relearn.json"
+    old.write_text("{}\n", encoding="utf-8")
+    current.write_text("{}\n", encoding="utf-8")
+    monkeypatch.setattr(synth, "REPORT_DIR", tmp_path)
+
+    assert synth.default_card_value_report() == current

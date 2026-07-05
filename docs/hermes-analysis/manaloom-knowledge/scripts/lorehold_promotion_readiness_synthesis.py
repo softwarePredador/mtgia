@@ -167,42 +167,42 @@ def newest_report(pattern: str, fallback: Path, *, report_dir: Path | None = Non
 
 def default_card_value_report() -> Path:
     return newest_report(
-        "lorehold_card_value_priority_synthesis_20260704*.json",
+        "lorehold_card_value_priority_synthesis_*.json",
         REPORT_DIR / "lorehold_card_value_priority_synthesis_20260704_learning.json",
     )
 
 
 def default_mana_report() -> Path:
     return newest_report(
-        "lorehold_mana_sequence_policy_synthesis_20260704*.json",
+        "lorehold_mana_sequence_policy_synthesis_*.json",
         REPORT_DIR / "lorehold_mana_sequence_policy_synthesis_20260704_learning.json",
     )
 
 
 def default_staple_report() -> Path:
     return newest_report(
-        "lorehold_staple_policy_synthesis_20260704*.json",
+        "lorehold_staple_policy_synthesis_*.json",
         REPORT_DIR / "lorehold_staple_policy_synthesis_20260704_learning.json",
     )
 
 
 def default_selection_report() -> Path:
     return newest_report(
-        "lorehold_selection_access_synthesis_20260704*.json",
+        "lorehold_selection_access_synthesis_*.json",
         REPORT_DIR / "lorehold_selection_access_synthesis_20260704_learning.json",
     )
 
 
 def default_interaction_report() -> Path:
     return newest_report(
-        "lorehold_interaction_resilience_synthesis_20260704*.json",
+        "lorehold_interaction_resilience_synthesis_*.json",
         REPORT_DIR / "lorehold_interaction_resilience_synthesis_20260704_learning.json",
     )
 
 
 def default_payoff_report() -> Path:
     return newest_report(
-        "lorehold_payoff_finisher_recursion_synthesis_20260704*.json",
+        "lorehold_payoff_finisher_recursion_synthesis_*.json",
         REPORT_DIR / "lorehold_payoff_finisher_recursion_synthesis_20260704_learning.json",
     )
 

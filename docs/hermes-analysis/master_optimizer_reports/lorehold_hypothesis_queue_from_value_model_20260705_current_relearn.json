@@ -1,0 +1,4107 @@
+{
+  "artifact_type": "lorehold_hypothesis_queue_from_value_model",
+  "decision": {
+    "current_best_baseline": "deck_607",
+    "natural_gate_ready_now": false,
+    "next_action": "run safe-cut model and forced-access diagnostics as learning steps before any natural battle gate",
+    "promotion_allowed": false,
+    "reason": "The value model has useful hypotheses, but the latest preflight has zero gate-ready candidates. No card from the watchlist currently has both safe-cut proof and miracle-access floor proof."
+  },
+  "deck_607_mutated": false,
+  "external_research_refresh": [
+    {
+      "learning": "Commander legality remains the first gate: 99-card main deck plus commander, singleton, color identity, multiplayer context, and power-bracket framing.",
+      "source": "Wizards Commander format",
+      "url": "https://magic.wizards.com/en/formats/commander"
+    },
+    {
+      "learning": "The deck shape, singleton rule, and color identity restrictions are hard constraints before strategy scoring.",
+      "source": "Official Commander rules",
+      "url": "https://mtgcommander.net/index.php/rules/"
+    },
+    {
+      "learning": "Lorehold's strategic center is discounted miracle for instants/sorceries plus opponent-upkeep rummage, so topdeck control and first-draw timing are not optional lanes.",
+      "source": "Scryfall Lorehold Oracle",
+      "url": "https://scryfall.com/card/sos/201/lorehold-the-historian"
+    },
+    {
+      "learning": "Current public signal tags Lorehold as Topdeck, Spellslinger, Combo, and Discard; these are evidence lanes, not automatic card swaps over protected 607 anchors.",
+      "source": "EDHREC Lorehold optimized topdeck decks",
+      "url": "https://edhrec.com/decks/lorehold-the-historian/optimized/topdeck"
+    },
+    {
+      "learning": "Approach/Scroll Rack, Mizzix's Mastery, and Top/Birgi-style combo references support package hypotheses, but combo existence is not deck-balance or battle-gate proof.",
+      "source": "EDHREC Lorehold combos",
+      "url": "https://edhrec.com/combos/lorehold-the-historian"
+    },
+    {
+      "learning": "Library of Leng, Penance, Sensei's Divining Top, Scroll Rack, Land Tax, Victory Chimes, and Bender's Waterskin are externally coherent with the miracle setup plan; internal gates still decide final cuts.",
+      "source": "Card Kingdom Lorehold synergy review",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/"
+    },
+    {
+      "learning": "Public Lorehold builds split into spellslinger, combo, token, burn, and Voltron directions; ManaLoom must classify these as shell contracts unless they preserve the current 607 miracle/topdeck/protection floor.",
+      "source": "CoolStuffInc Lorehold commander article",
+      "url": "https://www.coolstuffinc.com/a/stephenjohnson-04202026-lorehold-the-historian-commander"
+    },
+    {
+      "learning": "Current Lorehold primer evidence still points at Entreat, Approach, Apex of Power, Dance with Calamity, Hit the Mother Lode, and Insurrection as payoff hypotheses that must be balanced against topdeck setup and closing-window proof.",
+      "source": "GameTyrant Lorehold deck tech",
+      "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech"
+    }
+  ],
+  "generated_at": "2026-07-05T03:14:35Z",
+  "hypotheses": [
+    {
+      "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Plateau",
+      "example_functional_tag": "land",
+      "hypothesis_lanes": [
+        "mana_base_review"
+      ],
+      "priority": "P1_safe_cut_model",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Urza's Saga",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Arid Mesa",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Bloodstained Mire",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Flooded Strand",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Marsh Flats",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 7,
+      "variant_deck_ids": [
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Clifftop Retreat",
+      "example_functional_tag": "land",
+      "hypothesis_lanes": [
+        "mana_base_review"
+      ],
+      "priority": "P1_safe_cut_model",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Urza's Saga",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Arid Mesa",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Bloodstained Mire",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Flooded Strand",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Marsh Flats",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 6,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        614,
+        615,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Boseiju, Who Shelters All",
+      "example_functional_tag": "land",
+      "hypothesis_lanes": [
+        "mana_base_review"
+      ],
+      "priority": "P1_safe_cut_model",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Urza's Saga",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Arid Mesa",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Bloodstained Mire",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Flooded Strand",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Marsh Flats",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        612,
+        613,
+        615,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Rugged Prairie",
+      "example_functional_tag": "land",
+      "hypothesis_lanes": [
+        "mana_base_review"
+      ],
+      "priority": "P1_safe_cut_model",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Urza's Saga",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Arid Mesa",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Bloodstained Mire",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Flooded Strand",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Marsh Flats",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Sundown Pass",
+      "example_functional_tag": "land",
+      "hypothesis_lanes": [
+        "mana_base_review"
+      ],
+      "priority": "P1_safe_cut_model",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Urza's Saga",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Arid Mesa",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Bloodstained Mire",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Flooded Strand",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Marsh Flats",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        611,
+        613,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "best_edhrec_rank": null,
+      "card_name": "Apex of Power",
+      "example_functional_tag": "draw",
+      "hypothesis_lanes": [
+        "spell_chain_conversion"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 6,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        613,
+        615,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "best_edhrec_rank": null,
+      "card_name": "Brass's Bounty",
+      "example_functional_tag": "wincon",
+      "hypothesis_lanes": [
+        "combo_finishers",
+        "spell_chain_conversion"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 6,
+      "variant_deck_ids": [
+        609,
+        611,
+        612,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+      "best_edhrec_rank": null,
+      "card_name": "Perch Protection",
+      "example_functional_tag": "wincon",
+      "hypothesis_lanes": [
+        "combo_finishers",
+        "protection_window"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Rise of the Eldrazi",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 90
+        },
+        {
+          "card_name": "Surge to Victory",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 90
+        },
+        {
+          "card_name": "Generous Gift",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Mizzix's Mastery",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Path to Exile",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 88
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 6,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+      "best_edhrec_rank": 173,
+      "card_name": "Boros Charm",
+      "example_functional_tag": "protection",
+      "hypothesis_lanes": [
+        "protection_window"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Rise of the Eldrazi",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 90
+        },
+        {
+          "card_name": "Surge to Victory",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 90
+        },
+        {
+          "card_name": "Generous Gift",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Mizzix's Mastery",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Path to Exile",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 88
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "global_top_500",
+      "variant_deck_count": 5,
+      "variant_deck_ids": [
+        609,
+        612,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+      "best_edhrec_rank": 423,
+      "card_name": "Silence",
+      "example_functional_tag": "protection",
+      "hypothesis_lanes": [
+        "protection_window"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Rise of the Eldrazi",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 90
+        },
+        {
+          "card_name": "Surge to Victory",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 90
+        },
+        {
+          "card_name": "Generous Gift",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Mizzix's Mastery",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Path to Exile",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 88
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "global_top_500",
+      "variant_deck_count": 5,
+      "variant_deck_ids": [
+        612,
+        613,
+        614,
+        615,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "best_edhrec_rank": null,
+      "card_name": "Galvanoth",
+      "example_functional_tag": "draw",
+      "hypothesis_lanes": [
+        "topdeck_miracle_setup"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Land Tax",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Library of Leng",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Lorehold, the Historian",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "commander_intent",
+          "priority_class": "commander_core_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Scroll Rack",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        611,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "best_edhrec_rank": null,
+      "card_name": "Penance",
+      "example_functional_tag": "draw",
+      "hypothesis_lanes": [
+        "topdeck_miracle_setup"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Land Tax",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Library of Leng",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Lorehold, the Historian",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "commander_intent",
+          "priority_class": "commander_core_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Scroll Rack",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        611,
+        613,
+        614
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "best_edhrec_rank": null,
+      "card_name": "Valakut Awakening // Valakut Stoneforge",
+      "example_functional_tag": "draw",
+      "hypothesis_lanes": [
+        "topdeck_miracle_setup"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Land Tax",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Library of Leng",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Lorehold, the Historian",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "commander_intent",
+          "priority_class": "commander_core_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Scroll Rack",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        608,
+        609,
+        610,
+        611
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "best_edhrec_rank": 554,
+      "card_name": "Wheel of Fortune",
+      "example_functional_tag": "draw",
+      "hypothesis_lanes": [
+        "topdeck_miracle_setup"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Land Tax",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Library of Leng",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Lorehold, the Historian",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "commander_intent",
+          "priority_class": "commander_core_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Scroll Rack",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "format_staple_long_tail",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        608,
+        609,
+        612,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+      "best_edhrec_rank": null,
+      "card_name": "Deflecting Palm",
+      "example_functional_tag": "protection",
+      "hypothesis_lanes": [
+        "interaction_pressure",
+        "protection_window"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Blasphemous Act",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Everything Comes to Dust",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Farewell",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Fated Clash",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "protection_resilience",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        614,
+        615,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "best_edhrec_rank": null,
+      "card_name": "Dragon's Rage Channeler",
+      "example_functional_tag": "draw",
+      "hypothesis_lanes": [
+        "topdeck_miracle_setup"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Land Tax",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Library of Leng",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Lorehold, the Historian",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "commander_intent",
+          "priority_class": "commander_core_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Scroll Rack",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        609,
+        613,
+        614
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+      "best_edhrec_rank": 249,
+      "card_name": "Grand Abolisher",
+      "example_functional_tag": "protection",
+      "hypothesis_lanes": [
+        "protection_window"
+      ],
+      "priority": "P1_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Rise of the Eldrazi",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 90
+        },
+        {
+          "card_name": "Surge to Victory",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 90
+        },
+        {
+          "card_name": "Generous Gift",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Mizzix's Mastery",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Path to Exile",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "interaction_removal",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 88
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "global_top_500",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        613,
+        615,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Austere Command",
+      "example_functional_tag": "board_wipe",
+      "hypothesis_lanes": [
+        "interaction_pressure"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Blasphemous Act",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Everything Comes to Dust",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Farewell",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Fated Clash",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "protection_resilience",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        612
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "best_edhrec_rank": null,
+      "card_name": "Dance with Calamity",
+      "example_functional_tag": "draw",
+      "hypothesis_lanes": [
+        "spell_chain_conversion"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        611,
+        613,
+        614
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "best_edhrec_rank": null,
+      "card_name": "Goldspan Dragon",
+      "example_functional_tag": "ramp",
+      "hypothesis_lanes": [
+        "spell_chain_conversion"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        608,
+        611,
+        614,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+      "best_edhrec_rank": null,
+      "card_name": "Invoke Calamity",
+      "example_functional_tag": "engine",
+      "hypothesis_lanes": [
+        "spell_chain_conversion"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        614,
+        615,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Longshot, Rebel Bowman",
+      "example_functional_tag": "wincon",
+      "hypothesis_lanes": [
+        "combo_finishers"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        611,
+        612,
+        613,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Ol\u00f3rin's Searing Light",
+      "example_functional_tag": "draw",
+      "hypothesis_lanes": [
+        "unclassified_variant_watchlist"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Restoration Seminar",
+      "example_functional_tag": "engine",
+      "hypothesis_lanes": [
+        "unclassified_variant_watchlist"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        612
+      ]
+    },
+    {
+      "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Volcanic Vision",
+      "example_functional_tag": "engine",
+      "hypothesis_lanes": [
+        "unclassified_variant_watchlist"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        611,
+        613,
+        614
+      ]
+    },
+    {
+      "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Boros Garrison",
+      "example_functional_tag": "land",
+      "hypothesis_lanes": [
+        "mana_base_review"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Urza's Saga",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Arid Mesa",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Bloodstained Mire",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Flooded Strand",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Marsh Flats",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        609,
+        610,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Cavern of Souls",
+      "example_functional_tag": "land",
+      "hypothesis_lanes": [
+        "mana_base_review"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Urza's Saga",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 88
+        },
+        {
+          "card_name": "Arid Mesa",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Bloodstained Mire",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Flooded Strand",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        },
+        {
+          "card_name": "Marsh Flats",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "tutors_access",
+          "priority_class": "structural_foundation",
+          "value_priority_index": 86
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        612,
+        614,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+      "best_edhrec_rank": 29,
+      "card_name": "Chaos Warp",
+      "example_functional_tag": "draw",
+      "hypothesis_lanes": [
+        "interaction_pressure"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Blasphemous Act",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Everything Comes to Dust",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Farewell",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Fated Clash",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "protection_resilience",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "global_top_100",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        611,
+        615,
+        616
+      ]
+    },
+    {
+      "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+      "best_edhrec_rank": 630,
+      "card_name": "Dualcaster Mage",
+      "example_functional_tag": "engine",
+      "hypothesis_lanes": [
+        "combo_finishers"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "format_staple_long_tail",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        611,
+        612,
+        613
+      ]
+    },
+    {
+      "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Goblin Engineer",
+      "example_functional_tag": "tutor",
+      "hypothesis_lanes": [
+        "tutors_access"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Land Tax",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Library of Leng",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Lorehold, the Historian",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "commander_intent",
+          "priority_class": "commander_core_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Scroll Rack",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        608,
+        610,
+        611
+      ]
+    },
+    {
+      "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+      "best_edhrec_rank": null,
+      "card_name": "Goliath Daydreamer",
+      "example_functional_tag": "creature",
+      "hypothesis_lanes": [
+        "combo_finishers"
+      ],
+      "priority": "P2_forced_access_diagnostic",
+      "readiness_status": "needs_safe_cut_model",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+      "best_edhrec_rank": 115,
+      "card_name": "Enlightened Tutor",
+      "example_functional_tag": "tutor",
+      "hypothesis_lanes": [
+        "tutors_access"
+      ],
+      "priority": "P3_learning_only",
+      "readiness_status": "blocked_prior_reject",
+      "reason": "coherent tutor, but tested 607 cuts lost natural confirmation",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Land Tax",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Library of Leng",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Lorehold, the Historian",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "commander_intent",
+          "priority_class": "commander_core_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Scroll Rack",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        }
+      ],
+      "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis",
+      "staple_tier": "global_top_500",
+      "variant_deck_count": 6,
+      "variant_deck_ids": [
+        608,
+        611,
+        612,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+      "best_edhrec_rank": 231,
+      "card_name": "Gamble",
+      "example_functional_tag": "tutor",
+      "hypothesis_lanes": [
+        "tutors_access"
+      ],
+      "priority": "P3_learning_only",
+      "readiness_status": "blocked_prior_reject",
+      "reason": "coherent tutor, but tested 607 cuts lost natural confirmation",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Land Tax",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Library of Leng",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Lorehold, the Historian",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "commander_intent",
+          "priority_class": "commander_core_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Scroll Rack",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        },
+        {
+          "card_name": "Sensei's Divining Top",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_topdeck_access_anchor",
+          "value_priority_index": 100
+        }
+      ],
+      "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis",
+      "staple_tier": "global_top_500",
+      "variant_deck_count": 5,
+      "variant_deck_ids": [
+        609,
+        612,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+      "best_edhrec_rank": 233,
+      "card_name": "Storm-Kiln Artist",
+      "example_functional_tag": "ramp",
+      "hypothesis_lanes": [
+        "spell_chain_conversion"
+      ],
+      "priority": "P3_learning_only",
+      "readiness_status": "blocked_prior_reject",
+      "reason": "real runtime signal, but Arcane Signet replacement regressed fast pressure",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis",
+      "staple_tier": "global_top_500",
+      "variant_deck_count": 5,
+      "variant_deck_ids": [
+        608,
+        611,
+        612,
+        613,
+        614
+      ]
+    },
+    {
+      "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+      "best_edhrec_rank": null,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "example_functional_tag": "engine",
+      "hypothesis_lanes": [
+        "spell_chain_conversion"
+      ],
+      "priority": "P3_learning_only",
+      "readiness_status": "blocked_prior_reject",
+      "reason": "same-macro signal but not confirmed as final 607 change",
+      "runtime_ready": false,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        608,
+        612,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+      "best_edhrec_rank": 144,
+      "card_name": "Mana Vault",
+      "example_functional_tag": "ramp",
+      "hypothesis_lanes": [
+        "spell_chain_conversion"
+      ],
+      "priority": "P3_learning_only",
+      "readiness_status": "blocked_prior_reject",
+      "reason": "internally available and runtime-modeled, but one-card Bender's Waterskin replacement lost",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis",
+      "staple_tier": "global_top_500",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        612,
+        613,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+      "best_edhrec_rank": null,
+      "card_name": "The One Ring",
+      "example_functional_tag": "draw",
+      "hypothesis_lanes": [
+        "unclassified_variant_watchlist"
+      ],
+      "priority": "P3_learning_only",
+      "readiness_status": "blocked_prior_reject",
+      "reason": "internally available and runtime-modeled, but tested value/draw cuts lost to 607",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [],
+      "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        608,
+        613,
+        615
+      ]
+    },
+    {
+      "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+      "best_edhrec_rank": null,
+      "card_name": "Cloud Key",
+      "example_functional_tag": "ramp",
+      "hypothesis_lanes": [
+        "spell_chain_conversion"
+      ],
+      "priority": "P3_learning_only",
+      "readiness_status": "blocked_prior_reject",
+      "reason": "lost same-lane Bender's Waterskin benchmark and regressed miracle cadence",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 1,
+      "variant_deck_ids": [
+        612
+      ]
+    },
+    {
+      "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+      "best_edhrec_rank": null,
+      "card_name": "Electro, Assaulting Battery",
+      "example_functional_tag": "removal",
+      "hypothesis_lanes": [
+        "interaction_pressure"
+      ],
+      "priority": "P3_learning_only",
+      "readiness_status": "blocked_prior_reject",
+      "reason": "lost same-lane Bender's Waterskin benchmark and regressed Winota",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Blasphemous Act",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Everything Comes to Dust",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Farewell",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "board_wipes",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        },
+        {
+          "card_name": "Fated Clash",
+          "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+          "primary_value_lane": "protection_resilience",
+          "priority_class": "protected_interaction_resilience_floor",
+          "value_priority_index": 84
+        }
+      ],
+      "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 1,
+      "variant_deck_ids": [
+        611
+      ]
+    },
+    {
+      "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+      "best_edhrec_rank": null,
+      "card_name": "Possibility Storm",
+      "example_functional_tag": "unknown",
+      "hypothesis_lanes": [
+        "combo_finishers"
+      ],
+      "priority": "P3_learning_only",
+      "readiness_status": "blocked_prior_reject",
+      "reason": "same-lane Creative Technique benchmark lost and had weak used-game outcome sample",
+      "runtime_ready": true,
+      "same_lane_current_607_anchors": [
+        {
+          "card_name": "Molecule Man",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 95
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "topdeck_miracle_setup",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 93
+        },
+        {
+          "card_name": "Creative Technique",
+          "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+          "primary_value_lane": "payoffs_finishers",
+          "priority_class": "protected_payoff_finisher_anchor",
+          "value_priority_index": 92
+        }
+      ],
+      "same_lane_cut_contract": "blocked_prior_reject_requires_material_new_hypothesis",
+      "staple_tier": "not_format_staple",
+      "variant_deck_count": 1,
+      "variant_deck_ids": [
+        616
+      ]
+    }
+  ],
+  "lane_queue": {
+    "combo_finishers": [
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Brass's Bounty",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 6
+      },
+      {
+        "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+        "card_name": "Perch Protection",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Rise of the Eldrazi",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 90
+          },
+          {
+            "card_name": "Surge to Victory",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 90
+          },
+          {
+            "card_name": "Generous Gift",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Mizzix's Mastery",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Path to Exile",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 88
+          }
+        ],
+        "variant_deck_count": 6
+      },
+      {
+        "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+        "card_name": "Longshot, Rebel Bowman",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+        "card_name": "Dualcaster Mage",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 3
+      },
+      {
+        "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+        "card_name": "Goliath Daydreamer",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 3
+      },
+      {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "card_name": "Possibility Storm",
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 1
+      }
+    ],
+    "interaction_pressure": [
+      {
+        "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+        "card_name": "Deflecting Palm",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Blasphemous Act",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Everything Comes to Dust",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Farewell",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Fated Clash",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "protection_resilience",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          }
+        ],
+        "variant_deck_count": 3
+      },
+      {
+        "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+        "card_name": "Austere Command",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Blasphemous Act",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Everything Comes to Dust",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Farewell",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Fated Clash",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "protection_resilience",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+        "card_name": "Chaos Warp",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Blasphemous Act",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Everything Comes to Dust",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Farewell",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Fated Clash",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "protection_resilience",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          }
+        ],
+        "variant_deck_count": 3
+      },
+      {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "card_name": "Electro, Assaulting Battery",
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Blasphemous Act",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Everything Comes to Dust",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Farewell",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Fated Clash",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "protection_resilience",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          }
+        ],
+        "variant_deck_count": 1
+      }
+    ],
+    "mana_base_review": [
+      {
+        "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+        "card_name": "Plateau",
+        "priority": "P1_safe_cut_model",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Urza's Saga",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Arid Mesa",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Bloodstained Mire",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Flooded Strand",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Marsh Flats",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          }
+        ],
+        "variant_deck_count": 7
+      },
+      {
+        "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+        "card_name": "Clifftop Retreat",
+        "priority": "P1_safe_cut_model",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Urza's Saga",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Arid Mesa",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Bloodstained Mire",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Flooded Strand",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Marsh Flats",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          }
+        ],
+        "variant_deck_count": 6
+      },
+      {
+        "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+        "card_name": "Boseiju, Who Shelters All",
+        "priority": "P1_safe_cut_model",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Urza's Saga",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Arid Mesa",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Bloodstained Mire",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Flooded Strand",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Marsh Flats",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+        "card_name": "Rugged Prairie",
+        "priority": "P1_safe_cut_model",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Urza's Saga",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Arid Mesa",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Bloodstained Mire",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Flooded Strand",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Marsh Flats",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+        "card_name": "Sundown Pass",
+        "priority": "P1_safe_cut_model",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Urza's Saga",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Arid Mesa",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Bloodstained Mire",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Flooded Strand",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Marsh Flats",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+        "card_name": "Boros Garrison",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Urza's Saga",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Arid Mesa",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Bloodstained Mire",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Flooded Strand",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Marsh Flats",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          }
+        ],
+        "variant_deck_count": 3
+      },
+      {
+        "allowed_next_test": "build_safe_cut_mana_source_model_before_any_battle_gate",
+        "card_name": "Cavern of Souls",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Urza's Saga",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Arid Mesa",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Bloodstained Mire",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Flooded Strand",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          },
+          {
+            "card_name": "Marsh Flats",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "tutors_access",
+            "priority_class": "structural_foundation",
+            "value_priority_index": 86
+          }
+        ],
+        "variant_deck_count": 3
+      }
+    ],
+    "protection_window": [
+      {
+        "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+        "card_name": "Perch Protection",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Rise of the Eldrazi",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 90
+          },
+          {
+            "card_name": "Surge to Victory",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 90
+          },
+          {
+            "card_name": "Generous Gift",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Mizzix's Mastery",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Path to Exile",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 88
+          }
+        ],
+        "variant_deck_count": 6
+      },
+      {
+        "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+        "card_name": "Boros Charm",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Rise of the Eldrazi",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 90
+          },
+          {
+            "card_name": "Surge to Victory",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 90
+          },
+          {
+            "card_name": "Generous Gift",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Mizzix's Mastery",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Path to Exile",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 88
+          }
+        ],
+        "variant_deck_count": 5
+      },
+      {
+        "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+        "card_name": "Silence",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Rise of the Eldrazi",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 90
+          },
+          {
+            "card_name": "Surge to Victory",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 90
+          },
+          {
+            "card_name": "Generous Gift",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Mizzix's Mastery",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Path to Exile",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 88
+          }
+        ],
+        "variant_deck_count": 5
+      },
+      {
+        "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+        "card_name": "Deflecting Palm",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Blasphemous Act",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Everything Comes to Dust",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Farewell",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "board_wipes",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          },
+          {
+            "card_name": "Fated Clash",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "protection_resilience",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 84
+          }
+        ],
+        "variant_deck_count": 3
+      },
+      {
+        "allowed_next_test": "forced_access_pressure_window_diagnostic_only_until_winota_floor_passes",
+        "card_name": "Grand Abolisher",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Rise of the Eldrazi",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 90
+          },
+          {
+            "card_name": "Surge to Victory",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 90
+          },
+          {
+            "card_name": "Generous Gift",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Mizzix's Mastery",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 88
+          },
+          {
+            "card_name": "Path to Exile",
+            "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+            "primary_value_lane": "interaction_removal",
+            "priority_class": "protected_interaction_resilience_floor",
+            "value_priority_index": 88
+          }
+        ],
+        "variant_deck_count": 3
+      }
+    ],
+    "spell_chain_conversion": [
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Apex of Power",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 6
+      },
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Brass's Bounty",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 6
+      },
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Dance with Calamity",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Goldspan Dragon",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Invoke Calamity",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "card_name": "Storm-Kiln Artist",
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 5
+      },
+      {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 3
+      },
+      {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "card_name": "Mana Vault",
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 3
+      },
+      {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "card_name": "Cloud Key",
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Molecule Man",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Reforge the Soul",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 95
+          },
+          {
+            "card_name": "Call Forth the Tempest",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Hit the Mother Lode",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 93
+          },
+          {
+            "card_name": "Creative Technique",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "payoffs_finishers",
+            "priority_class": "protected_payoff_finisher_anchor",
+            "value_priority_index": 92
+          }
+        ],
+        "variant_deck_count": 1
+      }
+    ],
+    "topdeck_miracle_setup": [
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Galvanoth",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Land Tax",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Library of Leng",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Lorehold, the Historian",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "commander_intent",
+            "priority_class": "commander_core_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Scroll Rack",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Sensei's Divining Top",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Penance",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Land Tax",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Library of Leng",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Lorehold, the Historian",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "commander_intent",
+            "priority_class": "commander_core_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Scroll Rack",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Sensei's Divining Top",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Valakut Awakening // Valakut Stoneforge",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Land Tax",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Library of Leng",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Lorehold, the Historian",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "commander_intent",
+            "priority_class": "commander_core_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Scroll Rack",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Sensei's Divining Top",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Wheel of Fortune",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Land Tax",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Library of Leng",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Lorehold, the Historian",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "commander_intent",
+            "priority_class": "commander_core_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Scroll Rack",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Sensei's Divining Top",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          }
+        ],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "card_name": "Dragon's Rage Channeler",
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Land Tax",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Library of Leng",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Lorehold, the Historian",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "commander_intent",
+            "priority_class": "commander_core_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Scroll Rack",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Sensei's Divining Top",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          }
+        ],
+        "variant_deck_count": 3
+      }
+    ],
+    "tutors_access": [
+      {
+        "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+        "card_name": "Goblin Engineer",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Land Tax",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Library of Leng",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Lorehold, the Historian",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "commander_intent",
+            "priority_class": "commander_core_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Scroll Rack",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Sensei's Divining Top",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          }
+        ],
+        "variant_deck_count": 3
+      },
+      {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "card_name": "Enlightened Tutor",
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Land Tax",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Library of Leng",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Lorehold, the Historian",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "commander_intent",
+            "priority_class": "commander_core_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Scroll Rack",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Sensei's Divining Top",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          }
+        ],
+        "variant_deck_count": 6
+      },
+      {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "card_name": "Gamble",
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "same_lane_current_607_anchors": [
+          {
+            "card_name": "Land Tax",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Library of Leng",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Lorehold, the Historian",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "commander_intent",
+            "priority_class": "commander_core_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Scroll Rack",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          },
+          {
+            "card_name": "Sensei's Divining Top",
+            "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+            "primary_value_lane": "topdeck_miracle_setup",
+            "priority_class": "protected_topdeck_access_anchor",
+            "value_priority_index": 100
+          }
+        ],
+        "variant_deck_count": 5
+      }
+    ],
+    "unclassified_variant_watchlist": [
+      {
+        "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+        "card_name": "Ol\u00f3rin's Searing Light",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+        "card_name": "Restoration Seminar",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "safe_cut_model_required_before_natural_gate",
+        "card_name": "Volcanic Vision",
+        "priority": "P2_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "same_lane_current_607_anchors": [],
+        "variant_deck_count": 4
+      },
+      {
+        "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+        "card_name": "The One Ring",
+        "priority": "P3_learning_only",
+        "readiness_status": "blocked_prior_reject",
+        "same_lane_current_607_anchors": [],
+        "variant_deck_count": 3
+      }
+    ]
+  },
+  "next_learning_actions": [
+    {
+      "id": "mana_base_safe_cut_model_v1",
+      "promotion_boundary": "No battle gate until the land cut keeps 34 lands, color access, topdeck anchors, and fast-pressure utility intact.",
+      "purpose": "Compare Plateau, Clifftop Retreat, Rugged Prairie, Sundown Pass, Boseiju, Cavern, and Boros Garrison by source quality, ETB/timing risk, and protected utility-land displacement."
+    },
+    {
+      "id": "topdeck_forced_access_diagnostic_v1",
+      "promotion_boundary": "Forced access can teach card value, but natural-gate eligibility still requires non-regressed anchor access floors.",
+      "purpose": "Exercise Penance, Galvanoth, Valakut Awakening, Wheel of Fortune, and Dragon's Rage Channeler to learn whether they increase first-draw/miracle access without suppressing 607 anchors."
+    },
+    {
+      "id": "spell_chain_conversion_trace_v2",
+      "promotion_boundary": "Do not expand pressure or mana packages without positive miracle-cast and topdeck-activation traces.",
+      "purpose": "Study Apex of Power, Brass's Bounty, Dance with Calamity, Goldspan Dragon, and Invoke Calamity as conversion cards only after miracle/topdeck trace improves."
+    },
+    {
+      "id": "protection_window_pressure_diagnostic_v1",
+      "promotion_boundary": "A card that improves generic protection still fails if it regresses fast-pressure matchup or protected miracle cadence.",
+      "purpose": "Test Silence, Boros Charm, Grand Abolisher, Perch Protection, and Deflecting Palm as pressure-window hypotheses with explicit Winota-floor checks."
+    }
+  ],
+  "postgres_writes": false,
+  "queue_policy": {
+    "current_607_slots": "every candidate must name the protected 607 slot and lane it challenges before a natural gate can run",
+    "forced_access": "allowed only as learning diagnostic; it cannot promote a deck by itself",
+    "game_changer_metadata": "Game Changer or staple discovery creates explainable candidate pressure, not promotion readiness",
+    "lands": "review only through a mana-source model that preserves 34 lands and protected utility anchors",
+    "natural_gate": "closed until miracle_access_first_shell_v1 floors pass before battle",
+    "prior_rejects": "blocked unless a materially new cut model or trace hypothesis is declared",
+    "safe_cuts": "required before any candidate can be called a real challenger"
+  },
+  "source_db_mutated": false,
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_card_value_priority_synthesis_20260705_current_relearn.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_preflight_20260704_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_trace_failure_miner_20260704_current.json"
+  ],
+  "status": "lorehold_hypothesis_queue_ready_no_natural_gate",
+  "summary": {
+    "allow_new_natural_gate_now": false,
+    "blocked_prior_reject_count": 9,
+    "card_value_priority_status": "card_value_priority_no_direct_cut_ready_current_607",
+    "card_value_ready_replacement_count": 0,
+    "game_changer_metadata_rows_considered": 12,
+    "gate_ready_now_count_from_preflight": 0,
+    "hypotheses_with_same_lane_anchor_count": 36,
+    "hypothesis_count": 40,
+    "keep_607_as_protected_baseline": true,
+    "lane_counts": {
+      "combo_finishers": 6,
+      "interaction_pressure": 4,
+      "mana_base_review": 7,
+      "protection_window": 5,
+      "spell_chain_conversion": 9,
+      "topdeck_miracle_setup": 5,
+      "tutors_access": 3,
+      "unclassified_variant_watchlist": 4
+    },
+    "natural_gate_ready_count": 0,
+    "preflight_status": "no_current_candidate_passes_miracle_access_first_preflight",
+    "promotion_allowed": false,
+    "protected_baseline": "deck_607",
+    "status_counts": {
+      "blocked_prior_reject": 9,
+      "needs_safe_cut_model": 31
+    },
+    "trace_status": "lorehold_miracle_trace_failure_learning_ready"
+  }
+}

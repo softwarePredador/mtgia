@@ -964,3 +964,55 @@ Product/deckbuilder contract:
   use evidence.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and the learning task remains open.
+
+## Hypothesis And Promotion Readiness Relearn - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_hypothesis_queue_from_value_model_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_hypothesis_queue_from_value_model_20260705_current_relearn.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_readiness_synthesis_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_promotion_readiness_synthesis_20260705_current_relearn.json`
+
+The hypothesis queue now consumes the current
+`lorehold_card_value_priority_synthesis_20260705_current_relearn` report in
+addition to the existing value model, miracle-access preflight, and trace
+miner. This means candidate hypotheses now carry the current `607` lane
+anchors they would have to challenge before any natural battle gate.
+
+Current hypothesis-queue result:
+
+- status: `lorehold_hypothesis_queue_ready_no_natural_gate`;
+- hypotheses: `40`;
+- natural gate-ready hypotheses: `0`;
+- blocked prior rejects: `9`;
+- hypotheses needing safe-cut model: `31`;
+- hypotheses with same-lane `607` anchors attached: `36`;
+- Game Changer metadata rows considered through the value-priority report:
+  `12`;
+- promotion allowed: `false`.
+
+Current promotion-readiness result:
+
+- status: `promotion_readiness_keep_607_no_candidate_ready`;
+- reports loaded: `7/7`;
+- unique candidate rows considered: `139`;
+- gate-ready candidates: `0`;
+- hypotheses needing named cut/gate: `98`;
+- blocked/rejected rows: `39`;
+- role-mapping watch items: `0`;
+- promotion allowed: `false`.
+
+Operational lesson:
+
+- A hypothesis queue is not a battle queue. It is a learning queue until a card
+  names the exact current `607` slot and lane it challenges.
+- Public Lorehold evidence continues to support multiple shells
+  (spellslinger, topdeck, combo, token, burn, Voltron), but each alternate
+  direction is a shell contract unless it preserves the current
+  miracle/topdeck/protection floor.
+- Game Changer, staple rank, variant frequency, and public primer mentions now
+  feed candidate pressure, not promotion readiness.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion. The next useful step is a safe-cut/diagnostic learning
+  step, not a natural promotion gate.
