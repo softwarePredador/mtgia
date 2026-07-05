@@ -1337,3 +1337,63 @@ Operational lesson:
   diagnostic to learn whether the token-pressure branch repairs a real failure.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Young Pyromancer Pressure-Window Trace Synthesis - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_young_pyromancer_pressure_window_trace_synthesis_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_young_pyromancer_pressure_window_trace_synthesis_20260705_current_relearn.json`
+
+This synthesis crosses the Young Pyromancer singleton cut-safety model with the
+current spell-pressure trace, closing-window trace, and miracle-trace failure
+miner. It asks whether the best pressure singleton actually repairs a real 607
+pressure-window failure mode.
+
+Current result:
+
+- decision status:
+  `young_pyromancer_pressure_window_refuted_no_deck_action`;
+- target card: `Young Pyromancer`;
+- target singleton status: `young_pyromancer_singleton_no_cut_keep_607`;
+- target package status: `blocked_no_cut_or_hypothesis_capacity`;
+- eligible cuts: `0`;
+- seed-safe cuts: `0`;
+- wins with pressure-card events: `0`;
+- losses with pressure-card events: `1`;
+- Young Pyromancer seen only in losses: `true`;
+- pressure trace status: `pressure_trace_refutes_pressure_causality`;
+- closing-window comparisons consumed: `13`;
+- average 607 turn advantage in those comparisons: `10.15`;
+- miracle trace failure flags: `7`;
+- ready deck changes: `0`;
+- promotion allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- recommended next action:
+  `deprioritize_young_pyromancer_until_new_pressure_cut_or_forced_diagnostic`.
+
+Why this matters:
+
+- The current spell-pressure shell did not win because of Young Pyromancer. Its
+  only candidate win had no pressure-card events and was carried by the protected
+  topdeck/miracle engine.
+- Young Pyromancer appeared only in losses in the current pressure trace, so it
+  is not positive card-level proof.
+- Closing-window failures are dominated by miracle, topdeck, spell-volume,
+  mana-timing, and Approach-conversion deficits. Young Pyromancer only
+  theoretically helps the "died before closing window" pressure body problem;
+  it does not directly repair the engine deficits that separate 607 wins from
+  rejected shell losses.
+- Therefore the token-pressure branch is not a natural 607 gate path now.
+
+Operational lesson:
+
+- Young Pyromancer remains legal and runtime-preflighted, but it is no longer
+  the next natural deck-action candidate.
+- If learning continues on Young Pyromancer, it must be a non-deck forced
+  diagnostic only, tracking token creation and pressure absorption while also
+  preserving miracle, topdeck, and Lorehold spell-cast floors.
+- The next deckbuilding priority should favor engine-preserving pressure or
+  conversion routes over broad token-pressure shells.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.

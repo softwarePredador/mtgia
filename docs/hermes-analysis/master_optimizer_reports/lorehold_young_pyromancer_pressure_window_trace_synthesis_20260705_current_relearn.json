@@ -1,0 +1,279 @@
+{
+  "artifact_type": "lorehold_young_pyromancer_pressure_window_trace_synthesis",
+  "closing_window_gap_alignment": [
+    {
+      "actionability": "diagnostic_only_needs_causal_trace",
+      "comparison_count": 13,
+      "gap": "candidate_died_before_closing_window",
+      "young_pyromancer_repair_status": "partial_theoretical_pressure_body"
+    },
+    {
+      "actionability": "diagnostic_only_needs_causal_trace",
+      "comparison_count": 13,
+      "gap": "candidate_lost_multiple_turns_before_607_finish",
+      "young_pyromancer_repair_status": "partial_theoretical_pressure_body"
+    },
+    {
+      "actionability": "weak_indirect_not_gate_ready",
+      "comparison_count": 13,
+      "gap": "lorehold_spell_volume_deficit",
+      "young_pyromancer_repair_status": "indirect_only_from_more_spell_payoffs"
+    },
+    {
+      "actionability": "do_not_use_young_pyromancer_for_this_gap",
+      "comparison_count": 13,
+      "gap": "miracle_cast_deficit",
+      "young_pyromancer_repair_status": "does_not_repair"
+    },
+    {
+      "actionability": "do_not_use_young_pyromancer_for_this_gap",
+      "comparison_count": 11,
+      "gap": "topdeck_engine_card_deficit",
+      "young_pyromancer_repair_status": "does_not_repair"
+    },
+    {
+      "actionability": "do_not_use_young_pyromancer_for_this_gap",
+      "comparison_count": 9,
+      "gap": "607_mana_timing_anchor_deficit",
+      "young_pyromancer_repair_status": "does_not_repair"
+    },
+    {
+      "actionability": "do_not_use_young_pyromancer_for_this_gap",
+      "comparison_count": 9,
+      "gap": "static_cost_reduction_deficit",
+      "young_pyromancer_repair_status": "does_not_repair"
+    },
+    {
+      "actionability": "do_not_use_young_pyromancer_for_this_gap",
+      "comparison_count": 9,
+      "gap": "topdeck_activation_deficit",
+      "young_pyromancer_repair_status": "does_not_repair"
+    },
+    {
+      "actionability": "do_not_use_young_pyromancer_for_this_gap",
+      "comparison_count": 9,
+      "gap": "upkeep_rummage_deficit",
+      "young_pyromancer_repair_status": "does_not_repair"
+    },
+    {
+      "actionability": "do_not_use_young_pyromancer_for_this_gap",
+      "comparison_count": 7,
+      "gap": "approach_conversion_missing",
+      "young_pyromancer_repair_status": "does_not_repair"
+    }
+  ],
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_gate_allowed": false,
+    "next_actions": [
+      "do_not_mutate_or_replace_deck_607",
+      "do_not_run_a_natural_young_pyromancer_gate_now",
+      "deprioritize_young_pyromancer_until_a_pressure_compatible_cut_exists",
+      "if_learning_continues_on_tokens_use_non_deck_forced_diagnostic_only",
+      "prioritize engine-preserving pressure or conversion routes over broad token-pressure shells"
+    ],
+    "promotion_allowed": false,
+    "reason": "Current trace evidence does not show Young Pyromancer repairing the 607 pressure window. The only existing pressure-shell win was carried by the core topdeck/miracle engine, while Young Pyromancer was observed only in losses and still has no eligible cut."
+  },
+  "deck_607_mutated": false,
+  "diagnostic_contract": {
+    "allowed_now": false,
+    "natural_battle_allowed": false,
+    "promotion_allowed": false,
+    "required_if_run": [
+      "copied_db_or_non_deck_harness_only",
+      "no_mutation_of_deck_607",
+      "track_young_pyromancer_token_creation_and_damage_absorption",
+      "track_miracle_cast_topdeck_activation_lorehold_spell_cast_floors",
+      "stop_if_pressure_events_appear_only_in_losses_again"
+    ]
+  },
+  "generated_at": "2026-07-05T03:53:16Z",
+  "learning_rules": [
+    {
+      "effect": "Young Pyromancer appeared in pressure trace only on losses, so it cannot be promoted or used as positive 607 evidence.",
+      "rule": "loss_only_pressure_trace_is_not_card_proof"
+    },
+    {
+      "effect": "Most closing-window gaps are miracle, topdeck, spell-volume, mana-timing, or Approach-conversion deficits that Young Pyromancer does not directly repair.",
+      "rule": "token_pressure_does_not_replace_engine_floor"
+    },
+    {
+      "effect": "A forced Young Pyromancer diagnostic may teach whether tokens buy time, but it must not create a deck-change claim without a named safe cut, structure matrix, natural equal gate, and direct card-use proof.",
+      "rule": "diagnostic_is_not_promotion"
+    }
+  ],
+  "miracle_trace_blockers": [
+    "head_to_head_not_won",
+    "miracle_trace_missing",
+    "topdeck_activation_missing",
+    "topdeck_anchor_access_regressed",
+    "pressure_causality_unproven",
+    "pressure_conversion_unproven",
+    "fast_pressure_slice_not_protected"
+  ],
+  "postgres_writes": false,
+  "pressure_trace_evidence": {
+    "baseline_record": {
+      "games": 4,
+      "losses": 4,
+      "stalls": 0,
+      "wins": 0
+    },
+    "candidate_record": {
+      "games": 4,
+      "losses": 3,
+      "stalls": 0,
+      "wins": 1
+    },
+    "decision": {
+      "confirmation_allowed": false,
+      "keep_607_as_protected_baseline": true,
+      "next_actions": [
+        "do_not_confirm_current_spell_pressure_topdeck_shell",
+        "treat_young_pyromancer_result_as_loss_only_sampling_not_win_proof",
+        "mine_or_generate_a_storm_kiln_plus_guttersnipe_hypothesis_before_more_token_pressure",
+        "require_seed_safe_same_lane_cuts_before_any_new_natural_gate"
+      ],
+      "promotion_allowed": false
+    },
+    "failure_modes": [
+      "head_to_head_lost_to_607",
+      "parent_decision_blocks_confirmation",
+      "pressure_seen_only_in_losses",
+      "sisay_win_carried_by_core_topdeck_miracle_engine",
+      "still_structurally_below_607",
+      "winning_game_has_no_pressure_card_events"
+    ],
+    "pressure_cards_by_result": {
+      "loss": [
+        "Young Pyromancer"
+      ]
+    }
+  },
+  "source_db_mutated": false,
+  "source_reports": {
+    "closing_trace": "docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_trace_miner_20260704_role_tag_repair.json",
+    "miracle_trace": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_trace_failure_miner_20260704_current.json",
+    "spell_pressure_trace": "docs/hermes-analysis/master_optimizer_reports/lorehold_spell_pressure_trace_miner_20260704_current.json",
+    "young_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_young_pyromancer_singleton_cut_safety_model_20260705_current_relearn.json"
+  },
+  "status": "young_pyromancer_pressure_window_refuted_no_deck_action",
+  "summary": {
+    "avg_607_turn_advantage": 10.15,
+    "closing_window_comparison_count": 13,
+    "closing_window_ready_hypotheses": 3,
+    "current_baseline": "deck_607",
+    "eligible_cut_count": 0,
+    "losses_with_pressure_card_events": 1,
+    "miracle_trace_failure_flag_count": 7,
+    "natural_battle_gate_allowed_now": false,
+    "pressure_trace_status": "pressure_trace_refutes_pressure_causality",
+    "promotion_allowed_now": false,
+    "ready_deck_change_count": 0,
+    "recommended_next_action": "deprioritize_young_pyromancer_until_new_pressure_cut_or_forced_diagnostic",
+    "seed_safe_cut_ready_count": 0,
+    "target_card": "Young Pyromancer",
+    "target_package_status": "blocked_no_cut_or_hypothesis_capacity",
+    "target_singleton_status": "young_pyromancer_singleton_no_cut_keep_607",
+    "tested_pressure_cards": [
+      "Guttersnipe",
+      "Young Pyromancer",
+      "Monastery Mentor"
+    ],
+    "wins_with_pressure_card_events": 0,
+    "young_pyromancer_seen_only_in_losses": true
+  },
+  "top_anchor_card_deficits": [
+    {
+      "delta_total": 29,
+      "event": "topdeck_manipulation_activated:Sensei's Divining Top"
+    },
+    {
+      "delta_total": 17,
+      "event": "cost_paid:Lorehold, the Historian"
+    },
+    {
+      "delta_total": 15,
+      "event": "cost_paid:Sensei's Divining Top"
+    },
+    {
+      "delta_total": 15,
+      "event": "spell_cast:Sensei's Divining Top"
+    },
+    {
+      "delta_total": 15,
+      "event": "spell_resolved:Sensei's Divining Top"
+    },
+    {
+      "delta_total": 14,
+      "event": "topdeck_manipulation_activated:Scroll Rack"
+    },
+    {
+      "delta_total": 13,
+      "event": "spell_resolved:Approach of the Second Sun"
+    },
+    {
+      "delta_total": 8,
+      "event": "cost_paid:Victory Chimes"
+    },
+    {
+      "delta_total": 7,
+      "event": "spell_cast:Victory Chimes"
+    },
+    {
+      "delta_total": 7,
+      "event": "cost_paid:Approach of the Second Sun"
+    },
+    {
+      "delta_total": 7,
+      "event": "spell_cast:Approach of the Second Sun"
+    },
+    {
+      "delta_total": 6,
+      "event": "spell_resolved:Mizzix's Mastery"
+    },
+    {
+      "delta_total": 5,
+      "event": "miracle_cast:Approach of the Second Sun"
+    },
+    {
+      "delta_total": 4,
+      "event": "cost_paid:Bender's Waterskin"
+    },
+    {
+      "delta_total": 4,
+      "event": "cost_paid:Scroll Rack"
+    },
+    {
+      "delta_total": 4,
+      "event": "miracle_cast:Jeska's Will"
+    }
+  ],
+  "top_strategic_deficits": [
+    {
+      "delta_total": 153,
+      "event": "lorehold_cost_paid"
+    },
+    {
+      "delta_total": 134,
+      "event": "lorehold_spell_cast"
+    },
+    {
+      "delta_total": 71,
+      "event": "miracle_cast"
+    },
+    {
+      "delta_total": 63,
+      "event": "lorehold_upkeep_rummage"
+    },
+    {
+      "delta_total": 41,
+      "event": "topdeck_manipulation_activated"
+    },
+    {
+      "delta_total": 37,
+      "event": "static_cost_reduction_total"
+    }
+  ]
+}
