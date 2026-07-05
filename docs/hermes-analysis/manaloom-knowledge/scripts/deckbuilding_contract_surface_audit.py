@@ -34,6 +34,7 @@ GLOBAL_COMMANDER_NAMED_LAND_CANDIDATE_POOL = SCRIPT_DIR / "global_commander_name
 GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_land_cut_candidate_model.py"
 GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_nonland_core_candidate_model.py"
 GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT = SCRIPT_DIR / "global_commander_learning_priority_audit.py"
+GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -91,6 +92,10 @@ GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT = (
 GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md"
+)
+GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -169,6 +174,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md",
                 "global_commander_learning_priority_audit.py",
                 "global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md",
+                "global_commander_candidate_copy_materializer.py",
+                "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
                 "five Commander",
                 "brackets `1..5`",
                 "Game Changer budgets",
@@ -306,6 +313,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md",
                 "global_commander_nonland_core_candidate_model.py",
                 "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md",
+                "global_commander_candidate_copy_materializer.py",
+                "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
             ],
         )
     )
@@ -470,6 +479,20 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER,
+            [
+                "global_commander_candidate_copy_materializer",
+                "candidate_materialized_structure_ready_next_gate_closed",
+                "source_db_mutated",
+                "source_unchanged",
+                "promotion_allowed",
+                "allow_battle_gate_now",
+                "allow_next_strategy_matrix",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -551,6 +574,16 @@ def build_audit() -> dict[str, Any]:
             "missing": []
             if GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT.exists()
             else ["global_commander_learning_priority_report"],
+        }
+    )
+    checks.append(
+        {
+            "path": rel(GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT),
+            "exists": GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT.exists(),
+            "status": "pass" if GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT.exists() else "fail",
+            "missing": []
+            if GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT.exists()
+            else ["global_commander_candidate_copy_materializer_report"],
         }
     )
 

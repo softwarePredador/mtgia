@@ -251,6 +251,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Brackets + Game Changers; o backend agora aceita `1..5` em
     `server/lib/edh_bracket_policy.dart`, mas bracket continua sendo sinal de
     pregame/power e nao prova final de qualidade estrategica.
+    Quando uma hipotese add/cut estiver pronta, rode
+    `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
+    para materializar uma unica troca em copia isolada do Hermes SQLite. A
+    primeira evidencia global materializou `+Feed the Swarm / -Birgi, God of
+    Storytelling // Harnfel, Horn of Bounty` no deck `619`, com source DB
+    intacto e gate de batalha/promocao ainda fechado:
+    `master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

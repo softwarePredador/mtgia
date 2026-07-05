@@ -180,7 +180,12 @@ Operational priority after this pivot:
    source-lane availability, current external research, staple/bracket
    guardrails, and the Lorehold benchmark rule into one global next-action
    queue;
-11. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+11. run `global_commander_candidate_copy_materializer.py` only after a named
+   add/cut pool is ready; it may materialize one hypothesis inside an isolated
+   copied Hermes SQLite DB, must prove the source DB hash is unchanged, and
+   still keeps promotion/battle gates closed until strategy, battle, and replay
+   evidence pass;
+12. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -196,6 +201,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
 credentials are unavailable. It must report source lanes as unavailable and route
@@ -240,6 +246,12 @@ Current external refresh on 2026-07-05:
   density, and an explicit plan-B lane; it must not copy public decklists or
   promote the current Kaalia variant without the normal structure, strategy,
   battle, and replay gates.
+- Current candidate-copy materialization exists only as an isolated Hermes DB
+  copy step. The first global nonland candidate copy used deck `619` as a
+  Kaalia test case, materialized `+Feed the Swarm / -Birgi, God of Storytelling
+  // Harnfel, Horn of Bounty`, passed 100-card/singleton/source-unchanged
+  structure checks, and still reports `promotion_allowed=false` plus
+  `allow_battle_gate_now=false`.
 
 ## Global Commander Rollout - 2026-07-01
 
