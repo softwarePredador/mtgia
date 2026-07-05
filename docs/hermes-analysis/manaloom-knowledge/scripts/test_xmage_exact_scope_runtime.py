@@ -5633,6 +5633,65 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_destroy_draw_spell_respects_target_colors(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.battlefield = [
+            {
+                "name": "Red Guard",
+                "type_line": "Creature - Warrior",
+                "colors": ["R"],
+                "power": 2,
+                "toughness": 2,
+            },
+            {
+                "name": "Green Guard",
+                "type_line": "Creature - Elf",
+                "colors": ["G"],
+                "power": 2,
+                "toughness": 2,
+            },
+        ]
+        constraints = {"card_types": ["creature"], "target_colors": ["G"]}
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_destroy_target_and_draw_card_spell_v1",
+            "_composite_rule_components": [
+                {
+                    "effect": "remove_creature",
+                    "battle_model_scope": "xmage_destroy_target_spell_v1",
+                    "target": "creature",
+                    "target_constraints": constraints,
+                    "destination": "graveyard",
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Slay",
+            "type_line": "Instant",
+            "oracle_text": "Destroy target green creature. It can't be regenerated. Draw a card.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(54),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Red Guard"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Green Guard"])
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn Card"])
+
     def test_composite_scry_draw_spell_reorders_library_then_draws_once(self) -> None:
         active = self.battle.Player(
             "Active",

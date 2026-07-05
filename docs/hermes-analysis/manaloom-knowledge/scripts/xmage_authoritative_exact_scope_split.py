@@ -1361,7 +1361,7 @@ def fixed_destroy_draw_from_source(source: str) -> int | None:
         return None
     if "TargetPointer" in text or ".setTargetPointer" in text:
         return None
-    destroy_matches = list(re.finditer(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S))
+    destroy_matches = list(re.finditer(r"new\s+DestroyTargetEffect\s*\(\s*(?:true\s*)?\)", text, re.S))
     if len(destroy_matches) != 1:
         return None
     draw_matches = list(re.finditer(r"new\s+DrawCardSourceControllerEffect\s*\(", text))
@@ -7588,6 +7588,7 @@ def restricted_target_base(target: str) -> str:
         "black_creature",
         "white_creature",
         "blue_creature",
+        "green_creature",
         "green_or_white_creature",
         "artifact_creature",
         "nonartifact_creature",
@@ -7689,11 +7690,12 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target nongreen creature(?:\. it can't be regenerated)?", "nongreen_creature"),
         (r"target nonred creature", "nonred_creature"),
         (r"target nonwhite creature", "nonwhite_creature"),
-        (r"target black creature", "black_creature"),
+        (r"target black creature(?:\. it can't be regenerated)?", "black_creature"),
         (r"target artifact creature", "artifact_creature"),
         (r"target green or white creature", "green_or_white_creature"),
-        (r"target white creature", "white_creature"),
-        (r"target blue creature", "blue_creature"),
+        (r"target white creature(?:\. it can't be regenerated)?", "white_creature"),
+        (r"target blue creature(?:\. it can't be regenerated)?", "blue_creature"),
+        (r"target green creature(?:\. it can't be regenerated)?", "green_creature"),
         (r"target legendary creature", "legendary_creature"),
         (r"target nonlegendary creature", "nonlegendary_creature"),
         (r"target nonsnow creature", "nonsnow_creature"),
@@ -7818,6 +7820,8 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "white_creature"
     if 'FilterCreaturePermanent("blue creature")' in text or "blue creature" in text:
         return "blue_creature"
+    if 'FilterCreaturePermanent("green creature")' in text or "green creature" in text:
+        return "green_creature"
     if (
         'FilterCreaturePermanent("nonlegendary creature")' in text
         or "nonlegendary creature" in text
@@ -13526,6 +13530,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "target_colors": ["W"]}
     if target == "blue_creature":
         return {"card_types": ["creature"], "target_colors": ["U"]}
+    if target == "green_creature":
+        return {"card_types": ["creature"], "target_colors": ["G"]}
     if target == "green_or_white_creature":
         return {"card_types": ["creature"], "target_colors": ["G", "W"]}
     if target == "artifact_creature":

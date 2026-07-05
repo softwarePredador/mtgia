@@ -5161,6 +5161,95 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
         self.assertEqual(effect["_composite_rule_components"][0]["destination"], "graveyard")
 
+    def test_fixed_destroy_draw_spell_maps_colored_creature_cant_regenerate_targets(self) -> None:
+        cases = [
+            (
+                "Annihilate",
+                "Destroy target nonblack creature. It can't be regenerated. Draw a card.",
+                "TargetPermanent(FILTER_PERMANENT_CREATURE_NON_BLACK);",
+                {"card_types": ["creature"], "exclude_colors": ["B"]},
+            ),
+            (
+                "Execute",
+                "Destroy target white creature. It can't be regenerated. Draw a card.",
+                'new FilterCreaturePermanent("white creature");'
+                "filter.add(new ColorPredicate(ObjectColor.WHITE));",
+                {"card_types": ["creature"], "target_colors": ["W"]},
+            ),
+            (
+                "Slay",
+                "Destroy target green creature. It can't be regenerated. Draw a card.",
+                'new FilterCreaturePermanent("green creature");'
+                "filter.add(new ColorPredicate(ObjectColor.GREEN));",
+                {"card_types": ["creature"], "target_colors": ["G"]},
+            ),
+        ]
+        for name, oracle, source_filter, constraints in cases:
+            with self.subTest(card=name):
+                row = queue_row(
+                    split.DRAW_UNIT,
+                    effect_classes=["DestroyTargetEffect", "DrawCardSourceControllerEffect"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line="Instant", oracle_text=oracle),
+                    source_text=(
+                        source_filter
+                        + "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                        + "this.getSpellAbility().addEffect(new DestroyTargetEffect(true));"
+                        + "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+                    ),
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DESTROY_DRAW_SCOPE)
+                self.assertEqual(effect["target"], "creature")
+                self.assertEqual(effect["target_constraints"], constraints)
+                self.assertEqual(effect["draw_count"], 1)
+                self.assertEqual(
+                    effect["_composite_rule_components"][0]["target_constraints"],
+                    constraints,
+                )
+
+    def test_permanent_activated_destroy_maps_green_creature_target(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Eastern Paladin",
+                type_line="Creature - Phyrexian Zombie Knight",
+                oracle_text="{B}{B}, {T}: Destroy target green creature.",
+            ),
+            source_text="""
+                private static final FilterCreaturePermanent filter =
+                    new FilterCreaturePermanent("green creature");
+                static { filter.add(new ColorPredicate(ObjectColor.GREEN)); }
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new ManaCostsImpl<>("{B}{B}")
+                );
+                ability.addTarget(new TargetPermanent(filter));
+                ability.addCost(new TapSourceCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_remove_target"], "green_creature")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "target_colors": ["G"]})
+        self.assertEqual(effect["activation_cost_mana"], "{B}{B}")
+        self.assertTrue(effect["activation_requires_tap"])
+
     def test_fixed_destroy_draw_spell_blocks_dynamic_source_draw(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

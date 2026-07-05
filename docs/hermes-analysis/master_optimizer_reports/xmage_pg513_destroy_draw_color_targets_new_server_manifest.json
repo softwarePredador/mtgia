@@ -1,0 +1,526 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg513_xmage_pg513_destroy_draw_color_tar_20260705_150547",
+  "deploy_id": "PG513",
+  "expected_rules": [
+    {
+      "card_name": "Annihilate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8e5c579f97351f53716b06514fe211e",
+      "min_rule_version": 2,
+      "normalized_name": "annihilate",
+      "oracle_hash": "f578a7712e3dd990d0a0e92f96df9057",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "exclude_colors": [
+                "B"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_destroy_target_and_draw_card_spell_v1",
+        "count": 1,
+        "destination": "graveyard",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eastern Paladin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:afea40681a2aa92731b0434232adf3a3",
+      "min_rule_version": 2,
+      "normalized_name": "eastern paladin",
+      "oracle_hash": "2c989a30d9f4f99a9648dc54163ca4ef",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "destroy_target",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "green_creature",
+            "activation_cost_colors": [
+              "B",
+              "B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}{B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "G"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activation_cost_colors": [
+          "B",
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "G"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Execute",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f93b52c9ed6de8e93a4fa5dc105e255",
+      "min_rule_version": 2,
+      "normalized_name": "execute",
+      "oracle_hash": "47b93b5f7240d9a4fc489bd64b5d0db3",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "W"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_destroy_target_and_draw_card_spell_v1",
+        "count": 1,
+        "destination": "graveyard",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "W"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Slay",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d35c73183c4187e06a9e033352a52ab",
+      "min_rule_version": 2,
+      "normalized_name": "slay",
+      "oracle_hash": "309a7db610e0746acd2928c7633def47",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "G"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_destroy_target_and_draw_card_spell_v1",
+        "count": 1,
+        "destination": "graveyard",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "G"
+          ]
+        }
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_destroy_target_draw_card_spell": 3,
+    "xmage_permanent_simple_activated_destroy_target": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg513_destroy_draw_color_targets_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg513_destroy_draw_color_targets_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg513_destroy_draw_color_targets_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg513_destroy_draw_color_targets_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg513_destroy_draw_color_targets_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg513_destroy_draw_color_targets_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T15:05:47+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Annihilate"
+      },
+      "card_name": "Annihilate",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8e5c579f97351f53716b06514fe211e",
+      "normalized_name": "annihilate",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "exclude_colors": [
+                "B"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_destroy_target_and_draw_card_spell_v1",
+        "count": 1,
+        "destination": "graveyard",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Eastern Paladin"
+      },
+      "card_name": "Eastern Paladin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:afea40681a2aa92731b0434232adf3a3",
+      "normalized_name": "eastern paladin",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "destroy_target",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "green_creature",
+            "activation_cost_colors": [
+              "B",
+              "B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}{B}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "G"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DestroyTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "activated_effect": "destroy_target",
+        "activation_cost_colors": [
+          "B",
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "G"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Execute"
+      },
+      "card_name": "Execute",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f93b52c9ed6de8e93a4fa5dc105e255",
+      "normalized_name": "execute",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "W"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_destroy_target_and_draw_card_spell_v1",
+        "count": 1,
+        "destination": "graveyard",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "W"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Slay"
+      },
+      "card_name": "Slay",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d35c73183c4187e06a9e033352a52ab",
+      "normalized_name": "slay",
+      "required_effect_fields": {
+        "_composite_rule_components": [
+          {
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "compose_on_resolution": true,
+            "destination": "graveyard",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "target_colors": [
+                "G"
+              ]
+            },
+            "xmage_effect_class": "DestroyTargetEffect"
+          },
+          {
+            "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+            "compose_on_resolution": true,
+            "count": 1,
+            "effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect"
+          }
+        ],
+        "battle_model_scope": "xmage_destroy_target_and_draw_card_spell_v1",
+        "count": 1,
+        "destination": "graveyard",
+        "draw_count": 1,
+        "effect": "composite_resolution",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "G"
+          ]
+        }
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Annihilate",
+    "Eastern Paladin",
+    "Execute",
+    "Slay"
+  ],
+  "selected_count": 4,
+  "slug": "xmage_pg513_destroy_draw_color_targets_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Annihilate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8e5c579f97351f53716b06514fe211e",
+      "min_rule_version": 2,
+      "normalized_name": "annihilate",
+      "oracle_hash": "f578a7712e3dd990d0a0e92f96df9057",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eastern Paladin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:afea40681a2aa92731b0434232adf3a3",
+      "min_rule_version": 2,
+      "normalized_name": "eastern paladin",
+      "oracle_hash": "2c989a30d9f4f99a9648dc54163ca4ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Execute",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f93b52c9ed6de8e93a4fa5dc105e255",
+      "min_rule_version": 2,
+      "normalized_name": "execute",
+      "oracle_hash": "47b93b5f7240d9a4fc489bd64b5d0db3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Slay",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d35c73183c4187e06a9e033352a52ab",
+      "min_rule_version": 2,
+      "normalized_name": "slay",
+      "oracle_hash": "309a7db610e0746acd2928c7633def47",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
