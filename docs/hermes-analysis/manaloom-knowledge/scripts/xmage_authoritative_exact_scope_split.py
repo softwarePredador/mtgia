@@ -237,6 +237,7 @@ ETB_MILL_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_mill_then_return_graveya
 ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE = "xmage_creature_etb_put_graveyard_card_on_library_v1"
 ETB_LIBRARY_PICK_CREATURE_SCOPE = "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1"
 DAMAGE_RECURSION_CREATURE_SCOPE = "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1"
+COMBAT_DAMAGE_DRAW_CREATURE_SCOPE = "xmage_creature_combat_damage_draw_cards_v1"
 ATTACK_RECURSION_PERMANENT_SCOPE = "xmage_permanent_attack_return_graveyard_card_to_hand_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 DIES_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_dies_gain_life_v1"
@@ -4965,6 +4966,19 @@ def is_creature_dies_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_combat_damage_draw_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"DealsCombatDamageToAPlayerTriggeredAbility"}
+    return (
+        effect_classes(row) == {"DrawCardSourceControllerEffect"}
+        and "DealsCombatDamageToAPlayerTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"draw", "triggered_ability"})
+    )
+
+
 def is_spell_cast_draw_engine_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
         return False
@@ -5229,6 +5243,23 @@ def keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
         for ability in ability_classes(row)
         if ability in STATIC_SELF_KEYWORD_ABILITY_CLASSES
     }
+
+
+def keywords_from_source_added_ability_classes(source_text: str, row: dict[str, Any]) -> set[str]:
+    text = str(source_text or "")
+    keywords: set[str] = set()
+    for ability in ability_classes(row):
+        keyword = STATIC_SELF_KEYWORD_ABILITY_CLASSES.get(ability)
+        if not keyword:
+            continue
+        pattern = (
+            r"addAbility\s*\([^;]*\b"
+            + re.escape(ability)
+            + r"\s*(?:\.getInstance\s*\(\)|\()"
+        )
+        if re.search(pattern, text, re.S):
+            keywords.add(keyword)
+    return keywords
 
 
 def normalize_keyword_phrase(value: str) -> str:
@@ -9846,6 +9877,37 @@ def dies_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, bool] | None:
     return count, bool(match.group(1))
 
 
+def combat_damage_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, bool] | None:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    match = re.fullmatch(
+        r"whenever (?:this creature|[^,.]+) deals combat damage to a player, "
+        r"(?:you may )?(?:you )?draw (a|one|two|three|four|five|\d+) cards?\.?",
+        text,
+    )
+    if not match:
+        return None
+    count = number_word_to_int(match.group(1))
+    if count <= 0:
+        return None
+    return count, "you may" in text
+
+
+def combat_damage_draw_from_source(source_text: str) -> int | str:
+    text = str(source_text or "")
+    if len(re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(", text)) != 1:
+        return "combat_damage_draw_source_effect_count_not_supported"
+    if "DealsCombatDamageToAPlayerTriggeredAbility" not in text:
+        return "combat_damage_draw_source_trigger_mismatch"
+    count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if count is None or count <= 0:
+        return "combat_damage_draw_count_source_not_fixed"
+    return count
+
+
 def etb_damage_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | None:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
     patterns: list[tuple[str, str]] = [
@@ -11443,6 +11505,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature dies triggered fixed creature-token ability"
     elif scope == DIES_RECURSION_CREATURE_SCOPE:
         scope_kind = "creature dies triggered graveyard-to-hand ability"
+    elif scope == COMBAT_DAMAGE_DRAW_CREATURE_SCOPE:
+        scope_kind = "creature combat-damage-to-player triggered fixed draw ability"
     elif scope == CREATURE_TAP_DAMAGE_SCOPE:
         scope_kind = "creature with tap-only activated damage ability"
     elif scope == PERMANENT_ACTIVATED_DAMAGE_SCOPE:
@@ -11551,6 +11615,7 @@ def split_row(
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
     etb_draw_lose_life_creature_unit = is_creature_etb_draw_lose_life_unit(row)
     dies_draw_creature_unit = is_creature_dies_draw_unit(row)
+    combat_damage_draw_creature_unit = is_creature_combat_damage_draw_unit(row)
     dies_damage_creature_unit = is_creature_dies_damage_unit(row)
     spell_cast_draw_engine_unit = is_spell_cast_draw_engine_unit(row)
     permanent_activated_draw_discard_unit = is_permanent_activated_draw_discard_unit(row)
@@ -11634,6 +11699,7 @@ def split_row(
         and not etb_draw_creature_unit
         and not etb_draw_lose_life_creature_unit
         and not dies_draw_creature_unit
+        and not combat_damage_draw_creature_unit
         and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
         and not permanent_activated_draw_discard_unit
@@ -11696,6 +11762,7 @@ def split_row(
         and not etb_draw_creature_unit
         and not etb_draw_lose_life_creature_unit
         and not dies_draw_creature_unit
+        and not combat_damage_draw_creature_unit
         and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
         and not permanent_activated_draw_discard_unit
@@ -14137,6 +14204,48 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_dies_draw_cards",
+        ), "selected_exact_scope"
+
+    if combat_damage_draw_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "combat_damage_draw_not_creature"
+        parsed = combat_damage_draw_from_oracle(metadata)
+        if parsed is None:
+            text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+            if re.search(r"deals combat damage to a player, .*draw that many cards", text):
+                return None, "combat_damage_draw_amount_damage_dealt_not_supported"
+            return None, "combat_damage_draw_count_not_fixed"
+        source_draw = combat_damage_draw_from_source(source_text)
+        if isinstance(source_draw, str):
+            return None, source_draw
+        count, optional = parsed
+        if source_draw != count:
+            return None, "combat_damage_draw_source_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords_from_source_added_ability_classes(source_text, row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": COMBAT_DAMAGE_DRAW_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "combat_damage_to_player",
+            "trigger_effect": "draw_cards",
+            "combat_damage_player_draw": True,
+            "combat_damage_draw_count": count,
+            "draw_count": count,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "xmage_ability_class": "DealsCombatDamageToAPlayerTriggeredAbility",
+        }
+        if optional:
+            effect_json["combat_damage_draw_optional"] = True
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_combat_damage_draw_cards",
         ), "selected_exact_scope"
 
     if dies_recursion_creature_unit:
@@ -17435,6 +17544,7 @@ def build_exact_split_report(
             and not is_creature_etb_draw_unit(row)
             and not is_creature_etb_draw_lose_life_unit(row)
             and not is_creature_dies_draw_unit(row)
+            and not is_creature_combat_damage_draw_unit(row)
             and not is_creature_dies_damage_unit(row)
             and not is_spell_cast_draw_engine_unit(row)
             and not is_permanent_activated_draw_discard_unit(row)
@@ -17513,6 +17623,7 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect, EntersBattlefieldTriggeredAbility, exact fixed draw/life-loss Oracle/source agreement, and only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
+                "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DealsCombatDamageToAPlayerTriggeredAbility, exact fixed combat-damage-to-player draw Oracle/source agreement, and only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and SpellCastControllerTriggeredAbility, exact draw count, and supported spell filters",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",

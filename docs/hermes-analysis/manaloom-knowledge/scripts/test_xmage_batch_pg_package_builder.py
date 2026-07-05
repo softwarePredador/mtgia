@@ -346,6 +346,40 @@ def test_manifest_expected_rule_preserves_library_bottom_pick_fields() -> None:
     assert required["xmage_effect_class"] == "LookLibraryAndPickControllerEffect"
 
 
+def test_manifest_expected_rule_preserves_combat_damage_draw_fields() -> None:
+    proposal = {
+        "normalized_name": "scroll thief",
+        "card_name": "Scroll Thief",
+        "oracle_hash": "hash-scroll-thief",
+        "logical_rule_key": "battle_rule_v1:hash-scroll-thief",
+        "effect_json": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "combat_damage_to_player",
+            "trigger_effect": "draw_cards",
+            "combat_damage_player_draw": True,
+            "combat_damage_draw_count": 1,
+            "draw_count": 1,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "xmage_ability_class": "DealsCombatDamageToAPlayerTriggeredAbility",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    required = expected["required_effect_fields"]
+    assert required["effect"] == "creature"
+    assert required["battle_model_scope"] == "xmage_creature_combat_damage_draw_cards_v1"
+    assert required["trigger"] == "combat_damage_to_player"
+    assert required["trigger_effect"] == "draw_cards"
+    assert required["combat_damage_player_draw"] is True
+    assert required["combat_damage_draw_count"] == 1
+    assert required["draw_count"] == 1
+    assert required["xmage_effect_class"] == "DrawCardSourceControllerEffect"
+    assert required["xmage_ability_class"] == "DealsCombatDamageToAPlayerTriggeredAbility"
+
+
 def test_manifest_expected_rule_preserves_activation_discard_cost_fields() -> None:
     proposal = {
         "normalized_name": "goblin picker",

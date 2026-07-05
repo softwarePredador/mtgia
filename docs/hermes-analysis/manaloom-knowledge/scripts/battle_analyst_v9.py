@@ -39943,6 +39943,71 @@ def resolve_combat_damage_graveyard_recursion_triggers(
     return trigger_events
 
 
+def resolve_combat_damage_draw_triggers(
+    player,
+    damaging_creatures,
+    damaged_player,
+    turn,
+    *,
+    phase="combat_damage",
+    rng=None,
+    all_players=None,
+    stack=None,
+):
+    trigger_events = []
+    rng = rng or random.Random(turn or 0)
+    for permanent in list(damaging_creatures or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not (
+            permanent.get("combat_damage_player_draw")
+            or permanent.get("combat_damage_draw_count")
+        ):
+            continue
+        if permanent not in getattr(player, "battlefield", []):
+            continue
+        count = max(1, int(permanent.get("combat_damage_draw_count") or permanent.get("draw_count") or 1))
+        hand_before = len(getattr(player, "hand", []) or [])
+        library_before = len(getattr(player, "library", []) or [])
+        drawn = player.draw(count, rng)
+        if all_players is not None:
+            process_player_draw_triggers(
+                player,
+                len(drawn),
+                turn,
+                phase,
+                all_players,
+                stack=stack,
+                turn_player=player,
+            )
+        payload = {
+            "player": player.name,
+            "card": permanent.get("name", "?"),
+            "damaged_player": getattr(damaged_player, "name", None),
+            "trigger": "combat_damage_to_player",
+            "effect": "draw_cards",
+            "draw_count": count,
+            "cards_requested": count,
+            "cards_drawn": len(drawn),
+            "drawn_cards": [
+                drawn_card.get("name", "?")
+                for drawn_card in drawn
+                if isinstance(drawn_card, dict)
+            ],
+            "hand_before": hand_before,
+            "hand_after": len(getattr(player, "hand", []) or []),
+            "library_before": library_before,
+            "library_after": len(getattr(player, "library", []) or []),
+            "optional": bool(permanent.get("combat_damage_draw_optional")),
+            "turn": turn,
+            "phase": phase,
+            **replay_rule_fields(permanent),
+        }
+        emit_replay_event("combat_damage_draw_resolved", **payload)
+        trigger_events.append(payload)
+    return trigger_events
+
+
 def resolve_etb_removal(player, opponents, card, effect_data, turn, rng):
     target_type = (
         effect_data.get("etb_remove_target")
@@ -56607,6 +56672,16 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                 target,
                 turn,
                 phase="first_strike_damage" if first_strike_phase else "combat_damage",
+            )
+            resolve_combat_damage_draw_triggers(
+                attacker,
+                damaging_creatures_to_player,
+                target,
+                turn,
+                phase="first_strike_damage" if first_strike_phase else "combat_damage",
+                rng=rng,
+                all_players=all_players or [attacker, *list(opponents or [])],
+                stack=stack,
             )
         destroy_lethal_creatures()
 

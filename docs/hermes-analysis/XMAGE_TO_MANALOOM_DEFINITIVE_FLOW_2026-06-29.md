@@ -11335,6 +11335,59 @@ new server:
   the highest queue-reducing supported work units rather than card-by-card
   manual handling.
 
+## 2026-07-05 PG480 Combat-Damage Draw Closure
+
+- Closed the exact XMage `DrawCardSourceControllerEffect` +
+  `DealsCombatDamageToAPlayerTriggeredAbility` creature family as ManaLoom
+  scope `xmage_creature_combat_damage_draw_cards_v1`.
+- The selected package accepts only fixed-count draw triggers of the form
+  “whenever this creature deals combat damage to a player, draw N cards,” with
+  source/oracle count agreement and only source-added static self keywords.
+  The mapper deliberately blocks damage-scaled draw and sacrifice-then-draw
+  neighbors such as Fear of Failed Tests and Impaler Shrike.
+- The batch covers `5` cards: Neurok Commando, Nine-Tail White Fox, Scroll
+  Thief, Soulknife Spy, and Stealer of Secrets.
+- The runtime now resolves combat-damage-to-player draw triggers in the combat
+  damage step, calls player-draw follow-up triggers, and emits
+  `combat_damage_draw_resolved` evidence with drawn-card and rule-key details.
+- The mapper also guards against false positive keyword classes from XMage
+  imports/filters by preserving static keywords for this family only when the
+  source actually adds that ability. This prevents Stealer of Secrets from
+  inheriting a spurious `defender` flag from a filter reference.
+- Focused split/runtime/sync tests passed `762` checks. The package-builder
+  test lane passed after extending the E2E manifest whitelist for
+  `combat_damage_player_draw`, `combat_damage_draw_count`, and optional draw
+  metadata, and the touched scripts compiled.
+- The PostgreSQL package promoted `5` cards. Precheck found `5` target rows,
+  `0` existing expected rows, and `0` nonmatching shadow rows to deprecate.
+  Apply/postcheck verified `5/5` promoted rows as `verified`/`auto` with Oracle
+  hashes; backup rows were `0`.
+- E2E package validation passed across PostgreSQL, SQLite,
+  `known_cards_canonical_snapshot.json`, and runtime `get_card_effect` for all
+  `5` selected cards. Direct verification confirmed all five expose
+  `battle_model_scope=xmage_creature_combat_damage_draw_cards_v1` and
+  `combat_damage_draw_count=1`, with no spurious `defender` flag on Stealer of
+  Secrets.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. Metadata sync
+  matched `5729` PostgreSQL cards and `5640` SQLite cache aliases. The battle
+  sync loaded `8172` PostgreSQL rows, wrote `7936` SQLite rows, and exported
+  `5711` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`pass`), legacy contamination
+  (`pass`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26319`, `xmage_authoritative_source_count=26005`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26005`. This is an exact
+  reduction of `5` from the post-PG479 queue.
+- The post-PG480 exact split recheck reports `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`. The next work should continue from the
+  largest remaining family buckets, starting with recursion and draw-engine
+  subpatterns that can be split into runtime-backed exact scopes.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

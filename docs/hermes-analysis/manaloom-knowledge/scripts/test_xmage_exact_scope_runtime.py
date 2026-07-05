@@ -9918,6 +9918,49 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_combat_damage_draw_trigger_draws_fixed_count(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Draw A"}, {"name": "Draw B"}, {"name": "Draw C"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {
+            "name": "Scroll Thief",
+            "type_line": "Creature - Merfolk Rogue",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_combat_damage_draw_cards_v1",
+            "combat_damage_player_draw": True,
+            "combat_damage_draw_count": 2,
+            "_rule_logical_key": "battle_rule_v1:fixture_scroll_thief",
+        }
+        active.battlefield.append(permanent)
+
+        resolved = self.battle.resolve_combat_damage_draw_triggers(
+            active,
+            [permanent],
+            opponent,
+            turn=12,
+            phase="combat_damage",
+            rng=random.Random(12),
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual([card["name"] for card in active.hand], ["Draw A", "Draw B"])
+        self.assertEqual([card["name"] for card in active.library], ["Draw C"])
+        self.assertTrue(
+            any(
+                event == "combat_damage_draw_resolved"
+                and data.get("card") == "Scroll Thief"
+                and data.get("trigger") == "combat_damage_to_player"
+                and data.get("cards_drawn") == 2
+                and data.get("drawn_cards") == ["Draw A", "Draw B"]
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_scroll_thief"
+                for event, data in self.events
+            )
+        )
+
     def test_attack_graveyard_recursion_pays_trigger_cost_before_returning_card(self) -> None:
         active = self.battle.Player("Active", None, [])
         non_target = {"name": "Target Bolt", "type_line": "Instant", "cmc": 1}

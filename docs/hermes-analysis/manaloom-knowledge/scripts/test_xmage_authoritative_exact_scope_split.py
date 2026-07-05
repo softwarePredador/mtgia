@@ -10923,6 +10923,152 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "dies_draw_count_not_fixed")
 
+    def test_creature_combat_damage_draw_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["DealsCombatDamageToAPlayerTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Scroll Thief",
+                type_line="Creature - Merfolk Rogue",
+                oracle_text="Whenever Scroll Thief deals combat damage to a player, draw a card.",
+            ),
+            source_text=(
+                "this.addAbility(new DealsCombatDamageToAPlayerTriggeredAbility("
+                "new DrawCardSourceControllerEffect(), false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.COMBAT_DAMAGE_DRAW_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "combat_damage_to_player")
+        self.assertTrue(effect["combat_damage_player_draw"])
+        self.assertEqual(effect["combat_damage_draw_count"], 1)
+        self.assertEqual(effect["draw_count"], 1)
+
+    def test_creature_combat_damage_draw_preserves_static_keyword_and_optional_draw(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["DealsCombatDamageToAPlayerTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Sky Spy",
+                type_line="Creature - Bird Rogue",
+                oracle_text=(
+                    "Flying\n"
+                    "Whenever Fixture Sky Spy deals combat damage to a player, you may draw two cards."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new DealsCombatDamageToAPlayerTriggeredAbility("
+                "new DrawCardSourceControllerEffect(2), true));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["combat_damage_draw_optional"])
+        self.assertEqual(effect["combat_damage_draw_count"], 2)
+
+    def test_creature_combat_damage_draw_ignores_keyword_class_used_only_in_filter(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["DealsCombatDamageToAPlayerTriggeredAbility", "DefenderAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Stealer of Secrets",
+                type_line="Creature - Human Rogue",
+                oracle_text="Whenever Stealer of Secrets deals combat damage to a player, draw a card.",
+            ),
+            source_text=(
+                "import mage.abilities.keyword.DefenderAbility;"
+                "filter.add(new AbilityPredicate(DefenderAbility.class));"
+                "this.addAbility(new DealsCombatDamageToAPlayerTriggeredAbility("
+                "new DrawCardSourceControllerEffect(1), false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertNotIn("keywords", effect)
+        self.assertNotIn("defender", effect)
+        self.assertEqual(effect["combat_damage_draw_count"], 1)
+
+    def test_creature_combat_damage_draw_blocks_damage_dealt_amount(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["DealsCombatDamageToAPlayerTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cold-Eyed Selkie",
+                type_line="Creature - Merfolk Rogue",
+                oracle_text=(
+                    "Whenever Cold-Eyed Selkie deals combat damage to a player, "
+                    "you may draw that many cards."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new DealsCombatDamageToAPlayerTriggeredAbility("
+                "new DrawCardSourceControllerEffect(EachDamageValue.instance), true));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "combat_damage_draw_amount_damage_dealt_not_supported")
+
+    def test_creature_combat_damage_draw_blocks_unmodeled_auxiliary_ability(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["DealsCombatDamageToAPlayerTriggeredAbility", "NinjutsuAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ninja of the Deep Hours",
+                type_line="Creature - Human Ninja",
+                oracle_text=(
+                    "Ninjutsu {1}{U}\n"
+                    "Whenever Ninja of the Deep Hours deals combat damage to a player, you may draw a card."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new NinjutsuAbility(new ManaCostsImpl<>(\"{1}{U}\")));"
+                "this.addAbility(new DealsCombatDamageToAPlayerTriggeredAbility("
+                "new DrawCardSourceControllerEffect(), true));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "unsupported_adapter_work_unit")
+
     def test_creature_etb_destroy_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,
