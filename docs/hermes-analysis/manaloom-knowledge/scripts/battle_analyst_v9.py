@@ -11573,7 +11573,10 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         return False
     allowed_types = _constraint_card_types(spell)
     if allowed_types and "permanent" not in allowed_types:
-        if not any(target_matches_type(target, allowed_type) for allowed_type in allowed_types):
+        if constraints.get("all_card_types_required"):
+            if not all(target_matches_type(target, allowed_type) for allowed_type in allowed_types):
+                return False
+        elif not any(target_matches_type(target, allowed_type) for allowed_type in allowed_types):
             return False
     excluded_types = {
         str(value or "").strip().lower()

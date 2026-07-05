@@ -1,0 +1,10 @@
+        card_name        |     normalized_name     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-------------------------+-------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Chandler                | chandler                | battle_rule_v1:5e60c03b5afe1e38c8e5150c9e4aff8f |                  1 |                           1 |                         1 |           0
+ Dwarven Demolition Team | dwarven demolition team | battle_rule_v1:52cebf3e06ab1fb9032fe1a45b5cbc51 |                  1 |                           1 |                         1 |           0
+ Dwarven Miner           | dwarven miner           | battle_rule_v1:964df56fac2ca857226a7d15170fd937 |                  1 |                           1 |                         1 |           0
+ Fulminator Mage         | fulminator mage         | battle_rule_v1:acc9adc7364beb62efbfcafe4f78e06b |                  1 |                           1 |                         1 |           0
+ Goblin Replica          | goblin replica          | battle_rule_v1:b9db4933a141401157131aae70cd55b8 |                  1 |                           1 |                         1 |           0
+ Intrepid Hero           | intrepid hero           | battle_rule_v1:5aedf6dfb2d5cbdcd2061902f0b17bc7 |                  1 |                           1 |                         1 |           0
+ Trench Wurm             | trench wurm             | battle_rule_v1:964df56fac2ca857226a7d15170fd937 |                  1 |                           1 |                         1 |           0
+(7 rows)

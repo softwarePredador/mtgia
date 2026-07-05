@@ -14898,3 +14898,71 @@ Register decision:
 - PG504 is applied and should not be rebuilt.
 - The remaining activated damage/destroy backlog must continue as exact
   subpatterns, not broad generic review-scope promotion.
+
+## 2026-07-05 - PG505 activated destroy target parser
+
+- Deploy id: `xmage_pg505_activated_destroy_target_parser_new_server`.
+- Runtime family:
+  - `xmage_permanent_simple_activated_destroy_target_v1`.
+- Promoted cards: `7`.
+- Promoted card names: `Chandler`, `Dwarven Demolition Team`,
+  `Dwarven Miner`, `Fulminator Mage`, `Goblin Replica`, `Intrepid Hero`, and
+  `Trench Wurm`.
+- Only exact simple activated `DestroyTargetEffect` permanent abilities with
+  supported target predicates are allowed in this batch. Unsupported activation
+  costs, modal abilities, non-matching Oracle/XMage targets, random targets,
+  multi-target destroy abilities, and broad review scopes remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg505_activated_destroy_target_parser_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg505_activated_destroy_target_parser_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg505_activated_destroy_target_parser_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg505_activated_destroy_target_parser_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg505_activated_destroy_target_parser_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg505_activated_destroy_target_parser_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg505_activated_destroy_target_parser_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=7`, `COMMIT`.
+- Postcheck:
+  all 7 promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- Field postcheck:
+  all 7 promoted rows have expected activated destroy target, target
+  constraints, cost, tap, and sacrifice fields.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg505_activated_destroy_target_parser_new_server_pg_to_sqlite_sync.json`;
+  `pg_rows_loaded=7`, `sqlite_inserted_or_updated=7`,
+  `canonical_snapshot_rows_exported=5979`.
+- Runtime lookup:
+  all 7 cards resolve from the curated runtime cache with scope
+  `xmage_permanent_simple_activated_destroy_target_v1`.
+- Battle validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg505_activated_destroy_target_parser_focused_battle_tests.out`
+  has `628` PASS lines and
+  `docs/hermes-analysis/master_optimizer_reports/pg505_activated_destroy_target_parser_full_battle_suite.out`
+  has `632` PASS lines, with no `Traceback`, `FAILED`, `ERROR`, or
+  `SkipTest`.
+- Audits:
+  PG/Hermes/SQLite `51/51` pass, XMage strategy `26/26` pass, deckbuilding
+  contract `pass`, operational surface `pass`, and legacy contamination
+  `pass`.
+
+Register decision:
+
+- PG505 is applied and should not be rebuilt.
+- The activated destroy target parser now supports the exact safe predicates in
+  this package, including artifact creature, nonbasic land, artifact, Wall, and
+  power-four-or-greater targets.
+- The remaining activated destroy backlog must continue through exact
+  subpatterns, not broad generic review-scope promotion.

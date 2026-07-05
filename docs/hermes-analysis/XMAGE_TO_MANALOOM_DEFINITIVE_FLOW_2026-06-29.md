@@ -12840,6 +12840,49 @@ parser shapes above. It does not authorize broad activated damage or destroy
 review rows, modal abilities, unsupported target predicates, or non-matching
 Oracle/XMage target pairs.
 
+## 2026-07-05 Checkpoint: PG505 Activated Destroy Target Parser
+
+PG505 closed the next exact activated permanent destroy-target parser expansion
+for supported simple XMage `DestroyTargetEffect` abilities. The package
+promoted `Chandler`, `Dwarven Demolition Team`, `Dwarven Miner`,
+`Fulminator Mage`, `Goblin Replica`, `Intrepid Hero`, and `Trench Wurm`.
+
+Runtime and mapper changes:
+
+- `xmage_authoritative_exact_scope_split.py` now recognizes activated destroy
+  targets `artifact_creature`, `artifact`, `nonbasic_land`, `wall_creature`,
+  and `creature_power_4_or_greater` when Oracle text and local XMage source
+  agree.
+- The source matcher accepts `FilterPermanent(SubType.WALL)` and whitespace
+  variants around `PowerPredicate(ComparisonType.MORE_THAN, 3)`.
+- `battle_analyst_v9.py` supports `all_card_types_required` so an artifact
+  creature target requires both `artifact` and `creature`, not either type.
+
+PostgreSQL and cache evidence:
+
+- Precheck: 7 target card rows, 0 existing active same-scope rules.
+- Apply: `deprecated_shadow_rows=0`, `upserted_rows=7`, `COMMIT`.
+- Postcheck: all 7 rows have promoted rule, verified-auto, and Oracle hash
+  matches.
+- PG -> Hermes/SQLite sync:
+  `pg_rows_loaded=7`, `sqlite_inserted_or_updated=7`, and
+  `canonical_snapshot_rows_exported=5979`.
+- Runtime lookup:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg505_activated_destroy_target_parser_new_server_runtime_get_card_effect.out`
+  resolves all 7 cards to
+  `xmage_permanent_simple_activated_destroy_target_v1`.
+- Battle validation:
+  focused battle output has `628` PASS lines and full battle output has `632`
+  PASS lines, with no `Traceback`, `FAILED`, `ERROR`, or `SkipTest`.
+- Contract/alignment audits passed: PG/Hermes/SQLite `51/51`, XMage strategy
+  `26/26`, deckbuilding contract `pass`, operational surface `pass`, and
+  legacy contamination `pass`.
+
+Residual boundary: PG505 only closes the exact supported activated
+destroy-target parser shapes above. It does not authorize broad activated
+destroy review rows, modal abilities, unsupported target predicates, or
+non-matching Oracle/XMage target pairs.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

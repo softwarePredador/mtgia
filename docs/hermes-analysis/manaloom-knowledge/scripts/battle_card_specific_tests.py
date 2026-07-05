@@ -7841,6 +7841,49 @@ def register_tests(battle, player):
         assert not battle.is_legal_target(spirit_or_enchantment, ordinary, controller, target_type="permanent")
         assert not battle.is_legal_target(spirit_or_enchantment, artifact, controller, target_type="permanent")
 
+        artifact_creature_filter = {
+            "name": "Fixture Activated Destroy",
+            "effect": "remove_creature",
+            "target": "creature",
+            "target_constraints": {
+                "card_types": ["artifact", "creature"],
+                "all_card_types_required": True,
+            },
+        }
+        artifact_creature = {
+            "name": "Artifact Creature",
+            "type_line": "Artifact Creature - Golem",
+            "effect": "creature",
+        }
+        nonartifact_creature = {
+            "name": "Plain Creature",
+            "type_line": "Creature - Human",
+            "effect": "creature",
+        }
+        artifact_only = {
+            "name": "Plain Artifact",
+            "type_line": "Artifact",
+            "effect": "artifact",
+        }
+        assert battle.is_legal_target(
+            artifact_creature_filter,
+            artifact_creature,
+            controller,
+            target_type="creature",
+        )
+        assert not battle.is_legal_target(
+            artifact_creature_filter,
+            nonartifact_creature,
+            controller,
+            target_type="creature",
+        )
+        assert not battle.is_legal_target(
+            artifact_creature_filter,
+            artifact_only,
+            controller,
+            target_type="creature",
+        )
+
         combat_filter = {
             "name": "Fixture Removal",
             "effect": "remove_creature",

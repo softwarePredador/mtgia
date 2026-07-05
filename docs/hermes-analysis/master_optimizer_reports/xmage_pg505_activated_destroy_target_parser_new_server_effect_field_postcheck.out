@@ -1,0 +1,10 @@
+     normalized_name     |   activated_remove_target   |                            target_constraints                             | activation_cost_mana | requires_tap | requires_sacrifice
+-------------------------+-----------------------------+---------------------------------------------------------------------------+----------------------+--------------+--------------------
+ chandler                | artifact_creature           | {"card_types": ["artifact", "creature"], "all_card_types_required": true} | {R}{R}{R}            | true         | false
+ dwarven demolition team | wall_creature               | {"card_types": ["creature"], "required_subtypes": ["wall"]}               | {0}                  | true         | false
+ dwarven miner           | nonbasic_land               | {"card_types": ["land"], "exclude_supertypes": ["basic"]}                 | {2}{R}               | true         | false
+ fulminator mage         | nonbasic_land               | {"card_types": ["land"], "exclude_supertypes": ["basic"]}                 | {0}                  | false        | true
+ goblin replica          | artifact                    | {"card_types": ["artifact"]}                                              | {3}{R}               | false        | true
+ intrepid hero           | creature_power_4_or_greater | {"power_min": 4, "card_types": ["creature"]}                              | {0}                  | true         | false
+ trench wurm             | nonbasic_land               | {"card_types": ["land"], "exclude_supertypes": ["basic"]}                 | {2}{R}               | true         | false
+(7 rows)

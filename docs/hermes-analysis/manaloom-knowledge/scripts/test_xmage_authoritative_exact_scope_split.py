@@ -6092,6 +6092,168 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_sacrifice"])
         self.assertTrue(effect["activated_self_sacrifice_destroy"])
 
+    def test_permanent_activated_destroy_maps_artifact_creature_target(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Chandler",
+                type_line="Legendary Creature - Human Rogue",
+                oracle_text="{R}{R}{R}, {T}: Destroy target artifact creature.",
+            ),
+            source_text="""
+                private static final FilterCreaturePermanent filter =
+                    new FilterCreaturePermanent("artifact creature");
+                static { filter.add(CardType.ARTIFACT.getPredicate()); }
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new ManaCostsImpl<>("{R}{R}{R}")
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activated_remove_target"], "artifact_creature")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["artifact", "creature"], "all_card_types_required": True},
+        )
+        self.assertEqual(effect["activation_cost_mana"], "{R}{R}{R}")
+        self.assertTrue(effect["activation_requires_tap"])
+
+    def test_permanent_activated_destroy_maps_filter_permanent_artifact_target(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Goblin Replica",
+                type_line="Artifact Creature - Goblin",
+                oracle_text="{3}{R}, Sacrifice this creature: Destroy target artifact.",
+            ),
+            source_text="""
+                private static final FilterPermanent filter = new FilterPermanent("artifact");
+                static { filter.add(CardType.ARTIFACT.getPredicate()); }
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new ManaCostsImpl<>("{3}{R}")
+                );
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activated_remove_target"], "artifact")
+        self.assertEqual(effect["target"], "artifact")
+        self.assertEqual(effect["activation_cost_mana"], "{3}{R}")
+        self.assertTrue(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_destroy_maps_nonbasic_land_target(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dwarven Miner",
+                type_line="Creature - Dwarf",
+                oracle_text="{2}{R}, {T}: Destroy target nonbasic land.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new ManaCostsImpl<>("{2}{R}")
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetNonBasicLandPermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activated_remove_target"], "nonbasic_land")
+        self.assertEqual(effect["target"], "land")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["land"], "exclude_supertypes": ["basic"]})
+        self.assertEqual(effect["activation_cost_mana"], "{2}{R}")
+        self.assertTrue(effect["activation_requires_tap"])
+
+    def test_permanent_activated_destroy_maps_wall_and_power_filters(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        wall_proposal, wall_reason = split.split_row(
+            row,
+            metadata(
+                name="Dwarven Demolition Team",
+                type_line="Creature - Dwarf",
+                oracle_text="{T}: Destroy target Wall.",
+            ),
+            source_text="""
+                private static final FilterPermanent filter = new FilterPermanent(SubType.WALL);
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new TapSourceCost()
+                );
+                ability.addTarget(new TargetPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+        self.assertEqual(wall_reason, "selected_exact_scope")
+        self.assertEqual(wall_proposal["effect_json"]["activated_remove_target"], "wall_creature")
+        self.assertEqual(
+            wall_proposal["effect_json"]["target_constraints"],
+            {"card_types": ["creature"], "required_subtypes": ["wall"]},
+        )
+
+        power_proposal, power_reason = split.split_row(
+            row,
+            metadata(
+                name="Intrepid Hero",
+                type_line="Creature - Human Soldier",
+                oracle_text="{T}: Destroy target creature with power 4 or greater.",
+            ),
+            source_text="""
+                filter.add(new PowerPredicate(ComparisonType.MORE_THAN,3));
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new TapSourceCost()
+                );
+                ability.addTarget(new TargetPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+        self.assertEqual(power_reason, "selected_exact_scope")
+        self.assertEqual(power_proposal["effect_json"]["activated_remove_target"], "creature_power_4_or_greater")
+        self.assertEqual(power_proposal["effect_json"]["target_constraints"], {"card_types": ["creature"], "power_min": 4})
+
     def test_permanent_activated_destroy_blocks_sacrifice_target_cost(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,
