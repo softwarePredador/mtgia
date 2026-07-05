@@ -1715,3 +1715,88 @@ Routing conclusion:
   no battle, no deck mutation, and predeclared metric floors.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Miracle Access First Shell Contract - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_shell_contract_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_shell_contract_20260705_current_relearn.json`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_access_first_shell_contract_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_access_first_shell_contract_current.json`
+
+This contract converts the router result into a pre-deck gate for the next
+Lorehold shell. It does not generate a deck, mutate deck `607`, write
+PostgreSQL or SQLite, or allow a battle gate.
+
+Current result:
+
+- decision status:
+  `miracle_access_first_contract_written_no_battle_blocked_before_structure_matrix`;
+- selected hypothesis:
+  `preserve_topdeck_miracle_floor_micro_package`;
+- selected contract:
+  `miracle_access_first_shell_contract`;
+- structure matrix contract allowed now: `true`;
+- structure matrix allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- named seed-safe cuts: `0`;
+- cut shortage: `2`;
+- preflight candidates ready now: `0`;
+- from-scratch promotable shell signals: `0`;
+- aggregate blockers: `28`;
+- recommended next action:
+  `design_micro_shell_structure_matrix_contract_no_battle`.
+
+Protected anchors for the next miracle-access shell:
+
+- `Approach of the Second Sun`;
+- `Bender's Waterskin`;
+- `Creative Technique`;
+- `Land Tax`;
+- `Library of Leng`;
+- `Lorehold, the Historian`;
+- `Mizzix's Mastery`;
+- `Molecule Man`;
+- `Scroll Rack`;
+- `Sensei's Divining Top`;
+- `Storm Herd`;
+- `The Mind Stone`;
+- `The Scarlet Witch`;
+- `Victory Chimes`.
+
+Predeclared floor requirements:
+
+- `miracle_cast` must meet or exceed the current `607` same-seed floor;
+- `topdeck_manipulation_activated` must meet or exceed the current `607`
+  same-seed floor;
+- `lorehold_spell_cast` must meet or exceed the current `607` same-seed floor;
+- `lorehold_upkeep_rummage` must meet or exceed the current `607` same-seed
+  floor;
+- `static_cost_reduction_total` must not regress in closing-window trace;
+- `approach_conversion` must not disappear from candidate closing windows.
+
+External research absorbed into the contract:
+
+- Wizards Commander format remains the legality, singleton, color identity,
+  and bracket framing source.
+- EDHREC Lorehold evidence is useful as an evidence lane, but it does not
+  override protected `607` trace floors or cut safety.
+- Lorehold-specific public articles reinforce the same local lesson: the deck
+  must first preserve opponent-upkeep first-draw miracle windows, topdeck
+  manipulation, instant/sorcery density, protection, and mana available on
+  opponents' turns.
+- Commander Spellbook remains combo/package discovery evidence, not full-deck
+  balance or runtime proof.
+
+Operational lesson:
+
+- Pressure routes, forced-access diagnostics, broad from-scratch shells, and
+  global staples such as `Mana Vault` or `The One Ring` remain blocked as
+  shortcuts until the miracle/topdeck floor survives a structure matrix and
+  later equal battle gate.
+- A clean synthetic case would only allow the structure matrix; it would still
+  not allow battle, promotion, or mutation.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.
