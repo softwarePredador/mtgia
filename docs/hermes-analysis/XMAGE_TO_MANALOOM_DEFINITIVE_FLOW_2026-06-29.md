@@ -12175,6 +12175,59 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG495 Exile Target Mana-Value Vocabulary Closure
+
+- PG495 extends the targeted exile mapper with XMage-verified battlefield
+  target filters that constrain a target by mana value. The accepted source
+  shape is deliberately narrow: one-shot `ExileTargetEffect`, no additional
+  cost or auxiliary effect class, exact Oracle/source target agreement, and a
+  local `ManaValuePredicate` over `TargetPermanent`/`FilterPermanent` or
+  `FilterCreaturePermanent`.
+- The mapper now recognizes `target permanent/creature with mana value N`,
+  `N or less`, and `N or greater`, translating them into executable
+  `target_constraints` with `mana_value_min`/`mana_value_max`. It also fixes
+  the generic `nonland_permanent` constraint representation to
+  `card_types=["permanent"]` plus `exclude_card_types=["land"]`, instead of
+  the invalid pseudo-type `nonland_permanent`.
+- The batch covers `4` cards: Death in the Family, Despark, Isolate, and
+  Kin-Tree Severance. Despark had two old generated/review-only rows without
+  exact scope or target constraints; PG495 deprecated those rows and promoted
+  the XMage-backed verified rule.
+- Validation passed: `py_compile` for touched parser/runtime/test files,
+  focused mapper/runtime tests for mana-value restricted targets and source
+  mismatch, the full exact-scope splitter suite (`494` tests OK), and the full
+  `test_battle_analyst_v10_3.py` suite (`622` PASS lines) with the live
+  PostgreSQL environment loaded.
+- PostgreSQL package PG495 applied against `143.198.230.247:5433/halder` and
+  promoted `4/4` selected cards as verified/auto rows with matching Oracle
+  hashes. The apply upserted `4` rows and deprecated `2` generated/review-only
+  Despark rows.
+- Hermes metadata sync matched `5933` PostgreSQL cards, wrote `5844` SQLite
+  cache aliases, updated `108` deck-card ids, and left the known
+  `unresolved=1` residual unchanged. The targeted battle-rule sync loaded `6`
+  PostgreSQL rows, wrote `6` SQLite rows, exported `4741` canonical fallback
+  rows, and refreshed the tracked default canonical snapshot; the two extra
+  rows are Despark's deprecated/disabled historical rules.
+- Generic E2E validation passed across PostgreSQL, SQLite
+  `battle_card_rules`, the default canonical snapshot, and runtime
+  `get_card_effect` for all `4` selected cards. The manifest does not define
+  battle-execution scenarios for this generic family, so scenario execution
+  remains `0`; concrete target-constraint behavior is covered by the focused
+  PG495 runtime test.
+- Final governance audits passed: XMage strategy (`26/26`), operational
+  surface, deckbuilding contract surface, legacy contamination, and
+  PG/Hermes/SQLite contract with live PostgreSQL connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26116`, `xmage_authoritative_source_count=25802`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25802`. This is an exact
+  reduction of `4` from the post-PG494 queue. The exile work unit fell from
+  `149` before PG495 to `145` after PG495.
+- Post-sync global readiness is now `34331` known cards, `4834`
+  `battle_and_oracle_ready`, `29039` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

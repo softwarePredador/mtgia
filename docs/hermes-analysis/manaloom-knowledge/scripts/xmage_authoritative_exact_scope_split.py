@@ -7051,6 +7051,9 @@ def x_damage_source_blocker(source: str) -> str | None:
 
 
 def restricted_target_base(target: str) -> str:
+    mana_value_target = mana_value_restricted_target_parts(target)
+    if mana_value_target is not None:
+        return mana_value_target["base"]
     if target in {
         "attacking_creature",
         "blocking_creature",
@@ -7102,6 +7105,31 @@ def restricted_target_base(target: str) -> str:
     if target == "spirit_or_enchantment":
         return "permanent"
     return target
+
+
+def mana_value_restricted_target_parts(target: str) -> dict[str, Any] | None:
+    match = re.fullmatch(
+        r"(?P<base>creature|permanent|nonland_permanent)_mana_value_(?P<value>\d+)_(?P<op>or_less|or_greater|exact)",
+        str(target or ""),
+    )
+    if not match:
+        return None
+    return {
+        "base": match.group("base"),
+        "value": int(match.group("value")),
+        "op": match.group("op"),
+    }
+
+
+def mana_value_restricted_target_name(base: str, value: int, op: str) -> str:
+    normalized_base = "nonland_permanent" if base == "nonland permanent" else base
+    normalized_op = {
+        "or less": "or_less",
+        "or greater": "or_greater",
+        "": "exact",
+        None: "exact",
+    }.get(op, op)
+    return f"{normalized_base}_mana_value_{int(value)}_{normalized_op}"
 
 
 def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: str) -> str | None:
@@ -7158,11 +7186,27 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
     for target_pattern, target in patterns:
         if re.match(prefix + target_pattern + suffix, text):
             return target
+    mana_value_match = re.match(
+        prefix
+        + r"target (?P<base>creature|permanent|nonland permanent) with "
+        + r"(?:mana value|converted mana cost) (?P<value>\d+)(?P<op> or less| or greater)?"
+        + suffix,
+        text,
+    )
+    if mana_value_match:
+        return mana_value_restricted_target_name(
+            mana_value_match.group("base"),
+            int(mana_value_match.group("value")),
+            (mana_value_match.group("op") or "").strip(),
+        )
     return None
 
 
 def restricted_battlefield_target_from_source(source: str) -> str | None:
     text = source or ""
+    mana_value_target = mana_value_restricted_target_from_source(text)
+    if mana_value_target is not None:
+        return mana_value_target
     if (
         "FilterAttackingOrBlockingCreature" in text
         and "PowerPredicate(ComparisonType.FEWER_THAN, 3)" in text
@@ -7267,6 +7311,37 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "creature_power_4_or_greater"
     if "ManaValuePredicate(ComparisonType.MORE_THAN, 2)" in text:
         return "creature_mana_value_3_or_greater"
+    return None
+
+
+def mana_value_restricted_target_from_source(source: str) -> str | None:
+    text = source or ""
+    mana_value_match = re.search(
+        r"ManaValuePredicate\s*\(\s*ComparisonType\.(?P<comparison>EQUAL_TO|FEWER_THAN|OR_LESS|OR_GREATER|MORE_THAN)\s*,\s*(?P<value>\d+)",
+        text,
+    )
+    if not mana_value_match:
+        return None
+    if "FilterCreaturePermanent" in text or "TargetCreaturePermanent" in text:
+        base = "creature"
+    elif "FilterNonlandPermanent" in text or "TargetNonlandPermanent" in text:
+        base = "nonland_permanent"
+    elif "FilterPermanent" in text or "TargetPermanent" in text:
+        base = "permanent"
+    else:
+        return None
+    value = int(mana_value_match.group("value"))
+    comparison = mana_value_match.group("comparison")
+    if comparison == "EQUAL_TO":
+        return mana_value_restricted_target_name(base, value, "exact")
+    if comparison == "OR_LESS":
+        return mana_value_restricted_target_name(base, value, "or_less")
+    if comparison == "FEWER_THAN":
+        return mana_value_restricted_target_name(base, value - 1, "or_less")
+    if comparison == "OR_GREATER":
+        return mana_value_restricted_target_name(base, value, "or_greater")
+    if comparison == "MORE_THAN":
+        return mana_value_restricted_target_name(base, value + 1, "or_greater")
     return None
 
 
@@ -12379,6 +12454,26 @@ def library_tutor_effect_constraints(tutor_spec: dict[str, Any]) -> dict[str, An
 
 
 def target_constraints_for(target: str) -> dict[str, Any]:
+    mana_value_target = mana_value_restricted_target_parts(target)
+    if mana_value_target is not None:
+        base = str(mana_value_target["base"])
+        if base == "nonland_permanent":
+            constraints: dict[str, Any] = {
+                "card_types": ["permanent"],
+                "exclude_card_types": ["land"],
+            }
+        else:
+            constraints = {"card_types": [base]}
+        op = str(mana_value_target["op"])
+        value = int(mana_value_target["value"])
+        if op == "or_less":
+            constraints["mana_value_max"] = value
+        elif op == "or_greater":
+            constraints["mana_value_min"] = value
+        else:
+            constraints["mana_value_min"] = value
+            constraints["mana_value_max"] = value
+        return constraints
     if target == "any_target":
         return {"scope": "any_target"}
     if target == "attacking_creature":
@@ -12498,7 +12593,9 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"scope": "player_or_planeswalker"}
     if target == "opponent":
         return {"scope": "opponent"}
-    if target in {"artifact", "enchantment", "land", "permanent", "nonland_permanent"}:
+    if target == "nonland_permanent":
+        return {"card_types": ["permanent"], "exclude_card_types": ["land"]}
+    if target in {"artifact", "enchantment", "land", "permanent"}:
         return {"card_types": [target]}
     if target == "artifact_or_enchantment":
         return {"card_types": ["artifact", "enchantment"]}

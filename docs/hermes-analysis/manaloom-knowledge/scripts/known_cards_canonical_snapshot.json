@@ -21847,6 +21847,28 @@
     "battle_rule_logical_key": "battle_rule_v1:7f2b1cf93136c4e6f40016e5392a7451",
     "battle_rule_oracle_hash": "11326914a120abaf48b741c8f9d80034"
   },
+  "Death in the Family": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "mana_value_max": 3
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4f594a6c03925ef13c941828b8bf0e37",
+    "battle_rule_oracle_hash": "96c816812abd03a00008482a15d572c9"
+  },
   "Death Speakers": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
@@ -23195,6 +23217,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "171fe54b0926b568b14abf7f587dbbe8"
+  },
+  "Despark": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ],
+      "mana_value_min": 4
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:82b66ad245c33a7dff7405f247103824",
+    "battle_rule_oracle_hash": "bdb01981887f688b6f7230d85f727be8"
   },
   "Desperate Charge": {
     "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
@@ -48546,6 +48590,29 @@
     "battle_rule_logical_key": "battle_rule_v1:0b61a431c21395aae201cec046f3a79a",
     "battle_rule_oracle_hash": "0eca3a8786dd1c64e4214908a2961a3b"
   },
+  "Isolate": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ],
+      "mana_value_max": 1,
+      "mana_value_min": 1
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0d8820c30b1c902555b822cd791105e2",
+    "battle_rule_oracle_hash": "039088da593f0297af0edf9db231fd10"
+  },
   "Isolated Chapel": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -50998,6 +51065,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "5fcc8ba3e411e0240b7a0de584dc899b"
+  },
+  "Kin-Tree Severance": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ],
+      "mana_value_min": 3
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4bbe77a2bf4a40945e0a0118acb4cd5e",
+    "battle_rule_oracle_hash": "b1da5c300ddf70142c4ac522f71784d1"
   },
   "Kindle": {
     "amount": 0,

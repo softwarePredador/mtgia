@@ -4824,7 +4824,10 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         effect = proposal["effect_json"]
         self.assertEqual(effect["battle_model_scope"], split.BOUNCE_DRAW_SCOPE)
         self.assertEqual(effect["target"], "nonland_permanent")
-        self.assertEqual(effect["target_constraints"], {"card_types": ["nonland_permanent"]})
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["permanent"], "exclude_card_types": ["land"]},
+        )
         self.assertEqual(effect["_composite_rule_components"][0]["effect"], "remove_permanent")
 
     def test_fixed_bounce_draw_spell_maps_tapped_creature_constraint(self) -> None:
@@ -5035,6 +5038,74 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["effect"], "remove_permanent")
         self.assertEqual(effect["target"], "permanent")
         self.assertEqual(effect["target_constraints"], {"card_types": ["permanent"], "target_colors": ["B", "R"]})
+
+    def test_exile_spell_maps_mana_value_restricted_permanent_constraints(self) -> None:
+        fixtures = [
+            {
+                "oracle": "Exile target permanent with mana value 4 or greater.",
+                "source": (
+                    "private static final FilterPermanent filter = "
+                    "new FilterPermanent(\"permanent with mana value 4 or greater\");"
+                    "filter.add(new ManaValuePredicate(ComparisonType.MORE_THAN, 3));"
+                    "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                ),
+                "constraints": {"card_types": ["permanent"], "mana_value_min": 4},
+            },
+            {
+                "oracle": "Exile target permanent with mana value 1.",
+                "source": (
+                    "private static final FilterPermanent filter = "
+                    "new FilterPermanent(\"permanent with mana value 1\");"
+                    "filter.add(new ManaValuePredicate(ComparisonType.EQUAL_TO, 1));"
+                    "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                ),
+                "constraints": {"card_types": ["permanent"], "mana_value_min": 1, "mana_value_max": 1},
+            },
+            {
+                "oracle": "Exile target creature with mana value 3 or less.",
+                "source": (
+                    "private static final FilterPermanent filter = "
+                    "new FilterCreaturePermanent(\"creature with mana value 3 or less\");"
+                    "filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 4));"
+                    "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                    "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                ),
+                "effect": "remove_creature",
+                "target": "creature",
+                "constraints": {"card_types": ["creature"], "mana_value_max": 3},
+            },
+        ]
+        for fixture in fixtures:
+            with self.subTest(oracle=fixture["oracle"]):
+                row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(oracle_text=fixture["oracle"]),
+                    source_text=fixture["source"],
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["effect"], fixture.get("effect", "remove_permanent"))
+                self.assertEqual(effect["target"], fixture.get("target", "permanent"))
+                self.assertEqual(effect["target_constraints"], fixture["constraints"])
+                self.assertEqual(effect["destination"], "exile")
+
+    def test_exile_spell_blocks_mana_value_source_mismatch(self) -> None:
+        row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Exile target permanent with mana value 4 or greater."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "exile_target_source_mismatch")
 
     def test_creature_tap_damage_maps_to_creature_with_activated_damage(self) -> None:
         row = queue_row(

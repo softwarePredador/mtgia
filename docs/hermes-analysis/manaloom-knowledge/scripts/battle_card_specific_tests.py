@@ -8413,6 +8413,89 @@ def register_tests(battle, player):
         ]
         assert resolved_targets == ["Damaged Engine", "Wounded Planeswalker"]
 
+    def test_pg495_exile_target_respects_mana_value_and_nonland_constraints():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            spell = {
+                "name": "Despark",
+                "type_line": "Instant",
+                "effect": "remove_permanent",
+                "controller": "Active",
+                "owner": "Active",
+            }
+            high_value_land = {
+                "name": "Castle Fixture",
+                "type_line": "Land",
+                "effect": "land",
+                "cmc": 7,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            low_value_artifact = {
+                "name": "Small Engine",
+                "type_line": "Artifact",
+                "effect": "artifact",
+                "cmc": 2,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            high_value_artifact = {
+                "name": "Big Engine",
+                "type_line": "Artifact",
+                "effect": "artifact",
+                "cmc": 4,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [high_value_land, low_value_artifact, high_value_artifact]
+            effect_data = {
+                **spell,
+                "battle_model_scope": "xmage_exile_target_spell_v1",
+                "target": "permanent",
+                "target_constraints": {
+                    "card_types": ["permanent"],
+                    "exclude_card_types": ["land"],
+                    "mana_value_min": 4,
+                },
+                "destination": "exile",
+                "_rule_logical_key": "battle_rule_v1:pg495-despark",
+                "_rule_oracle_hash": "pg495-despark-hash",
+            }
+            effect_data, declared = battle.prepare_declared_removal_targets(
+                active,
+                [opponent],
+                spell,
+                effect_data,
+            )
+            assert [row["target"] for row in declared] == ["Big Engine"]
+            assert battle.resolve_declared_single_removal(
+                active,
+                [opponent],
+                spell,
+                effect_data,
+                15,
+                random.Random(495),
+            )
+
+            assert high_value_land in opponent.battlefield
+            assert low_value_artifact in opponent.battlefield
+            assert high_value_artifact not in opponent.battlefield
+            assert high_value_artifact in opponent.exile
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        resolved = [
+            data
+            for event, data in events
+            if event == "removal_resolved" and data.get("card") == "Despark"
+        ]
+        assert resolved and resolved[-1]["target"] == "Big Engine"
+        assert resolved[-1]["destination"] == "exile"
+
     def test_pg086_removal_targets_filter_nontoken_and_mana_value_max():
         active = player("Active")
         opponent = player("Opponent")
@@ -22850,6 +22933,7 @@ def register_tests(battle, player):
         test_pg492_etb_bounce_respects_subtype_and_historic_constraints,
         test_pg493_etb_destroy_respects_extended_target_constraints,
         test_pg494_etb_destroy_requires_damaged_this_turn_target,
+        test_pg495_exile_target_respects_mana_value_and_nonland_constraints,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
         test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,
