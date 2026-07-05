@@ -8248,6 +8248,59 @@ def register_tests(battle, player):
             active = player("Active")
             opponent = player("Opponent")
             source = {
+                "name": "Acidic Slime",
+                "type_line": "Creature - Ooze",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+                "keywords": ["deathtouch"],
+                "deathtouch": True,
+            }
+            legal_land = {
+                "name": "Command Tower",
+                "type_line": "Land",
+                "effect": "land",
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            illegal_creature = {
+                "name": "Runeclaw Bear",
+                "type_line": "Creature - Bear",
+                "effect": "creature",
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [illegal_creature, legal_land]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_permanent",
+                    "etb_remove_target": "artifact_or_enchantment_or_land",
+                    "target_constraints": {"card_types": ["artifact", "enchantment", "land"]},
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg500-acidic-slime",
+                    "_rule_oracle_hash": "pg500-acidic-slime-hash",
+                },
+                13,
+                random.Random(500),
+                all_players=[active, opponent],
+            )
+
+            assert illegal_creature in opponent.battlefield
+            assert legal_land not in opponent.battlefield
+            assert legal_land in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
                 "name": "Slayer of the Wicked",
                 "type_line": "Creature - Human Soldier",
                 "effect": "creature",
@@ -8311,7 +8364,12 @@ def register_tests(battle, player):
             for event, data in events
             if event == "etb_removal_resolved"
         ]
-        assert resolved_targets == ["Weak Creature", "Command Tower", "Diregraf Ghoul"]
+        assert resolved_targets == [
+            "Weak Creature",
+            "Command Tower",
+            "Command Tower",
+            "Diregraf Ghoul",
+        ]
 
     def test_pg494_etb_destroy_requires_damaged_this_turn_target():
         events = []

@@ -1,0 +1,4 @@
+manifest=docs/hermes-analysis/master_optimizer_reports/xmage_pg500_etb_destroy_static_keywords_new_server_manifest.json
+package=docs/hermes-analysis/master_optimizer_reports/xmage_pg500_etb_destroy_static_keywords_new_server_package.md
+selected_count=7
+mutations_performed=[]

@@ -5909,9 +5909,12 @@ def is_creature_etb_graveyard_count_damage_unit(row: dict[str, Any]) -> bool:
 def is_creature_etb_destroy_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DESTROY_UNIT:
         return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
     return (
         effect_classes(row) == {"DestroyTargetEffect"}
-        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
     )
 
@@ -11675,7 +11678,7 @@ def dies_source_trigger_is_optional(source: str) -> bool:
 
 
 def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
-    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
     text = re.sub(r"\s+", " ", text).strip()
     text = re.sub(r"^[a-z0-9' -]+\s+[—-]\s+", "", text)
     etb_subject = r"(?:this creature|.+?)"
@@ -11737,6 +11740,10 @@ def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] 
             ("remove_permanent", "artifact_or_enchantment"),
         ),
         (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target artifact, enchantment, or land\.?$",
+            ("remove_permanent", "artifact_or_enchantment_or_land"),
+        ),
+        (
             rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target land\.?$",
             ("remove_permanent", "land"),
         ),
@@ -11788,6 +11795,11 @@ def etb_destroy_source_supported(source: str, target: str) -> str | None:
             and "SubType.ZOMBIE" in value
         ),
         "artifact_or_enchantment": lambda value: "FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT" in value,
+        "artifact_or_enchantment_or_land": lambda value: (
+            "CardType.ARTIFACT" in value
+            and "CardType.ENCHANTMENT" in value
+            and "CardType.LAND" in value
+        ),
         "artifact": lambda value: "TargetArtifactPermanent" in value or "FilterArtifactPermanent" in value,
         "enchantment": lambda value: "TargetEnchantmentPermanent" in value or "FilterEnchantmentPermanent" in value,
         "land": lambda value: "TargetLandPermanent" in value or "FilterLandPermanent" in value,
@@ -13259,6 +13271,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": [target]}
     if target == "artifact_or_enchantment":
         return {"card_types": ["artifact", "enchantment"]}
+    if target == "artifact_or_enchantment_or_land":
+        return {"card_types": ["artifact", "enchantment", "land"]}
     if target == "artifact_or_creature":
         return {"card_types": ["artifact", "creature"]}
     if target == "creature_or_enchantment":
@@ -16519,6 +16533,12 @@ def split_row(
             "creature_or_planeswalker_damaged_this_turn_opponent_controls",
         }:
             effect_json["target_controller"] = "opponent"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,

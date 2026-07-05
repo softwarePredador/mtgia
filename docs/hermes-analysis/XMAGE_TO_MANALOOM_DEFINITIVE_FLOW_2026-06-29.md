@@ -12504,6 +12504,84 @@ Residual boundary: `Deathknell Berserker`, `Tuktuk the Explorer`, dynamic token
 counts, custom token text, and token classes with mana abilities remain outside
 PG499 and require separate exact runtime families.
 
+## 2026-07-05 PG500 ETB Destroy Static Keywords Checkpoint
+
+PG500 closed the exact XMage family
+`EntersBattlefieldTriggeredAbility + DestroyTargetEffect` for creature ETB
+destroy effects whose only auxiliary abilities are static self keywords. The
+splitter now allows simple self keywords on the source permanent, skips leading
+Oracle keyword lines before the ETB sentence, supports
+`artifact_or_enchantment_or_land`, and preserves keyword metadata in the
+promoted rule payload.
+
+Promoted cards:
+
+- `Acid Web Spider`
+- `Acidic Slime`
+- `Aven Cloudchaser`
+- `Cloudchaser Eagle`
+- `Manticore`
+- `Rooftop Assassin`
+- `Stingblade Assassin`
+
+Runtime and parser changes:
+
+- ETB destroy units can include static self keyword abilities in addition to
+  `EntersBattlefieldTriggeredAbility`.
+- `artifact_or_enchantment_or_land` target constraints map to
+  `["artifact", "enchantment", "land"]` only when source and Oracle agree.
+- Promoted rows preserve self keywords such as `reach`, `deathtouch`,
+  `flying`, `flash`, and `lifelink`.
+- Non-static auxiliary abilities, conditional/reflexive triggers, unsupported
+  target filters, and non-simple destroy effects remain blocked.
+
+Validation and deploy evidence:
+
+- Split candidate:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg500_etb_destroy_static_keywords_candidate.json`
+  with `proposal_count=7`.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg500_etb_destroy_static_keywords_new_server_package.md`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg500_etb_destroy_static_keywords_new_server_precheck.out`
+  validated all 7 target cards and identified 2 old `Acidic Slime` rows to
+  deprecate.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg500_etb_destroy_static_keywords_new_server_apply.out`
+  reported `deprecated_shadow_rows=2`, `upserted_rows=7`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg500_etb_destroy_static_keywords_new_server_postcheck.out`
+  confirmed all 7 promoted rows as verified/auto with Oracle hashes.
+- PG -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg500_etb_destroy_static_keywords_new_server_pg_to_sqlite_sync.json`
+  reported `pg_rows_loaded=8424`, `sqlite_inserted_or_updated=8188`, and
+  `canonical_snapshot_rows_exported=5952`.
+- SQLite validation:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg500_etb_destroy_static_keywords_new_server_sqlite_validation.json`
+  reported `status=pass`, `validated_card_count=7`, and `issue_count=0`.
+- Battle tests:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg500_etb_destroy_static_keywords_new_server_full_battle_suite_post_sync.out`
+  passed `test_pg493_etb_destroy_respects_extended_target_constraints`.
+- PG/Hermes/SQLite contract:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg500_etb_destroy_static_keywords_new_server.md`
+  passed `51/51`.
+- Post-sync Commander-legal queue:
+  `target_identity_count=26067`, `xmage_authoritative_source_count=25753`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25753`.
+- Post-sync global readiness:
+  `battle_and_oracle_ready=4883`, `battle_family_mapper_required=28990`,
+  `generic_runtime_or_no_card_rule=360`, `oracle_data_sync=4`,
+  `commander_legality_sync=3`, and `oracle_identity_rule_link_or_copy=2`.
+- Post-sync exact splitter recheck against the rebuilt queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg500_etb_destroy_static_keywords_new_server_final_recheck.json`
+  reported `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: PG500 does not close all targeted destroy rows. Activated
+destroy costs, kicker/evoke-like auxiliaries, conditional/reflexive ETB destroy
+effects, unsupported target filters, and composite destroy rows require
+separate exact runtime families.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

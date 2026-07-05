@@ -12231,6 +12231,72 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_remove_target"], "artifact_or_enchantment")
         self.assertEqual(effect["trigger"], "enters_battlefield")
 
+    def test_creature_etb_destroy_allows_static_self_keywords(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DeathtouchAbility", "EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Acidic Slime",
+                type_line="Creature - Ooze",
+                oracle_text=(
+                    "Deathtouch\n"
+                    "When Acidic Slime enters the battlefield, destroy target artifact, "
+                    "enchantment, or land."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(DeathtouchAbility.getInstance());"
+                "private static final FilterPermanent filter = new FilterPermanent(\"artifact, enchantment, or land\");"
+                "filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(), "
+                "CardType.ENCHANTMENT.getPredicate(), CardType.LAND.getPredicate()));"
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), false);"
+                "ability.addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_DESTROY_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_remove_target"], "artifact_or_enchantment_or_land")
+        self.assertEqual(effect["keywords"], ["deathtouch"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertTrue(effect["deathtouch"])
+
+    def test_creature_etb_destroy_blocks_nonstatic_auxiliary_abilities(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "KickerAbility"],
+            xmage_signals=["targeting", "condition", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Kor Sanctifiers",
+                type_line="Creature - Kor Cleric",
+                oracle_text=(
+                    "Kicker {W}\n"
+                    "When Kor Sanctifiers enters the battlefield, if it was kicked, "
+                    "destroy target artifact or enchantment."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new KickerAbility(new ManaCostsImpl<>(\"{W}\")));"
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), true);"
+                "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertNotEqual(reason, "selected_exact_scope")
+
     def test_creature_etb_destroy_maps_restricted_target_constraints(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,

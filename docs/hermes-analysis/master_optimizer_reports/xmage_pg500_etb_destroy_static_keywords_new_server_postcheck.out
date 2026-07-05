@@ -1,0 +1,10 @@
+      card_name      |   normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+---------------------+---------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Acidic Slime        | acidic slime        | battle_rule_v1:d6f7486e4c786b9fb3a3ff228eba900f |                  1 |                           1 |                         1 |           2
+ Acid Web Spider     | acid web spider     | battle_rule_v1:1aa0efe2e139b1b4cfd98f1a96d15f09 |                  1 |                           1 |                         1 |           2
+ Aven Cloudchaser    | aven cloudchaser    | battle_rule_v1:e2339aebf333937d9a130bfc466caf48 |                  1 |                           1 |                         1 |           2
+ Cloudchaser Eagle   | cloudchaser eagle   | battle_rule_v1:e2339aebf333937d9a130bfc466caf48 |                  1 |                           1 |                         1 |           2
+ Manticore           | manticore           | battle_rule_v1:1052f1ae2599cc97def59d1a4409e475 |                  1 |                           1 |                         1 |           2
+ Rooftop Assassin    | rooftop assassin    | battle_rule_v1:b6a4b99b720989841de8c334981cce1f |                  1 |                           1 |                         1 |           2
+ Stingblade Assassin | stingblade assassin | battle_rule_v1:1052f1ae2599cc97def59d1a4409e475 |                  1 |                           1 |                         1 |           2
+(7 rows)
