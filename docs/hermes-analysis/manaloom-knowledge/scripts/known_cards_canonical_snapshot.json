@@ -4148,6 +4148,38 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "46f88746a44673690d8ccc32b4c430d1"
   },
+  "Arcum's Astrolabe": {
+    "ability_kind": "mana_and_triggered",
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+    "effect": "ramp_permanent",
+    "etb_draw_count": 1,
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "WUBRG",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_classes": [
+      "AnyColorManaAbility",
+      "EntersBattlefieldTriggeredAbility"
+    ],
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect"
+    ],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+    "battle_rule_oracle_hash": "b8440b4581f1393b623f598bf31c8341"
+  },
   "Ardent Elementalist": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
@@ -26661,6 +26693,38 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0a678c0c9029d42a32bc3ab7bb5772ae",
     "battle_rule_oracle_hash": "88af8c01f2653ce88bd330fb483c2417"
+  },
+  "Energy Refractor": {
+    "ability_kind": "mana_and_triggered",
+    "activation_mana_cost": "{2}",
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+    "effect": "ramp_permanent",
+    "etb_draw_count": 1,
+    "is_mana_source": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "WUBRG",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_classes": [
+      "AnyColorManaAbility",
+      "EntersBattlefieldTriggeredAbility"
+    ],
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect"
+    ],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+    "battle_rule_oracle_hash": "cec4e478a79bc9f7ee003844fb1e3cdc"
   },
   "Enforcer Griffin": {
     "_keywords_are_self": true,
@@ -49313,6 +49377,40 @@
     "battle_rule_logical_key": "battle_rule_v1:29092606e116ce6b7d861140cdfcddf2",
     "battle_rule_oracle_hash": "43487f19c310e49becac3784dfec884b"
   },
+  "Llanowar Visionary": {
+    "ability_kind": "mana_and_triggered",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+    "effect": "ramp_permanent",
+    "etb_draw_count": 1,
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "G"
+    ],
+    "produces": "G",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_classes": [
+      "EntersBattlefieldTriggeredAbility",
+      "GreenManaAbility"
+    ],
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect"
+    ],
+    "xmage_mana_ability_classes": [
+      "GreenManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+    "battle_rule_oracle_hash": "bb7ee1e889365c1602ebac24e4dbedab"
+  },
   "Llanowar Wastes": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -63069,6 +63167,38 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "a94fb96943ef55618bdfa4ce44928a21"
+  },
+  "Prophetic Prism": {
+    "ability_kind": "mana_and_triggered",
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+    "effect": "ramp_permanent",
+    "etb_draw_count": 1,
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "WUBRG",
+    "trigger": "enters_battlefield",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_classes": [
+      "AnyColorManaAbility",
+      "EntersBattlefieldTriggeredAbility"
+    ],
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect"
+    ],
+    "xmage_mana_ability_classes": [
+      "AnyColorManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+    "battle_rule_oracle_hash": "dbafd52cab67ffc85aa684f524be0c37"
   },
   "Protector of Gondor": {
     "ability_kind": "triggered",

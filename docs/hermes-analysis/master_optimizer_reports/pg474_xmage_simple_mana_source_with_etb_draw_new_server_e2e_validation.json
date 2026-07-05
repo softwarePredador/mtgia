@@ -1,0 +1,198 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T02:39:06.210055+00:00",
+  "manifest": "../../master_optimizer_reports/pg474_xmage_simple_mana_source_with_etb_draw_new_server_manifest.json",
+  "package_id": "pg474_xmage_simple_mana_source_with_etb_draw_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Arcum's Astrolabe",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+          "oracle_hash": "b8440b4581f1393b623f598bf31c8341",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Energy Refractor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+          "oracle_hash": "cec4e478a79bc9f7ee003844fb1e3cdc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Llanowar Visionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+          "oracle_hash": "bb7ee1e889365c1602ebac24e4dbedab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Prophetic Prism",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+          "oracle_hash": "dbafd52cab67ffc85aa684f524be0c37",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Arcum's Astrolabe",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+          "oracle_hash": "b8440b4581f1393b623f598bf31c8341",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Energy Refractor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+          "oracle_hash": "cec4e478a79bc9f7ee003844fb1e3cdc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Llanowar Visionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+          "oracle_hash": "bb7ee1e889365c1602ebac24e4dbedab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Prophetic Prism",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+          "oracle_hash": "dbafd52cab67ffc85aa684f524be0c37",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Arcum's Astrolabe",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Energy Refractor",
+          "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Llanowar Visionary",
+          "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Prophetic Prism",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Arcum's Astrolabe",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Energy Refractor",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Llanowar Visionary",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Prophetic Prism",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

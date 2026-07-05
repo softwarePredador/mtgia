@@ -10981,6 +10981,66 @@ new server:
   `xmage_fixed_damage_draw_card_spell`,
   `xmage_fixed_target_player_draw_spell`, and `xmage_x_damage_spell`.
 
+## 2026-07-05 PG474 Simple Mana Source With ETB Draw Closure
+
+- Closed the exact XMage simple mana-source permanent with enter-the-battlefield
+  draw family as ManaLoom scope
+  `xmage_simple_mana_source_with_etb_draw_v1`.
+- The selected package accepted local XMage artifact/creature mana sources
+  whose executable behavior is one safe mana ability plus
+  `EntersBattlefieldTriggeredAbility` with `DrawCardSourceControllerEffect`,
+  preserving the ETB trigger, fixed draw count, activation mana cost,
+  tap requirement, produced mana, permanent type, and XMage ability classes.
+- The batch covers `4` cards: Arcum's Astrolabe, Energy Refractor,
+  Llanowar Visionary, and Prophetic Prism.
+- Runtime was tightened before promotion: the natural `cast_spells_v8` ramp
+  path now resolves generic permanent ETB triggers and pays
+  `activation_mana_cost` through `pay_mana_source_activation_costs` before
+  immediate mana production. This prevents the direct resolver from being
+  correct while natural battle casts skip ETB draw or generate unpaid mana.
+- Focused mapper/runtime/package tests covered direct resolution, natural ramp
+  cast ETB draw, mana activation-cost payment, package generation, and exact
+  split selection; the focused test lane passed `722` checks.
+- The PostgreSQL package promoted `4` cards. Precheck found `4` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` generated shadow
+  rows to deprecate; apply/postcheck verified `4/4` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `4` promoted rows are
+  `verified`/`auto`, have `rule_version=2`, and preserve
+  `battle_model_scope=xmage_simple_mana_source_with_etb_draw_v1`,
+  `effect=ramp_permanent`, `is_mana_source`, `mana_produced`, `produces`,
+  `produced_mana_symbols` where applicable, `activation_mana_cost`,
+  `activation_requires_tap`, `mana_activation_requires_tap`,
+  `trigger=enters_battlefield`, `trigger_effect=draw_cards`,
+  `etb_draw_count=1`, `permanent_type`, and Oracle hash.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `4` selected cards. Generic battle
+  scenario count remained `0`; natural battle execution is covered by focused
+  runtime test
+  `test_natural_ramp_cast_resolves_etb_draw_and_pays_mana_activation_cost`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4523` PostgreSQL runtime rows, wrote `4515` SQLite runtime
+  rows, and exported `4490` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`pass`), legacy contamination
+  (`pass`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26363`, `xmage_authoritative_source_count=26049`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26049`. This is an exact
+  reduction of `4` from the post-PG473 queue.
+- The post-PG474 exact split recheck reports `proposal_count=24` and
+  `safe_for_batch_pg_package_count=24`. The largest remaining exact families
+  are `xmage_fixed_damage_draw_card_spell`,
+  `xmage_fixed_target_player_draw_spell`, `xmage_x_damage_spell`,
+  `xmage_graveyard_multi_zone_recursion_spell`,
+  `xmage_static_play_lands_from_graveyard`, and
+  `xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -50026,13 +50026,26 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     if eff.get("requires_imprint_nonartifact_nonland"):
                         resolve_chrome_mox_imprint(player, permanent, c, turn=turn)
                     player.battlefield.append(permanent)
+                    resolve_generic_permanent_etb(
+                        player,
+                        opponents,
+                        permanent,
+                        eff,
+                        turn,
+                        rng,
+                        stack=stack,
+                        all_players=all_players,
+                        phase=phase,
+                    )
                     if player_mana_source_permanent(player, permanent) and not (
                         is_battlefield_creature(permanent) and permanent.get("summoning_sick")
                     ):
-                        colors = mana_source_colors_for_state(player, permanent)
                         produced = mana_source_production_for_state(player, permanent)
-                        if produced > 0:
-                            player.mana_pool.add(colors[0], produced)
+                        if (
+                            produced > 0
+                            and pay_mana_source_activation_costs(player, permanent, turn=turn)
+                            and add_player_mana_source_to_pool(player, permanent, turn=turn)
+                        ):
                             mark_mana_source_used_if_nonstandard_untap(permanent)
                 mana = player.available_mana()
                 if note_action():

@@ -1,0 +1,321 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg474_xmage_simple_mana_source_with_etb_draw_new_server_",
+  "deploy_id": "pg474",
+  "expected_rules": [
+    {
+      "card_name": "Arcum's Astrolabe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "min_rule_version": 2,
+      "normalized_name": "arcum's astrolabe",
+      "oracle_hash": "b8440b4581f1393b623f598bf31c8341",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Energy Refractor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+      "min_rule_version": 2,
+      "normalized_name": "energy refractor",
+      "oracle_hash": "cec4e478a79bc9f7ee003844fb1e3cdc",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{2}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Llanowar Visionary",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+      "min_rule_version": 2,
+      "normalized_name": "llanowar visionary",
+      "oracle_hash": "bb7ee1e889365c1602ebac24e4dbedab",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "G"
+        ],
+        "produces": "G",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "EntersBattlefieldTriggeredAbility",
+          "GreenManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prophetic Prism",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "min_rule_version": 2,
+      "normalized_name": "prophetic prism",
+      "oracle_hash": "dbafd52cab67ffc85aa684f524be0c37",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_simple_mana_source_with_etb_draw": 4
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg474_xmage_simple_mana_source_with_etb_draw_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg474_xmage_simple_mana_source_with_etb_draw_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg474_xmage_simple_mana_source_with_etb_draw_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg474_xmage_simple_mana_source_with_etb_draw_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg474_xmage_simple_mana_source_with_etb_draw_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg474_xmage_simple_mana_source_with_etb_draw_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T02:37:56+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Arcum's Astrolabe"
+      },
+      "card_name": "Arcum's Astrolabe",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "normalized_name": "arcum's astrolabe",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Energy Refractor"
+      },
+      "card_name": "Energy Refractor",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+      "normalized_name": "energy refractor",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{2}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Llanowar Visionary"
+      },
+      "card_name": "Llanowar Visionary",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+      "normalized_name": "llanowar visionary",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "G"
+        ],
+        "produces": "G",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "EntersBattlefieldTriggeredAbility",
+          "GreenManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Prophetic Prism"
+      },
+      "card_name": "Prophetic Prism",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "normalized_name": "prophetic prism",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Arcum's Astrolabe",
+    "Energy Refractor",
+    "Llanowar Visionary",
+    "Prophetic Prism"
+  ],
+  "selected_count": 4,
+  "slug": "xmage_simple_mana_source_with_etb_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Arcum's Astrolabe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "min_rule_version": 2,
+      "normalized_name": "arcum's astrolabe",
+      "oracle_hash": "b8440b4581f1393b623f598bf31c8341",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Energy Refractor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+      "min_rule_version": 2,
+      "normalized_name": "energy refractor",
+      "oracle_hash": "cec4e478a79bc9f7ee003844fb1e3cdc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Llanowar Visionary",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+      "min_rule_version": 2,
+      "normalized_name": "llanowar visionary",
+      "oracle_hash": "bb7ee1e889365c1602ebac24e4dbedab",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prophetic Prism",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "min_rule_version": 2,
+      "normalized_name": "prophetic prism",
+      "oracle_hash": "dbafd52cab67ffc85aa684f524be0c37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
