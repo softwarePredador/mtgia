@@ -1,0 +1,4122 @@
+{
+  "artifact_type": "global_commander_mana_base_profile",
+  "battle_or_optimization_performed": false,
+  "generated_at": "2026-07-05T19:56:29.072256+00:00",
+  "mutation_allowed": false,
+  "policy": {
+    "diagnostic_source_floor": "Heuristic only: each commander color must have enough direct or fetchable access before named land candidates can be reviewed. This is not a promotion gate by itself.",
+    "named_lands": "This report does not name additions. Candidate lands require commander color identity, legality, current ownership/availability if applicable, same-lane cuts, and battle trace evidence."
+  },
+  "postgres_writes": false,
+  "profiles": [
+    {
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_identity_source": "card_oracle_cache",
+      "conditional_sources_by_color": {
+        "R": 1,
+        "W": 1
+      },
+      "current_land_count": 27,
+      "deck_id": "612",
+      "deck_name": "VARIANT Lorehold Variant 07 - Rafael Paste 2026-06-24",
+      "diagnostic_source_floor_per_color": 21,
+      "direct_or_fetch_access_by_color": {
+        "R": 17,
+        "W": 15
+      },
+      "direct_sources_by_color": {
+        "R": 12,
+        "W": 10
+      },
+      "land_features": [
+        {
+          "basic": false,
+          "card_name": "Ancient Tomb",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "fast_colorless_mana"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Arena of Glory",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Arid Mesa",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Barbarian Ring",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "graveyard_utility"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Bloodstained Mire",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "B",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Boseiju, Who Shelters All",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": [
+            "anti_countermagic"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Cavern of Souls",
+          "colorless_only": false,
+          "conditional_any_colors": [
+            "W",
+            "R"
+          ],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "anti_countermagic"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "City of Brass",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "City of Traitors",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Command Tower",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "commander_support"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Crystal Vein",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Eiganjo, Seat of the Empire",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Elegant Parlor",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": [
+            "graveyard_utility",
+            "topdeck_selection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Flooded Strand",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "U"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Forbidden Orchard",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Gemstone Caverns",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Mana Confluence",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Marsh Flats",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "B"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Plains // Plains",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Basic Land \u2014 Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Plateau",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sacred Foundry",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Scalding Tarn",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "U",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Shivan Gorge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sokenzan, Crucible of Defiance",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Urza's Saga",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Enchantment Land \u2014 Urza's Saga",
+          "utility_roles": [
+            "artifact_tutor"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Windswept Heath",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "G"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Wooded Foothills",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "R",
+            "G"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        }
+      ],
+      "land_gap": 7,
+      "mana_base_counts": {
+        "always_tapped_quantity": 2,
+        "basic_land_quantity": 1,
+        "colorless_only_quantity": 5,
+        "conditional_tapped_quantity": 1,
+        "fetch_or_search_quantity": 7,
+        "land_quantity": 27,
+        "land_rows": 27,
+        "land_rows_with_oracle_text": 27,
+        "optional_untapped_life_quantity": 1,
+        "reliably_untapped_quantity": 23,
+        "untapped_or_expected_quantity": 24,
+        "utility_land_quantity": 7
+      },
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "limit_colorless_utility_until_color_floor",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "required_next_gates": [
+        "named_land_candidate_pool_by_commander_color_identity",
+        "same_lane_or_excess_role_cut_model",
+        "structure_and_legality_recheck_after_candidate_copy",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "scope": "hermes_lorehold_variant",
+      "status": "mana_profile_ready_for_named_land_candidate_pool",
+      "target_land_floor": 34
+    },
+    {
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_identity_source": "card_oracle_cache",
+      "conditional_sources_by_color": {
+        "R": 0,
+        "W": 0
+      },
+      "current_land_count": 29,
+      "deck_id": "616",
+      "deck_name": "VARIANT Lorehold Variant 11 - Rafael Paste 2026-06-24",
+      "diagnostic_source_floor_per_color": 21,
+      "direct_or_fetch_access_by_color": {
+        "R": 19,
+        "W": 16
+      },
+      "direct_sources_by_color": {
+        "R": 17,
+        "W": 14
+      },
+      "land_features": [
+        {
+          "basic": false,
+          "card_name": "Boros Garrison",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "bounce_land_tempo_risk"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Boseiju, Who Shelters All",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": [
+            "anti_countermagic"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Clifftop Retreat",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Command Tower",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "commander_support"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Lindblum, Industrial Regency // Mage Siege",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Town",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Mountain // Mountain",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 10,
+          "type_line": "Basic Land \u2014 Mountain",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Myriad Landscape",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Plains // Plains",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 8,
+          "type_line": "Basic Land \u2014 Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Plateau",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Reliquary Tower",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Rugged Prairie",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sacred Foundry",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Thawing Glaciers",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        }
+      ],
+      "land_gap": 5,
+      "mana_base_counts": {
+        "always_tapped_quantity": 5,
+        "basic_land_quantity": 18,
+        "colorless_only_quantity": 2,
+        "conditional_tapped_quantity": 1,
+        "fetch_or_search_quantity": 2,
+        "land_quantity": 29,
+        "land_rows": 13,
+        "land_rows_with_oracle_text": 13,
+        "optional_untapped_life_quantity": 1,
+        "reliably_untapped_quantity": 22,
+        "untapped_or_expected_quantity": 23,
+        "utility_land_quantity": 3
+      },
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "required_next_gates": [
+        "named_land_candidate_pool_by_commander_color_identity",
+        "same_lane_or_excess_role_cut_model",
+        "structure_and_legality_recheck_after_candidate_copy",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "scope": "hermes_lorehold_variant",
+      "status": "mana_profile_ready_for_named_land_candidate_pool",
+      "target_land_floor": 34
+    },
+    {
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_identity_source": "card_oracle_cache",
+      "conditional_sources_by_color": {
+        "R": 0,
+        "W": 0
+      },
+      "current_land_count": 30,
+      "deck_id": "609",
+      "deck_name": "VARIANT Lorehold Variant 04 - Rafael Paste 2026-06-24",
+      "diagnostic_source_floor_per_color": 21,
+      "direct_or_fetch_access_by_color": {
+        "R": 19,
+        "W": 18
+      },
+      "direct_sources_by_color": {
+        "R": 16,
+        "W": 15
+      },
+      "land_features": [
+        {
+          "basic": false,
+          "card_name": "Arid Archway",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Desert",
+          "utility_roles": [
+            "bounce_land_tempo_risk",
+            "desert_typal",
+            "graveyard_utility",
+            "topdeck_selection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Arid Mesa",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Ash Barrens",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Battlefield Forge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Boros Garrison",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "bounce_land_tempo_risk"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Clifftop Retreat",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Command Tower",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "commander_support"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Demolition Field",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Glittering Massif",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": [
+            "card_flow",
+            "cycling"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Guildless Commons",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "bounce_land_tempo_risk"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Lotus Field",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "protection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Lotus Vale",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "graveyard_utility"
+          ]
+        },
+        {
+          "basic": true,
+          "card_name": "Mountain // Mountain",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 5,
+          "type_line": "Basic Land \u2014 Mountain",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Needleverge Pathway // Pillarverge Pathway",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Plains // Plains",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 5,
+          "type_line": "Basic Land \u2014 Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Radiant Summit",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Rugged Prairie",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sacred Foundry",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Scavenger Grounds",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Desert",
+          "utility_roles": [
+            "desert_typal",
+            "graveyard_utility"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Sunbillow Verge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sundown Pass",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Urza's Saga",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Enchantment Land \u2014 Urza's Saga",
+          "utility_roles": [
+            "artifact_tutor"
+          ]
+        }
+      ],
+      "land_gap": 4,
+      "mana_base_counts": {
+        "always_tapped_quantity": 5,
+        "basic_land_quantity": 10,
+        "colorless_only_quantity": 4,
+        "conditional_tapped_quantity": 3,
+        "fetch_or_search_quantity": 3,
+        "land_quantity": 30,
+        "land_rows": 22,
+        "land_rows_with_oracle_text": 22,
+        "optional_untapped_life_quantity": 1,
+        "reliably_untapped_quantity": 21,
+        "untapped_or_expected_quantity": 22,
+        "utility_land_quantity": 10
+      },
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "prioritize_untapped_fixing_lands",
+        "limit_colorless_utility_until_color_floor",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "required_next_gates": [
+        "named_land_candidate_pool_by_commander_color_identity",
+        "same_lane_or_excess_role_cut_model",
+        "structure_and_legality_recheck_after_candidate_copy",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "scope": "hermes_lorehold_variant",
+      "status": "mana_profile_ready_for_named_land_candidate_pool",
+      "target_land_floor": 34
+    },
+    {
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_identity_source": "card_oracle_cache",
+      "conditional_sources_by_color": {
+        "R": 1,
+        "W": 1
+      },
+      "current_land_count": 30,
+      "deck_id": "610",
+      "deck_name": "VARIANT Lorehold Variant 05 - Rafael Paste 2026-06-24",
+      "diagnostic_source_floor_per_color": 21,
+      "direct_or_fetch_access_by_color": {
+        "R": 18,
+        "W": 20
+      },
+      "direct_sources_by_color": {
+        "R": 17,
+        "W": 19
+      },
+      "land_features": [
+        {
+          "basic": false,
+          "card_name": "Adagia, Windswept Bastion",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Planet",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Ancient Den",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Artifact Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Battlefield Forge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Boros Garrison",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "bounce_land_tempo_risk"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Buried Ruin",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "graveyard_utility"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Clifftop Retreat",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Command Tower",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "commander_support"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Darksteel Citadel",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Artifact Land",
+          "utility_roles": [
+            "protection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Elegant Parlor",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": [
+            "graveyard_utility",
+            "topdeck_selection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Fomori Vault",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Great Furnace",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Artifact Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Inventors' Fair",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": [
+            "artifact_tutor"
+          ]
+        },
+        {
+          "basic": true,
+          "card_name": "Mountain // Mountain",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 3,
+          "type_line": "Basic Land \u2014 Mountain",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Plains // Plains",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 4,
+          "type_line": "Basic Land \u2014 Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Plateau",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Rugged Prairie",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Rustvale Bridge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Artifact Land",
+          "utility_roles": [
+            "protection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Sacred Foundry",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Spectator Seating",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "commander_expected_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Spire of Industry",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sunbaked Canyon",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Sunbillow Verge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "The Mycosynth Gardens",
+          "colorless_only": false,
+          "conditional_any_colors": [
+            "W",
+            "R"
+          ],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Sphere",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Tocasia's Dig Site",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "graveyard_utility",
+            "topdeck_selection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Urza's Saga",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Enchantment Land \u2014 Urza's Saga",
+          "utility_roles": [
+            "artifact_tutor"
+          ]
+        }
+      ],
+      "land_gap": 4,
+      "mana_base_counts": {
+        "always_tapped_quantity": 4,
+        "basic_land_quantity": 7,
+        "colorless_only_quantity": 6,
+        "commander_expected_untapped_quantity": 1,
+        "conditional_tapped_quantity": 1,
+        "land_quantity": 30,
+        "land_rows": 25,
+        "land_rows_with_oracle_text": 25,
+        "optional_untapped_life_quantity": 1,
+        "reliably_untapped_quantity": 23,
+        "untapped_or_expected_quantity": 25,
+        "utility_land_quantity": 10
+      },
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "limit_colorless_utility_until_color_floor"
+      ],
+      "required_next_gates": [
+        "named_land_candidate_pool_by_commander_color_identity",
+        "same_lane_or_excess_role_cut_model",
+        "structure_and_legality_recheck_after_candidate_copy",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "scope": "hermes_lorehold_variant",
+      "status": "mana_profile_ready_for_named_land_candidate_pool",
+      "target_land_floor": 34
+    },
+    {
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_identity_source": "card_oracle_cache",
+      "conditional_sources_by_color": {
+        "R": 0,
+        "W": 0
+      },
+      "current_land_count": 31,
+      "deck_id": "608",
+      "deck_name": "VARIANT Lorehold Variant 03 - Rafael Paste 2026-06-23",
+      "diagnostic_source_floor_per_color": 21,
+      "direct_or_fetch_access_by_color": {
+        "R": 25,
+        "W": 10
+      },
+      "direct_sources_by_color": {
+        "R": 22,
+        "W": 7
+      },
+      "land_features": [
+        {
+          "basic": false,
+          "card_name": "Ancient Tomb",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "fast_colorless_mana"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Arid Mesa",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Bloodstained Mire",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "B",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Command Tower",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "commander_support"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Cori Mountain Monastery",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Eiganjo, Seat of the Empire",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Elegant Parlor",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": [
+            "graveyard_utility",
+            "topdeck_selection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Marsh Flats",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "B"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Mountain // Mountain",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 14,
+          "type_line": "Basic Land \u2014 Mountain",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Radiant Summit",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sacred Foundry",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Scalding Tarn",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "U",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Scavenger Grounds",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Desert",
+          "utility_roles": [
+            "desert_typal",
+            "graveyard_utility"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Sokenzan, Crucible of Defiance",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Spectator Seating",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "commander_expected_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Turbulent Steppe",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Urza's Saga",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Enchantment Land \u2014 Urza's Saga",
+          "utility_roles": [
+            "artifact_tutor"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Windswept Heath",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "G"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        }
+      ],
+      "land_gap": 3,
+      "mana_base_counts": {
+        "always_tapped_quantity": 1,
+        "basic_land_quantity": 14,
+        "colorless_only_quantity": 3,
+        "commander_expected_untapped_quantity": 1,
+        "conditional_tapped_quantity": 3,
+        "fetch_or_search_quantity": 5,
+        "land_quantity": 31,
+        "land_rows": 18,
+        "land_rows_with_oracle_text": 18,
+        "optional_untapped_life_quantity": 1,
+        "reliably_untapped_quantity": 25,
+        "untapped_or_expected_quantity": 27,
+        "utility_land_quantity": 5
+      },
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "limit_colorless_utility_until_color_floor",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "required_next_gates": [
+        "named_land_candidate_pool_by_commander_color_identity",
+        "same_lane_or_excess_role_cut_model",
+        "structure_and_legality_recheck_after_candidate_copy",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "scope": "hermes_lorehold_variant",
+      "status": "mana_profile_ready_for_named_land_candidate_pool",
+      "target_land_floor": 34
+    },
+    {
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_identity_source": "card_oracle_cache",
+      "conditional_sources_by_color": {
+        "R": 0,
+        "W": 0
+      },
+      "current_land_count": 32,
+      "deck_id": "613",
+      "deck_name": "VARIANT Lorehold Variant 08 - Rafael Paste 2026-06-24",
+      "diagnostic_source_floor_per_color": 21,
+      "direct_or_fetch_access_by_color": {
+        "R": 19,
+        "W": 18
+      },
+      "direct_sources_by_color": {
+        "R": 18,
+        "W": 16
+      },
+      "land_features": [
+        {
+          "basic": false,
+          "card_name": "Ancient Tomb",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "fast_colorless_mana"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Bloodstained Mire",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "B",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Boseiju, Who Shelters All",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": [
+            "anti_countermagic"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "City of Brass",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Command Tower",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "commander_support"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Elegant Parlor",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": [
+            "graveyard_utility",
+            "topdeck_selection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Gemstone Caverns",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Marsh Flats",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "B"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Mountain // Mountain",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 6,
+          "type_line": "Basic Land \u2014 Mountain",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Plains // Plains",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 5,
+          "type_line": "Basic Land \u2014 Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Plateau",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Reliquary Tower",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sacred Foundry",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Shinka, the Bloodsoaked Keep",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Spectator Seating",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "commander_expected_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Starting Town",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Town",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sunbillow Verge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sundown Pass",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Temple of Triumph",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "topdeck_selection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "The Biblioplex",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "graveyard_utility"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Urza's Saga",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Enchantment Land \u2014 Urza's Saga",
+          "utility_roles": [
+            "artifact_tutor"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Windswept Heath",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "G"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Zhalfirin Void",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "topdeck_selection"
+          ]
+        }
+      ],
+      "land_gap": 2,
+      "mana_base_counts": {
+        "always_tapped_quantity": 3,
+        "basic_land_quantity": 11,
+        "colorless_only_quantity": 6,
+        "commander_expected_untapped_quantity": 1,
+        "conditional_tapped_quantity": 2,
+        "fetch_or_search_quantity": 3,
+        "land_quantity": 32,
+        "land_rows": 23,
+        "land_rows_with_oracle_text": 23,
+        "optional_untapped_life_quantity": 1,
+        "reliably_untapped_quantity": 25,
+        "untapped_or_expected_quantity": 27,
+        "utility_land_quantity": 8
+      },
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "limit_colorless_utility_until_color_floor",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "required_next_gates": [
+        "named_land_candidate_pool_by_commander_color_identity",
+        "same_lane_or_excess_role_cut_model",
+        "structure_and_legality_recheck_after_candidate_copy",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "scope": "hermes_lorehold_variant",
+      "status": "mana_profile_ready_for_named_land_candidate_pool",
+      "target_land_floor": 34
+    },
+    {
+      "commander": "Y'shtola, Night's Blessed",
+      "commander_color_identity": [
+        "W",
+        "U",
+        "B"
+      ],
+      "commander_identity_source": "card_oracle_cache",
+      "conditional_sources_by_color": {
+        "B": 1,
+        "U": 1,
+        "W": 1
+      },
+      "current_land_count": 32,
+      "deck_id": "621",
+      "deck_name": "VARIANT Y'shtola Variant 01 - Rafael Paste 2026-06-24",
+      "diagnostic_source_floor_per_color": 15,
+      "direct_or_fetch_access_by_color": {
+        "B": 19,
+        "U": 17,
+        "W": 16
+      },
+      "direct_sources_by_color": {
+        "B": 14,
+        "U": 12,
+        "W": 11
+      },
+      "land_features": [
+        {
+          "basic": false,
+          "card_name": "Adarkar Wastes",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "U"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Ancient Tomb",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "fast_colorless_mana"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Caves of Koilos",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Command Tower",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "commander_support"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Exotic Orchard",
+          "colorless_only": false,
+          "conditional_any_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Fabled Passage",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Flooded Strand",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "U"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Gloomlake Verge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "U",
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Godless Shrine",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "B"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Plains Swamp",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Hallowed Fountain // Hallowed Fountain",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "U"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Plains Island",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Island // Island",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "U"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 3,
+          "type_line": "Basic Land \u2014 Island",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Marsh Flats",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "B"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Otawara, Soaring City",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "U"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Plains // Plains",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 3,
+          "type_line": "Basic Land \u2014 Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Polluted Delta",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "U",
+            "B"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Prismatic Vista",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Reflecting Pool",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Reliquary Tower",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Scrubland",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Plains Swamp",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Shattered Sanctum",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "B"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Starting Town",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Town",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sunken Ruins",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "U",
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Swamp // Swamp",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 4,
+          "type_line": "Basic Land \u2014 Swamp",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Underground River",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "U",
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Watery Grave",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "U",
+            "B"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Island Swamp",
+          "utility_roles": []
+        }
+      ],
+      "land_gap": 2,
+      "mana_base_counts": {
+        "basic_land_quantity": 10,
+        "colorless_only_quantity": 2,
+        "conditional_tapped_quantity": 2,
+        "fetch_or_search_quantity": 5,
+        "land_quantity": 32,
+        "land_rows": 25,
+        "land_rows_with_oracle_text": 25,
+        "optional_untapped_life_quantity": 3,
+        "reliably_untapped_quantity": 27,
+        "untapped_or_expected_quantity": 30,
+        "utility_land_quantity": 2
+      },
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "required_next_gates": [
+        "named_land_candidate_pool_by_commander_color_identity",
+        "same_lane_or_excess_role_cut_model",
+        "structure_and_legality_recheck_after_candidate_copy",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "scope": "hermes_registered_variant",
+      "status": "mana_profile_ready_for_named_land_candidate_pool",
+      "target_land_floor": 34
+    },
+    {
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_identity_source": "card_oracle_cache",
+      "conditional_sources_by_color": {
+        "R": 0,
+        "W": 0
+      },
+      "current_land_count": 33,
+      "deck_id": "6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "diagnostic_source_floor_per_color": 21,
+      "direct_or_fetch_access_by_color": {
+        "R": 23,
+        "W": 23
+      },
+      "direct_sources_by_color": {
+        "R": 18,
+        "W": 18
+      },
+      "land_features": [
+        {
+          "basic": false,
+          "card_name": "Ancient Den",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Artifact Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Ancient Tomb",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "fast_colorless_mana"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Arid Mesa",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Battlefield Forge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Bloodstained Mire",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "B",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "City of Brass",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Clifftop Retreat",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Command Tower",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "commander_support"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Elegant Parlor",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": [
+            "graveyard_utility",
+            "topdeck_selection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Flooded Strand",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "U"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Gemstone Caverns",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Great Furnace",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Artifact Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Hall of Heliod's Generosity",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": [
+            "graveyard_utility"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Inspiring Vantage",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Inventors' Fair",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Legendary Land",
+          "utility_roles": [
+            "artifact_tutor"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Mana Confluence",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Marsh Flats",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "B"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Mountain // Mountain",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Basic Land \u2014 Mountain",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Needleverge Pathway // Pillarverge Pathway",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Plains // Plains",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Basic Land \u2014 Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Plateau",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Prismatic Vista",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Rugged Prairie",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sacred Foundry",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Scalding Tarn",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "U",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Spectator Seating",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "commander_expected_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sunbaked Canyon",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Sunbillow Verge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sundown Pass",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Urza's Saga",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Enchantment Land \u2014 Urza's Saga",
+          "utility_roles": [
+            "artifact_tutor"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "War Room",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "card_flow",
+            "commander_support"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Windswept Heath",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "G"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Wooded Foothills",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "R",
+            "G"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        }
+      ],
+      "land_gap": 1,
+      "mana_base_counts": {
+        "always_tapped_quantity": 1,
+        "basic_land_quantity": 2,
+        "colorless_only_quantity": 4,
+        "commander_expected_untapped_quantity": 1,
+        "conditional_tapped_quantity": 3,
+        "fetch_or_search_quantity": 8,
+        "land_quantity": 33,
+        "land_rows": 33,
+        "land_rows_with_oracle_text": 33,
+        "optional_untapped_life_quantity": 1,
+        "reliably_untapped_quantity": 27,
+        "untapped_or_expected_quantity": 29,
+        "utility_land_quantity": 8
+      },
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "limit_colorless_utility_until_color_floor",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "required_next_gates": [
+        "named_land_candidate_pool_by_commander_color_identity",
+        "same_lane_or_excess_role_cut_model",
+        "structure_and_legality_recheck_after_candidate_copy",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "scope": "hermes_lorehold_baseline",
+      "status": "mana_profile_ready_for_named_land_candidate_pool",
+      "target_land_floor": 34
+    },
+    {
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_identity_source": "card_oracle_cache",
+      "conditional_sources_by_color": {
+        "R": 2,
+        "W": 2
+      },
+      "current_land_count": 33,
+      "deck_id": "614",
+      "deck_name": "VARIANT Lorehold Variant 09 - Rafael Paste 2026-06-24",
+      "diagnostic_source_floor_per_color": 21,
+      "direct_or_fetch_access_by_color": {
+        "R": 19,
+        "W": 24
+      },
+      "direct_sources_by_color": {
+        "R": 12,
+        "W": 17
+      },
+      "land_features": [
+        {
+          "basic": false,
+          "card_name": "Ancient Den",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Artifact Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Ancient Tomb",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "fast_colorless_mana"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Arid Mesa",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Bloodstained Mire",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "B",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Cavern of Souls",
+          "colorless_only": false,
+          "conditional_any_colors": [
+            "W",
+            "R"
+          ],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "anti_countermagic"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Clifftop Retreat",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "conditional_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Command Tower",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "commander_support"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Conduit Pylons",
+          "colorless_only": false,
+          "conditional_any_colors": [
+            "W",
+            "R"
+          ],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Desert",
+          "utility_roles": [
+            "desert_typal",
+            "graveyard_utility",
+            "topdeck_selection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Elegant Parlor",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "always_tapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": [
+            "graveyard_utility",
+            "topdeck_selection"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Flooded Strand",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "U"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Great Furnace",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Artifact Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Marsh Flats",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "B"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Mountain // Mountain",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 3,
+          "type_line": "Basic Land \u2014 Mountain",
+          "utility_roles": []
+        },
+        {
+          "basic": true,
+          "card_name": "Plains // Plains",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 8,
+          "type_line": "Basic Land \u2014 Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Plateau",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Prismatic Vista",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sacred Foundry",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "optional_untapped_life",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land \u2014 Mountain Plains",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Scalding Tarn",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "U",
+            "R"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Spectator Seating",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "commander_expected_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Sunbaked Canyon",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Sunbillow Verge",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Urza's Saga",
+          "colorless_only": true,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": false,
+          "fetchable_colors": [],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Enchantment Land \u2014 Urza's Saga",
+          "utility_roles": [
+            "artifact_tutor"
+          ]
+        },
+        {
+          "basic": false,
+          "card_name": "Windswept Heath",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "W",
+            "G"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        },
+        {
+          "basic": false,
+          "card_name": "Wooded Foothills",
+          "colorless_only": false,
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetch_or_search_land": true,
+          "fetchable_colors": [
+            "R",
+            "G"
+          ],
+          "has_oracle_text": true,
+          "quantity": 1,
+          "type_line": "Land",
+          "utility_roles": []
+        }
+      ],
+      "land_gap": 1,
+      "mana_base_counts": {
+        "always_tapped_quantity": 1,
+        "basic_land_quantity": 11,
+        "colorless_only_quantity": 2,
+        "commander_expected_untapped_quantity": 1,
+        "conditional_tapped_quantity": 1,
+        "fetch_or_search_quantity": 8,
+        "land_quantity": 33,
+        "land_rows": 24,
+        "land_rows_with_oracle_text": 24,
+        "optional_untapped_life_quantity": 1,
+        "reliably_untapped_quantity": 29,
+        "untapped_or_expected_quantity": 31,
+        "utility_land_quantity": 7
+      },
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_R_source_or_fetchable_access",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "required_next_gates": [
+        "named_land_candidate_pool_by_commander_color_identity",
+        "same_lane_or_excess_role_cut_model",
+        "structure_and_legality_recheck_after_candidate_copy",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "scope": "hermes_lorehold_variant",
+      "status": "mana_profile_ready_for_named_land_candidate_pool",
+      "target_land_floor": 34
+    }
+  ],
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_repair_hypothesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_core_repair_hypothesis_20260705_global_goal_hermes_only.json",
+  "summary": {
+    "profile_count": 9,
+    "recommendation_counts": {
+      "add_R_source_or_fetchable_access": 6,
+      "add_W_source_or_fetchable_access": 6,
+      "add_land_quantity_before_spell_slots": 9,
+      "limit_colorless_utility_until_color_floor": 6,
+      "prioritize_untapped_fixing_lands": 1,
+      "review_fetchable_dual_or_basic_mix": 8
+    },
+    "status_counts": {
+      "mana_profile_ready_for_named_land_candidate_pool": 9
+    },
+    "top_next_action": "build_named_land_candidate_pool_from_mana_profiles"
+  }
+}

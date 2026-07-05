@@ -1,0 +1,4724 @@
+{
+  "artifact_type": "global_commander_land_cut_candidate_model",
+  "battle_or_optimization_performed": false,
+  "deck_cut_pools": [
+    {
+      "blocked_cut_examples": [],
+      "commander": "Lorehold, the Historian",
+      "cut_candidate_count": 63,
+      "deck_id": "612",
+      "deck_name": "VARIANT Lorehold Variant 07 - Rafael Paste 2026-06-24",
+      "excess_roles": [
+        {
+          "count": 24,
+          "excess": 8,
+          "role": "ramp",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 12,
+          "excess": 7,
+          "role": "board_wipe",
+          "severity": "critical",
+          "target_max": 5
+        },
+        {
+          "count": 18,
+          "excess": 4,
+          "role": "wincon",
+          "severity": "critical",
+          "target_max": 14
+        },
+        {
+          "count": 47,
+          "excess": 23,
+          "role": "engine",
+          "severity": "support",
+          "target_max": 24
+        }
+      ],
+      "land_candidate_count": 507,
+      "missing_roles": [
+        "land"
+      ],
+      "mutation_allowed": false,
+      "pair_hypotheses": [
+        {
+          "add": "Ash Barrens",
+          "cut": "Longshot, Rebel Bowman",
+          "mutation_allowed": false,
+          "pair_score": 175,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Longshot, Rebel Bowman",
+          "mutation_allowed": false,
+          "pair_score": 175,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Battlefield Forge",
+          "cut": "Longshot, Rebel Bowman",
+          "mutation_allowed": false,
+          "pair_score": 170,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Agate Instigator",
+          "mutation_allowed": false,
+          "pair_score": 161,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Warleader's Call",
+          "mutation_allowed": false,
+          "pair_score": 161,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Agate Instigator",
+          "mutation_allowed": false,
+          "pair_score": 161,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Warleader's Call",
+          "mutation_allowed": false,
+          "pair_score": 161,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Battlefield Forge",
+          "cut": "Agate Instigator",
+          "mutation_allowed": false,
+          "pair_score": 156,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Battlefield Forge",
+          "cut": "Warleader's Call",
+          "mutation_allowed": false,
+          "pair_score": 156,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        }
+      ],
+      "status": "review_cut_pool_ready",
+      "top_cut_candidates": [
+        {
+          "card_name": "Longshot, Rebel Bowman",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine,ramp,wincon",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine",
+            "ramp",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine",
+            "ramp",
+            "wincon"
+          ],
+          "score": 76,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Agate Instigator",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine,wincon",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine",
+            "wincon"
+          ],
+          "score": 62,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Warleader's Call",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine,wincon",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine",
+            "wincon"
+          ],
+          "score": 62,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Pyromancer's Goggles",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 58,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "classification_source": "tag_plus_text",
+          "cmc": 8.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "score": 57,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Ancient Gold Dragon",
+          "classification_source": "tag_plus_text",
+          "cmc": 7.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "wincon"
+          ],
+          "score": 54,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 53,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Grinding Station",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 53,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Monologue Tax",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 53,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Heat Shimmer",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,wincon",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "wincon"
+          ],
+          "score": 49,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Molten Duplication",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,wincon",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "wincon"
+          ],
+          "score": 49,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Twinflame",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,wincon",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "wincon"
+          ],
+          "score": 49,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        }
+      ],
+      "top_land_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Sunbaked Canyon",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "card_name": "Battlefield Forge",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "blocked_cut_examples": [],
+      "commander": "Lorehold, the Historian",
+      "cut_candidate_count": 63,
+      "deck_id": "616",
+      "deck_name": "VARIANT Lorehold Variant 11 - Rafael Paste 2026-06-24",
+      "excess_roles": [
+        {
+          "count": 19,
+          "excess": 3,
+          "role": "draw",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 16,
+          "excess": 2,
+          "role": "removal",
+          "severity": "critical",
+          "target_max": 14
+        },
+        {
+          "count": 10,
+          "excess": 5,
+          "role": "board_wipe",
+          "severity": "critical",
+          "target_max": 5
+        },
+        {
+          "count": 17,
+          "excess": 7,
+          "role": "protection",
+          "severity": "support",
+          "target_max": 10
+        },
+        {
+          "count": 16,
+          "excess": 2,
+          "role": "wincon",
+          "severity": "critical",
+          "target_max": 14
+        },
+        {
+          "count": 30,
+          "excess": 6,
+          "role": "engine",
+          "severity": "support",
+          "target_max": 24
+        }
+      ],
+      "land_candidate_count": 519,
+      "missing_roles": [
+        "land"
+      ],
+      "mutation_allowed": false,
+      "pair_hypotheses": [
+        {
+          "add": "Ash Barrens",
+          "cut": "Rise of the Eldrazi",
+          "mutation_allowed": false,
+          "pair_score": 143,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Rise of the Eldrazi",
+          "mutation_allowed": false,
+          "pair_score": 143,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Soul Immolation",
+          "mutation_allowed": false,
+          "pair_score": 141,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Soul Immolation",
+          "mutation_allowed": false,
+          "pair_score": 141,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Coruscation Mage",
+          "mutation_allowed": false,
+          "pair_score": 140,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Coruscation Mage",
+          "mutation_allowed": false,
+          "pair_score": 140,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "Rise of the Eldrazi",
+          "mutation_allowed": false,
+          "pair_score": 138,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "Soul Immolation",
+          "mutation_allowed": false,
+          "pair_score": 136,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "Coruscation Mage",
+          "mutation_allowed": false,
+          "pair_score": 135,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        }
+      ],
+      "status": "review_cut_pool_ready",
+      "top_cut_candidates": [
+        {
+          "card_name": "Rise of the Eldrazi",
+          "classification_source": "tag_plus_text",
+          "cmc": 12.0,
+          "cut_reasons": [
+            "matches_excess_roles:protection,removal,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "protection",
+            "removal",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "protection",
+            "removal",
+            "wincon"
+          ],
+          "score": 44,
+          "staple_rank": 2173,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Soul Immolation",
+          "classification_source": "text_inferred",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,removal,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "removal",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "removal",
+            "wincon"
+          ],
+          "score": 42,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Coruscation Mage",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine,wincon",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine",
+            "wincon"
+          ],
+          "score": 41,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Stuffy Doll",
+          "classification_source": "text_inferred",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,protection,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "protection",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "protection",
+            "wincon"
+          ],
+          "score": 40,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Explosive Singularity",
+          "classification_source": "tag_plus_text",
+          "cmc": 10.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,removal",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "removal"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "removal"
+          ],
+          "score": 38,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Star of Extinction",
+          "classification_source": "tag_plus_text",
+          "cmc": 7.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,removal",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "removal"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "removal"
+          ],
+          "score": 38,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Worldfire",
+          "classification_source": "tag_plus_text",
+          "cmc": 9.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "wincon"
+          ],
+          "score": 38,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Apex of Power",
+          "classification_source": "tag_plus_text",
+          "cmc": 10.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 36,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Bedlam Reveler",
+          "classification_source": "tag_plus_text",
+          "cmc": 8.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 36,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 36,
+          "staple_rank": 1765,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Firesong and Sunspeaker",
+          "classification_source": "tag_plus_text",
+          "cmc": 6.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "wincon"
+          ],
+          "score": 35,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Utvara Hellkite",
+          "classification_source": "tag_plus_text",
+          "cmc": 8.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "wincon"
+          ],
+          "score": 35,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        }
+      ],
+      "top_land_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Sunbaked Canyon",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "card_name": "Arid Mesa",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "blocked_cut_examples": [],
+      "commander": "Lorehold, the Historian",
+      "cut_candidate_count": 59,
+      "deck_id": "609",
+      "deck_name": "VARIANT Lorehold Variant 04 - Rafael Paste 2026-06-24",
+      "excess_roles": [
+        {
+          "count": 26,
+          "excess": 10,
+          "role": "draw",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 15,
+          "excess": 1,
+          "role": "removal",
+          "severity": "critical",
+          "target_max": 14
+        },
+        {
+          "count": 8,
+          "excess": 3,
+          "role": "board_wipe",
+          "severity": "critical",
+          "target_max": 5
+        },
+        {
+          "count": 14,
+          "excess": 4,
+          "role": "protection",
+          "severity": "support",
+          "target_max": 10
+        },
+        {
+          "count": 11,
+          "excess": 3,
+          "role": "tutor",
+          "severity": "support",
+          "target_max": 8
+        },
+        {
+          "count": 27,
+          "excess": 3,
+          "role": "engine",
+          "severity": "support",
+          "target_max": 24
+        }
+      ],
+      "land_candidate_count": 510,
+      "missing_roles": [
+        "land"
+      ],
+      "mutation_allowed": false,
+      "pair_hypotheses": [
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Tibalt's Trickery",
+          "mutation_allowed": false,
+          "pair_score": 142,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Apex of Power",
+          "mutation_allowed": false,
+          "pair_score": 139,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Reforge the Soul",
+          "mutation_allowed": false,
+          "pair_score": 139,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Cabaretti Courtyard",
+          "cut": "Tibalt's Trickery",
+          "mutation_allowed": false,
+          "pair_score": 137,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "City of Brass",
+          "cut": "Tibalt's Trickery",
+          "mutation_allowed": false,
+          "pair_score": 137,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Cabaretti Courtyard",
+          "cut": "Apex of Power",
+          "mutation_allowed": false,
+          "pair_score": 134,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Cabaretti Courtyard",
+          "cut": "Reforge the Soul",
+          "mutation_allowed": false,
+          "pair_score": 134,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "City of Brass",
+          "cut": "Apex of Power",
+          "mutation_allowed": false,
+          "pair_score": 134,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "City of Brass",
+          "cut": "Reforge the Soul",
+          "mutation_allowed": false,
+          "pair_score": 134,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        }
+      ],
+      "status": "review_cut_pool_ready",
+      "top_cut_candidates": [
+        {
+          "card_name": "Tibalt's Trickery",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,protection,removal",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "protection",
+            "removal"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "protection",
+            "removal"
+          ],
+          "score": 43,
+          "staple_rank": 571,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Apex of Power",
+          "classification_source": "tag_plus_text",
+          "cmc": 10.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 40,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 40,
+          "staple_rank": 1765,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Bolt Bend",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,protection",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "protection"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "protection"
+          ],
+          "score": 36,
+          "staple_rank": 605,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Penance",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,protection",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "protection"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "protection"
+          ],
+          "score": 36,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Archivist of Oghma",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 35,
+          "staple_rank": 637,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Improvisation Capstone",
+          "classification_source": "tag_plus_text",
+          "cmc": 0.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 35,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "classification_source": "tag_plus_text",
+          "cmc": 8.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "score": 33,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Blood Sun",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw"
+          ],
+          "score": 30,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "classification_source": "tag",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw"
+          ],
+          "score": 30,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Valakut Awakening // Valakut Stoneforge",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw"
+          ],
+          "score": 30,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Wheel of Fortune",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw"
+          ],
+          "score": 30,
+          "staple_rank": 554,
+          "status": "review_only_cut_candidate"
+        }
+      ],
+      "top_land_candidates": [
+        {
+          "card_name": "Sunbaked Canyon",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "City of Brass",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "blocked_cut_examples": [],
+      "commander": "Lorehold, the Historian",
+      "cut_candidate_count": 56,
+      "deck_id": "610",
+      "deck_name": "VARIANT Lorehold Variant 05 - Rafael Paste 2026-06-24",
+      "excess_roles": [
+        {
+          "count": 22,
+          "excess": 6,
+          "role": "ramp",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 7,
+          "excess": 2,
+          "role": "board_wipe",
+          "severity": "critical",
+          "target_max": 5
+        },
+        {
+          "count": 17,
+          "excess": 9,
+          "role": "recursion",
+          "severity": "support",
+          "target_max": 8
+        },
+        {
+          "count": 31,
+          "excess": 7,
+          "role": "engine",
+          "severity": "support",
+          "target_max": 24
+        }
+      ],
+      "land_candidate_count": 508,
+      "missing_roles": [
+        "land"
+      ],
+      "mutation_allowed": false,
+      "pair_hypotheses": [
+        {
+          "add": "Ash Barrens",
+          "cut": "Brilliant Restoration",
+          "mutation_allowed": false,
+          "pair_score": 124,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Wake the Past",
+          "mutation_allowed": false,
+          "pair_score": 124,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Unstable Glyphbridge // Sandswirl Wanderglyph",
+          "mutation_allowed": false,
+          "pair_score": 123,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "Brilliant Restoration",
+          "mutation_allowed": false,
+          "pair_score": 119,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "Wake the Past",
+          "mutation_allowed": false,
+          "pair_score": 119,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Cabaretti Courtyard",
+          "cut": "Brilliant Restoration",
+          "mutation_allowed": false,
+          "pair_score": 119,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Cabaretti Courtyard",
+          "cut": "Wake the Past",
+          "mutation_allowed": false,
+          "pair_score": 119,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "Unstable Glyphbridge // Sandswirl Wanderglyph",
+          "mutation_allowed": false,
+          "pair_score": 118,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Cabaretti Courtyard",
+          "cut": "Unstable Glyphbridge // Sandswirl Wanderglyph",
+          "mutation_allowed": false,
+          "pair_score": 118,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        }
+      ],
+      "status": "review_cut_pool_ready",
+      "top_cut_candidates": [
+        {
+          "card_name": "Brilliant Restoration",
+          "classification_source": "tag_plus_text",
+          "cmc": 7.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,recursion",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "recursion"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "recursion"
+          ],
+          "score": 39,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Wake the Past",
+          "classification_source": "tag_plus_text",
+          "cmc": 7.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,recursion",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "recursion"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "recursion"
+          ],
+          "score": 39,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Unstable Glyphbridge // Sandswirl Wanderglyph",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,recursion",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "recursion"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "recursion"
+          ],
+          "score": 38,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "classification_source": "tag_plus_text",
+          "cmc": 8.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "score": 36,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Primal Amulet // Primal Wellspring",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 35,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Squee, Goblin Nabob",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,recursion",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "recursion"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "recursion"
+          ],
+          "score": 34,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Norn's Annex",
+          "classification_source": "tag",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:ramp",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "score": 31,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "All Is Dust",
+          "classification_source": "tag",
+          "cmc": 7.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe"
+          ],
+          "score": 27,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Austere Command",
+          "classification_source": "tag",
+          "cmc": 6.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe"
+          ],
+          "score": 27,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Blasphemous Act",
+          "classification_source": "tag",
+          "cmc": 9.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe"
+          ],
+          "score": 27,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Vanquish the Horde",
+          "classification_source": "tag",
+          "cmc": 8.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe"
+          ],
+          "score": 27,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Basalt Monolith",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:ramp",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "score": 26,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        }
+      ],
+      "top_land_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 85,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Arid Mesa",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "blocked_cut_examples": [],
+      "commander": "Lorehold, the Historian",
+      "cut_candidate_count": 42,
+      "deck_id": "608",
+      "deck_name": "VARIANT Lorehold Variant 03 - Rafael Paste 2026-06-23",
+      "excess_roles": [
+        {
+          "count": 21,
+          "excess": 5,
+          "role": "ramp",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 35,
+          "excess": 19,
+          "role": "draw",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 23,
+          "excess": 18,
+          "role": "board_wipe",
+          "severity": "critical",
+          "target_max": 5
+        },
+        {
+          "count": 23,
+          "excess": 15,
+          "role": "recursion",
+          "severity": "support",
+          "target_max": 8
+        },
+        {
+          "count": 25,
+          "excess": 17,
+          "role": "tutor",
+          "severity": "support",
+          "target_max": 8
+        },
+        {
+          "count": 25,
+          "excess": 1,
+          "role": "engine",
+          "severity": "support",
+          "target_max": 24
+        }
+      ],
+      "land_candidate_count": 516,
+      "missing_roles": [
+        "land"
+      ],
+      "mutation_allowed": false,
+      "pair_hypotheses": [
+        {
+          "add": "Ash Barrens",
+          "cut": "Cool but Rude",
+          "mutation_allowed": false,
+          "pair_score": 160,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Cool but Rude",
+          "mutation_allowed": false,
+          "pair_score": 160,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Bant Panorama",
+          "cut": "Cool but Rude",
+          "mutation_allowed": false,
+          "pair_score": 155,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Velomachus Lorehold",
+          "mutation_allowed": false,
+          "pair_score": 122,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Velomachus Lorehold",
+          "mutation_allowed": false,
+          "pair_score": 122,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Magmakin Artillerist",
+          "mutation_allowed": false,
+          "pair_score": 121,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Magmakin Artillerist",
+          "mutation_allowed": false,
+          "pair_score": 121,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Bant Panorama",
+          "cut": "Velomachus Lorehold",
+          "mutation_allowed": false,
+          "pair_score": 117,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Bant Panorama",
+          "cut": "Magmakin Artillerist",
+          "mutation_allowed": false,
+          "pair_score": 116,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        }
+      ],
+      "status": "review_cut_pool_ready",
+      "top_cut_candidates": [
+        {
+          "card_name": "Cool but Rude",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,draw,engine,tutor",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "draw",
+            "engine",
+            "tutor"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "draw",
+            "engine",
+            "tutor"
+          ],
+          "score": 85,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Velomachus Lorehold",
+          "classification_source": "tag_plus_text",
+          "cmc": 7.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 47,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Magmakin Artillerist",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,draw,engine",
+            "also_carries_non_excess_roles:wincon"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "draw",
+            "engine",
+            "wincon"
+          ],
+          "score": 46,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Scroll Rack",
+          "classification_source": "tag",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw"
+          ],
+          "score": 39,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Valakut Awakening // Valakut Stoneforge",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw"
+          ],
+          "score": 39,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Wheel of Fortune",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw"
+          ],
+          "score": 39,
+          "staple_rank": 554,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Tablet of Discovery",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,ramp",
+            "only_carries_excess_roles",
+            "potential_topdeck_engine_anchor_requires_commander_source_lane"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "ramp"
+          ],
+          "score": 38,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Ancient Copper Dragon",
+          "classification_source": "tag_plus_text",
+          "cmc": 6.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 33,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Artist's Talent",
+          "classification_source": "tag_plus_text",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine,ramp",
+            "also_carries_non_excess_roles:wincon"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine",
+            "ramp",
+            "wincon"
+          ],
+          "score": 33,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Goldspan Dragon",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 33,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Idyllic Tutor",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:tutor",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "tutor"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "tutor"
+          ],
+          "score": 33,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Imperial Recruiter",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:tutor",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "tutor"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "tutor"
+          ],
+          "score": 33,
+          "staple_rank": 596,
+          "status": "review_only_cut_candidate"
+        }
+      ],
+      "top_land_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 75,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Sunbaked Canyon",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 75,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "card_name": "Bant Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "blocked_cut_examples": [],
+      "commander": "Lorehold, the Historian",
+      "cut_candidate_count": 62,
+      "deck_id": "613",
+      "deck_name": "VARIANT Lorehold Variant 08 - Rafael Paste 2026-06-24",
+      "excess_roles": [
+        {
+          "count": 20,
+          "excess": 4,
+          "role": "ramp",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 28,
+          "excess": 12,
+          "role": "draw",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 8,
+          "excess": 3,
+          "role": "board_wipe",
+          "severity": "critical",
+          "target_max": 5
+        },
+        {
+          "count": 16,
+          "excess": 6,
+          "role": "protection",
+          "severity": "support",
+          "target_max": 10
+        },
+        {
+          "count": 37,
+          "excess": 13,
+          "role": "engine",
+          "severity": "support",
+          "target_max": 24
+        }
+      ],
+      "land_candidate_count": 510,
+      "missing_roles": [
+        "land"
+      ],
+      "mutation_allowed": false,
+      "pair_hypotheses": [
+        {
+          "add": "Ash Barrens",
+          "cut": "Glint-Horn Buccaneer",
+          "mutation_allowed": false,
+          "pair_score": 155,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Glint-Horn Buccaneer",
+          "mutation_allowed": false,
+          "pair_score": 155,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "The One Ring",
+          "mutation_allowed": false,
+          "pair_score": 154,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "The One Ring",
+          "mutation_allowed": false,
+          "pair_score": 154,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Apex of Power",
+          "mutation_allowed": false,
+          "pair_score": 151,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Sunbaked Canyon",
+          "cut": "Apex of Power",
+          "mutation_allowed": false,
+          "pair_score": 151,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "Glint-Horn Buccaneer",
+          "mutation_allowed": false,
+          "pair_score": 150,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "The One Ring",
+          "mutation_allowed": false,
+          "pair_score": 149,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "Apex of Power",
+          "mutation_allowed": false,
+          "pair_score": 146,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        }
+      ],
+      "status": "review_cut_pool_ready",
+      "top_cut_candidates": [
+        {
+          "card_name": "Glint-Horn Buccaneer",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,draw,engine",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "draw",
+            "engine"
+          ],
+          "score": 56,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "The One Ring",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine,protection",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine",
+            "protection"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine",
+            "protection"
+          ],
+          "score": 55,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Apex of Power",
+          "classification_source": "tag_plus_text",
+          "cmc": 10.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 52,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Reforge the Soul",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 52,
+          "staple_rank": 1765,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Hit the Mother Lode",
+          "classification_source": "tag_plus_text",
+          "cmc": 7.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,ramp",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "ramp"
+          ],
+          "score": 47,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Improvisation Capstone",
+          "classification_source": "tag_plus_text",
+          "cmc": 0.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 47,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "classification_source": "tag_plus_text",
+          "cmc": 8.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "score": 43,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Dance with Calamity",
+          "classification_source": "tag_plus_text",
+          "cmc": 8.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot",
+            "potential_topdeck_engine_anchor_requires_commander_source_lane"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 40,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Galvanoth",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot",
+            "potential_topdeck_engine_anchor_requires_commander_source_lane"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 40,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Penance",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,protection",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "protection"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "protection"
+          ],
+          "score": 40,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Planetarium of Wan Shi Tong",
+          "classification_source": "tag_plus_text",
+          "cmc": 6.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot",
+            "potential_topdeck_engine_anchor_requires_commander_source_lane"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 40,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Redirect Lightning",
+          "classification_source": "tag_plus_text",
+          "cmc": 1.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,protection",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "protection"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "protection"
+          ],
+          "score": 40,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        }
+      ],
+      "top_land_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Sunbaked Canyon",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "card_name": "Arid Mesa",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "blocked_cut_examples": [],
+      "commander": "Y'shtola, Night's Blessed",
+      "cut_candidate_count": 34,
+      "deck_id": "621",
+      "deck_name": "VARIANT Y'shtola Variant 01 - Rafael Paste 2026-06-24",
+      "excess_roles": [
+        {
+          "count": 6,
+          "excess": 1,
+          "role": "board_wipe",
+          "severity": "critical",
+          "target_max": 5
+        },
+        {
+          "count": 31,
+          "excess": 7,
+          "role": "engine",
+          "severity": "support",
+          "target_max": 24
+        }
+      ],
+      "land_candidate_count": 674,
+      "missing_roles": [
+        "land"
+      ],
+      "mutation_allowed": false,
+      "pair_hypotheses": [
+        {
+          "add": "Ash Barrens",
+          "cut": "Farewell",
+          "mutation_allowed": false,
+          "pair_score": 73,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Contaminated Landscape",
+          "cut": "Farewell",
+          "mutation_allowed": false,
+          "pair_score": 73,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Delney, Streetwise Lookout",
+          "mutation_allowed": false,
+          "pair_score": 70,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "High Fae Trickster",
+          "mutation_allowed": false,
+          "pair_score": 70,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Contaminated Landscape",
+          "cut": "Delney, Streetwise Lookout",
+          "mutation_allowed": false,
+          "pair_score": 70,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Contaminated Landscape",
+          "cut": "High Fae Trickster",
+          "mutation_allowed": false,
+          "pair_score": 70,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "Farewell",
+          "mutation_allowed": false,
+          "pair_score": 68,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "Delney, Streetwise Lookout",
+          "mutation_allowed": false,
+          "pair_score": 65,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Arid Mesa",
+          "cut": "High Fae Trickster",
+          "mutation_allowed": false,
+          "pair_score": 65,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        }
+      ],
+      "status": "review_cut_pool_ready",
+      "top_cut_candidates": [
+        {
+          "card_name": "Farewell",
+          "classification_source": "text_inferred",
+          "cmc": 6.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "board_wipe"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe"
+          ],
+          "score": 22,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Delney, Streetwise Lookout",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 19,
+          "staple_rank": 847,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "High Fae Trickster",
+          "classification_source": "text_inferred",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 19,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Kira, Great Glass-Spinner",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 19,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Spirit Link",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 19,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Propaganda // Propaganda",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "board_wipe"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe"
+          ],
+          "score": 17,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Authority of the Consuls",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review",
+            "commander_staple_rank_399"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 11,
+          "staple_rank": 399,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Ghostly Prison",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe",
+            "only_carries_excess_roles",
+            "role_text_inferred_review",
+            "commander_staple_rank_168"
+          ],
+          "matching_excess_roles": [
+            "board_wipe"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe"
+          ],
+          "score": 9,
+          "staple_rank": 168,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "The Meathook Massacre",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine",
+            "also_carries_non_excess_roles:wincon",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine",
+            "wincon"
+          ],
+          "score": 6,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Bloodthirsty Conqueror",
+          "classification_source": "text_inferred",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "also_carries_non_excess_roles:wincon",
+            "high_cmc_spell_slot",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "wincon"
+          ],
+          "score": 4,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Exquisite Blood",
+          "classification_source": "text_inferred",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "also_carries_non_excess_roles:wincon",
+            "high_cmc_spell_slot",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "wincon"
+          ],
+          "score": 4,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Sanguine Bond",
+          "classification_source": "text_inferred",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "also_carries_non_excess_roles:wincon",
+            "high_cmc_spell_slot",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "wincon"
+          ],
+          "score": 4,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        }
+      ],
+      "top_land_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 51,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Contaminated Landscape",
+          "color_identity": [
+            "W",
+            "U",
+            "B"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 51,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow",
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Arid Mesa",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "blocked_cut_examples": [],
+      "commander": "Lorehold, the Historian",
+      "cut_candidate_count": 59,
+      "deck_id": "6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "excess_roles": [
+        {
+          "count": 51,
+          "excess": 35,
+          "role": "ramp",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 22,
+          "excess": 6,
+          "role": "draw",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 19,
+          "excess": 9,
+          "role": "protection",
+          "severity": "support",
+          "target_max": 10
+        },
+        {
+          "count": 9,
+          "excess": 1,
+          "role": "tutor",
+          "severity": "support",
+          "target_max": 8
+        },
+        {
+          "count": 26,
+          "excess": 2,
+          "role": "engine",
+          "severity": "support",
+          "target_max": 24
+        }
+      ],
+      "land_candidate_count": 499,
+      "missing_roles": [
+        "land",
+        "wincon"
+      ],
+      "mutation_allowed": false,
+      "pair_hypotheses": [
+        {
+          "add": "Ash Barrens",
+          "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "mutation_allowed": false,
+          "pair_score": 110,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Unexpected Windfall",
+          "mutation_allowed": false,
+          "pair_score": 110,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Rite of Flame",
+          "mutation_allowed": false,
+          "pair_score": 106,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Bant Panorama",
+          "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "mutation_allowed": false,
+          "pair_score": 105,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Bant Panorama",
+          "cut": "Unexpected Windfall",
+          "mutation_allowed": false,
+          "pair_score": 105,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Brokers Hideout",
+          "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "mutation_allowed": false,
+          "pair_score": 105,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Brokers Hideout",
+          "cut": "Unexpected Windfall",
+          "mutation_allowed": false,
+          "pair_score": 105,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Bant Panorama",
+          "cut": "Rite of Flame",
+          "mutation_allowed": false,
+          "pair_score": 101,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Brokers Hideout",
+          "cut": "Rite of Flame",
+          "mutation_allowed": false,
+          "pair_score": 101,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        }
+      ],
+      "status": "review_cut_pool_ready",
+      "top_cut_candidates": [
+        {
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 59,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Unexpected Windfall",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,ramp",
+            "only_carries_excess_roles",
+            "commander_staple_rank_303"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "ramp"
+          ],
+          "score": 59,
+          "staple_rank": 303,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Rite of Flame",
+          "classification_source": "tag",
+          "cmc": 1.0,
+          "cut_reasons": [
+            "matches_excess_roles:ramp",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "score": 55,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Ruby Medallion",
+          "classification_source": "tag",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:ramp",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "score": 55,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Professional Face-Breaker",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine,ramp",
+            "only_carries_excess_roles",
+            "potential_topdeck_engine_anchor_requires_commander_source_lane",
+            "commander_staple_rank_223"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine",
+            "ramp"
+          ],
+          "score": 51,
+          "staple_rank": 223,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Storm-Kiln Artist",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles",
+            "commander_staple_rank_233"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 51,
+          "staple_rank": 233,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Boros Signet",
+          "classification_source": "tag",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:ramp",
+            "only_carries_excess_roles",
+            "commander_staple_rank_226"
+          ],
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "score": 47,
+          "staple_rank": 226,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Jeska's Will",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,ramp",
+            "only_carries_excess_roles",
+            "potential_topdeck_engine_anchor_requires_commander_source_lane",
+            "commander_staple_rank_102"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "ramp"
+          ],
+          "score": 47,
+          "staple_rank": 102,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Lotus Petal",
+          "classification_source": "tag",
+          "cmc": 0.0,
+          "cut_reasons": [
+            "matches_excess_roles:ramp",
+            "only_carries_excess_roles",
+            "commander_staple_rank_117"
+          ],
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "score": 47,
+          "staple_rank": 117,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Mana Vault",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles",
+            "role_text_inferred_review",
+            "commander_staple_rank_144"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 47,
+          "staple_rank": 144,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Mox Amber",
+          "classification_source": "tag",
+          "cmc": 0.0,
+          "cut_reasons": [
+            "matches_excess_roles:ramp",
+            "only_carries_excess_roles",
+            "commander_staple_rank_208"
+          ],
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "score": 47,
+          "staple_rank": 208,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Seething Song",
+          "classification_source": "tag",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:ramp",
+            "only_carries_excess_roles",
+            "commander_staple_rank_370"
+          ],
+          "matching_excess_roles": [
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "score": 47,
+          "staple_rank": 370,
+          "status": "review_only_cut_candidate"
+        }
+      ],
+      "top_land_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 51,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Bant Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Brokers Hideout",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "blocked_cut_examples": [],
+      "commander": "Lorehold, the Historian",
+      "cut_candidate_count": 63,
+      "deck_id": "614",
+      "deck_name": "VARIANT Lorehold Variant 09 - Rafael Paste 2026-06-24",
+      "excess_roles": [
+        {
+          "count": 22,
+          "excess": 6,
+          "role": "ramp",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 20,
+          "excess": 4,
+          "role": "draw",
+          "severity": "critical",
+          "target_max": 16
+        },
+        {
+          "count": 7,
+          "excess": 2,
+          "role": "board_wipe",
+          "severity": "critical",
+          "target_max": 5
+        },
+        {
+          "count": 15,
+          "excess": 5,
+          "role": "protection",
+          "severity": "support",
+          "target_max": 10
+        },
+        {
+          "count": 15,
+          "excess": 1,
+          "role": "wincon",
+          "severity": "critical",
+          "target_max": 14
+        },
+        {
+          "count": 31,
+          "excess": 7,
+          "role": "engine",
+          "severity": "support",
+          "target_max": 24
+        }
+      ],
+      "land_candidate_count": 509,
+      "missing_roles": [
+        "land"
+      ],
+      "mutation_allowed": false,
+      "pair_hypotheses": [
+        {
+          "add": "Ash Barrens",
+          "cut": "Monument to Endurance",
+          "mutation_allowed": false,
+          "pair_score": 127,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Battlefield Forge",
+          "cut": "Monument to Endurance",
+          "mutation_allowed": false,
+          "pair_score": 122,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Cabaretti Courtyard",
+          "cut": "Monument to Endurance",
+          "mutation_allowed": false,
+          "pair_score": 122,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Fated Clash",
+          "mutation_allowed": false,
+          "pair_score": 118,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Ash Barrens",
+          "cut": "Goldspan Dragon",
+          "mutation_allowed": false,
+          "pair_score": 115,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Battlefield Forge",
+          "cut": "Fated Clash",
+          "mutation_allowed": false,
+          "pair_score": 113,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Cabaretti Courtyard",
+          "cut": "Fated Clash",
+          "mutation_allowed": false,
+          "pair_score": 113,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Battlefield Forge",
+          "cut": "Goldspan Dragon",
+          "mutation_allowed": false,
+          "pair_score": 110,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        },
+        {
+          "add": "Cabaretti Courtyard",
+          "cut": "Goldspan Dragon",
+          "mutation_allowed": false,
+          "pair_score": 110,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "mana_base_profile_recheck",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "status": "review_only_land_add_cut_pair"
+        }
+      ],
+      "status": "review_cut_pool_ready",
+      "top_cut_candidates": [
+        {
+          "card_name": "Monument to Endurance",
+          "classification_source": "tag_plus_text",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine,ramp,wincon",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine",
+            "ramp",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine",
+            "ramp",
+            "wincon"
+          ],
+          "score": 52,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Fated Clash",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine,protection",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine",
+            "protection"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine",
+            "protection"
+          ],
+          "score": 43,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Goldspan Dragon",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 40,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Trouble in Pairs",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine,wincon",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine",
+            "wincon"
+          ],
+          "score": 40,
+          "staple_rank": 631,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Brass's Bounty",
+          "classification_source": "tag_plus_text",
+          "cmc": 7.0,
+          "cut_reasons": [
+            "matches_excess_roles:ramp,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "ramp",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "ramp",
+            "wincon"
+          ],
+          "score": 38,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Heroes Remembered",
+          "classification_source": "tag_plus_text",
+          "cmc": 9.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine"
+          ],
+          "score": 38,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Call Forth the Tempest",
+          "classification_source": "tag_plus_text",
+          "cmc": 8.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine"
+          ],
+          "score": 36,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Caldera Pyremaw",
+          "classification_source": "tag_plus_text",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "wincon"
+          ],
+          "score": 35,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Treasonous Ogre",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,ramp",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "ramp"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "score": 35,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Insurrection",
+          "classification_source": "tag_plus_text",
+          "cmc": 8.0,
+          "cut_reasons": [
+            "matches_excess_roles:board_wipe,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "board_wipe",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "wincon"
+          ],
+          "score": 34,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Perch Protection",
+          "classification_source": "tag_plus_text",
+          "cmc": 6.0,
+          "cut_reasons": [
+            "matches_excess_roles:protection,wincon",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot"
+          ],
+          "matching_excess_roles": [
+            "protection",
+            "wincon"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "protection",
+            "wincon"
+          ],
+          "score": 33,
+          "staple_rank": null,
+          "status": "review_only_cut_candidate"
+        },
+        {
+          "card_name": "Bolt Bend",
+          "classification_source": "tag_plus_text",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:draw,protection",
+            "only_carries_excess_roles"
+          ],
+          "matching_excess_roles": [
+            "draw",
+            "protection"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "protection"
+          ],
+          "score": 31,
+          "staple_rank": 605,
+          "status": "review_only_cut_candidate"
+        }
+      ],
+      "top_land_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 75,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Battlefield Forge",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-07-05T19:56:47.728992+00:00",
+  "mutation_allowed": false,
+  "policy": {
+    "floor_protection": "Cards carrying any currently missing core role are blocked from cut suggestions.",
+    "land_gap_rule": "Land additions must cut nonland spell slots to actually repair land quantity.",
+    "promotion_block": "No deck change is promoted without candidate copy, structure/legal recheck, strategy matrix, battle gate, and replay trace.",
+    "review_only": "Cut candidates and add/cut pairs are hypotheses only."
+  },
+  "postgres_writes": false,
+  "source_core_role_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.json",
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_named_land_pool_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.json",
+  "summary": {
+    "deck_cut_pool_count": 9,
+    "status_counts": {
+      "review_cut_pool_ready": 9
+    },
+    "top_next_action": "materialize_candidate_copy_for_top_review_pair_only_after_commander_source_lane",
+    "total_cut_candidate_count": 501,
+    "total_pair_hypothesis_count": 81
+  }
+}

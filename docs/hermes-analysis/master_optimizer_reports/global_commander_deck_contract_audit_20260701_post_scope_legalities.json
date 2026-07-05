@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-07-05T19:55:52.883972+00:00",
+  "status": "pass",
+  "contract": "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
+  "total_decks": 17,
+  "scope_counts": {
+    "hermes_lorehold_baseline": 1,
+    "hermes_lorehold_variant": 11,
+    "hermes_registered_variant": 5
+  },
+  "status_counts_by_scope": {
+    "hermes_lorehold_baseline": {
+      "structure_ready": 1
+    },
+    "hermes_lorehold_variant": {
+      "structure_ready": 11
+    },
+    "hermes_registered_variant": {
+      "structure_ready": 5
+    },
+    "registered_pg_variant": {},
+    "user_product": {}
+  },
+  "issue_counts": {},
+  "top_commanders": [
+    {
+      "commander": "Lorehold, the Historian",
+      "deck_count": 12
+    },
+    {
+      "commander": "Kefka, Court Mage // Kefka, Ruler of Ruin",
+      "deck_count": 1
+    },
+    {
+      "commander": "Valgavoth, Harrower of Souls",
+      "deck_count": 1
+    },
+    {
+      "commander": "Kaalia of the Vast",
+      "deck_count": 1
+    },
+    {
+      "commander": "Sauron, the Dark Lord",
+      "deck_count": 1
+    },
+    {
+      "commander": "Y'shtola, Night's Blessed",
+      "deck_count": 1
+    }
+  ],
+  "sample_issues": [],
+  "sample_issues_by_scope": {},
+  "action_items": [],
+  "method": {
+    "postgres_is_product_truth": true,
+    "hermes_is_lab_cache": true,
+    "lorehold_607_role": "pilot_and_protected_baseline_not_global_template",
+    "promotion_requires": [
+      "resolved_card_ids",
+      "commander_shape",
+      "commander_intent_profile",
+      "reference_or_learned_source_lane",
+      "strategy_matrix",
+      "battle_gate_with_drawn_cast_used_evidence"
+    ]
+  }
+}

@@ -54,6 +54,9 @@ GLOBAL_COMMANDER_PROFILE_BLOCKER_REPAIR_PLAN = (
 GLOBAL_COMMANDER_PROFILE_REPAIR_CANDIDATE_MODEL = (
     SCRIPT_DIR / "global_commander_profile_repair_candidate_model.py"
 )
+GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_EXPANDER = (
+    SCRIPT_DIR / "global_commander_payoff_source_lane_expander.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -140,6 +143,10 @@ GLOBAL_COMMANDER_PROFILE_REPAIR_CANDIDATE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_removal_floor_step5.md"
 )
+GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5.md"
+)
 
 REQUIRED_FOCUS_CARDS = {
     "Aetherflux Reservoir",
@@ -153,6 +160,57 @@ REQUIRED_FOCUS_CARDS = {
 HISTORICAL_BLOCKED_SURFACES = {
     SCRIPT_DIR / "build_optimized_deck.py": "status=historical_disabled",
     SCRIPT_DIR / "universal_optimizer.py": "legacy_deprecated_not_authorized_for_handoff",
+}
+
+VOLATILE_HISTORICAL_REPORTS = {
+    GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT: {
+        "reason": "candidate copy snapshot depends on ignored local Hermes DB artifacts",
+        "patterns": [
+            "Global Commander Candidate Copy Materializer",
+            "candidate_materialized_structure_ready_next_gate_closed",
+            "promotion_allowed: `false`",
+            "allow_battle_gate_now: `false`",
+        ],
+    },
+    GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT: {
+        "reason": "battle probe snapshot depends on ignored replay artifacts",
+        "patterns": [
+            "battle_probe_blocks_promotion",
+            "base_wr: `66.7`",
+            "candidate_wr: `33.3`",
+            "candidate_underperformed_base_probe",
+            "added_cards_not_exercised_in_replay_events",
+            "stale_lorehold_mentions: `0`",
+        ],
+    },
+    GLOBAL_COMMANDER_BATTLE_FEEDBACK_REPORT: {
+        "reason": "feedback snapshot depends on prior ignored battle probe reports",
+        "patterns": [
+            "Global Commander Battle Feedback Model",
+            "pair_blocked_by_failed_gate",
+            "pair_needs_exposure_replay_before_gate",
+            "block_pair_until_new_source_lane_or_cut",
+            "Feed the Swarm",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Archaeomancer's Map",
+            "ready_pair_count: `0`",
+        ],
+    },
+    GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_REPORT: {
+        "reason": "package chain snapshot depends on ignored candidate-copy lineage artifacts",
+        "patterns": [
+            "Global Commander Candidate Package Chain Audit",
+            "core_floor_repaired: `true`",
+            "battle_gate_allowed_now: `false`",
+            "promotion_allowed: `false`",
+            "Path to Exile",
+            "Feed the Swarm",
+            "Swords to Plowshares",
+            "Rakdos Charm",
+            "Terminate",
+            "run_commander_specific_strategy_matrix_for_package_before_battle",
+        ],
+    },
 }
 
 
@@ -179,8 +237,22 @@ def check_contains(path: Path, patterns: list[str]) -> dict[str, Any]:
     }
 
 
+def check_volatile_historical_report(path: Path, spec: dict[str, Any]) -> dict[str, Any]:
+    text = read(path)
+    patterns = spec["patterns"]
+    missing = [pattern for pattern in patterns if pattern not in text]
+    return {
+        "path": rel(path),
+        "exists": path.exists(),
+        "status": "pass" if path.exists() and not missing else "warn",
+        "missing": missing,
+        "reason": spec["reason"],
+    }
+
+
 def build_audit() -> dict[str, Any]:
     checks: list[dict[str, Any]] = []
+    volatile_historical_reports: list[dict[str, Any]] = []
     checks.append(
         check_contains(
             CONTRACT_DOC,
@@ -264,6 +336,11 @@ def build_audit() -> dict[str, Any]:
                 "profile_repair_candidate_model_blocks_materialization",
                 "candidate_copy_allowed_now=false",
                 "expand_commander_payoff_source_lane_before_candidate_copy",
+                "global_commander_payoff_source_lane_expander.py",
+                "global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5.md",
+                "commander_payoff_source_lane_expanded",
+                "ready_candidates_cover_shortfall=true",
+                "synthesize_commander_payoff_package_before_candidate_copy",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -454,6 +531,10 @@ def build_audit() -> dict[str, Any]:
                 "profile_repair_candidate_model_blocks_materialization",
                 "candidate_copy_allowed_now=false",
                 "expand_commander_payoff_source_lane_before_candidate_copy",
+                "global_commander_payoff_source_lane_expander.py",
+                "global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5.md",
+                "commander_payoff_source_lane_expanded",
+                "synthesize_commander_payoff_package_before_candidate_copy",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -754,6 +835,20 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_EXPANDER,
+            [
+                "global_commander_payoff_source_lane_expander",
+                "commander_payoff_source_lane_expanded",
+                "commander_payoff_source_lane_needs_external_or_oracle_backfill",
+                "synthesize_commander_payoff_package_before_candidate_copy",
+                "review_only_commander_payoff_source_candidate",
+                "battle_or_optimization_performed",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -837,61 +932,8 @@ def build_audit() -> dict[str, Any]:
             else ["global_commander_learning_priority_report"],
         }
     )
-    checks.append(
-        {
-            "path": rel(GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT),
-            "exists": GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT.exists(),
-            "status": "pass" if GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT.exists() else "fail",
-            "missing": []
-            if GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT.exists()
-            else ["global_commander_candidate_copy_materializer_report"],
-        }
-    )
-    checks.append(
-        check_contains(
-            GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT,
-            [
-                "battle_probe_blocks_promotion",
-                "base_wr: `66.7`",
-                "candidate_wr: `33.3`",
-                "candidate_underperformed_base_probe",
-                "added_cards_not_exercised_in_replay_events",
-                "stale_lorehold_mentions: `0`",
-            ],
-        )
-    )
-    checks.append(
-        check_contains(
-            GLOBAL_COMMANDER_BATTLE_FEEDBACK_REPORT,
-            [
-                "Global Commander Battle Feedback Model",
-                "pair_blocked_by_failed_gate",
-                "pair_needs_exposure_replay_before_gate",
-                "block_pair_until_new_source_lane_or_cut",
-                "Feed the Swarm",
-                "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
-                "Archaeomancer's Map",
-                "ready_pair_count: `0`",
-            ],
-        )
-    )
-    checks.append(
-        check_contains(
-            GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_REPORT,
-            [
-                "Global Commander Candidate Package Chain Audit",
-                "core_floor_repaired: `true`",
-                "battle_gate_allowed_now: `false`",
-                "promotion_allowed: `false`",
-                "Path to Exile",
-                "Feed the Swarm",
-                "Swords to Plowshares",
-                "Rakdos Charm",
-                "Terminate",
-                "run_commander_specific_strategy_matrix_for_package_before_battle",
-            ],
-        )
-    )
+    for path, spec in VOLATILE_HISTORICAL_REPORTS.items():
+        volatile_historical_reports.append(check_volatile_historical_report(path, spec))
     checks.append(
         check_contains(
             GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_REPORT,
@@ -948,6 +990,24 @@ def build_audit() -> dict[str, Any]:
             ],
         )
     )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_REPORT,
+            [
+                "Global Commander Payoff Source Lane Expander",
+                "commander_payoff_source_lane_expanded",
+                "ready_candidates_cover_shortfall: `true`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "synthesize_commander_payoff_package_before_candidate_copy",
+                "Balefire Dragon",
+                "Ancient Copper Dragon",
+                "Hellkite Charger",
+                "Avacyn, Angel of Hope",
+            ],
+        )
+    )
 
     historical = []
     for path, marker in HISTORICAL_BLOCKED_SURFACES.items():
@@ -963,12 +1023,15 @@ def build_audit() -> dict[str, Any]:
 
     failures = [check for check in checks if check["status"] != "pass"]
     failures.extend(row for row in historical if row["status"] != "pass")
+    warnings = [row for row in volatile_historical_reports if row["status"] != "pass"]
     return {
         "generated_at": utc_now(),
         "status": "pass" if not failures else "fail",
         "contract": rel(CONTRACT_DOC),
         "active_surfaces": checks,
         "historical_blocked_surfaces": historical,
+        "volatile_historical_reports": volatile_historical_reports,
+        "warnings": warnings,
         "failures": failures,
     }
 
@@ -992,6 +1055,18 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
     lines.extend(["", "## Historical Blocked Surfaces", "", "| Status | Path | Marker |", "| --- | --- | --- |"])
     for row in payload["historical_blocked_surfaces"]:
         lines.append(f"| {row['status']} | `{row['path']}` | `{row['marker']}` |")
+    lines.extend(
+        [
+            "",
+            "## Volatile Historical Reports",
+            "",
+            "| Status | Path | Reason | Missing |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
+    for row in payload["volatile_historical_reports"]:
+        missing = ", ".join(row.get("missing") or [])
+        lines.append(f"| {row['status']} | `{row['path']}` | {row['reason']} | {missing} |")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

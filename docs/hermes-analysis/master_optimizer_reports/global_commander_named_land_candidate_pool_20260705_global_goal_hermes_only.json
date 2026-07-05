@@ -1,0 +1,2935 @@
+{
+  "artifact_type": "global_commander_named_land_candidate_pool",
+  "battle_or_optimization_performed": false,
+  "candidate_pools": [
+    {
+      "candidate_count": 507,
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "deck_id": "612",
+      "deck_name": "VARIANT Lorehold Variant 07 - Rafael Paste 2026-06-24",
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "limit_colorless_utility_until_color_floor",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "source_profile_status": "mana_profile_ready_for_named_land_candidate_pool",
+      "top_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Sunbaked Canyon",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "card_name": "Battlefield Forge",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Demolition Field",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Escape Tunnel",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Evolving Wilds",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Fabled Passage",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forgotten Monument",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forsaken City",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Gemstone Mine",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Glimmervoid",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "candidate_count": 519,
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "deck_id": "616",
+      "deck_name": "VARIANT Lorehold Variant 11 - Rafael Paste 2026-06-24",
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "source_profile_status": "mana_profile_ready_for_named_land_candidate_pool",
+      "top_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Sunbaked Canyon",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "card_name": "Arid Mesa",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Battlefield Forge",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "City of Brass",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Demolition Field",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Escape Tunnel",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Evolving Wilds",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Fabled Passage",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forbidden Orchard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forgotten Monument",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "candidate_count": 510,
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "deck_id": "609",
+      "deck_name": "VARIANT Lorehold Variant 04 - Rafael Paste 2026-06-24",
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "prioritize_untapped_fixing_lands",
+        "limit_colorless_utility_until_color_floor",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "source_profile_status": "mana_profile_ready_for_named_land_candidate_pool",
+      "top_candidates": [
+        {
+          "card_name": "Sunbaked Canyon",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "City of Brass",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Escape Tunnel",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Evolving Wilds",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Fabled Passage",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forbidden Orchard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forgotten Monument",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forsaken City",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Gemstone Caverns",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Gemstone Mine",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Glimmervoid",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "candidate_count": 508,
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "deck_id": "610",
+      "deck_name": "VARIANT Lorehold Variant 05 - Rafael Paste 2026-06-24",
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "limit_colorless_utility_until_color_floor"
+      ],
+      "source_profile_status": "mana_profile_ready_for_named_land_candidate_pool",
+      "top_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 85,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Arid Mesa",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "City of Brass",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Demolition Field",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Escape Tunnel",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Evolving Wilds",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Fabled Passage",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forbidden Orchard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forgotten Monument",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forsaken City",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Gemstone Caverns",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 80,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "candidate_count": 516,
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "deck_id": "608",
+      "deck_name": "VARIANT Lorehold Variant 03 - Rafael Paste 2026-06-23",
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "limit_colorless_utility_until_color_floor",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "source_profile_status": "mana_profile_ready_for_named_land_candidate_pool",
+      "top_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 75,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Sunbaked Canyon",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 75,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "card_name": "Bant Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Battlefield Forge",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Brokers Hideout",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "City of Brass",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Demolition Field",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Escape Tunnel",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Esper Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Evolving Wilds",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Fabled Passage",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "candidate_count": 510,
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "deck_id": "613",
+      "deck_name": "VARIANT Lorehold Variant 08 - Rafael Paste 2026-06-24",
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_W_source_or_fetchable_access",
+        "add_R_source_or_fetchable_access",
+        "limit_colorless_utility_until_color_floor",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "source_profile_status": "mana_profile_ready_for_named_land_candidate_pool",
+      "top_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Sunbaked Canyon",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 99,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow"
+          ]
+        },
+        {
+          "card_name": "Arid Mesa",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Battlefield Forge",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Demolition Field",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Escape Tunnel",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Evolving Wilds",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Fabled Passage",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forbidden Orchard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forgotten Monument",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forsaken City",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_W_access",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 94,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "candidate_count": 674,
+      "commander": "Y'shtola, Night's Blessed",
+      "commander_color_identity": [
+        "W",
+        "U",
+        "B"
+      ],
+      "deck_id": "621",
+      "deck_name": "VARIANT Y'shtola Variant 01 - Rafael Paste 2026-06-24",
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "source_profile_status": "mana_profile_ready_for_named_land_candidate_pool",
+      "top_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 51,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Contaminated Landscape",
+          "color_identity": [
+            "W",
+            "U",
+            "B"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 51,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "card_flow",
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Arid Mesa",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Bant Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Bloodstained Mire",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "B",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Brokers Hideout",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "City of Brass",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Demolition Field",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Dromar's Cavern",
+          "color_identity": [
+            "W",
+            "U",
+            "B"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Escape Tunnel",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Esper Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "candidate_count": 499,
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "deck_id": "6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "limit_colorless_utility_until_color_floor",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "source_profile_status": "mana_profile_ready_for_named_land_candidate_pool",
+      "top_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 51,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Bant Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Brokers Hideout",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Demolition Field",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Escape Tunnel",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Esper Panorama",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "U",
+            "B"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Evolving Wilds",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Fabled Passage",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Flagstones of Trokair",
+          "color_identity": [
+            "W"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "graveyard_utility"
+          ]
+        },
+        {
+          "card_name": "Forbidden Orchard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forgotten Monument",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 46,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    },
+    {
+      "candidate_count": 509,
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "deck_id": "614",
+      "deck_name": "VARIANT Lorehold Variant 09 - Rafael Paste 2026-06-24",
+      "mutation_allowed": false,
+      "recommended_land_classes": [
+        "add_land_quantity_before_spell_slots",
+        "add_R_source_or_fetchable_access",
+        "review_fetchable_dual_or_basic_mix"
+      ],
+      "source_profile_status": "mana_profile_ready_for_named_land_candidate_pool",
+      "top_candidates": [
+        {
+          "card_name": "Ash Barrens",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected",
+            "useful_land_utility"
+          ],
+          "mutation_allowed": false,
+          "score": 75,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": [
+            "cycling"
+          ]
+        },
+        {
+          "card_name": "Battlefield Forge",
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Cabaretti Courtyard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R",
+            "G"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "City of Brass",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Demolition Field",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Escape Tunnel",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Evolving Wilds",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Fabled Passage",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [
+            "W",
+            "R"
+          ],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forbidden Orchard",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forgotten Monument",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Forsaken City",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        },
+        {
+          "card_name": "Gemstone Caverns",
+          "color_identity": [],
+          "colorless_only": false,
+          "commander_legality": "legal",
+          "conditional_any_colors": [],
+          "direct_colors": [
+            "W",
+            "R"
+          ],
+          "enters_tapped_profile": "reliably_untapped",
+          "fetchable_colors": [],
+          "fit_reasons": [
+            "commander_legal",
+            "fills_land_quantity_gap",
+            "adds_R_access",
+            "supports_fetchable_or_dual_mix",
+            "untapped_or_commander_expected"
+          ],
+          "mutation_allowed": false,
+          "score": 70,
+          "status": "review_only_named_land_candidate",
+          "utility_roles": []
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-07-05T19:56:36.768631+00:00",
+  "mutation_allowed": false,
+  "policy": {
+    "promotion_block": "A candidate still needs same-lane cuts, structure/legal recheck, strategy matrix, battle gate, and drawn/cast/used trace before product promotion.",
+    "review_only": "Named lands here are candidate-pool rows, not additions."
+  },
+  "postgres_writes": false,
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_mana_base_profile_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_mana_base_profile_20260705_global_goal_hermes_only.json",
+  "summary": {
+    "pool_count": 9,
+    "top_candidate_status_counts": {
+      "review_only_named_land_candidate": 108
+    },
+    "top_next_action": "run_same_lane_cut_model_for_top_named_land_candidates",
+    "total_candidate_count": 4752
+  }
+}

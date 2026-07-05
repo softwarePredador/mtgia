@@ -1,0 +1,744 @@
+{
+  "generated_at": "2026-07-05T19:56:20.615205+00:00",
+  "status": "pass",
+  "artifact_type": "global_commander_core_repair_hypothesis",
+  "contract": "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
+  "source_core_role_report": "global_commander_core_role_audit",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "battle_or_optimization_performed": false,
+  "mutation_allowed": false,
+  "method": {
+    "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+    "format_staples_are_review_only": true,
+    "requires_color_identity_before_named_card_use": true,
+    "lorehold_607_role": "benchmark_regression_only_not_global_template"
+  },
+  "summary": {
+    "deck_count": 10,
+    "commander_count": 3,
+    "hypothesis_count": 11,
+    "role_counts": {
+      "land": 9,
+      "removal": 1,
+      "wincon": 1
+    },
+    "status_counts": {
+      "needs_commander_win_plan_source_lane": 1,
+      "needs_mana_base_profile_before_named_cards": 9,
+      "review_candidate_pool_ready_color_identity_required": 1
+    },
+    "top_next_action": "build_commander_specific_source_lane_for_wincon_or_apply_safe_core_floor_repair_review"
+  },
+  "hypotheses": [
+    {
+      "deck_id": "612",
+      "deck_name": "VARIANT Lorehold Variant 07 - Rafael Paste 2026-06-24",
+      "commander": "Lorehold, the Historian",
+      "scope": "hermes_lorehold_variant",
+      "role": "land",
+      "missing": 7,
+      "current_count": 27,
+      "target_min": 34,
+      "severity": "critical",
+      "status": "needs_mana_base_profile_before_named_cards",
+      "repair_classes": [
+        "basic_or_color_source_floor",
+        "untapped_fixing_land",
+        "utility_land_only_after_color_floor"
+      ],
+      "review_candidates": [],
+      "cut_pressure": [
+        {
+          "role": "engine",
+          "count": 47,
+          "target_max": 24,
+          "excess": 23,
+          "severity": "support"
+        },
+        {
+          "role": "ramp",
+          "count": 24,
+          "target_max": 16,
+          "excess": 8,
+          "severity": "critical"
+        },
+        {
+          "role": "board_wipe",
+          "count": 12,
+          "target_max": 5,
+          "excess": 7,
+          "severity": "critical"
+        },
+        {
+          "role": "wincon",
+          "count": 18,
+          "target_max": 14,
+          "excess": 4,
+          "severity": "critical"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "mana_source_and_untapped_land_profile",
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    },
+    {
+      "deck_id": "619",
+      "deck_name": "VARIANT Kaalia Variant 01 - Rafael Paste 2026-06-24",
+      "commander": "Kaalia of the Vast",
+      "scope": "hermes_registered_variant",
+      "role": "removal",
+      "missing": 5,
+      "current_count": 1,
+      "target_min": 6,
+      "severity": "critical",
+      "status": "review_candidate_pool_ready_color_identity_required",
+      "repair_classes": [
+        "cheap_targeted_interaction",
+        "flexible_permanent_answer"
+      ],
+      "review_candidates": [
+        {
+          "card_name": "Swords to Plowshares",
+          "source": "format_staples",
+          "archetype": "removal",
+          "category": "",
+          "color_identity": "W",
+          "edhrec_rank": 11,
+          "status": "review_only_requires_commander_color_identity_and_fit"
+        },
+        {
+          "card_name": "Path to Exile",
+          "source": "format_staples",
+          "archetype": "removal",
+          "category": "",
+          "color_identity": "W",
+          "edhrec_rank": 15,
+          "status": "review_only_requires_commander_color_identity_and_fit"
+        },
+        {
+          "card_name": "Bojuka Bog",
+          "source": "format_staples",
+          "archetype": "removal",
+          "category": "",
+          "color_identity": "B",
+          "edhrec_rank": 27,
+          "status": "review_only_requires_commander_color_identity_and_fit"
+        },
+        {
+          "card_name": "Feed the Swarm",
+          "source": "format_staples",
+          "archetype": "removal",
+          "category": "",
+          "color_identity": "B",
+          "edhrec_rank": 88,
+          "status": "review_only_requires_commander_color_identity_and_fit"
+        },
+        {
+          "card_name": "Deadly Rollick",
+          "source": "format_staples",
+          "archetype": "removal",
+          "category": "",
+          "color_identity": "B",
+          "edhrec_rank": 116,
+          "status": "review_only_requires_commander_color_identity_and_fit"
+        }
+      ],
+      "cut_pressure": [
+        {
+          "role": "engine",
+          "count": 35,
+          "target_max": 24,
+          "excess": 11,
+          "severity": "support"
+        },
+        {
+          "role": "tutor",
+          "count": 16,
+          "target_max": 8,
+          "excess": 8,
+          "severity": "support"
+        },
+        {
+          "role": "ramp",
+          "count": 23,
+          "target_max": 16,
+          "excess": 7,
+          "severity": "critical"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    },
+    {
+      "deck_id": "616",
+      "deck_name": "VARIANT Lorehold Variant 11 - Rafael Paste 2026-06-24",
+      "commander": "Lorehold, the Historian",
+      "scope": "hermes_lorehold_variant",
+      "role": "land",
+      "missing": 5,
+      "current_count": 29,
+      "target_min": 34,
+      "severity": "critical",
+      "status": "needs_mana_base_profile_before_named_cards",
+      "repair_classes": [
+        "basic_or_color_source_floor",
+        "untapped_fixing_land",
+        "utility_land_only_after_color_floor"
+      ],
+      "review_candidates": [],
+      "cut_pressure": [
+        {
+          "role": "protection",
+          "count": 17,
+          "target_max": 10,
+          "excess": 7,
+          "severity": "support"
+        },
+        {
+          "role": "engine",
+          "count": 30,
+          "target_max": 24,
+          "excess": 6,
+          "severity": "support"
+        },
+        {
+          "role": "board_wipe",
+          "count": 10,
+          "target_max": 5,
+          "excess": 5,
+          "severity": "critical"
+        },
+        {
+          "role": "draw",
+          "count": 19,
+          "target_max": 16,
+          "excess": 3,
+          "severity": "critical"
+        },
+        {
+          "role": "removal",
+          "count": 16,
+          "target_max": 14,
+          "excess": 2,
+          "severity": "critical"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "mana_source_and_untapped_land_profile",
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    },
+    {
+      "deck_id": "609",
+      "deck_name": "VARIANT Lorehold Variant 04 - Rafael Paste 2026-06-24",
+      "commander": "Lorehold, the Historian",
+      "scope": "hermes_lorehold_variant",
+      "role": "land",
+      "missing": 4,
+      "current_count": 30,
+      "target_min": 34,
+      "severity": "critical",
+      "status": "needs_mana_base_profile_before_named_cards",
+      "repair_classes": [
+        "basic_or_color_source_floor",
+        "untapped_fixing_land",
+        "utility_land_only_after_color_floor"
+      ],
+      "review_candidates": [],
+      "cut_pressure": [
+        {
+          "role": "draw",
+          "count": 26,
+          "target_max": 16,
+          "excess": 10,
+          "severity": "critical"
+        },
+        {
+          "role": "protection",
+          "count": 14,
+          "target_max": 10,
+          "excess": 4,
+          "severity": "support"
+        },
+        {
+          "role": "board_wipe",
+          "count": 8,
+          "target_max": 5,
+          "excess": 3,
+          "severity": "critical"
+        },
+        {
+          "role": "engine",
+          "count": 27,
+          "target_max": 24,
+          "excess": 3,
+          "severity": "support"
+        },
+        {
+          "role": "tutor",
+          "count": 11,
+          "target_max": 8,
+          "excess": 3,
+          "severity": "support"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "mana_source_and_untapped_land_profile",
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    },
+    {
+      "deck_id": "610",
+      "deck_name": "VARIANT Lorehold Variant 05 - Rafael Paste 2026-06-24",
+      "commander": "Lorehold, the Historian",
+      "scope": "hermes_lorehold_variant",
+      "role": "land",
+      "missing": 4,
+      "current_count": 30,
+      "target_min": 34,
+      "severity": "critical",
+      "status": "needs_mana_base_profile_before_named_cards",
+      "repair_classes": [
+        "basic_or_color_source_floor",
+        "untapped_fixing_land",
+        "utility_land_only_after_color_floor"
+      ],
+      "review_candidates": [],
+      "cut_pressure": [
+        {
+          "role": "recursion",
+          "count": 17,
+          "target_max": 8,
+          "excess": 9,
+          "severity": "support"
+        },
+        {
+          "role": "engine",
+          "count": 31,
+          "target_max": 24,
+          "excess": 7,
+          "severity": "support"
+        },
+        {
+          "role": "ramp",
+          "count": 22,
+          "target_max": 16,
+          "excess": 6,
+          "severity": "critical"
+        },
+        {
+          "role": "board_wipe",
+          "count": 7,
+          "target_max": 5,
+          "excess": 2,
+          "severity": "critical"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "mana_source_and_untapped_land_profile",
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    },
+    {
+      "deck_id": "608",
+      "deck_name": "VARIANT Lorehold Variant 03 - Rafael Paste 2026-06-23",
+      "commander": "Lorehold, the Historian",
+      "scope": "hermes_lorehold_variant",
+      "role": "land",
+      "missing": 3,
+      "current_count": 31,
+      "target_min": 34,
+      "severity": "critical",
+      "status": "needs_mana_base_profile_before_named_cards",
+      "repair_classes": [
+        "basic_or_color_source_floor",
+        "untapped_fixing_land",
+        "utility_land_only_after_color_floor"
+      ],
+      "review_candidates": [],
+      "cut_pressure": [
+        {
+          "role": "draw",
+          "count": 35,
+          "target_max": 16,
+          "excess": 19,
+          "severity": "critical"
+        },
+        {
+          "role": "board_wipe",
+          "count": 23,
+          "target_max": 5,
+          "excess": 18,
+          "severity": "critical"
+        },
+        {
+          "role": "tutor",
+          "count": 25,
+          "target_max": 8,
+          "excess": 17,
+          "severity": "support"
+        },
+        {
+          "role": "recursion",
+          "count": 23,
+          "target_max": 8,
+          "excess": 15,
+          "severity": "support"
+        },
+        {
+          "role": "ramp",
+          "count": 21,
+          "target_max": 16,
+          "excess": 5,
+          "severity": "critical"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "mana_source_and_untapped_land_profile",
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    },
+    {
+      "deck_id": "6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "commander": "Lorehold, the Historian",
+      "scope": "hermes_lorehold_baseline",
+      "role": "wincon",
+      "missing": 2,
+      "current_count": 1,
+      "target_min": 3,
+      "severity": "critical",
+      "status": "needs_commander_win_plan_source_lane",
+      "repair_classes": [
+        "commander_plan_finisher",
+        "deterministic_combo_or_closer"
+      ],
+      "review_candidates": [],
+      "cut_pressure": [
+        {
+          "role": "ramp",
+          "count": 51,
+          "target_max": 16,
+          "excess": 35,
+          "severity": "critical"
+        },
+        {
+          "role": "protection",
+          "count": 19,
+          "target_max": 10,
+          "excess": 9,
+          "severity": "support"
+        },
+        {
+          "role": "draw",
+          "count": 22,
+          "target_max": 16,
+          "excess": 6,
+          "severity": "critical"
+        },
+        {
+          "role": "engine",
+          "count": 26,
+          "target_max": 24,
+          "excess": 2,
+          "severity": "support"
+        },
+        {
+          "role": "tutor",
+          "count": 9,
+          "target_max": 8,
+          "excess": 1,
+          "severity": "support"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "commander_win_plan_or_spellbook_source_lane",
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    },
+    {
+      "deck_id": "613",
+      "deck_name": "VARIANT Lorehold Variant 08 - Rafael Paste 2026-06-24",
+      "commander": "Lorehold, the Historian",
+      "scope": "hermes_lorehold_variant",
+      "role": "land",
+      "missing": 2,
+      "current_count": 32,
+      "target_min": 34,
+      "severity": "critical",
+      "status": "needs_mana_base_profile_before_named_cards",
+      "repair_classes": [
+        "basic_or_color_source_floor",
+        "untapped_fixing_land",
+        "utility_land_only_after_color_floor"
+      ],
+      "review_candidates": [],
+      "cut_pressure": [
+        {
+          "role": "engine",
+          "count": 37,
+          "target_max": 24,
+          "excess": 13,
+          "severity": "support"
+        },
+        {
+          "role": "draw",
+          "count": 28,
+          "target_max": 16,
+          "excess": 12,
+          "severity": "critical"
+        },
+        {
+          "role": "protection",
+          "count": 16,
+          "target_max": 10,
+          "excess": 6,
+          "severity": "support"
+        },
+        {
+          "role": "ramp",
+          "count": 20,
+          "target_max": 16,
+          "excess": 4,
+          "severity": "critical"
+        },
+        {
+          "role": "board_wipe",
+          "count": 8,
+          "target_max": 5,
+          "excess": 3,
+          "severity": "critical"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "mana_source_and_untapped_land_profile",
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    },
+    {
+      "deck_id": "621",
+      "deck_name": "VARIANT Y'shtola Variant 01 - Rafael Paste 2026-06-24",
+      "commander": "Y'shtola, Night's Blessed",
+      "scope": "hermes_registered_variant",
+      "role": "land",
+      "missing": 2,
+      "current_count": 32,
+      "target_min": 34,
+      "severity": "critical",
+      "status": "needs_mana_base_profile_before_named_cards",
+      "repair_classes": [
+        "basic_or_color_source_floor",
+        "untapped_fixing_land",
+        "utility_land_only_after_color_floor"
+      ],
+      "review_candidates": [],
+      "cut_pressure": [
+        {
+          "role": "engine",
+          "count": 31,
+          "target_max": 24,
+          "excess": 7,
+          "severity": "support"
+        },
+        {
+          "role": "board_wipe",
+          "count": 6,
+          "target_max": 5,
+          "excess": 1,
+          "severity": "critical"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "mana_source_and_untapped_land_profile",
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    },
+    {
+      "deck_id": "6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "commander": "Lorehold, the Historian",
+      "scope": "hermes_lorehold_baseline",
+      "role": "land",
+      "missing": 1,
+      "current_count": 33,
+      "target_min": 34,
+      "severity": "critical",
+      "status": "needs_mana_base_profile_before_named_cards",
+      "repair_classes": [
+        "basic_or_color_source_floor",
+        "untapped_fixing_land",
+        "utility_land_only_after_color_floor"
+      ],
+      "review_candidates": [],
+      "cut_pressure": [
+        {
+          "role": "ramp",
+          "count": 51,
+          "target_max": 16,
+          "excess": 35,
+          "severity": "critical"
+        },
+        {
+          "role": "protection",
+          "count": 19,
+          "target_max": 10,
+          "excess": 9,
+          "severity": "support"
+        },
+        {
+          "role": "draw",
+          "count": 22,
+          "target_max": 16,
+          "excess": 6,
+          "severity": "critical"
+        },
+        {
+          "role": "engine",
+          "count": 26,
+          "target_max": 24,
+          "excess": 2,
+          "severity": "support"
+        },
+        {
+          "role": "tutor",
+          "count": 9,
+          "target_max": 8,
+          "excess": 1,
+          "severity": "support"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "mana_source_and_untapped_land_profile",
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    },
+    {
+      "deck_id": "614",
+      "deck_name": "VARIANT Lorehold Variant 09 - Rafael Paste 2026-06-24",
+      "commander": "Lorehold, the Historian",
+      "scope": "hermes_lorehold_variant",
+      "role": "land",
+      "missing": 1,
+      "current_count": 33,
+      "target_min": 34,
+      "severity": "critical",
+      "status": "needs_mana_base_profile_before_named_cards",
+      "repair_classes": [
+        "basic_or_color_source_floor",
+        "untapped_fixing_land",
+        "utility_land_only_after_color_floor"
+      ],
+      "review_candidates": [],
+      "cut_pressure": [
+        {
+          "role": "engine",
+          "count": 31,
+          "target_max": 24,
+          "excess": 7,
+          "severity": "support"
+        },
+        {
+          "role": "ramp",
+          "count": 22,
+          "target_max": 16,
+          "excess": 6,
+          "severity": "critical"
+        },
+        {
+          "role": "protection",
+          "count": 15,
+          "target_max": 10,
+          "excess": 5,
+          "severity": "support"
+        },
+        {
+          "role": "draw",
+          "count": 20,
+          "target_max": 16,
+          "excess": 4,
+          "severity": "critical"
+        },
+        {
+          "role": "board_wipe",
+          "count": 7,
+          "target_max": 5,
+          "excess": 2,
+          "severity": "critical"
+        }
+      ],
+      "cut_policy": "review excess roles first; never cut below another core floor; commander anchors and protected staples require explicit source proof",
+      "required_gates": [
+        "mana_source_and_untapped_land_profile",
+        "commander_color_identity_check",
+        "card_legality_and_singleton_check",
+        "same_lane_or_excess_role_cut_model",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "mutation_allowed": false
+    }
+  ]
+}

@@ -352,6 +352,22 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `18` e ha apenas `5` candidatos prontos no expected package local.
     Portanto `candidate_copy_allowed_now=false`, `battle_gate_allowed_now=false`
     e o proximo gate e `expand_commander_payoff_source_lane_before_candidate_copy`.
+    A expansao da source lane de payoffs fica em
+    `manaloom-knowledge/scripts/global_commander_payoff_source_lane_expander.py`
+    com evidencia local
+    `master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5.md`.
+    Resultado: `commander_payoff_source_lane_expanded`; a varredura local
+    Oracle/Hermes encontrou `30` candidatos ADD legais/WBR contra shortfall `18`,
+    incluindo `Balefire Dragon`, `Ancient Copper Dragon`, `Angel of the Ruins`,
+    `Hoarding Broodlord`, `Hellkite Charger` e `Avacyn, Angel of Hope`.
+    Mesmo assim `candidate_copy_allowed_now=false`, `battle_gate_allowed_now=false`
+    e o proximo gate passa a ser
+    `synthesize_commander_payoff_package_before_candidate_copy`.
+    Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
+    battle-feedback e package-chain dependem de artefatos locais ignorados. Se
+    faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
+    deve mostrar `warn`, nao falha ativa; antes de qualquer nova copia, batalha,
+    requeue ou promocao, a evidencia exata precisa ser regenerada.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

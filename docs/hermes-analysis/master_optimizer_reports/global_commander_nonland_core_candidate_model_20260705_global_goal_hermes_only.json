@@ -1,0 +1,916 @@
+{
+  "artifact_type": "global_commander_nonland_core_candidate_model",
+  "battle_or_optimization_performed": false,
+  "generated_at": "2026-07-05T19:56:50.265685+00:00",
+  "mutation_allowed": false,
+  "nonland_pools": [
+    {
+      "battle_feedback_blocked_pair_count": 0,
+      "blocked_cut_candidate_count": 12,
+      "blocked_cut_candidates": [
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Alicia Masters, Skilled Sculptor",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "mutation_allowed": false,
+          "roles": [
+            "board_wipe",
+            "engine",
+            "ramp"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Arcane Signet",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Basalt Monolith",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "ramp"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "kaalia_angel_demon_dragon_payoff_requires_source_lane"
+          ],
+          "card_name": "Bloodthirster",
+          "classification_source": "text_inferred",
+          "cmc": 6.0,
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Burnt Offering",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Cabal Ritual",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Culling the Weak",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Dark Ritual",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Desperate Ritual",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "mutation_allowed": false,
+          "roles": [
+            "draw",
+            "engine",
+            "ramp",
+            "recursion"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        },
+        {
+          "block_reasons": [
+            "cross_lane_ramp_cut_requires_same_lane_source_or_gate"
+          ],
+          "card_name": "Grim Monolith",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "mutation_allowed": false,
+          "roles": [
+            "ramp"
+          ],
+          "status": "blocked_cut_requires_source_lane"
+        }
+      ],
+      "blocked_pair_hypotheses": [],
+      "candidate_count": 12,
+      "commander": "Kaalia of the Vast",
+      "commander_color_identity": [
+        "W",
+        "B",
+        "R"
+      ],
+      "current_count": 1,
+      "cut_candidate_count": 12,
+      "deck_id": "619",
+      "deck_name": "VARIANT Kaalia Variant 01 - Rafael Paste 2026-06-24",
+      "missing": 5,
+      "mutation_allowed": false,
+      "pair_hypotheses": [
+        {
+          "add": "Feed the Swarm",
+          "cut": "Archaeomancer's Map",
+          "mutation_allowed": false,
+          "pair_score": 157,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "role_floor_recheck",
+            "commander_strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "role": "removal",
+          "status": "review_only_nonland_add_cut_pair"
+        },
+        {
+          "add": "Path to Exile",
+          "cut": "Archaeomancer's Map",
+          "mutation_allowed": false,
+          "pair_score": 154,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "role_floor_recheck",
+            "commander_strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "role": "removal",
+          "status": "review_only_nonland_add_cut_pair"
+        },
+        {
+          "add": "Swords to Plowshares",
+          "cut": "Archaeomancer's Map",
+          "mutation_allowed": false,
+          "pair_score": 154,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "role_floor_recheck",
+            "commander_strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "role": "removal",
+          "status": "review_only_nonland_add_cut_pair"
+        },
+        {
+          "add": "Feed the Swarm",
+          "cut": "Genji Glove",
+          "mutation_allowed": false,
+          "pair_score": 152,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "role_floor_recheck",
+            "commander_strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "role": "removal",
+          "status": "review_only_nonland_add_cut_pair"
+        },
+        {
+          "add": "Feed the Swarm",
+          "cut": "Karlach, Fury of Avernus",
+          "mutation_allowed": false,
+          "pair_score": 152,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "role_floor_recheck",
+            "commander_strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "role": "removal",
+          "status": "review_only_nonland_add_cut_pair"
+        },
+        {
+          "add": "Path to Exile",
+          "cut": "Genji Glove",
+          "mutation_allowed": false,
+          "pair_score": 149,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "role_floor_recheck",
+            "commander_strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "role": "removal",
+          "status": "review_only_nonland_add_cut_pair"
+        },
+        {
+          "add": "Path to Exile",
+          "cut": "Karlach, Fury of Avernus",
+          "mutation_allowed": false,
+          "pair_score": 149,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "role_floor_recheck",
+            "commander_strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "role": "removal",
+          "status": "review_only_nonland_add_cut_pair"
+        },
+        {
+          "add": "Swords to Plowshares",
+          "cut": "Genji Glove",
+          "mutation_allowed": false,
+          "pair_score": 149,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "role_floor_recheck",
+            "commander_strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "role": "removal",
+          "status": "review_only_nonland_add_cut_pair"
+        },
+        {
+          "add": "Swords to Plowshares",
+          "cut": "Karlach, Fury of Avernus",
+          "mutation_allowed": false,
+          "pair_score": 149,
+          "required_gates": [
+            "candidate_copy_only",
+            "structure_and_legality_recheck",
+            "role_floor_recheck",
+            "commander_strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "role": "removal",
+          "status": "review_only_nonland_add_cut_pair"
+        }
+      ],
+      "related_source_lanes": [],
+      "role": "removal",
+      "scope": "hermes_registered_variant",
+      "status": "review_nonland_add_cut_pool_ready",
+      "target_min": 6,
+      "top_candidates": [
+        {
+          "archetype": "removal",
+          "card_name": "Feed the Swarm",
+          "category": "",
+          "cmc": 2.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 88,
+          "fit_reasons": [
+            "format_staple_rank_88",
+            "commander_legal",
+            "cheap_interaction",
+            "direct_targeted_answer",
+            "flexible_answer_text"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 124,
+          "source": "format_staples",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Sorcery"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Path to Exile",
+          "category": "",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 15,
+          "fit_reasons": [
+            "format_staple_rank_15",
+            "commander_legal",
+            "cheap_interaction",
+            "direct_targeted_answer"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 121,
+          "source": "format_staples",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Instant"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Swords to Plowshares",
+          "category": "",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 11,
+          "fit_reasons": [
+            "format_staple_rank_11",
+            "commander_legal",
+            "cheap_interaction",
+            "direct_targeted_answer"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 121,
+          "source": "format_staples",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Instant"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Rakdos Charm",
+          "category": "",
+          "cmc": 2.0,
+          "color_identity": [
+            "B",
+            "R"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 320,
+          "fit_reasons": [
+            "format_staple_rank_320",
+            "commander_legal",
+            "cheap_interaction",
+            "direct_targeted_answer",
+            "flexible_answer_text"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 115,
+          "source": "format_staples_expanded_role_pool",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Instant"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Terminate",
+          "category": "",
+          "cmc": 2.0,
+          "color_identity": [
+            "B",
+            "R"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 222,
+          "fit_reasons": [
+            "format_staple_rank_222",
+            "commander_legal",
+            "cheap_interaction",
+            "direct_targeted_answer"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 113,
+          "source": "format_staples_expanded_role_pool",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Instant"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Despark",
+          "category": "",
+          "cmc": 2.0,
+          "color_identity": [
+            "W",
+            "B"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 387,
+          "fit_reasons": [
+            "format_staple_rank_387",
+            "commander_legal",
+            "cheap_interaction",
+            "direct_targeted_answer",
+            "flexible_answer_text"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 112,
+          "source": "format_staples_expanded_role_pool",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Instant"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Infernal Grasp",
+          "category": "",
+          "cmc": 2.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 276,
+          "fit_reasons": [
+            "format_staple_rank_276",
+            "commander_legal",
+            "cheap_interaction",
+            "direct_targeted_answer"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 110,
+          "source": "format_staples_expanded_role_pool",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Instant"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Anguished Unmaking",
+          "category": "",
+          "cmc": 3.0,
+          "color_identity": [
+            "W",
+            "B"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 156,
+          "fit_reasons": [
+            "format_staple_rank_156",
+            "commander_legal",
+            "direct_targeted_answer",
+            "flexible_answer_text"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 109,
+          "source": "format_staples_expanded_role_pool",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Instant"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Damn",
+          "category": "",
+          "cmc": 2.0,
+          "color_identity": [
+            "W",
+            "B"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 324,
+          "fit_reasons": [
+            "format_staple_rank_324",
+            "commander_legal",
+            "cheap_interaction",
+            "direct_targeted_answer"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 109,
+          "source": "format_staples_expanded_role_pool",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Sorcery"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Deadly Rollick",
+          "category": "",
+          "cmc": 4.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 116,
+          "fit_reasons": [
+            "format_staple_rank_116",
+            "commander_legal",
+            "direct_targeted_answer"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 105,
+          "source": "format_staples",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Instant"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Withering Torment",
+          "category": "",
+          "cmc": 3.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 321,
+          "fit_reasons": [
+            "format_staple_rank_321",
+            "commander_legal",
+            "direct_targeted_answer",
+            "flexible_answer_text"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 103,
+          "source": "format_staples_expanded_role_pool",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Instant"
+        },
+        {
+          "archetype": "removal",
+          "card_name": "Fell the Profane",
+          "category": "",
+          "cmc": 4.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "edhrec_rank": 242,
+          "fit_reasons": [
+            "format_staple_rank_242",
+            "commander_legal",
+            "direct_targeted_answer"
+          ],
+          "mutation_allowed": false,
+          "role": "removal",
+          "score": 100,
+          "source": "format_staples_expanded_role_pool",
+          "status": "review_only_nonland_core_candidate",
+          "type_line": "Instant"
+        }
+      ],
+      "top_cut_candidates": [
+        {
+          "card_name": "Archaeomancer's Map",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine,tutor",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine",
+            "tutor"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine",
+            "tutor"
+          ],
+          "score": 33,
+          "staple_rank": null,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Genji Glove",
+          "classification_source": "text_inferred",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 28,
+          "staple_rank": null,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Karlach, Fury of Avernus",
+          "classification_source": "text_inferred",
+          "cmc": 5.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "high_cmc_spell_slot",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 28,
+          "staple_rank": 996,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Ardenn, Intrepid Archaeologist",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 23,
+          "staple_rank": null,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Biotransference",
+          "classification_source": "text_inferred",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 23,
+          "staple_rank": null,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Delney, Streetwise Lookout",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 23,
+          "staple_rank": 847,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Maskwood Nexus",
+          "classification_source": "text_inferred",
+          "cmc": 4.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 23,
+          "staple_rank": null,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Sigarda's Aid",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "cut_reasons": [
+            "matches_excess_roles:engine",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "engine"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "engine"
+          ],
+          "score": 23,
+          "staple_rank": null,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Grim Tutor",
+          "classification_source": "text_inferred",
+          "cmc": 3.0,
+          "cut_reasons": [
+            "matches_excess_roles:tutor",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "tutor"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "tutor"
+          ],
+          "score": 20,
+          "staple_rank": null,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Oswald Fiddlebender",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:tutor",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "tutor"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "tutor"
+          ],
+          "score": 20,
+          "staple_rank": null,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Steelshaper's Gift",
+          "classification_source": "text_inferred",
+          "cmc": 1.0,
+          "cut_reasons": [
+            "matches_excess_roles:tutor",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "tutor"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "tutor"
+          ],
+          "score": 20,
+          "staple_rank": null,
+          "status": "review_only_nonland_cut_candidate"
+        },
+        {
+          "card_name": "Stoneforge Mystic",
+          "classification_source": "text_inferred",
+          "cmc": 2.0,
+          "cut_reasons": [
+            "matches_excess_roles:tutor",
+            "only_carries_excess_roles",
+            "role_text_inferred_review"
+          ],
+          "matching_excess_roles": [
+            "tutor"
+          ],
+          "mutation_allowed": false,
+          "roles": [
+            "tutor"
+          ],
+          "score": 20,
+          "staple_rank": null,
+          "status": "review_only_nonland_cut_candidate"
+        }
+      ]
+    },
+    {
+      "battle_feedback_blocked_pair_count": 0,
+      "blocked_cut_candidate_count": 0,
+      "blocked_cut_candidates": [],
+      "blocked_pair_hypotheses": [],
+      "candidate_count": 0,
+      "commander": "Lorehold, the Historian",
+      "commander_color_identity": [
+        "W",
+        "R"
+      ],
+      "current_count": 1,
+      "cut_candidate_count": 0,
+      "deck_id": "6",
+      "deck_name": "Runtime Lorehold Learned 19e93de3cca",
+      "missing": 2,
+      "mutation_allowed": false,
+      "pair_hypotheses": [],
+      "related_source_lanes": [],
+      "role": "wincon",
+      "scope": "hermes_lorehold_baseline",
+      "status": "needs_commander_specific_source_lane",
+      "target_min": 3,
+      "top_candidates": [],
+      "top_cut_candidates": []
+    }
+  ],
+  "policy": {
+    "battle_feedback_pair_memory": "Exact add/cut pairs blocked by global battle feedback are removed from fresh nonland pair hypotheses.",
+    "commander_payoff_protection": "Commander-specific payoffs such as Kaalia Angel/Demon/Dragon creatures are blocked from generic excess-role cuts until source-lane review.",
+    "cross_lane_ramp_protection": "Ramp cards are blocked from non-ramp repairs unless a same-lane source or later battle gate proves the cut.",
+    "floor_protection": "Cards carrying any missing core role are blocked from cut suggestions.",
+    "promotion_block": "No deck change is promoted without candidate copy, structure/legal recheck, strategy matrix, battle gate, and replay trace.",
+    "review_only": "Nonland candidates and cuts are hypotheses only.",
+    "source_lane_boundary": "Wincon candidates require commander-specific win-plan evidence before named additions."
+  },
+  "postgres_writes": false,
+  "source_battle_feedback_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.json",
+  "source_core_role_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.json",
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_repair_hypothesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_core_repair_hypothesis_20260705_global_goal_hermes_only.json",
+  "summary": {
+    "pool_count": 2,
+    "status_counts": {
+      "needs_commander_specific_source_lane": 1,
+      "review_nonland_add_cut_pool_ready": 1
+    },
+    "top_next_action": "review_nonland_add_cut_pairs_or_build_commander_source_lane",
+    "total_battle_feedback_blocked_pair_count": 0,
+    "total_blocked_cut_candidate_count": 12,
+    "total_candidate_count": 12,
+    "total_cut_candidate_count": 12,
+    "total_pair_hypothesis_count": 9
+  }
+}
