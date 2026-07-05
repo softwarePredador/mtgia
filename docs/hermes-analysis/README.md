@@ -622,6 +622,16 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `commander_attack_window`, `mana_acceleration_replacement` e
     `tutors_access_replacement`. Proximo gate:
     `expand_same_lane_add_source_lanes_for_target_cut_roles`.
+    O expander dessas source-lanes fica em
+    `global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `same_lane_add_source_lanes_expanded_no_deck_action`, com
+    `requirement_count=3`, `ready_axis_count=3` e `missing_axis_count=0`.
+    As top lanes locais agora incluem `Boros Charm`, `Swiftfoot Boots` e
+    `Flawless Maneuver` para attack-window; `Fellwar Stone`, signets e
+    talismans para mana; e `Gamble`, `Wishclaw Talisman`, `Entomb` e
+    `Imperial Seal` para acesso/tutor. Isso ainda e source-lane de revisao,
+    nao par add/cut. Proximo gate:
+    `resynthesize_same_lane_package_from_source_lanes_before_cut_pairing`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

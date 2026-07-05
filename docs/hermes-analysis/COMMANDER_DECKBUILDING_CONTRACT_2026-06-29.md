@@ -334,7 +334,13 @@ Operational priority after this pivot:
     until they have their own same-lane cuts, and route to same-lane add source
     lane expansion while candidate copy, battle, promotion, and value-safe
     reclassification remain closed;
-41. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+41. run `global_commander_same_lane_add_source_lane_expander.py` after same-lane
+    package resynthesis; it must scan the current evaluation DB for legal,
+    commander-color-compatible source candidates for each required add axis,
+    separate review-only candidates from blocked color/legality/existing-deck
+    rows, and route to package resynthesis from source lanes while candidate
+    copy, battle, promotion, and value-safe reclassification stay closed;
+42. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -393,6 +399,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_package_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -869,6 +876,17 @@ Current external refresh on 2026-07-05:
   `ready_pair_count=0`. The required add axes are `commander_attack_window`,
   `mana_acceleration_replacement`, and `tutors_access_replacement`. The next
   gate is `expand_same_lane_add_source_lanes_for_target_cut_roles`.
+- Current same-lane add source-lane expansion returns
+  `same_lane_add_source_lanes_expanded_no_deck_action` with
+  `requirement_count=3`, `ready_axis_count=3`, `missing_axis_count=0`, and
+  ready local source candidates for `commander_attack_window`,
+  `mana_acceleration_replacement`, and `tutors_access_replacement`. Top signals
+  include attack-window cards such as `Boros Charm`, `Swiftfoot Boots`, and
+  `Flawless Maneuver`; mana replacements such as `Fellwar Stone`, signets, and
+  talismans; and tutor/access replacements such as `Gamble`, `Wishclaw
+  Talisman`, `Entomb`, and `Imperial Seal`. These are review-only source lanes,
+  not paired swaps. The next gate is
+  `resynthesize_same_lane_package_from_source_lanes_before_cut_pairing`.
 
 ## Global Commander Rollout - 2026-07-01
 

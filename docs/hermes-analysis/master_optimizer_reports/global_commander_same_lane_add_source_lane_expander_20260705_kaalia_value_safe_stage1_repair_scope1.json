@@ -1,0 +1,4662 @@
+{
+  "artifact_type": "global_commander_same_lane_add_source_lane_expander",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "source_lanes_are_review_only_not_deck_actions",
+    "value_safe_cut_pairs_still_missing",
+    "candidate_copy_closed_until_resynthesized_package_and_scope_reducer_pass"
+  ],
+  "db_resolution": {
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+    "selected_db_exists": true,
+    "source": "profile_repair_candidate_db"
+  },
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T23:28:48.245138+00:00",
+  "input_artifacts": {
+    "profile_repair_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "same_lane_resynthesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "No battle or promotion opens before package resynthesis, scope reduction, candidate copy, strategy matrix, and replay gates.",
+    "cut_boundary": "This report does not reclassify any cut as value-safe.",
+    "same_lane_boundary": "Candidates must explicitly match the required add axis; incidental payoff text is not enough.",
+    "source_lane_boundary": "Same-lane add source candidates are evidence rows, not deck changes."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "source_lanes": [
+    {
+      "blocked_candidate_sample": [
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Grand Abolisher",
+          "cmc": 2.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_249",
+            "profile_role_haste_protection_silence",
+            "protects_commander_attack_step",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 133,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Creature \u2014 Human Cleric"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Silence",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_423",
+            "profile_role_haste_protection_silence",
+            "protects_commander_attack_step",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 131,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Lightning Greaves",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 123,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Arena of Glory",
+          "cmc": 0.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "profile_role_haste_protection_silence",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence",
+            "lands"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 111,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Land"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Hellkite Charger",
+          "cmc": 6.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 92,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Creature \u2014 Dragon"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Voice of Victory",
+          "cmc": 2.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "protects_commander_attack_step",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 91,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Creature \u2014 Human Bard"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Ranger-Captain of Eos",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "protects_commander_attack_step"
+          ],
+          "profile_roles": [
+            "haste_protection_silence",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 84,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Creature \u2014 Human Soldier Ranger"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Hammer of Nazahn",
+          "cmc": 4.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 82,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "The One Ring",
+          "cmc": 4.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 70,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Artifact"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Alicia Masters, Skilled Sculptor",
+          "cmc": 2.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "attack_window_text",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "board_wipes_resets",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 69,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Creature \u2014 Human Artificer"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Vorpal Sword",
+          "cmc": 1.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "attack_window_text",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "dedicated_win_conditions"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 69,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Ardenn, Intrepid Archaeologist",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "attack_window_text"
+          ],
+          "profile_roles": [],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 62,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Creature \u2014 Kor Scout"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Bloodthirster",
+          "cmc": 6.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "attack_window_text"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 62,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Creature \u2014 Demon"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Delney, Streetwise Lookout",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "attack_window_text"
+          ],
+          "profile_roles": [],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 62,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Creature \u2014 Human Scout"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Genji Glove",
+          "cmc": 5.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "attack_window_text"
+          ],
+          "profile_roles": [],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 62,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Karlach, Fury of Avernus",
+          "cmc": 5.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "attack_window_text"
+          ],
+          "profile_roles": [],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 62,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Creature \u2014 Tiefling Barbarian"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Scourge of the Throne",
+          "cmc": 6.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "attack_window_text"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 62,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Creature \u2014 Dragon"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Sunforger",
+          "cmc": 3.0,
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "attack_window_text"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 62,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Ragavan, Nimble Pilferer",
+          "cmc": 1.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "haste_protection_silence",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 87,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Creature \u2014 Monkey Pirate"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Aurelia, the Law Above",
+          "cmc": 5.0,
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "haste_enabler"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "board_wipes_resets",
+            "card_draw_selection",
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 80,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Creature \u2014 Angel"
+        }
+      ],
+      "blocked_candidate_sample_count": 20,
+      "candidate_copy_allowed": false,
+      "cut_role": "haste_protection_silence",
+      "expected_profile_name_count": 12,
+      "ready_candidate_count": 351,
+      "required_add_axis": "commander_attack_window",
+      "status": "same_lane_add_source_lane_ready_for_package_resynthesis",
+      "target_cut_count": 4,
+      "top_candidates": [
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Boros Charm",
+          "cmc": 2.0,
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_173",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 132,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Swiftfoot Boots",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 123,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Flawless Maneuver",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_181",
+            "profile_role_haste_protection_silence"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 113,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Loyal Apprentice",
+          "cmc": 2.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_705",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 112,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Creature \u2014 Human Artificer"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Hall of the Bandit Lord",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "profile_role_haste_protection_silence",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence",
+            "lands"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 111,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Land"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Anger",
+          "cmc": 4.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_369",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 109,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Creature \u2014 Incarnation"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Rising of the Day",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_634",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 106,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Enchantment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Conqueror's Flail",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "protects_commander_attack_step",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 103,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Emperor of Bones",
+          "cmc": 2.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence",
+            "reanimation_plan_b"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 99,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Creature \u2014 Skeleton Noble"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Gingerbrute",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 99,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Artifact Creature \u2014 Food Golem"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Lavaspur Boots",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 99,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Skateboard",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 99,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Sting, the Glinting Dagger",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 99,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Caduceus, Staff of Hermes",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "protects_commander_attack_step"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 96,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Expedite",
+          "cmc": 1.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_1182",
+            "profile_role_haste_protection_silence",
+            "haste_enabler",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 96,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Deflecting Swat",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_81"
+          ],
+          "profile_roles": [],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 94,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Untimely Malfunction",
+          "cmc": 2.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_334",
+            "profile_role_haste_protection_silence",
+            "cheap_attack_window_support"
+          ],
+          "profile_roles": [
+            "haste_protection_silence",
+            "spot_interaction"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 94,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Gogo, Mysterious Mime",
+          "cmc": 4.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 92,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Creature \u2014 Wizard"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Haunted Cloak",
+          "cmc": 3.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 92,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "commander_attack_window",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Helm of the Host",
+          "cmc": 4.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "haste_protection_silence",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_haste_protection_silence",
+            "attack_window_text",
+            "haste_enabler"
+          ],
+          "profile_roles": [
+            "haste_protection_silence"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 92,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 4,
+          "type_line": "Legendary Artifact \u2014 Equipment"
+        }
+      ]
+    },
+    {
+      "blocked_candidate_sample": [
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Arcane Signet",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_3",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 136,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Sol Ring",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_1",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 136,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Sol Ring // Sol Ring",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_1",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 136,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Mana Vault",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_144",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 111,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Ornithopter of Paradise",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_227",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 110,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact Creature \u2014 Thopter"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Smothering Tithe",
+          "cmc": 4.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_57",
+            "profile_role_mana_acceleration",
+            "mana_production_text",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 110,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Enchantment"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Dark Ritual",
+          "cmc": 1.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_36",
+            "profile_role_mana_acceleration",
+            "cheap_ramp"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 100,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Goldspan Dragon",
+          "cmc": 5.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_mana_acceleration",
+            "mana_production_text",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "haste_protection_silence",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 90,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Creature \u2014 Dragon"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Alicia Masters, Skilled Sculptor",
+          "cmc": 2.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "board_wipes_resets",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 88,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Legendary Creature \u2014 Human Artificer"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Ragavan, Nimble Pilferer",
+          "cmc": 1.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "haste_protection_silence",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 88,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Legendary Creature \u2014 Monkey Pirate"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Ancient Copper Dragon",
+          "cmc": 6.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_mana_acceleration",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 78,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Creature \u2014 Elder Dragon"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Cavern-Hoard Dragon",
+          "cmc": 9.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_mana_acceleration",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "haste_protection_silence",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 78,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Creature \u2014 Dragon"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Goldlust Triad",
+          "cmc": 5.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_mana_acceleration",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 78,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Creature \u2014 Dragon"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Professional Face-Breaker",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_mana_acceleration",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 78,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Creature \u2014 Human Warrior"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_mana_acceleration"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 70,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Legendary Creature \u2014 God"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_mana_acceleration"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 70,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Legendary Creature \u2014 God"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Jeska's Will",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_mana_acceleration"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 70,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Demonic Tutor",
+          "cmc": 2.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_58",
+            "cheap_ramp"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 80,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Esper Sentinel",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_73",
+            "cheap_ramp"
+          ],
+          "profile_roles": [
+            "card_draw_selection"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 80,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact Creature \u2014 Human Soldier"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Feed the Swarm",
+          "cmc": 2.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_88",
+            "cheap_ramp"
+          ],
+          "profile_roles": [
+            "spot_interaction"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 80,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Sorcery"
+        }
+      ],
+      "blocked_candidate_sample_count": 20,
+      "candidate_copy_allowed": false,
+      "cut_role": "mana_acceleration",
+      "expected_profile_name_count": 11,
+      "ready_candidate_count": 304,
+      "required_add_axis": "mana_acceleration_replacement",
+      "status": "same_lane_add_source_lane_ready_for_package_resynthesis",
+      "target_cut_count": 1,
+      "top_candidates": [
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Fellwar Stone",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_18",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 136,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Orzhov Signet",
+          "cmc": 2.0,
+          "color_identity": [
+            "W",
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_171",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 135,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Rakdos Signet",
+          "cmc": 2.0,
+          "color_identity": [
+            "B",
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_151",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 135,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Talisman of Conviction",
+          "cmc": 2.0,
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_155",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 135,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Talisman of Hierarchy",
+          "cmc": 2.0,
+          "color_identity": [
+            "W",
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_138",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 135,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Talisman of Indulgence",
+          "cmc": 2.0,
+          "color_identity": [
+            "B",
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_128",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 135,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Boros Signet",
+          "cmc": 2.0,
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_226",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 134,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Deadly Dispute",
+          "cmc": 2.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_131",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 119,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Mind Stone",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_31",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 112,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Thought Vessel",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_21",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 112,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Chrome Mox",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_142",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 111,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Lotus Petal",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_117",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 111,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Everflowing Chalice",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_248",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 110,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Mox Amber",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_208",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 110,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Legendary Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Mox Diamond",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_246",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 110,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Mox Opal",
+          "cmc": 0.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_239",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 110,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Legendary Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Big Score",
+          "cmc": 4.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_172",
+            "profile_role_mana_acceleration",
+            "mana_production_text",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 109,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Liquimetal Torque",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_477",
+            "profile_role_mana_acceleration",
+            "cheap_ramp",
+            "mana_production_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 108,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Pitiless Plunderer",
+          "cmc": 4.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_237",
+            "profile_role_mana_acceleration",
+            "mana_production_text",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 108,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Creature \u2014 Human Pirate"
+        },
+        {
+          "axis": "mana_acceleration_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Unexpected Windfall",
+          "cmc": 4.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "mana_acceleration",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_303",
+            "profile_role_mana_acceleration",
+            "mana_production_text",
+            "treasure_ramp_text"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 107,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 1,
+          "type_line": "Instant"
+        }
+      ]
+    },
+    {
+      "blocked_candidate_sample": [
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Demonic Tutor",
+          "cmc": 2.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_58",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 150,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Vampiric Tutor",
+          "cmc": 1.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_106",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_setup_zone",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 146,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Enlightened Tutor",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_115",
+            "profile_role_tutors_access",
+            "restricted_tutor",
+            "tutor_to_setup_zone",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 136,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Diabolic Intent",
+          "cmc": 2.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_265",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 124,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Razaketh, the Foulblooded",
+          "cmc": 8.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 98,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Legendary Creature \u2014 Demon"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Rune-Scarred Demon",
+          "cmc": 7.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 98,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Creature \u2014 Demon"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Hoarding Broodlord",
+          "cmc": 8.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 90,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Creature \u2014 Dragon"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Angel of the Ruins",
+          "cmc": 7.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "restricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 88,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Artifact Creature \u2014 Angel"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Ranger-Captain of Eos",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "restricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "haste_protection_silence",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 88,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Creature \u2014 Human Soldier Ranger"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Starfield Shepherd",
+          "cmc": 5.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "restricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 88,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Creature \u2014 Angel"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "The Seriema",
+          "cmc": 3.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "restricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "haste_protection_silence",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 88,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Legendary Artifact \u2014 Spacecraft"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Sunforger",
+          "cmc": 3.0,
+          "color_identity": [
+            "W",
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "restricted_tutor"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 80,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Esper Sentinel",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "format_staple_rank_73",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "card_draw_selection"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 102,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Artifact Creature \u2014 Human Soldier"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Necropotence",
+          "cmc": 3.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "commander_expected_package",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "reanimation_plan_b"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 82,
+          "source_lanes": [
+            "commander_reference_profile_expected_package",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Enchantment"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Arcane Signet",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_3",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 78,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Dark Ritual",
+          "cmc": 1.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_36",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 78,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Feed the Swarm",
+          "cmc": 2.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_88",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "spot_interaction"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 78,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Path to Exile",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_15",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "spot_interaction"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 78,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Sol Ring",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_1",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 78,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [
+            "already_in_current_evaluation_deck",
+            "does_not_match_required_same_lane_add_axis"
+          ],
+          "candidate_copy_allowed": false,
+          "card_name": "Sol Ring // Sol Ring",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_1",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "mana_acceleration"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 78,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "blocked_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Artifact"
+        }
+      ],
+      "blocked_candidate_sample_count": 20,
+      "candidate_copy_allowed": false,
+      "cut_role": "tutors_access",
+      "expected_profile_name_count": 7,
+      "ready_candidate_count": 105,
+      "required_add_axis": "tutors_access_replacement",
+      "status": "same_lane_add_source_lane_ready_for_package_resynthesis",
+      "target_cut_count": 8,
+      "top_candidates": [
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Gamble",
+          "cmc": 1.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_231",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 124,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Wishclaw Talisman",
+          "cmc": 2.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_503",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 121,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Entomb",
+          "cmc": 1.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_316",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_setup_zone",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 120,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Instant"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Imperial Seal",
+          "cmc": 1.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_489",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_setup_zone",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 119,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Diabolic Tutor",
+          "cmc": 4.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_442",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 114,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Insatiable Avarice",
+          "cmc": 1.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_1087",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_setup_zone",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 113,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Expedition Map",
+          "cmc": 1.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_438",
+            "profile_role_tutors_access",
+            "restricted_tutor",
+            "tutor_to_hand",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 112,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Artifact"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Cool but Rude",
+          "cmc": 2.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "board_wipes_resets",
+            "card_draw_selection",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 106,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Enchantment \u2014 Class"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Profane Tutor",
+          "cmc": 0.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 106,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Sword of the Animist",
+          "cmc": 2.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_240",
+            "profile_role_tutors_access",
+            "restricted_tutor",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 106,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Legendary Artifact \u2014 Equipment"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Land Tax",
+          "cmc": 1.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_424",
+            "profile_role_tutors_access",
+            "restricted_tutor",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 104,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Enchantment"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Imperial Recruiter",
+          "cmc": 3.0,
+          "color_identity": [
+            "R"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_596",
+            "profile_role_tutors_access",
+            "restricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 103,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Creature \u2014 Human Advisor"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Knight of the White Orchid",
+          "cmc": 2.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_601",
+            "profile_role_tutors_access",
+            "restricted_tutor",
+            "cheap_tutor_access"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 102,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Creature \u2014 Human Knight"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Solemn Simulacrum",
+          "cmc": 4.0,
+          "color_identity": [],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "format_staple_rank_34",
+            "profile_role_tutors_access",
+            "restricted_tutor"
+          ],
+          "profile_roles": [
+            "card_draw_selection",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 100,
+          "source_lanes": [
+            "format_staples",
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Artifact Creature \u2014 Golem"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Beseech the Queen",
+          "cmc": 6.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 98,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Brainspoil",
+          "cmc": 5.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "spot_interaction",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 98,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Coveted Prize",
+          "cmc": 5.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "board_wipes_resets",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 98,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Dark Petition",
+          "cmc": 5.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "mana_acceleration",
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 98,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Daru Cavalier",
+          "cmc": 4.0,
+          "color_identity": [
+            "W"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 98,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Creature \u2014 Human Soldier"
+        },
+        {
+          "axis": "tutors_access_replacement",
+          "block_reasons": [],
+          "candidate_copy_allowed": false,
+          "card_name": "Demonic Bargain",
+          "cmc": 3.0,
+          "color_identity": [
+            "B"
+          ],
+          "commander_legality": "legal",
+          "cut_role": "tutors_access",
+          "fit_reasons": [
+            "commander_legal",
+            "profile_role_tutors_access",
+            "unrestricted_tutor",
+            "tutor_to_hand"
+          ],
+          "profile_roles": [
+            "tutors_access"
+          ],
+          "required_gates": [
+            "same_lane_source_lane_review",
+            "same_lane_package_resynthesis",
+            "value_safe_cut_pair_proof",
+            "candidate_copy_only_after_scope_reducer",
+            "strategy_matrix_before_battle",
+            "battle_gate_with_drawn_cast_used_trace_before_promotion"
+          ],
+          "score": 98,
+          "source_lanes": [
+            "local_oracle_same_lane_scan"
+          ],
+          "status": "review_only_same_lane_add_source_candidate",
+          "target_cut_count": 8,
+          "type_line": "Sorcery"
+        }
+      ]
+    }
+  ],
+  "status": "same_lane_add_source_lanes_expanded_no_deck_action",
+  "summary": {
+    "commander": "Kaalia of the Vast",
+    "commander_color_identity": [
+      "W",
+      "B",
+      "R"
+    ],
+    "deck_id": "619",
+    "missing_axes": [],
+    "missing_axis_count": 0,
+    "next_gate": "resynthesize_same_lane_package_from_source_lanes_before_cut_pairing",
+    "ready_axis_count": 3,
+    "ready_candidate_count_by_axis": {
+      "commander_attack_window": 351,
+      "mana_acceleration_replacement": 304,
+      "tutors_access_replacement": 105
+    },
+    "requirement_count": 3
+  },
+  "value_safe_reclassification_allowed_now": false
+}

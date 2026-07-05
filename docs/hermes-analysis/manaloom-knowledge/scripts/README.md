@@ -174,6 +174,13 @@ until payoff-lane cuts exist, and routes to
 requirements gate only; no deck copy, battle, promotion, or value-safe
 reclassification opens.
 
+Then run `global_commander_same_lane_add_source_lane_expander.py`. It scans the
+current evaluation DB for legal, commander-color-compatible add candidates for
+each required same-lane axis, excluding existing-deck rows and blocked
+color/legality matches. If all lanes have review-only source candidates, route
+to `resynthesize_same_lane_package_from_source_lanes_before_cut_pairing`; this
+still does not pair cuts, copy a deck, run battle, or promote anything.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

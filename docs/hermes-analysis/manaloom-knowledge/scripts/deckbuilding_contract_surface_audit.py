@@ -180,6 +180,12 @@ GLOBAL_COMMANDER_SAME_LANE_PACKAGE_RESYNTHESIZER = (
 GLOBAL_COMMANDER_SAME_LANE_PACKAGE_RESYNTHESIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_same_lane_package_resynthesizer.py"
 )
+GLOBAL_COMMANDER_SAME_LANE_ADD_SOURCE_LANE_EXPANDER = (
+    SCRIPT_DIR / "global_commander_same_lane_add_source_lane_expander.py"
+)
+GLOBAL_COMMANDER_SAME_LANE_ADD_SOURCE_LANE_EXPANDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_same_lane_add_source_lane_expander.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -413,6 +419,10 @@ GLOBAL_COMMANDER_SCOPE1_PACKAGE_AXIS_BROADENING_PLAN_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_SAME_LANE_PACKAGE_RESYNTHESIZER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_SAME_LANE_ADD_SOURCE_LANE_EXPANDER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -754,6 +764,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "same_lane_package_resynthesis_blocks_candidate_copy_needs_source_lanes",
                 "expand_same_lane_add_source_lanes_for_target_cut_roles",
+                "global_commander_same_lane_add_source_lane_expander.py",
+                "global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_add_source_lanes_expanded_no_deck_action",
+                "resynthesize_same_lane_package_from_source_lanes_before_cut_pairing",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1036,6 +1050,10 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_package_resynthesis_blocks_candidate_copy_needs_source_lanes",
                 "held_payoff_add_count=6",
                 "expand_same_lane_add_source_lanes_for_target_cut_roles",
+                "global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_add_source_lanes_expanded_no_deck_action",
+                "ready_axis_count=3",
+                "resynthesize_same_lane_package_from_source_lanes_before_cut_pairing",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1661,6 +1679,37 @@ def build_audit() -> dict[str, Any]:
                 "mana_acceleration_replacement",
                 "tutors_access_replacement",
                 "same_lane_axes_still_need_value_safe_cut_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_ADD_SOURCE_LANE_EXPANDER,
+            [
+                "global_commander_same_lane_add_source_lane_expander",
+                "same_lane_add_source_lanes_expanded_no_deck_action",
+                "same_lane_add_source_lanes_need_external_research",
+                "resynthesize_same_lane_package_from_source_lanes_before_cut_pairing",
+                "external_same_lane_source_research_for_missing_axes",
+                "review_only_same_lane_add_source_candidate",
+                "land_candidate_requires_mana_base_lane_not_same_lane_nonland_replacement",
+                "source_lanes_are_review_only_not_deck_actions",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_ADD_SOURCE_LANE_EXPANDER_TEST,
+            [
+                "test_expands_ready_source_lanes_for_all_required_axes",
+                "test_missing_same_lane_axis_routes_to_external_research",
+                "test_existing_and_color_incompatible_candidates_are_blocked",
+                "same_lane_add_source_lanes_expanded_no_deck_action",
+                "resynthesize_same_lane_package_from_source_lanes_before_cut_pairing",
+                "missing_same_lane_add_source_axes:tutors_access_replacement",
+                "not_commander_color_identity_compatible",
             ],
         )
     )
@@ -2684,6 +2733,28 @@ def build_audit() -> dict[str, Any]:
                 "tutors_access_replacement",
                 "hold_payoff_package_until_payoff_lane_has_own_cuts",
                 "same_lane_add_source_lanes_missing_for_target_cut_roles",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_SAME_LANE_ADD_SOURCE_LANE_EXPANDER_REPORT,
+            [
+                "Global Commander Same-Lane Add Source Lane Expander",
+                "same_lane_add_source_lanes_expanded_no_deck_action",
+                "requirement_count: `3`",
+                "ready_axis_count: `3`",
+                "missing_axis_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "resynthesize_same_lane_package_from_source_lanes_before_cut_pairing",
+                "commander_attack_window",
+                "mana_acceleration_replacement",
+                "tutors_access_replacement",
+                "Boros Charm",
+                "Fellwar Stone",
+                "Gamble",
+                "source_lanes_are_review_only_not_deck_actions",
             ],
         )
     )
