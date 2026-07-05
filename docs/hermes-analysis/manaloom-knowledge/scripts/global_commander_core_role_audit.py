@@ -254,6 +254,61 @@ def band_status(role: str, count: int) -> dict[str, Any]:
     }
 
 
+def core_repair_plan(role_rows: list[dict[str, Any]], unknown_count: int) -> dict[str, Any]:
+    missing_role_slots = []
+    excess_role_slots = []
+    for row in role_rows:
+        count = int(row["count"])
+        if row["status"] == "below_floor":
+            target_min = int(row["min"])
+            missing_role_slots.append(
+                {
+                    "role": row["role"],
+                    "count": count,
+                    "target_min": target_min,
+                    "missing": max(0, target_min - count),
+                    "severity": row["severity"],
+                }
+            )
+        elif row["status"] == "above_range_review":
+            target_max = int(row["max"])
+            excess_role_slots.append(
+                {
+                    "role": row["role"],
+                    "count": count,
+                    "target_max": target_max,
+                    "excess": max(0, count - target_max),
+                    "severity": row["severity"],
+                }
+            )
+
+    critical_missing = [
+        row for row in missing_role_slots if row["severity"] == "critical"
+    ]
+    if critical_missing:
+        first_action = "fill_critical_role_floor"
+    elif missing_role_slots:
+        first_action = "fill_support_role_floor"
+    elif excess_role_slots:
+        first_action = "review_role_extremes"
+    elif unknown_count:
+        first_action = "classify_unknown_role_cards"
+    else:
+        first_action = "commander_profile_and_source_lanes"
+
+    return {
+        "first_action": first_action,
+        "missing_role_slots": missing_role_slots,
+        "excess_role_slots": excess_role_slots,
+        "unknown_count": unknown_count,
+        "mutation_policy": (
+            "repair_missing_critical_floor_before_strategy_matrix;"
+            "treat_excess_roles_as_review_signals_not_auto_cuts;"
+            "classify_unknown_cards_before_physical_swaps"
+        ),
+    }
+
+
 def deck_core_status(*, shape_status: str, total_cards: int, role_rows: list[dict[str, Any]], unknown_count: int) -> str:
     critical_gaps = [
         row for row in role_rows if row["status"] == "below_floor" and row["severity"] == "critical"
@@ -296,6 +351,10 @@ def build_report(
         counts = Counter(role_data.get("role_counts") or {})
         total_cards = int(role_data.get("total_cards") or matrix.get("quantity") or 0)
         role_band_rows = [band_status(role, int(counts.get(role) or 0)) for role in ROLE_ORDER]
+        repair_plan = core_repair_plan(
+            role_band_rows,
+            unknown_count=int(counts.get("unknown") or 0),
+        )
         status = deck_core_status(
             shape_status=str(matrix.get("status") or ""),
             total_cards=total_cards,
@@ -313,6 +372,7 @@ def build_report(
                 "total_cards": total_cards,
                 "role_counts": {role: int(counts.get(role) or 0) for role in [*ROLE_ORDER, "unknown"]},
                 "role_bands": role_band_rows,
+                "core_repair_plan": repair_plan,
                 "classification_source_counts": dict(role_data.get("classification_source_counts") or {}),
                 "unknown_card_sample": role_data.get("unknown_cards") or [],
                 "next_gate": next_gate(status),
@@ -321,6 +381,16 @@ def build_report(
 
     status_counts = Counter(row["core_status"] for row in audited_rows)
     commander_counts = Counter(row["commander"] for row in audited_rows if row.get("commander"))
+    missing_role_slot_totals: Counter[str] = Counter()
+    excess_role_slot_totals: Counter[str] = Counter()
+    unknown_role_card_total = 0
+    for row in audited_rows:
+        repair_plan = row["core_repair_plan"]
+        unknown_role_card_total += int(repair_plan["unknown_count"])
+        for gap in repair_plan["missing_role_slots"]:
+            missing_role_slot_totals[gap["role"]] += int(gap["missing"])
+        for excess in repair_plan["excess_role_slots"]:
+            excess_role_slot_totals[excess["role"]] += int(excess["excess"])
     return {
         "generated_at": utc_now(),
         "status": "pass",
@@ -347,6 +417,9 @@ def build_report(
             "role_data_incomplete_count": status_counts.get("role_data_incomplete", 0),
             "core_role_gap_count": status_counts.get("core_role_gap", 0),
             "structure_blocked_count": status_counts.get("structure_blocked", 0),
+            "missing_role_slot_totals": dict(sorted(missing_role_slot_totals.items())),
+            "excess_role_slot_totals": dict(sorted(excess_role_slot_totals.items())),
+            "unknown_role_card_total": unknown_role_card_total,
             "next_action": "repair_role_data_or_core_gaps_before_strategy_matrix",
         },
         "decks": audited_rows,
@@ -367,6 +440,15 @@ def next_gate(status: str) -> str:
     return "repair_structure_before_core_quality"
 
 
+def format_role_slots(slots: list[dict[str, Any]], key: str) -> str:
+    if not slots:
+        return "-"
+    return ", ".join(
+        f"{slot['role']}={slot[key]}"
+        for slot in slots
+    )
+
+
 def write_markdown(payload: dict[str, Any], path: Path) -> None:
     lines = [
         "# Global Commander Core Role Audit",
@@ -385,6 +467,33 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
     ]
     for status, count in payload["summary"]["status_counts"].items():
         lines.append(f"| `{status}` | {count} |")
+    lines.extend(
+        [
+            "",
+            "## Core Repair Queue",
+            "",
+            "| Deck | Commander | First Action | Missing Slots | Excess Review | Unknown |",
+            "| --- | --- | --- | --- | --- | ---: |",
+        ]
+    )
+    for row in payload["decks"]:
+        plan = row["core_repair_plan"]
+        if (
+            not plan["missing_role_slots"]
+            and not plan["excess_role_slots"]
+            and not plan["unknown_count"]
+        ):
+            continue
+        lines.append(
+            "| `{deck}` | `{commander}` | `{action}` | {missing} | {excess} | {unknown} |".format(
+                deck=f"{row['deck_name']} ({row['deck_id']})".replace("|", "/"),
+                commander=str(row.get("commander") or "").replace("|", "/"),
+                action=plan["first_action"],
+                missing=format_role_slots(plan["missing_role_slots"], "missing"),
+                excess=format_role_slots(plan["excess_role_slots"], "excess"),
+                unknown=plan["unknown_count"],
+            )
+        )
     lines.extend(
         [
             "",
@@ -421,6 +530,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "- This report is read-only and does not promote decks.",
             "- Role bands are generic Commander floors; commander-specific profiles may adjust them later.",
             "- Structured tags win; Oracle text inference is diagnostic fallback for untagged lab decks.",
+            "- Core repair plans are not mutation permits; missing critical floors come before source lanes, while excess roles are review signals.",
             "- Deck 607 is treated as a benchmark/regression deck, not a global template.",
             "",
         ]

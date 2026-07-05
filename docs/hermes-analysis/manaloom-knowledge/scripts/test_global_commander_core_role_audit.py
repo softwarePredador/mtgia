@@ -117,6 +117,27 @@ class GlobalCommanderCoreRoleAuditTests(unittest.TestCase):
         self.assertEqual(status, "role_data_incomplete")
         self.assertEqual(counts["unknown"], 50)
 
+    def test_core_repair_plan_prioritizes_critical_floor_before_excess_review(self) -> None:
+        role_rows = [
+            audit.band_status("land", 32),
+            audit.band_status("ramp", 18),
+            audit.band_status("draw", 12),
+            audit.band_status("removal", 5),
+        ]
+
+        plan = audit.core_repair_plan(role_rows, unknown_count=3)
+
+        self.assertEqual(plan["first_action"], "fill_critical_role_floor")
+        self.assertEqual(
+            [(row["role"], row["missing"]) for row in plan["missing_role_slots"]],
+            [("land", 2), ("removal", 1)],
+        )
+        self.assertEqual(
+            [(row["role"], row["excess"]) for row in plan["excess_role_slots"]],
+            [("ramp", 2)],
+        )
+        self.assertIn("not_auto_cuts", plan["mutation_policy"])
+
     def test_sqlite_report_routes_core_gap(self) -> None:
         conn = sqlite3.connect(":memory:")
         conn.row_factory = sqlite3.Row
