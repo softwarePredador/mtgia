@@ -1397,3 +1397,77 @@ Operational lesson:
   conversion routes over broad token-pressure shells.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Engine-Preserving Pressure Conversion Router - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_pressure_conversion_router_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_pressure_conversion_router_20260705_current_relearn.json`
+
+This router translates the external deckbuilding lesson from Guttersnipe and
+Storm-Kiln Artist into the current protected-`607` contract. The purpose is to
+avoid two bad loops: adding a public staple just because it is popular, or
+retesting Storm-Kiln as the already-rejected `Arcane Signet` swap.
+
+Current result:
+
+- decision status:
+  `engine_preserving_pressure_conversion_not_gate_ready_keep_607`;
+- routes evaluated: `3`;
+- gate-ready routes: `0`;
+- diagnostic-ready routes: `0`;
+- gate-ready cut count: `0`;
+- diagnostic cut count: `0`;
+- hypothesis natural gate-ready count: `0`;
+- wins with pressure-card events: `0`;
+- losses with pressure-card events: `1`;
+- miracle trace failure flags: `7`;
+- Storm-Kiln prior decision:
+  `rejected_for_deck_promotion_pressure_regression`;
+- best next learning route:
+  `guttersnipe_storm_kiln_engine_preserving_pair`;
+- best next learning status:
+  `best_next_learning_route_contract_required_no_deck_action`;
+- ready deck changes: `0`;
+- promotion allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- recommended next action:
+  `build_engine_preserving_hypothesis_contract_and_find_named_safe_cuts`.
+
+Route-level conclusion:
+
+- `Guttersnipe` is the cleaner noncombat pressure lesson, but it is missing
+  current hypothesis readiness and has no positive current pressure trace.
+- `Storm-Kiln Artist` has real Treasure-conversion evidence, but its direct
+  `Arcane Signet` swap is still rejected because the Winota fast-pressure slice
+  regressed.
+- `Guttersnipe + Storm-Kiln Artist` is now the best next learning route because
+  it converts spell volume into both pressure and mana while preserving the
+  lesson from the Young Pyromancer refutation. It is not a deck action until
+  two named seed-safe same-lane cuts exist and the package protects the 607
+  topdeck, miracle, spell-volume, mana-timing, protection, and fast-pressure
+  floors.
+
+External learning used by the router:
+
+- EDHREC's current Lorehold core spellslinger surface keeps the public shell
+  tied to topdeck, spellslinger, discard, and reanimator lanes.
+- Commander Spellbook shows that Storm-Kiln can be a real combo/conversion
+  engine with storm/copy chains, so it should be treated as a conversion card,
+  not generic ramp.
+- GameTyrant's Lorehold deck tech treats Guttersnipe as direct spell damage
+  and Storm-Kiln as big-turn Treasure support, but both remain secondary to the
+  deck's topdeck/miracle engine.
+
+Operational lesson:
+
+- External value is priority, not permission.
+- Do not repeat the Storm-Kiln / Arcane Signet swap.
+- Do not return to broad token-pressure shells after the Young Pyromancer trace
+  was refuted.
+- The next useful work is a written engine-preserving hypothesis contract for
+  Guttersnipe + Storm-Kiln, with direct event requirements and named safe cuts
+  before any natural battle gate.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.
