@@ -27,6 +27,7 @@ PROMOTION_DECISION_AUDIT = SCRIPT_DIR / "lorehold_promotion_gate_decision_audit.
 GLOBAL_COMMANDER_AUDIT = SCRIPT_DIR / "global_commander_deck_contract_audit.py"
 GLOBAL_COMMANDER_MATRIX = SCRIPT_DIR / "global_commander_strategy_matrix.py"
 GLOBAL_COMMANDER_CORE_ROLE_AUDIT = SCRIPT_DIR / "global_commander_core_role_audit.py"
+GLOBAL_COMMANDER_CORE_REPAIR_HYPOTHESIS = SCRIPT_DIR / "global_commander_core_repair_hypothesis.py"
 GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT = SCRIPT_DIR / "global_commander_learning_priority_audit.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
@@ -61,6 +62,10 @@ GLOBAL_COMMANDER_MATRIX_REPORT = (
 GLOBAL_COMMANDER_CORE_ROLE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.md"
+)
+GLOBAL_COMMANDER_CORE_REPAIR_HYPOTHESIS_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_core_repair_hypothesis_20260705_global_goal_hermes_only.md"
 )
 GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
     REPO_ROOT
@@ -131,6 +136,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_strategy_matrix.py",
                 "global_commander_core_role_audit.py",
                 "global_commander_core_role_audit_20260705_global_goal_hermes_only.md",
+                "global_commander_core_repair_hypothesis.py",
+                "global_commander_core_repair_hypothesis_20260705_global_goal_hermes_only.md",
                 "global_commander_learning_priority_audit.py",
                 "global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md",
                 "five Commander",
@@ -248,6 +255,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_strategy_matrix_20260701_current.md",
                 "global_commander_deck_contract_audit_20260705_global_core_pivot_hermes_only.md",
                 "global_commander_strategy_matrix_20260705_global_core_pivot_hermes_only.md",
+                "global_commander_core_repair_hypothesis.py",
+                "global_commander_core_repair_hypothesis_20260705_global_goal_hermes_only.md",
             ],
         )
     )
@@ -332,6 +341,18 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_CORE_REPAIR_HYPOTHESIS,
+            [
+                "global_commander_core_repair_hypothesis",
+                "mutation_allowed",
+                "needs_mana_base_profile_before_named_cards",
+                "needs_commander_win_plan_source_lane",
+                "review_only_requires_commander_color_identity_and_fit",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT,
             [
                 "global_commander_learning_priority_audit",
@@ -364,6 +385,16 @@ def build_audit() -> dict[str, Any]:
             "exists": GLOBAL_COMMANDER_CORE_ROLE_REPORT.exists(),
             "status": "pass" if GLOBAL_COMMANDER_CORE_ROLE_REPORT.exists() else "fail",
             "missing": [] if GLOBAL_COMMANDER_CORE_ROLE_REPORT.exists() else ["global_commander_core_role_report"],
+        }
+    )
+    checks.append(
+        {
+            "path": rel(GLOBAL_COMMANDER_CORE_REPAIR_HYPOTHESIS_REPORT),
+            "exists": GLOBAL_COMMANDER_CORE_REPAIR_HYPOTHESIS_REPORT.exists(),
+            "status": "pass" if GLOBAL_COMMANDER_CORE_REPAIR_HYPOTHESIS_REPORT.exists() else "fail",
+            "missing": []
+            if GLOBAL_COMMANDER_CORE_REPAIR_HYPOTHESIS_REPORT.exists()
+            else ["global_commander_core_repair_hypothesis_report"],
         }
     )
     checks.append(

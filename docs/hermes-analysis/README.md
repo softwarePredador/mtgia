@@ -208,6 +208,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `manaloom-knowledge/scripts/global_commander_core_role_audit.py`; evidencia
     local atual:
     `master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.md`.
+    Para transformar gaps criticos em hipoteses seguras antes de qualquer
+    materializacao, rode
+    `manaloom-knowledge/scripts/global_commander_core_repair_hypothesis.py`;
+    evidencia local atual:
+    `master_optimizer_reports/global_commander_core_repair_hypothesis_20260705_global_goal_hermes_only.md`.
     Para ordenar o proximo aprendizado global sem voltar a focar no `607`,
     rode `manaloom-knowledge/scripts/global_commander_learning_priority_audit.py`;
     evidencia local atual:

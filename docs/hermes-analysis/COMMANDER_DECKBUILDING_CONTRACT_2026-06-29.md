@@ -159,11 +159,14 @@ Operational priority after this pivot:
    mana, curve, ramp, draw, removal, wipes, protection, recursion, win plans,
    staples, and same-lane cuts across all commanders before commander-specific
    matrices or battle gates;
-5. run `global_commander_learning_priority_audit.py` to combine core gaps,
+5. run `global_commander_core_repair_hypothesis.py` to convert critical core
+   gaps into read-only repair hypotheses, candidate-source lanes, cut pressure,
+   and required gates before any materialized deck or card swap;
+6. run `global_commander_learning_priority_audit.py` to combine core gaps,
    source-lane availability, current external research, staple/bracket
    guardrails, and the Lorehold benchmark rule into one global next-action
    queue;
-6. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+7. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -173,6 +176,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260705_global_core_pivot_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260705_global_core_pivot_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_core_repair_hypothesis_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
@@ -193,6 +197,9 @@ Current external refresh on 2026-07-05:
 - The external deckbuilding template evidence remains directional: core ranges
   for lands, ramp, draw, interaction, and wipes identify floor gaps, while the
   commander profile decides which ranges bend up or down.
+- Current core repair hypothesis output is read-only. Land gaps require a mana
+  base profile before named cards, wincon gaps require commander win-plan/source
+  proof before named cards, and format staples are review candidates only.
 
 ## Global Commander Rollout - 2026-07-01
 
