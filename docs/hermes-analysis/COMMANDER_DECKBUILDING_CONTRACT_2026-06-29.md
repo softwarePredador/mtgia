@@ -159,7 +159,11 @@ Operational priority after this pivot:
    mana, curve, ramp, draw, removal, wipes, protection, recursion, win plans,
    staples, and same-lane cuts across all commanders before commander-specific
    matrices or battle gates;
-5. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+5. run `global_commander_learning_priority_audit.py` to combine core gaps,
+   source-lane availability, current external research, staple/bracket
+   guardrails, and the Lorehold benchmark rule into one global next-action
+   queue;
+6. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -169,11 +173,26 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260705_global_core_pivot_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260705_global_core_pivot_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
 credentials are unavailable. It must report source lanes as unavailable and route
 ready lab decks to `structure_ready_source_missing`; it must not silently treat
 missing PostgreSQL source evidence as complete product readiness.
+
+Current external refresh on 2026-07-05:
+
+- The official Wizards Commander format page now exposes five Commander
+  Brackets and Game Changers as power-intent signals. ManaLoom must treat them
+  as bracket/pregame-context evidence, not as proof a deck is strategically
+  correct.
+- `server/lib/edh_bracket_policy.dart` still clamps to legacy brackets `1..4`.
+  Until that policy is audited and refreshed for the current official bracket
+  model, bracket checks are a warning/gate signal and must not be used as final
+  deck-quality proof.
+- The external deckbuilding template evidence remains directional: core ranges
+  for lands, ramp, draw, interaction, and wipes identify floor gaps, while the
+  commander profile decides which ranges bend up or down.
 
 ## Global Commander Rollout - 2026-07-01
 

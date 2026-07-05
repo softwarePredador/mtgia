@@ -27,6 +27,7 @@ PROMOTION_DECISION_AUDIT = SCRIPT_DIR / "lorehold_promotion_gate_decision_audit.
 GLOBAL_COMMANDER_AUDIT = SCRIPT_DIR / "global_commander_deck_contract_audit.py"
 GLOBAL_COMMANDER_MATRIX = SCRIPT_DIR / "global_commander_strategy_matrix.py"
 GLOBAL_COMMANDER_CORE_ROLE_AUDIT = SCRIPT_DIR / "global_commander_core_role_audit.py"
+GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT = SCRIPT_DIR / "global_commander_learning_priority_audit.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -60,6 +61,10 @@ GLOBAL_COMMANDER_MATRIX_REPORT = (
 GLOBAL_COMMANDER_CORE_ROLE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.md"
+)
+GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -126,6 +131,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_strategy_matrix.py",
                 "global_commander_core_role_audit.py",
                 "global_commander_core_role_audit_20260705_global_goal_hermes_only.md",
+                "global_commander_learning_priority_audit.py",
+                "global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md",
+                "five Commander",
+                "legacy brackets `1..4`",
             ],
         )
     )
@@ -321,6 +330,18 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT,
+            [
+                "global_commander_learning_priority_audit",
+                "EXTERNAL_RESEARCH_SNAPSHOT",
+                "current_official_bracket_model_has_five_brackets_and_game_changers",
+                "benchmark_regression_only_not_global_template",
+                "battle_or_optimization_performed",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -342,6 +363,16 @@ def build_audit() -> dict[str, Any]:
             "exists": GLOBAL_COMMANDER_CORE_ROLE_REPORT.exists(),
             "status": "pass" if GLOBAL_COMMANDER_CORE_ROLE_REPORT.exists() else "fail",
             "missing": [] if GLOBAL_COMMANDER_CORE_ROLE_REPORT.exists() else ["global_commander_core_role_report"],
+        }
+    )
+    checks.append(
+        {
+            "path": rel(GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT),
+            "exists": GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT.exists(),
+            "status": "pass" if GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT.exists() else "fail",
+            "missing": []
+            if GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT.exists()
+            else ["global_commander_learning_priority_report"],
         }
     )
 
