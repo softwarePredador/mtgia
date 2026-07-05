@@ -1086,6 +1086,40 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "ada97e73a2269ec6eb2b5ff17eb48756"
   },
+  "Adventurous Impulse": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "any",
+    "look_count": 3,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "creature_or_land",
+    "pick_up_to_count": true,
+    "rest_destination": "library_bottom",
+    "reveal": true,
+    "sorcery": true,
+    "target": "creature_or_land",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:302f257c7eda577079dd69104635301f",
+    "battle_rule_oracle_hash": "7478d6d791872add3b340dfeed23220b"
+  },
   "Aegis of the Heavens": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
     "duration": "until_end_of_turn",
@@ -3032,6 +3066,37 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "6c3c1edd7c035c2c37688617fc4e4859"
   },
+  "Ancient Stirrings": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "any",
+    "look_count": 5,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "colorless_card",
+    "pick_up_to_count": true,
+    "rest_destination": "library_bottom",
+    "reveal": true,
+    "sorcery": true,
+    "target": "colorless_card",
+    "target_constraints": {
+      "colorless": true,
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:348c875ae89f49fba29c6157a06095ea",
+    "battle_rule_oracle_hash": "1f1bcfa3104e6b1cb9ea31da7192a50b"
+  },
   "Ancient Tomb": {
     "damage_on_tap": 2,
     "effect": "land",
@@ -3465,6 +3530,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:775e48cfdbd6a0216549054631aadf2b",
     "battle_rule_oracle_hash": "4a570028eace3ac497b96fb187e5ab86"
+  },
+  "Anticipate": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": true,
+    "library_bottom_order": "any",
+    "look_count": 3,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "any_card",
+    "pick_up_to_count": false,
+    "rest_destination": "library_bottom",
+    "reveal": false,
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:16386f8d4aaa428de582b4d97f799ff0",
+    "battle_rule_oracle_hash": "52cfbf76673ea2b0b9cbefa5588eb652"
   },
   "Anurid Barkripper": {
     "ability_kind": "static",
@@ -16941,6 +17037,108 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "d7a9e7f78c8d50aba0bff043502ca2b7"
   },
+  "Commune with Beavers": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "any",
+    "look_count": 3,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "artifact_creature_or_land",
+    "pick_up_to_count": true,
+    "rest_destination": "library_bottom",
+    "reveal": true,
+    "sorcery": true,
+    "target": "artifact_creature_or_land",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5f1a37e69b8d162784d576e9cd2019cb",
+    "battle_rule_oracle_hash": "9d1921d9917e3217fe7b5db0e3e3c047"
+  },
+  "Commune with Nature": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "any",
+    "look_count": 5,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "creature",
+    "pick_up_to_count": true,
+    "rest_destination": "library_bottom",
+    "reveal": true,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0c68e0658377ffa712034d55f23d7397",
+    "battle_rule_oracle_hash": "dd1b6623e2851ed8a283e40ae7a99dfc"
+  },
+  "Commune with Spirits": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "random",
+    "look_count": 4,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "enchantment_or_land",
+    "pick_up_to_count": true,
+    "rest_destination": "library_bottom",
+    "reveal": true,
+    "sorcery": true,
+    "target": "enchantment_or_land",
+    "target_constraints": {
+      "card_types": [
+        "enchantment",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:43aef398ada45fc0b97ba170e8c59e54",
+    "battle_rule_oracle_hash": "6a6b479ff05e0490417cf97e2a922e26"
+  },
   "Commune with the Gods": {
     "battle_model_scope": "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1",
     "count": 1,
@@ -23896,6 +24094,37 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "20a317e80288a052b769608f5cbfe86d"
+  },
+  "Drawn from Dreams": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "random",
+    "look_count": 7,
+    "max_count": 2,
+    "pick_all_matching": false,
+    "pick_count": 2,
+    "pick_target": "any_card",
+    "pick_up_to_count": false,
+    "rest_destination": "library_bottom",
+    "reveal": false,
+    "sorcery": true,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b5057f3277dc5b1012a8fe99ff9a3db0",
+    "battle_rule_oracle_hash": "f7b3baa02ae345dbb0bb3249ce8f5bd6"
   },
   "Dread Shade": {
     "_activated_rule_effects": [
@@ -32919,6 +33148,39 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "1c6805da1930c16f66d502565954adc7"
+  },
+  "Forging the Anchor": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 5,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "random",
+    "look_count": 5,
+    "max_count": 5,
+    "pick_all_matching": true,
+    "pick_count": 5,
+    "pick_target": "artifact",
+    "pick_up_to_count": true,
+    "rest_destination": "library_bottom",
+    "reveal": true,
+    "sorcery": true,
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8b3d650965f61f18cf5c9cd912ead65b",
+    "battle_rule_oracle_hash": "0239ca9fb55ea5c3f422198ae9bfbdf7"
   },
   "Forgotten Cave": {
     "effect": "land",
@@ -43236,6 +43498,37 @@
     "battle_rule_logical_key": "battle_rule_v1:493c7acef4e465b2707cebd170fdcaae",
     "battle_rule_oracle_hash": "0276e05f9d0f18098753d013f7d64bdc"
   },
+  "Impulse": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": true,
+    "library_bottom_order": "any",
+    "look_count": 4,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "any_card",
+    "pick_up_to_count": false,
+    "rest_destination": "library_bottom",
+    "reveal": false,
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6da04a2fb5dc4c776d683cada568ad49",
+    "battle_rule_oracle_hash": "932d0c33cf9c77df8aec3d4dddc6c06d"
+  },
   "Impulsive Pilferer": {
     "ability_kind": "triggered",
     "battle_model_scope": "dies_create_treasure_encore_v1",
@@ -48782,6 +49075,39 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "964ac012d35c8ce1f649c20e914fe3c2"
+  },
+  "Lead the Stampede": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 5,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "any",
+    "look_count": 5,
+    "max_count": 5,
+    "pick_all_matching": true,
+    "pick_count": 5,
+    "pick_target": "creature",
+    "pick_up_to_count": true,
+    "rest_destination": "library_bottom",
+    "reveal": true,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50a0c40363ad84e7485d105b3f19b199",
+    "battle_rule_oracle_hash": "4e68a0a72a9dc085ba0368c17004e782"
   },
   "Leaden Myr": {
     "activation_requires_tap": true,
@@ -60680,6 +61006,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ab8a7926e0f1a05ad4ce8d94f9ea0edf",
     "battle_rule_oracle_hash": "7cf43cc724ce9697a50c633646b4cf5b"
+  },
+  "Peer Through Depths": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": true,
+    "library_bottom_order": "any",
+    "look_count": 5,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "instant_or_sorcery",
+    "pick_up_to_count": true,
+    "rest_destination": "library_bottom",
+    "reveal": true,
+    "sorcery": false,
+    "target": "instant_or_sorcery",
+    "target_constraints": {
+      "card_types": [
+        "instant",
+        "sorcery"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cfa78947191c91113d861739af161471",
+    "battle_rule_oracle_hash": "f93aca7734c0ae2f7393b04ea2dc5754"
   },
   "Pegasus Charger": {
     "_keywords_are_self": true,
@@ -75425,6 +75785,40 @@
     "battle_rule_logical_key": "battle_rule_v1:18d04737564bf889d16bdd128abb8848",
     "battle_rule_oracle_hash": "d74a1f98d1c82a4c62e872c89438fbc9"
   },
+  "Seek the Wilds": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "any",
+    "look_count": 4,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "creature_or_land",
+    "pick_up_to_count": true,
+    "rest_destination": "library_bottom",
+    "reveal": true,
+    "sorcery": true,
+    "target": "creature_or_land",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a395a5212bfef971b53430e4620ef53c",
+    "battle_rule_oracle_hash": "3a8c9988837f2b022ddcccb9e2d46a47"
+  },
   "Seething Landscape": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -77009,6 +77403,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:007474402d8a3f7cc66d62b9b3853aba",
     "battle_rule_oracle_hash": "3f7693d00f1b35bec96c1dea4118dce3"
+  },
+  "Shimmer of Possibility": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "random",
+    "look_count": 4,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "any_card",
+    "pick_up_to_count": false,
+    "rest_destination": "library_bottom",
+    "reveal": false,
+    "sorcery": true,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5b97d350fcad842825fc8c0b8d47366d",
+    "battle_rule_oracle_hash": "37eab1090283cebd45c06a2009c16033"
   },
   "Shimmerdrift Vale": {
     "effect": "land",
@@ -79756,6 +80181,37 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "927b11077c5559baaa059026ecbcca07"
+  },
+  "Sleight of Hand": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "any",
+    "look_count": 2,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "any_card",
+    "pick_up_to_count": false,
+    "rest_destination": "library_bottom",
+    "reveal": false,
+    "sorcery": true,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6731276e8b08a4f2f2ca895277d4ce30",
+    "battle_rule_oracle_hash": "cd083f937bb757148f5b6ac27354b335"
   },
   "Slice in Twain": {
     "_composite_rule_components": [
@@ -83272,6 +83728,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:5dc1b5fcfe5ba33c0ae895a3eec6d558",
     "battle_rule_oracle_hash": "0c5c60d1c06788f80a724d4f62e365cf"
+  },
+  "Stock Up": {
+    "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "library_bottom_order": "any",
+    "look_count": 5,
+    "max_count": 2,
+    "pick_all_matching": false,
+    "pick_count": 2,
+    "pick_target": "any_card",
+    "pick_up_to_count": false,
+    "rest_destination": "library_bottom",
+    "reveal": false,
+    "sorcery": true,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "library"
+    },
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:34e54544fbfec3dab68a9f1aa9885812",
+    "battle_rule_oracle_hash": "773c908f616e6ee79cd17438f9b999fa"
   },
   "Stoic Builder": {
     "ability_kind": "triggered",

@@ -1339,6 +1339,49 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dig_to_hand_can_bottom_unpicked_cards(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Small Creature", "type_line": "Creature - Mouse", "cmc": 1},
+                {"name": "Large Spell", "type_line": "Sorcery", "cmc": 7},
+                {"name": "Medium Artifact", "type_line": "Artifact", "cmc": 3},
+                {"name": "Next Draw", "type_line": "Instant", "cmc": 2},
+            ],
+        )
+        effect = {
+            "effect": "dig_to_hand",
+            "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+            "look_count": 3,
+            "pick_count": 1,
+            "pick_target": "any_card",
+            "rest_destination": "library_bottom",
+        }
+
+        self.battle.resolve_dig_to_hand(
+            active,
+            {"name": "Anticipate", "type_line": "Instant"},
+            effect,
+            turn=4,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Large Spell"])
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual(
+            [card["name"] for card in active.library],
+            ["Next Draw", "Small Creature", "Medium Artifact"],
+        )
+        self.assertTrue(
+            any(
+                event == "dig_to_hand_resolved"
+                and data.get("rest_destination") == "library_bottom"
+                and data.get("moved_to_library_bottom") == ["Small Creature", "Medium Artifact"]
+                and data.get("moved_to_graveyard") == []
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_library_pick_moves_one_to_hand_and_rest_to_graveyard(self) -> None:
         active = self.battle.Player(
             "Active",

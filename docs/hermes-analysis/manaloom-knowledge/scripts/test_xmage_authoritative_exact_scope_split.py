@@ -2920,6 +2920,93 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "library_pick_ability_class_not_simple")
 
+    def test_look_library_pick_spell_any_card_bottom_is_package_safe(self) -> None:
+        row = queue_row(
+            split.LOOK_LIBRARY_PICK_SPELL_UNIT,
+            effect_classes=["LookLibraryAndPickControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Anticipate",
+                type_line="Instant",
+                oracle_text=(
+                    "Look at the top three cards of your library. "
+                    "Put one of them into your hand and the rest on the bottom "
+                    "of your library in any order."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new LookLibraryAndPickControllerEffect("
+                "3, 1, PutCards.HAND, PutCards.BOTTOM_ANY));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "dig_to_hand")
+        self.assertEqual(effect["battle_model_scope"], split.LOOK_LIBRARY_PICK_SPELL_SCOPE)
+        self.assertEqual(effect["look_count"], 3)
+        self.assertEqual(effect["pick_count"], 1)
+        self.assertEqual(effect["pick_target"], "any_card")
+        self.assertEqual(effect["rest_destination"], "library_bottom")
+        self.assertEqual(effect["library_bottom_order"], "any")
+        self.assertFalse(effect["pick_up_to_count"])
+
+    def test_look_library_pick_spell_filtered_bottom_is_package_safe(self) -> None:
+        row = queue_row(
+            split.LOOK_LIBRARY_PICK_SPELL_UNIT,
+            effect_classes=["LookLibraryAndPickControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Adventurous Impulse",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Look at the top three cards of your library. "
+                    "You may reveal a creature or land card from among them and put it into your hand. "
+                    "Put the rest on the bottom of your library in any order."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new LookLibraryAndPickControllerEffect("
+                "3, 1, StaticFilters.FILTER_CARD_CREATURE_OR_LAND, "
+                "PutCards.HAND, PutCards.BOTTOM_ANY));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["pick_target"], "creature_or_land")
+        self.assertEqual(effect["target_constraints"]["card_types"], ["creature", "land"])
+        self.assertTrue(effect["pick_up_to_count"])
+        self.assertTrue(effect["reveal"])
+
+    def test_look_library_pick_spell_blocks_top_destination(self) -> None:
+        row = queue_row(
+            split.LOOK_LIBRARY_PICK_SPELL_UNIT,
+            effect_classes=["LookLibraryAndPickControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Diabolic Vision",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Look at the top five cards of your library. "
+                    "Put one of them into your hand and the rest on top of your library in any order."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new LookLibraryAndPickControllerEffect("
+                "5, 1, PutCards.HAND, PutCards.TOP_ANY));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "look_library_pick_oracle_not_simple")
+
     def test_library_tutor_land_to_battlefield_spell_is_package_safe(self) -> None:
         row = queue_row(split.TUTOR_UNIT, effect_classes=["SearchLibraryPutInPlayEffect"])
         proposal, reason = split.split_row(

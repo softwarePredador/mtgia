@@ -1,0 +1,1213 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg479_look_library_pick_bottom_new_server_20260705_03405",
+  "deploy_id": "pg479",
+  "expected_rules": [
+    {
+      "card_name": "Adventurous Impulse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:302f257c7eda577079dd69104635301f",
+      "min_rule_version": 2,
+      "normalized_name": "adventurous impulse",
+      "oracle_hash": "7478d6d791872add3b340dfeed23220b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 3,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "creature_or_land",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "creature_or_land",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ancient Stirrings",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:348c875ae89f49fba29c6157a06095ea",
+      "min_rule_version": 2,
+      "normalized_name": "ancient stirrings",
+      "oracle_hash": "1f1bcfa3104e6b1cb9ea31da7192a50b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 5,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "colorless_card",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "colorless_card",
+        "target_constraints": {
+          "colorless": true,
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Anticipate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16386f8d4aaa428de582b4d97f799ff0",
+      "min_rule_version": 2,
+      "normalized_name": "anticipate",
+      "oracle_hash": "52cfbf76673ea2b0b9cbefa5588eb652",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 3,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Commune with Beavers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f1a37e69b8d162784d576e9cd2019cb",
+      "min_rule_version": 2,
+      "normalized_name": "commune with beavers",
+      "oracle_hash": "9d1921d9917e3217fe7b5db0e3e3c047",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 3,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "artifact_creature_or_land",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "artifact_creature_or_land",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Commune with Nature",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0c68e0658377ffa712034d55f23d7397",
+      "min_rule_version": 2,
+      "normalized_name": "commune with nature",
+      "oracle_hash": "dd1b6623e2851ed8a283e40ae7a99dfc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 5,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "creature",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Commune with Spirits",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:43aef398ada45fc0b97ba170e8c59e54",
+      "min_rule_version": 2,
+      "normalized_name": "commune with spirits",
+      "oracle_hash": "6a6b479ff05e0490417cf97e2a922e26",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "random",
+        "look_count": 4,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "enchantment_or_land",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "enchantment_or_land",
+        "target_constraints": {
+          "card_types": [
+            "enchantment",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Drawn from Dreams",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5057f3277dc5b1012a8fe99ff9a3db0",
+      "min_rule_version": 2,
+      "normalized_name": "drawn from dreams",
+      "oracle_hash": "f7b3baa02ae345dbb0bb3249ce8f5bd6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 2,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "random",
+        "look_count": 7,
+        "pick_all_matching": false,
+        "pick_count": 2,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Forging the Anchor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b3d650965f61f18cf5c9cd912ead65b",
+      "min_rule_version": 2,
+      "normalized_name": "forging the anchor",
+      "oracle_hash": "0239ca9fb55ea5c3f422198ae9bfbdf7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 5,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "random",
+        "look_count": 5,
+        "pick_all_matching": true,
+        "pick_count": 5,
+        "pick_target": "artifact",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Impulse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6da04a2fb5dc4c776d683cada568ad49",
+      "min_rule_version": 2,
+      "normalized_name": "impulse",
+      "oracle_hash": "932d0c33cf9c77df8aec3d4dddc6c06d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 4,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lead the Stampede",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50a0c40363ad84e7485d105b3f19b199",
+      "min_rule_version": 2,
+      "normalized_name": "lead the stampede",
+      "oracle_hash": "4e68a0a72a9dc085ba0368c17004e782",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 5,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 5,
+        "pick_all_matching": true,
+        "pick_count": 5,
+        "pick_target": "creature",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Peer Through Depths",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cfa78947191c91113d861739af161471",
+      "min_rule_version": 2,
+      "normalized_name": "peer through depths",
+      "oracle_hash": "f93aca7734c0ae2f7393b04ea2dc5754",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 5,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "instant_or_sorcery",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Seek the Wilds",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a395a5212bfef971b53430e4620ef53c",
+      "min_rule_version": 2,
+      "normalized_name": "seek the wilds",
+      "oracle_hash": "3a8c9988837f2b022ddcccb9e2d46a47",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 4,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "creature_or_land",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "creature_or_land",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shimmer of Possibility",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5b97d350fcad842825fc8c0b8d47366d",
+      "min_rule_version": 2,
+      "normalized_name": "shimmer of possibility",
+      "oracle_hash": "37eab1090283cebd45c06a2009c16033",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "random",
+        "look_count": 4,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sleight of Hand",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6731276e8b08a4f2f2ca895277d4ce30",
+      "min_rule_version": 2,
+      "normalized_name": "sleight of hand",
+      "oracle_hash": "cd083f937bb757148f5b6ac27354b335",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 2,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stock Up",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:34e54544fbfec3dab68a9f1aa9885812",
+      "min_rule_version": 2,
+      "normalized_name": "stock up",
+      "oracle_hash": "773c908f616e6ee79cd17438f9b999fa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 2,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 5,
+        "pick_all_matching": false,
+        "pick_count": 2,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_look_library_pick_to_hand_rest_bottom_spell": 15
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg479_look_library_pick_bottom_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg479_look_library_pick_bottom_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg479_look_library_pick_bottom_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg479_look_library_pick_bottom_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg479_look_library_pick_bottom_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg479_look_library_pick_bottom_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T03:42:18+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Adventurous Impulse"
+      },
+      "card_name": "Adventurous Impulse",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:302f257c7eda577079dd69104635301f",
+      "normalized_name": "adventurous impulse",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 3,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "creature_or_land",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "creature_or_land",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ancient Stirrings"
+      },
+      "card_name": "Ancient Stirrings",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:348c875ae89f49fba29c6157a06095ea",
+      "normalized_name": "ancient stirrings",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 5,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "colorless_card",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "colorless_card",
+        "target_constraints": {
+          "colorless": true,
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Anticipate"
+      },
+      "card_name": "Anticipate",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16386f8d4aaa428de582b4d97f799ff0",
+      "normalized_name": "anticipate",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 3,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Commune with Beavers"
+      },
+      "card_name": "Commune with Beavers",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f1a37e69b8d162784d576e9cd2019cb",
+      "normalized_name": "commune with beavers",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 3,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "artifact_creature_or_land",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "artifact_creature_or_land",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Commune with Nature"
+      },
+      "card_name": "Commune with Nature",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0c68e0658377ffa712034d55f23d7397",
+      "normalized_name": "commune with nature",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 5,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "creature",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Commune with Spirits"
+      },
+      "card_name": "Commune with Spirits",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:43aef398ada45fc0b97ba170e8c59e54",
+      "normalized_name": "commune with spirits",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "random",
+        "look_count": 4,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "enchantment_or_land",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "enchantment_or_land",
+        "target_constraints": {
+          "card_types": [
+            "enchantment",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Drawn from Dreams"
+      },
+      "card_name": "Drawn from Dreams",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5057f3277dc5b1012a8fe99ff9a3db0",
+      "normalized_name": "drawn from dreams",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 2,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "random",
+        "look_count": 7,
+        "pick_all_matching": false,
+        "pick_count": 2,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Forging the Anchor"
+      },
+      "card_name": "Forging the Anchor",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b3d650965f61f18cf5c9cd912ead65b",
+      "normalized_name": "forging the anchor",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 5,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "random",
+        "look_count": 5,
+        "pick_all_matching": true,
+        "pick_count": 5,
+        "pick_target": "artifact",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Impulse"
+      },
+      "card_name": "Impulse",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6da04a2fb5dc4c776d683cada568ad49",
+      "normalized_name": "impulse",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 4,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Lead the Stampede"
+      },
+      "card_name": "Lead the Stampede",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50a0c40363ad84e7485d105b3f19b199",
+      "normalized_name": "lead the stampede",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 5,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 5,
+        "pick_all_matching": true,
+        "pick_count": 5,
+        "pick_target": "creature",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Peer Through Depths"
+      },
+      "card_name": "Peer Through Depths",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cfa78947191c91113d861739af161471",
+      "normalized_name": "peer through depths",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 5,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "instant_or_sorcery",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Seek the Wilds"
+      },
+      "card_name": "Seek the Wilds",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a395a5212bfef971b53430e4620ef53c",
+      "normalized_name": "seek the wilds",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 4,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "creature_or_land",
+        "pick_up_to_count": true,
+        "rest_destination": "library_bottom",
+        "reveal": true,
+        "target": "creature_or_land",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Shimmer of Possibility"
+      },
+      "card_name": "Shimmer of Possibility",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5b97d350fcad842825fc8c0b8d47366d",
+      "normalized_name": "shimmer of possibility",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "random",
+        "look_count": 4,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sleight of Hand"
+      },
+      "card_name": "Sleight of Hand",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6731276e8b08a4f2f2ca895277d4ce30",
+      "normalized_name": "sleight of hand",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 2,
+        "pick_all_matching": false,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Stock Up"
+      },
+      "card_name": "Stock Up",
+      "effect": "dig_to_hand",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:34e54544fbfec3dab68a9f1aa9885812",
+      "normalized_name": "stock up",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+        "count": 2,
+        "destination": "hand",
+        "effect": "dig_to_hand",
+        "library_bottom_order": "any",
+        "look_count": 5,
+        "pick_all_matching": false,
+        "pick_count": 2,
+        "pick_target": "any_card",
+        "pick_up_to_count": false,
+        "rest_destination": "library_bottom",
+        "reveal": false,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "library"
+        },
+        "xmage_effect_class": "LookLibraryAndPickControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Adventurous Impulse",
+    "Ancient Stirrings",
+    "Anticipate",
+    "Commune with Beavers",
+    "Commune with Nature",
+    "Commune with Spirits",
+    "Drawn from Dreams",
+    "Forging the Anchor",
+    "Impulse",
+    "Lead the Stampede",
+    "Peer Through Depths",
+    "Seek the Wilds",
+    "Shimmer of Possibility",
+    "Sleight of Hand",
+    "Stock Up"
+  ],
+  "selected_count": 15,
+  "slug": "look_library_pick_bottom_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Adventurous Impulse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:302f257c7eda577079dd69104635301f",
+      "min_rule_version": 2,
+      "normalized_name": "adventurous impulse",
+      "oracle_hash": "7478d6d791872add3b340dfeed23220b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ancient Stirrings",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:348c875ae89f49fba29c6157a06095ea",
+      "min_rule_version": 2,
+      "normalized_name": "ancient stirrings",
+      "oracle_hash": "1f1bcfa3104e6b1cb9ea31da7192a50b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Anticipate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16386f8d4aaa428de582b4d97f799ff0",
+      "min_rule_version": 2,
+      "normalized_name": "anticipate",
+      "oracle_hash": "52cfbf76673ea2b0b9cbefa5588eb652",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Commune with Beavers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f1a37e69b8d162784d576e9cd2019cb",
+      "min_rule_version": 2,
+      "normalized_name": "commune with beavers",
+      "oracle_hash": "9d1921d9917e3217fe7b5db0e3e3c047",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Commune with Nature",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0c68e0658377ffa712034d55f23d7397",
+      "min_rule_version": 2,
+      "normalized_name": "commune with nature",
+      "oracle_hash": "dd1b6623e2851ed8a283e40ae7a99dfc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Commune with Spirits",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:43aef398ada45fc0b97ba170e8c59e54",
+      "min_rule_version": 2,
+      "normalized_name": "commune with spirits",
+      "oracle_hash": "6a6b479ff05e0490417cf97e2a922e26",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Drawn from Dreams",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b5057f3277dc5b1012a8fe99ff9a3db0",
+      "min_rule_version": 2,
+      "normalized_name": "drawn from dreams",
+      "oracle_hash": "f7b3baa02ae345dbb0bb3249ce8f5bd6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Forging the Anchor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8b3d650965f61f18cf5c9cd912ead65b",
+      "min_rule_version": 2,
+      "normalized_name": "forging the anchor",
+      "oracle_hash": "0239ca9fb55ea5c3f422198ae9bfbdf7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Impulse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6da04a2fb5dc4c776d683cada568ad49",
+      "min_rule_version": 2,
+      "normalized_name": "impulse",
+      "oracle_hash": "932d0c33cf9c77df8aec3d4dddc6c06d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lead the Stampede",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50a0c40363ad84e7485d105b3f19b199",
+      "min_rule_version": 2,
+      "normalized_name": "lead the stampede",
+      "oracle_hash": "4e68a0a72a9dc085ba0368c17004e782",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Peer Through Depths",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cfa78947191c91113d861739af161471",
+      "min_rule_version": 2,
+      "normalized_name": "peer through depths",
+      "oracle_hash": "f93aca7734c0ae2f7393b04ea2dc5754",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Seek the Wilds",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a395a5212bfef971b53430e4620ef53c",
+      "min_rule_version": 2,
+      "normalized_name": "seek the wilds",
+      "oracle_hash": "3a8c9988837f2b022ddcccb9e2d46a47",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shimmer of Possibility",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5b97d350fcad842825fc8c0b8d47366d",
+      "min_rule_version": 2,
+      "normalized_name": "shimmer of possibility",
+      "oracle_hash": "37eab1090283cebd45c06a2009c16033",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sleight of Hand",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6731276e8b08a4f2f2ca895277d4ce30",
+      "min_rule_version": 2,
+      "normalized_name": "sleight of hand",
+      "oracle_hash": "cd083f937bb757148f5b6ac27354b335",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stock Up",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:34e54544fbfec3dab68a9f1aa9885812",
+      "min_rule_version": 2,
+      "normalized_name": "stock up",
+      "oracle_hash": "773c908f616e6ee79cd17438f9b999fa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

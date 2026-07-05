@@ -40145,8 +40145,16 @@ def library_dig_card_matches_pick_target(candidate, pick_target):
         return has_type("creature") or has_type("land")
     if target == "creature_or_enchantment":
         return has_type("creature") or has_type("enchantment")
+    if target == "artifact_creature_or_land":
+        return has_type("artifact") or has_type("creature") or has_type("land")
+    if target == "enchantment_or_land":
+        return has_type("enchantment") or has_type("land")
     if target == "instant_or_sorcery":
         return has_type("instant") or has_type("sorcery")
+    if target == "colorless_card":
+        colors = candidate.get("colors")
+        color_identity = candidate.get("color_identity")
+        return has_type("land") or colors == [] or color_identity == []
     if target == "snow_permanent":
         permanent_types = ("artifact", "creature", "enchantment", "planeswalker", "battle", "land")
         return has_type("snow") and any(has_type(card_type) for card_type in permanent_types)
@@ -40158,6 +40166,7 @@ def resolve_dig_to_hand(player, card, effect_data, turn):
     pick_count = int(effect_data.get("pick_count") or 0)
     pick_target = str(effect_data.get("pick_target") or effect_data.get("target") or "any_card")
     pick_all_matching = bool(effect_data.get("pick_all_matching"))
+    rest_destination = str(effect_data.get("rest_destination") or "graveyard")
     if look_count <= 0 or pick_count <= 0:
         emit_replay_event(
             "dig_to_hand_resolved",
@@ -40167,8 +40176,10 @@ def resolve_dig_to_hand(player, card, effect_data, turn):
             picked_count=0,
             picked=[],
             moved_to_graveyard=[],
+            moved_to_library_bottom=[],
             pick_target=pick_target,
             pick_all_matching=pick_all_matching,
+            rest_destination=rest_destination,
             library_remaining=len(player.library),
             hand_size=len(player.hand),
             graveyard_size=len(player.graveyard),
@@ -40197,10 +40208,17 @@ def resolve_dig_to_hand(player, card, effect_data, turn):
     )
     picked = ranked[: min(effective_pick_count, len(ranked))]
     picked_ids = {id(candidate) for candidate in picked}
-    moved_to_graveyard = [candidate for candidate in looked if id(candidate) not in picked_ids]
+    unpicked = [candidate for candidate in looked if id(candidate) not in picked_ids]
+    moved_to_graveyard = []
+    moved_to_library_bottom = []
 
     player.hand.extend(picked)
-    player.graveyard.extend(moved_to_graveyard)
+    if rest_destination in {"library_bottom", "bottom", "bottom_library"}:
+        moved_to_library_bottom = unpicked
+        player.library.extend(moved_to_library_bottom)
+    else:
+        moved_to_graveyard = unpicked
+        player.graveyard.extend(moved_to_graveyard)
 
     emit_replay_event(
         "dig_to_hand_resolved",
@@ -40217,6 +40235,12 @@ def resolve_dig_to_hand(player, card, effect_data, turn):
             for candidate in moved_to_graveyard
             if isinstance(candidate, dict)
         ],
+        moved_to_library_bottom=[
+            candidate.get("name", "?")
+            for candidate in moved_to_library_bottom
+            if isinstance(candidate, dict)
+        ],
+        rest_destination=rest_destination,
         library_remaining=len(player.library),
         hand_size=len(player.hand),
         graveyard_size=len(player.graveyard),

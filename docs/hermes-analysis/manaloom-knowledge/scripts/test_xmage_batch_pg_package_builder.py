@@ -310,6 +310,42 @@ def test_manifest_expected_rule_preserves_target_player_draw_fields() -> None:
     }
 
 
+def test_manifest_expected_rule_preserves_library_bottom_pick_fields() -> None:
+    proposal = {
+        "normalized_name": "shimmer of possibility",
+        "card_name": "Shimmer of Possibility",
+        "oracle_hash": "hash-shimmer",
+        "logical_rule_key": "battle_rule_v1:hash-shimmer",
+        "effect_json": {
+            "effect": "dig_to_hand",
+            "battle_model_scope": "xmage_look_library_pick_to_hand_rest_bottom_spell_v1",
+            "look_count": 4,
+            "pick_count": 1,
+            "count": 1,
+            "pick_target": "any_card",
+            "target": "any_card",
+            "destination": "hand",
+            "rest_destination": "library_bottom",
+            "library_bottom_order": "random",
+            "pick_up_to_count": False,
+            "pick_all_matching": False,
+            "reveal": False,
+            "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    required = expected["required_effect_fields"]
+    assert required["effect"] == "dig_to_hand"
+    assert required["battle_model_scope"] == "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
+    assert required["look_count"] == 4
+    assert required["pick_count"] == 1
+    assert required["rest_destination"] == "library_bottom"
+    assert required["library_bottom_order"] == "random"
+    assert required["xmage_effect_class"] == "LookLibraryAndPickControllerEffect"
+
+
 def test_manifest_expected_rule_preserves_activation_discard_cost_fields() -> None:
     proposal = {
         "normalized_name": "goblin picker",

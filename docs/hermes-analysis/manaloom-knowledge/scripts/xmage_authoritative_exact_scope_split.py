@@ -76,6 +76,10 @@ TOKEN_SPELL_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::"
     "no_target_class::no_condition_class::token"
 )
+LOOK_LIBRARY_PICK_SPELL_UNIT = (
+    "xmage_signature::LookLibraryAndPickControllerEffect::no_ability_class::"
+    "no_target_class::no_condition_class::no_signal"
+)
 ETB_TOKEN_CREATURE_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility::"
     "no_target_class::no_condition_class::token,triggered_ability"
@@ -104,6 +108,7 @@ SUPPORTED_UNITS = {
     BOOST_CONTROLLED_SPELL_UNIT,
     STATIC_CONTROLLED_PT_UNIT,
     TOKEN_SPELL_UNIT,
+    LOOK_LIBRARY_PICK_SPELL_UNIT,
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
@@ -163,6 +168,7 @@ RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
 )
 GRAVEYARD_TO_LIBRARY_SPELL_SCOPE = "xmage_put_target_graveyard_card_on_library_spell_v1"
 LIBRARY_PICK_SPELL_SCOPE = "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1"
+LOOK_LIBRARY_PICK_SPELL_SCOPE = "xmage_look_library_pick_to_hand_rest_bottom_spell_v1"
 GRAVEYARD_LAND_PLAY_SCOPE = "xmage_static_play_lands_from_graveyard_v1"
 PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = (
     "xmage_permanent_simple_activated_graveyard_to_library_v1"
@@ -257,6 +263,7 @@ SPELL_UNITS = {
     BOOST_TARGET_UNIT,
     BOOST_CONTROLLED_SPELL_UNIT,
     TOKEN_SPELL_UNIT,
+    LOOK_LIBRARY_PICK_SPELL_UNIT,
 }
 RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT}
 
@@ -1579,10 +1586,16 @@ def library_pick_target_constraints_for(target: str) -> dict[str, Any]:
         constraints["card_types"] = [target]
     elif target == "creature_or_land":
         constraints["card_types"] = ["creature", "land"]
+    elif target == "artifact_creature_or_land":
+        constraints["card_types"] = ["artifact", "creature", "land"]
     elif target == "creature_or_enchantment":
         constraints["card_types"] = ["creature", "enchantment"]
+    elif target == "enchantment_or_land":
+        constraints["card_types"] = ["enchantment", "land"]
     elif target == "instant_or_sorcery":
         constraints["card_types"] = ["instant", "sorcery"]
+    elif target == "colorless_card":
+        constraints["colorless"] = True
     elif target == "snow_permanent":
         constraints["card_types"] = ["artifact", "creature", "enchantment", "planeswalker", "battle", "land"]
         constraints["supertypes"] = ["snow"]
@@ -10022,8 +10035,12 @@ def library_pick_target_from_phrase(phrase: str) -> str | None:
     normalized = normalized.removesuffix(".")
     normalized = normalized.removesuffix(" cards").removesuffix(" card")
     mapping = {
+        "artifact, creature, or land": "artifact_creature_or_land",
+        "colorless": "colorless_card",
+        "colorless card": "colorless_card",
         "creature or enchantment": "creature_or_enchantment",
         "creature or land": "creature_or_land",
+        "enchantment or land": "enchantment_or_land",
         "instant and/or sorcery": "instant_or_sorcery",
         "instant or sorcery": "instant_or_sorcery",
         "snow permanent": "snow_permanent",
@@ -10083,10 +10100,20 @@ def library_pick_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
 def library_pick_target_from_source(source: str, filter_arg: str) -> str | None:
     text = source or ""
     filter_ref = str(filter_arg or "").strip()
+    if "FILTER_CARD_ARTIFACTS" in filter_ref or "FILTER_CARD_ARTIFACTS" in text:
+        return "artifact"
+    if "FILTER_CARD_CREATURES" in filter_ref or "FILTER_CARD_CREATURES" in text:
+        return "creature"
+    if "FILTER_CARD_CREATURE_A" in filter_ref or "FILTER_CARD_CREATURE_A" in text:
+        return "creature"
+    if "FILTER_CARD_LANDS" in filter_ref or "FILTER_CARD_LANDS" in text:
+        return "land"
     if "FILTER_CARD_CREATURE_OR_LAND" in filter_ref or "FILTER_CARD_CREATURE_OR_LAND" in text:
         return "creature_or_land"
     if "FILTER_CARD_ENCHANTMENTS" in filter_ref or "FILTER_CARD_ENCHANTMENTS" in text:
         return "enchantment"
+    if "ColorlessPredicate" in text:
+        return "colorless_card"
     if "SuperType.SNOW.getPredicate" in text and "FilterPermanentCard" in text:
         return "snow_permanent"
     filter_match = re.search(r'new\s+Filter(?:Permanent)?Card\s*\(\s*"([^"]+)"\s*\)', text)
@@ -10094,8 +10121,16 @@ def library_pick_target_from_source(source: str, filter_arg: str) -> str | None:
         target = library_pick_target_from_phrase(filter_match.group(1))
         if target is not None:
             return target
+    if (
+        "CardType.ARTIFACT.getPredicate()" in text
+        and "CardType.CREATURE.getPredicate()" in text
+        and "CardType.LAND.getPredicate()" in text
+    ):
+        return "artifact_creature_or_land"
     if "CardType.CREATURE.getPredicate()" in text and "CardType.ENCHANTMENT.getPredicate()" in text:
         return "creature_or_enchantment"
+    if "CardType.ENCHANTMENT.getPredicate()" in text and "CardType.LAND.getPredicate()" in text:
+        return "enchantment_or_land"
     if "CardType.INSTANT.getPredicate()" in text and "CardType.SORCERY.getPredicate()" in text:
         return "instant_or_sorcery"
     return None
@@ -10125,6 +10160,97 @@ def library_pick_from_source(source: str) -> dict[str, Any] | str:
         "pick_target": target,
         "pick_all_matching": pick_all_matching,
         "rest_destination": "graveyard",
+    }
+
+
+def look_library_pick_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata).strip().lower())
+    prefix = r"^look at the top (?P<look>\w+) cards of your library\. "
+    simple_match = re.match(
+        prefix
+        + r"put (?P<count>one|two|three|\d+) of (?:them|those cards) into your hand "
+        + r"and (?:the rest|the other) on the bottom of your library(?: in (?:any|a random) order)?\.?$",
+        text,
+    )
+    may_reveal_match = re.match(
+        prefix
+        + r"you may reveal (?P<count>a|an|one|two|three|up to one|up to two|any number of) "
+        + r"(?P<phrase>.+?) cards? from among them and put (?:it|the revealed cards?) into your hand\. "
+        + r"(?:then )?put the rest on the bottom of your library(?: in (?:any|a random) order)?\.?$",
+        text,
+    )
+    match = simple_match or may_reveal_match
+    if not match:
+        return "look_library_pick_oracle_not_simple"
+    look_count = word_count_value(match.group("look"))
+    if look_count is None or look_count <= 0:
+        return "look_library_pick_oracle_look_count_not_supported"
+
+    count_token = str(match.group("count") or "").strip().lower()
+    pick_all_matching = count_token == "any number of"
+    pick_up_to_count = bool(may_reveal_match)
+    if pick_all_matching:
+        pick_count = look_count
+    elif count_token in {"a", "an"}:
+        pick_count = 1
+    elif count_token.startswith("up to "):
+        pick_count = word_count_value(count_token.removeprefix("up to "))
+    else:
+        pick_count = word_count_value(count_token)
+    if pick_count is None or pick_count <= 0:
+        return "look_library_pick_oracle_pick_count_not_supported"
+
+    pick_target = "any_card"
+    if may_reveal_match:
+        pick_target = library_pick_target_from_phrase(may_reveal_match.group("phrase"))
+        if pick_target is None:
+            return "look_library_pick_oracle_target_not_supported"
+
+    return {
+        "look_count": int(look_count),
+        "pick_count": int(pick_count),
+        "pick_target": pick_target,
+        "pick_up_to_count": pick_up_to_count,
+        "pick_all_matching": pick_all_matching,
+        "rest_destination": "library_bottom",
+    }
+
+
+def look_library_pick_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    filtered_match = re.search(
+        r"LookLibraryAndPickControllerEffect\s*\(\s*(?P<look>\d+)\s*,\s*"
+        r"(?P<pick>\d+|Integer\.MAX_VALUE)\s*,\s*(?P<filter>[^,]+)\s*,\s*"
+        r"PutCards\.HAND\s*,\s*PutCards\.(?P<rest>BOTTOM_ANY|BOTTOM_RANDOM)",
+        text,
+        re.S,
+    )
+    unfiltered_match = re.search(
+        r"LookLibraryAndPickControllerEffect\s*\(\s*(?P<look>\d+)\s*,\s*"
+        r"(?P<pick>\d+|Integer\.MAX_VALUE)\s*,\s*PutCards\.HAND\s*,\s*"
+        r"PutCards\.(?P<rest>BOTTOM_ANY|BOTTOM_RANDOM)",
+        text,
+        re.S,
+    )
+    match = filtered_match or unfiltered_match
+    if not match:
+        return "look_library_pick_source_effect_not_supported"
+    pick_raw = match.group("pick")
+    look_count = int(match.group("look"))
+    pick_all_matching = pick_raw == "Integer.MAX_VALUE"
+    pick_count = look_count if pick_all_matching else int(pick_raw)
+    pick_target = "any_card"
+    if filtered_match:
+        pick_target = library_pick_target_from_source(text, filtered_match.group("filter"))
+        if pick_target is None:
+            return "look_library_pick_source_target_not_supported"
+    return {
+        "look_count": look_count,
+        "pick_count": pick_count,
+        "pick_target": pick_target,
+        "pick_all_matching": pick_all_matching,
+        "rest_destination": "library_bottom",
+        "library_bottom_order": "random" if match.group("rest") == "BOTTOM_RANDOM" else "any",
     }
 
 
@@ -11347,6 +11473,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated library-search-to-battlefield ability"
     elif scope == LIBRARY_PICK_SPELL_SCOPE:
         scope_kind = "fixed reveal-top-library pick-to-hand spell"
+    elif scope == LOOK_LIBRARY_PICK_SPELL_SCOPE:
+        scope_kind = "fixed look-at-library pick-to-hand spell with rest on library bottom"
     elif scope == GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE:
         scope_kind = "graveyard simple activated self-return-to-hand ability"
     elif scope == GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE:
@@ -15353,6 +15481,53 @@ def split_row(
             **(additional_cost_fields or {}),
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_draw_spell"), "selected_exact_scope"
+
+    if unit == LOOK_LIBRARY_PICK_SPELL_UNIT:
+        if classes != {"LookLibraryAndPickControllerEffect"}:
+            return None, "look_library_pick_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "look_library_pick_ability_class_not_simple"
+        oracle_pick = look_library_pick_from_oracle(metadata)
+        if isinstance(oracle_pick, str):
+            return None, oracle_pick
+        source_pick = look_library_pick_from_source(source_text)
+        if isinstance(source_pick, str):
+            return None, source_pick
+        for key in (
+            "look_count",
+            "pick_count",
+            "pick_target",
+            "pick_all_matching",
+            "rest_destination",
+        ):
+            if source_pick.get(key) != oracle_pick.get(key):
+                return None, f"look_library_pick_source_oracle_{key}_mismatch"
+        pick_target = str(oracle_pick["pick_target"])
+        effect_json = {
+            "effect": "dig_to_hand",
+            "battle_model_scope": LOOK_LIBRARY_PICK_SPELL_SCOPE,
+            "look_count": int(oracle_pick["look_count"]),
+            "pick_count": int(oracle_pick["pick_count"]),
+            "count": int(oracle_pick["pick_count"]),
+            "max_count": int(oracle_pick["pick_count"]),
+            "pick_target": pick_target,
+            "target": pick_target,
+            "target_constraints": library_pick_target_constraints_for(pick_target),
+            "destination": "hand",
+            "rest_destination": "library_bottom",
+            "library_bottom_order": str(source_pick.get("library_bottom_order") or "any"),
+            "reveal": pick_target != "any_card",
+            "pick_up_to_count": bool(oracle_pick.get("pick_up_to_count")),
+            "pick_all_matching": bool(oracle_pick.get("pick_all_matching")),
+            "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_look_library_pick_to_hand_rest_bottom_spell",
+        ), "selected_exact_scope"
 
     if unit == DAMAGE_UNIT:
         if classes == {"DamageTargetEffect", "ExileTargetIfDiesEffect"}:

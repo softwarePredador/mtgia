@@ -11284,6 +11284,57 @@ new server:
   work is implementing/splitting new family subpatterns from the blocked
   reasons, then rebuilding the authoritative queue and exact split.
 
+## 2026-07-05 PG479 Look-Library Pick Bottom Closure
+
+- Closed the exact XMage `LookLibraryAndPickControllerEffect` spell family as
+  ManaLoom scope `xmage_look_library_pick_to_hand_rest_bottom_spell_v1`.
+- The selected package accepts local XMage spell sources that look at a fixed
+  number of top-library cards, put fixed or matching card(s) into hand, and
+  put the rest on the bottom of the library. The runtime now preserves
+  `rest_destination=library_bottom` instead of treating this family like older
+  graveyard-rest `dig_to_hand` behavior.
+- The batch covers `15` cards: Adventurous Impulse, Ancient Stirrings,
+  Anticipate, Commune with Beavers, Commune with Nature, Commune with Spirits,
+  Drawn from Dreams, Forging the Anchor, Impulse, Lead the Stampede, Peer
+  Through Depths, Seek the Wilds, Shimmer of Possibility, Sleight of Hand, and
+  Stock Up.
+- The package preserves per-card `look_count`, `pick_count`, `pick_target`,
+  `pick_up_to_count`, `pick_all_matching`, `target_constraints`,
+  `rest_destination`, and `library_bottom_order` (`any` or `random`) from the
+  XMage source/oracle agreement.
+- Focused split/runtime tests passed `726` checks. The package-builder test
+  lane passed after extending the E2E manifest whitelist to require
+  `library_bottom_order` for this family, and the touched scripts compiled.
+- The PostgreSQL package promoted `15` cards. Precheck found `15` target rows,
+  `0` missing targets, `0` existing expected rows, and `2` nonmatching shadow
+  rows to deprecate. Apply/postcheck verified `15/15` promoted rows as
+  `verified`/`auto` with Oracle hashes; `failed_cards=[]`; the backup captured
+  `2` rows.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  runtime `get_card_effect`, and no-override battle gate for all `15` selected
+  cards. Additional direct cache verification confirmed SQLite and
+  `known_cards_canonical_snapshot.json` both preserve the library-pick fields,
+  including `library_bottom_order`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4562` PostgreSQL runtime rows, wrote `4554` SQLite runtime
+  rows, and exported `4529` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy
+  contamination (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL
+  connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26324`, `xmage_authoritative_source_count=26010`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26010`. This is an exact
+  reduction of `15` from the post-PG478 queue.
+- The post-PG479 exact split recheck reports `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`. The next real work is another
+  family/subpattern implementation from the remaining blocked reasons, led by
+  the highest queue-reducing supported work units rather than card-by-card
+  manual handling.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -44,6 +44,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "up_to_count",
     "destination",
     "rest_destination",
+    "library_bottom_order",
     "look_count",
     "pick_count",
     "pick_target",
