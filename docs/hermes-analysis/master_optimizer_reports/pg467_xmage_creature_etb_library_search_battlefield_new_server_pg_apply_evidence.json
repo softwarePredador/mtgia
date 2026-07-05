@@ -1,0 +1,171 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg467",
+  "generated_at": "2026-07-05T01:41:58.085538+00:00",
+  "manifest": "../../master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg467_xmage_creature_etb_library_search_battlefield_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 2,
+    "cards": [
+      "Farhaven Elf",
+      "Kor Cartographer",
+      "Ondu Giant",
+      "Quandrix Cultivator",
+      "Quirion Trailblazer",
+      "Wild Wanderer"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 6,
+    "promoted_rule_rows": 6,
+    "promoted_verified_auto_rows": 6,
+    "row_count": 6
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 2,
+      "card_name": "Farhaven Elf",
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "farhaven elf",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Kor Cartographer",
+      "logical_rule_key": "battle_rule_v1:0e4e552a7adc8c6d744abdd7562f6a4d",
+      "normalized_name": "kor cartographer",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Ondu Giant",
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "ondu giant",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Quandrix Cultivator",
+      "logical_rule_key": "battle_rule_v1:5a35faf7994c507956d5ae39d661c8ee",
+      "normalized_name": "quandrix cultivator",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Quirion Trailblazer",
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "quirion trailblazer",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Wild Wanderer",
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "wild wanderer",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Farhaven Elf",
+      "Kor Cartographer",
+      "Ondu Giant",
+      "Quandrix Cultivator",
+      "Quirion Trailblazer",
+      "Wild Wanderer"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 6,
+    "total_target_card_rows": 6,
+    "would_deprecate_shadow_rows": 2
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "022dab70-d629-49eb-b73c-ce895d59b19e",
+      "card_name": "Farhaven Elf",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "farhaven elf",
+      "oracle_hash": "a1911864ebef631dda5f3217ba8e81d3",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "canonical_card_id": "19344219-933c-488e-99e4-a95e54d1f32a",
+      "card_name": "Kor Cartographer",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:0e4e552a7adc8c6d744abdd7562f6a4d",
+      "normalized_name": "kor cartographer",
+      "oracle_hash": "1f7e890320cf85f7a4334520d01bebb3",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "791d45fd-9b2b-4c03-b3da-5a717f3aa119",
+      "card_name": "Ondu Giant",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "ondu giant",
+      "oracle_hash": "a1911864ebef631dda5f3217ba8e81d3",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "7db1fb83-32f2-4aca-b98d-c56632b342d8",
+      "card_name": "Quandrix Cultivator",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:5a35faf7994c507956d5ae39d661c8ee",
+      "normalized_name": "quandrix cultivator",
+      "oracle_hash": "5a8241aabb39c48a25a4f61c80c3f91d",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "12169683-8086-4e15-b9c3-c602abe0df15",
+      "card_name": "Quirion Trailblazer",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "quirion trailblazer",
+      "oracle_hash": "590c51ac8e2c916beff6e25d458634f0",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "6cc53f7a-ac4a-4d3a-84bb-f83f3d4bf2ac",
+      "card_name": "Wild Wanderer",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "wild wanderer",
+      "oracle_hash": "a1911864ebef631dda5f3217ba8e81d3",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_creature_etb_library_search_battlefield_new_server"
+}

@@ -10631,6 +10631,57 @@ new server:
   `xmage_creature_etb_library_search_to_battlefield` with `6` cards, followed
   by `xmage_permanent_simple_activated_draw` with `5` cards.
 
+## 2026-07-05 PG467 Creature ETB Library Search Battlefield Closure
+
+- Closed the exact XMage creature enter-the-battlefield library-search-to-
+  battlefield family as ManaLoom scope
+  `xmage_creature_etb_library_search_to_battlefield_v1`.
+- The selected package accepted local XMage creature sources whose executable
+  behavior is `EntersBattlefieldTriggeredAbility` with
+  `SearchLibraryPutInPlayEffect`, preserving the searched target, count,
+  battlefield destination, and whether the tutored permanent enters tapped.
+- The batch covers `6` cards: Farhaven Elf, Kor Cartographer, Ondu Giant,
+  Quandrix Cultivator, Quirion Trailblazer, and Wild Wanderer.
+- Focused mapper/runtime tests covered ETB tutor extraction, target/tapped
+  preservation, runtime lookup, and package generation; PG467 performed no code
+  mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `6` cards. Precheck found `6` target rows,
+  `0` missing targets, `0` existing expected rows, and `2` generated shadow
+  rows to deprecate; apply/postcheck verified `6/6` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `2` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `6` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve
+  `trigger=enters_battlefield`, `destination=battlefield`, `count=1`, and the
+  selected target/tapped parameters. The selected targets are:
+  Farhaven Elf `basic_land_to_battlefield` tapped, Kor Cartographer
+  `plains_to_battlefield` tapped, Ondu Giant `basic_land_to_battlefield`
+  tapped, Quandrix Cultivator `basic_forest_or_island_to_battlefield` untapped,
+  Quirion Trailblazer `basic_land_to_battlefield` tapped, and Wild Wanderer
+  `basic_land_to_battlefield` tapped.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4494` PostgreSQL runtime rows, wrote `4486` SQLite runtime
+  rows, and exported `4461` canonical fallback rows.
+- PG467 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `6` selected cards. Generic
+  battle scenario count remained `0`; ETB tutor behavior remains covered by
+  focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26392`, `xmage_authoritative_source_count=26078`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26078`. This is an exact
+  reduction of `6` from the post-PG466 queue.
+- The post-PG467 exact split recheck reports `proposal_count=53` and
+  `safe_for_batch_pg_package_count=53`. The largest remaining exact family is
+  `xmage_permanent_simple_activated_draw` with `5` cards, followed by several
+  `4`-card exact families.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -1,0 +1,107 @@
+{
+  "status": "closed",
+  "deploy_id": "pg467",
+  "slug": "xmage_creature_etb_library_search_battlefield_new_server",
+  "database_target": "143.198.230.247:5433/halder",
+  "family": "xmage_creature_etb_library_search_to_battlefield",
+  "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+  "selected_cards": [
+    {
+      "card_name": "Farhaven Elf",
+      "target": "basic_land_to_battlefield",
+      "count": 1,
+      "destination": "battlefield",
+      "tutor_enters_tapped": true
+    },
+    {
+      "card_name": "Kor Cartographer",
+      "target": "plains_to_battlefield",
+      "count": 1,
+      "destination": "battlefield",
+      "tutor_enters_tapped": true
+    },
+    {
+      "card_name": "Ondu Giant",
+      "target": "basic_land_to_battlefield",
+      "count": 1,
+      "destination": "battlefield",
+      "tutor_enters_tapped": true
+    },
+    {
+      "card_name": "Quandrix Cultivator",
+      "target": "basic_forest_or_island_to_battlefield",
+      "count": 1,
+      "destination": "battlefield",
+      "tutor_enters_tapped": false
+    },
+    {
+      "card_name": "Quirion Trailblazer",
+      "target": "basic_land_to_battlefield",
+      "count": 1,
+      "destination": "battlefield",
+      "tutor_enters_tapped": true
+    },
+    {
+      "card_name": "Wild Wanderer",
+      "target": "basic_land_to_battlefield",
+      "count": 1,
+      "destination": "battlefield",
+      "tutor_enters_tapped": true
+    }
+  ],
+  "tests": {
+    "focused_unittest_count": 718,
+    "status": "pass"
+  },
+  "postgres_apply": {
+    "precheck_target_rows": 6,
+    "precheck_missing_targets": 0,
+    "precheck_existing_expected_rows_before": 0,
+    "precheck_would_deprecate_shadow_rows": 2,
+    "postcheck_promoted_rule_rows": 6,
+    "postcheck_promoted_verified_auto_rows": 6,
+    "postcheck_promoted_oracle_hash_rows": 6,
+    "backup_rows": 2,
+    "failed_cards": []
+  },
+  "sync": {
+    "postgres_cards_matched": 5655,
+    "sqlite_cache_alias_rows": 5565,
+    "deck_cards_matched": "2699/2699",
+    "pg_rows_loaded": 4494,
+    "sqlite_inserted_or_updated": 4486,
+    "canonical_snapshot_rows_exported": 4461,
+    "generated_rows": 1947,
+    "curated_rows": 145,
+    "oracle_normalized_rows": 274
+  },
+  "e2e": {
+    "status": "pass",
+    "validated_cards": 6,
+    "battle_scenarios": 0,
+    "battle_events": 0
+  },
+  "audits": {
+    "xmage_strategy": "pass",
+    "operational_surface": "pass",
+    "legacy_contamination": "pass",
+    "pg_hermes_sqlite_contract": "pass"
+  },
+  "post_sync_queue": {
+    "target_identity_count": 26392,
+    "xmage_authoritative_source_count": 26078,
+    "xmage_missing_source_exception_count": 314,
+    "xmage_authoritative_parser_gap_count": 0,
+    "xmage_authoritative_adapter_required_count": 26078,
+    "safe_for_batch_pg_package_count": 53
+  },
+  "artifacts": {
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_manifest.json",
+    "pg_apply_evidence": "docs/hermes-analysis/master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_pg_apply_evidence.json",
+    "metadata_sync": "docs/hermes-analysis/master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_metadata_sync_operational.json",
+    "full_pg_to_sqlite_sync": "docs/hermes-analysis/master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_full_pg_to_sqlite_sync_operational.json",
+    "e2e_validation": "docs/hermes-analysis/master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_e2e_validation.json",
+    "queue_recheck": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg467_creature_etb_library_search_battlefield_new_server_commander_legal.json",
+    "exact_split_recheck": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg467_creature_etb_library_search_battlefield_new_server_recheck.json"
+  }
+}

@@ -1,0 +1,401 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg467_xmage_creature_etb_library_search_battlefield_new_",
+  "deploy_id": "pg467",
+  "expected_rules": [
+    {
+      "card_name": "Farhaven Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "min_rule_version": 2,
+      "normalized_name": "farhaven elf",
+      "oracle_hash": "a1911864ebef631dda5f3217ba8e81d3",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_battlefield",
+        "target": "basic_land_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kor Cartographer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0e4e552a7adc8c6d744abdd7562f6a4d",
+      "min_rule_version": 2,
+      "normalized_name": "kor cartographer",
+      "oracle_hash": "1f7e890320cf85f7a4334520d01bebb3",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "plains_to_battlefield",
+        "target": "plains_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ondu Giant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "min_rule_version": 2,
+      "normalized_name": "ondu giant",
+      "oracle_hash": "a1911864ebef631dda5f3217ba8e81d3",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_battlefield",
+        "target": "basic_land_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Quandrix Cultivator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5a35faf7994c507956d5ae39d661c8ee",
+      "min_rule_version": 2,
+      "normalized_name": "quandrix cultivator",
+      "oracle_hash": "5a8241aabb39c48a25a4f61c80c3f91d",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_forest_or_island_to_battlefield",
+        "target": "basic_forest_or_island_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": false,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Quirion Trailblazer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "min_rule_version": 2,
+      "normalized_name": "quirion trailblazer",
+      "oracle_hash": "590c51ac8e2c916beff6e25d458634f0",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_battlefield",
+        "target": "basic_land_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wild Wanderer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "min_rule_version": 2,
+      "normalized_name": "wild wanderer",
+      "oracle_hash": "a1911864ebef631dda5f3217ba8e81d3",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_battlefield",
+        "target": "basic_land_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_library_search_to_battlefield": 6
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg467_xmage_creature_etb_library_search_battlefield_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T01:38:37+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Farhaven Elf"
+      },
+      "card_name": "Farhaven Elf",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "farhaven elf",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_battlefield",
+        "target": "basic_land_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kor Cartographer"
+      },
+      "card_name": "Kor Cartographer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0e4e552a7adc8c6d744abdd7562f6a4d",
+      "normalized_name": "kor cartographer",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "plains_to_battlefield",
+        "target": "plains_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Ondu Giant"
+      },
+      "card_name": "Ondu Giant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "ondu giant",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_battlefield",
+        "target": "basic_land_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Quandrix Cultivator"
+      },
+      "card_name": "Quandrix Cultivator",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5a35faf7994c507956d5ae39d661c8ee",
+      "normalized_name": "quandrix cultivator",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_forest_or_island_to_battlefield",
+        "target": "basic_forest_or_island_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": false,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Quirion Trailblazer"
+      },
+      "card_name": "Quirion Trailblazer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "quirion trailblazer",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_battlefield",
+        "target": "basic_land_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Wild Wanderer"
+      },
+      "card_name": "Wild Wanderer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "normalized_name": "wild wanderer",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_battlefield",
+        "target": "basic_land_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Farhaven Elf",
+    "Kor Cartographer",
+    "Ondu Giant",
+    "Quandrix Cultivator",
+    "Quirion Trailblazer",
+    "Wild Wanderer"
+  ],
+  "selected_count": 6,
+  "slug": "xmage_creature_etb_library_search_battlefield_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Farhaven Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "min_rule_version": 2,
+      "normalized_name": "farhaven elf",
+      "oracle_hash": "a1911864ebef631dda5f3217ba8e81d3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kor Cartographer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0e4e552a7adc8c6d744abdd7562f6a4d",
+      "min_rule_version": 2,
+      "normalized_name": "kor cartographer",
+      "oracle_hash": "1f7e890320cf85f7a4334520d01bebb3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ondu Giant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "min_rule_version": 2,
+      "normalized_name": "ondu giant",
+      "oracle_hash": "a1911864ebef631dda5f3217ba8e81d3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Quandrix Cultivator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5a35faf7994c507956d5ae39d661c8ee",
+      "min_rule_version": 2,
+      "normalized_name": "quandrix cultivator",
+      "oracle_hash": "5a8241aabb39c48a25a4f61c80c3f91d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Quirion Trailblazer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "min_rule_version": 2,
+      "normalized_name": "quirion trailblazer",
+      "oracle_hash": "590c51ac8e2c916beff6e25d458634f0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wild Wanderer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6083c47a002100c88f241b4ef7e5e9c8",
+      "min_rule_version": 2,
+      "normalized_name": "wild wanderer",
+      "oracle_hash": "a1911864ebef631dda5f3217ba8e81d3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
