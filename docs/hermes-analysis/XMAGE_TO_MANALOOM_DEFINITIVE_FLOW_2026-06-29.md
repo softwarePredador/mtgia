@@ -13581,6 +13581,67 @@ gain, non-spell stack objects, activated or triggered counter abilities, or
 broad `xmage_*_review_v1` promotions. The next wave must start from the
 rebuilt post-PG519 queue.
 
+## PG520 Counter Unless Pays Checkpoint
+
+As of 2026-07-05, PG520 is applied and synced against the new server target.
+It promotes exact local-XMage instant/sorcery one-shot counterspells where the
+spell counters target spell or nonartifact spell unless the target controller
+pays a fixed generic mana tax.
+
+Promoted cards:
+
+- `Convolute`
+- `Force Spike`
+- `It'll Quench Ya!`
+- `Mana Tithe`
+- `Mindstatic`
+- `Quench`
+- `Revolutionary Rebuff`
+
+Runtime scope:
+
+- `xmage_counter_target_spell_unless_controller_pays_generic_v1`
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg520_counter_unless_pays_candidate.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg520_xmage_pg520_counter_unless_pays_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg520_counter_unless_pays_new_server.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/battle_package_end_to_end_validation_20260705_pg520_counter_unless_pays_new_server.md`
+- runtime smoke:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg520_counter_unless_pays_new_server_runtime_get_card_effect.out`
+- focused unittest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg520_counter_unless_pays_new_server_unittest.out`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg520_counter_unless_pays_new_server.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg520_counter_unless_pays_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg520_counter_unless_pays_new_server_commander_legal.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4979`
+- `battle_family_mapper_required=28894`
+- `target_identity_count=25971`
+- `xmage_authoritative_source_count=25657`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25657`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+- final exact-scope recheck `adapter_work_unit_counts={}`
+
+Residual boundary: PG520 does not authorize dynamic or non-fixed counter-unless
+taxes, X taxes, domain/count/devotion formulas, modal counterspells,
+exile-if-countered variants, extra targets, non-spell stack objects, activated
+or triggered counter abilities, or broad `xmage_*_review_v1` promotions. The
+next wave must start from the rebuilt post-PG520 queue.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

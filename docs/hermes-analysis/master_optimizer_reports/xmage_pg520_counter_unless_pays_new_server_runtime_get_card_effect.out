@@ -1,0 +1,154 @@
+{
+  "cases": [
+    {
+      "acted": true,
+      "active_mana_after": {
+        "black": 0,
+        "blue": 0,
+        "colorless": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0,
+        "wildcard": 0
+      },
+      "can_pay_tax": false,
+      "effect_counter_unless_pays_generic": 1,
+      "effect_rule_key": "battle_rule_v1:aa6da9f509ac3ac59eedf048d8c4dfa8",
+      "effect_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+      "responder_graveyard": [
+        "Force Spike"
+      ],
+      "spell_countered_events": [
+        {
+          "cards_drawn": 0,
+          "cost": 1,
+          "counter": "Force Spike",
+          "counter_tax_mana_after": {
+            "black": 0,
+            "blue": 0,
+            "colorless": 0,
+            "generic": 0,
+            "green": 0,
+            "red": 0,
+            "white": 0,
+            "wildcard": 0
+          },
+          "counter_tax_mana_before": {
+            "black": 0,
+            "blue": 0,
+            "colorless": 0,
+            "generic": 0,
+            "green": 0,
+            "red": 0,
+            "white": 0,
+            "wildcard": 0
+          },
+          "counter_tax_paid": false,
+          "counter_tax_paid_by": null,
+          "counter_unless_pays_generic": 1,
+          "countered_spell_to_top_library": false,
+          "life_after": 40,
+          "life_before": 40,
+          "life_gain_on_counter": 0,
+          "life_gained": 0,
+          "phase": "precombat_main",
+          "player": "Responder",
+          "priority_window": "stack_response",
+          "result": "countered",
+          "rule_alternative_count": 1,
+          "rule_confidence": 0.96,
+          "rule_execution_status": "auto",
+          "rule_logical_key": "battle_rule_v1:aa6da9f509ac3ac59eedf048d8c4dfa8",
+          "rule_oracle_hash": "e980b1e22d76bcc7a902a7bd4494f2c2",
+          "rule_review_status": "verified",
+          "rule_runtime_selection_mode": "single_selected",
+          "rule_source": "curated",
+          "rule_version": 2,
+          "stack_depth": 1,
+          "stack_object": "Target Finisher",
+          "target": "Target Finisher",
+          "target_controller": "Active",
+          "target_effect": "finisher",
+          "turn": 8
+        }
+      ],
+      "stack_countered": true
+    },
+    {
+      "acted": true,
+      "active_mana_after": {
+        "black": 0,
+        "blue": 0,
+        "colorless": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0,
+        "wildcard": 0
+      },
+      "can_pay_tax": true,
+      "effect_counter_unless_pays_generic": 1,
+      "effect_rule_key": "battle_rule_v1:aa6da9f509ac3ac59eedf048d8c4dfa8",
+      "effect_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+      "responder_graveyard": [
+        "Force Spike"
+      ],
+      "spell_countered_events": [
+        {
+          "cards_drawn": 0,
+          "cost": 1,
+          "counter": "Force Spike",
+          "counter_tax_mana_after": {
+            "black": 0,
+            "blue": 0,
+            "colorless": 0,
+            "generic": 0,
+            "green": 0,
+            "red": 0,
+            "white": 0,
+            "wildcard": 0
+          },
+          "counter_tax_mana_before": {
+            "black": 0,
+            "blue": 0,
+            "colorless": 0,
+            "generic": 1,
+            "green": 0,
+            "red": 0,
+            "white": 0,
+            "wildcard": 0
+          },
+          "counter_tax_paid": true,
+          "counter_tax_paid_by": "Active",
+          "counter_unless_pays_generic": 1,
+          "countered_spell_to_top_library": false,
+          "life_after": 40,
+          "life_before": 40,
+          "life_gain_on_counter": 0,
+          "life_gained": 0,
+          "phase": "precombat_main",
+          "player": "Responder",
+          "priority_window": "stack_response",
+          "result": "not_countered_tax_paid",
+          "rule_alternative_count": 1,
+          "rule_confidence": 0.96,
+          "rule_execution_status": "auto",
+          "rule_logical_key": "battle_rule_v1:aa6da9f509ac3ac59eedf048d8c4dfa8",
+          "rule_oracle_hash": "e980b1e22d76bcc7a902a7bd4494f2c2",
+          "rule_review_status": "verified",
+          "rule_runtime_selection_mode": "single_selected",
+          "rule_source": "curated",
+          "rule_version": 2,
+          "stack_depth": 1,
+          "stack_object": "Target Finisher",
+          "target": "Target Finisher",
+          "target_controller": "Active",
+          "target_effect": "finisher",
+          "turn": 8
+        }
+      ],
+      "stack_countered": false
+    }
+  ]
+}

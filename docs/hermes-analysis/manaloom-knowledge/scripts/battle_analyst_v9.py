@@ -8450,6 +8450,7 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "counter_target_mana_value_min",
     "draw_on_counter",
     "life_gain_on_counter",
+    "counter_unless_pays_generic",
     "countered_spell_to_top_library",
     "counter_own_approach_to_top",
     "xmage_effect_class",
@@ -9900,20 +9901,34 @@ class Player:
         self.graveyard.append(counter)
         self.counters_available = len(self.counterspell_cards())
         effect = get_card_effect(counter)
-        draw_count = int(effect.get("draw_on_counter") or 0)
+        target_controller_obj = getattr(stack_item, "controller", None)
+        counter_unless_pays_generic = int(effect.get("counter_unless_pays_generic") or 0)
+        counter_tax_paid = False
+        counter_tax_paid_by = None
+        counter_tax_mana_before = None
+        counter_tax_mana_after = None
+        if counter_unless_pays_generic > 0 and target_controller_obj is not None:
+            counter_tax_mana_before = target_controller_obj.mana_pool.snapshot()
+            tax_cost = {"generic": counter_unless_pays_generic}
+            if target_controller_obj.can_pay(tax_cost) and target_controller_obj.spend_mana(tax_cost):
+                counter_tax_paid = True
+                counter_tax_paid_by = getattr(target_controller_obj, "name", None)
+            counter_tax_mana_after = target_controller_obj.mana_pool.snapshot()
+        counter["_counter_tax_paid"] = counter_tax_paid
+        counter["_countered_target"] = not counter_tax_paid
+        draw_count = int(effect.get("draw_on_counter") or 0) if not counter_tax_paid else 0
         if draw_count:
             self.draw(draw_count, random.Random(turn or 0))
-        life_gain_on_counter = int(effect.get("life_gain_on_counter") or 0)
+        life_gain_on_counter = int(effect.get("life_gain_on_counter") or 0) if not counter_tax_paid else 0
         life_before = int(getattr(self, "life", 0) or 0)
         if life_gain_on_counter:
             gain_life(self, life_gain_on_counter, cap=999)
         life_after = int(getattr(self, "life", life_before) or 0)
-        countered_to_top = bool(effect.get("countered_spell_to_top_library"))
+        countered_to_top = bool(effect.get("countered_spell_to_top_library")) and not counter_tax_paid
         if countered_to_top and isinstance(target_card, dict):
             target_card["_countered_to_top_library"] = True
             target_card["_countered_to_top_library_by"] = counter.get("name", "?")
         target_name = (target_card or {}).get("name", "?")
-        target_controller_obj = getattr(stack_item, "controller", None)
         target_controller = getattr(target_controller_obj, "name", None)
         target_effect = (getattr(stack_item, "effect_data", None) or {}).get("effect")
         if target_controller_obj is not None and target_controller_obj is not self:
@@ -9933,11 +9948,16 @@ class Player:
             stack_object=target_name,
             target_controller=target_controller,
             target_effect=target_effect,
-            result="countered",
+            result="not_countered_tax_paid" if counter_tax_paid else "countered",
             stack_depth=stack_depth,
             phase=phase,
             priority_window=priority_window or "stack_response",
             countered_spell_to_top_library=countered_to_top,
+            counter_unless_pays_generic=counter_unless_pays_generic,
+            counter_tax_paid=counter_tax_paid,
+            counter_tax_paid_by=counter_tax_paid_by,
+            counter_tax_mana_before=counter_tax_mana_before,
+            counter_tax_mana_after=counter_tax_mana_after,
             cost=cost,
             cards_drawn=draw_count,
             life_gain_on_counter=life_gain_on_counter,
@@ -14427,7 +14447,8 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                         actual_outcome="own_approach_countered_to_top",
                         reason="counter_first_approach_to_setup_second_cast_miracle",
                     )
-                    stack.items[-1].countered = True
+                    if not used_counter.get("_counter_tax_paid"):
+                        stack.items[-1].countered = True
                     return True
         if player != top_item.controller and (
             top_item.controller.silenced_opponents
@@ -15078,10 +15099,15 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                         rule_status=fields.get("rule_review_status", "heuristic"),
                         confidence="medium",
                         expected_benefit_score=score,
-                        actual_outcome="counterspell_used",
+                        actual_outcome=(
+                            "counterspell_tax_paid"
+                            if counter.get("_counter_tax_paid")
+                            else "counterspell_used"
+                        ),
                         reason="counter_high_threat_spell",
                     )
-                    stack.items[-1].countered = True
+                    if not counter.get("_counter_tax_paid"):
+                        stack.items[-1].countered = True
                     return True
 
     # No one responded — resolve

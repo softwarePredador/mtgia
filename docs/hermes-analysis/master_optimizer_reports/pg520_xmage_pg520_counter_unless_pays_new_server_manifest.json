@@ -1,0 +1,427 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg520_counter_unless_pays_new_serv_20260705_174428",
+  "deploy_id": "xmage_pg520_counter_unless_pays_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Convolute",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f19dd7a4fca383cf6666d63219dfc95e",
+      "min_rule_version": 2,
+      "normalized_name": "convolute",
+      "oracle_hash": "28e054de37811a5a6c69c182c2a8133f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 4,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Force Spike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa6da9f509ac3ac59eedf048d8c4dfa8",
+      "min_rule_version": 2,
+      "normalized_name": "force spike",
+      "oracle_hash": "e980b1e22d76bcc7a902a7bd4494f2c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 1,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "It'll Quench Ya!",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b33285d9ff753c4c630cd7e0b756cd0",
+      "min_rule_version": 2,
+      "normalized_name": "it'll quench ya!",
+      "oracle_hash": "d541d6d83519c2147cb2c08404e238e3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 2,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mana Tithe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa6da9f509ac3ac59eedf048d8c4dfa8",
+      "min_rule_version": 2,
+      "normalized_name": "mana tithe",
+      "oracle_hash": "e980b1e22d76bcc7a902a7bd4494f2c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 1,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mindstatic",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fd343c6b32cba13d335821c7cb12913f",
+      "min_rule_version": 2,
+      "normalized_name": "mindstatic",
+      "oracle_hash": "31d9fa82432680ed5ed8472451543989",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 6,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Quench",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b33285d9ff753c4c630cd7e0b756cd0",
+      "min_rule_version": 2,
+      "normalized_name": "quench",
+      "oracle_hash": "d541d6d83519c2147cb2c08404e238e3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 2,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Revolutionary Rebuff",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f5b3fcb5be409ce75e90a5bb9838c13d",
+      "min_rule_version": 2,
+      "normalized_name": "revolutionary rebuff",
+      "oracle_hash": "4bde1d5613deab8c0f70b20b7d9ab2e7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 2,
+        "effect": "counter",
+        "target": "nonartifact_spell",
+        "target_constraints": {
+          "exclude_card_types": [
+            "artifact"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_counter_unless_pays_generic_spell": 7
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg520_xmage_pg520_counter_unless_pays_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg520_xmage_pg520_counter_unless_pays_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg520_xmage_pg520_counter_unless_pays_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg520_xmage_pg520_counter_unless_pays_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg520_xmage_pg520_counter_unless_pays_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg520_xmage_pg520_counter_unless_pays_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T17:44:28+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Convolute"
+      },
+      "card_name": "Convolute",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f19dd7a4fca383cf6666d63219dfc95e",
+      "normalized_name": "convolute",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 4,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Force Spike"
+      },
+      "card_name": "Force Spike",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa6da9f509ac3ac59eedf048d8c4dfa8",
+      "normalized_name": "force spike",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 1,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "It'll Quench Ya!"
+      },
+      "card_name": "It'll Quench Ya!",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b33285d9ff753c4c630cd7e0b756cd0",
+      "normalized_name": "it'll quench ya!",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 2,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mana Tithe"
+      },
+      "card_name": "Mana Tithe",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa6da9f509ac3ac59eedf048d8c4dfa8",
+      "normalized_name": "mana tithe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 1,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mindstatic"
+      },
+      "card_name": "Mindstatic",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fd343c6b32cba13d335821c7cb12913f",
+      "normalized_name": "mindstatic",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 6,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Quench"
+      },
+      "card_name": "Quench",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b33285d9ff753c4c630cd7e0b756cd0",
+      "normalized_name": "quench",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 2,
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Revolutionary Rebuff"
+      },
+      "card_name": "Revolutionary Rebuff",
+      "effect": "counter",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f5b3fcb5be409ce75e90a5bb9838c13d",
+      "normalized_name": "revolutionary rebuff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1",
+        "counter_unless_pays_generic": 2,
+        "effect": "counter",
+        "target": "nonartifact_spell",
+        "target_constraints": {
+          "exclude_card_types": [
+            "artifact"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterUnlessPaysEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Convolute",
+    "Force Spike",
+    "It'll Quench Ya!",
+    "Mana Tithe",
+    "Mindstatic",
+    "Quench",
+    "Revolutionary Rebuff"
+  ],
+  "selected_count": 7,
+  "slug": "pg520_counter_unless_pays_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Convolute",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f19dd7a4fca383cf6666d63219dfc95e",
+      "min_rule_version": 2,
+      "normalized_name": "convolute",
+      "oracle_hash": "28e054de37811a5a6c69c182c2a8133f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Force Spike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa6da9f509ac3ac59eedf048d8c4dfa8",
+      "min_rule_version": 2,
+      "normalized_name": "force spike",
+      "oracle_hash": "e980b1e22d76bcc7a902a7bd4494f2c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "It'll Quench Ya!",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b33285d9ff753c4c630cd7e0b756cd0",
+      "min_rule_version": 2,
+      "normalized_name": "it'll quench ya!",
+      "oracle_hash": "d541d6d83519c2147cb2c08404e238e3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mana Tithe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aa6da9f509ac3ac59eedf048d8c4dfa8",
+      "min_rule_version": 2,
+      "normalized_name": "mana tithe",
+      "oracle_hash": "e980b1e22d76bcc7a902a7bd4494f2c2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mindstatic",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fd343c6b32cba13d335821c7cb12913f",
+      "min_rule_version": 2,
+      "normalized_name": "mindstatic",
+      "oracle_hash": "31d9fa82432680ed5ed8472451543989",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Quench",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b33285d9ff753c4c630cd7e0b756cd0",
+      "min_rule_version": 2,
+      "normalized_name": "quench",
+      "oracle_hash": "d541d6d83519c2147cb2c08404e238e3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Revolutionary Rebuff",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f5b3fcb5be409ce75e90a5bb9838c13d",
+      "min_rule_version": 2,
+      "normalized_name": "revolutionary rebuff",
+      "oracle_hash": "4bde1d5613deab8c0f70b20b7d9ab2e7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_counter_target_spell_unless_controller_pays_generic_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

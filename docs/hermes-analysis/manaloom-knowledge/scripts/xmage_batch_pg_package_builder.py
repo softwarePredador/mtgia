@@ -29,6 +29,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "library_controller",
     "target_constraints",
     "target_preference",
+    "counter_unless_pays_generic",
     "power_delta",
     "toughness_delta",
     "power_boost",

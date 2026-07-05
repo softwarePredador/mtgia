@@ -44,6 +44,10 @@ EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
 RAMP_ARTIFACT_UNIT = "ramp_permanent::xmage_artifact_mana_source_variant_review_v1"
 RAMP_CREATURE_UNIT = "ramp_permanent::xmage_creature_mana_source_variant_review_v1"
 COUNTER_UNIT = "counter_spell::counter_target_stack_object_variant_v1"
+COUNTER_UNLESS_PAYS_UNIT = (
+    "xmage_signature::CounterUnlessPaysEffect::no_ability_class::"
+    "TargetSpell::no_condition_class::targeting,counter"
+)
 BOUNCE_UNIT = "bounce::targeted_return_to_hand_variant_v1"
 RECURSION_UNIT = "recursion::xmage_graveyard_return_variant_review_v1"
 TUTOR_UNIT = "tutor::xmage_library_search_variant_review_v1"
@@ -173,6 +177,7 @@ SELF_SACRIFICE_MANA_SOURCE_SCOPE = "xmage_self_sacrifice_mana_source_permanent_v
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 COUNTER_DRAW_SCOPE = "xmage_counter_target_and_draw_card_spell_v1"
 COUNTER_GAIN_LIFE_SCOPE = "xmage_counter_target_and_controller_gain_life_spell_v1"
+COUNTER_UNLESS_PAYS_SCOPE = "xmage_counter_target_spell_unless_controller_pays_generic_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_MILL_RETURN_SCOPE = "xmage_mill_then_return_graveyard_card_to_hand_spell_v1"
@@ -1998,6 +2003,7 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
         (r"^counter target artifact or enchantment spell\.?$", "artifact_or_enchantment_spell"),
         (r"^counter target instant or sorcery spell\.?$", "instant_or_sorcery_spell"),
         (r"^counter target noncreature spell\.?$", "noncreature_spell"),
+        (r"^counter target nonartifact spell\.?$", "nonartifact_spell"),
         (r"^counter target colorless spell\.?$", "colorless_spell"),
         (r"^counter target nonblue spell\.?$", "nonblue_spell"),
         (r"^counter target multicolored spell\.?$", "multicolored_spell"),
@@ -2055,6 +2061,36 @@ def fixed_counter_gain_life_from_source(source_text: str) -> tuple[int, str] | N
     return life_gain, target
 
 
+def fixed_counter_unless_pays_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^(?P<counter>counter target .+?) unless its controller pays \{(?P<cost>\d+)\}\.?$",
+        text,
+    )
+    if not match:
+        return None
+    target = counter_target_from_oracle({"oracle_text": match.group("counter")})
+    if target is None:
+        return None
+    return target, int(match.group("cost"))
+
+
+def fixed_counter_unless_pays_from_source(source_text: str) -> int | None:
+    text = str(source_text or "")
+    effect_matches = list(re.finditer(r"new\s+CounterUnlessPaysEffect\s*\(", text))
+    if len(effect_matches) != 1:
+        return None
+    match = re.search(
+        r"new\s+CounterUnlessPaysEffect\s*\(\s*new\s+GenericManaCost\s*\(\s*(?P<cost>\d+)\s*\)\s*\)",
+        text,
+    )
+    if not match:
+        return None
+    if "new TargetSpell" not in text:
+        return None
+    return int(match.group("cost"))
+
+
 def counter_target_constraints_for(target: str) -> dict[str, Any]:
     constraints: dict[str, Any] = {"zone": "stack", "stack_object": "spell"}
     mana_value_match = re.match(r"^spell_mana_value_(?P<value>\d+)(?P<op>_or_greater|_or_less)?$", target)
@@ -2090,6 +2126,8 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
         constraints["spell_types"] = ["instant", "sorcery"]
     elif target == "noncreature_spell":
         constraints["exclude_card_types"] = ["creature"]
+    elif target == "nonartifact_spell":
+        constraints["exclude_card_types"] = ["artifact"]
     elif target == "colorless_spell":
         constraints["spell_color_count_exact"] = 0
     elif target == "nonblue_spell":
@@ -6236,6 +6274,15 @@ def is_spell_cast_add_counters_source_unit(row: dict[str, Any]) -> bool:
         and "SpellCastControllerTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"counter", "triggered_ability"}
+    )
+
+
+def is_counter_unless_pays_spell_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == COUNTER_UNLESS_PAYS_UNIT
+        and effect_classes(row) == {"CounterUnlessPaysEffect"}
+        and not ability_classes(row)
+        and set(row.get("xmage_signals") or []) == {"targeting", "counter"}
     )
 
 
@@ -14280,6 +14327,7 @@ def split_row(
         and effect_classes(row) == {"DamageTargetEffect"}
         and not ability_classes(row)
     )
+    counter_unless_pays_spell_unit = is_counter_unless_pays_spell_unit(row)
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     keyword_draw_spell_unit = (
         unit == DRAW_UNIT
@@ -14366,6 +14414,7 @@ def split_row(
         and not keyword_draw_spell_unit
         and not fixed_token_spell_unit
         and not graveyard_count_damage_unit
+        and not counter_unless_pays_spell_unit
     ):
         return None, "unsupported_adapter_work_unit"
     if not metadata:
@@ -14437,6 +14486,7 @@ def split_row(
         and not draw_self_cost_reduction_spell_unit
         and not keyword_draw_spell_unit
         and not boost_keyword_draw_spell_unit
+        and not counter_unless_pays_spell_unit
     ):
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
@@ -19461,6 +19511,38 @@ def split_row(
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_exile_target_spell"), "selected_exact_scope"
 
+    if counter_unless_pays_spell_unit:
+        if not is_spell(metadata):
+            return None, "counter_unless_pays_not_instant_or_sorcery_spell"
+        if ability_kind(row) != "one_shot":
+            return None, "counter_unless_pays_not_one_shot_spell_ability"
+        oracle_pair = fixed_counter_unless_pays_from_oracle(metadata)
+        if oracle_pair is None:
+            return None, "counter_unless_pays_oracle_not_exact_fixed_generic"
+        source_cost = fixed_counter_unless_pays_from_source(source_text)
+        if source_cost is None:
+            return None, "counter_unless_pays_source_not_fixed_generic"
+        target, pay_generic = oracle_pair
+        if pay_generic != source_cost:
+            return None, "counter_unless_pays_source_oracle_mismatch"
+        effect_json = {
+            "effect": "counter",
+            "battle_model_scope": COUNTER_UNLESS_PAYS_SCOPE,
+            "target": target,
+            "target_constraints": counter_target_constraints_for(target),
+            "counter_unless_pays_generic": pay_generic,
+            "xmage_effect_class": "CounterUnlessPaysEffect",
+            **flags,
+        }
+        if target == "blue_spell":
+            effect_json["requires_blue_target"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_counter_unless_pays_generic_spell",
+        ), "selected_exact_scope"
+
     if unit == COUNTER_UNIT:
         if classes != {"CounterTargetEffect"}:
             return None, "counter_effect_class_not_pure"
@@ -21097,6 +21179,7 @@ def build_exact_split_report(
             and not is_permanent_attack_recursion_to_hand_unit(row)
             and not is_creature_combat_damage_recursion_to_hand_unit(row)
             and not is_boost_keyword_spell_unit(row)
+            and not is_counter_unless_pays_spell_unit(row)
             and not (
                 str(row.get("adapter_work_unit") or "") == RECURSION_UNIT
                 and effect_classes(row) == {"PutOnLibraryTargetEffect"}
@@ -21157,6 +21240,7 @@ def build_exact_split_report(
                 "bounce::targeted_return_to_hand_variant_v1 rows with ReturnToHandTargetEffect, EntersBattlefieldTriggeredAbility, exact ETB return-target-to-hand Oracle text, no condition, and no multi-target adjuster",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect, SimpleActivatedAbility, exact self-counter Oracle text, and mana/tap source costs only",
+                "xmage_signature CounterUnlessPaysEffect one-shot spell rows with exact GenericManaCost(N), exact Oracle 'unless its controller pays {N}', and supported stack target constraints",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with LookLibraryAndPickControllerEffect, EntersBattlefieldTriggeredAbility, exact ETB look-library pick-one-to-hand Oracle/source agreement, and only static self keywords",
                 "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInPlayEffect, EntersBattlefieldTriggeredAbility, exact ETB land tutor-to-battlefield Oracle/source agreement, and only static self keywords",
