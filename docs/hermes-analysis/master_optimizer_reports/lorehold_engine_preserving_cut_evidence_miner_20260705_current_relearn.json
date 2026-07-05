@@ -1,0 +1,3784 @@
+{
+  "all_cut_rows": [
+    {
+      "actionability": "same_lane_hard_blocked",
+      "card_name": "Creative Technique",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 54,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "big_spell_value",
+      "manual_status": "same_lane_only",
+      "near_miss_rank": 1,
+      "other_blockers": [],
+      "score": 42,
+      "soft_evidence_blockers": [
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 58,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "same_lane_hard_blocked",
+      "card_name": "Bender's Waterskin",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 216,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "same_lane_only",
+      "near_miss_rank": 2,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 268,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, measured_high_cut_exposure, prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Generous Gift",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 19,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 3,
+      "other_blockers": [],
+      "score": 48,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 52,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Improvisation Capstone",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 49,
+      "hard_stop_blockers": [
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "draw",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": 4,
+      "other_blockers": [],
+      "score": 41,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 59,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Esper Sentinel",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 442,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 5,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 527,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Path to Exile",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 117,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 6,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 166,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Swords to Plowshares",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 240,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 7,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 271,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Stroke of Midnight",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 32,
+      "hard_stop_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": 8,
+      "other_blockers": [],
+      "score": 57,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 43,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Winds of Abandon",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 32,
+      "hard_stop_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": 9,
+      "other_blockers": [],
+      "score": 41,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 59,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Monument to Endurance",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 19,
+      "hard_stop_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 10,
+      "other_blockers": [],
+      "score": 27,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 73,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: early_mana_floor_support, measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Sensei's Divining Top",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 3514,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 11,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 3816,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Smothering Tithe",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 801,
+      "hard_stop_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 12,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 859,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: early_mana_floor_support, measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Hexing Squelcher",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 17,
+      "hard_stop_blockers": [
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "contextual",
+      "manual_status": "blocked_by_cut_safety",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 7,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 93,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Call Forth the Tempest",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 4,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 102,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Elegant Parlor",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 8,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 102,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Spectator Seating",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 9,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 101,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 9,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Windswept Heath",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 11,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 99,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 11,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Arid Mesa",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 13,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 97,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 13,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "War Room",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 13,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 97,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 13,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Exotic Orchard",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 14,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 96,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 14,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Prismatic Vista",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 14,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 96,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 14,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Battlefield Forge",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 15,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 95,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 15,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Flawless Maneuver",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 12,
+      "hard_stop_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 94,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 16,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_protection_shell, protection_shell, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Plaza of Heroes",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 17,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 93,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 17,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Command Beacon",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 18,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 92,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 18,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Flooded Strand",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 18,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 92,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 18,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Teferi's Protection",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 12,
+      "hard_stop_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 86,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 24,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_protection_shell, protection_shell, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Marsh Flats",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 29,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 71,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 29,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Sunbaked Canyon",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 30,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 70,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 30,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Bloodstained Mire",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 31,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 69,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 31,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Tempt with Bunnies",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 3,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 69,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 31,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Sunbillow Verge",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 32,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 68,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 32,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Everything Comes to Dust",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 31,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 66,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 34,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Scalding Tarn",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 38,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 62,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 38,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Ancient Tomb",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 39,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 61,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 39,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Wooded Foothills",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 44,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 56,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 44,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Sacred Foundry",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 46,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 54,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 46,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Rise of the Eldrazi",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 48,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 40,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 60,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "High Noon",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 2,
+      "hard_stop_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 34,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 66,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: prior_rejected_cut, prior_rejected_cut_slot, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Giver of Runes",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 12,
+      "hard_stop_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 28,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 72,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_protection_shell, protection_shell, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Swiftfoot Boots",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 2,
+      "hard_stop_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 27,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 73,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_protection_shell, protection_shell, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Glittering Massif",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 75,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 25,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 75,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Lightning Greaves",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 34,
+      "hard_stop_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 15,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 85,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_protection_shell, protection_shell, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Command Tower",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 93,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 7,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 93,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Eiganjo, Seat of the Empire",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 96,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 4,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 96,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Mizzix's Mastery",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 76,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 3,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 97,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Thor, God of Thunder",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 85,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "graveyard_recursion",
+      "manual_status": "blocked_by_cut_safety",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 152,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure, prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Artist's Talent",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 500,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 535,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure, prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Library of Leng",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 816,
+      "hard_stop_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 855,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: early_mana_floor_support, measured_high_cut_exposure, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Land Tax",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 3395,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "misc",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 3449,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure, prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Radiant Summit",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 7,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 103,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 7,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base, prior_rejected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 7,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 102,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, prior_rejected_cut, prior_rejected_cut_slot, prior_rejected_signature",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Turbulent Steppe",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 8,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 102,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base, prior_rejected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Dawn's Truce",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 1,
+      "hard_stop_blockers": [
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "hand_filter",
+      "manual_status": "blocked_by_cut_safety",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 93,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 17,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_protection_shell, prior_rejected_cut, protected_cut, protection_shell",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Insurrection",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 22,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 87,
+      "soft_evidence_blockers": [
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 23,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, protected_cut, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Storm Herd",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 20,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "big_spell_value",
+      "manual_status": "blocked_by_cut_safety",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 75,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 25,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Unexpected Windfall",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 25,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "early_mana_floor_support",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 67,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 33,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, early_mana_floor_support, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Jeska's Will",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 6,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 56,
+      "soft_evidence_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 44,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Boros Signet",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 14,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 35,
+      "soft_evidence_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 65,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Talisman of Conviction",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 0,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 31,
+      "soft_evidence_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 69,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Fellwar Stone",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 1,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 14,
+      "soft_evidence_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 86,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Mother of Runes",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 24,
+      "hard_stop_blockers": [
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 11,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 89,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_protection_shell, prior_rejected_cut, prior_rejected_cut_slot, protection_shell",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Molecule Man",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 101,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 102,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure, prior_rejected_cut, prior_rejected_cut_slot, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Deflecting Swat",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 43,
+      "hard_stop_blockers": [
+        "cut_is_protection_shell",
+        "measured_high_cut_exposure",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 126,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_protection_shell, measured_high_cut_exposure, protection_shell, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Approach of the Second Sun",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 82,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 140,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, measured_high_cut_exposure, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Furygale Flocking",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 2,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 160,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, measured_high_cut_exposure, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Sol Ring",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 158,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 226,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, measured_high_cut_exposure, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Farewell",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 195,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 231,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, measured_high_cut_exposure, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Plains // Plains",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 244,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 244,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, measured_high_cut_exposure, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Surge to Victory",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 243,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 275,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, measured_high_cut_exposure, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Starfall Invocation",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 392,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 396,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, measured_high_cut_exposure, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Mountain // Mountain",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 402,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 402,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, measured_high_cut_exposure, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "The Mind Stone",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 2266,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 2312,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, measured_high_cut_exposure, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Urza's Saga",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 2656,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 2656,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, measured_high_cut_exposure, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Scroll Rack",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 2745,
+      "hard_stop_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 2957,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: early_mana_floor_support, measured_high_cut_exposure, protected_cut, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Lorehold, the Historian",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 5558,
+      "hard_stop_blockers": [
+        "commander_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "commander",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 5768,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: commander_never_cut, measured_high_cut_exposure, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Redirect Lightning",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 1,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 101,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 9,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, cut_is_protection_shell, prior_rejected_cut, prior_rejected_cut_slot, protection_shell",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Hit the Mother Lode",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 7,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "early_mana_floor_support",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 99,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 11,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, early_mana_floor_support, miracle_or_finisher_core, prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Tibalt's Trickery",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 0,
+      "hard_stop_blockers": [
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 93,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 17,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_protection_shell, prior_rejected_cut, prior_rejected_cut_slot, protected_cut, protection_shell",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Reforge the Soul",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 15,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 87,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 23,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, prior_rejected_cut, prior_rejected_cut_slot, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Reliquary Tower",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 31,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 69,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 31,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base, prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Big Score",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 33,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "early_mana_floor_support",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 60,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 40,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, early_mana_floor_support, miracle_or_finisher_core, prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Prismari Pianist",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 40,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "wincon",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 35,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 65,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, prior_rejected_cut, prior_rejected_cut_slot, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Pearl Medallion",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 0,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 184,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, measured_high_cut_exposure, prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Arcane Signet",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 114,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 195,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, measured_high_cut_exposure, prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Ruby Medallion",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 29,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 219,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, measured_high_cut_exposure, prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Victory Chimes",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 236,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 283,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, measured_high_cut_exposure, prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "The Scarlet Witch",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 304,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "misc",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 362,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, measured_high_cut_exposure, prior_rejected_cut, prior_rejected_cut_slot, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Blasphemous Act",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 218,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 368,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, cut_is_miracle_core_big_spell, measured_high_cut_exposure, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Tragic Arrogance",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 72,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 20,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 80,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, prior_rejected_cut, prior_rejected_cut_slot, prior_rejected_signature, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 82,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 14,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 86,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, cut_is_protection_shell, miracle_or_finisher_core, prior_rejected_cut, prior_rejected_cut_slot, protection_shell",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Fated Clash",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 266,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "blocked_by_cut_safety",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 267,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, cut_is_protection_shell, measured_high_cut_exposure, miracle_or_finisher_core, prior_rejected_cut, protected_cut, protection_shell",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Promise of Loyalty",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 46,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 47,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 53,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, cut_is_protection_shell, miracle_or_finisher_core, prior_rejected_cut, prior_rejected_cut_slot, prior_rejected_signature, protected_cut, protection_shell",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Avatar's Wrath",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 74,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protection_shell"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 118,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, cut_is_protection_shell, measured_high_cut_exposure, miracle_or_finisher_core, prior_rejected_cut, prior_rejected_cut_slot, prior_rejected_signature, protection_shell",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    }
+  ],
+  "artifact_type": "lorehold_engine_preserving_cut_evidence_miner",
+  "cross_lane_exclusions": [],
+  "current_baseline": "deck_607",
+  "decision": {
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_run_natural_battle_for_this_package",
+      "mine new low-exposure non-anchor target-lane evidence",
+      "or define a separate shell contract if the cut is cross-lane",
+      "keep hard-stop anchors closed unless a future contract explicitly changes the role profile"
+    ],
+    "promotion_allowed": false,
+    "reason": "The Guttersnipe + Storm-Kiln package still needs two named seed-safe cuts. Current evidence has no seed-safe cuts and no target-lane evidence gaps that can be promoted into a package now."
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T04:13:47Z",
+  "hard_stop_near_misses": [
+    {
+      "actionability": "same_lane_hard_blocked",
+      "card_name": "Creative Technique",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 54,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "big_spell_value",
+      "manual_status": "same_lane_only",
+      "near_miss_rank": 1,
+      "other_blockers": [],
+      "score": 42,
+      "soft_evidence_blockers": [
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 58,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "same_lane_hard_blocked",
+      "card_name": "Bender's Waterskin",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 216,
+      "hard_stop_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "same_lane_only",
+      "near_miss_rank": 2,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 268,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_early_mana_floor_support, early_mana_floor_support, measured_high_cut_exposure, prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Generous Gift",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 19,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 3,
+      "other_blockers": [],
+      "score": 48,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 52,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Improvisation Capstone",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 49,
+      "hard_stop_blockers": [
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "draw",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": 4,
+      "other_blockers": [],
+      "score": 41,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 59,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Esper Sentinel",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 442,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 5,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 527,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Path to Exile",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 117,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 6,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 166,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Swords to Plowshares",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 240,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 7,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 271,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Stroke of Midnight",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 32,
+      "hard_stop_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": 8,
+      "other_blockers": [],
+      "score": 57,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 43,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Winds of Abandon",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 32,
+      "hard_stop_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "near_miss_rank": 9,
+      "other_blockers": [],
+      "score": 41,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 59,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: prior_rejected_cut, prior_rejected_cut_slot",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Monument to Endurance",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 19,
+      "hard_stop_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 10,
+      "other_blockers": [],
+      "score": 27,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 73,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: early_mana_floor_support, measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Sensei's Divining Top",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 3514,
+      "hard_stop_blockers": [
+        "measured_high_cut_exposure",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 11,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 3816,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: measured_high_cut_exposure, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Smothering Tithe",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 801,
+      "hard_stop_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "near_miss_rank": 12,
+      "other_blockers": [],
+      "score": 0,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 859,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: early_mana_floor_support, measured_high_cut_exposure",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Hexing Squelcher",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 17,
+      "hard_stop_blockers": [
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "contextual",
+      "manual_status": "blocked_by_cut_safety",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 7,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 93,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: prior_rejected_cut, protected_cut",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Call Forth the Tempest",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 4,
+      "hard_stop_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 102,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: cut_is_miracle_core_big_spell, miracle_or_finisher_core, structural_dependency",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Elegant Parlor",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 8,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 102,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Spectator Seating",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 9,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 101,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 9,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Windswept Heath",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 11,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 99,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 11,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Arid Mesa",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 13,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 97,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 13,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "War Room",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 13,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 97,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 13,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    },
+    {
+      "actionability": "hard_blocked",
+      "card_name": "Exotic Orchard",
+      "classification": "closed_hard_stop_current_607",
+      "direct_event_count": 14,
+      "hard_stop_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "investigation_action": "do_not_use_as_cut_under_current_607_contract",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "near_miss_rank": null,
+      "other_blockers": [],
+      "score": 96,
+      "soft_evidence_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "status": "blocked",
+      "unique_exposure_count": 14,
+      "unlock_requirements": [
+        "current hard-stop blockers must not be bypassed: mana_base_never_cut, never_cut_lane, never_cut_or_mana_base",
+        "named cut must be seed-safe under current 607 evidence",
+        "cut must be same-lane or covered by explicit package-shell contract",
+        "future gate must preserve Winota and other fast-pressure slices",
+        "future gate must preserve topdeck, miracle, Lorehold spell-cast, and mana floors",
+        "added cards must produce direct Guttersnipe damage and Storm-Kiln Treasure events"
+      ]
+    }
+  ],
+  "postgres_writes": false,
+  "ready_seed_safe_cuts": [],
+  "source_db_mutated": false,
+  "source_reports": {
+    "hypothesis_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_guttersnipe_storm_kiln_hypothesis_contract_20260705_current_relearn.json",
+    "pressure_safe_cut_expansion_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_cut_expansion_model_20260705_current.json",
+    "seed_safe_cut_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260704_role_tag_repair.json",
+    "trace_cut_evidence_expander": "docs/hermes-analysis/master_optimizer_reports/lorehold_trace_cut_evidence_expander_20260704_role_tag_repair.json"
+  },
+  "status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+  "summary": {
+    "classification_counts": {
+      "closed_hard_stop_current_607": 94
+    },
+    "contract_status": "hypothesis_contract_written_blocked_no_named_safe_cuts",
+    "cross_lane_excluded_count": 0,
+    "cut_expansion_status": "pressure_cut_expansion_no_seed_safe_cut_keep_607",
+    "cut_shortage": 2,
+    "decision_status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+    "hard_stop_blocker_counts": {
+      "commander_never_cut": 1,
+      "cut_is_early_mana_floor_support": 14,
+      "cut_is_miracle_core_big_spell": 25,
+      "cut_is_protection_shell": 14,
+      "early_mana_floor_support": 18,
+      "mana_base_never_cut": 28,
+      "measured_high_cut_exposure": 34,
+      "miracle_or_finisher_core": 24,
+      "never_cut_lane": 29,
+      "never_cut_or_mana_base": 29,
+      "prior_rejected_cut": 37,
+      "prior_rejected_cut_slot": 24,
+      "prior_rejected_signature": 4,
+      "protected_cut": 22,
+      "protection_shell": 14,
+      "structural_dependency": 24
+    },
+    "hard_stop_cut_count": 94,
+    "lane_counts": {
+      "big_spell_value": 2,
+      "commander": 1,
+      "contextual": 1,
+      "draw": 6,
+      "early_mana": 18,
+      "graveyard_recursion": 1,
+      "hand_filter": 1,
+      "mana_base": 28,
+      "misc": 2,
+      "protection": 13,
+      "removal": 10,
+      "spell_velocity": 5,
+      "wincon": 6
+    },
+    "named_seed_safe_cut_count": 0,
+    "natural_battle_gate_allowed_now": false,
+    "promotion_allowed_now": false,
+    "ready_deck_change_count": 0,
+    "recommended_next_action": "do_not_battle_mine_new_nonanchor_trace_or_new_shell_contract",
+    "router_route_status": "best_next_learning_route_contract_required_no_deck_action",
+    "target_adds": [
+      "Guttersnipe",
+      "Storm-Kiln Artist"
+    ],
+    "target_lane_evidence_gap_count": 0,
+    "target_required_cut_count": 2,
+    "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair",
+    "total_cut_slots_reviewed": 94
+  },
+  "target_lane_evidence_gaps": []
+}

@@ -1542,3 +1542,71 @@ Operational lesson:
   legal cuts would only test a fantasy list.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Engine-Preserving Cut Evidence Miner - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json`
+
+This miner attacks the exact blocker left by the Guttersnipe + Storm-Kiln
+contract: the package needs two named seed-safe cuts before structure matrix or
+natural battle can begin.
+
+Current result:
+
+- decision status:
+  `no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607`;
+- target route:
+  `guttersnipe_storm_kiln_engine_preserving_pair`;
+- target adds:
+  `Guttersnipe`, `Storm-Kiln Artist`;
+- required cuts: `2`;
+- named seed-safe cuts: `0`;
+- cut shortage: `2`;
+- target-lane evidence gaps: `0`;
+- total cut slots reviewed: `94`;
+- hard-stop cut slots: `94`;
+- cross-lane excluded slots: `0`;
+- ready deck changes: `0`;
+- promotion allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- recommended next action:
+  `do_not_battle_mine_new_nonanchor_trace_or_new_shell_contract`.
+
+Key blocker counts from the current 607 cut surface:
+
+- `mana_base_never_cut`: `28`;
+- `never_cut_lane`: `29`;
+- `never_cut_or_mana_base`: `29`;
+- `cut_is_miracle_core_big_spell`: `25`;
+- `miracle_or_finisher_core`: `24`;
+- `structural_dependency`: `24`;
+- `protected_cut`: `22`;
+- `prior_rejected_cut`: `37`;
+- `measured_high_cut_exposure`: `34`;
+- `early_mana_floor_support`: `18`;
+- `cut_is_protection_shell`: `14`;
+- `protection_shell`: `14`.
+
+Cut-search conclusion:
+
+- There is no current 607 cut slot that can feed the Guttersnipe + Storm-Kiln
+  package.
+- There is also no target-lane soft evidence gap to promote into a cut-safety
+  candidate now.
+- `Creative Technique`, `Bender's Waterskin`, removal staples, draw/selection
+  anchors, mana cards, lands, protection cards, and finisher/miracle cards
+  remain closed for this package under the current evidence.
+
+Operational lesson:
+
+- The package remains valuable as a learning direction, but not as a mutation
+  of the current `607` list.
+- The next useful work is not a battle; it is either new non-anchor trace
+  mining that discovers a real low-exposure target-lane cut, or a separate
+  shell contract that deliberately changes the role profile and starts from
+  structure validation.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.
