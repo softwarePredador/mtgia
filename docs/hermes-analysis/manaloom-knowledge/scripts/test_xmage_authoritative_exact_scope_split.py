@@ -12933,6 +12933,30 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 None,
             ),
             (
+                "Dark Hatchling",
+                "Flying\nWhen Dark Hatchling enters, destroy target nonblack creature. It can't be regenerated.",
+                (
+                    "this.addAbility(FlyingAbility.getInstance());"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(true));"
+                    "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_CREATURE_NON_BLACK));"
+                ),
+                "creature",
+                {"card_types": ["creature"], "exclude_colors": ["B"]},
+                None,
+            ),
+            (
+                "Angel of Despair",
+                "Flying\nWhen this creature enters, destroy target permanent.",
+                (
+                    "this.addAbility(FlyingAbility.getInstance());"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect());"
+                    "ability.addTarget(new TargetPermanent());"
+                ),
+                "permanent",
+                {"card_types": ["permanent"]},
+                "any",
+            ),
+            (
                 "Fathom Fleet Cutthroat",
                 (
                     "When Fathom Fleet Cutthroat enters the battlefield, destroy target creature "

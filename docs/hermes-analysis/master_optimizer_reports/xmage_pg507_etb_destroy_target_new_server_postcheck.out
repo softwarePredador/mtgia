@@ -1,0 +1,5 @@
+    card_name     | normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+------------------+------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Angel of Despair | angel of despair | battle_rule_v1:9d2efc733ae570ba205a6341970c214d |                  1 |                           1 |                         1 |           0
+ Dark Hatchling   | dark hatchling   | battle_rule_v1:1cefc520c0a5ba4a2750db80e107c900 |                  1 |                           1 |                         1 |           0
+(2 rows)

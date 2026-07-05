@@ -11811,7 +11811,7 @@ def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] 
             ("remove_creature", "creature_toughness_2_or_less"),
         ),
         (
-            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target nonblack creature\.?$",
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target nonblack creature(?:\. it can't be regenerated)?\.?$",
             ("remove_creature", "nonblack_creature"),
         ),
         (
@@ -11871,6 +11871,10 @@ def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] 
             ("remove_permanent", "nonland_permanent"),
         ),
         (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target permanent\.?$",
+            ("remove_permanent", "permanent"),
+        ),
+        (
             rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target creature an opponent controls\.?$",
             ("remove_creature", "creature"),
         ),
@@ -11923,6 +11927,7 @@ def etb_destroy_source_supported(source: str, target: str) -> str | None:
         "enchantment": lambda value: "TargetEnchantmentPermanent" in value or "FilterEnchantmentPermanent" in value,
         "land": lambda value: "TargetLandPermanent" in value or "FilterLandPermanent" in value,
         "nonland_permanent": lambda value: "TargetNonlandPermanent" in value or "FilterNonlandPermanent" in value,
+        "permanent": lambda value: re.search(r"new\s+TargetPermanent\s*\(\s*\)", value) is not None,
         "creature": lambda value: "TargetCreaturePermanent" in value or "FILTER_PERMANENT_CREATURE" in value,
     }
     checker = checks.get(target)
@@ -16780,7 +16785,7 @@ def split_row(
             "xmage_effect_class": "DestroyTargetEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
         }
-        if target_type in {"nonbasic_land", "aura", "equipment"}:
+        if target_type in {"permanent", "nonbasic_land", "aura", "equipment"}:
             effect_json["target_controller"] = "any"
         if target_type in {
             "island_or_swamp_opponent_controls",

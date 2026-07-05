@@ -1,0 +1,5 @@
+    card_name     | normalized_name  | source  | review_status | execution_status |           oracle_hash            |                scope                 |  remove_effect   | remove_target |                  target_constraints                   | target_controller |  keywords
+------------------+------------------+---------+---------------+------------------+----------------------------------+--------------------------------------+------------------+---------------+-------------------------------------------------------+-------------------+------------
+ Angel of Despair | angel of despair | curated | verified      | auto             | 8f3d25714f7c73c7c565f993c87d10ed | xmage_creature_etb_destroy_target_v1 | remove_permanent | permanent     | {"card_types": ["permanent"]}                         | any               | ["flying"]
+ Dark Hatchling   | dark hatchling   | curated | verified      | auto             | 0acde6c3f71bac4f6e76c86eedbeaf1a | xmage_creature_etb_destroy_target_v1 | remove_creature  | creature      | {"card_types": ["creature"], "exclude_colors": ["B"]} |                   | ["flying"]
+(2 rows)

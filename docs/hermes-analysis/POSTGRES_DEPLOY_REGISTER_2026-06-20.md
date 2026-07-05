@@ -15037,3 +15037,76 @@ Register decision:
   cards.
 - The remaining damaged-creature and activated target backlog must continue
   through exact subpatterns, not broad generic review-scope promotion.
+
+## 2026-07-05 - PG507 creature ETB destroy target parser
+
+- Deploy id: `xmage_pg507_etb_destroy_target_new_server`.
+- Runtime family: `xmage_creature_etb_destroy_target_v1`.
+- Promoted cards: `2`.
+- Promoted card names: `Angel of Despair` and `Dark Hatchling`.
+- Scope boundary: only exact creature enters-the-battlefield destroy target
+  patterns backed by local XMage `EntersBattlefieldTriggeredAbility` plus
+  `DestroyTargetEffect` and supported target classes are allowed in this
+  package. Multi-target, modal, variable, unsupported-cost, or broad
+  `xmage_*_review_v1` rows remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=2`, `COMMIT`.
+- Postcheck:
+  both promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- Field postcheck:
+  `Angel of Despair` carries `etb_remove_effect=remove_permanent`,
+  `etb_remove_target=permanent`, `target_constraints.card_types=["permanent"]`,
+  and `target_controller=any`; `Dark Hatchling` carries
+  `etb_remove_effect=remove_creature`, `etb_remove_target=creature`, and
+  `target_constraints.exclude_colors=["B"]`.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_pg_to_sqlite_sync.json`;
+  `selected_card_count=2`, `pg_rows_loaded=2`,
+  `sqlite_inserted_or_updated=2`, and
+  `canonical_snapshot_rows_exported=5984`.
+- Runtime lookup:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_runtime_get_card_effect.out`
+  resolves both cards to the expected runtime scope and target constraints.
+- Validation:
+  splitter unit suite `526` tests passed, focused battle runtime test exited
+  `0`, full battle runtime suite has `632` PASS lines, XMage strategy `26/26`
+  pass, deckbuilding contract `pass`, operational surface `pass`, legacy
+  contamination `pass`, and PG/Hermes/SQLite `pass`.
+- Post-sync queue:
+  `target_identity_count=26033`, `xmage_authoritative_source_count=25719`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25719`.
+- Final exact-scope recheck:
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`, and
+  `etb_destroy_target_not_supported=8`.
+
+Register decision:
+
+- PG507 is applied and should not be rebuilt.
+- The ETB destroy target parser now supports exact permanent and nonblack
+  creature target predicates for the two promoted cards.
+- The remaining ETB destroy backlog must continue through exact subpatterns,
+  especially multi-target and unsupported target forms, not broad generic
+  review-scope promotion.

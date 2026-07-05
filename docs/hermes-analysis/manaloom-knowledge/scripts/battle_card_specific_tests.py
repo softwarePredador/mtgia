@@ -8411,6 +8411,114 @@ def register_tests(battle, player):
             assert elf in opponent.battlefield
             assert zombie not in opponent.battlefield
             assert zombie in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Angel of Despair",
+                "type_line": "Creature - Angel",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 5,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            own_artifact = {
+                "name": "Mind Stone",
+                "type_line": "Artifact",
+                "effect": "ramp_permanent",
+                "controller": "Active",
+                "owner": "Active",
+            }
+            opponent_enchantment = {
+                "name": "Ghostly Prison",
+                "type_line": "Enchantment",
+                "effect": "passive",
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            active.battlefield = [own_artifact]
+            opponent.battlefield = [opponent_enchantment]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_permanent",
+                    "etb_remove_target": "permanent",
+                    "target": "permanent",
+                    "target_controller": "any",
+                    "target_constraints": {"card_types": ["permanent"]},
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg507-permanent",
+                    "_rule_oracle_hash": "pg507-permanent-hash",
+                },
+                14,
+                random.Random(507),
+                all_players=[active, opponent],
+            )
+
+            assert own_artifact in active.battlefield
+            assert opponent_enchantment not in opponent.battlefield
+            assert opponent_enchantment in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Dark Hatchling",
+                "type_line": "Creature - Horror",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            black_creature = {
+                "name": "Black Knight",
+                "type_line": "Creature - Human Knight",
+                "effect": "creature",
+                "colors": ["B"],
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            white_creature = {
+                "name": "White Knight",
+                "type_line": "Creature - Human Knight",
+                "effect": "creature",
+                "colors": ["W"],
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [black_creature, white_creature]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_creature",
+                    "etb_remove_target": "creature",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"], "exclude_colors": ["B"]},
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg507-nonblack",
+                    "_rule_oracle_hash": "pg507-nonblack-hash",
+                },
+                15,
+                random.Random(507),
+                all_players=[active, opponent],
+            )
+
+            assert black_creature in opponent.battlefield
+            assert white_creature not in opponent.battlefield
+            assert white_creature in opponent.graveyard
         finally:
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
@@ -8424,6 +8532,8 @@ def register_tests(battle, player):
             "Command Tower",
             "Command Tower",
             "Diregraf Ghoul",
+            "Ghostly Prison",
+            "White Knight",
         ]
 
     def test_pg494_etb_destroy_requires_damaged_this_turn_target():

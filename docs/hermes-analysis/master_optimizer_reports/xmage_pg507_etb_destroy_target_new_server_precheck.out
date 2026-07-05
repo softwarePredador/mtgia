@@ -1,0 +1,5 @@
+    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+------------------+------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Angel of Despair | angel of despair | 8f3d25714f7c73c7c565f993c87d10ed | battle_rule_v1:9d2efc733ae570ba205a6341970c214d | deprecate_nonmatching_rows |                1 | c39cc8f7-80aa-4a1d-9659-6c48b5962f95 |                  0 |                         0 |                           0
+ Dark Hatchling   | dark hatchling   | 0acde6c3f71bac4f6e76c86eedbeaf1a | battle_rule_v1:1cefc520c0a5ba4a2750db80e107c900 | deprecate_nonmatching_rows |                1 | 74f8faaa-8fbe-4301-aa52-7f4ae32478d4 |                  0 |                         0 |                           0
+(2 rows)

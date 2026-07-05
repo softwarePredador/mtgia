@@ -12935,6 +12935,46 @@ creature-damaged-this-turn target predicate above. It does not authorize broad
 damaged-creature review rows, modal abilities, unsupported activation costs, or
 non-matching Oracle/XMage target pairs.
 
+## PG507 Exact ETB Destroy Target Checkpoint
+
+As of 2026-07-05, PG507 is applied and synced against the new server target.
+It closes the exact creature enters-the-battlefield destroy target subpattern
+for:
+
+- `Angel of Despair`: `remove_permanent`, `target=permanent`,
+  `target_controller=any`.
+- `Dark Hatchling`: `remove_creature`, `target=creature`,
+  `target_constraints.exclude_colors=["B"]`.
+
+Evidence:
+
+- package and apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg507_etb_destroy_target_new_server_pg_to_sqlite_sync.json`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg507_etb_destroy_target_new_server_final_recheck.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg507_etb_destroy_target_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg507_etb_destroy_target_new_server_commander_legal.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4917`
+- `battle_family_mapper_required=28956`
+- `target_identity_count=26033`
+- `xmage_authoritative_source_count=25719`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25719`
+- final exact-scope recheck `proposal_count=0`
+
+Residual boundary: PG507 does not authorize multi-target ETB destroy effects,
+unsupported target predicates, modal forms, or broad review-scope rows. The
+remaining `etb_destroy_target_not_supported=8` cards must be split into their
+own exact runtime-backed subpatterns before PostgreSQL promotion.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
