@@ -1,0 +1,497 @@
+{
+  "generated_at": "2026-07-05T01:36:24Z",
+  "artifact_type": "lorehold_external_candidate_identity_import_preflight",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "deck_607_mutated": false,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_reports": {
+    "external_material_scout": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_material_evidence_scout_20260705_current.json"
+  },
+  "status": "external_identity_preflight_blocks_gate_keep_607",
+  "summary": {
+    "current_baseline": "deck_607",
+    "material_candidate_count": 14,
+    "commander_legal_count": 14,
+    "oracle_identity_ready_count": 7,
+    "oracle_identity_missing_count": 7,
+    "identity_ready_without_verified_rule_count": 6,
+    "runtime_or_manual_review_required_count": 2,
+    "shell_contract_required_count": 5,
+    "format_staple_candidate_count": 1,
+    "gate_ready_now_count": 0,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "recommended_next_action": "resolve_oracle_identity_then_split_runtime_shell_and_cut_safety_queues"
+  },
+  "preflight_rows": [
+    {
+      "card_name": "Anointed Procession",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "oracle_identity_ready": false,
+      "oracle_name": null,
+      "card_id": null,
+      "scryfall_id": null,
+      "color_identity_json": null,
+      "type_line": null,
+      "cmc": null,
+      "commander_legal_status": "legal",
+      "format_staple_rank": 341,
+      "format_staple_category": "",
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "identity_import_required",
+      "blockers": [
+        "oracle_identity_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Blackblade Reforged",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "oracle_identity_ready": true,
+      "oracle_name": "Blackblade Reforged",
+      "card_id": "17fcbe2d-c4f9-47a5-b5a3-6af2275db165",
+      "scryfall_id": "dca51281-fb21-45b6-beb4-1f13397caee2",
+      "color_identity_json": "[]",
+      "type_line": "Legendary Artifact \u2014 Equipment",
+      "cmc": 2.0,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "shell_contract_required_not_one_for_one_cut",
+      "blockers": [
+        "full_shell_contract_required",
+        "verified_battle_rule_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Brain in a Jar",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "oracle_identity_ready": false,
+      "oracle_name": null,
+      "card_id": null,
+      "scryfall_id": null,
+      "color_identity_json": null,
+      "type_line": null,
+      "cmc": null,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "identity_import_required",
+      "blockers": [
+        "oracle_identity_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Burning Prophet",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "oracle_identity_ready": true,
+      "oracle_name": "Burning Prophet",
+      "card_id": "ceea36ea-135c-4f9a-b5ca-abec5e15def4",
+      "scryfall_id": "1e462ce2-15d3-473c-8f48-9c9363fc65eb",
+      "color_identity_json": "[\"R\"]",
+      "type_line": "Creature \u2014 Human Wizard",
+      "cmc": 2.0,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "runtime_rule_or_manual_review_required",
+      "blockers": [
+        "verified_battle_rule_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Cathars' Crusade",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "oracle_identity_ready": true,
+      "oracle_name": "Cathars' Crusade",
+      "card_id": "0adc8298-b5f3-4101-a79b-24163345c54d",
+      "scryfall_id": "cc65ac73-5bef-4ecb-ad8e-39199084c027",
+      "color_identity_json": "[\"W\"]",
+      "type_line": "Enchantment",
+      "cmc": 5.0,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "shell_contract_required_not_one_for_one_cut",
+      "blockers": [
+        "full_shell_contract_required",
+        "verified_battle_rule_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Entreat the Angels",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "source_keys": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "oracle_identity_ready": false,
+      "oracle_name": null,
+      "card_id": null,
+      "scryfall_id": null,
+      "color_identity_json": null,
+      "type_line": null,
+      "cmc": null,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "identity_import_required",
+      "blockers": [
+        "oracle_identity_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Excalibur, Sword of Eden",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "oracle_identity_ready": true,
+      "oracle_name": "Excalibur, Sword of Eden",
+      "card_id": "05e98415-dd54-4de2-a849-47aa848d4de2",
+      "scryfall_id": "9fb6bd72-031b-40a1-83c5-8a1c82f84e12",
+      "color_identity_json": "[]",
+      "type_line": "Legendary Artifact \u2014 Equipment",
+      "cmc": 12.0,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "shell_contract_required_not_one_for_one_cut",
+      "blockers": [
+        "full_shell_contract_required",
+        "verified_battle_rule_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Haze of Rage",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "combo_package_research_only_requires_runtime_cut_and_battle_proof",
+      "source_keys": [
+        "commander_spellbook_storm_kiln_haze"
+      ],
+      "route_types": [
+        "combo_package"
+      ],
+      "oracle_identity_ready": false,
+      "oracle_name": null,
+      "card_id": null,
+      "scryfall_id": null,
+      "color_identity_json": null,
+      "type_line": null,
+      "cmc": null,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "identity_import_required_before_combo_runtime",
+      "blockers": [
+        "oracle_identity_missing",
+        "combo_runtime_unavailable_until_identity_exists"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Inti, Seneschal of the Sun",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "requires_import_or_identity_resolution_before_deckbuilding_test",
+      "source_keys": [
+        "edhrec_upgraded_spellslinger_current"
+      ],
+      "route_types": [
+        "reference_corpus"
+      ],
+      "oracle_identity_ready": true,
+      "oracle_name": "Inti, Seneschal of the Sun",
+      "card_id": "6f90ac54-f350-4671-9da7-ddd826468c77",
+      "scryfall_id": "176f5ba8-6e7b-4234-a298-b6164f51656f",
+      "color_identity_json": "[\"R\"]",
+      "type_line": "Legendary Creature \u2014 Human Knight",
+      "cmc": 2.0,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "runtime_rule_or_manual_review_required",
+      "blockers": [
+        "verified_battle_rule_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Karmic Guide",
+      "source_classification": "rule_known_external_not_in_lorehold_candidate_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "oracle_identity_ready": true,
+      "oracle_name": "Karmic Guide",
+      "card_id": "d2e5986e-7a3f-4a00-98b9-b60b67e7bd0d",
+      "scryfall_id": "8c31fec9-e4b3-4761-990e-7be38eb05604",
+      "color_identity_json": "[\"W\"]",
+      "type_line": "Creature \u2014 Angel Spirit",
+      "cmc": 5.0,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 1,
+      "verified_auto_rule_count": 1,
+      "battle_rules": [
+        {
+          "card_name": "Karmic Guide",
+          "logical_rule_key": "battle_rule_v1:f053ebb7e05bdedc8dc3afac3c33f777",
+          "review_status": "verified",
+          "execution_status": "auto"
+        }
+      ],
+      "preflight_status": "shell_contract_required_not_one_for_one_cut",
+      "blockers": [
+        "full_shell_contract_required"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Late to Dinner",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "oracle_identity_ready": false,
+      "oracle_name": null,
+      "card_id": null,
+      "scryfall_id": null,
+      "color_identity_json": null,
+      "type_line": null,
+      "cmc": null,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "identity_import_required",
+      "blockers": [
+        "oracle_identity_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Miraculous Recovery",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "oracle_identity_ready": false,
+      "oracle_name": null,
+      "card_id": null,
+      "scryfall_id": null,
+      "color_identity_json": null,
+      "type_line": null,
+      "cmc": null,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "identity_import_required",
+      "blockers": [
+        "oracle_identity_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Storm of Souls",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "card_kingdom_reanimator_direction"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "oracle_identity_ready": true,
+      "oracle_name": "Storm of Souls",
+      "card_id": "153cf728-f0fb-4482-ba9d-461de2549825",
+      "scryfall_id": "7022ae9a-2589-493b-a050-a230fd02f80b",
+      "color_identity_json": "[\"W\"]",
+      "type_line": "Sorcery",
+      "cmc": 6.0,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "shell_contract_required_not_one_for_one_cut",
+      "blockers": [
+        "full_shell_contract_required",
+        "verified_battle_rule_missing"
+      ],
+      "deck_test_allowed_now": false
+    },
+    {
+      "card_name": "Strata Scythe",
+      "source_classification": "external_missing_from_local_deck_pool",
+      "source_actionability": "archetype_fork_only_requires_full_shell_contract",
+      "source_keys": [
+        "coolstuffinc_token_combo_voltron_directions"
+      ],
+      "route_types": [
+        "archetype_fork"
+      ],
+      "oracle_identity_ready": false,
+      "oracle_name": null,
+      "card_id": null,
+      "scryfall_id": null,
+      "color_identity_json": null,
+      "type_line": null,
+      "cmc": null,
+      "commander_legal_status": "legal",
+      "format_staple_rank": null,
+      "format_staple_category": null,
+      "format_staple_banned": false,
+      "battle_rule_count": 0,
+      "verified_auto_rule_count": 0,
+      "battle_rules": [],
+      "preflight_status": "identity_import_required",
+      "blockers": [
+        "oracle_identity_missing"
+      ],
+      "deck_test_allowed_now": false
+    }
+  ],
+  "queues": {
+    "identity_import_required": [
+      "Anointed Procession",
+      "Brain in a Jar",
+      "Entreat the Angels",
+      "Haze of Rage",
+      "Late to Dinner",
+      "Miraculous Recovery",
+      "Strata Scythe"
+    ],
+    "runtime_or_manual_review_required": [
+      "Burning Prophet",
+      "Inti, Seneschal of the Sun"
+    ],
+    "shell_contract_required": [
+      "Blackblade Reforged",
+      "Cathars' Crusade",
+      "Excalibur, Sword of Eden",
+      "Karmic Guide",
+      "Storm of Souls"
+    ],
+    "cut_safety_contract_required": []
+  },
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "next_actions": [
+      "do_not_mutate_or_replace_deck_607",
+      "resolve missing Oracle identities before local materialization",
+      "separate full-shell archetype forks from single-card candidate work",
+      "add or review battle runtime only after identity is resolved",
+      "rerun cut-safety only after the candidate has identity and route classification"
+    ],
+    "reason": "The external material queue is legal in Commander, but it is not deck-test ready: several cards lack local Oracle identity, several identity-ready cards lack runtime/manual-review coverage, and the archetype-fork lanes are not one-for-one cuts from 607."
+  }
+}

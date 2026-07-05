@@ -333,3 +333,56 @@ Current conclusion remains unchanged: protected deck `607` is still the
 Lorehold champion. External evidence has expanded the learning queue, but the
 next valid step is `build_external_candidate_identity_import_preflight_before_any_new_gate`,
 not a natural battle or mutation of `607`.
+
+## External Candidate Identity Import Preflight - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_candidate_identity_import_preflight_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_candidate_identity_import_preflight_20260705_current.json`
+
+It consumes the external material scout and checks the `14` external material
+candidates against local Oracle identity, Commander legality, format-staple
+metadata, and verified battle-rule coverage.
+
+Current result:
+
+- status: `external_identity_preflight_blocks_gate_keep_607`;
+- material candidates: `14`;
+- Commander legal: `14`;
+- local Oracle identity ready: `7`;
+- local Oracle identity missing: `7`;
+- identity-ready without verified rule: `6`;
+- isolated runtime/manual-review queue: `2`;
+- full-shell contract queue: `5`;
+- gate-ready packages: `0`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`.
+
+Current queues:
+
+- `identity_import_required`: `Anointed Procession`, `Brain in a Jar`,
+  `Entreat the Angels`, `Haze of Rage`, `Late to Dinner`,
+  `Miraculous Recovery`, and `Strata Scythe`.
+- `runtime_or_manual_review_required`: `Burning Prophet` and
+  `Inti, Seneschal of the Sun`.
+- `shell_contract_required`: `Blackblade Reforged`, `Cathars' Crusade`,
+  `Excalibur, Sword of Eden`, `Karmic Guide`, and `Storm of Souls`.
+- `cut_safety_contract_required`: none.
+
+Interpretation:
+
+- All material candidates pass Commander legality, so the current blocker is
+  not color identity or legality.
+- Seven candidates cannot be materialized responsibly because local Oracle
+  identity is missing.
+- `Burning Prophet` and `Inti, Seneschal of the Sun` have local identity but
+  require runtime/manual-review work before any focused deck test.
+- The shell-contract queue is a deck-thesis question, not a one-card cut
+  question. It must not be routed into the exhausted one-for-one `607` swap
+  gate.
+
+Current conclusion remains unchanged: protected deck `607` is still the
+Lorehold champion. The next valid learning step is
+`resolve_oracle_identity_then_split_runtime_shell_and_cut_safety_queues`, with
+identity import/preflight before battle or mutation.
