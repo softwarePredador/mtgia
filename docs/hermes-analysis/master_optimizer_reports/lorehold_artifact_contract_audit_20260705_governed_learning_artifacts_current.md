@@ -1,8 +1,8 @@
 # Lorehold Artifact Contract Audit
 
-- Generated at: `2026-07-05T08:25:04.379473+00:00`
+- Generated at: `2026-07-05T08:31:04.364257+00:00`
 - Status: `pass`
-- Artifact count: `957`
+- Artifact count: `958`
 - Unknown/invalid artifacts: `0`
 - Artifact contract: `pass`
 - Deck universe: `pass`
@@ -77,6 +77,7 @@
 | `lorehold_brain_safe_cut_gap_audit` | 1 |
 | `lorehold_card_value_priority_synthesis` | 3 |
 | `lorehold_closing_window_next_shell_target_router` | 1 |
+| `lorehold_current_best_baseline_synthesis` | 1 |
 | `lorehold_current_champion_snapshot` | 2 |
 | `lorehold_cut_blocker_synthesis` | 1 |
 | `lorehold_deckbuilding_value_model` | 1 |

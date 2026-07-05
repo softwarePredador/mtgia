@@ -3373,9 +3373,9 @@ surface instead of leaving historical deckbuilding reports as unknown schemas:
 Current result:
 
 - status: `pass`;
-- artifact count: `957`;
+- artifact count: `958`;
 - unknown or invalid artifacts: `0`;
-- status counts: `956` pass and `1` warn;
+- status counts: `957` pass and `1` warn;
 - artifact contract: `pass`;
 - deck universe: `pass`;
 - current matrix: `pass`;
@@ -3396,5 +3396,49 @@ Deckbuilding lesson:
   does not mutate deck `607`.
 - A real deck change still requires an explicit promotion decision audit with
   `ready_for_real_deck_change=true`.
+
+Deck `607` remains untouched and protected.
+
+## Current Best Baseline Synthesis - 2026-07-05
+
+The current-best synthesis now checks whether any classified Lorehold artifact
+still authorizes promotion, materialization, a natural gate, or matrix-ready
+rows:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_current.json`
+
+Current result:
+
+- status: `current_best_baseline_synthesis_keep_607`;
+- artifact count: `958`;
+- unknown or invalid artifacts: `0`;
+- protected baseline rank: `1`;
+- strategy top deck is `607`: `true`;
+- current positive promotion/materialization signals: `0`;
+- historical positive signals overridden: `1`;
+- sidecar matrix-eligible rows: `0`;
+- sidecar safe-cut ready count: `0`;
+- floor trace cut blockers: `6`;
+- deck action allowed: `false`;
+- candidate deck materialization allowed now: `false`;
+- natural battle gate ready now: `false`;
+- promotion allowed: `false`.
+
+The only positive signal found is historical:
+`lorehold_ideal_candidate_decision_audit_20260629_v615_mana_engine_v1.json`
+had `ready_for_real_deck_change=true`, but it is overridden by
+`lorehold_cut_methodology_reaudit_20260629.json`, which marks the package as
+`battle_cleared_with_cut_methodology_caveat` and sets
+`ready_for_real_deck_change=false`.
+
+Deckbuilding lesson:
+
+- The artifact contract says the evidence surface is clean enough to run an
+  equal battle gate, but there is no current materializable candidate ready for
+  that gate.
+- The next valid path is a new shell contract or new cut evidence before any
+  battle run.
+- Under current evidence, `607` remains the best protected Lorehold baseline.
 
 Deck `607` remains untouched and protected.

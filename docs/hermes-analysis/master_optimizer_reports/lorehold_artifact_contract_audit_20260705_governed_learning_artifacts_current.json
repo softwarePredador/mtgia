@@ -3646,11 +3646,11 @@
         ],
         "source_db_mutated": false,
         "summary": {
-          "artifact_count": 956,
+          "artifact_count": 957,
           "classification_counts": {
             "access_cut_model": 13,
             "action_critic": 1,
-            "artifact_contract_audit": 18,
+            "artifact_contract_audit": 19,
             "battle_forensic": 3,
             "candidate_matrix": 42,
             "canonical_snapshot": 2,
@@ -3794,7 +3794,7 @@
             "variant_staging": 10
           },
           "status_counts": {
-            "pass": 955,
+            "pass": 956,
             "warn": 1
           },
           "unknown_or_invalid_count": 0
@@ -6554,6 +6554,45 @@
       "file_name": "lorehold_currency_converter_monument_gate_20260630_goal_learning_critical_guard_20260630_212135_currency_converter_same_lane_benchmark_cut_monument_to_endurance.json",
       "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_currency_converter_monument_gate_20260630_goal_learning_critical_guard_20260630_212135_currency_converter_same_lane_benchmark_cut_monument_to_endurance.json",
       "schema_version": "equal_battle_gate_v1",
+      "status": "pass"
+    },
+    {
+      "artifact_kind": "lorehold_current_best_baseline_synthesis",
+      "canonical_summary": {
+        "artifact_type": "lorehold_current_best_baseline_synthesis",
+        "candidate_deck_materialization_allowed_now": false,
+        "decision_status": "current_best_baseline_synthesis_keep_607",
+        "deck_607_mutated": false,
+        "learning_domain": "general_learning",
+        "natural_battle_gate_allowed_now": false,
+        "postgres_writes": false,
+        "promotion_allowed_now": false,
+        "source_db_mutated": false,
+        "status": "current_best_baseline_synthesis_keep_607",
+        "summary": {
+          "artifact_contract_equal_battle_gate_allowed": true,
+          "artifact_contract_status": "pass",
+          "artifact_count": 957,
+          "current_positive_signal_count": 0,
+          "decision_status": "current_best_baseline_synthesis_keep_607",
+          "floor_trace_cut_blocker_count": 6,
+          "overridden_historical_positive_signal_count": 1,
+          "protected_baseline_rank": 1,
+          "ready_for_real_deck_change_from_artifact_gate": false,
+          "recommended_next_action": "define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate",
+          "sidecar_candidate_deck_materialization_allowed_now": false,
+          "sidecar_matrix_candidate_row_eligible_count": 0,
+          "sidecar_promotion_allowed_now": false,
+          "sidecar_safe_cut_ready_count": 0,
+          "top_deck_is_607": true,
+          "unknown_or_invalid_count": 0,
+          "validation_error_count": 0
+        }
+      },
+      "detail": "governed Lorehold learning artifact with explicit mutation flags",
+      "file_name": "lorehold_current_best_baseline_synthesis_20260705_current.json",
+      "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_current.json",
+      "schema_version": "lorehold_current_best_baseline_synthesis_governed_v1",
       "status": "pass"
     },
     {
@@ -48108,12 +48147,12 @@
     ],
     "status": "pass"
   },
-  "generated_at": "2026-07-05T08:25:04.379473+00:00",
+  "generated_at": "2026-07-05T08:31:04.364257+00:00",
   "postgres_writes": false,
   "source_db_mutated": false,
   "status": "pass",
   "summary": {
-    "artifact_count": 957,
+    "artifact_count": 958,
     "classification_counts": {
       "access_cut_model": 13,
       "action_critic": 1,
@@ -48153,6 +48192,7 @@
       "lorehold_brain_safe_cut_gap_audit": 1,
       "lorehold_card_value_priority_synthesis": 3,
       "lorehold_closing_window_next_shell_target_router": 1,
+      "lorehold_current_best_baseline_synthesis": 1,
       "lorehold_current_champion_snapshot": 2,
       "lorehold_cut_blocker_synthesis": 1,
       "lorehold_deckbuilding_value_model": 1,
@@ -48261,7 +48301,7 @@
       "variant_staging": 10
     },
     "status_counts": {
-      "pass": 956,
+      "pass": 957,
       "warn": 1
     },
     "unknown_or_invalid_count": 0

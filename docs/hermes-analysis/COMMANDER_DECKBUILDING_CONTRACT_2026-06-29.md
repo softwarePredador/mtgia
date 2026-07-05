@@ -1586,8 +1586,8 @@ Governed learning artifact audit generated on 2026-07-05:
 - Status: `pass`.
 - Scope: classify all current local `lorehold*.json` artifacts without deleting
   historical evidence or flattening schemas into one shape.
-- Current counts: `artifact_count=957`, `unknown_or_invalid_count=0`,
-  `status_counts={"pass": 956, "warn": 1}`.
+- Current counts: `artifact_count=958`, `unknown_or_invalid_count=0`,
+  `status_counts={"pass": 957, "warn": 1}`.
 - The single warning is the historical
   `lorehold_role_tag_repair_synthesis_20260704_applied.json`, which declares
   `source_db_mutated=true`; it is now visible as a governed historical mutation
@@ -1605,6 +1605,40 @@ Operational lesson:
 - Passing the artifact contract means the deckbuilder can trust the evidence
   surface enough to run further gates; it does not authorize a 607 mutation or
   a promotion.
+
+Current-best baseline synthesis generated on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_current.json`.
+- Status:
+  `current_best_baseline_synthesis_keep_607`.
+- Scope: scan the governed Lorehold evidence surface for any still-active
+  promotion, candidate materialization, natural-gate, or matrix-ready signal.
+- Current counts: `artifact_count=958`, `unknown_or_invalid_count=0`,
+  `protected_baseline_rank=1`, `top_deck_is_607=true`,
+  `current_positive_signal_count=0`,
+  `overridden_historical_positive_signal_count=1`,
+  `sidecar_matrix_candidate_row_eligible_count=0`,
+  `sidecar_safe_cut_ready_count=0`, and `floor_trace_cut_blocker_count=6`.
+- The one historical positive signal is
+  `lorehold_ideal_candidate_decision_audit_20260629_v615_mana_engine_v1.json`;
+  it is overridden by `lorehold_cut_methodology_reaudit_20260629.json`, which
+  sets `ready_for_real_deck_change=false` and keeps the package only as
+  `battle_cleared_with_cut_methodology_caveat`.
+- Decision: keep `607` as the current best protected baseline. Deck action,
+  candidate materialization, natural battle gate, and promotion are all
+  `false` until a new shell contract or new cut evidence creates a
+  materializable candidate.
+
+Operational lesson:
+
+- `can_run_equal_battle_gate=true` from the artifact contract means the
+  evidence surface is trusted enough for a gate. It does not mean there is a
+  current candidate ready to battle.
+- Before any battle run, the system must first create a materializable
+  candidate contract from new shell evidence or new cut evidence.
 
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.
