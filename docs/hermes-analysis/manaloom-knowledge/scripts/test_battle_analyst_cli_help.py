@@ -27,6 +27,27 @@ class BattleAnalystCliHelpTests(unittest.TestCase):
         self.assertNotIn("BATTLE ANALYST v8", completed.stdout)
         self.assertNotIn("Using", completed.stdout)
 
+    def test_target_player_name_is_commander_specific(self) -> None:
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys; "
+                    f"sys.path.insert(0, {str(SCRIPT_DIR)!r}); "
+                    "import battle_analyst_v9 as b; "
+                    "print(b.target_player_name_for_commander({'name':'Kaalia of the Vast'})); "
+                    "print(b.target_player_name_for_commander({'name':'Lorehold, the Historian'}))"
+                ),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(completed.returncode, 0, msg=completed.stderr)
+        self.assertEqual(completed.stdout.splitlines(), ["Kaalia of the Vast", "Lorehold"])
+
 
 if __name__ == "__main__":
     unittest.main()
