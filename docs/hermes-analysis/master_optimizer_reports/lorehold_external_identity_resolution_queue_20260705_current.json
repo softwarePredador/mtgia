@@ -1,0 +1,333 @@
+{
+  "generated_at": "2026-07-05T01:41:32Z",
+  "artifact_type": "lorehold_external_identity_resolution_queue",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "deck_607_mutated": false,
+  "apply_sqlite_allowed_now": false,
+  "source_reports": {
+    "identity_import_preflight": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_candidate_identity_import_preflight_20260705_current.json"
+  },
+  "status": "external_identity_resolution_ready_for_apply_plan_keep_607",
+  "summary": {
+    "current_baseline": "deck_607",
+    "identity_queue_count": 7,
+    "scryfall_found_count": 7,
+    "commander_legal_count": 7,
+    "lorehold_color_identity_compatible_count": 7,
+    "cache_insert_ready_count": 7,
+    "deck_test_ready_count": 0,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "recommended_next_action": "prepare_reviewed_sqlite_identity_cache_apply_package_without_deck_mutation"
+  },
+  "resolution_rows": [
+    {
+      "card_name": "Anointed Procession",
+      "source_preflight_status": "identity_import_required",
+      "route_types": [
+        "archetype_fork"
+      ],
+      "lookup": {
+        "lookup_status": "found",
+        "name": "Anointed Procession",
+        "oracle_id": "7246d45b-2185-4cdd-981b-5419b7d52bce",
+        "scryfall_id": "9a52c265-6920-4929-ba0a-70da08df01f1",
+        "mana_cost": "{3}{W}",
+        "cmc": 4.0,
+        "type_line": "Enchantment",
+        "oracle_text": "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead.",
+        "colors": [
+          "W"
+        ],
+        "color_identity": [
+          "W"
+        ],
+        "keywords": [],
+        "legalities": {
+          "commander": "legal"
+        },
+        "scryfall_uri": "https://scryfall.com/card/akh/2/anointed-procession?utm_source=api",
+        "scryfall_api_url": "https://api.scryfall.com/cards/named?exact=Anointed+Procession"
+      },
+      "scryfall_lookup_status": "found",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true,
+      "cache_insert_ready": true,
+      "post_import_status": "identity_ready_then_shell_contract_required",
+      "deck_test_allowed_after_identity": false,
+      "blockers": [
+        "full_shell_contract_still_required"
+      ]
+    },
+    {
+      "card_name": "Brain in a Jar",
+      "source_preflight_status": "identity_import_required",
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "lookup": {
+        "lookup_status": "found",
+        "name": "Brain in a Jar",
+        "oracle_id": "321dbd10-1d48-49fc-ba6a-1df241a53338",
+        "scryfall_id": "88ecfcbe-e8db-4f08-aa8b-5b7b3e6c6ce7",
+        "mana_cost": "{2}",
+        "cmc": 2.0,
+        "type_line": "Artifact",
+        "oracle_text": "{1}, {T}: Put a charge counter on this artifact, then you may cast an instant or sorcery spell with mana value equal to the number of charge counters on this artifact from your hand without paying its mana cost.\n{3}, {T}, Remove X charge counters from this artifact: Scry X.",
+        "colors": [],
+        "color_identity": [],
+        "keywords": [
+          "Scry"
+        ],
+        "legalities": {
+          "commander": "legal"
+        },
+        "scryfall_uri": "https://scryfall.com/card/soi/252/brain-in-a-jar?utm_source=api",
+        "scryfall_api_url": "https://api.scryfall.com/cards/named?exact=Brain+in+a+Jar"
+      },
+      "scryfall_lookup_status": "found",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true,
+      "cache_insert_ready": true,
+      "post_import_status": "identity_ready_then_runtime_or_cut_safety_required",
+      "deck_test_allowed_after_identity": false,
+      "blockers": [
+        "runtime_or_cut_safety_still_required"
+      ]
+    },
+    {
+      "card_name": "Entreat the Angels",
+      "source_preflight_status": "identity_import_required",
+      "route_types": [
+        "topdeck_pressure_reference"
+      ],
+      "lookup": {
+        "lookup_status": "found",
+        "name": "Entreat the Angels",
+        "oracle_id": "b349f018-c20b-48b0-9e65-d5fd56b24b88",
+        "scryfall_id": "ff4411bc-ed4e-4d54-9e1b-21fc77b0e415",
+        "mana_cost": "{X}{X}{W}{W}{W}",
+        "cmc": 3.0,
+        "type_line": "Sorcery",
+        "oracle_text": "Create X 4/4 white Angel creature tokens with flying.\nMiracle {X}{W}{W} (You may cast this card for its miracle cost when you draw it if it's the first card you drew this turn.)",
+        "colors": [
+          "W"
+        ],
+        "color_identity": [
+          "W"
+        ],
+        "keywords": [
+          "Miracle"
+        ],
+        "legalities": {
+          "commander": "legal"
+        },
+        "scryfall_uri": "https://scryfall.com/card/dsc/99/entreat-the-angels?utm_source=api",
+        "scryfall_api_url": "https://api.scryfall.com/cards/named?exact=Entreat+the+Angels"
+      },
+      "scryfall_lookup_status": "found",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true,
+      "cache_insert_ready": true,
+      "post_import_status": "identity_ready_then_runtime_or_cut_safety_required",
+      "deck_test_allowed_after_identity": false,
+      "blockers": [
+        "runtime_or_cut_safety_still_required"
+      ]
+    },
+    {
+      "card_name": "Haze of Rage",
+      "source_preflight_status": "identity_import_required_before_combo_runtime",
+      "route_types": [
+        "combo_package"
+      ],
+      "lookup": {
+        "lookup_status": "found",
+        "name": "Haze of Rage",
+        "oracle_id": "f17d0fb8-c157-43b8-be26-f5ba4c6aed14",
+        "scryfall_id": "c344b885-68c6-43d2-b6c1-6c89b3c94983",
+        "mana_cost": "{1}{R}",
+        "cmc": 2.0,
+        "type_line": "Sorcery",
+        "oracle_text": "Buyback {2} (You may pay an additional {2} as you cast this spell. If you do, put this card into your hand as it resolves.)\nCreatures you control get +1/+0 until end of turn.\nStorm (When you cast this spell, copy it for each spell cast before it this turn.)",
+        "colors": [
+          "R"
+        ],
+        "color_identity": [
+          "R"
+        ],
+        "keywords": [
+          "Storm",
+          "Buyback"
+        ],
+        "legalities": {
+          "commander": "legal"
+        },
+        "scryfall_uri": "https://scryfall.com/card/tsr/169/haze-of-rage?utm_source=api",
+        "scryfall_api_url": "https://api.scryfall.com/cards/named?exact=Haze+of+Rage"
+      },
+      "scryfall_lookup_status": "found",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true,
+      "cache_insert_ready": true,
+      "post_import_status": "identity_ready_then_combo_runtime_and_cut_safety_required",
+      "deck_test_allowed_after_identity": false,
+      "blockers": [
+        "combo_runtime_and_cut_safety_still_required"
+      ]
+    },
+    {
+      "card_name": "Late to Dinner",
+      "source_preflight_status": "identity_import_required",
+      "route_types": [
+        "archetype_fork"
+      ],
+      "lookup": {
+        "lookup_status": "found",
+        "name": "Late to Dinner",
+        "oracle_id": "31bf199b-dfb1-428e-96a5-eb25104e2b43",
+        "scryfall_id": "6633cab9-23f9-474e-96f1-ca7c0c67691c",
+        "mana_cost": "{3}{W}",
+        "cmc": 4.0,
+        "type_line": "Sorcery",
+        "oracle_text": "Return target creature card from your graveyard to the battlefield. Create a Food token. (It's an artifact with \"{2}, {T}, Sacrifice this token: You gain 3 life.\")",
+        "colors": [
+          "W"
+        ],
+        "color_identity": [
+          "W"
+        ],
+        "keywords": [
+          "Food"
+        ],
+        "legalities": {
+          "commander": "legal"
+        },
+        "scryfall_uri": "https://scryfall.com/card/mh2/19/late-to-dinner?utm_source=api",
+        "scryfall_api_url": "https://api.scryfall.com/cards/named?exact=Late+to+Dinner"
+      },
+      "scryfall_lookup_status": "found",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true,
+      "cache_insert_ready": true,
+      "post_import_status": "identity_ready_then_shell_contract_required",
+      "deck_test_allowed_after_identity": false,
+      "blockers": [
+        "full_shell_contract_still_required"
+      ]
+    },
+    {
+      "card_name": "Miraculous Recovery",
+      "source_preflight_status": "identity_import_required",
+      "route_types": [
+        "archetype_fork"
+      ],
+      "lookup": {
+        "lookup_status": "found",
+        "name": "Miraculous Recovery",
+        "oracle_id": "cea73a4b-e10a-4517-a92b-24a08321009f",
+        "scryfall_id": "2b3459d9-a667-4cee-9b39-844013576d0b",
+        "mana_cost": "{4}{W}",
+        "cmc": 5.0,
+        "type_line": "Instant",
+        "oracle_text": "Return target creature card from your graveyard to the battlefield. Put a +1/+1 counter on it.",
+        "colors": [
+          "W"
+        ],
+        "color_identity": [
+          "W"
+        ],
+        "keywords": [],
+        "legalities": {
+          "commander": "legal"
+        },
+        "scryfall_uri": "https://scryfall.com/card/uma/26/miraculous-recovery?utm_source=api",
+        "scryfall_api_url": "https://api.scryfall.com/cards/named?exact=Miraculous+Recovery"
+      },
+      "scryfall_lookup_status": "found",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true,
+      "cache_insert_ready": true,
+      "post_import_status": "identity_ready_then_shell_contract_required",
+      "deck_test_allowed_after_identity": false,
+      "blockers": [
+        "full_shell_contract_still_required"
+      ]
+    },
+    {
+      "card_name": "Strata Scythe",
+      "source_preflight_status": "identity_import_required",
+      "route_types": [
+        "archetype_fork"
+      ],
+      "lookup": {
+        "lookup_status": "found",
+        "name": "Strata Scythe",
+        "oracle_id": "a500b724-bf28-47a3-b434-6efdebbcc04c",
+        "scryfall_id": "4d623951-3896-494d-bcc5-6caf3cc74bc6",
+        "mana_cost": "{3}",
+        "cmc": 3.0,
+        "type_line": "Artifact \u2014 Equipment",
+        "oracle_text": "Imprint \u2014 When this Equipment enters, search your library for a land card, exile it, then shuffle.\nEquipped creature gets +1/+1 for each land on the battlefield with the same name as the exiled card.\nEquip {3}",
+        "colors": [],
+        "color_identity": [],
+        "keywords": [
+          "Equip",
+          "Imprint"
+        ],
+        "legalities": {
+          "commander": "legal"
+        },
+        "scryfall_uri": "https://scryfall.com/card/c14/274/strata-scythe?utm_source=api",
+        "scryfall_api_url": "https://api.scryfall.com/cards/named?exact=Strata+Scythe"
+      },
+      "scryfall_lookup_status": "found",
+      "commander_legal": true,
+      "lorehold_color_identity_compatible": true,
+      "cache_insert_ready": true,
+      "post_import_status": "identity_ready_then_shell_contract_required",
+      "deck_test_allowed_after_identity": false,
+      "blockers": [
+        "full_shell_contract_still_required"
+      ]
+    }
+  ],
+  "queues": {
+    "cache_insert_ready": [
+      "Anointed Procession",
+      "Brain in a Jar",
+      "Entreat the Angels",
+      "Haze of Rage",
+      "Late to Dinner",
+      "Miraculous Recovery",
+      "Strata Scythe"
+    ],
+    "combo_runtime_after_identity": [
+      "Haze of Rage"
+    ],
+    "shell_contract_after_identity": [
+      "Anointed Procession",
+      "Late to Dinner",
+      "Miraculous Recovery",
+      "Strata Scythe"
+    ],
+    "runtime_or_cut_safety_after_identity": [
+      "Brain in a Jar",
+      "Entreat the Angels"
+    ]
+  },
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "next_actions": [
+      "do_not_mutate_or_replace_deck_607",
+      "prepare reviewed SQLite identity cache apply package if local cache should be updated",
+      "after identity cache update, rerun identity/import preflight",
+      "route Haze of Rage to combo runtime only after identity exists locally",
+      "keep archetype-fork cards out of one-for-one 607 cut gates"
+    ],
+    "reason": "The missing identity queue can be resolved externally, but this report intentionally does not apply cache rows and no card becomes battle- or promotion-ready from identity alone."
+  }
+}

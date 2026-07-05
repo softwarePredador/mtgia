@@ -386,3 +386,51 @@ Current conclusion remains unchanged: protected deck `607` is still the
 Lorehold champion. The next valid learning step is
 `resolve_oracle_identity_then_split_runtime_shell_and_cut_safety_queues`, with
 identity import/preflight before battle or mutation.
+
+## External Identity Resolution Queue - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_resolution_queue_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_resolution_queue_20260705_current.json`
+
+It resolves the `7` missing identity cards through Scryfall and produces a
+report-only queue. It does not write SQLite, does not mutate `607`, and does
+not make any card battle-ready by itself.
+
+Current result:
+
+- status: `external_identity_resolution_ready_for_apply_plan_keep_607`;
+- identity queue: `7`;
+- Scryfall identities found: `7`;
+- Commander legal: `7`;
+- Lorehold color-identity compatible: `7`;
+- cache-insert ready: `7`;
+- deck-test ready: `0`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`.
+
+Cache identity queue:
+
+- `Anointed Procession`
+- `Brain in a Jar`
+- `Entreat the Angels`
+- `Haze of Rage`
+- `Late to Dinner`
+- `Miraculous Recovery`
+- `Strata Scythe`
+
+Post-identity routes:
+
+- `Haze of Rage`: combo runtime plus cut-safety route after identity exists
+  locally.
+- `Anointed Procession`, `Late to Dinner`, `Miraculous Recovery`, and
+  `Strata Scythe`: shell-contract route; keep them out of one-for-one `607`
+  swap gates.
+- `Brain in a Jar` and `Entreat the Angels`: runtime or cut-safety route after
+  identity exists locally.
+
+Current conclusion remains unchanged: protected deck `607` is still the
+Lorehold champion. The next valid step is
+`prepare_reviewed_sqlite_identity_cache_apply_package_without_deck_mutation`;
+identity readiness is not deck-promotion evidence.
