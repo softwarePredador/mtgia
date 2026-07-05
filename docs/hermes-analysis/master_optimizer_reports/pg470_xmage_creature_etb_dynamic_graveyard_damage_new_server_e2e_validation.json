@@ -1,0 +1,198 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T02:03:48.200983+00:00",
+  "manifest": "../../master_optimizer_reports/pg470_xmage_creature_etb_dynamic_graveyard_damage_new_server_manifest.json",
+  "package_id": "pg470_xmage_creature_etb_dynamic_graveyard_damage_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "card_name": "Cyclops Electromancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:38b4656bd20b7355310d44e4580bc6cc",
+          "oracle_hash": "6fa0a410670c7cae1dbe5a9aa56cc129",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "card_name": "Lotleth Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7a8697df610f35c9f5af7d1a0babeba2",
+          "oracle_hash": "87bb35781c7f441f3b92bd3ddd1332e5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "card_name": "Ossuary Rats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3c3475330943e9542421f2d7baafa684",
+          "oracle_hash": "efc330b3c7dad6d9bed7b84b60761592",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "card_name": "Warfire Javelineer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:38b4656bd20b7355310d44e4580bc6cc",
+          "oracle_hash": "6fa0a410670c7cae1dbe5a9aa56cc129",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "card_name": "Cyclops Electromancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:38b4656bd20b7355310d44e4580bc6cc",
+          "oracle_hash": "6fa0a410670c7cae1dbe5a9aa56cc129",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "card_name": "Lotleth Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7a8697df610f35c9f5af7d1a0babeba2",
+          "oracle_hash": "87bb35781c7f441f3b92bd3ddd1332e5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "card_name": "Ossuary Rats",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3c3475330943e9542421f2d7baafa684",
+          "oracle_hash": "efc330b3c7dad6d9bed7b84b60761592",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "card_name": "Warfire Javelineer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:38b4656bd20b7355310d44e4580bc6cc",
+          "oracle_hash": "6fa0a410670c7cae1dbe5a9aa56cc129",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cyclops Electromancer",
+          "logical_rule_key": "battle_rule_v1:38b4656bd20b7355310d44e4580bc6cc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lotleth Giant",
+          "logical_rule_key": "battle_rule_v1:7a8697df610f35c9f5af7d1a0babeba2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ossuary Rats",
+          "logical_rule_key": "battle_rule_v1:3c3475330943e9542421f2d7baafa684"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_dynamic_graveyard_count_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Warfire Javelineer",
+          "logical_rule_key": "battle_rule_v1:38b4656bd20b7355310d44e4580bc6cc"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Cyclops Electromancer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:38b4656bd20b7355310d44e4580bc6cc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lotleth Giant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7a8697df610f35c9f5af7d1a0babeba2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ossuary Rats",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3c3475330943e9542421f2d7baafa684"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Warfire Javelineer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:38b4656bd20b7355310d44e4580bc6cc"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

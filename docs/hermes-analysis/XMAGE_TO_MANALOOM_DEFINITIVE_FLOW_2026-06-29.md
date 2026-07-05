@@ -10782,6 +10782,52 @@ new server:
   `xmage_permanent_simple_activated_self_boost_until_eot`, and
   `xmage_simple_mana_source_with_etb_draw`, each with `4` cards.
 
+## 2026-07-05 PG470 Creature ETB Dynamic Graveyard Damage Closure
+
+- Closed the exact XMage creature enter-the-battlefield dynamic graveyard count
+  damage family as ManaLoom scope
+  `xmage_creature_etb_dynamic_graveyard_count_damage_v1`.
+- The selected package accepted local XMage creature sources whose executable
+  behavior is `EntersBattlefieldTriggeredAbility` with `DamageTargetEffect`,
+  preserving the ETB trigger, target constraints, graveyard-count filter, count
+  scope, and damage multiplier.
+- The batch covers `4` cards: Cyclops Electromancer, Lotleth Giant, Ossuary
+  Rats, and Warfire Javelineer.
+- Focused mapper/runtime tests covered the exact ETB damage model and package
+  generation; PG470 performed no code mutation. The focused test lane passed
+  `718` checks.
+- The PostgreSQL package promoted `4` cards. Precheck found `4` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` generated shadow
+  rows to deprecate; apply/postcheck verified `4/4` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `4` selected cards. Generic battle
+  scenario count remained `0`; ETB dynamic graveyard damage behavior remains
+  covered by focused runtime tests.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4507` PostgreSQL runtime rows, wrote `4499` SQLite runtime
+  rows, and exported `4474` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26379`, `xmage_authoritative_source_count=26065`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26065`. This is an exact
+  reduction of `4` from the post-PG469 queue.
+- The post-PG470 exact split recheck reports `proposal_count=40` and
+  `safe_for_batch_pg_package_count=40`. The largest remaining exact families
+  are `xmage_destroy_target_spell`,
+  `xmage_dynamic_graveyard_count_damage_spell`,
+  `xmage_permanent_simple_activated_self_boost_until_eot`,
+  `xmage_simple_mana_source_with_etb_draw`,
+  `xmage_fixed_damage_draw_card_spell`,
+  `xmage_fixed_target_player_draw_spell`, and `xmage_x_damage_spell`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
