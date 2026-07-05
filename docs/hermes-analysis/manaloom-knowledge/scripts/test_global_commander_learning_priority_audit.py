@@ -129,6 +129,65 @@ class GlobalCommanderLearningPriorityAuditTests(unittest.TestCase):
         self.assertEqual(report["deck_priorities"][1]["stage"], "benchmark_regression_review_only")
         self.assertEqual(report["method"]["lorehold_607_role"], "benchmark_regression_only_not_global_template")
 
+    def test_land_cut_pool_ready_updates_core_floor_next_action(self) -> None:
+        core_payload = {
+            "decks": [
+                {
+                    "deck_id": "612",
+                    "deck_name": "Lorehold Land Gap",
+                    "commander": "Lorehold, the Historian",
+                    "scope": "hermes_lorehold_variant",
+                    "shape_status": "structure_ready",
+                    "core_status": "core_role_gap",
+                    "role_bands": [
+                        {
+                            "role": "land",
+                            "count": 27,
+                            "min": 34,
+                            "max": 39,
+                            "severity": "critical",
+                            "status": "below_floor",
+                        }
+                    ],
+                }
+            ]
+        }
+        strategy_payload = {
+            "commanders": [
+                {
+                    "commander_key": "lorehold, the historian",
+                    "status": "structure_ready_source_missing",
+                    "source_lane_count": 0,
+                }
+            ]
+        }
+        land_cut_payload = {
+            "deck_cut_pools": [
+                {
+                    "deck_id": "612",
+                    "status": "review_cut_pool_ready",
+                    "cut_candidate_count": 3,
+                    "pair_hypotheses": [{"add": "Ash Barrens", "cut": "Pyromancer's Goggles"}],
+                }
+            ]
+        }
+
+        report = audit.build_report(
+            core_payload=core_payload,
+            strategy_payload=strategy_payload,
+            land_cut_payload=land_cut_payload,
+            bracket_status=audit.bracket_policy_status_from_text(""),
+            core_report_path=Path("docs/hermes-analysis/master_optimizer_reports/core.json"),
+            strategy_report_path=Path("docs/hermes-analysis/master_optimizer_reports/strategy.json"),
+            land_cut_report_path=Path("docs/hermes-analysis/master_optimizer_reports/cuts.json"),
+        )
+
+        [row] = report["deck_priorities"]
+        self.assertEqual(row["repair_gate_state"], "land_add_cut_pool_ready_review_only")
+        self.assertEqual(row["land_cut_candidate_count"], 3)
+        self.assertIn("review_top_land_add_cut_pair", row["next_action"])
+        self.assertEqual(report["summary"]["repair_gate_counts"]["land_add_cut_pool_ready_review_only"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

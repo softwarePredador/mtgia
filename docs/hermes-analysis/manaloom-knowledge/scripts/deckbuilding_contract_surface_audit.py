@@ -422,6 +422,8 @@ def build_audit() -> dict[str, Any]:
             [
                 "global_commander_learning_priority_audit",
                 "EXTERNAL_RESEARCH_SNAPSHOT",
+                "land_add_cut_pool_ready_review_only",
+                "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only",
                 "current_official_bracket_model_has_five_brackets_and_game_changers",
                 "benchmark_regression_only_not_global_template",
                 "battle_or_optimization_performed",
