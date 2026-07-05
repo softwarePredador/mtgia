@@ -18,14 +18,13 @@
     "natural_battle_allowed_now": false,
     "next_actions": [
       "do_not_mutate_deck_607",
-      "do_not_generate_brain_pg_package_until_adapter_and_focused_tests_exist",
-      "implement_brain_in_a_jar_runtime_adapter_no_deck_action",
-      "rerun_brain_runtime_cut_preflight_after_adapter"
+      "prepare_brain_in_a_jar_pg_package_precheck_no_deck_action",
+      "rerun_brain_runtime_cut_preflight_after_pg_package_review"
     ],
     "postgres_writes_allowed": false,
     "preflight_required_after_adapter": true,
     "promotion_allowed": false,
-    "reason": "The exact Brain runtime contract is now explicit, but the current battle runtime does not expose the Brain-specific adapter. Deck 607 therefore remains protected and Brain cannot enter candidate scoring, PostgreSQL packaging, or battle.",
+    "reason": "The exact Brain runtime contract is explicit and the ManaLoom adapter is detectable, but protected deck 607 still cannot use Brain until an active PostgreSQL rule and a seed-safe same-lane cut exist.",
     "runtime_adapter_required_before_pg_package": false,
     "safe_cut_still_required": true
   },
@@ -157,7 +156,7 @@
       "starting_brain_charge_counters": 3
     }
   ],
-  "generated_at": "2026-07-05T05:30:17Z",
+  "generated_at": "2026-07-05T05:43:58Z",
   "missing_xmage_signals": [],
   "postgres_writes": false,
   "source_db_mutated": false,

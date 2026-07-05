@@ -1,6 +1,6 @@
 # Lorehold Brain in a Jar Exact Runtime Contract
 
-- Generated at: `2026-07-05T05:30:17Z`
+- Generated at: `2026-07-05T05:43:58Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
@@ -57,9 +57,8 @@
 - postgres_writes_allowed: `false`
 - runtime_adapter_required_before_pg_package: `false`
 - safe_cut_still_required: `true`
-- reason: The exact Brain runtime contract is now explicit, but the current battle runtime does not expose the Brain-specific adapter. Deck 607 therefore remains protected and Brain cannot enter candidate scoring, PostgreSQL packaging, or battle.
+- reason: The exact Brain runtime contract is explicit and the ManaLoom adapter is detectable, but protected deck 607 still cannot use Brain until an active PostgreSQL rule and a seed-safe same-lane cut exist.
 - next_actions:
   - do_not_mutate_deck_607
-  - do_not_generate_brain_pg_package_until_adapter_and_focused_tests_exist
-  - implement_brain_in_a_jar_runtime_adapter_no_deck_action
-  - rerun_brain_runtime_cut_preflight_after_adapter
+  - prepare_brain_in_a_jar_pg_package_precheck_no_deck_action
+  - rerun_brain_runtime_cut_preflight_after_pg_package_review

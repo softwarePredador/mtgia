@@ -95,6 +95,9 @@ def test_detected_adapter_changes_next_action_to_preflight() -> None:
     assert payload["summary"]["recommended_next_action"] == (
         "rerun_brain_runtime_cut_preflight_before_any_deck_action"
     )
+    assert payload["decision"]["runtime_adapter_required_before_pg_package"] is False
+    assert "adapter is detectable" in payload["decision"]["reason"]
+    assert "does not expose the Brain-specific adapter" not in payload["decision"]["reason"]
 
 
 def test_markdown_surfaces_closed_gates_and_test_vectors() -> None:

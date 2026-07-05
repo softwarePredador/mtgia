@@ -387,7 +387,7 @@
     "runtime_family_required_before_battle": false
   },
   "deck_607_mutated": false,
-  "generated_at": "2026-07-05T05:29:35Z",
+  "generated_at": "2026-07-05T05:44:03Z",
   "postgres_writes": false,
   "safe_same_lane_cut_candidates": [],
   "same_lane_cut_rows": [
@@ -744,7 +744,7 @@
       "effect_json_scope": "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1",
       "natural_battle_gate_allowed_now": false,
       "postgres_writes_allowed_now": false,
-      "prior_preflight_status": "brain_in_a_jar_runtime_cut_preflight_blocked_no_active_rule_no_safe_cut_keep_607",
+      "prior_preflight_status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607",
       "promotion_allowed_now": false,
       "recommended_next_action": "rerun_brain_runtime_cut_preflight_before_any_deck_action",
       "route_planner_selected_brain": true,

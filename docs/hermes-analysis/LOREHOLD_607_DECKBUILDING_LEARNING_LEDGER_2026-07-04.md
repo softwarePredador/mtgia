@@ -2247,3 +2247,83 @@ Operational lesson:
   explicitly approved and independently gated.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion.
+
+## Brain in a Jar PostgreSQL Package Preflight - 2026-07-05
+
+The Brain PostgreSQL package-preflight artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_pg_package_preflight_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_pg_package_preflight_20260705_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_pg_package_preflight_20260705_current_precheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_pg_package_preflight_20260705_current_apply.sql`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_pg_package_preflight_20260705_current_postcheck.sql`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_in_a_jar_pg_package_preflight_20260705_current_rollback.sql`
+
+This closes only the package-preparation step. It does not execute SQL, does
+not mutate PostgreSQL, does not sync Hermes SQLite, does not run battle, and
+does not modify protected deck `607`.
+
+Current package result:
+
+- decision status: `prepared_read_only_pending_apply_approval`;
+- apply ready for manual review: `true`;
+- apply executed by this script: `false`;
+- Brain exact adapter present: `true`;
+- active Brain rule rows before apply: `0`;
+- safe same-lane cuts before apply: `0`;
+- proposed scope:
+  `xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1`;
+- proposed logical rule key:
+  `battle_rule_v1:aedfa4929249f55c1d607effe109f3f3`;
+- Oracle hash:
+  `41468898bf6400763de517269fdeb456`;
+- PostgreSQL writes allowed now: `false`;
+- deck action allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- recommended next action:
+  `review_precheck_then_request_explicit_postgresql_apply_if_approved`.
+
+Package safety notes:
+
+- precheck validates a matching `public.cards` row through
+  `md5(coalesce(c.oracle_text, '')) = oracle_hash`;
+- apply upserts only the Brain exact rule and preserves existing nonmatching
+  Brain rows;
+- rollback deletes only the proposed Brain `logical_rule_key` and restores
+  the package backup rows;
+- the package records current Oracle/source learning, including that Brain's
+  first activation counts the newly added charge counter, casts at most one
+  matching instant/sorcery from hand, casts during ability resolution, and
+  still needs explicit follow-up for nontrivial additional-cost/X edge cases
+  before Brain can be used as broad deck-quality proof.
+
+Operational lesson:
+
+- Brain has moved from "runtime adapter present, product rule missing" to
+  "product rule package prepared but not applied."
+- Actual PostgreSQL apply remains approval-gated. Even after apply, Brain
+  still cannot enter Lorehold deck candidate materialization until a named
+  safe same-lane cut exists and the Brain preflight is rerun.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion.
+
+Validation after package generation:
+
+- `python3 -m pytest -q
+  docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_brain_in_a_jar_exact_runtime_contract.py
+  docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_brain_in_a_jar_runtime_cut_preflight.py
+  docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_brain_in_a_jar_pg_package_preflight.py`
+  returned `15 passed`;
+- `python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_brain_in_a_jar_runtime.py`
+  returned `PASS test_brain_in_a_jar_runtime`;
+- `python3 -m pytest -q
+  docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_exact_scope_runtime.py`
+  returned `281 passed, 3 subtests passed`;
+- `python3 -m pytest -q
+  docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_batch_pg_package_builder.py`
+  returned `15 passed`;
+- `deckbuilding_contract_surface_audit_20260705_brain_pg_package_current`,
+  `xmage_strategy_consistency_audit_20260705_brain_pg_package_current`,
+  `operational_surface_alignment_audit_20260705_brain_pg_package_current`,
+  and `legacy_contamination_audit_20260705_brain_pg_package_current` all
+  returned `pass`.

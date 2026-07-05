@@ -248,6 +248,30 @@ def build_report(
     status, next_action = decision_status(signals, surfaces)
     missing_signals = [name for name, present in signals.items() if not present]
     effect_json = build_effect_json()
+    adapter_present = bool(surfaces.get("brain_exact_scope_adapter"))
+    if adapter_present:
+        decision_reason = (
+            "The exact Brain runtime contract is explicit and the ManaLoom adapter "
+            "is detectable, but protected deck 607 still cannot use Brain until an "
+            "active PostgreSQL rule and a seed-safe same-lane cut exist."
+        )
+        decision_next_actions = [
+            "do_not_mutate_deck_607",
+            "prepare_brain_in_a_jar_pg_package_precheck_no_deck_action",
+            "rerun_brain_runtime_cut_preflight_after_pg_package_review",
+        ]
+    else:
+        decision_reason = (
+            "The exact Brain runtime contract is now explicit, but the current battle runtime "
+            "does not expose the Brain-specific adapter. Deck 607 therefore remains protected "
+            "and Brain cannot enter candidate scoring, PostgreSQL packaging, or battle."
+        )
+        decision_next_actions = [
+            "do_not_mutate_deck_607",
+            "do_not_generate_brain_pg_package_until_adapter_and_focused_tests_exist",
+            "implement_brain_in_a_jar_runtime_adapter_no_deck_action",
+            "rerun_brain_runtime_cut_preflight_after_adapter",
+        ]
     return {
         "generated_at": utc_now(),
         "artifact_type": "lorehold_brain_in_a_jar_exact_runtime_contract",
@@ -300,20 +324,11 @@ def build_report(
             "natural_battle_allowed_now": False,
             "promotion_allowed": False,
             "postgres_writes_allowed": False,
-            "runtime_adapter_required_before_pg_package": not bool(surfaces.get("brain_exact_scope_adapter")),
+            "runtime_adapter_required_before_pg_package": not adapter_present,
             "preflight_required_after_adapter": True,
             "safe_cut_still_required": True,
-            "reason": (
-                "The exact Brain runtime contract is now explicit, but the current battle runtime "
-                "does not expose the Brain-specific adapter. Deck 607 therefore remains protected "
-                "and Brain cannot enter candidate scoring, PostgreSQL packaging, or battle."
-            ),
-            "next_actions": [
-                "do_not_mutate_deck_607",
-                "do_not_generate_brain_pg_package_until_adapter_and_focused_tests_exist",
-                "implement_brain_in_a_jar_runtime_adapter_no_deck_action",
-                "rerun_brain_runtime_cut_preflight_after_adapter",
-            ],
+            "reason": decision_reason,
+            "next_actions": decision_next_actions,
         },
     }
 
