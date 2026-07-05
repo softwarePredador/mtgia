@@ -1,0 +1,1247 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg498_static_generic_cost_reductio_20260705_095259",
+  "deploy_id": "xmage_pg498_static_generic_cost_reduction_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Ballyrush Banneret",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d9038ce0eaf069a46c6adec11dfe830a",
+      "min_rule_version": 2,
+      "normalized_name": "ballyrush banneret",
+      "oracle_hash": "589c49cee1133cebf35e67323cdeb6ad",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bosk Banneret",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1082b4a59a4e4ab45b36cec3ceb31fd8",
+      "min_rule_version": 2,
+      "normalized_name": "bosk banneret",
+      "oracle_hash": "d3324f2d1b46468d7f05127501069a3d",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragonlord's Servant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ec77f894d6594b7dd449e88da78f7a8e",
+      "min_rule_version": 2,
+      "normalized_name": "dragonlord's servant",
+      "oracle_hash": "993790878a196bc1041b1293108367cb",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragonspeaker Shaman",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3a0439051970f6c4ec1bf8ffc0efe3e3",
+      "min_rule_version": 2,
+      "normalized_name": "dragonspeaker shaman",
+      "oracle_hash": "d684de81aea07cbc6905869004f5aeb4",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Emerald Medallion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d1575b7e349debdcc00cb11a81a98d63",
+      "min_rule_version": 2,
+      "normalized_name": "emerald medallion",
+      "oracle_hash": "64d37738e6d200489451c7be9b5da3c9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Etherium Sculptor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "min_rule_version": 2,
+      "normalized_name": "etherium sculptor",
+      "oracle_hash": "ea60d391afb6f2d73cdd177b45a726b7",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Foundry Inspector",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "min_rule_version": 2,
+      "normalized_name": "foundry inspector",
+      "oracle_hash": "ea60d391afb6f2d73cdd177b45a726b7",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Anarchomancer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:69dcc05d941ebeb0ff30d84d2f79a2a4",
+      "min_rule_version": 2,
+      "normalized_name": "goblin anarchomancer",
+      "oracle_hash": "7791d9cf6f6733acb73703aaf966ec7a",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Electromancer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:97742df754bd4727c76acdff9b052bcd",
+      "min_rule_version": 2,
+      "normalized_name": "goblin electromancer",
+      "oracle_hash": "08a5f3901b3bc8297adecdc0e40b934d",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jet Medallion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:60eb5ad36259e78de7afd7602355822d",
+      "min_rule_version": 2,
+      "normalized_name": "jet medallion",
+      "oracle_hash": "235bf306c30e7aa38b4ff6eb6f9c9b60",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kinjalli's Caller",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24778ef9c8f9902d9cc486d10184fcf8",
+      "min_rule_version": 2,
+      "normalized_name": "kinjalli's caller",
+      "oracle_hash": "ebac3e19b660e42254f82764f5f431c5",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Knight of the Stampede",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5391f735165a635c5529d0516f52b32",
+      "min_rule_version": 2,
+      "normalized_name": "knight of the stampede",
+      "oracle_hash": "4aff3918f7e6039d76a78942acd0e9c3",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Krosan Drover",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f65dffd9475e2bf6158dc2953ed0c0c0",
+      "min_rule_version": 2,
+      "normalized_name": "krosan drover",
+      "oracle_hash": "c892e97e4e4ac391aca9f3ea98214475",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mana Matrix",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65c4b5011824391362541154c43048dd",
+      "min_rule_version": 2,
+      "normalized_name": "mana matrix",
+      "oracle_hash": "6971bbb583a7cb8107874e1134765dc0",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Planar Gate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b544492e418127e41bca5abc1a8b4f89",
+      "min_rule_version": 2,
+      "normalized_name": "planar gate",
+      "oracle_hash": "82947868876564380f84066647d242fa",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sapphire Medallion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f00d642df9881613f42056f752390e6f",
+      "min_rule_version": 2,
+      "normalized_name": "sapphire medallion",
+      "oracle_hash": "ce0b6343ccf5f7701f575fb94834a23c",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Starnheim Aspirant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8dd17b96b2f406548230a80e7cb721c",
+      "min_rule_version": 2,
+      "normalized_name": "starnheim aspirant",
+      "oracle_hash": "b1dfb8cd144123ab09f7bde37fed9cf4",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stinkdrinker Daredevil",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:40afd6630f0f910d931a3c03a6ccef2a",
+      "min_rule_version": 2,
+      "normalized_name": "stinkdrinker daredevil",
+      "oracle_hash": "e6eeeb0647bed579b15b973498287c81",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stone Calendar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6abb2de88eac5fd4d683b0b51d82401a",
+      "min_rule_version": 2,
+      "normalized_name": "stone calendar",
+      "oracle_hash": "a44e1e3215d3972e3634f7d0eeef2791",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thornscape Familiar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:04cc4c542745fa6b0f95ee27afa30335",
+      "min_rule_version": 2,
+      "normalized_name": "thornscape familiar",
+      "oracle_hash": "e77945e49db81da34c5c87bba147020a",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voyager Quickwelder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "min_rule_version": 2,
+      "normalized_name": "voyager quickwelder",
+      "oracle_hash": "ea60d391afb6f2d73cdd177b45a726b7",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_generic_cost_reduction_for_matching_spells": 21
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T09:53:00+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Ballyrush Banneret"
+      },
+      "card_name": "Ballyrush Banneret",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d9038ce0eaf069a46c6adec11dfe830a",
+      "normalized_name": "ballyrush banneret",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Bosk Banneret"
+      },
+      "card_name": "Bosk Banneret",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1082b4a59a4e4ab45b36cec3ceb31fd8",
+      "normalized_name": "bosk banneret",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Dragonlord's Servant"
+      },
+      "card_name": "Dragonlord's Servant",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ec77f894d6594b7dd449e88da78f7a8e",
+      "normalized_name": "dragonlord's servant",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Dragonspeaker Shaman"
+      },
+      "card_name": "Dragonspeaker Shaman",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3a0439051970f6c4ec1bf8ffc0efe3e3",
+      "normalized_name": "dragonspeaker shaman",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Emerald Medallion"
+      },
+      "card_name": "Emerald Medallion",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d1575b7e349debdcc00cb11a81a98d63",
+      "normalized_name": "emerald medallion",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Etherium Sculptor"
+      },
+      "card_name": "Etherium Sculptor",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "normalized_name": "etherium sculptor",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Foundry Inspector"
+      },
+      "card_name": "Foundry Inspector",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "normalized_name": "foundry inspector",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Goblin Anarchomancer"
+      },
+      "card_name": "Goblin Anarchomancer",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:69dcc05d941ebeb0ff30d84d2f79a2a4",
+      "normalized_name": "goblin anarchomancer",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Goblin Electromancer"
+      },
+      "card_name": "Goblin Electromancer",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:97742df754bd4727c76acdff9b052bcd",
+      "normalized_name": "goblin electromancer",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Jet Medallion"
+      },
+      "card_name": "Jet Medallion",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:60eb5ad36259e78de7afd7602355822d",
+      "normalized_name": "jet medallion",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kinjalli's Caller"
+      },
+      "card_name": "Kinjalli's Caller",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24778ef9c8f9902d9cc486d10184fcf8",
+      "normalized_name": "kinjalli's caller",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Knight of the Stampede"
+      },
+      "card_name": "Knight of the Stampede",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5391f735165a635c5529d0516f52b32",
+      "normalized_name": "knight of the stampede",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Krosan Drover"
+      },
+      "card_name": "Krosan Drover",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f65dffd9475e2bf6158dc2953ed0c0c0",
+      "normalized_name": "krosan drover",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mana Matrix"
+      },
+      "card_name": "Mana Matrix",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65c4b5011824391362541154c43048dd",
+      "normalized_name": "mana matrix",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Planar Gate"
+      },
+      "card_name": "Planar Gate",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b544492e418127e41bca5abc1a8b4f89",
+      "normalized_name": "planar gate",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sapphire Medallion"
+      },
+      "card_name": "Sapphire Medallion",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f00d642df9881613f42056f752390e6f",
+      "normalized_name": "sapphire medallion",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Starnheim Aspirant"
+      },
+      "card_name": "Starnheim Aspirant",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8dd17b96b2f406548230a80e7cb721c",
+      "normalized_name": "starnheim aspirant",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Stinkdrinker Daredevil"
+      },
+      "card_name": "Stinkdrinker Daredevil",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:40afd6630f0f910d931a3c03a6ccef2a",
+      "normalized_name": "stinkdrinker daredevil",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 2,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Stone Calendar"
+      },
+      "card_name": "Stone Calendar",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6abb2de88eac5fd4d683b0b51d82401a",
+      "normalized_name": "stone calendar",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "artifact",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Thornscape Familiar"
+      },
+      "card_name": "Thornscape Familiar",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:04cc4c542745fa6b0f95ee27afa30335",
+      "normalized_name": "thornscape familiar",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Voyager Quickwelder"
+      },
+      "card_name": "Voyager Quickwelder",
+      "effect": "static_cost_reduction",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "normalized_name": "voyager quickwelder",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+        "cost_reduction_amount_source": "fixed",
+        "cost_reduction_applies_to": "spells_you_cast",
+        "cost_reduction_generic": 1,
+        "effect": "static_cost_reduction",
+        "permanent_type": "creature",
+        "static_effect": "generic_cost_reduction_for_matching_spells",
+        "xmage_ability_class": "SimpleStaticAbility",
+        "xmage_effect_class": "SpellsCostReductionControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Ballyrush Banneret",
+    "Bosk Banneret",
+    "Dragonlord's Servant",
+    "Dragonspeaker Shaman",
+    "Emerald Medallion",
+    "Etherium Sculptor",
+    "Foundry Inspector",
+    "Goblin Anarchomancer",
+    "Goblin Electromancer",
+    "Jet Medallion",
+    "Kinjalli's Caller",
+    "Knight of the Stampede",
+    "Krosan Drover",
+    "Mana Matrix",
+    "Planar Gate",
+    "Sapphire Medallion",
+    "Starnheim Aspirant",
+    "Stinkdrinker Daredevil",
+    "Stone Calendar",
+    "Thornscape Familiar",
+    "Voyager Quickwelder"
+  ],
+  "selected_count": 21,
+  "slug": "xmage_pg498_static_generic_cost_reduction_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Ballyrush Banneret",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d9038ce0eaf069a46c6adec11dfe830a",
+      "min_rule_version": 2,
+      "normalized_name": "ballyrush banneret",
+      "oracle_hash": "589c49cee1133cebf35e67323cdeb6ad",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bosk Banneret",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1082b4a59a4e4ab45b36cec3ceb31fd8",
+      "min_rule_version": 2,
+      "normalized_name": "bosk banneret",
+      "oracle_hash": "d3324f2d1b46468d7f05127501069a3d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragonlord's Servant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ec77f894d6594b7dd449e88da78f7a8e",
+      "min_rule_version": 2,
+      "normalized_name": "dragonlord's servant",
+      "oracle_hash": "993790878a196bc1041b1293108367cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragonspeaker Shaman",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3a0439051970f6c4ec1bf8ffc0efe3e3",
+      "min_rule_version": 2,
+      "normalized_name": "dragonspeaker shaman",
+      "oracle_hash": "d684de81aea07cbc6905869004f5aeb4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Emerald Medallion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d1575b7e349debdcc00cb11a81a98d63",
+      "min_rule_version": 2,
+      "normalized_name": "emerald medallion",
+      "oracle_hash": "64d37738e6d200489451c7be9b5da3c9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Etherium Sculptor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "min_rule_version": 2,
+      "normalized_name": "etherium sculptor",
+      "oracle_hash": "ea60d391afb6f2d73cdd177b45a726b7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Foundry Inspector",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "min_rule_version": 2,
+      "normalized_name": "foundry inspector",
+      "oracle_hash": "ea60d391afb6f2d73cdd177b45a726b7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Anarchomancer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:69dcc05d941ebeb0ff30d84d2f79a2a4",
+      "min_rule_version": 2,
+      "normalized_name": "goblin anarchomancer",
+      "oracle_hash": "7791d9cf6f6733acb73703aaf966ec7a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Electromancer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:97742df754bd4727c76acdff9b052bcd",
+      "min_rule_version": 2,
+      "normalized_name": "goblin electromancer",
+      "oracle_hash": "08a5f3901b3bc8297adecdc0e40b934d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jet Medallion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:60eb5ad36259e78de7afd7602355822d",
+      "min_rule_version": 2,
+      "normalized_name": "jet medallion",
+      "oracle_hash": "235bf306c30e7aa38b4ff6eb6f9c9b60",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kinjalli's Caller",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24778ef9c8f9902d9cc486d10184fcf8",
+      "min_rule_version": 2,
+      "normalized_name": "kinjalli's caller",
+      "oracle_hash": "ebac3e19b660e42254f82764f5f431c5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Knight of the Stampede",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e5391f735165a635c5529d0516f52b32",
+      "min_rule_version": 2,
+      "normalized_name": "knight of the stampede",
+      "oracle_hash": "4aff3918f7e6039d76a78942acd0e9c3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Krosan Drover",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f65dffd9475e2bf6158dc2953ed0c0c0",
+      "min_rule_version": 2,
+      "normalized_name": "krosan drover",
+      "oracle_hash": "c892e97e4e4ac391aca9f3ea98214475",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mana Matrix",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65c4b5011824391362541154c43048dd",
+      "min_rule_version": 2,
+      "normalized_name": "mana matrix",
+      "oracle_hash": "6971bbb583a7cb8107874e1134765dc0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Planar Gate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b544492e418127e41bca5abc1a8b4f89",
+      "min_rule_version": 2,
+      "normalized_name": "planar gate",
+      "oracle_hash": "82947868876564380f84066647d242fa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sapphire Medallion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f00d642df9881613f42056f752390e6f",
+      "min_rule_version": 2,
+      "normalized_name": "sapphire medallion",
+      "oracle_hash": "ce0b6343ccf5f7701f575fb94834a23c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Starnheim Aspirant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8dd17b96b2f406548230a80e7cb721c",
+      "min_rule_version": 2,
+      "normalized_name": "starnheim aspirant",
+      "oracle_hash": "b1dfb8cd144123ab09f7bde37fed9cf4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stinkdrinker Daredevil",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:40afd6630f0f910d931a3c03a6ccef2a",
+      "min_rule_version": 2,
+      "normalized_name": "stinkdrinker daredevil",
+      "oracle_hash": "e6eeeb0647bed579b15b973498287c81",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stone Calendar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6abb2de88eac5fd4d683b0b51d82401a",
+      "min_rule_version": 2,
+      "normalized_name": "stone calendar",
+      "oracle_hash": "a44e1e3215d3972e3634f7d0eeef2791",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thornscape Familiar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:04cc4c542745fa6b0f95ee27afa30335",
+      "min_rule_version": 2,
+      "normalized_name": "thornscape familiar",
+      "oracle_hash": "e77945e49db81da34c5c87bba147020a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voyager Quickwelder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "min_rule_version": 2,
+      "normalized_name": "voyager quickwelder",
+      "oracle_hash": "ea60d391afb6f2d73cdd177b45a726b7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

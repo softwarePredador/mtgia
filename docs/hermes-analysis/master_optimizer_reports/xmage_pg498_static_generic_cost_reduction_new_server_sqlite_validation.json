@@ -1,0 +1,307 @@
+{
+  "expected": 21,
+  "missing": [],
+  "ok": 21,
+  "rows": [
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Ballyrush Banneret",
+      "card_types": null,
+      "colors": null,
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:d9038ce0eaf069a46c6adec11dfe830a",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": [
+        "kithkin",
+        "soldier"
+      ]
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Bosk Banneret",
+      "card_types": null,
+      "colors": null,
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:1082b4a59a4e4ab45b36cec3ceb31fd8",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": [
+        "shaman",
+        "treefolk"
+      ]
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Dragonlord's Servant",
+      "card_types": null,
+      "colors": null,
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:ec77f894d6594b7dd449e88da78f7a8e",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": [
+        "dragon"
+      ]
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Dragonspeaker Shaman",
+      "card_types": null,
+      "colors": null,
+      "cost_reduction_generic": 2,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:3a0439051970f6c4ec1bf8ffc0efe3e3",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": [
+        "dragon"
+      ]
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Emerald Medallion",
+      "card_types": null,
+      "colors": [
+        "G"
+      ],
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:d1575b7e349debdcc00cb11a81a98d63",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Etherium Sculptor",
+      "card_types": [
+        "artifact"
+      ],
+      "colors": null,
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Foundry Inspector",
+      "card_types": [
+        "artifact"
+      ],
+      "colors": null,
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Goblin Anarchomancer",
+      "card_types": null,
+      "colors": [
+        "R",
+        "G"
+      ],
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:69dcc05d941ebeb0ff30d84d2f79a2a4",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Goblin Electromancer",
+      "card_types": [
+        "instant",
+        "sorcery"
+      ],
+      "colors": null,
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:97742df754bd4727c76acdff9b052bcd",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Jet Medallion",
+      "card_types": null,
+      "colors": [
+        "B"
+      ],
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:60eb5ad36259e78de7afd7602355822d",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Kinjalli's Caller",
+      "card_types": null,
+      "colors": null,
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:24778ef9c8f9902d9cc486d10184fcf8",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": [
+        "dinosaur"
+      ]
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Knight of the Stampede",
+      "card_types": null,
+      "colors": null,
+      "cost_reduction_generic": 2,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:e5391f735165a635c5529d0516f52b32",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": [
+        "dinosaur"
+      ]
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Krosan Drover",
+      "card_types": [
+        "creature"
+      ],
+      "colors": null,
+      "cost_reduction_generic": 2,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:f65dffd9475e2bf6158dc2953ed0c0c0",
+      "mana_value_min": 6,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Mana Matrix",
+      "card_types": [
+        "enchantment",
+        "instant"
+      ],
+      "colors": null,
+      "cost_reduction_generic": 2,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:65c4b5011824391362541154c43048dd",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Planar Gate",
+      "card_types": [
+        "creature"
+      ],
+      "colors": null,
+      "cost_reduction_generic": 2,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:b544492e418127e41bca5abc1a8b4f89",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Sapphire Medallion",
+      "card_types": null,
+      "colors": [
+        "U"
+      ],
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:f00d642df9881613f42056f752390e6f",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Starnheim Aspirant",
+      "card_types": null,
+      "colors": null,
+      "cost_reduction_generic": 2,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:c8dd17b96b2f406548230a80e7cb721c",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": [
+        "angel"
+      ]
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Stinkdrinker Daredevil",
+      "card_types": null,
+      "colors": null,
+      "cost_reduction_generic": 2,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:40afd6630f0f910d931a3c03a6ccef2a",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": [
+        "giant"
+      ]
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Stone Calendar",
+      "card_types": null,
+      "colors": null,
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:6abb2de88eac5fd4d683b0b51d82401a",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Thornscape Familiar",
+      "card_types": null,
+      "colors": [
+        "W",
+        "R"
+      ],
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:04cc4c542745fa6b0f95ee27afa30335",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    },
+    {
+      "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+      "card_name": "Voyager Quickwelder",
+      "card_types": [
+        "artifact"
+      ],
+      "colors": null,
+      "cost_reduction_generic": 1,
+      "effect": "static_cost_reduction",
+      "logical_rule_key": "battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170",
+      "mana_value_min": null,
+      "status": "ok",
+      "subtypes": null
+    }
+  ],
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "wrong_scope": []
+}

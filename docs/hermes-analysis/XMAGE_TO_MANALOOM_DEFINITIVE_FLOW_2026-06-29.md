@@ -12344,6 +12344,94 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG498 Static Generic Cost Reduction Checkpoint
+
+PG498 closed the exact XMage family
+`SpellsCostReductionControllerEffect + SimpleStaticAbility` for permanent
+static generic cost reduction on spells you cast. The runtime now supports
+subtype-restricted reducers through `applies_to_subtypes`, while existing
+card-type, color, and minimum mana value filters remain in the same
+`static_cost_reduction` execution path.
+
+Promoted cards:
+
+- `Ballyrush Banneret`
+- `Bosk Banneret`
+- `Dragonlord's Servant`
+- `Dragonspeaker Shaman`
+- `Emerald Medallion`
+- `Etherium Sculptor`
+- `Foundry Inspector`
+- `Goblin Anarchomancer`
+- `Goblin Electromancer`
+- `Jet Medallion`
+- `Kinjalli's Caller`
+- `Knight of the Stampede`
+- `Krosan Drover`
+- `Mana Matrix`
+- `Planar Gate`
+- `Sapphire Medallion`
+- `Starnheim Aspirant`
+- `Stinkdrinker Daredevil`
+- `Stone Calendar`
+- `Thornscape Familiar`
+- `Voyager Quickwelder`
+
+Blocked residual in this exact family:
+
+- `Edgewalker`
+- `Ragemonger`
+
+These remain blocked because XMage reduces colored mana with
+`ManaCostsImpl`; ManaLoom currently executes generic reduction only. They
+must not be promoted through this generic reducer path.
+
+Validation and deploy evidence:
+
+- Split candidate:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg498_static_generic_cost_reduction_candidate.json`
+  with `proposal_count=21`.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_package.md`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_precheck.out`
+  validated `21` canonical target rows.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_apply.out`
+  reported `upserted_rows=21` and `deprecated_shadow_rows=8`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_postcheck.out`
+  reported `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`, and
+  `promoted_oracle_hash_rows=1` for every promoted card.
+- PG -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_pg_to_sqlite_sync.json`
+  reported `pg_rows_loaded=8415`, `sqlite_inserted_or_updated=8179`, and
+  `canonical_snapshot_rows_exported=5944`.
+- SQLite validation:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_sqlite_validation.json`
+  reported `ok=21`, `missing=[]`, and `wrong_scope=[]`.
+- Battle tests:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_full_battle_suite.out`
+  passed after sync.
+- PG/Hermes/SQLite contract:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg498_static_generic_cost_reduction_new_server.md`
+  passed `51/51`.
+- Post-sync Commander-legal queue:
+  `target_identity_count=26076`, `xmage_authoritative_source_count=25762`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25762`.
+- Post-sync global readiness:
+  `battle_and_oracle_ready=4874`, `battle_family_mapper_required=28999`,
+  `generic_runtime_or_no_card_rule=360`, `oracle_data_sync=4`,
+  `commander_legality_sync=3`, and `oracle_identity_rule_link_or_copy=2`.
+- Post-sync exact splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg498_static_generic_cost_reduction_new_server_recheck.json`
+  reported `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Next exact family should not revisit PG498. Continue from the rebuilt queue;
+the largest remaining work units are still recursion, draw engine, targeted
+protection, direct damage, add counters, and life gain.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -14944,6 +14944,161 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_flying_block_restriction_oracle_not_exact")
 
+    def test_static_generic_cost_reduction_maps_subtype_spells(self) -> None:
+        row = queue_row(
+            split.STATIC_GENERIC_COST_REDUCTION_UNIT,
+            effect_classes=["SpellsCostReductionControllerEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["cost_reduction", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ballyrush Banneret",
+                type_line="Creature - Kithkin Soldier",
+                oracle_text="Kithkin spells and Soldier spells you cast cost {1} less to cast.",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("Kithkin spells and Soldier spells");
+                static {
+                    filter.add(Predicates.or(
+                        SubType.KITHKIN.getPredicate(),
+                        SubType.SOLDIER.getPredicate()));
+                }
+                this.addAbility(new SimpleStaticAbility(
+                    new SpellsCostReductionControllerEffect(filter, 1)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GENERIC_COST_REDUCTION_SCOPE)
+        self.assertEqual(effect["effect"], "static_cost_reduction")
+        self.assertEqual(effect["cost_reduction_generic"], 1)
+        self.assertEqual(effect["applies_to_subtypes"], ["kithkin", "soldier"])
+
+    def test_static_generic_cost_reduction_maps_color_spells(self) -> None:
+        row = queue_row(
+            split.STATIC_GENERIC_COST_REDUCTION_UNIT,
+            effect_classes=["SpellsCostReductionControllerEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["cost_reduction", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Thornscape Familiar",
+                type_line="Creature - Insect",
+                oracle_text="Red spells and white spells you cast cost {1} less to cast.",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("red spells and white spells");
+                static {
+                    filter.add(Predicates.or(
+                        new ColorPredicate(ObjectColor.RED),
+                        new ColorPredicate(ObjectColor.WHITE)));
+                }
+                this.addAbility(new SimpleStaticAbility(
+                    new SpellsCostReductionControllerEffect(filter, 1)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["cost_reduction_generic"], 1)
+        self.assertEqual(effect["applies_to_spell_colors"], ["W", "R"])
+
+    def test_static_generic_cost_reduction_maps_card_type_and_mana_value_minimum(self) -> None:
+        row = queue_row(
+            split.STATIC_GENERIC_COST_REDUCTION_UNIT,
+            effect_classes=["SpellsCostReductionControllerEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["cost_reduction", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Krosan Drover",
+                type_line="Creature - Elf",
+                oracle_text="Creature spells you cast with mana value 6 or greater cost {2} less to cast.",
+            ),
+            source_text="""
+                private static final FilterCreatureCard filter = new FilterCreatureCard("Creature spells");
+                static {
+                    filter.add(new ManaValuePredicate(ComparisonType.MORE_THAN, 5));
+                }
+                this.addAbility(new SimpleStaticAbility(
+                    new SpellsCostReductionControllerEffect(filter, 2)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["cost_reduction_generic"], 2)
+        self.assertEqual(effect["applies_to_card_types"], ["creature"])
+        self.assertEqual(effect["mana_value_min"], 6)
+
+    def test_static_generic_cost_reduction_accepts_xmage_internal_up_to_generic_flag(self) -> None:
+        row = queue_row(
+            split.STATIC_GENERIC_COST_REDUCTION_UNIT,
+            effect_classes=["SpellsCostReductionControllerEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["cost_reduction", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Stone Calendar",
+                type_line="Artifact",
+                oracle_text="Spells you cast cost {1} less to cast.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleStaticAbility(
+                    new SpellsCostReductionControllerEffect(new FilterCard("spells"), 1, true)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["cost_reduction_generic"], 1)
+        self.assertNotIn("applies_to_card_types", effect)
+        self.assertNotIn("cost_reduction_up_to", effect)
+
+    def test_static_generic_cost_reduction_blocks_colored_mana_reductions(self) -> None:
+        row = queue_row(
+            split.STATIC_GENERIC_COST_REDUCTION_UNIT,
+            effect_classes=["SpellsCostReductionControllerEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["cost_reduction", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Edgewalker",
+                type_line="Creature - Human Cleric",
+                oracle_text=(
+                    "Cleric spells you cast cost {W}{B} less to cast. "
+                    "This effect reduces only the amount of colored mana you pay."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("Cleric spells");
+                static {
+                    filter.add(SubType.CLERIC.getPredicate());
+                }
+                this.addAbility(new SimpleStaticAbility(
+                    new SpellsCostReductionControllerEffect(filter, new ManaCostsImpl<>("{W}{B}"))));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_cost_reduction_colored_mana_not_supported")
+
     def test_report_summarizes_selected_and_blocked_rows(self) -> None:
         rows = [
             queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"], card_id="draw"),

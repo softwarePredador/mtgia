@@ -14371,3 +14371,69 @@ Register decision:
   `needs_rule_before_strategy` lane.
 - The expanded Lorehold + opponent queue is back to
   `package_ready_unprepared=0`.
+
+## 2026-07-05 - PG498 Static Generic Cost Reduction New Server
+
+Status: applied on the new PostgreSQL target and synced to Hermes SQLite.
+
+Scope:
+
+- Deploy id: `xmage_pg498_static_generic_cost_reduction_new_server`.
+- Runtime family:
+  `xmage_static_generic_cost_reduction_for_matching_spells_v1`.
+- XMage source signature:
+  `SpellsCostReductionControllerEffect + SimpleStaticAbility`.
+- Promoted cards: `21`.
+- Colored-mana reducers deliberately blocked: `Edgewalker`, `Ragemonger`.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_rollback.sql`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_manifest.json`.
+
+Execution evidence:
+
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_precheck.out`;
+  `21` target rows matched by name plus oracle hash.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_apply.out`;
+  `deprecated_shadow_rows=8`, `upserted_rows=21`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_postcheck.out`;
+  all `21` promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_pg_to_sqlite_sync.json`;
+  `pg_rows_loaded=8415`, `sqlite_inserted_or_updated=8179`,
+  `canonical_snapshot_rows_exported=5944`.
+- SQLite validation:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg498_static_generic_cost_reduction_new_server_sqlite_validation.json`;
+  `ok=21`, `missing=[]`, `wrong_scope=[]`.
+- Contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg498_static_generic_cost_reduction_new_server.md`;
+  `51/51` checks passed.
+- Post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg498_static_generic_cost_reduction_new_server_commander_legal.json`;
+  `xmage_authoritative_adapter_required_count=25762`.
+- Post-sync exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg498_static_generic_cost_reduction_new_server_recheck.json`;
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`.
+
+Register decision:
+
+- PG498 is applied and should not be rebuilt.
+- Generic cost reducers by card type, subtype, color, or minimum mana value are
+  now handled through the static cost-reduction runtime path.
+- Colored-mana reducers must wait for a separate runtime family; do not route
+  `ManaCostsImpl` reducers through PG498.

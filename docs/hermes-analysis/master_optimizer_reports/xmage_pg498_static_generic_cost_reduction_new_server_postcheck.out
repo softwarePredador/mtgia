@@ -1,0 +1,24 @@
+       card_name        |    normalized_name     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+------------------------+------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Ballyrush Banneret     | ballyrush banneret     | battle_rule_v1:d9038ce0eaf069a46c6adec11dfe830a |                  1 |                           1 |                         1 |           8
+ Bosk Banneret          | bosk banneret          | battle_rule_v1:1082b4a59a4e4ab45b36cec3ceb31fd8 |                  1 |                           1 |                         1 |           8
+ Dragonlord's Servant   | dragonlord's servant   | battle_rule_v1:ec77f894d6594b7dd449e88da78f7a8e |                  1 |                           1 |                         1 |           8
+ Dragonspeaker Shaman   | dragonspeaker shaman   | battle_rule_v1:3a0439051970f6c4ec1bf8ffc0efe3e3 |                  1 |                           1 |                         1 |           8
+ Emerald Medallion      | emerald medallion      | battle_rule_v1:d1575b7e349debdcc00cb11a81a98d63 |                  1 |                           1 |                         1 |           8
+ Etherium Sculptor      | etherium sculptor      | battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170 |                  1 |                           1 |                         1 |           8
+ Foundry Inspector      | foundry inspector      | battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170 |                  1 |                           1 |                         1 |           8
+ Goblin Anarchomancer   | goblin anarchomancer   | battle_rule_v1:69dcc05d941ebeb0ff30d84d2f79a2a4 |                  1 |                           1 |                         1 |           8
+ Goblin Electromancer   | goblin electromancer   | battle_rule_v1:97742df754bd4727c76acdff9b052bcd |                  1 |                           1 |                         1 |           8
+ Jet Medallion          | jet medallion          | battle_rule_v1:60eb5ad36259e78de7afd7602355822d |                  1 |                           1 |                         1 |           8
+ Kinjalli's Caller      | kinjalli's caller      | battle_rule_v1:24778ef9c8f9902d9cc486d10184fcf8 |                  1 |                           1 |                         1 |           8
+ Knight of the Stampede | knight of the stampede | battle_rule_v1:e5391f735165a635c5529d0516f52b32 |                  1 |                           1 |                         1 |           8
+ Krosan Drover          | krosan drover          | battle_rule_v1:f65dffd9475e2bf6158dc2953ed0c0c0 |                  1 |                           1 |                         1 |           8
+ Mana Matrix            | mana matrix            | battle_rule_v1:65c4b5011824391362541154c43048dd |                  1 |                           1 |                         1 |           8
+ Planar Gate            | planar gate            | battle_rule_v1:b544492e418127e41bca5abc1a8b4f89 |                  1 |                           1 |                         1 |           8
+ Sapphire Medallion     | sapphire medallion     | battle_rule_v1:f00d642df9881613f42056f752390e6f |                  1 |                           1 |                         1 |           8
+ Starnheim Aspirant     | starnheim aspirant     | battle_rule_v1:c8dd17b96b2f406548230a80e7cb721c |                  1 |                           1 |                         1 |           8
+ Stinkdrinker Daredevil | stinkdrinker daredevil | battle_rule_v1:40afd6630f0f910d931a3c03a6ccef2a |                  1 |                           1 |                         1 |           8
+ Stone Calendar         | stone calendar         | battle_rule_v1:6abb2de88eac5fd4d683b0b51d82401a |                  1 |                           1 |                         1 |           8
+ Thornscape Familiar    | thornscape familiar    | battle_rule_v1:04cc4c542745fa6b0f95ee27afa30335 |                  1 |                           1 |                         1 |           8
+ Voyager Quickwelder    | voyager quickwelder    | battle_rule_v1:8dc1c1998408b6b4f9e1541bfc587170 |                  1 |                           1 |                         1 |           8
+(21 rows)

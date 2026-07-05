@@ -7453,6 +7453,43 @@ def register_tests(battle, player):
         assert not battle.is_mana_source_permanent(ruby_permanent)
         assert active.available_mana() == 0
 
+    def test_pg498_static_cost_reduction_filters_spell_subtypes():
+        active = player("Active")
+        reducer = {
+            "name": "Dragonlord's Servant",
+            "effect": "static_cost_reduction",
+            "battle_model_scope": "xmage_static_generic_cost_reduction_for_matching_spells_v1",
+            "type_line": "Creature - Goblin Shaman",
+            "cost_reduction_applies_to": "spells_you_cast",
+            "cost_reduction_generic": 1,
+            "applies_to_subtypes": ["dragon"],
+        }
+        dragon_spell = {
+            "name": "Shivan Dragon",
+            "cmc": 6,
+            "type_line": "Creature - Dragon",
+        }
+        non_dragon_spell = {
+            "name": "Runeclaw Bear",
+            "cmc": 2,
+            "type_line": "Creature - Bear",
+        }
+        active.battlefield = [reducer]
+
+        dragon_reductions = battle.static_cost_reductions_for_spell(active, dragon_spell)
+        non_dragon_reductions = battle.static_cost_reductions_for_spell(active, non_dragon_spell)
+
+        assert len(dragon_reductions) == 1
+        assert dragon_reductions[0]["amount"] == 1
+        assert dragon_reductions[0]["applies_to_subtypes"] == ["dragon"]
+        assert not non_dragon_reductions
+        adjusted = battle.apply_static_cost_reductions_to_cost(
+            {"generic": 5, "colors": ["R"]},
+            dragon_reductions,
+        )
+        assert adjusted["generic"] == 4
+        assert adjusted["static_cost_reduction_total"] == 1
+
     def test_pg072_pyroblast_counters_only_blue_stack_spell_with_rule_provenance():
         active = player("Active")
         blue_spell = {
@@ -22942,6 +22979,7 @@ def register_tests(battle, player):
         test_pg070_gamble_tutors_then_randomly_discards_with_rule_provenance,
         test_pg071_lotus_petal_is_one_shot_fast_mana_with_rule_provenance,
         test_pg071_ruby_medallion_is_static_cost_reducer_not_mana_source,
+        test_pg498_static_cost_reduction_filters_spell_subtypes,
         test_pg072_pyroblast_counters_only_blue_stack_spell_with_rule_provenance,
         test_pg086_counter_target_filter_respects_uncounterable_static_shield,
         test_pg086_removal_targets_filter_nontoken_and_mana_value_max,

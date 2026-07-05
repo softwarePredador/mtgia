@@ -1324,6 +1324,14 @@ def _card_type_matches(card, allowed_types):
     return any(card_type in type_line for card_type in allowed)
 
 
+def _card_subtype_matches(card, allowed_subtypes):
+    allowed = {str(value).lower() for value in _as_list(allowed_subtypes) if value}
+    if not allowed:
+        return True
+    type_line = str(card.get("type_line") or "").lower()
+    return any(re.search(rf"\b{re.escape(subtype)}\b", type_line) for subtype in allowed)
+
+
 def _static_cost_reduction_scope(effect_data):
     return str(effect_data.get("battle_model_scope") or STATIC_COST_REDUCTION_SCOPE).strip()
 
@@ -1418,6 +1426,19 @@ def _static_cost_reduction_card_types(effect_data):
             return values
     if _static_cost_reduction_scope(effect_data) == POWER_BASED_INSTANT_SORCERY_COST_REDUCTION_SCOPE:
         return ["instant", "sorcery"]
+    return []
+
+
+def _static_cost_reduction_subtypes(effect_data):
+    for key in (
+        "applies_to_subtypes",
+        "applies_to_spell_subtypes",
+        "spell_subtypes",
+        "subtypes",
+    ):
+        values = [str(value).lower() for value in _as_list(effect_data.get(key)) if value]
+        if values:
+            return values
     return []
 
 
@@ -1718,6 +1739,9 @@ def _static_cost_reduction_matches_spell(source, effect_data, card, *, controlle
     card_types = [chosen_card_type] if chosen_card_type else _static_cost_reduction_card_types(effect_data)
     if not shared_types and not _card_type_matches(card, card_types):
         return None
+    subtypes = _static_cost_reduction_subtypes(effect_data)
+    if subtypes and not _card_subtype_matches(card, subtypes):
+        return None
     min_mana_value = _static_cost_reduction_min_mana_value(effect_data)
     if min_mana_value is not None and card_mana_value(card) < min_mana_value:
         return None
@@ -1729,6 +1753,7 @@ def _static_cost_reduction_matches_spell(source, effect_data, card, *, controlle
         "scope": scope,
         "colors": sorted(colors),
         "applies_to_card_types": card_types,
+        "applies_to_subtypes": subtypes,
         "minimum_mana_value": min_mana_value,
         "amount_source": amount_source or "fixed",
         "cost_reduction_applies_to": applies_to,
