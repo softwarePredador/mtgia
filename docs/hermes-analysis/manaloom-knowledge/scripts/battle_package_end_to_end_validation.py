@@ -1504,7 +1504,105 @@ def run_static_global_power_toughness_boost(
     }
 
 
+def run_aura_static_power_toughness_attachment(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    source = battle.enrich_card({**card, **battle.get_card_effect(card)})
+    active = battle.Player(str(scenario.get("player") or "Aura Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Aura Target Opponent"), None, [])
+    target = dict(scenario["target"])
+    target_owner = str(scenario.get("target_owner") or "controller")
+    target_controller = opponent if target_owner == "opponent" else active
+    target_controller.battlefield.append(target)
+    before_events = len(events)
+    battle.apply_aura_static_attachment(
+        active,
+        [opponent],
+        source,
+        battle.get_card_effect(card),
+        turn=int(scenario.get("turn") or 3),
+        rng=random.Random(int(scenario.get("seed") or 17)),
+    )
+    expected_moved = bool(scenario.get("expected_moved_to_graveyard"))
+    moved = target not in target_controller.battlefield and target in getattr(target_controller, "graveyard", [])
+    if moved != expected_moved:
+        fail("battle_execution", f"{card['name']} moved_to_graveyard={moved}, expected {expected_moved}")
+    expected_power = int(scenario["expected_power"])
+    expected_toughness = int(scenario["expected_toughness"])
+    if int(target.get("power") or 0) != expected_power:
+        fail("battle_execution", f"{card['name']} target power={target.get('power')}, expected {expected_power}")
+    if int(target.get("toughness") or 0) != expected_toughness:
+        fail("battle_execution", f"{card['name']} target toughness={target.get('toughness')}, expected {expected_toughness}")
+    attached_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "aura_attached_static_pt"
+            and data.get("card") == card.get("name")
+            and data.get("target") == target.get("name")
+        ),
+        None,
+    )
+    if attached_event is None:
+        fail("battle_events", f"missing {card['name']} aura_attached_static_pt event")
+    source_name = str(scenario.get("expected_source") or card.get("name"))
+    if attached_event.get("card") != source_name:
+        fail("battle_events", f"{card['name']} attached event source={attached_event.get('card')!r}")
+    if expected_moved:
+        target_move_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "permanent_moved_from_battlefield"
+                and data.get("card") == target.get("name")
+                and data.get("reason") == "zero_toughness"
+                and data.get("destination") == "graveyard"
+            ),
+            None,
+        )
+        if target_move_event is None:
+            fail("battle_events", f"missing {card['name']} zero-toughness graveyard move event")
+        aura_move_event = next(
+            (
+                data
+                for event, data in events[before_events:]
+                if event == "permanent_moved_from_battlefield"
+                and data.get("card") == source_name
+                and data.get("reason") == "attached_target_left_battlefield"
+                and data.get("destination") == "graveyard"
+            ),
+            None,
+        )
+        if aura_move_event is None:
+            fail("battle_events", f"missing {card['name']} attached Aura graveyard move event")
+        aura_in_graveyard = any(
+            item.get("name") == source_name
+            for item in getattr(active, "graveyard", []) or []
+            if isinstance(item, dict)
+        )
+        if not aura_in_graveyard:
+            fail("battle_execution", f"{card['name']} aura was not moved after target left battlefield")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "target_owner": target_owner,
+        "target_power": target.get("power"),
+        "target_toughness": target.get("toughness"),
+        "moved_to_graveyard": moved,
+        "attached_event": {
+            "power_boost": attached_event.get("power_boost"),
+            "toughness_boost": attached_event.get("toughness_boost"),
+            "target_player": attached_event.get("target_player"),
+        },
+    }
+
+
 SCENARIO_RUNNERS = {
+    "aura_static_power_toughness_attachment": run_aura_static_power_toughness_attachment,
     "conditional_land_play": run_conditional_land_play,
     "copy_stack_ability_response": run_copy_stack_ability_response,
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,

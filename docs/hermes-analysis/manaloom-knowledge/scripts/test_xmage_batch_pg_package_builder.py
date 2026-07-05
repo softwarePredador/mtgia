@@ -844,6 +844,105 @@ def test_manifest_expected_rule_preserves_dies_mana_fields() -> None:
     }
 
 
+def test_manifest_expected_rule_preserves_aura_static_power_toughness_fields() -> None:
+    proposal = {
+        "normalized_name": "dead weight",
+        "card_name": "Dead Weight",
+        "oracle_hash": "hash-dead-weight",
+        "logical_rule_key": "battle_rule_v1:dead-weight",
+        "effect_json": {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "zone": "battlefield"},
+            "enchant_target": "creature",
+            "enchant_target_controller": "any",
+            "power_boost": -2,
+            "toughness_boost": -2,
+            "static_power_bonus": -2,
+            "static_toughness_bonus": -2,
+            "aura": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"] == {
+        "effect": "aura_static_attachment",
+        "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+        "target": "creature",
+        "target_constraints": {"card_types": ["creature"], "zone": "battlefield"},
+        "enchant_target": "creature",
+        "enchant_target_controller": "any",
+        "static_power_bonus": -2,
+        "static_toughness_bonus": -2,
+        "power_boost": -2,
+        "toughness_boost": -2,
+    }
+
+
+def test_aura_static_power_toughness_execution_scenario_targets_debuff_to_opponent() -> None:
+    rule = {
+        "normalized_name": "dead weight",
+        "card_name": "Dead Weight",
+        "logical_rule_key": "battle_rule_v1:dead-weight",
+        "required_effect_fields": {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+            "enchant_target_controller": "any",
+            "power_boost": -2,
+            "toughness_boost": -2,
+            "static_power_bonus": -2,
+            "static_toughness_bonus": -2,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario == {
+        "name": "Dead Weight aura static P/T attaches",
+        "type": "aura_static_power_toughness_attachment",
+        "card": {"name": "Dead Weight"},
+        "target": {
+            "name": "E2E Aura Target for Dead Weight",
+            "type_line": "Creature - Soldier",
+            "base_power": 2,
+            "base_toughness": 2,
+            "power": 2,
+            "toughness": 2,
+        },
+        "target_owner": "opponent",
+        "expected_power": 0,
+        "expected_toughness": 0,
+        "expected_moved_to_graveyard": True,
+        "expected_source": "Dead Weight",
+        "logical_rule_key": "battle_rule_v1:dead-weight",
+    }
+
+
+def test_aura_static_power_toughness_execution_scenario_targets_boost_to_controller() -> None:
+    rule = {
+        "normalized_name": "giant strength",
+        "card_name": "Giant Strength",
+        "logical_rule_key": "battle_rule_v1:giant-strength",
+        "required_effect_fields": {
+            "effect": "aura_static_attachment",
+            "battle_model_scope": "xmage_aura_static_power_toughness_attachment_v1",
+            "enchant_target_controller": "any",
+            "power_boost": 2,
+            "toughness_boost": 2,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "aura_static_power_toughness_attachment"
+    assert scenario["target_owner"] == "controller"
+    assert scenario["expected_power"] == 4
+    assert scenario["expected_toughness"] == 4
+    assert scenario["expected_moved_to_graveyard"] is False
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",

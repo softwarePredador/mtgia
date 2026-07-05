@@ -22397,6 +22397,7 @@ def build_exact_split_report(
             and not is_creature_attack_target_keyword_unit(row)
             and not is_static_controlled_pt_unit(row)
             and not is_static_global_pt_unit(row)
+            and not is_simple_aura_static_pt_unit(row)
             and not is_simple_equipment_static_attachment_unit(row)
             and not is_static_generic_cost_reduction_unit(row)
             and not is_static_graveyard_count_pt_unit(row)
@@ -22482,6 +22483,7 @@ def build_exact_split_report(
                 "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
                 "xmage_signature BoostAllEffect + SimpleStaticAbility rows with exact static fixed creature power/toughness boosts for all, opponent, color, subtype, token, or land-creature filters",
+                "xmage_signature AttachEffect + BoostEnchantedEffect Aura rows with exact fixed enchanted-creature power/toughness modifiers and simple EnchantAbility",
                 "xmage_signature BoostEquippedEffect Equipment rows with exact fixed equipped-creature power/toughness boost, supported attached combat keywords, and no auxiliary non-static effects",
                 "xmage_signature SpellsCostReductionControllerEffect + SimpleStaticAbility rows with exact generic cost reduction for spells you cast by card type, subtype, color, or minimum mana value",
                 "SetBasePowerToughnessSourceEffect + SimpleStaticAbility creature rows whose source and Oracle both set source power/toughness to a direct controller/all-graveyards card-type count",

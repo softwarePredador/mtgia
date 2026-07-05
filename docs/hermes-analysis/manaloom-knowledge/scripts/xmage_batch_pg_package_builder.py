@@ -29,6 +29,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "library_controller",
     "target_constraints",
     "target_preference",
+    "enchant_target",
+    "enchant_target_controller",
     "static_effect",
     "static_applies_to",
     "static_power_bonus",
@@ -873,8 +875,47 @@ def static_global_pt_execution_scenario_from_expected_rule(rule: dict[str, Any])
     }
 
 
+def aura_static_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("effect") != "aura_static_attachment":
+        return None
+    power_bonus = int(required.get("power_boost") or required.get("static_power_bonus") or 0)
+    toughness_bonus = int(required.get("toughness_boost") or required.get("static_toughness_bonus") or 0)
+    target_controller = str(required.get("enchant_target_controller") or "any").lower()
+    if target_controller in {"opponent", "opponents"}:
+        target_owner = "opponent"
+    elif target_controller in {"self", "you", "controller"}:
+        target_owner = "controller"
+    else:
+        target_owner = "opponent" if power_bonus < 0 or toughness_bonus < 0 else "controller"
+    target = {
+        "name": f"E2E Aura Target for {rule['card_name']}",
+        "type_line": "Creature - Soldier",
+        "base_power": 2,
+        "base_toughness": 2,
+        "power": 2,
+        "toughness": 2,
+    }
+    expected_toughness = target["base_toughness"] + toughness_bonus
+    return {
+        "name": f"{rule['card_name']} aura static P/T attaches",
+        "type": "aura_static_power_toughness_attachment",
+        "card": {"name": rule["card_name"]},
+        "target": target,
+        "target_owner": target_owner,
+        "expected_power": target["base_power"] + power_bonus,
+        "expected_toughness": expected_toughness,
+        "expected_moved_to_graveyard": expected_toughness <= 0,
+        "expected_source": rule["card_name"],
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
-    return static_global_pt_execution_scenario_from_expected_rule(rule)
+    return (
+        static_global_pt_execution_scenario_from_expected_rule(rule)
+        or aura_static_pt_execution_scenario_from_expected_rule(rule)
+    )
 
 
 def markdown_package(manifest: dict[str, Any]) -> str:

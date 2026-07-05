@@ -180,6 +180,43 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "aura_static_pt_oracle_not_exact_fixed")
 
+    def test_exact_split_report_includes_simple_aura_static_power_toughness_unit(self) -> None:
+        row = queue_row(
+            "xmage_signature::AttachEffect,BoostEnchantedEffect::EnchantAbility,SimpleStaticAbility::"
+            "TargetCreaturePermanent,TargetPermanent::no_condition_class::targeting,static_ability",
+            effect_classes=["AttachEffect", "BoostEnchantedEffect"],
+            ability_kind="static",
+            ability_classes=["EnchantAbility", "SimpleStaticAbility"],
+            xmage_signals=["targeting", "static_ability"],
+        )
+        report = split.build_exact_split_report(
+            {"status": "action_required", "method": {"scope": "test"}, "queue": [row]},
+            card_metadata_by_id={
+                "card-1": metadata(
+                    name="Dead Weight",
+                    type_line="Enchantment - Aura",
+                    oracle_text="Enchant creature\nEnchanted creature gets -2/-2.",
+                )
+            },
+            source_reader=lambda _row: """
+                this.getSpellAbility().addEffect(new AttachEffect(Outcome.Detriment));
+                this.addAbility(new EnchantAbility(new TargetCreaturePermanent()));
+                this.addAbility(new SimpleStaticAbility(
+                    new BoostEnchantedEffect(-2, -2, Duration.WhileOnBattlefield)));
+            """,
+        )
+
+        self.assertEqual(report["summary"]["proposal_count"], 1)
+        self.assertEqual(report["summary"]["safe_for_batch_pg_package_count"], 1)
+        self.assertEqual(
+            report["summary"]["family_counts"],
+            {"xmage_aura_static_power_toughness_attachment": 1},
+        )
+        self.assertEqual(
+            report["summary"]["scope_counts"],
+            {split.AURA_STATIC_PT_ATTACHMENT_SCOPE: 1},
+        )
+
     def test_static_cast_as_flash_permission_maps_artifact_filter(self) -> None:
         row = queue_row(
             split.FLASH_PERMISSION_UNIT,

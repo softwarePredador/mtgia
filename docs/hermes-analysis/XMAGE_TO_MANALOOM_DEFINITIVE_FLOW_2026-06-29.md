@@ -14264,6 +14264,67 @@ blocking-only static effects, no-ability filters, variable count-based boosts,
 phase-limited effects, non-permanent effects, or source/Oracle mismatches still
 blocked by `static_global_pt_*` reasons.
 
+## 2026-07-05 PG532 Aura Static Power/Toughness Checkpoint
+
+Applied package: `PG532 aura_static_pt_new_server`.
+
+Closed family:
+
+- `35` exact Aura static power/toughness attachment rows from XMage
+  `AttachEffect + BoostEnchantedEffect` with simple `EnchantAbility` and
+  `SimpleStaticAbility`.
+
+Runtime scope:
+
+- `xmage_aura_static_power_toughness_attachment_v1`
+
+Supported exact forms:
+
+- fixed enchanted-creature power/toughness boosts and debuffs;
+- flash as an auxiliary Aura timing keyword;
+- target-controller metadata for any/self/opponent Aura targets;
+- zero-toughness target movement plus attached Aura movement when the Aura
+  kills the enchanted creature.
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg532_aura_static_pt_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg532_aura_static_pt_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg532_aura_static_pt_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg532_aura_static_pt_new_server_pg_to_sqlite_sync.json`
+- battle package E2E with runtime scenarios:
+  `docs/hermes-analysis/master_optimizer_reports/pg532_aura_static_pt_new_server_e2e_validation.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg532_aura_static_pt_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg532_aura_static_pt_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg532_aura_static_pt_new_server_recheck.md`
+- final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg532_aura_static_pt_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg532_aura_static_pt_new_server_final_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg532_aura_static_pt_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg532_aura_static_pt_new_server_final.md`
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25864`
+- post-cycle `target_identity_count=25829`
+- post-cycle `xmage_authoritative_source_count=25515`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_adapter_required_count=25515`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+
+Residual boundary: PG532 does not authorize dynamic Aura boosts, count-based
+modifiers, Aura rows with auxiliary non-static abilities, Umbra/Cycling/Escape
+style packages, unsupported target restrictions, or source/Oracle mismatches
+still blocked by `aura_static_pt_*` reasons.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
