@@ -26,7 +26,10 @@ DEFAULT_EXTERNAL_RECONCILIATION = (
 DEFAULT_SHELL_SYNTHESIS = (
     REPORT_DIR / "lorehold_external_shell_gate_synthesis_20260704_current.json"
 )
-DEFAULT_STEM = "lorehold_diagnostic_contract_planner_20260704_current"
+DEFAULT_HYPOTHESIS_QUEUE = (
+    REPORT_DIR / "lorehold_hypothesis_queue_from_value_model_20260705_current_relearn.json"
+)
+DEFAULT_STEM = "lorehold_diagnostic_contract_planner_20260705_current_relearn"
 
 EXTERNAL_REFRESH_SOURCES = [
     {
@@ -59,6 +62,22 @@ EXTERNAL_REFRESH_SOURCES = [
         "learning": (
             "The commander identity is cost reduction, miracle timing, and rummage; "
             "candidate value must be measured against that identity."
+        ),
+    },
+    {
+        "source_key": "gametyrant_lorehold_payoff_refresh",
+        "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech",
+        "learning": (
+            "Entreat, Approach, Apex, Dance, Hit the Mother Lode, and Insurrection are "
+            "payoff signals, but each still needs topdeck setup and closing-window proof."
+        ),
+    },
+    {
+        "source_key": "coolstuffinc_lorehold_shell_refresh",
+        "url": "https://www.coolstuffinc.com/a/stephenjohnson-04202026-lorehold-the-historian-commander",
+        "learning": (
+            "Lorehold can branch into spellslinger, combo, token, damage, or Voltron shells; "
+            "those are separate contracts unless they preserve the protected 607 floor."
         ),
     },
 ]
@@ -147,8 +166,89 @@ def rel(path: Path) -> str:
         return str(path)
 
 
+def newest_report(pattern: str, fallback: Path, *, report_dir: Path = REPORT_DIR) -> Path:
+    matches = sorted(
+        report_dir.glob(pattern),
+        key=lambda path: (path.stat().st_mtime, path.name),
+        reverse=True,
+    )
+    return matches[0] if matches else fallback
+
+
+def default_external_reconciliation() -> Path:
+    return newest_report(
+        "lorehold_external_evidence_reconciler_*.json",
+        DEFAULT_EXTERNAL_RECONCILIATION,
+    )
+
+
+def default_shell_synthesis() -> Path:
+    return newest_report(
+        "lorehold_external_shell_gate_synthesis_*.json",
+        DEFAULT_SHELL_SYNTHESIS,
+    )
+
+
+def default_hypothesis_queue() -> Path:
+    return newest_report(
+        "lorehold_hypothesis_queue_from_value_model_*.json",
+        DEFAULT_HYPOTHESIS_QUEUE,
+    )
+
+
 def signal_map(rows: list[Mapping[str, Any]]) -> dict[str, Mapping[str, Any]]:
     return {str(row.get("signal_key") or ""): row for row in rows if row.get("signal_key")}
+
+
+def hypothesis_map(hypothesis_queue: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
+    rows = {}
+    for row in as_list(hypothesis_queue.get("hypotheses")):
+        if isinstance(row, Mapping) and row.get("card_name"):
+            rows[str(row["card_name"])] = row
+    return rows
+
+
+def hypothesis_queue_alignment(
+    cards_checked: list[str],
+    hypothesis_by_card: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    matched = []
+    missing = []
+    status_counts: Counter[str] = Counter()
+    priority_counts: Counter[str] = Counter()
+    next_tests: Counter[str] = Counter()
+    anchors_by_card: dict[str, list[dict[str, Any]]] = {}
+    for card in cards_checked:
+        row = hypothesis_by_card.get(card)
+        if not row:
+            missing.append(card)
+            continue
+        matched.append(card)
+        status_counts[str(row.get("readiness_status") or "")] += 1
+        priority_counts[str(row.get("priority") or "")] += 1
+        next_tests[str(row.get("allowed_next_test") or "")] += 1
+        anchors_by_card[card] = [
+            {
+                "card_name": anchor.get("card_name"),
+                "primary_value_lane": anchor.get("primary_value_lane"),
+                "priority_class": anchor.get("priority_class"),
+                "cut_policy": anchor.get("cut_policy"),
+            }
+            for anchor in as_list(row.get("same_lane_current_607_anchors"))[:3]
+            if isinstance(anchor, Mapping)
+        ]
+    natural_gate_ready_count = status_counts.get("natural_gate_ready", 0)
+    return {
+        "matched_hypothesis_count": len(matched),
+        "matched_cards": matched,
+        "missing_from_hypothesis_queue": missing,
+        "readiness_status_counts": dict(sorted(status_counts.items())),
+        "priority_counts": dict(sorted(priority_counts.items())),
+        "allowed_next_test_counts": dict(sorted(next_tests.items())),
+        "same_lane_anchors_by_card": anchors_by_card,
+        "natural_gate_ready_count": natural_gate_ready_count,
+        "natural_gate_allowed_by_queue": natural_gate_ready_count > 0,
+    }
 
 
 def strength_points(strength: str) -> int:
@@ -221,6 +321,7 @@ def testability_points(synthesis_status: str, exact_coverage_count: int) -> int:
 def build_diagnostic(
     synthesis_row: Mapping[str, Any],
     reconciliation_row: Mapping[str, Any],
+    hypothesis_by_card: Mapping[str, Mapping[str, Any]],
 ) -> dict[str, Any]:
     signal_key = str(synthesis_row.get("signal_key") or "")
     lane = str(synthesis_row.get("lane") or reconciliation_row.get("lane") or "")
@@ -229,6 +330,8 @@ def build_diagnostic(
     known_decisions = [
         str(item) for item in as_list(reconciliation_row.get("known_internal_decisions"))
     ]
+    cards_checked = [str(item) for item in as_list(synthesis_row.get("cards_checked"))]
+    queue_alignment = hypothesis_queue_alignment(cards_checked, hypothesis_by_card)
     external_strength = str(reconciliation_row.get("external_strength") or "")
     exact_coverage_count = int(synthesis_row.get("exact_coverage_count") or 0)
     score_components = {
@@ -269,7 +372,8 @@ def build_diagnostic(
         "lane": lane,
         "synthesis_status": synthesis_status,
         "external_strength": external_strength,
-        "cards_checked": synthesis_row.get("cards_checked") or [],
+        "cards_checked": cards_checked,
+        "hypothesis_queue_alignment": queue_alignment,
         "best_coverages": synthesis_row.get("best_coverages") or [],
         "score_components": score_components,
         "priority_score": score,
@@ -279,6 +383,8 @@ def build_diagnostic(
         "blockers": blockers,
         "known_internal_decisions": known_decisions,
         "recommended_action": synthesis_row.get("recommended_action") or "",
+        "natural_gate_allowed_now": False,
+        "diagnostic_only": queue_alignment["natural_gate_ready_count"] == 0,
     }
 
 
@@ -321,15 +427,19 @@ def build_report(
     *,
     external_reconciliation: Mapping[str, Any],
     shell_synthesis: Mapping[str, Any],
+    hypothesis_queue: Mapping[str, Any] | None = None,
     external_reconciliation_path: Path,
     shell_synthesis_path: Path,
+    hypothesis_queue_path: Path | None = None,
 ) -> dict[str, Any]:
     reconciliation_by_signal = signal_map(as_list(external_reconciliation.get("signals")))
+    hypothesis_queue = hypothesis_queue or {}
+    hypothesis_by_card = hypothesis_map(hypothesis_queue)
     diagnostics = []
     for synthesis_row in as_list(shell_synthesis.get("signals")):
         signal_key = str(synthesis_row.get("signal_key") or "")
         reconciliation_row = reconciliation_by_signal.get(signal_key, {})
-        diagnostics.append(build_diagnostic(synthesis_row, reconciliation_row))
+        diagnostics.append(build_diagnostic(synthesis_row, reconciliation_row, hypothesis_by_card))
     diagnostics.sort(
         key=lambda row: (
             row.get("readiness") != "design_next",
@@ -343,6 +453,13 @@ def build_report(
         if row.get("readiness") in {"design_next", "research_or_diagnostic_only"}
     ]
     readiness_counts = Counter(str(row.get("readiness") or "") for row in diagnostics)
+    matched_hypothesis_count = sum(
+        int((row.get("hypothesis_queue_alignment") or {}).get("matched_hypothesis_count") or 0)
+        for row in diagnostics
+    )
+    natural_gate_ready_from_queue = int(
+        ((hypothesis_queue.get("summary") or {}).get("natural_gate_ready_count") or 0)
+    )
     top = diagnostics[0] if diagnostics else {}
     return {
         "generated_at": utc_now(),
@@ -351,15 +468,18 @@ def build_report(
         "source_db_mutated": False,
         "external_reconciliation": rel(external_reconciliation_path),
         "shell_synthesis": rel(shell_synthesis_path),
+        "hypothesis_queue": rel(hypothesis_queue_path) if hypothesis_queue_path else "",
         "current_champion": "deck_607",
         "summary": {
             "diagnostic_count": len(diagnostics),
             "actionable_learning_count": len(actionable),
             "ready_deck_change_count": 0,
+            "matched_hypothesis_count": matched_hypothesis_count,
+            "natural_gate_ready_from_hypothesis_queue": natural_gate_ready_from_queue,
             "readiness_counts": dict(sorted(readiness_counts.items())),
             "top_diagnostic_key": top.get("diagnostic_key") or "",
             "recommended_next_action": (
-                "build_pressure_safe_spell_payoff_micro_shell_contract"
+                "draft_pressure_safe_spell_payoff_diagnostic_contract_no_natural_gate"
                 if top.get("diagnostic_key") == "pressure_safe_spell_payoff_micro_shell"
                 else "continue_diagnostic_contract_planning"
             ),
@@ -373,6 +493,7 @@ def build_report(
             "Priority score ranks learning value, not permission to change deck 607.",
             "Any natural battle gate still requires a named contract, structure matrix, equal opponent/seed window, and direct card-use evidence.",
             "Forced-access diagnostics remain learning-only unless later natural confirmation passes the Lorehold promotion gate.",
+            "The current hypothesis queue contributes candidate/anchor context, but zero natural gate-ready rows means this planner can only authorize diagnostic design.",
         ],
     }
 
@@ -387,10 +508,13 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "- Source DB mutated: `false`",
         f"- External reconciliation: `{payload['external_reconciliation']}`",
         f"- Shell synthesis: `{payload['shell_synthesis']}`",
+        f"- Hypothesis queue: `{payload['hypothesis_queue']}`",
         f"- Current champion: `{payload['current_champion']}`",
         f"- Diagnostics ranked: `{summary['diagnostic_count']}`",
         f"- Actionable learning items: `{summary['actionable_learning_count']}`",
         f"- Ready deck changes: `{summary['ready_deck_change_count']}`",
+        f"- Matched hypothesis rows: `{summary['matched_hypothesis_count']}`",
+        f"- Natural gate-ready from hypothesis queue: `{summary['natural_gate_ready_from_hypothesis_queue']}`",
         f"- Top diagnostic: `{summary['top_diagnostic_key']}`",
         f"- Recommended next action: `{summary['recommended_next_action']}`",
         f"- Readiness counts: `{json.dumps(summary['readiness_counts'], sort_keys=True)}`",
@@ -439,6 +563,14 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         lines.append("")
         for requirement in requirements:
             lines.append(f"- {requirement}")
+        alignment = row.get("hypothesis_queue_alignment") or {}
+        if alignment.get("matched_cards"):
+            lines.append(
+                "- Current hypothesis queue: matched `{}`; natural gate allowed `{}`.".format(
+                    ", ".join(alignment.get("matched_cards") or []),
+                    str(alignment.get("natural_gate_allowed_by_queue")).lower(),
+                )
+            )
         lines.append("")
     lines.extend(["## External Refresh Sources", ""])
     for source in payload.get("external_refresh_sources") or []:
@@ -457,20 +589,26 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--external-reconciliation",
         type=Path,
-        default=DEFAULT_EXTERNAL_RECONCILIATION,
+        default=None,
     )
-    parser.add_argument("--shell-synthesis", type=Path, default=DEFAULT_SHELL_SYNTHESIS)
+    parser.add_argument("--shell-synthesis", type=Path, default=None)
+    parser.add_argument("--hypothesis-queue", type=Path, default=None)
     parser.add_argument("--stem", default=DEFAULT_STEM)
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+    external_reconciliation_path = args.external_reconciliation or default_external_reconciliation()
+    shell_synthesis_path = args.shell_synthesis or default_shell_synthesis()
+    hypothesis_queue_path = args.hypothesis_queue or default_hypothesis_queue()
     payload = build_report(
-        external_reconciliation=read_json(args.external_reconciliation),
-        shell_synthesis=read_json(args.shell_synthesis),
-        external_reconciliation_path=args.external_reconciliation,
-        shell_synthesis_path=args.shell_synthesis,
+        external_reconciliation=read_json(external_reconciliation_path),
+        shell_synthesis=read_json(shell_synthesis_path),
+        hypothesis_queue=read_json(hypothesis_queue_path),
+        external_reconciliation_path=external_reconciliation_path,
+        shell_synthesis_path=shell_synthesis_path,
+        hypothesis_queue_path=hypothesis_queue_path,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

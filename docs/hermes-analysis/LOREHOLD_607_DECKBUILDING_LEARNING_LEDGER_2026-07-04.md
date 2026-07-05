@@ -1016,3 +1016,54 @@ Operational lesson:
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion. The next useful step is a safe-cut/diagnostic learning
   step, not a natural promotion gate.
+
+## Diagnostic Contract Planner Relearn - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_diagnostic_contract_planner_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_diagnostic_contract_planner_20260705_current_relearn.json`
+
+The diagnostic planner now consumes the current
+`lorehold_hypothesis_queue_from_value_model_20260705_current_relearn` queue in
+addition to the external reconciliation and shell synthesis reports. This keeps
+the next-step planner aligned with the current `607` anchor and safe-cut state.
+
+Current result:
+
+- diagnostics ranked: `8`;
+- actionable learning items: `4`;
+- ready deck changes: `0`;
+- hypothesis-queue card matches: `5`;
+- natural gate-ready rows from the hypothesis queue: `0`;
+- top diagnostic: `pressure_safe_spell_payoff_micro_shell`;
+- recommended next action:
+  `draft_pressure_safe_spell_payoff_diagnostic_contract_no_natural_gate`.
+
+Top diagnostic interpretation:
+
+- The pressure-safe spell-payoff route remains the best learning target because
+  it addresses the known pressure/closing-window weakness without asking for a
+  generic one-for-one cut.
+- The current matched hypothesis is `Storm-Kiln Artist`, but it is still a
+  prior reject under the current `607` queue and its same-lane anchors include
+  protected payoff/topdeck cards such as `Molecule Man`, `Reforge the Soul`,
+  and `Call Forth the Tempest`.
+- `Monastery Mentor`, `Young Pyromancer`, and `Guttersnipe` are part of the
+  pressure package family but are not current natural-gate permissions.
+- `Approach + Lapse of Certainty` remains a useful deterministic-line
+  diagnostic, but it is telegraphed, depends on the second Approach resolving,
+  and has no seed-safe named cut.
+- Fast-mana, One Ring, Brainstone/Planetarium, and broad conversion shells
+  remain blocked, deferred, or separate-shell work under the current evidence.
+
+Operational lesson:
+
+- A planner can rank learning value without authorizing deck mutation.
+- The next implementable step is to draft a pressure-safe diagnostic contract
+  that predeclares protected anchors, pressure/Winota guardrails, direct card
+  events required, and stop rules. It must not run a natural battle gate until
+  the contract has a named shell/cut model and the current preflight moves from
+  `0` gate-ready rows.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this goal remains open.

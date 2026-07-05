@@ -116,12 +116,60 @@ def _base_shell_synthesis():
     }
 
 
+def _base_hypothesis_queue():
+    return {
+        "summary": {
+            "natural_gate_ready_count": 0,
+            "promotion_allowed": False,
+        },
+        "hypotheses": [
+            {
+                "card_name": "Storm-Kiln Artist",
+                "readiness_status": "blocked_prior_reject",
+                "priority": "P3_learning_only",
+                "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+                "same_lane_current_607_anchors": [
+                    {
+                        "card_name": "Arcane Signet",
+                        "primary_value_lane": "ramp",
+                        "priority_class": "structural_foundation",
+                        "cut_policy": "same_lane_only_with_card_use_and_equal_gate",
+                    }
+                ],
+            },
+            {
+                "card_name": "The One Ring",
+                "readiness_status": "blocked_prior_reject",
+                "priority": "P3_learning_only",
+                "allowed_next_test": "do_not_retest_without_new_cut_or_new_trace_hypothesis",
+                "same_lane_current_607_anchors": [],
+            },
+            {
+                "card_name": "Wheel of Fortune",
+                "readiness_status": "needs_safe_cut_model",
+                "priority": "P1_forced_access_diagnostic",
+                "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+                "same_lane_current_607_anchors": [
+                    {
+                        "card_name": "Reforge the Soul",
+                        "primary_value_lane": "topdeck_miracle_setup",
+                        "priority_class": "protected_payoff_finisher_anchor",
+                        "cut_policy": "protected_anchor_no_cut_without_explicit_package_and_equal_gate",
+                    }
+                ],
+            },
+        ],
+    }
+
+
 def test_planner_ranks_pressure_safe_micro_shell_first():
     payload = planner.build_report(
         external_reconciliation=_base_external_reconciliation(),
         shell_synthesis=_base_shell_synthesis(),
+        hypothesis_queue=_base_hypothesis_queue(),
         external_reconciliation_path=Path("/tmp/recon.json"),
         shell_synthesis_path=Path("/tmp/shell.json"),
+        hypothesis_queue_path=Path("/tmp/hypothesis.json"),
     )
 
     assert payload["summary"]["top_diagnostic_key"] == (
@@ -130,14 +178,20 @@ def test_planner_ranks_pressure_safe_micro_shell_first():
     assert payload["summary"]["ready_deck_change_count"] == 0
     assert payload["summary"]["keep_607_protected"] is True
     assert payload["ranked_diagnostics"][0]["readiness"] == "design_next"
+    assert payload["summary"]["natural_gate_ready_from_hypothesis_queue"] == 0
+    assert payload["summary"]["recommended_next_action"] == (
+        "draft_pressure_safe_spell_payoff_diagnostic_contract_no_natural_gate"
+    )
 
 
 def test_planner_keeps_covered_failed_conversion_shell_deferred():
     payload = planner.build_report(
         external_reconciliation=_base_external_reconciliation(),
         shell_synthesis=_base_shell_synthesis(),
+        hypothesis_queue=_base_hypothesis_queue(),
         external_reconciliation_path=Path("/tmp/recon.json"),
         shell_synthesis_path=Path("/tmp/shell.json"),
+        hypothesis_queue_path=Path("/tmp/hypothesis.json"),
     )
     row = next(
         item
@@ -153,8 +207,10 @@ def test_planner_blocks_one_ring_until_cut_safety_changes():
     payload = planner.build_report(
         external_reconciliation=_base_external_reconciliation(),
         shell_synthesis=_base_shell_synthesis(),
+        hypothesis_queue=_base_hypothesis_queue(),
         external_reconciliation_path=Path("/tmp/recon.json"),
         shell_synthesis_path=Path("/tmp/shell.json"),
+        hypothesis_queue_path=Path("/tmp/hypothesis.json"),
     )
     row = next(
         item
@@ -164,14 +220,18 @@ def test_planner_blocks_one_ring_until_cut_safety_changes():
 
     assert row["readiness"] == "blocked_until_cut_safety_changes"
     assert row["score_components"]["risk_penalty"] >= 7
+    assert row["hypothesis_queue_alignment"]["matched_cards"] == ["The One Ring"]
+    assert row["natural_gate_allowed_now"] is False
 
 
 def test_planner_keeps_approach_lapse_as_diagnostic_until_cut_exists():
     payload = planner.build_report(
         external_reconciliation=_base_external_reconciliation(),
         shell_synthesis=_base_shell_synthesis(),
+        hypothesis_queue=_base_hypothesis_queue(),
         external_reconciliation_path=Path("/tmp/recon.json"),
         shell_synthesis_path=Path("/tmp/shell.json"),
+        hypothesis_queue_path=Path("/tmp/hypothesis.json"),
     )
     row = next(
         item
@@ -183,3 +243,24 @@ def test_planner_keeps_approach_lapse_as_diagnostic_until_cut_exists():
     assert payload["summary"]["top_diagnostic_key"] == (
         "pressure_safe_spell_payoff_micro_shell"
     )
+
+
+def test_planner_attaches_hypothesis_queue_anchor_context():
+    payload = planner.build_report(
+        external_reconciliation=_base_external_reconciliation(),
+        shell_synthesis=_base_shell_synthesis(),
+        hypothesis_queue=_base_hypothesis_queue(),
+        external_reconciliation_path=Path("/tmp/recon.json"),
+        shell_synthesis_path=Path("/tmp/shell.json"),
+        hypothesis_queue_path=Path("/tmp/hypothesis.json"),
+    )
+    pressure = next(
+        item
+        for item in payload["ranked_diagnostics"]
+        if item["signal_key"] == "external_spell_pressure_creature_package"
+    )
+
+    alignment = pressure["hypothesis_queue_alignment"]
+    assert alignment["matched_cards"] == ["Storm-Kiln Artist"]
+    assert alignment["natural_gate_allowed_by_queue"] is False
+    assert alignment["same_lane_anchors_by_card"]["Storm-Kiln Artist"][0]["card_name"] == "Arcane Signet"
