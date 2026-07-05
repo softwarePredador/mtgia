@@ -1,0 +1,482 @@
+{
+  "artifact_type": "lorehold_pressure_safe_cut_expansion_model",
+  "cut_expansion_targets": [
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Creative Technique",
+      "current_status": "same_lane_only_not_seed_safe",
+      "direct_event_count": 54,
+      "investigation_status": "same_lane_microbenchmark_only",
+      "lane": "big_spell_value",
+      "manual_status": "same_lane_only",
+      "rank": 1,
+      "unique_exposure_count": 58
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Bender's Waterskin",
+      "current_status": "same_lane_only_not_seed_safe",
+      "direct_event_count": 216,
+      "investigation_status": "same_lane_microbenchmark_only",
+      "lane": "early_mana",
+      "manual_status": "same_lane_only",
+      "rank": 2,
+      "unique_exposure_count": 268
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Generous Gift",
+      "current_status": "blocked",
+      "direct_event_count": 19,
+      "investigation_status": "blocked_high_exposure_anchor",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "rank": 3,
+      "unique_exposure_count": 52
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Improvisation Capstone",
+      "current_status": "blocked",
+      "direct_event_count": 49,
+      "investigation_status": "blocked_structural_dependency",
+      "lane": "draw",
+      "manual_status": "structural_dependency",
+      "rank": 4,
+      "unique_exposure_count": 59
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Esper Sentinel",
+      "current_status": "blocked",
+      "direct_event_count": 442,
+      "investigation_status": "blocked_high_exposure_anchor",
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "rank": 5,
+      "unique_exposure_count": 527
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Path to Exile",
+      "current_status": "blocked",
+      "direct_event_count": 117,
+      "investigation_status": "blocked_high_exposure_anchor",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "rank": 6,
+      "unique_exposure_count": 166
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Swords to Plowshares",
+      "current_status": "blocked",
+      "direct_event_count": 240,
+      "investigation_status": "blocked_high_exposure_anchor",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "rank": 7,
+      "unique_exposure_count": 271
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Stroke of Midnight",
+      "current_status": "blocked",
+      "direct_event_count": 32,
+      "investigation_status": "blocked_prior_rejected_signature",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "rank": 8,
+      "unique_exposure_count": 43
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Winds of Abandon",
+      "current_status": "blocked",
+      "direct_event_count": 32,
+      "investigation_status": "blocked_prior_rejected_signature",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "rank": 9,
+      "unique_exposure_count": 59
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Monument to Endurance",
+      "current_status": "blocked",
+      "direct_event_count": 19,
+      "investigation_status": "blocked_high_exposure_anchor",
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "rank": 10,
+      "unique_exposure_count": 73
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut"
+      ],
+      "card_name": "Sensei's Divining Top",
+      "current_status": "blocked",
+      "direct_event_count": 3514,
+      "investigation_status": "blocked_high_exposure_anchor",
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "rank": 11,
+      "unique_exposure_count": 3816
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Smothering Tithe",
+      "current_status": "blocked",
+      "direct_event_count": 801,
+      "investigation_status": "blocked_high_exposure_anchor",
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "rank": 12,
+      "unique_exposure_count": 859
+    }
+  ],
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_or_replace_deck_607",
+      "do_not_run_natural_battle_for_pressure_package_until_seed_safe_cut_exists",
+      "treat Creative Technique and Bender's Waterskin as diagnostic-only same-lane cases",
+      "keep Mana Vault and The One Ring as legal staple hypotheses blocked by prior evidence and cut safety",
+      "mine or generate more trace evidence specifically for low-exposure non-anchor slots"
+    ],
+    "promotion_allowed": false,
+    "reason": "The model has real external pressure/combo signals and internal trigger evidence, but zero seed-safe cuts. The next deckbuilding lesson is cut-cost discovery, not another natural battle gate."
+  },
+  "deck_607_mutated": false,
+  "deckbuilding_priority_model": {
+    "current_607_lane_profile": {
+      "artifact": 17,
+      "basic_floor": 8,
+      "board_wipe": 8,
+      "commander_center": 1,
+      "creature": 2,
+      "draw": 9,
+      "engine": 3,
+      "fast_pressure_guard": 12,
+      "fetch_or_search_fixing": 8,
+      "format_staple_long_tail": 6,
+      "global_top_100": 17,
+      "global_top_500": 11,
+      "instant_sorcery_spell": 36,
+      "land": 34,
+      "mana_base": 34,
+      "miracle_conversion_finisher": 10,
+      "protection": 12,
+      "ramp": 15,
+      "removal": 7,
+      "structural_ramp_floor": 8,
+      "topdeck_miracle_engine": 9,
+      "tutor": 1,
+      "typed_dual_or_fetch_target": 5,
+      "untapped_or_multiplayer_fixing": 5,
+      "utility_engine_land": 8,
+      "wincon": 9
+    },
+    "current_607_mana_foundation": {
+      "artifact_ramp_quantity": 11,
+      "enchantment_ramp_quantity": 1,
+      "instant_sorcery_ramp_quantity": 3,
+      "interpretation": "The 607 mana plan is not just more fast mana: it combines 34 lands, fetch/dual fixing, artifact ramp, spell ramp, and opponent-turn mana rocks that feed miracle windows.",
+      "land_groups": {
+        "basic_floor": 8,
+        "fetch_or_search_fixing": 8,
+        "typed_dual_or_fetch_target": 5,
+        "untapped_or_multiplayer_fixing": 5,
+        "utility_engine_land": 8
+      },
+      "land_quantity": 34,
+      "land_rows": 28,
+      "mana_sources_land_plus_ramp": 49,
+      "ramp_quantity": 15
+    },
+    "planning_order": [
+      "legal_identity_and_deck_shape",
+      "commander_intent_and_win_plan",
+      "mana_foundation_lands_sources_ramp",
+      "card_flow_selection_and_resource_engine",
+      "interaction_protection_and_resilience",
+      "commander_specific_packages",
+      "staple_impact_by_role",
+      "same_lane_cut_cost",
+      "battle_and_replay_validation"
+    ],
+    "rule": "A card's generic power becomes actionable only after it improves a specific Lorehold lane and has a safe cut. Legal, famous, expensive, or game-changer cards are hypotheses, not automatic upgrades.",
+    "staple_artifact_land_learning": [
+      {
+        "card_name": "Mana Vault",
+        "current_learning_status": "blocked_not_auto_include",
+        "lane": "artifact_fast_mana_game_changer",
+        "reason": "Legal/colorless power is real, but prior Lorehold evidence rejected the one-card Bender's Waterskin replacement. Early mana is protected unless a same-lane plan preserves the miracle timing window."
+      },
+      {
+        "card_name": "The One Ring",
+        "current_learning_status": "blocked_not_auto_include",
+        "lane": "artifact_draw_protection_game_changer",
+        "reason": "The card is a powerful draw/protection engine, but tested draw/value cuts lost to protected 607. Its value is contextual only if a safe draw/protection cut and natural trace proof appear."
+      },
+      {
+        "card_name": "Storm-Kiln Artist",
+        "current_learning_status": "research_package_only",
+        "lane": "contextual_spell_payoff_mana_extension",
+        "reason": "It fits Lorehold's spell-chain pressure/treasure lane, but prior evidence forbids treating it as a generic mana-rock replacement."
+      },
+      {
+        "card_name": "Plateau",
+        "current_learning_status": "simple_swap_rejected",
+        "lane": "land_untapped_typed_dual",
+        "reason": "A cleaner land can still fail if the active shell loses battle timing. Both Plateau over Radiant Summit and Plateau over Turbulent Steppe were rejected in copied-DB diagnostics."
+      }
+    ]
+  },
+  "external_deckbuilding_learning": [
+    {
+      "learning": "Commander legality, singleton, commander count, and color identity are entry gates. They do not prove that a legal card belongs in Lorehold 607.",
+      "model_effect": "legal_identity_gate_only",
+      "source": "Wizards Commander format",
+      "url": "https://magic.wizards.com/en/formats/commander"
+    },
+    {
+      "learning": "The format requires exactly 100 cards including the commander, obeys color identity, and permits duplicate names only when rules text allows it.",
+      "model_effect": "shape_singleton_color_identity_gate",
+      "source": "Official Commander rules",
+      "url": "https://mtgcommander.net/index.php/rules/"
+    },
+    {
+      "learning": "Deck construction should check ramp, card flow, interaction, lands, curve, and commander plan together. Category counts start the process; they are not final proof.",
+      "model_effect": "role_density_and_curve_are_inputs_not_promotion",
+      "source": "EDHREC How to Build a Commander Deck",
+      "url": "https://edhrec.com/articles/how-to-build-a-commander-deck"
+    },
+    {
+      "learning": "Storm-Kiln Artist plus Haze of Rage is a red legal combo lane with infinite mana, storm, magecraft, and Treasure implications.",
+      "model_effect": "combo_package_research_requires_runtime_cut_and_battle_proof",
+      "source": "Commander Spellbook Storm-Kiln Artist + Haze of Rage",
+      "url": "https://commanderspellbook.com/combo/3940-5195/"
+    },
+    {
+      "learning": "Card legality, identity, type, oracle text, and game-changer metadata are card-data facts. ManaLoom must combine them with commander-context and battle evidence before changing 607.",
+      "model_effect": "card_data_is_not_deck_quality_by_itself",
+      "source": "Scryfall card data",
+      "url": "https://scryfall.com/docs/api/cards"
+    }
+  ],
+  "generated_at": "2026-07-05T01:10:45Z",
+  "postgres_writes": false,
+  "pressure_package_routes": [
+    {
+      "adds": [
+        "Monastery Mentor",
+        "Young Pyromancer",
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "available_seed_safe_cut_count": 0,
+      "gate_ready": false,
+      "natural_trigger_count": 26,
+      "promotion_use": "not_allowed_without_four_named_safe_cuts_and_battle_trace_proof",
+      "required_cut_count": 4,
+      "route_key": "primary_four_card_pressure_package",
+      "status": "blocked_no_seed_safe_cut_plan"
+    },
+    {
+      "adds": [
+        "Guttersnipe",
+        "Young Pyromancer"
+      ],
+      "available_seed_safe_cut_count": 0,
+      "gate_ready": false,
+      "natural_trigger_count": 13,
+      "promotion_use": "not_allowed_without_seed_safe_cut_and_strategy_matrix",
+      "required_cut_count": 2,
+      "route_key": "pressure_natural_trigger_pair_guttersnipe_young_pyromancer",
+      "status": "blocked_no_seed_safe_cut"
+    },
+    {
+      "adds": [
+        "Guttersnipe"
+      ],
+      "available_seed_safe_cut_count": 0,
+      "gate_ready": false,
+      "natural_trigger_count": 7,
+      "promotion_use": "not_allowed_without_seed_safe_cut_and_strategy_matrix",
+      "required_cut_count": 1,
+      "route_key": "pressure_single_guttersnipe",
+      "status": "blocked_no_seed_safe_cut"
+    },
+    {
+      "adds": [
+        "Young Pyromancer"
+      ],
+      "available_seed_safe_cut_count": 0,
+      "gate_ready": false,
+      "natural_trigger_count": 6,
+      "promotion_use": "not_allowed_without_seed_safe_cut_and_strategy_matrix",
+      "required_cut_count": 1,
+      "route_key": "pressure_single_young_pyromancer",
+      "status": "blocked_no_seed_safe_cut"
+    },
+    {
+      "adds": [
+        "Monastery Mentor"
+      ],
+      "available_seed_safe_cut_count": 0,
+      "gate_ready": false,
+      "natural_trigger_count": 0,
+      "promotion_use": "not_allowed_without_seed_safe_cut_and_strategy_matrix",
+      "required_cut_count": 1,
+      "route_key": "pressure_single_monastery_mentor_probe_only",
+      "status": "blocked_no_seed_safe_cut"
+    },
+    {
+      "adds": [
+        "Storm-Kiln Artist",
+        "Haze of Rage"
+      ],
+      "available_seed_safe_cut_count": 0,
+      "gate_ready": false,
+      "natural_trigger_count": 0,
+      "promotion_use": "combo_source_signal_only_until_runtime_cut_and_battle_evidence_exist",
+      "required_cut_count": 2,
+      "route_key": "storm_kiln_artist_haze_of_rage_combo_research",
+      "status": "research_only_runtime_and_cut_safety_required"
+    }
+  ],
+  "primary_pressure_adds": [
+    {
+      "card_name": "Monastery Mentor",
+      "commander_legal_status": "legal",
+      "preflight_status": "pass",
+      "role": "token_pressure_spell_payoff",
+      "value_test": "Converts noncreature spell density into board pressure and blockers; valuable only if the shell keeps enough cheap spell velocity.",
+      "verified_auto_battle_rule_count": 1
+    },
+    {
+      "card_name": "Young Pyromancer",
+      "commander_legal_status": "legal",
+      "preflight_status": "pass",
+      "role": "low_curve_token_pressure_payoff",
+      "value_test": "Adds low-cost pressure absorption and chip pressure from instants and sorceries without asking the deck to become creature-heavy.",
+      "verified_auto_battle_rule_count": 1
+    },
+    {
+      "card_name": "Guttersnipe",
+      "commander_legal_status": "legal",
+      "preflight_status": "pass",
+      "role": "noncombat_spell_pressure_payoff",
+      "value_test": "Turns spell chaining into direct table pressure, but must be measured against protection and closing-window timing.",
+      "verified_auto_battle_rule_count": 1
+    },
+    {
+      "card_name": "Storm-Kiln Artist",
+      "commander_legal_status": "legal",
+      "preflight_status": "pass",
+      "role": "spell_payoff_mana_extension",
+      "value_test": "Extends spell-chain turns through treasure production; prior internal evidence forbids treating it as a generic Arcane Signet replacement.",
+      "verified_auto_battle_rule_count": 1
+    }
+  ],
+  "source_db_mutated": false,
+  "source_reports": {
+    "pressure_micro_package_planner": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_micro_package_planner_20260704_current.json",
+    "pressure_safe_cut_pool_resolver": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_cut_pool_resolver_20260704_current.json",
+    "pressure_safe_spell_payoff_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_spell_payoff_contract_20260704_current.json",
+    "router": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_mana_base_learning_router_20260705_current.json",
+    "seed_safe_cut_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260704_role_tag_repair.json",
+    "trace_cut_evidence_expander": "docs/hermes-analysis/master_optimizer_reports/lorehold_trace_cut_evidence_expander_20260704_role_tag_repair.json",
+    "value_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json"
+  },
+  "status": "pressure_cut_expansion_no_seed_safe_cut_keep_607",
+  "summary": {
+    "current_baseline": "deck_607",
+    "gate_ready_cut_count": 0,
+    "gate_ready_package_count": 0,
+    "hard_blocked_count": 92,
+    "natural_battle_allowed_now": false,
+    "primary_add_count": 4,
+    "promotion_allowed": false,
+    "ready_deck_change_count": 0,
+    "recommended_next_action": "build_diagnostic_same_lane_microbenchmarks_and_more_trace_mining",
+    "reviewable_evidence_gap_count": 0,
+    "router_status": "post_mana_base_route_cut_safety_expansion_required",
+    "same_lane_only_cut_count": 2,
+    "seed_safe_cut_ready_count": 0
+  }
+}

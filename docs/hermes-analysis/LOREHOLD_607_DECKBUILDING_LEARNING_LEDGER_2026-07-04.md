@@ -155,3 +155,59 @@ candidate has safe-cut proof and miracle-access preflight.
 Current conclusion: protected deck `607` remains the Lorehold champion under
 the active contract. The learning task stays open because a better deck may
 exist, but it has not been proven by the current evidence.
+
+## Pressure Safe-Cut Expansion Model - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_cut_expansion_model_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_cut_expansion_model_20260705_current.json`
+
+It converts the external deckbuilding lesson into an executable local policy:
+legal identity, public popularity, game-changer status, and raw card power are
+only inputs. A card becomes actionable only after it improves a specific
+Lorehold lane, has a named safe cut, and survives battle/replay validation.
+
+Current result:
+
+- status: `pressure_cut_expansion_no_seed_safe_cut_keep_607`;
+- seed-safe cuts: `0`;
+- same-lane-only diagnostic cuts: `2`;
+- hard-blocked cuts: `92`;
+- gate-ready pressure packages: `0`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`.
+
+Current pressure routes:
+
+- `Monastery Mentor`, `Young Pyromancer`, `Guttersnipe`, and
+  `Storm-Kiln Artist` remain the primary four-card pressure package, but it is
+  blocked because it needs four named safe cuts and currently has zero.
+- `Guttersnipe` plus `Young Pyromancer` remains the smallest natural-trigger
+  pressure hypothesis, but it is also blocked because it needs two safe cuts.
+- `Storm-Kiln Artist` plus `Haze of Rage` is a valid combo research lane, not a
+  promotion lane, until runtime, cut-safety, and battle evidence exist.
+
+Current cut-learning targets:
+
+- `Creative Technique`: same-lane diagnostic only; not a generic flex cut.
+- `Bender's Waterskin`: same-lane diagnostic only; not a generic fast-mana cut.
+- `Generous Gift`, `Esper Sentinel`, `Path to Exile`,
+  `Swords to Plowshares`, `Monument to Endurance`, `Sensei's Divining Top`,
+  and `Smothering Tithe` remain blocked by high exposure or protected role
+  evidence.
+
+Staple/artifact/land lesson:
+
+- `Mana Vault` is legal and powerful, but remains blocked as an automatic
+  include because the prior one-card `Bender's Waterskin` replacement lost.
+- `The One Ring` is legal and powerful, but remains blocked as an automatic
+  include because tested draw/value cuts lost to protected `607`.
+- `Storm-Kiln Artist` is contextual pressure/treasure research, not a generic
+  mana-rock replacement.
+- `Plateau` is a structurally clean land, but both simple copied-DB swaps were
+  rejected, so simple land swaps are not the next learning route.
+
+Current conclusion remains unchanged: protected deck `607` is still the
+Lorehold champion. The persistent learning task continues through cut-cost
+discovery and diagnostic-only same-lane microbenchmarks, not natural battles.
