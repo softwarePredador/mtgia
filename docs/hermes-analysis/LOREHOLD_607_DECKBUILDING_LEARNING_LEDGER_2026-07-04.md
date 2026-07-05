@@ -2468,3 +2468,73 @@ App/deckbuilder rule:
   strategy matrix, and later equal battle traces.
 - Current conclusion remains unchanged: deck `607` is still the protected
   Lorehold champion.
+
+## Topdeck Forced Access Audit - 2026-07-05
+
+The current topdeck forced-access artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_forced_access_audit_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_forced_access_audit_20260705_current.json`
+
+This audit consumes:
+
+- `lorehold_hypothesis_queue_from_value_model_20260705_current_relearn`;
+- `lorehold_miracle_access_first_preflight_20260704_current`;
+- `lorehold_miracle_trace_failure_miner_20260704_current`;
+- `lorehold_card_value_priority_synthesis_20260705_current_relearn`.
+
+Current result:
+
+- status:
+  `topdeck_forced_access_diagnostic_ready_no_natural_gate_keep_607`;
+- target cards reviewed: `5`;
+- diagnostic-ready cards: `5`;
+- natural-gate-ready cards: `0`;
+- safe-cut-ready cards: `0`;
+- preflight gate-ready count: `0`;
+- deck action allowed now: `false`;
+- promotion allowed: `false`;
+- recommended first diagnostic: `Penance`.
+
+Topdeck learning priority:
+
+1. `Penance`: direct hand-to-top setup signal from the Card Kingdom Lorehold
+   synergy review. It is the best first microbenchmark because it tests the
+   exact missing skill: turning cards in hand into known first-draw miracle
+   access.
+2. `Galvanoth`: top-card free-cast engine with current EDHREC Lorehold signal
+   (`26%` inclusion and `26%` synergy in the audit snapshot). It tests whether
+   more top-card casting actually converts after setup.
+3. `Dragon's Rage Channeler`: cheap noncreature-spell selection with current
+   EDHREC Lorehold signal (`39%` inclusion and `37%` synergy in the audit
+   snapshot). It tests whether surveil improves live miracle windows or only
+   churns cards.
+4. `Valakut Awakening // Valakut Stoneforge`: modal hand refresh. It tests
+   recovery from bad hands, but must prove it does not become tap-land drag or
+   reset prepared topdeck anchors.
+5. `Wheel of Fortune`: powerful mass redraw and hand-filter lane hypothesis.
+   It is high variance because it can refill opponents and undo a prepared top
+   card.
+
+Required before any natural gate:
+
+- name the exact current `607` cut slot and functional lane;
+- preserve or beat current `607` strategic floors:
+  `miracle_cast=4`, `topdeck_manipulation_activated=5`,
+  `lorehold_spell_cast=22`, `lorehold_cost_paid=27`, and
+  `lorehold_upkeep_rummage=5`;
+- preserve or beat current `607` natural access to topdeck anchors:
+  `Land Tax=1`, `Scroll Rack=1`, `Sensei's Divining Top=2`,
+  `The Mind Stone=2`, `Urza's Saga=1`, `Lorehold, the Historian=3`;
+- show the candidate card drawn/cast/activated in focused traces;
+- tie or beat `607` in the same opponent and seed window;
+- avoid fast-pressure regression before any deck mutation.
+
+Operational lesson:
+
+- These five cards are now valid learning targets, not valid deck swaps.
+- Forced access is allowed only as a diagnostic/microbenchmark lane and cannot
+  promote a deck by itself.
+- The app/deckbuilder must keep showing `607` as the protected Lorehold
+  baseline until a candidate has named same-lane cut proof, non-regressed
+  miracle/topdeck floors, and equal battle traces.

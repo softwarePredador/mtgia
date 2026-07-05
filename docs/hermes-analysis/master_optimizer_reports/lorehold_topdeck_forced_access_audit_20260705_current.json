@@ -1,0 +1,611 @@
+{
+  "artifact_type": "lorehold_topdeck_forced_access_audit",
+  "candidates": [
+    {
+      "blockers_before_deck_action": [
+        "deck_607_protected_no_mutation",
+        "miracle_access_first_preflight_closed",
+        "needs_named_same_lane_safe_cut_model",
+        "no_natural_gate_ready_row"
+      ],
+      "card_name": "Penance",
+      "decision": "forced_access_diagnostic_ready_only",
+      "deck_action_allowed_now": false,
+      "diagnostic_allowed_now": true,
+      "external_evidence": {
+        "learning_priority_rank": 1,
+        "risk": "card disadvantage unless the top-card setup converts immediately",
+        "role": "turns cards in hand into known top-library cards for miracle windows",
+        "signal": "direct_hand_to_top_setup",
+        "source": "Card Kingdom Lorehold synergy review",
+        "strength": "direct_card_mechanic_support",
+        "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/"
+      },
+      "hypothesis": {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "best_edhrec_rank": null,
+        "lanes": [
+          "topdeck_miracle_setup"
+        ],
+        "present": true,
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+        "runtime_ready": true,
+        "same_lane_current_607_anchors": [
+          "Land Tax",
+          "Library of Leng",
+          "Lorehold, the Historian",
+          "Scroll Rack",
+          "Sensei's Divining Top"
+        ],
+        "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+        "staple_tier": "not_format_staple",
+        "variant_deck_count": 4,
+        "variant_deck_ids": [
+          609,
+          611,
+          613,
+          614
+        ]
+      },
+      "learning_priority_rank": 1,
+      "microbenchmark_contract": {
+        "access_mode": "forced_access_diagnostic_only",
+        "may_mutate_deck_607": false,
+        "may_promote_deck": false,
+        "must_log": [
+          "candidate_card_drawn_or_accessed",
+          "candidate_card_cast_or_activated",
+          "miracle_cast",
+          "topdeck_manipulation_activated",
+          "lorehold_upkeep_rummage",
+          "lorehold_cost_paid",
+          "head_to_head_vs_607_same_seed",
+          "fast_pressure_slice"
+        ],
+        "must_preserve_before_natural_gate": [
+          "Bender's Waterskin",
+          "Creative Technique",
+          "Land Tax",
+          "Library of Leng",
+          "Lorehold, the Historian",
+          "Mizzix's Mastery",
+          "Molecule Man",
+          "Scroll Rack",
+          "Sensei's Divining Top",
+          "Storm Herd",
+          "The Mind Stone",
+          "The Scarlet Witch",
+          "Urza's Saga",
+          "Victory Chimes"
+        ]
+      },
+      "natural_gate_allowed_now": false,
+      "required_trace_floors": {
+        "anchor_access_floors_from_607": {
+          "Land Tax": 1,
+          "Library of Leng": 0,
+          "Lorehold, the Historian": 3,
+          "Scroll Rack": 1,
+          "Sensei's Divining Top": 2,
+          "The Mind Stone": 2,
+          "Urza's Saga": 1
+        },
+        "strategic_floors_from_607": {
+          "lorehold_cost_paid": 27,
+          "lorehold_spell_cast": 22,
+          "lorehold_upkeep_rummage": 5,
+          "miracle_cast": 4,
+          "topdeck_manipulation_activated": 5
+        }
+      },
+      "safe_cut_ready": false
+    },
+    {
+      "blockers_before_deck_action": [
+        "deck_607_protected_no_mutation",
+        "miracle_access_first_preflight_closed",
+        "needs_named_same_lane_safe_cut_model",
+        "no_natural_gate_ready_row"
+      ],
+      "card_name": "Galvanoth",
+      "decision": "forced_access_diagnostic_ready_only",
+      "deck_action_allowed_now": false,
+      "diagnostic_allowed_now": true,
+      "external_evidence": {
+        "edhrec_lorehold_inclusion_percent": 26.0,
+        "edhrec_lorehold_synergy_percent": 26.0,
+        "learning_priority_rank": 2,
+        "risk": "five-mana setup can be too slow if it does not protect miracle cadence",
+        "role": "tests whether extra top-card spell casting improves conversion after setup",
+        "signal": "top_card_free_cast_engine",
+        "source": "EDHREC Lorehold commander page",
+        "strength": "commander_specific_public_usage_signal",
+        "url": "https://edhrec.com/commanders/lorehold-the-historian"
+      },
+      "hypothesis": {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "best_edhrec_rank": null,
+        "lanes": [
+          "topdeck_miracle_setup"
+        ],
+        "present": true,
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+        "runtime_ready": true,
+        "same_lane_current_607_anchors": [
+          "Land Tax",
+          "Library of Leng",
+          "Lorehold, the Historian",
+          "Scroll Rack",
+          "Sensei's Divining Top"
+        ],
+        "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+        "staple_tier": "not_format_staple",
+        "variant_deck_count": 4,
+        "variant_deck_ids": [
+          611,
+          613,
+          614,
+          615
+        ]
+      },
+      "learning_priority_rank": 2,
+      "microbenchmark_contract": {
+        "access_mode": "forced_access_diagnostic_only",
+        "may_mutate_deck_607": false,
+        "may_promote_deck": false,
+        "must_log": [
+          "candidate_card_drawn_or_accessed",
+          "candidate_card_cast_or_activated",
+          "miracle_cast",
+          "topdeck_manipulation_activated",
+          "lorehold_upkeep_rummage",
+          "lorehold_cost_paid",
+          "head_to_head_vs_607_same_seed",
+          "fast_pressure_slice"
+        ],
+        "must_preserve_before_natural_gate": [
+          "Bender's Waterskin",
+          "Creative Technique",
+          "Land Tax",
+          "Library of Leng",
+          "Lorehold, the Historian",
+          "Mizzix's Mastery",
+          "Molecule Man",
+          "Scroll Rack",
+          "Sensei's Divining Top",
+          "Storm Herd",
+          "The Mind Stone",
+          "The Scarlet Witch",
+          "Urza's Saga",
+          "Victory Chimes"
+        ]
+      },
+      "natural_gate_allowed_now": false,
+      "required_trace_floors": {
+        "anchor_access_floors_from_607": {
+          "Land Tax": 1,
+          "Library of Leng": 0,
+          "Lorehold, the Historian": 3,
+          "Scroll Rack": 1,
+          "Sensei's Divining Top": 2,
+          "The Mind Stone": 2,
+          "Urza's Saga": 1
+        },
+        "strategic_floors_from_607": {
+          "lorehold_cost_paid": 27,
+          "lorehold_spell_cast": 22,
+          "lorehold_upkeep_rummage": 5,
+          "miracle_cast": 4,
+          "topdeck_manipulation_activated": 5
+        }
+      },
+      "safe_cut_ready": false
+    },
+    {
+      "blockers_before_deck_action": [
+        "deck_607_protected_no_mutation",
+        "miracle_access_first_preflight_closed",
+        "needs_named_same_lane_safe_cut_model",
+        "no_natural_gate_ready_row"
+      ],
+      "card_name": "Dragon's Rage Channeler",
+      "decision": "forced_access_diagnostic_ready_only",
+      "deck_action_allowed_now": false,
+      "diagnostic_allowed_now": true,
+      "external_evidence": {
+        "edhrec_lorehold_inclusion_percent": 39.0,
+        "edhrec_lorehold_synergy_percent": 37.0,
+        "learning_priority_rank": 3,
+        "risk": "surveil is selection, not guaranteed topdeck placement for miracle",
+        "role": "tests whether cheap surveil selection increases live first-draw setup",
+        "signal": "noncreature_spell_surveillance",
+        "source": "EDHREC Lorehold commander page",
+        "strength": "commander_specific_public_usage_signal",
+        "url": "https://edhrec.com/commanders/lorehold-the-historian"
+      },
+      "hypothesis": {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "best_edhrec_rank": null,
+        "lanes": [
+          "topdeck_miracle_setup"
+        ],
+        "present": true,
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+        "runtime_ready": true,
+        "same_lane_current_607_anchors": [
+          "Land Tax",
+          "Library of Leng",
+          "Lorehold, the Historian",
+          "Scroll Rack",
+          "Sensei's Divining Top"
+        ],
+        "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+        "staple_tier": "not_format_staple",
+        "variant_deck_count": 3,
+        "variant_deck_ids": [
+          609,
+          613,
+          614
+        ]
+      },
+      "learning_priority_rank": 3,
+      "microbenchmark_contract": {
+        "access_mode": "forced_access_diagnostic_only",
+        "may_mutate_deck_607": false,
+        "may_promote_deck": false,
+        "must_log": [
+          "candidate_card_drawn_or_accessed",
+          "candidate_card_cast_or_activated",
+          "miracle_cast",
+          "topdeck_manipulation_activated",
+          "lorehold_upkeep_rummage",
+          "lorehold_cost_paid",
+          "head_to_head_vs_607_same_seed",
+          "fast_pressure_slice"
+        ],
+        "must_preserve_before_natural_gate": [
+          "Bender's Waterskin",
+          "Creative Technique",
+          "Land Tax",
+          "Library of Leng",
+          "Lorehold, the Historian",
+          "Mizzix's Mastery",
+          "Molecule Man",
+          "Scroll Rack",
+          "Sensei's Divining Top",
+          "Storm Herd",
+          "The Mind Stone",
+          "The Scarlet Witch",
+          "Urza's Saga",
+          "Victory Chimes"
+        ]
+      },
+      "natural_gate_allowed_now": false,
+      "required_trace_floors": {
+        "anchor_access_floors_from_607": {
+          "Land Tax": 1,
+          "Library of Leng": 0,
+          "Lorehold, the Historian": 3,
+          "Scroll Rack": 1,
+          "Sensei's Divining Top": 2,
+          "The Mind Stone": 2,
+          "Urza's Saga": 1
+        },
+        "strategic_floors_from_607": {
+          "lorehold_cost_paid": 27,
+          "lorehold_spell_cast": 22,
+          "lorehold_upkeep_rummage": 5,
+          "miracle_cast": 4,
+          "topdeck_manipulation_activated": 5
+        }
+      },
+      "safe_cut_ready": false
+    },
+    {
+      "blockers_before_deck_action": [
+        "deck_607_protected_no_mutation",
+        "miracle_access_first_preflight_closed",
+        "needs_named_same_lane_safe_cut_model",
+        "no_natural_gate_ready_row"
+      ],
+      "card_name": "Valakut Awakening // Valakut Stoneforge",
+      "decision": "forced_access_diagnostic_ready_only",
+      "deck_action_allowed_now": false,
+      "diagnostic_allowed_now": true,
+      "external_evidence": {
+        "learning_priority_rank": 4,
+        "risk": "can become a tap-land or hand churn that does not preserve topdeck anchors",
+        "role": "tests whether a modal land/filter card improves bad-hand recovery without land-floor loss",
+        "signal": "modal_hand_refresh",
+        "source": "Scryfall Oracle plus EDHREC topdeck shell context",
+        "strength": "mechanic_fit_requires_internal_trace",
+        "url": "https://scryfall.com/card/znr/174/valakut-awakening-valakut-stoneforge"
+      },
+      "hypothesis": {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "best_edhrec_rank": null,
+        "lanes": [
+          "topdeck_miracle_setup"
+        ],
+        "present": true,
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+        "runtime_ready": true,
+        "same_lane_current_607_anchors": [
+          "Land Tax",
+          "Library of Leng",
+          "Lorehold, the Historian",
+          "Scroll Rack",
+          "Sensei's Divining Top"
+        ],
+        "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+        "staple_tier": "not_format_staple",
+        "variant_deck_count": 4,
+        "variant_deck_ids": [
+          608,
+          609,
+          610,
+          611
+        ]
+      },
+      "learning_priority_rank": 4,
+      "microbenchmark_contract": {
+        "access_mode": "forced_access_diagnostic_only",
+        "may_mutate_deck_607": false,
+        "may_promote_deck": false,
+        "must_log": [
+          "candidate_card_drawn_or_accessed",
+          "candidate_card_cast_or_activated",
+          "miracle_cast",
+          "topdeck_manipulation_activated",
+          "lorehold_upkeep_rummage",
+          "lorehold_cost_paid",
+          "head_to_head_vs_607_same_seed",
+          "fast_pressure_slice"
+        ],
+        "must_preserve_before_natural_gate": [
+          "Bender's Waterskin",
+          "Creative Technique",
+          "Land Tax",
+          "Library of Leng",
+          "Lorehold, the Historian",
+          "Mizzix's Mastery",
+          "Molecule Man",
+          "Scroll Rack",
+          "Sensei's Divining Top",
+          "Storm Herd",
+          "The Mind Stone",
+          "The Scarlet Witch",
+          "Urza's Saga",
+          "Victory Chimes"
+        ]
+      },
+      "natural_gate_allowed_now": false,
+      "required_trace_floors": {
+        "anchor_access_floors_from_607": {
+          "Land Tax": 1,
+          "Library of Leng": 0,
+          "Lorehold, the Historian": 3,
+          "Scroll Rack": 1,
+          "Sensei's Divining Top": 2,
+          "The Mind Stone": 2,
+          "Urza's Saga": 1
+        },
+        "strategic_floors_from_607": {
+          "lorehold_cost_paid": 27,
+          "lorehold_spell_cast": 22,
+          "lorehold_upkeep_rummage": 5,
+          "miracle_cast": 4,
+          "topdeck_manipulation_activated": 5
+        }
+      },
+      "safe_cut_ready": false
+    },
+    {
+      "blockers_before_deck_action": [
+        "deck_607_protected_no_mutation",
+        "miracle_access_first_preflight_closed",
+        "needs_named_same_lane_safe_cut_model",
+        "no_natural_gate_ready_row"
+      ],
+      "card_name": "Wheel of Fortune",
+      "decision": "forced_access_diagnostic_ready_only",
+      "deck_action_allowed_now": false,
+      "diagnostic_allowed_now": true,
+      "external_evidence": {
+        "learning_priority_rank": 5,
+        "risk": "symmetrical refill can help opponents and reset a prepared top card",
+        "role": "tests whether a full hand reset improves spell-chain conversion after topdeck setup",
+        "signal": "mass_redraw_high_variance",
+        "source": "Format staple signal plus Lorehold hand-filter lane",
+        "strength": "format_staple_long_tail",
+        "url": "https://edhrec.com/top"
+      },
+      "hypothesis": {
+        "allowed_next_test": "forced_access_diagnostic_only_until_miracle_access_floors_pass",
+        "best_edhrec_rank": 554,
+        "lanes": [
+          "topdeck_miracle_setup"
+        ],
+        "present": true,
+        "priority": "P1_forced_access_diagnostic",
+        "readiness_status": "needs_safe_cut_model",
+        "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+        "runtime_ready": true,
+        "same_lane_current_607_anchors": [
+          "Land Tax",
+          "Library of Leng",
+          "Lorehold, the Historian",
+          "Scroll Rack",
+          "Sensei's Divining Top"
+        ],
+        "same_lane_cut_contract": "named_current_607_slot_and_equal_gate_required",
+        "staple_tier": "format_staple_long_tail",
+        "variant_deck_count": 4,
+        "variant_deck_ids": [
+          608,
+          609,
+          612,
+          616
+        ]
+      },
+      "learning_priority_rank": 5,
+      "microbenchmark_contract": {
+        "access_mode": "forced_access_diagnostic_only",
+        "may_mutate_deck_607": false,
+        "may_promote_deck": false,
+        "must_log": [
+          "candidate_card_drawn_or_accessed",
+          "candidate_card_cast_or_activated",
+          "miracle_cast",
+          "topdeck_manipulation_activated",
+          "lorehold_upkeep_rummage",
+          "lorehold_cost_paid",
+          "head_to_head_vs_607_same_seed",
+          "fast_pressure_slice"
+        ],
+        "must_preserve_before_natural_gate": [
+          "Bender's Waterskin",
+          "Creative Technique",
+          "Land Tax",
+          "Library of Leng",
+          "Lorehold, the Historian",
+          "Mizzix's Mastery",
+          "Molecule Man",
+          "Scroll Rack",
+          "Sensei's Divining Top",
+          "Storm Herd",
+          "The Mind Stone",
+          "The Scarlet Witch",
+          "Urza's Saga",
+          "Victory Chimes"
+        ]
+      },
+      "natural_gate_allowed_now": false,
+      "required_trace_floors": {
+        "anchor_access_floors_from_607": {
+          "Land Tax": 1,
+          "Library of Leng": 0,
+          "Lorehold, the Historian": 3,
+          "Scroll Rack": 1,
+          "Sensei's Divining Top": 2,
+          "The Mind Stone": 2,
+          "Urza's Saga": 1
+        },
+        "strategic_floors_from_607": {
+          "lorehold_cost_paid": 27,
+          "lorehold_spell_cast": 22,
+          "lorehold_upkeep_rummage": 5,
+          "miracle_cast": 4,
+          "topdeck_manipulation_activated": 5
+        }
+      },
+      "safe_cut_ready": false
+    }
+  ],
+  "current_baseline": "deck_607",
+  "decision": {
+    "allow_deck_mutation_now": false,
+    "allow_forced_access_microbenchmarks": true,
+    "allow_natural_gate_now": false,
+    "current_best_baseline": "deck_607",
+    "highest_learning_priority": "Penance",
+    "next_action": "build_forced_access_microbenchmarks_for_topdeck_candidates_without_deck_mutation",
+    "promotion_allowed": false,
+    "reason": "The topdeck cards are good learning targets because they directly test Lorehold's miracle-access problem. They still have zero safe-cut/natural-gate proof, so the only permitted next step is forced-access diagnostics that cannot promote or mutate 607."
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T06:11:49Z",
+  "postgres_writes": false,
+  "protected_607_anchors": [
+    "Bender's Waterskin",
+    "Creative Technique",
+    "Land Tax",
+    "Library of Leng",
+    "Lorehold, the Historian",
+    "Mizzix's Mastery",
+    "Molecule Man",
+    "Scroll Rack",
+    "Sensei's Divining Top",
+    "Storm Herd",
+    "The Mind Stone",
+    "The Scarlet Witch",
+    "Urza's Saga",
+    "Victory Chimes"
+  ],
+  "required_before_any_natural_gate": [
+    "name the exact current 607 cut slot and functional lane",
+    "preserve or beat current 607 strategic floors for miracle/topdeck execution",
+    "preserve or beat current 607 natural access to topdeck anchors",
+    "show candidate card drawn/cast/activated in focused traces",
+    "tie or beat 607 in the same opponent and seed window",
+    "avoid fast-pressure regression before any deck mutation"
+  ],
+  "source_db_mutated": false,
+  "source_reports": {
+    "hypothesis_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_hypothesis_queue_from_value_model_20260705_current_relearn.json",
+    "preflight": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_preflight_20260704_current.json",
+    "trace_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_trace_failure_miner_20260704_current.json",
+    "value_priority": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_value_priority_synthesis_20260705_current_relearn.json"
+  },
+  "source_snapshot": [
+    {
+      "source": "EDHREC Lorehold commander page",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian",
+      "use": "Current public Lorehold evidence tags the commander as Topdeck and Spellslinger and gives card-specific signals for Galvanoth and Dragon's Rage Channeler."
+    },
+    {
+      "source": "EDHREC optimized Topdeck Lorehold page",
+      "url": "https://edhrec.com/decks/lorehold-the-historian/optimized/topdeck",
+      "use": "Used as shell context only; optimized public lists do not replace the 607 gate."
+    },
+    {
+      "source": "EDHREC Miracles Every Turn with Lorehold",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander",
+      "use": "Imported lesson: opponent-upkeep rummage creates first-draw miracle windows, so top-library setup is a core engine floor."
+    },
+    {
+      "source": "Card Kingdom Lorehold synergy review",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/",
+      "use": "Imported lesson: Library of Leng, Penance, Sensei's Divining Top, Scroll Rack, Land Tax, Victory Chimes, and Bender's Waterskin are coherent with the plan."
+    }
+  ],
+  "status": "topdeck_forced_access_diagnostic_ready_no_natural_gate_keep_607",
+  "summary": {
+    "anchor_access_floor_count": 7,
+    "blocker_counts": {
+      "deck_607_protected_no_mutation": 5,
+      "miracle_access_first_preflight_closed": 5,
+      "needs_named_same_lane_safe_cut_model": 5,
+      "no_natural_gate_ready_row": 5
+    },
+    "candidate_count": 5,
+    "deck_607_mutated": false,
+    "deck_action_allowed_now": false,
+    "diagnostic_ready_count": 5,
+    "hypothesis_queue_status": "lorehold_hypothesis_queue_ready_no_natural_gate",
+    "keep_607_as_protected_baseline": true,
+    "missing_inputs": [],
+    "natural_gate_allowed_now": false,
+    "natural_gate_ready_count": 0,
+    "postgres_writes": false,
+    "preflight_gate_ready_now_count": 0,
+    "preflight_status": "no_current_candidate_passes_miracle_access_first_preflight",
+    "promotion_allowed": false,
+    "protected_anchor_count": 14,
+    "recommended_first_diagnostic": "Penance",
+    "safe_cut_ready_count": 0,
+    "source_db_mutated": false,
+    "strategic_floor_count": 5,
+    "target_card_count": 5,
+    "trace_status": "lorehold_miracle_trace_failure_learning_ready",
+    "value_priority_status": "card_value_priority_no_direct_cut_ready_current_607"
+  }
+}
