@@ -223,6 +223,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     para gerar um pool nomeado review-only por identidade de cor e legalidade
     Commander, ainda sem materializar decks. Evidencia local atual:
     `master_optimizer_reports/global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md`.
+    Em seguida, rode
+    `manaloom-knowledge/scripts/global_commander_land_cut_candidate_model.py`
+    para transformar candidatos de land e excesso de papeis em hipoteses
+    add/cut review-only, bloqueando cartas que carregam roles ainda faltantes.
+    Evidencia local atual:
+    `master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md`.
     Para ordenar o proximo aprendizado global sem voltar a focar no `607`,
     rode `manaloom-knowledge/scripts/global_commander_learning_priority_audit.py`;
     evidencia local atual:

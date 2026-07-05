@@ -30,6 +30,7 @@ GLOBAL_COMMANDER_CORE_ROLE_AUDIT = SCRIPT_DIR / "global_commander_core_role_audi
 GLOBAL_COMMANDER_CORE_REPAIR_HYPOTHESIS = SCRIPT_DIR / "global_commander_core_repair_hypothesis.py"
 GLOBAL_COMMANDER_MANA_BASE_PROFILE = SCRIPT_DIR / "global_commander_mana_base_profile.py"
 GLOBAL_COMMANDER_NAMED_LAND_CANDIDATE_POOL = SCRIPT_DIR / "global_commander_named_land_candidate_pool.py"
+GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_land_cut_candidate_model.py"
 GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT = SCRIPT_DIR / "global_commander_learning_priority_audit.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
@@ -76,6 +77,10 @@ GLOBAL_COMMANDER_MANA_BASE_PROFILE_REPORT = (
 GLOBAL_COMMANDER_NAMED_LAND_CANDIDATE_POOL_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md"
+)
+GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md"
 )
 GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
     REPO_ROOT
@@ -152,6 +157,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_mana_base_profile_20260705_global_goal_hermes_only.md",
                 "global_commander_named_land_candidate_pool.py",
                 "global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md",
+                "global_commander_land_cut_candidate_model.py",
+                "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md",
                 "global_commander_learning_priority_audit.py",
                 "global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md",
                 "five Commander",
@@ -275,6 +282,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_mana_base_profile_20260705_global_goal_hermes_only.md",
                 "global_commander_named_land_candidate_pool.py",
                 "global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md",
+                "global_commander_land_cut_candidate_model.py",
+                "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md",
             ],
         )
     )
@@ -396,6 +405,19 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL,
+            [
+                "global_commander_land_cut_candidate_model",
+                "review_only_land_add_cut_pair",
+                "carries_missing_core_role",
+                "printed_deck_construction_exception_requires_source_lane",
+                "potential_topdeck_engine_anchor_requires_commander_source_lane",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT,
             [
                 "global_commander_learning_priority_audit",
@@ -458,6 +480,16 @@ def build_audit() -> dict[str, Any]:
             "missing": []
             if GLOBAL_COMMANDER_NAMED_LAND_CANDIDATE_POOL_REPORT.exists()
             else ["global_commander_named_land_candidate_pool_report"],
+        }
+    )
+    checks.append(
+        {
+            "path": rel(GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL_REPORT),
+            "exists": GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL_REPORT.exists(),
+            "status": "pass" if GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL_REPORT.exists() else "fail",
+            "missing": []
+            if GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL_REPORT.exists()
+            else ["global_commander_land_cut_candidate_model_report"],
         }
     )
     checks.append(
