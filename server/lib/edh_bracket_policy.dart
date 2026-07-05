@@ -1,7 +1,8 @@
-/// Política determinística de EDH Brackets (1..4) para controlar power level.
+/// Política determinística de Commander Brackets (1..5) para controlar power level.
 ///
 /// Observação: isso NÃO substitui legalidade/identidade/limites de cópias.
 /// É uma camada adicional para manter consistência entre "brackets".
+/// Brackets são sinal de intenção/pregame; não provam qualidade estratégica.
 library;
 
 enum BracketCategory {
@@ -28,7 +29,7 @@ class BracketPolicy {
   final Map<BracketCategory, int> maxCounts;
 
   static BracketPolicy forBracket(int bracket) {
-    final b = bracket.clamp(1, 4);
+    final b = bracket.clamp(1, 5);
     switch (b) {
       case 1:
         return BracketPolicy(
@@ -82,26 +83,33 @@ class BracketPolicy {
           },
         );
       case 4:
-      default:
         return BracketPolicy(
           bracket: 4,
-          maxCounts: const {
-            BracketCategory.fastMana: 99,
-            BracketCategory.tutor: 99,
-            BracketCategory.freeInteraction: 99,
-            BracketCategory.extraTurns: 99,
-            BracketCategory.infiniteCombo: 99,
-            BracketCategory.boardWipe: 99,
-            BracketCategory.cardAdvantage: 99,
-            BracketCategory.stax: 99,
-            BracketCategory.protection: 99,
-            BracketCategory.valueEngine: 99,
-            BracketCategory.gameChanger: 99,
-          },
+          maxCounts: _unlimitedBracketCounts,
+        );
+      case 5:
+      default:
+        return BracketPolicy(
+          bracket: 5,
+          maxCounts: _unlimitedBracketCounts,
         );
     }
   }
 }
+
+const _unlimitedBracketCounts = <BracketCategory, int>{
+  BracketCategory.fastMana: 99,
+  BracketCategory.tutor: 99,
+  BracketCategory.freeInteraction: 99,
+  BracketCategory.extraTurns: 99,
+  BracketCategory.infiniteCombo: 99,
+  BracketCategory.boardWipe: 99,
+  BracketCategory.cardAdvantage: 99,
+  BracketCategory.stax: 99,
+  BracketCategory.protection: 99,
+  BracketCategory.valueEngine: 99,
+  BracketCategory.gameChanger: 99,
+};
 
 class BracketTagResult {
   BracketTagResult(this.categories);

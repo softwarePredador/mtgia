@@ -3,6 +3,63 @@ import 'package:test/test.dart';
 
 void main() {
   group('EDH bracket policy tags', () {
+    test('uses current five bracket model for game changer budgets', () {
+      expect(
+        BracketPolicy.forBracket(0).bracket,
+        equals(1),
+        reason: 'below-range bracket inputs clamp to Exhibition.',
+      );
+      expect(
+        BracketPolicy.forBracket(5).bracket,
+        equals(5),
+        reason: 'cEDH bracket must not collapse to legacy bracket 4.',
+      );
+      expect(
+        BracketPolicy.forBracket(6).bracket,
+        equals(5),
+        reason: 'above-range bracket inputs clamp to cEDH.',
+      );
+      expect(
+        BracketPolicy.forBracket(1).maxCounts[BracketCategory.gameChanger],
+        equals(0),
+      );
+      expect(
+        BracketPolicy.forBracket(2).maxCounts[BracketCategory.gameChanger],
+        equals(0),
+      );
+      expect(
+        BracketPolicy.forBracket(3).maxCounts[BracketCategory.gameChanger],
+        equals(3),
+      );
+      expect(
+        BracketPolicy.forBracket(4).maxCounts[BracketCategory.gameChanger],
+        equals(99),
+      );
+      expect(
+        BracketPolicy.forBracket(5).maxCounts[BracketCategory.gameChanger],
+        equals(99),
+      );
+    });
+
+    test('allows game changers in cEDH bracket 5', () {
+      final decision = applyBracketPolicyToAdditions(
+        bracket: 5,
+        currentDeckCards: const [],
+        additionsCardsData: const [
+          {
+            'name': 'Mana Vault',
+            'type_line': 'Artifact',
+            'oracle_text': '{T}: Add {C}{C}{C}.',
+            'quantity': 1,
+          }
+        ],
+      );
+
+      expect(decision.policy.bracket, equals(5));
+      expect(decision.allowed, ['Mana Vault']);
+      expect(decision.blocked, isEmpty);
+    });
+
     test('does not classify land search ramp as tutor', () {
       final cultivate = tagCardForBracket(
         name: 'Cultivate',

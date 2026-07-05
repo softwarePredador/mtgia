@@ -91,7 +91,8 @@ String? resolveCommanderMetaScopeFromPromptText(String prompt) {
       normalized.contains('high power') ||
       normalized.contains('high-power') ||
       normalized.contains('bracket 3') ||
-      normalized.contains('bracket 4')) {
+      normalized.contains('bracket 4') ||
+      normalized.contains('bracket 5')) {
     return 'competitive_commander';
   }
   return null;

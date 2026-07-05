@@ -213,8 +213,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     evidencia local atual:
     `master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md`.
     Essa auditoria tambem registra que a fonte oficial atual usa 5 Commander
-    Brackets + Game Changers, enquanto o backend ainda precisa de uma auditoria
-    propria porque `server/lib/edh_bracket_policy.dart` esta em 1..4.
+    Brackets + Game Changers; o backend agora aceita `1..5` em
+    `server/lib/edh_bracket_policy.dart`, mas bracket continua sendo sinal de
+    pregame/power e nao prova final de qualidade estrategica.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

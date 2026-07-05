@@ -157,13 +157,13 @@ Regras obrigatórias:
 7) Não sugira cartas que JÁ ESTÃO no deck (singleton rule em Commander).
 8) Priorize instant-speed sobre sorcery-speed para interação.
 9) Em Commander multiplayer (40 vida, 3-4 jogadores): "cada oponente" > "jogador alvo"; board wipes são valiosos.
-10) power_level deve usar bracket 1-4 (1=casual, 2=mid, 3=high, 4=cEDH).
+10) power_level deve usar bracket 1-5 (1=Exhibition, 2=Core, 3=Upgraded, 4=Optimized, 5=cEDH).
 11) Responda SOMENTE JSON válido, sem markdown.
 
 Formato obrigatório:
 {
   "archetype": "string",
-  "power_level": 1-4,
+  "power_level": 1-5,
   "analysis": "resumo curto e objetivo incluindo pontos fortes, fracos e categoria mais deficiente",
   "recommendations": {
     "add": [

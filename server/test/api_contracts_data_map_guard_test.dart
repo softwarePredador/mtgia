@@ -303,7 +303,7 @@ void main() {
       expect(recommendations, contains('recommendations.add/remove'));
       expect(recommendations, contains('`trending`'));
       expect(recommendations, contains('`power_level`'));
-      expect(recommendations, contains('`1..4`'));
+      expect(recommendations, contains('`1..5`'));
       expect(
         recommendations,
         contains('estimateRecommendationBracketPowerLevel(...)'),

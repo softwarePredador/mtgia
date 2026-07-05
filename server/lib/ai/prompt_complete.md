@@ -86,23 +86,25 @@ Ao adicionar terrenos:
 - Para decks 2 cores: ~15 terrenos de cada cor + 5-8 utilitários/fixing. Inclua terrenos dual (shock, check, pain lands).
 - Para decks 3+ cores: priorize terrenos que produzam 2+ cores. Inclua Command Tower, Exotic Orchard, terrenos tricolor.
 - Para mono: mais terrenos utilitários (War Room, Boseiju, Castle cycle).
-- Evite taplands (terrenos que entram virados) em brackets 3-4.
+- Evite taplands (terrenos que entram virados) em brackets 3-5.
 - Distribua as fontes de cor proporcionalmente ao número de símbolos de cada cor no deck.
 
 BRACKET / POWER LEVEL (guideline)
 
-- Bracket 1 (Casual): evite combos determinísticos, evite muitos tutores, evite fast mana explosivo. Foque em fun e tema.
-- Bracket 2 (Mid): pode ter sinergias fortes, poucos tutores (1-2), evite fast mana extremo. Combos de 3+ cartas ok.
-- Bracket 3 (High): pode usar staples fortes, tutores moderados (3-4), interação eficiente; combos ok se não hiper focado.
-- Bracket 4 (cEDH): máxima eficiência; fast mana/tutores/combos e interação pesada. Cada slot deve justificar sua inclusão.
+- Bracket 1 (Exhibition): evite combos determinísticos, Game Changers, muitos tutores e fast mana explosivo. Foque em fun e tema.
+- Bracket 2 (Core): pode ter sinergias fortes, poucos tutores (1-2), sem Game Changers e sem fast mana extremo. Combos de 3+ cartas ok.
+- Bracket 3 (Upgraded): pode usar staples fortes, ate 3 Game Changers, tutores moderados (3-4), interação eficiente; combos ok se não hiper focado.
+- Bracket 4 (Optimized): alta eficiência; Game Changers sem limite, fast mana/tutores/combos fortes e interação pesada. Cada slot deve justificar sua inclusão.
+- Bracket 5 (cEDH): máxima eficiência competitiva; fast mana/tutores/combos determinísticos e interação gratuita densa.
 
 MÉTRICA (consistência)
 
 Você deve respeitar limites aproximados por bracket nas categorias abaixo:
-- fast mana (Bracket 1: 1-2 | Bracket 2: 2-3 | Bracket 3: 3-5 | Bracket 4: all available)
-- tutores "search your library" (Bracket 1: 0-1 | Bracket 2: 1-2 | Bracket 3: 3-4 | Bracket 4: all efficient)
-- interação gratuita / pitch (Bracket 1: 0 | Bracket 2: 0-1 | Bracket 3: 1-2 | Bracket 4: all available)
-- turnos extras "extra turn" (Bracket 1: 0 | Bracket 2: 0-1 | Bracket 3: 1-2 | Bracket 4: as needed)
+- Game Changers oficiais (Bracket 1: 0 | Bracket 2: 0 | Bracket 3: ate 3 | Bracket 4: sem limite | Bracket 5: sem limite)
+- fast mana (Bracket 1: 1-2 | Bracket 2: 2-3 | Bracket 3: 3-5 | Bracket 4: all available | Bracket 5: all competitive)
+- tutores "search your library" (Bracket 1: 0-1 | Bracket 2: 1-2 | Bracket 3: 3-4 | Bracket 4: all efficient | Bracket 5: all competitive)
+- interação gratuita / pitch (Bracket 1: 0 | Bracket 2: 0-1 | Bracket 3: 1-2 | Bracket 4: all available | Bracket 5: all competitive)
+- turnos extras "extra turn" (Bracket 1: 0 | Bracket 2: 0-1 | Bracket 3: 1-2 | Bracket 4: as needed | Bracket 5: as needed)
 
 Se precisar completar o deck, prefira preencher com base de mana (terrenos) + ramp/draw/removal coerentes com o arquétipo, ao invés de estourar essas categorias.
 

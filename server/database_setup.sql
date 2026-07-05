@@ -200,7 +200,7 @@ CREATE INDEX IF NOT EXISTS idx_rules_category ON rules (category);
 
     -- Preferências do usuário (UX)
     archetype TEXT, -- Ex: "Goblin Tribal", "Voltron", etc.
-    bracket INTEGER, -- 1..4 (EDH bracket / power level)
+    bracket INTEGER, -- 1..5 (Commander bracket / power level)
     
 	    -- Campos de Análise da IA
 	    synergy_score INTEGER DEFAULT 0, -- 0 a 100: Quão consolidado/sinérgico é o deck

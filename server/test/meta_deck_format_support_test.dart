@@ -69,6 +69,12 @@ void main() {
       );
       expect(
         resolveCommanderMetaScopeFromPromptText(
+          'Build me a bracket 5 Kraum and Tymna list',
+        ),
+        'competitive_commander',
+      );
+      expect(
+        resolveCommanderMetaScopeFromPromptText(
           'Need a duel commander Talrand control deck',
         ),
         'duel_commander',

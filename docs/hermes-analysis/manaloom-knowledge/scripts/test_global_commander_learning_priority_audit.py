@@ -10,6 +10,18 @@ import global_commander_learning_priority_audit as audit
 
 
 class GlobalCommanderLearningPriorityAuditTests(unittest.TestCase):
+    def test_bracket_policy_accepts_current_five_bracket_model(self) -> None:
+        status = audit.bracket_policy_status_from_text(
+            "final b = bracket.clamp(1, 5); "
+            "case 5: enum BracketCategory { gameChanger } "
+            "officialGameChangerNamesForBracketPolicy"
+        )
+
+        self.assertEqual(status["status"], "aligned_with_current_official_bracket_model")
+        self.assertTrue(status["backend_supports_five_brackets"])
+        self.assertTrue(status["backend_has_game_changer_policy"])
+        self.assertFalse(status["backend_clamps_to_legacy_four_brackets"])
+
     def test_bracket_policy_detects_legacy_four_bracket_drift(self) -> None:
         status = audit.bracket_policy_status_from_text(
             "final b = bracket.clamp(1, 4); enum BracketCategory { gameChanger }"

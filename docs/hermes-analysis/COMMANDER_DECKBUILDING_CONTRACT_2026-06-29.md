@@ -186,10 +186,10 @@ Current external refresh on 2026-07-05:
   Brackets and Game Changers as power-intent signals. ManaLoom must treat them
   as bracket/pregame-context evidence, not as proof a deck is strategically
   correct.
-- `server/lib/edh_bracket_policy.dart` still clamps to legacy brackets `1..4`.
-  Until that policy is audited and refreshed for the current official bracket
-  model, bracket checks are a warning/gate signal and must not be used as final
-  deck-quality proof.
+- `server/lib/edh_bracket_policy.dart` now accepts brackets `1..5` and applies
+  the current Game Changer budgets: zero in brackets 1/2, up to three in
+  bracket 3, and unlimited in brackets 4/5. Bracket checks remain a
+  warning/gate signal and must not be used as final deck-quality proof.
 - The external deckbuilding template evidence remains directional: core ranges
   for lands, ramp, draw, interaction, and wipes identify floor gaps, while the
   commander profile decides which ranges bend up or down.

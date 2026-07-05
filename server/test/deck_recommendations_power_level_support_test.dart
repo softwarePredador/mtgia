@@ -54,5 +54,18 @@ void main() {
         4,
       );
     });
+
+    test('maps cEDH-density decks to bracket 5', () {
+      expect(
+        estimateRecommendationBracketPowerLevel(
+          totalCards: 100,
+          rampCount: 14,
+          drawCount: 12,
+          removalCount: 8,
+          averageCmc: 2.5,
+        ),
+        5,
+      );
+    });
   });
 }

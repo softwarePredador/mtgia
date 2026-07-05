@@ -1011,7 +1011,7 @@ void main() {
       'stress matrix: optimize with all brackets and sizes 1,2,5,10,15,20,40,60,80,97,99',
       () async {
         final deckSizes = [1, 2, 5, 10, 15, 20, 40, 60, 80, 97, 99];
-        final brackets = [1, 2, 3, 4];
+        final brackets = [1, 2, 3, 4, 5];
         final failures = <String>[];
         var evaluated = 0;
 

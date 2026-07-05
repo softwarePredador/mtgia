@@ -134,7 +134,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_learning_priority_audit.py",
                 "global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md",
                 "five Commander",
-                "legacy brackets `1..4`",
+                "brackets `1..5`",
+                "Game Changer budgets",
             ],
         )
     )

@@ -492,6 +492,26 @@ void main() {
       expect(decision.blocked.single['name'], equals('Mana Crypt'));
     });
 
+    test('supports cEDH bracket 5 without collapsing diagnostics to bracket 4',
+        () {
+      final decision = applyBracketPolicyToAdditions(
+        bracket: 5,
+        currentDeckCards: const [],
+        additionsCardsData: const [
+          {
+            'name': 'Mana Crypt',
+            'type_line': 'Artifact',
+            'oracle_text': '{T}: Add {C}{C}.',
+            'quantity': 1,
+          }
+        ],
+      );
+
+      expect(decision.policy.bracket, equals(5));
+      expect(decision.allowed, ['Mana Crypt']);
+      expect(decision.blocked, isEmpty);
+    });
+
     test('filler loaders use current deck state for bracket policy', () {
       final source = File(
         'lib/ai/optimize_filler_loader_support.dart',

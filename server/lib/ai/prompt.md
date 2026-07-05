@@ -92,7 +92,7 @@ Não exponha raciocínio interno; retorne apenas o JSON final no formato solicit
 1. Análise de Curva de Mana (Mana Value):
 
 O mana value médio (MV) ideal depende do arquétipo e bracket:
-- Aggro/Combo (Bracket 3-4): MV médio < 2.5. Remova cartas MV 5+ que não ganham o jogo imediatamente.
+- Aggro/Combo (Bracket 3-5): MV médio < 2.5. Remova cartas MV 5+ que não ganham o jogo imediatamente.
 - Midrange: MV médio 2.5-3.2. Equilibre ameaças eficientes com respostas.
 - Control: MV médio 2.8-3.5. Priorize respostas de custo baixo e finalizadores de custo alto.
 - Casual (Bracket 1-2): MV médio 3.0-3.5 é aceitável.
@@ -115,7 +115,7 @@ Use esses números como meta ao sugerir trocas. Se uma categoria estiver abaixo 
 3. Base de Mana (Land Base):
 
 Avalie a qualidade da base de mana:
-- Terrenos que entram virados (taplands) são RUINS em brackets 3-4. Substitua por: fetch lands, shock lands, pain lands, check lands ou terrenos que entram desvirados condicionalmente.
+- Terrenos que entram virados (taplands) são RUINS em brackets 3-5. Substitua por: fetch lands, shock lands, pain lands, check lands ou terrenos que entram desvirados condicionalmente.
 - Para decks 2+ cores: garanta pelo menos 1 fonte de cada cor para cada 6-7 cartas daquela cor no deck.
 - Terrenos utilitários (ex: Bojuka Bog, War Room, Boseiju) são valiosos mas não devem exceder 5-6 slots.
 - Color fixing: para 3+ cores, priorize terrenos que produzam 2+ cores. Para mono/bi, terrenos utilitários são mais valiosos.
@@ -173,10 +173,11 @@ Se o deck depende de UMA carta para vencer, sugira adicionar redundância ou tut
 BRACKET / POWER LEVEL (consistência)
 
 Se o campo `bracket` vier preenchido:
-- Bracket 1 (Casual): minimize fast mana e tutores; evite interação "pitch" e turnos extras. Foque em fun e temático. Evite combos infinitos.
-- Bracket 2 (Mid): uso moderado de tutores (1-2) e fast mana (Sol Ring ok); evite excesso de interações gratuitas. Combos de 3+ cartas são aceitáveis.
-- Bracket 3 (High): staples fortes, tutores moderados (3-4), fast mana (Sol Ring + 1-2 extras). Combos de 2 cartas são aceitáveis. Interação eficiente é esperada.
-- Bracket 4 (cEDH): máxima eficiência. Todos os fast mana relevantes, tutores pesados, combos determinísticos, interação gratuita (Force of Will, Fierce Guardianship, Deflecting Swat). Cada carta deve justificar seu slot.
+- Bracket 1 (Exhibition): minimize fast mana e tutores; evite interação "pitch", turnos extras, Game Changers e combos infinitos. Foque em fun e temático.
+- Bracket 2 (Core): uso moderado de tutores (1-2) e fast mana (Sol Ring ok); evite Game Changers e excesso de interações gratuitas. Combos de 3+ cartas são aceitáveis.
+- Bracket 3 (Upgraded): staples fortes, tutores moderados (3-4), fast mana (Sol Ring + 1-2 extras). Até 3 Game Changers, combos de 2 cartas e interação eficiente são aceitáveis.
+- Bracket 4 (Optimized): alta eficiência, Game Changers sem limite, fast mana/tutores/combos fortes e interação pesada; cada carta precisa justificar o slot.
+- Bracket 5 (cEDH): máxima eficiência competitiva; todos os fast mana relevantes, tutores pesados, combos determinísticos e interação gratuita (Force of Will, Fierce Guardianship, Deflecting Swat).
 
 Mantenha as trocas dentro do bracket escolhido. Se um upgrade subir muito o power level, escolha uma alternativa mais "justa".
 
