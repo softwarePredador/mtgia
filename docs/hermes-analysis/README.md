@@ -306,6 +306,18 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `blocked_pair_hypotheses`, entao `+Feed the Swarm / -Archaeomancer's Map`
     nao deve continuar como top par review-ready sem nova source lane, novo
     corte ou pacote diferente.
+    Quando varias copias candidatas forem encadeadas, rode
+    `manaloom-knowledge/scripts/global_commander_candidate_package_chain_audit.py`.
+    Evidencia local atual:
+    `master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md`.
+    A cadeia Kaalia step5 ficou estruturalmente pronta como pacote de piso de
+    removal em DB copiado: adds `Path to Exile`, `Feed the Swarm`,
+    `Swords to Plowshares`, `Rakdos Charm` e `Terminate`; cuts
+    `Archaeomancer's Map`, `Genji Glove`, `Karlach, Fury of Avernus`,
+    `Ardenn, Intrepid Archaeologist` e `Grim Tutor`. Resultado:
+    `core_floor_repaired=true`, `removal=6`, `strategy_ready=true`, mas
+    `battle_gate_allowed_now=false` e `promotion_allowed=false`. Proximo gate:
+    `run_commander_specific_strategy_matrix_for_package_before_battle`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

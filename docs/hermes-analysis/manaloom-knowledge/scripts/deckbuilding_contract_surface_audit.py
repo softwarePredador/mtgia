@@ -42,6 +42,9 @@ GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_battle_probe_audit.py"
 )
 GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL = SCRIPT_DIR / "global_commander_battle_feedback_model.py"
+GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT = (
+    SCRIPT_DIR / "global_commander_candidate_package_chain_audit.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -111,6 +114,10 @@ GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
 GLOBAL_COMMANDER_BATTLE_FEEDBACK_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md"
+)
+GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -212,6 +219,13 @@ def build_audit() -> dict[str, Any]:
                 "block_pair_until_new_source_lane_or_cut",
                 "blocked_by_global_battle_feedback",
                 "blocked_pair_hypotheses",
+                "global_commander_candidate_package_chain_audit.py",
+                "global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md",
+                "core_floor_repaired",
+                "run_commander_specific_strategy_matrix_for_package_before_battle",
+                "battle_gate_allowed_now",
+                "Path to Exile",
+                "Terminate",
                 "33.3%",
                 "66.7%",
                 "five Commander",
@@ -376,6 +390,13 @@ def build_audit() -> dict[str, Any]:
                 "block_pair_until_new_source_lane_or_cut",
                 "blocked_by_global_battle_feedback",
                 "blocked_pair_hypotheses",
+                "global_commander_candidate_package_chain_audit.py",
+                "global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md",
+                "core_floor_repaired",
+                "run_commander_specific_strategy_matrix_for_package_before_battle",
+                "battle_gate_allowed_now=false",
+                "Path to Exile",
+                "Terminate",
             ],
         )
     )
@@ -609,6 +630,22 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT,
+            [
+                "global_commander_candidate_package_chain_audit",
+                "materializer_chain_pass",
+                "core_floor_repaired",
+                "strategy_ready",
+                "battle_gate_allowed_now",
+                "promotion_allowed",
+                "run_commander_specific_strategy_matrix_for_package_before_battle",
+                "battle_or_optimization_performed",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -727,6 +764,23 @@ def build_audit() -> dict[str, Any]:
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
                 "Archaeomancer's Map",
                 "ready_pair_count: `0`",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_REPORT,
+            [
+                "Global Commander Candidate Package Chain Audit",
+                "core_floor_repaired: `true`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "Path to Exile",
+                "Feed the Swarm",
+                "Swords to Plowshares",
+                "Rakdos Charm",
+                "Terminate",
+                "run_commander_specific_strategy_matrix_for_package_before_battle",
             ],
         )
     )

@@ -198,7 +198,13 @@ Operational priority after this pivot:
    evidence, supersedes smaller positive probes when a larger gate rejects the
    same pair, and routes unexercised packages to exposure replay instead of
    requeueing them as fresh hypotheses;
-14. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+14. run `global_commander_candidate_package_chain_audit.py` when multiple
+   isolated candidate-copy swaps are chained into one package; it must prove
+   every source DB stayed unchanged, every pair report matched its source,
+   final core floors are repaired, strategy readiness exists, and battle plus
+   promotion remain closed until a commander-specific package strategy matrix
+   and replay-backed equal gate exist;
+15. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -217,6 +223,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
 credentials are unavailable. It must report source lanes as unavailable and route
@@ -316,6 +323,18 @@ Current external refresh on 2026-07-05:
   exercised pair such as `+Feed the Swarm / -Archaeomancer's Map` cannot stay
   as the top review-ready nonland candidate without a new source lane, cut, or
   package hypothesis.
+- Current package-chain auditing converted the surviving Kaalia removal-floor
+  route into a single isolated copied-DB package with five swaps:
+  `+Path to Exile / -Archaeomancer's Map`,
+  `+Feed the Swarm / -Genji Glove`,
+  `+Swords to Plowshares / -Karlach, Fury of Avernus`,
+  `+Rakdos Charm / -Ardenn, Intrepid Archaeologist`, and
+  `+Terminate / -Grim Tutor`. The chain report passed with
+  `materializer_chain_pass=true`, `core_floor_repaired=true`, final
+  `removal=6`, and `strategy_ready=true`; however `battle_gate_allowed_now`
+  and `promotion_allowed` remain `false`. The next allowed gate is
+  `run_commander_specific_strategy_matrix_for_package_before_battle`, not a
+  natural battle or real deck mutation.
 
 ## Global Commander Rollout - 2026-07-01
 
