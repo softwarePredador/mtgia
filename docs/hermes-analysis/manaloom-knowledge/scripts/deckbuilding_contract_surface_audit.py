@@ -126,6 +126,12 @@ GLOBAL_COMMANDER_FORCED_CUT_ACCESS_TRACE_GENERATOR = (
 GLOBAL_COMMANDER_FORCED_CUT_ACCESS_TRACE_GENERATOR_TEST = (
     SCRIPT_DIR / "test_global_commander_forced_cut_access_trace_generator.py"
 )
+GLOBAL_COMMANDER_POST_FORCED_RECOVERY_SYNTHESIZER = (
+    SCRIPT_DIR / "global_commander_post_forced_recovery_synthesizer.py"
+)
+GLOBAL_COMMANDER_POST_FORCED_RECOVERY_SYNTHESIZER_TEST = (
+    SCRIPT_DIR / "test_global_commander_post_forced_recovery_synthesizer.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -319,6 +325,10 @@ GLOBAL_COMMANDER_SCOPE1_POST_FORCED_CUT_SOURCE_LANE_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_POST_FORCED_PACKAGE_SCOPE_REDUCER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md"
+)
+GLOBAL_COMMANDER_SCOPE1_POST_FORCED_RECOVERY_SYNTHESIZER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -623,6 +633,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md",
                 "forced_cut_access_blocks_unresolved_cut_reclassification:3",
                 "synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block",
+                "global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "post_forced_recovery_blocks_candidate_copy_needs_new_cut_source",
+                "mine_new_value_safe_cut_source_before_package_resynthesis",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -868,6 +881,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md",
                 "forced_usage_blocked_count=3",
                 "synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block",
+                "global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "mine_new_value_safe_cut_source_before_package_resynthesis",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1374,6 +1389,33 @@ def build_audit() -> dict[str, Any]:
                 "Dark Ritual",
                 "Kaalia of the Vast",
                 "forced_access_usage_observed_blocks_value_safe",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_POST_FORCED_RECOVERY_SYNTHESIZER,
+            [
+                "global_commander_post_forced_recovery_synthesizer",
+                "post_forced_recovery_blocks_candidate_copy_needs_new_cut_source",
+                "mine_new_value_safe_cut_source_before_package_resynthesis",
+                "build_same_lane_or_equal_gate_proof_for_stage_only_cuts",
+                "resynthesize_smaller_package_only_after_fresh_cut_proof",
+                "no_value_safe_cut_source_after_forced_access",
+                "candidate_copy_allowed_now",
+                "battle_gate_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_POST_FORCED_RECOVERY_SYNTHESIZER_TEST,
+            [
+                "test_blocks_current_package_when_no_value_safe_cut_or_pair_exists",
+                "test_routes_to_existing_reduced_scope_materializer_when_pair_is_ready",
+                "post_forced_recovery_blocks_candidate_copy_needs_new_cut_source",
+                "mine_new_value_safe_cut_source_before_package_resynthesis",
+                "materialize_reduced_scope_candidate_copy",
             ],
         )
     )
@@ -2152,6 +2194,26 @@ def build_audit() -> dict[str, Any]:
                 "reduced_scope_candidate_copy_allowed_now: `false`",
                 "forced_cut_access_blocks_unresolved_cut_reclassification:3",
                 "synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block",
+                "Akroma, Angel of Wrath",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_POST_FORCED_RECOVERY_SYNTHESIZER_REPORT,
+            [
+                "Global Commander Post-Forced Recovery Synthesizer",
+                "post_forced_recovery_blocks_candidate_copy_needs_new_cut_source",
+                "selected_add_count: `6`",
+                "required_cut_count: `6`",
+                "value_safe_cut_count: `0`",
+                "stage_only_cut_count: `15`",
+                "forced_usage_blocked_count: `3`",
+                "scoped_pair_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "mine_new_value_safe_cut_source_before_package_resynthesis",
+                "no_value_safe_cut_source_after_forced_access",
+                "Dragon Mage",
                 "Akroma, Angel of Wrath",
             ],
         )

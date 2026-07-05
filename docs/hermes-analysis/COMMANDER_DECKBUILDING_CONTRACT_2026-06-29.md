@@ -283,7 +283,11 @@ Operational priority after this pivot:
    cut-access report before reducing scope again; if forced access proves the
    unresolved cuts are used, candidate copy remains closed and the next route is
    a new value-safe cut source or a smaller package with fresh cut proof;
-31. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+31. run `global_commander_post_forced_recovery_synthesizer.py` after post-forced
+   cut-lane expansion and scope reduction; it must select the next evidence
+   lane without deck action, and if no value-safe cut pair exists it must route
+   to mining a fresh value-safe cut source before package resynthesis;
+32. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -332,6 +336,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -727,6 +732,14 @@ Current external refresh on 2026-07-05:
   `scoped_pair_count=0`, `dropped_add_count=6`, and candidate copy, battle, and
   promotion still closed. The next gate is
   `synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block`.
+- Current post-forced recovery synthesis returns
+  `post_forced_recovery_blocks_candidate_copy_needs_new_cut_source` with
+  `selected_add_count=6`, `required_cut_count=6`, `value_safe_cut_count=0`,
+  `stage_only_cut_count=15`, `forced_usage_blocked_count=3`, and
+  `scoped_pair_count=0`. It names the only valid next gate as
+  `mine_new_value_safe_cut_source_before_package_resynthesis`; the current
+  package remains closed and no candidate copy, natural battle, promotion, or
+  deck mutation is authorized.
 
 ## Global Commander Rollout - 2026-07-01
 

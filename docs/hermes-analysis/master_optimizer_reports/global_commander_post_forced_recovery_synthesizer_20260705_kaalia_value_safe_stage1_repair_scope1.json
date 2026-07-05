@@ -1,0 +1,181 @@
+{
+  "artifact_type": "global_commander_post_forced_recovery_synthesizer",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "blocked_cut_reason_counts": {
+    "no_above_target_role_budget": 23,
+    "protected_profile_role_angels_demons_dragons_payoffs": 6,
+    "protected_profile_role_angels_demons_dragons_payoffs,haste_protection_silence": 5,
+    "protected_profile_role_haste_protection_silence": 4,
+    "protected_profile_role_haste_protection_silence,lands": 1,
+    "protected_profile_role_lands": 13,
+    "protected_profile_role_spot_interaction": 5
+  },
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "no_value_safe_cut_source_after_forced_access",
+    "no_reduced_scope_pair_after_forced_access",
+    "forced_access_usage_blocks_reclassification",
+    "current_package_closed_no_deck_action"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T22:19:53.328694+00:00",
+  "input_artifacts": {
+    "cut_source_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.json",
+    "package_synthesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "payoff_source_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "profile_repair_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "scope_reducer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "Battle and promotion remain closed until copy/materializer and strategy gates pass.",
+    "cut_boundary": "A smaller package cannot advance without at least one value-safe cut pair.",
+    "forced_access_boundary": "Forced access can block a cut; it cannot prove a cut is safe.",
+    "recovery_boundary": "This report chooses the next evidence lane; it is not a deck action."
+  },
+  "postgres_writes": false,
+  "profile_review_cuts": [
+    "Diabolic Intent",
+    "Jeska's Will",
+    "Professional Face-Breaker",
+    "Ornithopter of Paradise",
+    "Dark Ritual"
+  ],
+  "promotion_allowed": false,
+  "recovery_actions": [
+    {
+      "action": "mine_new_value_safe_cut_source_before_package_resynthesis",
+      "candidate_copy_allowed": false,
+      "priority": "P0",
+      "reason": "No value-safe cuts remain after forced-access review.",
+      "required_cut_count": 6,
+      "status": "required_now",
+      "target_cut_roles": {
+        "haste_protection_silence": 4,
+        "mana_acceleration": 1,
+        "tutors_access": 8
+      }
+    },
+    {
+      "action": "build_same_lane_or_equal_gate_proof_for_stage_only_cuts",
+      "candidate_copy_allowed": false,
+      "forced_usage_blocked_count": 3,
+      "priority": "P1",
+      "reason": "Used, structural, contextual, or attack-window cuts cannot become value-safe without explicit proof.",
+      "stage_only_cut_count": 15,
+      "status": "diagnostic_only"
+    },
+    {
+      "action": "resynthesize_smaller_package_only_after_fresh_cut_proof",
+      "candidate_copy_allowed": false,
+      "priority": "P2",
+      "reason": "A smaller package still needs at least one value-safe cut pair.",
+      "status": "blocked_until_new_cut_source"
+    },
+    {
+      "action": "keep_current_package_closed",
+      "candidate_copy_allowed": false,
+      "priority": "P3",
+      "reason": "Current evidence does not authorize copy, natural battle, promotion, or deck mutation.",
+      "status": "closed_no_deck_action"
+    }
+  ],
+  "selected_adds": [
+    {
+      "card_name": "Dragon Mage",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "score": 98,
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    },
+    {
+      "card_name": "Bonehoard Dracosaur",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "score": 97,
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    },
+    {
+      "card_name": "Drakuseth, Maw of Flames",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    },
+    {
+      "card_name": "The Balrog of Moria",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    },
+    {
+      "card_name": "Wrathful Red Dragon",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    },
+    {
+      "card_name": "Akroma, Angel of Wrath",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "score": 95,
+      "selected_for_axis": "angels_demons_dragons_payoffs"
+    }
+  ],
+  "source_db_mutated": false,
+  "stage_only_cut_names": [
+    "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+    "Jeska's Will",
+    "Professional Face-Breaker",
+    "Smothering Tithe",
+    "Sunforger",
+    "Demonic Tutor",
+    "Diabolic Intent",
+    "Enlightened Tutor",
+    "Vampiric Tutor",
+    "Alicia Masters, Skilled Sculptor",
+    "Arcane Signet",
+    "Dark Ritual",
+    "Mana Vault",
+    "Ornithopter of Paradise",
+    "Sol Ring"
+  ],
+  "stage_only_reason_counts": {
+    "attack_window_cut_requires_same_lane_stage_proof": 2,
+    "commander_expected_package_anchor_requires_stage_proof": 5,
+    "contextual_staple_requires_stage_review": 3,
+    "global_battle_feedback_requires_new_same_lane_or_gate": 1,
+    "structural_foundation_staple_requires_same_lane_or_battle_proof": 9
+  },
+  "status": "post_forced_recovery_blocks_candidate_copy_needs_new_cut_source",
+  "summary": {
+    "blocked_cut_sample_count": 40,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "dropped_add_count": 6,
+    "forced_usage_blocked_count": 3,
+    "next_gate": "mine_new_value_safe_cut_source_before_package_resynthesis",
+    "profile_blocked_cut_count": 12,
+    "profile_review_cut_count": 5,
+    "ready_payoff_candidate_count": 30,
+    "required_cut_count": 6,
+    "scoped_pair_count": 0,
+    "selected_add_count": 6,
+    "stage_only_cut_count": 15,
+    "target_cut_roles": {
+      "haste_protection_silence": 4,
+      "mana_acceleration": 1,
+      "tutors_access": 8
+    },
+    "value_safe_cut_count": 0
+  }
+}

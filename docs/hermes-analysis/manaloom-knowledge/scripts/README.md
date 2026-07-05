@@ -111,6 +111,14 @@ If `value_safe_cut_count=0` and `scoped_pair_count=0`, the next valid route is a
 new value-safe cut source or a smaller package with fresh cut proof, not
 candidate copy or battle.
 
+Then run `global_commander_post_forced_recovery_synthesizer.py`. It consolidates
+the post-forced cut report, package reducer, selected adds, and stage-only cut
+reasons into the next evidence lane. When it returns
+`post_forced_recovery_blocks_candidate_copy_needs_new_cut_source`, the next work
+is `mine_new_value_safe_cut_source_before_package_resynthesis`; do not run a
+candidate copy, natural battle, promotion, or deck mutation from the closed
+package.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

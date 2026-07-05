@@ -538,6 +538,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `forced_usage_blocked_count=3`; candidate copy, battle e promocao seguem
     fechados. O proximo gate e
     `synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block`.
+    Esse gate foi sintetizado por
+    `global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`:
+    `selected_add_count=6`, `required_cut_count=6`, `value_safe_cut_count=0`,
+    `stage_only_cut_count=15`, `scoped_pair_count=0`. A decisao atual e
+    `mine_new_value_safe_cut_source_before_package_resynthesis`; o pacote atual
+    segue fechado para candidate copy, battle, promocao e mutacao.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
