@@ -14467,6 +14467,74 @@ unsupported abilities, token land creatures, additional costs, triggered token
 makers, activated token makers, or multi-token spells whose token arguments are
 not literal no-arg token constructors.
 
+## 2026-07-05 PG535 Fixed Tapped Creature Tokens Checkpoint
+
+Applied package: `PG535 fixed_tapped_tokens_new_server`.
+
+Closed family:
+
+- `2` exact one-shot fixed creature-token rows from XMage
+  `CreateTokenEffect(new Token(), N)` and
+  `CreateTokenEffect(new Token(), N, true)`.
+
+Promoted cards:
+
+- `Servo Exhibition`
+- `Shadow Summoning`
+
+Runtime scope:
+
+- `xmage_fixed_create_creature_tokens_spell_v1`
+
+Supported exact forms:
+
+- sorcery/instant one-shot fixed creature-token creation where XMage has exactly
+  one `CreateTokenEffect`, no auxiliary ability class, no additional cost, the
+  token class is a simple creature token, optional `.setText(...)` is only a
+  display override, and optional third boolean argument is modeled as
+  `token_tapped=true`.
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg535_fixed_tapped_token_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_pg_to_sqlite_sync.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_e2e_validation.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg535_fixed_tapped_tokens_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg535_fixed_tapped_tokens_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg535_fixed_tapped_tokens_new_server_recheck.md`
+- final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg535_fixed_tapped_tokens_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg535_fixed_tapped_tokens_new_server_final_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg535_fixed_tapped_tokens_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg535_fixed_tapped_tokens_new_server_final.md`
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25823`
+- post-cycle `target_identity_count=25821`
+- post-cycle `xmage_authoritative_source_count=25507`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_adapter_required_count=25507`
+- `token_maker` reduced from `2383` to `2381`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+
+Residual boundary: PG535 does not authorize non-creature tokens such as
+Powerstone, dynamic token counts, devotion/chroma/converge token counts,
+triggered or activated token makers beyond already modeled scopes, token classes
+with unsupported abilities, `entersWithCounters`, additional costs, or
+`withAdditionalTokens(...)`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

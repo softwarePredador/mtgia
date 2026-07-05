@@ -3941,6 +3941,53 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertIn("trample", token.get("keywords", []))
         self.assertTrue(self.battle.card_has_keyword(token, "trample"))
 
+    def test_fixed_create_creature_tokens_spell_preserves_tapped_tokens(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+            "ability_kind": "one_shot",
+            "token_count": 2,
+            "token_name": "Spirit Token",
+            "token_subtype": "Spirit",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_colors": ["W"],
+            "token_keywords": ["flying"],
+            "token_flying": True,
+            "token_tapped": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_tapped_token_spell",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Shadow Summoning",
+                "type_line": "Sorcery",
+                "oracle_text": "Create two tapped 1/1 white Spirit creature tokens with flying.",
+            },
+            turn=2,
+            rng=random.Random(22),
+            effect_data_override=effect,
+        )
+
+        tokens = [card for card in active.battlefield if card.get("name") == "Spirit Token"]
+        self.assertEqual(len(tokens), 2)
+        self.assertTrue(all(token.get("tapped") is True for token in tokens))
+        self.assertTrue(all(token.get("flying") is True for token in tokens))
+        self.assertTrue(
+            any(
+                event == "tokens_created"
+                and data.get("card") == "Shadow Summoning"
+                and data.get("tokens_created") == 2
+                and data.get("token_tapped") is True
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_tapped_token_spell"
+                for event, data in self.events
+            )
+        )
+
     def test_multi_create_creature_tokens_spell_resolves_all_components(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
@@ -4185,6 +4232,7 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             "etb_token_colors": [],
             "etb_token_keywords": ["flying"],
             "etb_token_flying": True,
+            "etb_token_tapped": True,
             "etb_artifact_tokens": True,
             "_rule_logical_key": "battle_rule_v1:fixture_etb_token",
         }
@@ -4206,6 +4254,7 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(token.get("toughness"), 1)
         self.assertTrue(token.get("flying"))
         self.assertIn("flying", token.get("keywords", []))
+        self.assertTrue(token.get("tapped"))
 
     def test_fixed_damage_target_spell_deals_numeric_damage_to_player(self) -> None:
         active = self.battle.Player("Active", None, [])
@@ -11964,6 +12013,7 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             "dies_token_power": 1,
             "dies_token_toughness": 1,
             "dies_token_colors": ["W"],
+            "dies_token_tapped": True,
             "_rule_logical_key": "battle_rule_v1:fixture_dies_token",
         }
         active.battlefield.append(permanent)
@@ -11985,12 +12035,14 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(token.get("power"), 1)
         self.assertEqual(token.get("toughness"), 1)
         self.assertEqual(token.get("colors"), ["W"])
+        self.assertTrue(token.get("tapped"))
         self.assertTrue(
             any(
                 event == "dies_token_maker_resolved"
                 and data.get("card") == "Fixture Shieldmate"
                 and data.get("token_count") == 1
                 and data.get("token_name") == "Human Warrior Token"
+                and data.get("token_tapped") is True
                 and data.get("source") == "Fixture Removal"
                 and data.get("rule_logical_key") == "battle_rule_v1:fixture_dies_token"
                 for event, data in self.events

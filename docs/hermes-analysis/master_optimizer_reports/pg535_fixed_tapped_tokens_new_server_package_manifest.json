@@ -1,0 +1,203 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg535_fixed_tapped_tokens_new_server_pg5_20260705_230150",
+  "deploy_id": "pg535_fixed_tapped_tokens_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Servo Exhibition"
+      },
+      "expected_token": {
+        "artifact": true,
+        "colors": [],
+        "count": 2,
+        "keywords": [],
+        "name": "Servo Token",
+        "power": 1,
+        "subtype": "Servo",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:34867bd8005e3b1fb592b3dfb9a585ed",
+      "name": "Servo Exhibition creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    },
+    {
+      "card": {
+        "name": "Shadow Summoning"
+      },
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 2,
+        "keywords": [
+          "flying"
+        ],
+        "name": "Spirit Token",
+        "power": 1,
+        "subtype": "Spirit",
+        "tapped": true,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:e4509add508bcaf39e79f2811c958b41",
+      "name": "Shadow Summoning creates modeled creature tokens",
+      "type": "fixed_create_creature_tokens"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Servo Exhibition",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:34867bd8005e3b1fb592b3dfb9a585ed",
+      "min_rule_version": 2,
+      "normalized_name": "servo exhibition",
+      "oracle_hash": "986014963b1bb2a9361b04c58130bfca",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "artifact_tokens": true,
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "token_count": 2,
+        "token_name": "Servo Token",
+        "token_power": 1,
+        "token_subtype": "Servo",
+        "token_toughness": 1,
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shadow Summoning",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e4509add508bcaf39e79f2811c958b41",
+      "min_rule_version": 2,
+      "normalized_name": "shadow summoning",
+      "oracle_hash": "86865fd932dbac3129e8d1060691bc0d",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 2,
+        "token_flying": true,
+        "token_keywords": [
+          "flying"
+        ],
+        "token_name": "Spirit Token",
+        "token_power": 1,
+        "token_subtype": "Spirit",
+        "token_tapped": true,
+        "token_toughness": 1,
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_create_creature_tokens_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-05T23:01:50+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Servo Exhibition"
+      },
+      "card_name": "Servo Exhibition",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:34867bd8005e3b1fb592b3dfb9a585ed",
+      "normalized_name": "servo exhibition",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "artifact_tokens": true,
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "token_count": 2,
+        "token_name": "Servo Token",
+        "token_power": 1,
+        "token_subtype": "Servo",
+        "token_toughness": 1,
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Shadow Summoning"
+      },
+      "card_name": "Shadow Summoning",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e4509add508bcaf39e79f2811c958b41",
+      "normalized_name": "shadow summoning",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "token_colors": [
+          "W"
+        ],
+        "token_count": 2,
+        "token_flying": true,
+        "token_keywords": [
+          "flying"
+        ],
+        "token_name": "Spirit Token",
+        "token_power": 1,
+        "token_subtype": "Spirit",
+        "token_tapped": true,
+        "token_toughness": 1,
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Servo Exhibition",
+    "Shadow Summoning"
+  ],
+  "selected_count": 2,
+  "slug": "pg535_fixed_tapped_tokens_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Servo Exhibition",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:34867bd8005e3b1fb592b3dfb9a585ed",
+      "min_rule_version": 2,
+      "normalized_name": "servo exhibition",
+      "oracle_hash": "986014963b1bb2a9361b04c58130bfca",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shadow Summoning",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e4509add508bcaf39e79f2811c958b41",
+      "min_rule_version": 2,
+      "normalized_name": "shadow summoning",
+      "oracle_hash": "86865fd932dbac3129e8d1060691bc0d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

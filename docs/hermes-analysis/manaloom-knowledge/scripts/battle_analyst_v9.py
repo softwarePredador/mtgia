@@ -18346,6 +18346,7 @@ def resolve_generic_permanent_etb(
                 mana_produced=effect_data.get("etb_token_mana_produced"),
                 produces=effect_data.get("etb_token_produces"),
                 produced_mana_symbols=effect_data.get("etb_token_produced_mana_symbols"),
+                tapped=bool(effect_data.get("etb_token_tapped")),
                 opponents=opponents,
                 turn=turn,
                 source_event="etb_token_created",
@@ -19199,6 +19200,7 @@ def resolve_permanent_dies_token_maker(
         "dies_token_mana_produced": "token_mana_produced",
         "dies_token_produces": "token_produces",
         "dies_token_produced_mana_symbols": "token_produced_mana_symbols",
+        "dies_token_tapped": "token_tapped",
         "dies_artifact_tokens": "artifact_tokens",
     }
     for dies_key, token_key in dies_field_map.items():
@@ -19227,6 +19229,7 @@ def resolve_permanent_dies_token_maker(
         token_power=effect_data.get("token_power"),
         token_toughness=effect_data.get("token_toughness"),
         token_subtype=effect_data.get("token_subtype"),
+        token_tapped=bool(effect_data.get("token_tapped")),
         reason=reason,
         source=source.get("name", "?") if isinstance(source, dict) else source,
         turn=CURRENT_REPLAY_TURN,
@@ -38310,6 +38313,7 @@ def create_creature_token(
     mana_produced=None,
     produces=None,
     produced_mana_symbols=None,
+    tapped=False,
     opponents=None,
     turn=None,
     source_event="token_created",
@@ -38330,7 +38334,7 @@ def create_creature_token(
         "toughness": toughness if toughness is not None else power,
         "haste": bool(haste),
         "summoning_sick": not bool(haste),
-        "tapped": False,
+        "tapped": bool(tapped),
     }
     if sacrifice_for_colorless_mana or mana_activation_requires_sacrifice:
         produced_amount = max(1, int(mana_produced or 1))
@@ -38695,6 +38699,7 @@ def create_creature_tokens_from_effect(
     token_mana_produced = (effect_data or {}).get("token_mana_produced")
     token_produces = (effect_data or {}).get("token_produces")
     token_produced_mana_symbols = (effect_data or {}).get("token_produced_mana_symbols")
+    token_tapped = bool((effect_data or {}).get("token_tapped"))
     if (effect_data or {}).get("token_prowess") and "prowess" not in token_keywords:
         token_keywords.append("prowess")
     artifact_tokens = bool((effect_data or {}).get("artifact_tokens"))
@@ -38734,6 +38739,7 @@ def create_creature_tokens_from_effect(
                     mana_produced=token_mana_produced,
                     produces=token_produces,
                     produced_mana_symbols=token_produced_mana_symbols,
+                    tapped=token_tapped,
                     opponents=opponents,
                     turn=turn,
                     source_event=source_event,
@@ -38777,6 +38783,7 @@ def create_creature_tokens_from_effect(
             mana_produced=token_mana_produced,
             produces=token_produces,
             produced_mana_symbols=token_produced_mana_symbols,
+            tapped=token_tapped,
             opponents=opponents,
             turn=turn,
             source_event=source_event,
@@ -40177,7 +40184,11 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         )
     if permanent.get("does_not_untap_normally"):
         permanent["does_not_untap_in_untap_step"] = True
-    enters_tapped = bool(permanent.get("enters_tapped") or permanent.get("enters_battlefield_tapped"))
+    enters_tapped = bool(
+        permanent.get("tapped")
+        or permanent.get("enters_tapped")
+        or permanent.get("enters_battlefield_tapped")
+    )
     if apply_opponent_enter_tapped_static(permanent, controller, all_players, turn=turn):
         enters_tapped = True
     apply_graveyard_count_creature_static(
@@ -56592,6 +56603,7 @@ def apply_effect_immediate(
                 token_count_per_opponent=effect_data.get("token_count_per_opponent"),
                 token_flying=bool(effect_data.get("token_flying") or effect_data.get("flying")),
                 token_haste=bool(effect_data.get("token_haste") or effect_data.get("haste")),
+                token_tapped=bool(effect_data.get("token_tapped")),
                 attack_each_opponent_this_turn_status=effect_data.get("attack_each_opponent_this_turn_status"),
                 attack_assignment_by_opponent=effect_data.get("_last_token_attack_assignments") or [],
                 token_cap_applied=requested_tokens > 20,

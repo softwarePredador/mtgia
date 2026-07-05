@@ -1,0 +1,145 @@
+{
+  "battle_execution": {
+    "event_count": 4,
+    "results": [
+      {
+        "card_name": "Servo Exhibition",
+        "scenario": "Servo Exhibition creates modeled creature tokens",
+        "token_name": "Servo Token",
+        "token_tapped": false,
+        "tokens_created": 2
+      },
+      {
+        "card_name": "Shadow Summoning",
+        "scenario": "Shadow Summoning creates modeled creature tokens",
+        "token_name": "Spirit Token",
+        "token_tapped": true,
+        "tokens_created": 2
+      }
+    ],
+    "scenario_count": 2
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T23:03:10.289766+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg535_fixed_tapped_tokens_new_server_package_manifest.json",
+  "package_id": "pg535_fixed_tapped_tokens_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Servo Exhibition",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:34867bd8005e3b1fb592b3dfb9a585ed",
+          "oracle_hash": "986014963b1bb2a9361b04c58130bfca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Shadow Summoning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e4509add508bcaf39e79f2811c958b41",
+          "oracle_hash": "86865fd932dbac3129e8d1060691bc0d",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Servo Exhibition",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:34867bd8005e3b1fb592b3dfb9a585ed",
+          "oracle_hash": "986014963b1bb2a9361b04c58130bfca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Shadow Summoning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e4509add508bcaf39e79f2811c958b41",
+          "oracle_hash": "86865fd932dbac3129e8d1060691bc0d",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Servo Exhibition",
+          "logical_rule_key": "battle_rule_v1:34867bd8005e3b1fb592b3dfb9a585ed"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shadow Summoning",
+          "logical_rule_key": "battle_rule_v1:e4509add508bcaf39e79f2811c958b41"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Servo Exhibition",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:34867bd8005e3b1fb592b3dfb9a585ed"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shadow Summoning",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:e4509add508bcaf39e79f2811c958b41"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 4,
+        "scenarios": 2
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

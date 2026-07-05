@@ -114,6 +114,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "token_keywords",
     "token_flying",
     "token_haste",
+    "token_tapped",
     "token_landwalk",
     "token_landwalk_land_type",
     "token_landwalk_land_types",
@@ -136,6 +137,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_token_keywords",
     "etb_token_flying",
     "etb_token_haste",
+    "etb_token_tapped",
     "etb_token_landwalk",
     "etb_token_landwalk_land_type",
     "etb_token_landwalk_land_types",
@@ -155,6 +157,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "dies_token_keywords",
     "dies_token_flying",
     "dies_token_haste",
+    "dies_token_tapped",
     "dies_token_landwalk",
     "dies_token_landwalk_land_type",
     "dies_token_landwalk_land_types",
@@ -971,6 +974,31 @@ def destroy_target_create_treasure_execution_scenario_from_expected_rule(
     }
 
 
+def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_fixed_create_creature_tokens_spell_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} creates modeled creature tokens",
+        "type": "fixed_create_creature_tokens",
+        "card": {"name": rule["card_name"]},
+        "expected_token": {
+            "name": required.get("token_name"),
+            "count": int(required.get("token_count") or 1),
+            "power": required.get("token_power"),
+            "toughness": required.get("token_toughness"),
+            "subtype": required.get("token_subtype"),
+            "colors": required.get("token_colors") or [],
+            "keywords": required.get("token_keywords") or [],
+            "artifact": bool(required.get("artifact_tokens")),
+            "tapped": bool(required.get("token_tapped")),
+        },
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def multi_create_creature_tokens_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -1015,6 +1043,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
+        or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)
     )
 

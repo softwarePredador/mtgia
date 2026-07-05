@@ -901,27 +901,51 @@ def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | dict
         return "token_source_additional_tokens_not_supported"
     if ".entersWithCounters" in text:
         return "token_source_counters_not_supported"
-    if ".setText" in text:
-        return "token_source_custom_text_not_supported"
     match = re.search(
-        r"new\s+CreateTokenEffect\s*\(\s*new\s+(\w+)\s*\([^)]*\)\s*"
-        r"(?:,\s*(\d+|GetXValue\.instance))?\s*\)",
+        r"new\s+CreateTokenEffect\s*\(\s*new\s+(?P<class>\w+)\s*\([^)]*\)\s*"
+        r"(?:,\s*(?P<count>\d+|GetXValue\.instance))?"
+        r"(?:,\s*(?P<tapped>true|false))?"
+        r"(?:,\s*(?P<attacking>true|false))?"
+        r"\s*\)",
         text,
         re.S,
     )
     if not match:
         return "token_source_create_token_not_fixed"
-    token_class = match.group(1)
-    if match.group(2) == "GetXValue.instance":
-        return {
+    token_class = match.group("class")
+    token_tapped = match.group("tapped") == "true"
+    if match.group("count") == "GetXValue.instance":
+        parsed = {
             "token_class": token_class,
             "token_count_source": "x_value",
             "token_count_per_x": 1,
         }
-    count = int(match.group(2) or "1")
+        if token_tapped:
+            parsed["token_tapped"] = True
+        return parsed
+    count = int(match.group("count") or "1")
     if count <= 0:
         return "token_source_count_not_positive"
+    if token_tapped:
+        return {"token_class": token_class, "token_count": count, "token_tapped": True}
     return token_class, count
+
+
+def fixed_literal_token_parts(
+    parsed_effect: tuple[str, int] | dict[str, Any] | str,
+) -> tuple[str, int, dict[str, Any]] | str:
+    if isinstance(parsed_effect, str):
+        return parsed_effect
+    if isinstance(parsed_effect, dict):
+        if parsed_effect.get("token_count_source"):
+            return "token_source_create_token_not_fixed"
+        return (
+            str(parsed_effect["token_class"]),
+            int(parsed_effect.get("token_count") or 1),
+            {"token_tapped": True} if parsed_effect.get("token_tapped") else {},
+        )
+    token_class, token_count = parsed_effect
+    return str(token_class), int(token_count), {}
 
 
 def multi_create_token_effects_from_source(source: str) -> list[dict[str, Any]] | str:
@@ -17462,18 +17486,27 @@ def split_row(
         parsed_effect = fixed_create_token_effect_from_source(source_text)
         if isinstance(parsed_effect, str):
             return None, parsed_effect
-        if isinstance(parsed_effect, dict):
+        if isinstance(parsed_effect, dict) and parsed_effect.get("token_count_source"):
             token_class = str(parsed_effect["token_class"])
             token_count = None
             token_count_fields = {
                 "token_count_source": parsed_effect["token_count_source"],
                 "token_count_per_x": parsed_effect["token_count_per_x"],
             }
+            if parsed_effect.get("token_tapped"):
+                token_count_fields["token_tapped"] = True
             scope = X_TOKEN_SPELL_SCOPE
             family_id = "xmage_x_create_creature_tokens_spell"
         else:
-            token_class, token_count = parsed_effect
-            token_count_fields = {"token_count": token_count}
+            if isinstance(parsed_effect, dict):
+                token_class = str(parsed_effect["token_class"])
+                token_count = int(parsed_effect.get("token_count") or 1)
+                token_count_fields = {"token_count": token_count}
+                if parsed_effect.get("token_tapped"):
+                    token_count_fields["token_tapped"] = True
+            else:
+                token_class, token_count = parsed_effect
+                token_count_fields = {"token_count": token_count}
             scope = TOKEN_SPELL_SCOPE
             family_id = "xmage_fixed_create_creature_tokens_spell"
         token_data, token_reason = parse_simple_token_class(
@@ -17503,7 +17536,10 @@ def split_row(
         parsed_effect = fixed_create_token_effect_from_source(source_text)
         if isinstance(parsed_effect, str):
             return None, parsed_effect.replace("token_", "activated_token_", 1)
-        token_class, token_count = parsed_effect
+        parsed_parts = fixed_literal_token_parts(parsed_effect)
+        if isinstance(parsed_parts, str):
+            return None, parsed_parts.replace("token_", "activated_token_", 1)
+        token_class, token_count, parsed_token_fields = parsed_parts
         token_data, token_reason = parse_simple_token_class(
             token_class_source(row, source_text, token_class),
             token_class,
@@ -17542,6 +17578,7 @@ def split_row(
             "xmage_effect_class": "CreateTokenEffect",
             "xmage_ability_class": "SimpleActivatedAbility",
             **source_activation,
+            **parsed_token_fields,
             **token_data,
         }
         effect_json = {
@@ -17556,6 +17593,7 @@ def split_row(
             "xmage_ability_class": "SimpleActivatedAbility",
             "_activated_rule_effects": [activated_effect],
             **source_activation,
+            **parsed_token_fields,
             **token_data,
         }
         return build_proposal(
@@ -17571,7 +17609,10 @@ def split_row(
         parsed_effect = fixed_create_token_effect_from_source(source_text)
         if isinstance(parsed_effect, str):
             return None, parsed_effect
-        token_class, token_count = parsed_effect
+        parsed_parts = fixed_literal_token_parts(parsed_effect)
+        if isinstance(parsed_parts, str):
+            return None, parsed_parts
+        token_class, token_count, parsed_token_fields = parsed_parts
         token_data, token_reason = parse_simple_token_class(
             token_class_source(row, source_text, token_class),
             token_class,
@@ -17607,8 +17648,10 @@ def split_row(
             "token_mana_produced": "etb_token_mana_produced",
             "token_produces": "etb_token_produces",
             "token_produced_mana_symbols": "etb_token_produced_mana_symbols",
+            "token_tapped": "etb_token_tapped",
             "artifact_tokens": "etb_artifact_tokens",
         }
+        token_data = {**parsed_token_fields, **token_data}
         for source_key, target_key in optional_token_fields.items():
             if source_key in token_data:
                 effect_json[target_key] = token_data[source_key]
@@ -17625,7 +17668,10 @@ def split_row(
         parsed_effect = fixed_create_token_effect_from_source(source_text)
         if isinstance(parsed_effect, str):
             return None, parsed_effect
-        token_class, token_count = parsed_effect
+        parsed_parts = fixed_literal_token_parts(parsed_effect)
+        if isinstance(parsed_parts, str):
+            return None, parsed_parts
+        token_class, token_count, parsed_token_fields = parsed_parts
         token_data, token_reason = parse_simple_token_class(
             token_class_source(row, source_text, token_class),
             token_class,
@@ -17666,8 +17712,10 @@ def split_row(
             "token_mana_produced": "dies_token_mana_produced",
             "token_produces": "dies_token_produces",
             "token_produced_mana_symbols": "dies_token_produced_mana_symbols",
+            "token_tapped": "dies_token_tapped",
             "artifact_tokens": "dies_artifact_tokens",
         }
+        token_data = {**parsed_token_fields, **token_data}
         for source_key, target_key in optional_token_fields.items():
             if source_key in token_data:
                 effect_json[target_key] = token_data[source_key]

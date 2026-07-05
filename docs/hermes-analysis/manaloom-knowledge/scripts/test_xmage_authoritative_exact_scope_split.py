@@ -2681,6 +2681,71 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "token_land_token_runtime_not_supported")
 
+    def test_fixed_create_creature_tokens_spell_ignores_safe_custom_text(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Servo Exhibition",
+                type_line="Sorcery",
+                oracle_text="Create two 1/1 colorless Servo artifact creature tokens.",
+            ),
+            source_text="""
+                Effect effect = new CreateTokenEffect(new ServoToken(), 2);
+                effect.setText("Create two 1/1 colorless Servo artifact creature tokens");
+                this.getSpellAbility().addEffect(effect);
+                class ServoToken extends TokenImpl {
+                    public ServoToken() {
+                        super("Servo Token", "1/1 colorless Servo artifact creature token");
+                        cardType.add(CardType.ARTIFACT);
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SERVO);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_count"], 2)
+        self.assertTrue(effect["artifact_tokens"])
+        self.assertEqual(effect["token_name"], "Servo Token")
+
+    def test_fixed_create_creature_tokens_spell_maps_tapped_argument(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Shadow Summoning",
+                type_line="Sorcery",
+                oracle_text="Create two tapped 1/1 white Spirit creature tokens with flying.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new SpiritWhiteToken(), 2, true));
+                class SpiritWhiteToken extends TokenImpl {
+                    public SpiritWhiteToken() {
+                        super("Spirit Token", "1/1 white Spirit creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.SPIRIT);
+                        color.setWhite(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        this.addAbility(FlyingAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_count"], 2)
+        self.assertTrue(effect["token_tapped"])
+        self.assertTrue(effect["token_flying"])
+
     def test_create_creature_tokens_spell_blocks_contextual_dynamic_count(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(

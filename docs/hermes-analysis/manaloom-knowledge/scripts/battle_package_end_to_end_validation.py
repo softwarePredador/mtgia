@@ -448,6 +448,77 @@ def run_token_maker_attack_each_opponent(battle, scenario: dict[str, Any], event
     }
 
 
+def run_fixed_create_creature_tokens(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Token Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6066)),
+    )
+
+    expected = dict(scenario.get("expected_token") or {})
+    expected_name = str(expected.get("name") or "")
+    expected_count = int(expected.get("count") or 1)
+    actual_tokens = [
+        permanent
+        for permanent in active.battlefield
+        if isinstance(permanent, dict) and battle.is_token_permanent(permanent)
+    ]
+    matches = [token for token in actual_tokens if token.get("name") == expected_name]
+    if len(matches) != expected_count:
+        fail("battle_execution", f"{card['name']} {expected_name} count={len(matches)}, expected {expected_count}")
+    for token in matches:
+        if expected.get("power") is not None and int(token.get("power") or 0) != int(expected["power"]):
+            fail("battle_execution", f"{card['name']} {expected_name} power={token.get('power')}")
+        if expected.get("toughness") is not None and int(token.get("toughness") or 0) != int(expected["toughness"]):
+            fail("battle_execution", f"{card['name']} {expected_name} toughness={token.get('toughness')}")
+        expected_subtype = expected.get("subtype")
+        if expected_subtype and str(expected_subtype) not in str(token.get("type_line") or ""):
+            fail("battle_execution", f"{card['name']} {expected_name} type_line={token.get('type_line')!r}")
+        expected_colors = expected.get("colors") or []
+        if expected_colors and list(token.get("colors") or []) != list(expected_colors):
+            fail("battle_execution", f"{card['name']} {expected_name} colors={token.get('colors')!r}")
+        for keyword in expected.get("keywords") or []:
+            if not battle.card_has_keyword(token, str(keyword)):
+                fail("battle_execution", f"{card['name']} {expected_name} missing keyword {keyword!r}")
+        if bool(expected.get("artifact")) and "artifact" not in str(token.get("type_line") or "").lower():
+            fail("battle_execution", f"{card['name']} {expected_name} artifact token type missing")
+        if bool(token.get("tapped")) != bool(expected.get("tapped")):
+            fail("battle_execution", f"{card['name']} {expected_name} tapped={token.get('tapped')}")
+
+    token_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "tokens_created"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if token_event is None:
+        fail("battle_events", f"missing {card['name']} tokens_created event")
+    if int(token_event.get("tokens_created") or 0) != expected_count:
+        fail("battle_events", f"{card['name']} event tokens_created={token_event.get('tokens_created')}")
+    if bool(token_event.get("token_tapped")) != bool(expected.get("tapped")):
+        fail("battle_events", f"{card['name']} event token_tapped={token_event.get('token_tapped')}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "tokens_created": len(matches),
+        "token_name": expected_name,
+        "token_tapped": bool(expected.get("tapped")),
+    }
+
+
 def run_multi_create_creature_tokens(
     battle,
     scenario: dict[str, Any],
@@ -1760,6 +1831,7 @@ SCENARIO_RUNNERS = {
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "change_single_target_response": run_change_single_target_response,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
+    "fixed_create_creature_tokens": run_fixed_create_creature_tokens,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
     "multi_create_creature_tokens": run_multi_create_creature_tokens,
     "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,
