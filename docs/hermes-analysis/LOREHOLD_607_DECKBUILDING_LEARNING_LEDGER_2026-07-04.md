@@ -3259,3 +3259,62 @@ Deckbuilding lesson:
   `collect_targeted_floor_traces_for_unprobed_gap_rows_before_structure_matrix`.
 
 Deck `607` remains untouched and protected.
+
+## Gap Floor Trace Miner - 2026-07-05
+
+The floor trace miner is now generated:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_gap_floor_trace_miner_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_gap_floor_trace_miner_20260705_current.json`
+
+It scanned all current local Lorehold gate JSON reports and only counted rows
+where protected `607` won, a candidate lost in the same opponent/game slot, and
+the target card produced real `card_event_counts` for `607`.
+
+Current result:
+
+- status:
+  `gap_floor_trace_miner_found_floor_evidence_keep_607`;
+- scanned gate reports: `953`;
+- scanned game-result reports: `171`;
+- target cards: `6`;
+- targets with floor trace: `6`;
+- same-slot 607-win/candidate-loss traces: `540`;
+- positive target-delta traces: `520`;
+- structure-matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- forced access allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`.
+
+Floor traces by card:
+
+- `Call Forth the Tempest`: `58` traces, `58` positive deltas, `872`
+  baseline target events;
+- `Hit the Mother Lode`: `45` traces, `44` positive deltas, `119`
+  baseline target events;
+- `Everything Comes to Dust`: `102` traces, `102` positive deltas, `905`
+  baseline target events;
+- `Rise of the Eldrazi`: `68` traces, `67` positive deltas, `204`
+  baseline target events;
+- `Surge to Victory`: `112` traces, `111` positive deltas, `983`
+  baseline target events;
+- `Esper Sentinel`: `155` traces, `138` positive deltas, `813`
+  baseline target events.
+
+Cut decision:
+
+- All six cards are now `floor_trace_found_cut_blocked`.
+- The cut decision for each is
+  `protect_cut_slot_until_same_lane_replacement_preserves_floor`.
+- Low exposure no longer supports cutting these cards. It only explains why
+  they needed this floor-trace pass.
+
+Next allowed work:
+
+- `feed_floor_trace_blockers_back_into_cut_models_before_structure_matrix`.
+- Do not mutate deck `607`, do not materialize a candidate deck from these
+  traces, and do not open forced-access or natural battle gates from this
+  report.
+
+Deck `607` remains untouched and protected.

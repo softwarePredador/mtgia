@@ -1505,5 +1505,44 @@ Operational lesson:
 - The scout gives the deckbuilder a better learning target without weakening
   the protected `607` list.
 
+Gap floor trace miner generated on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_gap_floor_trace_miner_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_gap_floor_trace_miner_20260705_current.json`.
+- Status:
+  `gap_floor_trace_miner_found_floor_evidence_keep_607`.
+- Scope: consume the trace-gap scout and all current local Lorehold gate JSON
+  reports with `game_results`. The miner only uses same-slot rows where
+  protected `607` won, a candidate lost, and the target card produced real
+  `card_event_counts` for `607`.
+- Current counts: `scanned_gate_report_count=953`,
+  `scanned_game_result_report_count=171`, `target_card_count=6`,
+  `target_with_floor_trace_count=6`,
+  `same_slot_607_win_candidate_loss_trace_count=540`, and
+  `positive_target_delta_trace_count=520`.
+- Cut-blocked floor traces found:
+  `Call Forth the Tempest` (`58` traces, `58` positive deltas),
+  `Hit the Mother Lode` (`45` traces, `44` positive deltas),
+  `Everything Comes to Dust` (`102` traces, `102` positive deltas),
+  `Rise of the Eldrazi` (`68` traces, `67` positive deltas),
+  `Surge to Victory` (`112` traces, `111` positive deltas), and
+  `Esper Sentinel` (`155` traces, `138` positive deltas).
+- Structure-matrix scoring: `false`; candidate deck materialization: `false`;
+  forced access: `false`; natural battle gate: `false`; promotion: `false`.
+- Next allowed work:
+  `feed_floor_trace_blockers_back_into_cut_models_before_structure_matrix`.
+
+Operational lesson:
+
+- The six unprobed gap cards are no longer merely suspicious low-exposure
+  slots. Current evidence shows they participate in protected-`607` wins in
+  same-slot comparisons where candidates lost.
+- These cards become cut blockers. A future candidate can still replace one,
+  but only with a named same-lane replacement that preserves the observed floor
+  and then passes the normal structure and battle gates.
+- Do not turn this report into a deck change; it is cut-protection evidence.
+
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

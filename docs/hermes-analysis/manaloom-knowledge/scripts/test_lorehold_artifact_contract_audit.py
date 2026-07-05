@@ -502,6 +502,38 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertFalse(classification.canonical_summary["deck_607_mutated"])
 
+    def test_lorehold_gap_floor_trace_miner_is_recognized(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_gap_floor_trace_miner",
+            "current_baseline": "deck_607",
+            "decision": {
+                "keep_607_as_protected_baseline": True,
+                "candidate_deck_materialization_allowed_now": False,
+            },
+            "deck_607_mutated": False,
+            "floor_trace_rows": [{"target_card": "Hit the Mother Lode"}],
+            "generated_at": "2026-07-05T00:00:00Z",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "source_evidence": {},
+            "source_reports": {},
+            "status": "gap_floor_trace_miner_found_floor_evidence_keep_607",
+            "summary": {
+                "target_with_floor_trace_count": 1,
+                "candidate_deck_materialization_allowed_now": False,
+            },
+            "target_floor_summaries": [{"card_name": "Hit the Mother Lode"}],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lorehold_gap_floor_trace_miner.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "lorehold_gap_floor_trace_miner")
+        self.assertEqual(classification.schema_version, "lorehold_gap_floor_trace_miner_v1")
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+
     def test_cut_methodology_reaudit_payload_is_recognized(self) -> None:
         payload = {
             "candidate_report": "candidate.json",

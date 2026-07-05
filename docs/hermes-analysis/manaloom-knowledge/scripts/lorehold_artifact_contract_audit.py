@@ -467,6 +467,25 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             },
         )
 
+    if (
+        payload.get("artifact_type") == "lorehold_gap_floor_trace_miner"
+        and {"decision", "floor_trace_rows", "source_evidence", "summary", "target_floor_summaries"} <= keys
+    ):
+        return ArtifactClassification(
+            **base,
+            artifact_kind="lorehold_gap_floor_trace_miner",
+            schema_version="lorehold_gap_floor_trace_miner_v1",
+            status="pass",
+            detail="Lorehold protected-607 gap floor trace miner",
+            canonical_summary={
+                "schema_keys": sorted(keys),
+                "summary": payload.get("summary") if isinstance(payload.get("summary"), Mapping) else {},
+                "source_db_mutated": payload.get("source_db_mutated", False),
+                "postgres_writes": payload.get("postgres_writes", False),
+                "deck_607_mutated": payload.get("deck_607_mutated", False),
+            },
+        )
+
     support_signatures: list[tuple[str, set[str], str]] = [
         ("candidate_matrix", {"rows", "summary"}, "candidate matrix rows"),
         ("variant_staging", {"reports", "valid_count", "invalid_count"}, "variant staging report"),
