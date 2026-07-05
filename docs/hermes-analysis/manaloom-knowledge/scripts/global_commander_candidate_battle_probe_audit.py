@@ -234,6 +234,7 @@ def build_payload(
     if replay["added_cards_unobserved"] or replay["added_cards_decision_only"]:
         blocker_reasons.append("added_cards_not_exercised_in_replay_events")
     status = "battle_probe_blocks_promotion" if blocker_reasons else "battle_probe_ready_for_larger_gate"
+    sample_games = candidate["total_games"] if candidate["total_games"] else base["total_games"]
     return {
         "generated_at": utc_now(),
         "artifact_type": "global_commander_candidate_battle_probe_audit",
@@ -262,7 +263,7 @@ def build_payload(
         "replay": replay,
         "blocker_reasons": blocker_reasons,
         "policy": {
-            "small_probe": "A 3-game probe is diagnostic only and cannot promote a deck.",
+            "battle_sample": f"The {sample_games}-game equal-sample probe/gate is diagnostic only and cannot promote a deck by itself.",
             "card_exposure": "Added cards must be drawn/cast/used in replay events before card-level swap evidence is trusted.",
             "promotion": "Promotion remains closed until larger equal battle gate and replay trace pass.",
         },

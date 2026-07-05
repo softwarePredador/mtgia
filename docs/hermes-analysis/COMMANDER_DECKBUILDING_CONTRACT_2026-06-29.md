@@ -273,14 +273,18 @@ Current external refresh on 2026-07-05:
   `Lorehold`; however the small equal-seed probe underperformed the base
   (`33.3%` versus `66.7%`) and none of the five added removal cards were
   exercised in replay events, so promotion remains blocked.
-- Current clean one-swap Kaalia candidate evidence is better but still not a
-  promotion. A guarded source copy with only `+Feed the Swarm / -Birgi, God of
-  Storytelling // Harnfel, Horn of Bounty` produced local
+- Current clean one-swap Kaalia candidate evidence is a useful negative
+  learning example. A guarded source copy with only `+Feed the Swarm / -Birgi,
+  God of Storytelling // Harnfel, Horn of Bounty` first produced local
   `battle_probe_ready_for_larger_gate` evidence on the same three real
   opponents/seed: base `33.3%`, candidate `66.7%`, stale Lorehold mentions `0`.
-  Replay evidence shows `Demonic Tutor` selected `Feed the Swarm`, then `Feed
-  the Swarm` was cast/resolved and removed `Kinnan, Bonder Prodigy`. This
-  unlocks a larger equal battle/replay gate only; promotion remains closed.
+  Replay evidence showed `Demonic Tutor` selecting `Feed the Swarm`, then `Feed
+  the Swarm` being cast/resolved and removing `Kinnan, Bonder Prodigy`.
+  However the larger 9-game equal gate blocked promotion: base `66.7%`,
+  candidate `22.2%`, blocker `candidate_underperformed_base_probe`. The global
+  lesson is that a situational removal upgrade can be real while its cut is
+  still wrong; do not cut `Birgi` from this Kaalia shell for generic removal
+  without a better same-lane replacement and a passing larger gate.
 
 ## Global Commander Rollout - 2026-07-01
 

@@ -99,6 +99,7 @@ class GlobalCommanderCandidateBattleProbeAuditTests(unittest.TestCase):
         self.assertIn("added_cards_not_exercised_in_replay_events", payload["blocker_reasons"])
         self.assertEqual(payload["replay"]["stale_lorehold_mentions"], 0)
         self.assertEqual(payload["replay"]["added_cards_decision_only"], ["Terminate"])
+        self.assertIn("3-game equal-sample", payload["policy"]["battle_sample"])
 
 
 if __name__ == "__main__":
