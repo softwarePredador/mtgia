@@ -17,6 +17,19 @@ def _safe_cut(*, seed_safe=0, reviewable=0):
     }
 
 
+def _nonanchor(*, seed_safe=0, reviewable=0):
+    return {
+        "summary": {
+            "primary_target": "Dragon's Rage Channeler",
+            "primary_target_model_status": "clean_prior_target_blocked_no_nonanchor_cut",
+            "primary_target_same_lane_slot_count": 6,
+            "seed_safe_nonanchor_count": seed_safe,
+            "reviewable_nonanchor_gap_count": reviewable,
+            "clean_prior_blocked_target_count": 1,
+        }
+    }
+
+
 def _micro(*, runnable=0):
     return {
         "summary": {
@@ -66,6 +79,7 @@ def _queue():
 def _paths():
     return {
         "safe_cut_miner": Path("/tmp/safe.json"),
+        "nonanchor_cut_model": Path("/tmp/nonanchor.json"),
         "microbenchmark_plan": Path("/tmp/micro.json"),
         "miracle_shell_contract": Path("/tmp/miracle.json"),
         "shell_failure_synthesis": Path("/tmp/shell.json"),
@@ -77,6 +91,7 @@ def _paths():
 def _build(**overrides):
     return route.build_report(
         safe_cut_miner=overrides.get("safe_cut_miner", _safe_cut()),
+        nonanchor_cut_model=overrides.get("nonanchor_cut_model", _nonanchor()),
         microbenchmark_plan=overrides.get("microbenchmark_plan", _micro()),
         miracle_shell_contract=overrides.get("miracle_shell_contract", _miracle_contract()),
         shell_failure_synthesis=overrides.get("shell_failure_synthesis", _shell_failure()),
@@ -93,6 +108,8 @@ def test_current_like_zero_safe_cuts_routes_to_sidecar_shell_and_keeps_607():
     assert payload["summary"]["one_for_one_cut_ready_count"] == 0
     assert payload["summary"]["forced_access_runnable_count"] == 0
     assert payload["summary"]["sidecar_shell_contract_required"] is True
+    assert payload["summary"]["nonanchor_primary_target"] == "Dragon's Rage Channeler"
+    assert payload["summary"]["nonanchor_seed_safe_count"] == 0
     assert payload["deck_607_mutated"] is False
     assert payload["decision"]["allow_deck_mutation_now"] is False
     assert payload["decision"]["allow_natural_gate_now"] is False
@@ -106,6 +123,15 @@ def test_seed_safe_cut_routes_back_to_package_gate_not_sidecar():
     assert payload["summary"]["sidecar_shell_contract_required"] is False
     assert payload["route"]["selected_route"] == "safe_cut_package_gate"
     assert payload["decision"]["promotion_allowed"] is False
+
+
+def test_nonanchor_seed_safe_signal_routes_back_to_package_gate_but_not_forced_execution():
+    payload = _build(nonanchor_cut_model=_nonanchor(seed_safe=1))
+
+    assert payload["status"] == "topdeck_post_safe_cut_route_return_to_safe_cut_package_gate_keep_607"
+    assert payload["summary"]["one_for_one_cut_ready_count"] == 1
+    assert payload["summary"]["nonanchor_seed_safe_count"] == 1
+    assert payload["decision"]["allow_forced_access_execution_now"] is False
 
 
 def test_forced_runnable_without_safe_cut_is_diagnostic_only_not_promotion():
@@ -125,11 +151,20 @@ def test_missing_miracle_shell_contract_blocks_route_as_missing_input():
     assert payload["decision"]["allow_deck_mutation_now"] is False
 
 
+def test_missing_nonanchor_cut_model_blocks_route_as_missing_input():
+    payload = _build(nonanchor_cut_model={})
+
+    assert payload["status"] == "topdeck_post_safe_cut_route_inputs_missing_keep_607"
+    assert "nonanchor_cut_model" in payload["summary"]["missing_inputs"]
+    assert payload["decision"]["allow_deck_mutation_now"] is False
+
+
 def test_markdown_surfaces_no_mutation_sidecar_and_staple_policy():
     markdown = route.render_markdown(_build())
 
     assert "Deck 607 mutated: `false`" in markdown
     assert "Natural battle gate allowed: `false`" in markdown
     assert "topdeck_access_first_sidecar_shell" in markdown
+    assert "Dragon's Rage Channeler" in markdown
     assert "Mana Vault" in markdown
     assert "The One Ring" in markdown

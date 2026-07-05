@@ -1381,6 +1381,13 @@ Learning-frontier closure generated on 2026-07-05:
   `Wheel of Fortune` remain prior-reject targets with no non-anchor cut model.
 - Current next action:
   `collect_new_cut_evidence_or_define_new_shell_contract_before_execution`.
+- Post-safe-cut route and sidecar queue now consume the non-anchor miner as an
+  explicit input. The refreshed route still selects
+  `topdeck_access_first_sidecar_shell` with `one_for_one_cut_ready_count=0`,
+  `nonanchor_seed_safe_count=0`, and `nonanchor_reviewable_gap_count=0`.
+  The refreshed sidecar queue keeps `40` learning rows, `0` matrix-eligible
+  rows, and adds non-anchor blockers to all `5` topdeck targets before any
+  forced-access or materialization path can open.
 
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

@@ -3013,3 +3013,72 @@ Operational lesson:
   or a separate shell contract is declared. This is not permission to run
   forced access or battle.
 - Deck `607` remains untouched and protected.
+
+## Topdeck Non-Anchor Route Integration - 2026-07-05
+
+The current post-safe-cut route and sidecar queue now consume the non-anchor
+cut model directly:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_post_safe_cut_route_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_post_safe_cut_route_20260705_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_candidate_queue_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_candidate_queue_20260705_current.json`
+
+Route result after non-anchor integration:
+
+- status:
+  `topdeck_post_safe_cut_route_sidecar_shell_required_keep_607`;
+- selected route:
+  `topdeck_access_first_sidecar_shell`;
+- non-anchor primary target:
+  `Dragon's Rage Channeler`;
+- non-anchor primary target status:
+  `clean_prior_target_blocked_no_nonanchor_cut`;
+- one-for-one cut-ready count: `0`;
+- non-anchor seed-safe count: `0`;
+- non-anchor reviewable gap count: `0`;
+- forced-access runnable count: `0`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- recommended next action:
+  `write_or_refresh_topdeck_access_first_sidecar_shell_contract_before_materialization`.
+
+Sidecar queue result after non-anchor integration:
+
+- status:
+  `topdeck_sidecar_candidate_queue_blocked_no_matrix_rows_keep_607`;
+- queue rows: `40`;
+- matrix candidate rows eligible: `0`;
+- non-anchor primary target:
+  `Dragon's Rage Channeler`;
+- non-anchor seed-safe count: `0`;
+- non-anchor reviewable gap count: `0`;
+- non-anchor clean-prior blocked target count: `1`;
+- topdeck non-anchor blocker counts:
+  `nonanchor_model_has_no_seed_safe_cut=5`,
+  `nonanchor_model_has_no_reviewable_gap=5`;
+- candidate deck materialization allowed now: `false`;
+- forced access allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`.
+
+Topdeck target rows now carry the non-anchor model state:
+
+- `Dragon's Rage Channeler`: clean-prior target, `6` same-lane slots, `0`
+  seed-safe non-anchor cuts, `0` reviewable gaps;
+- `Galvanoth`: prior-reject target, `8` same-lane slots, `0` seed-safe
+  non-anchor cuts, `0` reviewable gaps;
+- `Penance`: prior-reject target, `20` same-lane slots, `0` seed-safe
+  non-anchor cuts, `0` reviewable gaps;
+- `Valakut Awakening // Valakut Stoneforge`: prior-reject target, `13`
+  same-lane slots, `0` seed-safe non-anchor cuts, `0` reviewable gaps;
+- `Wheel of Fortune`: prior-reject target, `13` same-lane slots, `0`
+  seed-safe non-anchor cuts, `0` reviewable gaps.
+
+Operational lesson:
+
+- The sidecar route is not a shortcut around cut safety. It is only the next
+  controlled learning surface once one-for-one swaps are blocked.
+- A sidecar row still needs a named cut model and preserved topdeck/miracle
+  floors before structure-matrix scoring. No row is eligible now.
+- Deck `607` remains untouched and protected.

@@ -1,12 +1,16 @@
 # Lorehold Topdeck Post Safe-Cut Route
 
-- Generated at: `2026-07-05T06:30:35Z`
+- Generated at: `2026-07-05T07:23:39Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
 - Status: `topdeck_post_safe_cut_route_sidecar_shell_required_keep_607`
 - Selected route: `topdeck_access_first_sidecar_shell`
 - One-for-one cut ready count: `0`
+- Non-anchor primary target: `Dragon's Rage Channeler`
+- Non-anchor primary target status: `clean_prior_target_blocked_no_nonanchor_cut`
+- Non-anchor seed-safe count: `0`
+- Non-anchor reviewable gaps: `0`
 - Reviewable same-lane gaps: `0`
 - Forced-access runnable count: `0`
 - Sidecar shell contract required: `true`
@@ -20,6 +24,7 @@
 - `hypothesis_queue`: `docs/hermes-analysis/master_optimizer_reports/lorehold_hypothesis_queue_from_value_model_20260705_current_relearn.json`
 - `microbenchmark_plan`: `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_forced_access_microbenchmark_plan_20260705_current.json`
 - `miracle_shell_contract`: `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_shell_contract_20260705_current_relearn.json`
+- `nonanchor_cut_model`: `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.json`
 - `safe_cut_miner`: `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_safe_cut_miner_20260705_current.json`
 - `shell_failure_synthesis`: `docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_shell_failure_synthesis_20260705_current_relearn.json`
 

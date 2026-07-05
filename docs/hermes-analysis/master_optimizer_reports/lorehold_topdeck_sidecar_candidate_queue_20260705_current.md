@@ -1,12 +1,16 @@
 # Lorehold Topdeck Sidecar Candidate Queue
 
-- Generated at: `2026-07-05T06:35:33Z`
+- Generated at: `2026-07-05T07:23:44Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
 - Status: `topdeck_sidecar_candidate_queue_blocked_no_matrix_rows_keep_607`
 - Queue rows: `40`
 - Matrix candidate rows eligible: `0`
+- Non-anchor primary target: `Dragon's Rage Channeler`
+- Non-anchor primary target status: `clean_prior_target_blocked_no_nonanchor_cut`
+- Non-anchor seed-safe count: `0`
+- Non-anchor reviewable gaps: `0`
 - Candidate deck materialization allowed now: `false`
 - Natural battle gate allowed now: `false`
 - Promotion allowed now: `false`
@@ -15,6 +19,7 @@
 ## Source Reports
 
 - `hypothesis_queue`: `docs/hermes-analysis/master_optimizer_reports/lorehold_hypothesis_queue_from_value_model_20260705_current_relearn.json`
+- `nonanchor_cut_model`: `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.json`
 - `post_safe_cut_route`: `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_post_safe_cut_route_20260705_current.json`
 - `safe_cut_miner`: `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_safe_cut_miner_20260705_current.json`
 - `structure_matrix`: `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn.json`
@@ -24,7 +29,7 @@
 
 - tag_counts: `{"generic_staple_learning_only": 2, "mana_base_safe_cut_model": 7, "pressure_window_after_topdeck_floor": 5, "sidecar_watchlist": 10, "spell_chain_after_miracle_floor": 8, "topdeck_access_sidecar_primary": 5, "tutor_learning_only_after_prior_reject": 3}`
 - readiness_counts: `{"blocked_prior_reject": 9, "needs_safe_cut_model": 31}`
-- blocker_counts: `{"generic_staple_not_lorehold_specific_until_trace_proof": 2, "missing_named_same_lane_cut": 40, "must_follow_topdeck_miracle_floor": 13, "needs_safe_cut_model": 40, "prior_reject_requires_new_trace_hypothesis": 9}`
+- blocker_counts: `{"generic_staple_not_lorehold_specific_until_trace_proof": 2, "missing_named_same_lane_cut": 40, "must_follow_topdeck_miracle_floor": 13, "needs_safe_cut_model": 40, "nonanchor_model_has_no_reviewable_gap": 5, "nonanchor_model_has_no_seed_safe_cut": 5, "prior_reject_requires_new_trace_hypothesis": 13}`
 
 ## Candidate Queue
 
@@ -35,11 +40,11 @@
 | Plateau | `mana_base_safe_cut_model` | `P1_safe_cut_model` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model` | `build_safe_cut_mana_source_model_before_any_battle_gate` |
 | Rugged Prairie | `mana_base_safe_cut_model` | `P1_safe_cut_model` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model` | `build_safe_cut_mana_source_model_before_any_battle_gate` |
 | Sundown Pass | `mana_base_safe_cut_model` | `P1_safe_cut_model` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model` | `build_safe_cut_mana_source_model_before_any_battle_gate` |
-| Dragon's Rage Channeler | `topdeck_access_sidecar_primary` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model` | `forced_access_diagnostic_only_until_miracle_access_floors_pass` |
-| Galvanoth | `topdeck_access_sidecar_primary` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model` | `forced_access_diagnostic_only_until_miracle_access_floors_pass` |
-| Penance | `topdeck_access_sidecar_primary` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model` | `forced_access_diagnostic_only_until_miracle_access_floors_pass` |
-| Valakut Awakening // Valakut Stoneforge | `topdeck_access_sidecar_primary` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model` | `forced_access_diagnostic_only_until_miracle_access_floors_pass` |
-| Wheel of Fortune | `topdeck_access_sidecar_primary` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model` | `forced_access_diagnostic_only_until_miracle_access_floors_pass` |
+| Dragon's Rage Channeler | `topdeck_access_sidecar_primary` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model, nonanchor_model_has_no_reviewable_gap, nonanchor_model_has_no_seed_safe_cut` | `forced_access_diagnostic_only_until_miracle_access_floors_pass` |
+| Galvanoth | `topdeck_access_sidecar_primary` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model, nonanchor_model_has_no_reviewable_gap, nonanchor_model_has_no_seed_safe_cut` | `forced_access_diagnostic_only_until_miracle_access_floors_pass` |
+| Penance | `topdeck_access_sidecar_primary` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model, nonanchor_model_has_no_reviewable_gap, nonanchor_model_has_no_seed_safe_cut` | `forced_access_diagnostic_only_until_miracle_access_floors_pass` |
+| Valakut Awakening // Valakut Stoneforge | `topdeck_access_sidecar_primary` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model, nonanchor_model_has_no_reviewable_gap, nonanchor_model_has_no_seed_safe_cut` | `forced_access_diagnostic_only_until_miracle_access_floors_pass` |
+| Wheel of Fortune | `topdeck_access_sidecar_primary` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, needs_safe_cut_model, nonanchor_model_has_no_reviewable_gap, nonanchor_model_has_no_seed_safe_cut` | `forced_access_diagnostic_only_until_miracle_access_floors_pass` |
 | Boros Charm | `pressure_window_after_topdeck_floor` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, must_follow_topdeck_miracle_floor, needs_safe_cut_model` | `forced_access_pressure_window_diagnostic_only_until_winota_floor_passes` |
 | Deflecting Palm | `pressure_window_after_topdeck_floor` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, must_follow_topdeck_miracle_floor, needs_safe_cut_model` | `forced_access_pressure_window_diagnostic_only_until_winota_floor_passes` |
 | Grand Abolisher | `pressure_window_after_topdeck_floor` | `P1_forced_access_diagnostic` | `false` | `missing_named_same_lane_cut, must_follow_topdeck_miracle_floor, needs_safe_cut_model` | `forced_access_pressure_window_diagnostic_only_until_winota_floor_passes` |
@@ -89,4 +94,5 @@
   - do_not_mutate_deck_607
   - do_not_materialize_a_sidecar_deck_from_blocked_rows
   - mine named same-lane cuts for topdeck and mana rows first
+  - respect the non-anchor cut model before any topdeck forced access
   - keep Mana Vault and The One Ring as learning-only until new trace and cut proof exist

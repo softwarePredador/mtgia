@@ -96,7 +96,7 @@
       "url": "https://edhrec.com/decks/lorehold-the-historian/optimized/topdeck"
     }
   ],
-  "generated_at": "2026-07-05T06:30:35Z",
+  "generated_at": "2026-07-05T07:23:39Z",
   "postgres_writes": false,
   "route": {
     "blocked_routes": [
@@ -173,6 +173,7 @@
         "opponent_turn_mana",
         "spell_volume_conversion",
         "same_lane_nonanchor_cut",
+        "nonanchor_cut_model_proof",
         "fast_pressure_survival"
       ]
     }
@@ -280,6 +281,31 @@
       "structure_matrix_allowed_now": false,
       "structure_matrix_contract_allowed_now": true
     },
+    "nonanchor_cut_model_summary": {
+      "candidate_deck_materialization_allowed_now": false,
+      "clean_prior_blocked_target_count": 1,
+      "clean_prior_blocked_targets": [
+        "Dragon's Rage Channeler"
+      ],
+      "decision_status": "topdeck_nonanchor_cut_model_none_found_keep_607",
+      "forced_access_allowed_now": false,
+      "microbenchmark_runnable_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "primary_target": "Dragon's Rage Channeler",
+      "primary_target_model_status": "clean_prior_target_blocked_no_nonanchor_cut",
+      "primary_target_same_lane_slot_count": 6,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "collect_new_cut_evidence_or_define_new_shell_contract_before_execution",
+      "reviewable_nonanchor_gap_count": 0,
+      "seed_safe_nonanchor_count": 0,
+      "status_counts": {
+        "clean_prior_target_blocked_no_nonanchor_cut": 1,
+        "prior_reject_target_blocked_no_nonanchor_cut": 4
+      },
+      "structure_matrix_allowed_now": false,
+      "target_card_count": 5
+    },
     "safe_cut_summary": {
       "action_counts": {
         "no_current_safe_cut_for_target": 5
@@ -352,6 +378,7 @@
     "hypothesis_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_hypothesis_queue_from_value_model_20260705_current_relearn.json",
     "microbenchmark_plan": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_forced_access_microbenchmark_plan_20260705_current.json",
     "miracle_shell_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_shell_contract_20260705_current_relearn.json",
+    "nonanchor_cut_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.json",
     "safe_cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_safe_cut_miner_20260705_current.json",
     "shell_failure_synthesis": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_shell_failure_synthesis_20260705_current_relearn.json"
   },
@@ -370,10 +397,18 @@
     "hypothesis_queue_natural_gate_ready_count": 0,
     "missing_inputs": [],
     "natural_battle_gate_allowed_now": false,
+    "nonanchor_clean_prior_blocked_target_count": 1,
+    "nonanchor_primary_target": "Dragon's Rage Channeler",
+    "nonanchor_primary_target_same_lane_slot_count": 6,
+    "nonanchor_primary_target_status": "clean_prior_target_blocked_no_nonanchor_cut",
+    "nonanchor_reviewable_gap_count": 0,
+    "nonanchor_seed_safe_count": 0,
     "one_for_one_cut_ready_count": 0,
     "promotion_allowed_now": false,
     "recommended_next_action": "write_or_refresh_topdeck_access_first_sidecar_shell_contract_before_materialization",
     "reviewable_same_lane_gap_count": 0,
+    "safe_cut_reviewable_count": 0,
+    "safe_cut_seed_ready_count": 0,
     "selected_route": "topdeck_access_first_sidecar_shell",
     "sidecar_shell_contract_required": true,
     "structure_matrix_allowed_now": false,

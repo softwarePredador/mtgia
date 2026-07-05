@@ -21,6 +21,9 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_SAFE_CUT_MINER = REPORT_DIR / "lorehold_topdeck_safe_cut_miner_20260705_current.json"
+DEFAULT_NONANCHOR_CUT_MODEL = (
+    REPORT_DIR / "lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.json"
+)
 DEFAULT_MICROBENCHMARK_PLAN = (
     REPORT_DIR / "lorehold_topdeck_forced_access_microbenchmark_plan_20260705_current.json"
 )
@@ -183,6 +186,7 @@ def summary(payload: Mapping[str, Any]) -> dict[str, Any]:
 def input_health(payloads: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
     required = [
         "safe_cut_miner",
+        "nonanchor_cut_model",
         "microbenchmark_plan",
         "miracle_shell_contract",
         "shell_failure_synthesis",
@@ -248,6 +252,7 @@ def route_for_counts(
 def build_report(
     *,
     safe_cut_miner: Mapping[str, Any],
+    nonanchor_cut_model: Mapping[str, Any],
     microbenchmark_plan: Mapping[str, Any],
     miracle_shell_contract: Mapping[str, Any],
     shell_failure_synthesis: Mapping[str, Any],
@@ -257,6 +262,7 @@ def build_report(
 ) -> dict[str, Any]:
     payloads = {
         "safe_cut_miner": safe_cut_miner,
+        "nonanchor_cut_model": nonanchor_cut_model,
         "microbenchmark_plan": microbenchmark_plan,
         "miracle_shell_contract": miracle_shell_contract,
         "shell_failure_synthesis": shell_failure_synthesis,
@@ -265,13 +271,18 @@ def build_report(
     }
     health = input_health(payloads)
     safe_summary = summary(safe_cut_miner)
+    nonanchor_summary = summary(nonanchor_cut_model)
     micro_summary = summary(microbenchmark_plan)
     miracle_summary = summary(miracle_shell_contract)
     shell_summary = summary(shell_failure_synthesis)
     router_summary = summary(closing_window_router)
     queue_summary = summary(hypothesis_queue)
-    seed_safe_count = as_int(safe_summary.get("seed_safe_cut_candidate_count"))
-    reviewable_count = as_int(safe_summary.get("reviewable_same_lane_gap_count"))
+    safe_seed_count = as_int(safe_summary.get("seed_safe_cut_candidate_count"))
+    safe_reviewable_count = as_int(safe_summary.get("reviewable_same_lane_gap_count"))
+    nonanchor_seed_count = as_int(nonanchor_summary.get("seed_safe_nonanchor_count"))
+    nonanchor_reviewable_count = as_int(nonanchor_summary.get("reviewable_nonanchor_gap_count"))
+    seed_safe_count = safe_seed_count + nonanchor_seed_count
+    reviewable_count = safe_reviewable_count + nonanchor_reviewable_count
     forced_runnable_count = as_int(micro_summary.get("runnable_now_count"))
     route = route_for_counts(
         missing_inputs=as_list(health.get("missing_inputs")),
@@ -282,13 +293,25 @@ def build_report(
     )
     allow_forced_access = (
         route["selected_route"] == "safe_cut_package_gate"
-        and seed_safe_count > 0
+        and safe_seed_count > 0
         and forced_runnable_count > 0
     )
     summary_row = {
         "decision_status": route["status"],
         "selected_route": route["selected_route"],
         "one_for_one_cut_ready_count": seed_safe_count,
+        "safe_cut_seed_ready_count": safe_seed_count,
+        "safe_cut_reviewable_count": safe_reviewable_count,
+        "nonanchor_seed_safe_count": nonanchor_seed_count,
+        "nonanchor_reviewable_gap_count": nonanchor_reviewable_count,
+        "nonanchor_primary_target": nonanchor_summary.get("primary_target") or "",
+        "nonanchor_primary_target_status": nonanchor_summary.get("primary_target_model_status") or "",
+        "nonanchor_primary_target_same_lane_slot_count": as_int(
+            nonanchor_summary.get("primary_target_same_lane_slot_count")
+        ),
+        "nonanchor_clean_prior_blocked_target_count": as_int(
+            nonanchor_summary.get("clean_prior_blocked_target_count")
+        ),
         "reviewable_same_lane_gap_count": reviewable_count,
         "forced_access_runnable_count": forced_runnable_count,
         "sidecar_shell_contract_required": bool(route["sidecar_shell_contract_required"]),
@@ -347,6 +370,7 @@ def build_report(
                     "opponent_turn_mana",
                     "spell_volume_conversion",
                     "same_lane_nonanchor_cut",
+                    "nonanchor_cut_model_proof",
                     "fast_pressure_survival",
                 ],
             },
@@ -383,6 +407,7 @@ def build_report(
         },
         "source_evidence": {
             "safe_cut_summary": safe_summary,
+            "nonanchor_cut_model_summary": nonanchor_summary,
             "microbenchmark_summary": micro_summary,
             "miracle_shell_contract_summary": miracle_summary,
             "shell_failure_summary": shell_summary,
@@ -423,6 +448,10 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Status: `{payload['status']}`",
         f"- Selected route: `{summary_row['selected_route']}`",
         f"- One-for-one cut ready count: `{summary_row['one_for_one_cut_ready_count']}`",
+        f"- Non-anchor primary target: `{summary_row.get('nonanchor_primary_target')}`",
+        f"- Non-anchor primary target status: `{summary_row.get('nonanchor_primary_target_status')}`",
+        f"- Non-anchor seed-safe count: `{summary_row.get('nonanchor_seed_safe_count')}`",
+        f"- Non-anchor reviewable gaps: `{summary_row.get('nonanchor_reviewable_gap_count')}`",
         f"- Reviewable same-lane gaps: `{summary_row['reviewable_same_lane_gap_count']}`",
         f"- Forced-access runnable count: `{summary_row['forced_access_runnable_count']}`",
         f"- Sidecar shell contract required: `{str(summary_row['sidecar_shell_contract_required']).lower()}`",
@@ -489,6 +518,7 @@ def write_outputs(payload: Mapping[str, Any], out_prefix: Path) -> tuple[Path, P
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--safe-cut-miner", type=Path, default=DEFAULT_SAFE_CUT_MINER)
+    parser.add_argument("--nonanchor-cut-model", type=Path, default=DEFAULT_NONANCHOR_CUT_MODEL)
     parser.add_argument("--microbenchmark-plan", type=Path, default=DEFAULT_MICROBENCHMARK_PLAN)
     parser.add_argument("--miracle-shell-contract", type=Path, default=DEFAULT_MIRACLE_SHELL_CONTRACT)
     parser.add_argument("--shell-failure-synthesis", type=Path, default=DEFAULT_SHELL_FAILURE)
@@ -502,6 +532,7 @@ def main() -> int:
     args = parse_args()
     paths = {
         "safe_cut_miner": args.safe_cut_miner,
+        "nonanchor_cut_model": args.nonanchor_cut_model,
         "microbenchmark_plan": args.microbenchmark_plan,
         "miracle_shell_contract": args.miracle_shell_contract,
         "shell_failure_synthesis": args.shell_failure_synthesis,
@@ -510,6 +541,7 @@ def main() -> int:
     }
     payload = build_report(
         safe_cut_miner=read_json(args.safe_cut_miner),
+        nonanchor_cut_model=read_json(args.nonanchor_cut_model),
         microbenchmark_plan=read_json(args.microbenchmark_plan),
         miracle_shell_contract=read_json(args.miracle_shell_contract),
         shell_failure_synthesis=read_json(args.shell_failure_synthesis),

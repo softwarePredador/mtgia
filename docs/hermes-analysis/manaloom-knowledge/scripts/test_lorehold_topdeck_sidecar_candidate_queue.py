@@ -75,6 +75,36 @@ def _safe_cut():
     return {"summary": {"seed_safe_cut_candidate_count": 0, "reviewable_same_lane_gap_count": 0}}
 
 
+def _nonanchor_cut():
+    return {
+        "summary": {
+            "primary_target": "Dragon's Rage Channeler",
+            "primary_target_model_status": "clean_prior_target_blocked_no_nonanchor_cut",
+            "seed_safe_nonanchor_count": 0,
+            "reviewable_nonanchor_gap_count": 0,
+            "clean_prior_blocked_target_count": 1,
+        },
+        "target_cut_models": [
+            {
+                "card_name": "Dragon's Rage Channeler",
+                "model_status": "clean_prior_target_blocked_no_nonanchor_cut",
+                "same_lane_slot_count": 6,
+                "seed_safe_nonanchor_count": 0,
+                "reviewable_nonanchor_gap_count": 0,
+                "prior_reject_count": 0,
+            },
+            {
+                "card_name": "Penance",
+                "model_status": "prior_reject_target_blocked_no_nonanchor_cut",
+                "same_lane_slot_count": 1,
+                "seed_safe_nonanchor_count": 0,
+                "reviewable_nonanchor_gap_count": 0,
+                "prior_reject_count": 2,
+            },
+        ],
+    }
+
+
 def _value_model():
     return {
         "summary": {
@@ -90,6 +120,7 @@ def _paths():
         "hypothesis_queue": Path("/tmp/hypotheses.json"),
         "structure_matrix": Path("/tmp/matrix.json"),
         "safe_cut_miner": Path("/tmp/safe.json"),
+        "nonanchor_cut_model": Path("/tmp/nonanchor.json"),
         "value_model": Path("/tmp/value.json"),
     }
 
@@ -100,6 +131,7 @@ def _build(**overrides):
         hypothesis_queue=overrides.get("hypothesis_queue", _hypotheses()),
         structure_matrix=overrides.get("structure_matrix", _matrix()),
         safe_cut_miner=overrides.get("safe_cut_miner", _safe_cut()),
+        nonanchor_cut_model=overrides.get("nonanchor_cut_model", _nonanchor_cut()),
         value_model=overrides.get("value_model", _value_model()),
         paths=_paths(),
     )
@@ -111,6 +143,7 @@ def test_current_like_queue_has_learning_rows_but_zero_matrix_rows():
     assert payload["status"] == "topdeck_sidecar_candidate_queue_blocked_no_matrix_rows_keep_607"
     assert payload["summary"]["queue_row_count"] == 4
     assert payload["summary"]["matrix_candidate_row_eligible_count"] == 0
+    assert payload["summary"]["nonanchor_primary_target"] == "Dragon's Rage Channeler"
     assert payload["summary"]["candidate_deck_materialization_allowed_now"] is False
     assert payload["decision"]["deck_action_allowed"] is False
 
@@ -120,6 +153,9 @@ def test_topdeck_target_and_land_are_tagged_separately():
     rows = {row["add_card"]: row for row in payload["candidate_queue"]}
 
     assert rows["Penance"]["sidecar_tag"] == "topdeck_access_sidecar_primary"
+    assert rows["Penance"]["nonanchor_model_status"] == "prior_reject_target_blocked_no_nonanchor_cut"
+    assert "nonanchor_model_has_no_seed_safe_cut" in rows["Penance"]["blockers"]
+    assert "prior_reject_requires_new_trace_hypothesis" in rows["Penance"]["blockers"]
     assert rows["Penance"]["expected_metric_lift"] == (
         "miracle_cast_and_topdeck_manipulation_floor_lift"
     )
@@ -153,4 +189,5 @@ def test_markdown_surfaces_blocked_materialization_and_staples():
     assert "Candidate deck materialization allowed now: `false`" in markdown
     assert "Mana Vault" in markdown
     assert "The One Ring" in markdown
+    assert "Dragon's Rage Channeler" in markdown
     assert "Matrix candidate rows eligible: `0`" in markdown

@@ -32,6 +32,9 @@ DEFAULT_STRUCTURE_MATRIX = (
     REPORT_DIR / "lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn.json"
 )
 DEFAULT_SAFE_CUT_MINER = REPORT_DIR / "lorehold_topdeck_safe_cut_miner_20260705_current.json"
+DEFAULT_NONANCHOR_CUT_MODEL = (
+    REPORT_DIR / "lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.json"
+)
 DEFAULT_VALUE_MODEL = REPORT_DIR / "lorehold_deckbuilding_value_model_20260704_current.json"
 DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_topdeck_sidecar_candidate_queue_20260705_current"
 
@@ -154,7 +157,11 @@ def proposed_cut(row: Mapping[str, Any]) -> str:
     return str(cuts[0]) if cuts else ""
 
 
-def row_blockers(row: Mapping[str, Any], tag: str) -> list[str]:
+def row_blockers(
+    row: Mapping[str, Any],
+    tag: str,
+    nonanchor_row: Mapping[str, Any] | None = None,
+) -> list[str]:
     blockers: list[str] = []
     readiness = str(row.get("readiness_status") or "")
     cut = proposed_cut(row)
@@ -168,13 +175,32 @@ def row_blockers(row: Mapping[str, Any], tag: str) -> list[str]:
         blockers.append("generic_staple_not_lorehold_specific_until_trace_proof")
     if tag in {"pressure_window_after_topdeck_floor", "spell_chain_after_miracle_floor"}:
         blockers.append("must_follow_topdeck_miracle_floor")
+    if tag == "topdeck_access_sidecar_primary" and nonanchor_row:
+        if as_int(nonanchor_row.get("seed_safe_nonanchor_count")) == 0:
+            blockers.append("nonanchor_model_has_no_seed_safe_cut")
+        if as_int(nonanchor_row.get("reviewable_nonanchor_gap_count")) == 0:
+            blockers.append("nonanchor_model_has_no_reviewable_gap")
+        if as_int(nonanchor_row.get("prior_reject_count")) > 0:
+            blockers.append("prior_reject_requires_new_trace_hypothesis")
     return sorted(set(blockers))
 
 
-def queue_row(row: Mapping[str, Any]) -> dict[str, Any]:
+def nonanchor_model_index(nonanchor_cut_model: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
+    return {
+        normalize_name(model.get("card_name")): dict(model)
+        for model in as_list(nonanchor_cut_model.get("target_cut_models"))
+        if isinstance(model, Mapping) and model.get("card_name")
+    }
+
+
+def queue_row(
+    row: Mapping[str, Any],
+    nonanchor_models: Mapping[str, Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
     card_name = str(row.get("card_name") or "")
     tag = sidecar_tag(card_name, row)
-    blockers = row_blockers(row, tag)
+    nonanchor_row = (nonanchor_models or {}).get(normalize_name(card_name))
+    blockers = row_blockers(row, tag, nonanchor_row=nonanchor_row)
     eligible = not blockers
     generic_policy = GENERIC_STAPLE_WATCHLIST.get(normalize_name(card_name), {})
     return {
@@ -192,6 +218,14 @@ def queue_row(row: Mapping[str, Any]) -> dict[str, Any]:
         "natural_gate_allowed_now": False,
         "promotion_allowed_now": False,
         "blockers": blockers,
+        "nonanchor_model_status": str((nonanchor_row or {}).get("model_status") or ""),
+        "nonanchor_same_lane_slot_count": as_int((nonanchor_row or {}).get("same_lane_slot_count")),
+        "nonanchor_seed_safe_count": as_int(
+            (nonanchor_row or {}).get("seed_safe_nonanchor_count")
+        ),
+        "nonanchor_reviewable_gap_count": as_int(
+            (nonanchor_row or {}).get("reviewable_nonanchor_gap_count")
+        ),
         "same_lane_cut_reason": (
             "named same-lane cut present"
             if proposed_cut(row)
@@ -230,9 +264,14 @@ def floor_risk(tag: str) -> str:
     return "unknown_until_trace_hypothesis_declared"
 
 
-def queue_rows(hypothesis_queue: Mapping[str, Any], limit: int) -> list[dict[str, Any]]:
+def queue_rows(
+    hypothesis_queue: Mapping[str, Any],
+    nonanchor_cut_model: Mapping[str, Any],
+    limit: int,
+) -> list[dict[str, Any]]:
+    nonanchor_models = nonanchor_model_index(nonanchor_cut_model)
     rows = [
-        queue_row(row)
+        queue_row(row, nonanchor_models=nonanchor_models)
         for row in as_list(hypothesis_queue.get("hypotheses"))
         if isinstance(row, Mapping) and row.get("card_name")
     ]
@@ -261,6 +300,7 @@ def build_report(
     hypothesis_queue: Mapping[str, Any],
     structure_matrix: Mapping[str, Any],
     safe_cut_miner: Mapping[str, Any],
+    nonanchor_cut_model: Mapping[str, Any],
     value_model: Mapping[str, Any],
     paths: Mapping[str, Path],
     limit: int = 40,
@@ -270,15 +310,21 @@ def build_report(
         "hypothesis_queue": hypothesis_queue,
         "structure_matrix": structure_matrix,
         "safe_cut_miner": safe_cut_miner,
+        "nonanchor_cut_model": nonanchor_cut_model,
         "value_model": value_model,
     }
     health = input_health(payloads)
-    rows = queue_rows(hypothesis_queue, limit=limit) if not health["missing_inputs"] else []
+    rows = (
+        queue_rows(hypothesis_queue, nonanchor_cut_model, limit=limit)
+        if not health["missing_inputs"]
+        else []
+    )
     eligible_rows = [row for row in rows if row.get("matrix_candidate_row_eligible_now")]
     tag_counts = Counter(str(row.get("sidecar_tag") or "") for row in rows)
     readiness_counts = Counter(str(row.get("readiness_status") or "") for row in rows)
     blocker_counts = Counter(blocker for row in rows for blocker in as_list(row.get("blockers")))
     safe_summary = summary(safe_cut_miner)
+    nonanchor_summary = summary(nonanchor_cut_model)
     route_summary = summary(post_safe_cut_route)
     matrix_summary = summary(structure_matrix)
     value_summary = summary(value_model)
@@ -310,6 +356,16 @@ def build_report(
             "post_safe_cut_selected_route": route_summary.get("selected_route") or "",
             "safe_cut_seed_ready_count": as_int(safe_summary.get("seed_safe_cut_candidate_count")),
             "safe_cut_reviewable_count": as_int(safe_summary.get("reviewable_same_lane_gap_count")),
+            "nonanchor_primary_target": nonanchor_summary.get("primary_target") or "",
+            "nonanchor_primary_target_status": nonanchor_summary.get("primary_target_model_status")
+            or "",
+            "nonanchor_seed_safe_count": as_int(nonanchor_summary.get("seed_safe_nonanchor_count")),
+            "nonanchor_reviewable_gap_count": as_int(
+                nonanchor_summary.get("reviewable_nonanchor_gap_count")
+            ),
+            "nonanchor_clean_prior_blocked_target_count": as_int(
+                nonanchor_summary.get("clean_prior_blocked_target_count")
+            ),
             "structure_matrix_scoring_allowed_now": bool(matrix_summary.get("matrix_scoring_allowed_now")),
             "value_model_land_quantity": as_int(
                 as_dict(value_summary.get("mana_foundation")).get("land_quantity")
@@ -351,6 +407,7 @@ def build_report(
             "hypothesis_queue_summary": summary(hypothesis_queue),
             "structure_matrix_summary": matrix_summary,
             "safe_cut_summary": safe_summary,
+            "nonanchor_cut_model_summary": nonanchor_summary,
             "value_model_summary": value_summary,
             "input_health": health,
         },
@@ -375,6 +432,7 @@ def build_report(
                 "do_not_mutate_deck_607",
                 "do_not_materialize_a_sidecar_deck_from_blocked_rows",
                 "mine named same-lane cuts for topdeck and mana rows first",
+                "respect the non-anchor cut model before any topdeck forced access",
                 "keep Mana Vault and The One Ring as learning-only until new trace and cut proof exist",
             ],
         },
@@ -394,6 +452,10 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Status: `{payload['status']}`",
         f"- Queue rows: `{summary_row['queue_row_count']}`",
         f"- Matrix candidate rows eligible: `{summary_row['matrix_candidate_row_eligible_count']}`",
+        f"- Non-anchor primary target: `{summary_row.get('nonanchor_primary_target')}`",
+        f"- Non-anchor primary target status: `{summary_row.get('nonanchor_primary_target_status')}`",
+        f"- Non-anchor seed-safe count: `{summary_row.get('nonanchor_seed_safe_count')}`",
+        f"- Non-anchor reviewable gaps: `{summary_row.get('nonanchor_reviewable_gap_count')}`",
         f"- Candidate deck materialization allowed now: `{str(summary_row['candidate_deck_materialization_allowed_now']).lower()}`",
         f"- Natural battle gate allowed now: `{str(summary_row['natural_battle_gate_allowed_now']).lower()}`",
         f"- Promotion allowed now: `{str(summary_row['promotion_allowed_now']).lower()}`",
@@ -471,6 +533,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hypothesis-queue", type=Path, default=DEFAULT_HYPOTHESIS_QUEUE)
     parser.add_argument("--structure-matrix", type=Path, default=DEFAULT_STRUCTURE_MATRIX)
     parser.add_argument("--safe-cut-miner", type=Path, default=DEFAULT_SAFE_CUT_MINER)
+    parser.add_argument("--nonanchor-cut-model", type=Path, default=DEFAULT_NONANCHOR_CUT_MODEL)
     parser.add_argument("--value-model", type=Path, default=DEFAULT_VALUE_MODEL)
     parser.add_argument("--limit", type=int, default=40)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
@@ -484,6 +547,7 @@ def main() -> int:
         "hypothesis_queue": args.hypothesis_queue,
         "structure_matrix": args.structure_matrix,
         "safe_cut_miner": args.safe_cut_miner,
+        "nonanchor_cut_model": args.nonanchor_cut_model,
         "value_model": args.value_model,
     }
     payload = build_report(
@@ -491,6 +555,7 @@ def main() -> int:
         hypothesis_queue=read_json(args.hypothesis_queue),
         structure_matrix=read_json(args.structure_matrix),
         safe_cut_miner=read_json(args.safe_cut_miner),
+        nonanchor_cut_model=read_json(args.nonanchor_cut_model),
         value_model=read_json(args.value_model),
         paths=paths,
         limit=args.limit,
