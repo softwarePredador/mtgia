@@ -8577,6 +8577,27 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "61711b7aaa45778736ab4ce3275e5c2f"
   },
+  "Blaze": {
+    "amount": 0,
+    "battle_model_scope": "xmage_x_damage_target_spell_v1",
+    "damage": 0,
+    "damage_amount_source": "x_value",
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:590ba5a00771d0397fff2194c5e6b9d2",
+    "battle_rule_oracle_hash": "a334b86c51bf2df3bd54e24f0a7b0a69"
+  },
   "Blaze Commando": {
     "ability_kind": "triggered",
     "battle_model_scope": "instant_sorcery_spell_damage_create_two_1_1_red_white_soldier_haste_v1",
@@ -40113,6 +40134,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
     "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
+  "Heat Ray": {
+    "amount": 0,
+    "battle_model_scope": "xmage_x_damage_target_spell_v1",
+    "damage": 0,
+    "damage_amount_source": "x_value",
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1b8cb1a191310cb17db6beb40824d496",
+    "battle_rule_oracle_hash": "50d26085a0e6ab5f47858250f77ac636"
   },
   "Heat Shimmer": {
     "battle_model_scope": "target_creature_copy_haste_exile_eot_v1",
@@ -95077,6 +95121,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:e526f04fc2d80423d401a137f6a4d2f3",
     "battle_rule_oracle_hash": "1b0bab59e6b0fd7929f30c9a8510b68d"
+  },
+  "Volcanic Geyser": {
+    "amount": 0,
+    "battle_model_scope": "xmage_x_damage_target_spell_v1",
+    "damage": 0,
+    "damage_amount_source": "x_value",
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1b3f1766d50e04ff26a812efa830acfc",
+    "battle_rule_oracle_hash": "8d93b3cdf14ae7e6995d6033b9bfa08e"
   },
   "Volcanic Hammer": {
     "amount": 3,

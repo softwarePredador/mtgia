@@ -1,0 +1,164 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T03:01:00.372304+00:00",
+  "manifest": "../../master_optimizer_reports/pg476_xmage_x_damage_spell_new_server_manifest.json",
+  "package_id": "pg476_xmage_x_damage_spell_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_x_damage_target_spell_v1",
+          "card_name": "Blaze",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:590ba5a00771d0397fff2194c5e6b9d2",
+          "oracle_hash": "a334b86c51bf2df3bd54e24f0a7b0a69",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_x_damage_target_spell_v1",
+          "card_name": "Heat Ray",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1b8cb1a191310cb17db6beb40824d496",
+          "oracle_hash": "50d26085a0e6ab5f47858250f77ac636",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_x_damage_target_spell_v1",
+          "card_name": "Volcanic Geyser",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1b3f1766d50e04ff26a812efa830acfc",
+          "oracle_hash": "8d93b3cdf14ae7e6995d6033b9bfa08e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_x_damage_target_spell_v1",
+          "card_name": "Blaze",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:590ba5a00771d0397fff2194c5e6b9d2",
+          "oracle_hash": "a334b86c51bf2df3bd54e24f0a7b0a69",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_x_damage_target_spell_v1",
+          "card_name": "Heat Ray",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1b8cb1a191310cb17db6beb40824d496",
+          "oracle_hash": "50d26085a0e6ab5f47858250f77ac636",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_x_damage_target_spell_v1",
+          "card_name": "Volcanic Geyser",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1b3f1766d50e04ff26a812efa830acfc",
+          "oracle_hash": "8d93b3cdf14ae7e6995d6033b9bfa08e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_x_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Blaze",
+          "logical_rule_key": "battle_rule_v1:590ba5a00771d0397fff2194c5e6b9d2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_x_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Heat Ray",
+          "logical_rule_key": "battle_rule_v1:1b8cb1a191310cb17db6beb40824d496"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_x_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Volcanic Geyser",
+          "logical_rule_key": "battle_rule_v1:1b3f1766d50e04ff26a812efa830acfc"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Blaze",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:590ba5a00771d0397fff2194c5e6b9d2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Heat Ray",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:1b8cb1a191310cb17db6beb40824d496"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Volcanic Geyser",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:1b3f1766d50e04ff26a812efa830acfc"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

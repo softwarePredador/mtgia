@@ -112,6 +112,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "graveyard_self_return_activation_cost_mana",
     "graveyard_self_return_activation_cost_generic",
     "graveyard_self_return_activation_cost_colors",
+    "amount",
     "damage",
     "damage_amount_source",
     "damage_base_amount",

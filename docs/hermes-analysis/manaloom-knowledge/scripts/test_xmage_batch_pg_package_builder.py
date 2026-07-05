@@ -445,6 +445,31 @@ def test_manifest_expected_rule_preserves_composite_damage_draw_components() -> 
     assert required["_composite_rule_components"] == components
 
 
+def test_manifest_expected_rule_preserves_zero_amount_for_x_damage() -> None:
+    proposal = {
+        "normalized_name": "blaze",
+        "card_name": "Blaze",
+        "oracle_hash": "hash-blaze",
+        "logical_rule_key": "battle_rule_v1:hash-blaze",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_x_damage_target_spell_v1",
+            "amount": 0,
+            "damage": 0,
+            "damage_amount_source": "x_value",
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    required = expected["required_effect_fields"]
+    assert required["amount"] == 0
+    assert required["damage"] == 0
+    assert required["damage_amount_source"] == "x_value"
+
+
 def test_apply_sql_preserves_existing_backup_table_for_idempotent_rerun() -> None:
     proposal = {
         "normalized_name": "quarry beetle",

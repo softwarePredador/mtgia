@@ -11104,6 +11104,68 @@ new server:
   `xmage_permanent_attack_graveyard_to_hand`, and
   `xmage_permanent_simple_activated_destroy_target`.
 
+## 2026-07-05 PG476 X Damage Spell Closure
+
+- Closed the exact XMage X damage spell family as ManaLoom scope
+  `xmage_x_damage_target_spell_v1`.
+- The selected package accepted local XMage spell sources whose executable
+  behavior is `DamageTargetEffect` where the damage amount is the X value paid
+  during cast, preserving `amount=0`, `damage=0`,
+  `damage_amount_source=x_value`, target scope, and target constraints.
+- The batch covers `3` cards: Blaze, Heat Ray, and Volcanic Geyser.
+- The package builder E2E manifest was tightened to require `amount`, including
+  `amount=0`. This prevents X-damage rules from passing package validation
+  with only `damage_amount_source=x_value` while omitting the explicit base
+  amount field used to distinguish X-derived damage from fixed damage.
+- Focused mapper/runtime/package tests covered exact split selection,
+  runtime cast-context X damage resolution, zero-amount field preservation,
+  package generation, and manifest field preservation; the focused
+  runtime/split lane passed `722` checks, and the package-builder test lane
+  also passed.
+- The PostgreSQL package promoted `3` cards. Precheck found `3` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` generated shadow
+  rows to deprecate; apply/postcheck verified `3/3` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `3` promoted rows are
+  `verified`/`auto`, have `rule_version=2`, and preserve
+  `battle_model_scope=xmage_x_damage_target_spell_v1`,
+  `effect=direct_damage`, `amount=0`, `damage=0`,
+  `damage_amount_source=x_value`, target metadata, and Oracle hash.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `3` selected cards. Generic battle
+  scenario count remained `0`; X-damage behavior remains covered by focused
+  runtime test `test_x_damage_uses_cast_context_x_value`.
+- Additional cache verification confirmed SQLite `battle_card_rules` and
+  `known_cards_canonical_snapshot.json` both preserve `amount=0`, `damage=0`,
+  and `damage_amount_source=x_value`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4529` PostgreSQL runtime rows, wrote `4521` SQLite runtime
+  rows, and exported `4496` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy
+  contamination (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL
+  connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26357`, `xmage_authoritative_source_count=26043`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26043`. This is an exact
+  reduction of `3` from the post-PG475 queue.
+- The post-PG476 exact split recheck reports `proposal_count=18` and
+  `safe_for_batch_pg_package_count=18`. The remaining exact families are
+  `xmage_fixed_target_player_draw_spell`,
+  `xmage_return_target_to_hand_and_scry_spell`,
+  `xmage_graveyard_multi_zone_recursion_spell`,
+  `xmage_static_play_lands_from_graveyard`,
+  `xmage_permanent_simple_activated_graveyard_to_battlefield`,
+  `xmage_permanent_simple_activated_graveyard_to_hand`,
+  `xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell`,
+  `xmage_creature_combat_damage_graveyard_to_hand`,
+  `xmage_permanent_attack_graveyard_to_hand`, and
+  `xmage_permanent_simple_activated_destroy_target`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
