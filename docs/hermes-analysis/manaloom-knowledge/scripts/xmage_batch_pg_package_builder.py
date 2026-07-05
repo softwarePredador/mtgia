@@ -282,13 +282,19 @@ def sql_json(value: Any) -> str:
     return sql_literal(json.dumps(value, sort_keys=True, separators=(",", ":"))) + "::jsonb"
 
 
-def safe_ident(value: str) -> str:
+def safe_ident(value: str, *, max_length: int = 56) -> str:
     ident = re.sub(r"[^a-z0-9_]+", "_", value.lower()).strip("_")
     if not ident:
         ident = "xmage_batch"
     if ident[0].isdigit():
         ident = "d_" + ident
-    return ident[:56]
+    if len(ident) <= max_length:
+        return ident
+    suffix_len = min(15, max(8, max_length // 3))
+    prefix_len = max_length - suffix_len - 1
+    prefix = ident[:prefix_len].rstrip("_") or "xmage"
+    suffix = ident[-suffix_len:].lstrip("_") or ident[-suffix_len:]
+    return f"{prefix}_{suffix}"[:max_length]
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -766,8 +772,10 @@ def existing_backup_table_from_manifest(manifest_path: Path) -> str | None:
     if not value:
         return None
     if "." in value:
-        return value.split(".", 1)[1]
-    return value
+        value = value.split(".", 1)[1]
+    if not re.search(r"_\d{8}_\d{6}$", value):
+        return None
+    return safe_ident(value)
 
 
 def build_package(

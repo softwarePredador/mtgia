@@ -8652,10 +8652,27 @@ def activation_sacrifice_cost_from_source(text: str, window: str) -> dict[str, A
     )
 
 
+def activation_discard_cost_from_oracle(text: str) -> dict[str, Any] | None:
+    cost_text = str(text or "").lower().rsplit(":", 1)[0]
+    if re.search(r"(?:^|,)\s*discard a card\s*$", cost_text):
+        return {"activation_discard_count": 1, "activation_discard_target": "any_card"}
+    return None
+
+
+def activation_discard_cost_from_source(window: str) -> dict[str, Any] | str | None:
+    if "DiscardCardCost" not in (window or ""):
+        return None
+    matches = re.findall(r"new\s+DiscardCardCost\s*\(\s*\)", window or "")
+    if len(matches) != 1:
+        return "activated_damage_source_discard_cost_not_supported"
+    return {"activation_discard_count": 1, "activation_discard_target": "any_card"}
+
+
 def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     if text.count(":") != 1:
         return None
+    discard_cost = activation_discard_cost_from_oracle(text)
     effect_text = text.rsplit(":", 1)[1].strip()
     restricted = restricted_battlefield_target_from_oracle({"oracle_text": effect_text}, "damage")
     if restricted is not None:
@@ -8672,6 +8689,7 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
             "amount": int(match.group(1)),
             "target": restricted,
             "activation_sacrifice_cost": sacrifice_cost,
+            **(discard_cost or {}),
         }
     match = re.match(
         r"^(?:it|this (?:artifact|creature|enchantment)|[^.]+?) deals (\d+) damage to "
@@ -8692,13 +8710,13 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | N
         "amount": int(match.group(1)),
         "target": target_map[match.group(2)],
         "activation_sacrifice_cost": sacrifice_cost,
+        **(discard_cost or {}),
     }
 
 
 def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     risky_cost_classes = {
-        "DiscardCardCost",
         "DiscardTargetCost",
         "ExileFrom",
         "ExileFromTopOfLibraryCost",
@@ -8736,6 +8754,9 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
     if present_risky:
         return "activated_damage_source_cost_not_supported"
+    discard_cost = activation_discard_cost_from_source(window)
+    if isinstance(discard_cost, str):
+        return discard_cost
     sacrifice_cost = activation_sacrifice_cost_from_source(text, window)
     if isinstance(sacrifice_cost, str):
         return sacrifice_cost
@@ -8765,6 +8786,7 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
         "activation_requires_tap": requires_tap,
         "activation_requires_sacrifice": requires_sacrifice,
         "activation_sacrifice_cost": sacrifice_cost,
+        **(discard_cost or {}),
     }
 
 
@@ -15539,6 +15561,14 @@ def split_row(
         )
         if source_sacrifice_cost != oracle_sacrifice_cost:
             return None, "activated_damage_source_oracle_sacrifice_cost_mismatch"
+        oracle_discard_count = int(oracle_damage.get("activation_discard_count") or 0)
+        source_discard_count = int(parsed_activation.get("activation_discard_count") or 0)
+        if source_discard_count != oracle_discard_count:
+            return None, "activated_damage_source_oracle_discard_cost_mismatch"
+        if str(parsed_activation.get("activation_discard_target") or "any_card") != str(
+            oracle_damage.get("activation_discard_target") or "any_card"
+        ):
+            return None, "activated_damage_source_oracle_discard_cost_mismatch"
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
             "creature"
@@ -15579,9 +15609,15 @@ def split_row(
                     "activation_cost_colors",
                     "activation_requires_tap",
                     "activation_requires_sacrifice",
+                    "activation_discard_count",
+                    "activation_discard_target",
                 )
+                if key in parsed_activation
             },
         }
+        if parsed_activation.get("activation_discard_count"):
+            activated_effect["activation_discard_count"] = int(parsed_activation["activation_discard_count"])
+            activated_effect["activation_discard_target"] = parsed_activation.get("activation_discard_target") or "any_card"
         if source_sacrifice_cost:
             effect_json["activation_sacrifice_cost"] = source_sacrifice_cost
             effect_json["activation_requires_sacrifice_target"] = True

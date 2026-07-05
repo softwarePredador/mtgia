@@ -42241,6 +42241,8 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
             "activation_requires_sacrifice_target": bool(permanent.get("activation_requires_sacrifice_target")),
             "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
@@ -42723,6 +42725,18 @@ def can_activate_generic_tap_damage_permanent(player, permanent, opponents, *, e
         )
         if sacrifice_candidate is None:
             return False
+    activation_discard_count = int(effect_data.get("activation_discard_count") or 0)
+    activation_discard_target = effect_data.get("activation_discard_target") or "any_card"
+    if activation_discard_count:
+        if activation_discard_target != "any_card":
+            return False
+        discard_cards = _choose_graveyard_self_return_discard_cards(
+            player,
+            activation_discard_count,
+            activation_discard_target,
+        )
+        if len(discard_cards) != activation_discard_count:
+            return False
     if direct_damage_targets_player(effect_data):
         if any(opponent.is_alive() for opponent in opponents or []):
             return True
@@ -42753,6 +42767,32 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
     if not player.spend_mana(activation_cost):
         return False
     old_tap_damage_scope = effect_data.get("battle_model_scope") == GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE
+    activation_discard_count = int(effect_data.get("activation_discard_count") or 0)
+    activation_discard_target = effect_data.get("activation_discard_target") or "any_card"
+    discard_cards = []
+    discard_resolution = {"to_top": [], "to_graveyard": [], "used_replacement": False}
+    if activation_discard_count:
+        if activation_discard_target != "any_card":
+            return False
+        discard_cards = _choose_graveyard_self_return_discard_cards(
+            player,
+            activation_discard_count,
+            activation_discard_target,
+        )
+        if len(discard_cards) != activation_discard_count:
+            return False
+        removed_cards = _remove_exact_cards_from_hand(player, discard_cards)
+        if len(removed_cards) != activation_discard_count:
+            return False
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            removed_cards,
+            top_limit=0,
+            opponents=opponents,
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
     if effect_data.get("activation_requires_tap"):
         permanent["tapped"] = True
     sacrificed_source = False
@@ -42806,6 +42846,9 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
             "requires_tap": 1 if requires_tap else 0,
             "requires_sacrifice": 1 if sacrificed_source else 0,
             "sacrifice_cost_target": (sacrificed_cost_target or {}).get("name"),
+            "discarded": [card.get("name", "?") for card in discard_cards],
+            "discarded_count": activation_discard_count,
+            "discard_target": activation_discard_target if activation_discard_count else None,
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -42821,6 +42864,8 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
             "permanents": -(
                 (1 if sacrificed_source else 0) + (1 if sacrificed_cost_target is not None else 0)
             ),
+            "graveyard": len(discard_resolution.get("to_graveyard") or []),
+            "cards_discarded": activation_discard_count,
         },
         risk_flags=[
             flag
@@ -42828,6 +42873,7 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
                 "tap_ability": requires_tap,
                 "sacrifice_source": sacrificed_source,
                 "sacrifice_cost_target": sacrificed_cost_target is not None,
+                "discard_cost": activation_discard_count > 0,
                 "simplified_target_choice": True,
             }.items()
             if active
@@ -42844,6 +42890,12 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         sacrificed_source=sacrificed_source,
         sacrificed_cost_target=(sacrificed_cost_target or {}).get("name"),
         sacrifice_cost_available_targets=len(sacrifice_cost_options),
+        discarded=[card.get("name", "?") for card in discard_cards],
+        discarded_count=activation_discard_count,
+        discard_target=activation_discard_target if activation_discard_count else None,
+        discard_to_graveyard=[card.get("name", "?") for card in discard_resolution.get("to_graveyard") or []],
+        discard_to_library_top=[card.get("name", "?") for card in discard_resolution.get("to_top") or []],
+        discard_replacement_used=bool(discard_resolution.get("used_replacement")),
         mana_paid=mana_paid,
         turn=turn,
         phase=phase,

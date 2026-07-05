@@ -6574,6 +6574,124 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(opponent.life, 5)
         self.assertFalse(any(event == "activated_ability" for event, _ in self.events))
 
+    def test_simple_activated_damage_discards_card_cost_and_damages_player(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 5
+        active.mana_pool.add("red", 1)
+        discard_card = {
+            "name": "Spare Mountain",
+            "type_line": "Basic Land - Mountain",
+            "mana_cost": "",
+            "effect": "land",
+        }
+        active.hand.append(discard_card)
+        permanent = {
+            "name": "Kris Mage",
+            "type_line": "Creature - Human Spellshaper",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 1,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activation_cost_mana": "{R}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["R"],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "summoning_sick": False,
+            "_rule_logical_key": "battle_rule_v1:kris_mage",
+        }
+        active.battlefield.append(permanent)
+
+        self.assertTrue(
+            self.battle.can_activate_generic_tap_damage_permanent(
+                active,
+                permanent,
+                [opponent],
+            )
+        )
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(62),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertEqual(active.available_mana(), 0)
+        self.assertNotIn(discard_card, active.hand)
+        self.assertIn(discard_card, active.graveyard)
+        self.assertEqual(opponent.life, 4)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Kris Mage"
+                and data.get("activation_kind") == "simple_activated_damage"
+                and data.get("discarded_count") == 1
+                and data.get("discarded") == ["Spare Mountain"]
+                and data.get("discard_to_graveyard") == ["Spare Mountain"]
+                and data.get("discard_target") == "any_card"
+                and data.get("rule_logical_key") == "battle_rule_v1:kris_mage"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_damage_blocks_without_discard_cost_card(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 5
+        active.mana_pool.add("red", 1)
+        permanent = {
+            "name": "Kris Mage",
+            "type_line": "Creature - Human Spellshaper",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 1,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activation_cost_mana": "{R}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["R"],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "summoning_sick": False,
+        }
+        active.battlefield.append(permanent)
+
+        self.assertFalse(
+            self.battle.can_activate_generic_tap_damage_permanent(
+                active,
+                permanent,
+                [opponent],
+            )
+        )
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(63),
+            phase="precombat_main",
+        )
+
+        self.assertFalse(activated)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(opponent.life, 5)
+        self.assertFalse(any(event == "activated_ability" for event, _ in self.events))
+
     def test_simple_activated_destroy_taps_and_destroys_tapped_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

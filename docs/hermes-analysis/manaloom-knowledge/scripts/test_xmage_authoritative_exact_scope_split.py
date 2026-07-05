@@ -5012,6 +5012,45 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertFalse(effect["activation_requires_sacrifice"])
         self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
 
+    def test_permanent_activated_damage_maps_discard_card_cost(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Kris Mage",
+                type_line="Creature - Human Spellshaper",
+                oracle_text="{R}, {T}, Discard a card: This creature deals 1 damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(1),
+                    new ManaCostsImpl<>("{R}")
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new DiscardCardCost());
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 1)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["activation_cost_mana"], "{R}")
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_count"], 1)
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_target"], "any_card")
+
     def test_permanent_activated_damage_maps_artifact_tap_self_sacrifice(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,

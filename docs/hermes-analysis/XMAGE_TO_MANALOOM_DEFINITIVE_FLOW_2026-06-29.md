@@ -11607,6 +11607,50 @@ new server:
   gain, targeted removal, draw cards, tutor, and the remaining board-wipe
   blockers.
 
+## 2026-07-05 PG485 Activated Damage Discard Cost Closure
+
+- PG485 closes the narrow direct-damage subpattern for permanents whose simple
+  activated ability has `DiscardCardCost()` in XMage and Oracle text with
+  `Discard a card` as an activation cost.
+- The accepted shape is intentionally limited to fixed `DamageTargetEffect`,
+  `SimpleActivatedAbility`, optional mana cost, optional tap cost, no filtered
+  discard target, and exact source/Oracle agreement on amount, target, and
+  discard count. Filtered discard costs, dynamic damage, non-simple Oracle
+  text, and other risky costs stay blocked.
+- The batch covers `2` cards: Fodder Tosser and Kris Mage.
+- Runtime support now treats discard as a real activation cost for
+  `xmage_permanent_simple_activated_damage_v1`: activation is blocked without
+  a valid discard card, the chosen card is removed from hand, discard
+  replacement handling is respected, damage is applied, and replay/decision
+  traces record discarded cards and discard destination.
+- The PostgreSQL package builder now preserves the timestamp suffix when a
+  long backup-table identifier is truncated and refuses to reuse a manifest
+  backup table that lacks the full `_YYYYMMDD_HHMMSS` suffix. This prevents a
+  regenerated package from silently reusing a stale truncated audit table.
+- Focused validation passed `476` exact-split tests, `283` runtime tests, and
+  `17` package-builder tests. `py_compile` and `git diff --check` also passed.
+- PostgreSQL package PG485 applied against `143.198.230.247:5433/halder` and
+  promoted `2/2` selected cards as verified/auto rule-version `2` rows with
+  matching Oracle hashes. The apply upserted `2` rows and deprecated `0`
+  shadow rows.
+- Hermes metadata sync matched `6759` PostgreSQL cards, wrote `6687` SQLite
+  cache aliases, and left the known `unresolved=1` residual unchanged. The
+  targeted battle-rule sync loaded `2` PostgreSQL rows and wrote `2` SQLite
+  rows for Fodder Tosser and Kris Mage.
+- Generic E2E validation passed across PostgreSQL, SQLite `battle_card_rules`,
+  canonical snapshot, and runtime `get_card_effect` for both selected cards.
+  The manifest does not define battle-execution scenarios for this family, so
+  scenario execution remains `0`; concrete activation/discard behavior is
+  proven by the focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract with live PostgreSQL connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26255`, `xmage_authoritative_source_count=25941`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25941`. This reduces
+  `direct_damage::targeted_damage_variant_v1` from `811` to `809`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

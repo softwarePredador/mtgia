@@ -696,6 +696,30 @@ def test_apply_sql_preserves_existing_backup_table_for_idempotent_rerun() -> Non
     assert "DROP TABLE" not in sql
 
 
+def test_safe_ident_preserves_timestamp_suffix_when_truncated() -> None:
+    ident = builder.safe_ident("PG485_activated_damage_discard_cost_new_server_20260705_055236")
+
+    assert len(ident) <= 56
+    assert ident.endswith("20260705_055236")
+
+
+def test_existing_backup_table_from_manifest_ignores_truncated_timestamp(tmp_path) -> None:
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(
+        '{"backup_table":"manaloom_deploy_audit.pg485_activated_damage_discard_cost_new_server_20260705_"}',
+        encoding="utf-8",
+    )
+
+    assert builder.existing_backup_table_from_manifest(manifest) is None
+
+    manifest.write_text(
+        '{"backup_table":"manaloom_deploy_audit.pg485_activated_damage_20260705_055236"}',
+        encoding="utf-8",
+    )
+
+    assert builder.existing_backup_table_from_manifest(manifest) == "pg485_activated_damage_20260705_055236"
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",

@@ -1,0 +1,285 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg485_activated_damage_discard_cost_new_20260705_055422",
+  "deploy_id": "PG485",
+  "expected_rules": [
+    {
+      "card_name": "Fodder Tosser",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d35ce8a381cc3d6a0cc576fb6108b3cc",
+      "min_rule_version": 2,
+      "normalized_name": "fodder tosser",
+      "oracle_hash": "fc32c851215fda8c42f0bf540c60b704",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "player_or_planeswalker",
+            "target_constraints": {
+              "scope": "player_or_planeswalker"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kris Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:155303f01b41347d870d32c90f594ff8",
+      "min_rule_version": 2,
+      "normalized_name": "kris mage",
+      "oracle_hash": "077c393a3a48b51541b86d4ee5673d59",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_damage": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg485_activated_damage_discard_cost_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg485_activated_damage_discard_cost_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg485_activated_damage_discard_cost_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg485_activated_damage_discard_cost_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg485_activated_damage_discard_cost_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg485_activated_damage_discard_cost_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T05:54:22+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Fodder Tosser"
+      },
+      "card_name": "Fodder Tosser",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d35ce8a381cc3d6a0cc576fb6108b3cc",
+      "normalized_name": "fodder tosser",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "player_or_planeswalker",
+            "target_constraints": {
+              "scope": "player_or_planeswalker"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kris Mage"
+      },
+      "card_name": "Kris Mage",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:155303f01b41347d870d32c90f594ff8",
+      "normalized_name": "kris mage",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Fodder Tosser",
+    "Kris Mage"
+  ],
+  "selected_count": 2,
+  "slug": "activated_damage_discard_cost_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Fodder Tosser",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d35ce8a381cc3d6a0cc576fb6108b3cc",
+      "min_rule_version": 2,
+      "normalized_name": "fodder tosser",
+      "oracle_hash": "fc32c851215fda8c42f0bf540c60b704",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kris Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:155303f01b41347d870d32c90f594ff8",
+      "min_rule_version": 2,
+      "normalized_name": "kris mage",
+      "oracle_hash": "077c393a3a48b51541b86d4ee5673d59",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -1,0 +1,5 @@
+   card_name   | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+---------------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Fodder Tosser | fodder tosser   | fc32c851215fda8c42f0bf540c60b704 | battle_rule_v1:d35ce8a381cc3d6a0cc576fb6108b3cc | deprecate_nonmatching_rows |                1 | 38e38a7b-5109-414f-bda5-92cdcccc3937 |                  0 |                         0 |                           0
+ Kris Mage     | kris mage       | 077c393a3a48b51541b86d4ee5673d59 | battle_rule_v1:155303f01b41347d870d32c90f594ff8 | deprecate_nonmatching_rows |                1 | a4bab88d-73f5-4c5e-aa98-198523057c2a |                  0 |                         0 |                           0
+(2 rows)

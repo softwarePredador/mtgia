@@ -1,0 +1,130 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T05:55:59.029391+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg485_activated_damage_discard_cost_new_server_manifest.json",
+  "package_id": "xmage_pg485_activated_damage_discard_cost_new_server_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Fodder Tosser",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d35ce8a381cc3d6a0cc576fb6108b3cc",
+          "oracle_hash": "fc32c851215fda8c42f0bf540c60b704",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Kris Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:155303f01b41347d870d32c90f594ff8",
+          "oracle_hash": "077c393a3a48b51541b86d4ee5673d59",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Fodder Tosser",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d35ce8a381cc3d6a0cc576fb6108b3cc",
+          "oracle_hash": "fc32c851215fda8c42f0bf540c60b704",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Kris Mage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:155303f01b41347d870d32c90f594ff8",
+          "oracle_hash": "077c393a3a48b51541b86d4ee5673d59",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fodder Tosser",
+          "logical_rule_key": "battle_rule_v1:d35ce8a381cc3d6a0cc576fb6108b3cc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kris Mage",
+          "logical_rule_key": "battle_rule_v1:155303f01b41347d870d32c90f594ff8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Fodder Tosser",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:d35ce8a381cc3d6a0cc576fb6108b3cc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kris Mage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:155303f01b41347d870d32c90f594ff8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
