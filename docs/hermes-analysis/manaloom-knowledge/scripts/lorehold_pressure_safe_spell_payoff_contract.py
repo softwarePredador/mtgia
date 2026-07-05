@@ -25,9 +25,12 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_KNOWLEDGE_DB = SCRIPT_DIR / "knowledge.db"
 DEFAULT_DIAGNOSTIC_PLANNER = (
-    REPORT_DIR / "lorehold_diagnostic_contract_planner_20260704_current.json"
+    REPORT_DIR / "lorehold_diagnostic_contract_planner_20260705_current_relearn.json"
 )
-DEFAULT_STEM = "lorehold_pressure_safe_spell_payoff_contract_20260704_current"
+DEFAULT_HYPOTHESIS_QUEUE = (
+    REPORT_DIR / "lorehold_hypothesis_queue_from_value_model_20260705_current_relearn.json"
+)
+DEFAULT_STEM = "lorehold_pressure_safe_spell_payoff_contract_20260705_current_relearn"
 
 PRIMARY_PACKAGE = [
     {
@@ -140,6 +143,8 @@ def utc_now() -> str:
 
 
 def read_json(path: Path) -> dict[str, Any]:
+    if not path or not path.exists():
+        return {}
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -152,6 +157,26 @@ def rel(path: Path) -> str:
         return str(path.relative_to(REPO_ROOT))
     except ValueError:
         return str(path)
+
+
+def newest_report(pattern: str, fallback: Path, *, report_dir: Path = REPORT_DIR) -> Path:
+    matches = sorted(
+        report_dir.glob(pattern),
+        key=lambda item: (item.stat().st_mtime, item.name),
+        reverse=True,
+    )
+    return matches[0] if matches else fallback
+
+
+def default_diagnostic_planner() -> Path:
+    return newest_report("lorehold_diagnostic_contract_planner_*.json", DEFAULT_DIAGNOSTIC_PLANNER)
+
+
+def default_hypothesis_queue() -> Path:
+    return newest_report(
+        "lorehold_hypothesis_queue_from_value_model_*.json",
+        DEFAULT_HYPOTHESIS_QUEUE,
+    )
 
 
 def normalize_name(name: str) -> str:
@@ -260,6 +285,89 @@ def deck_contains(deck_cards: Iterable[Mapping[str, Any]], card_name: str) -> bo
     return any(str(row.get("card_name") or "").lower() == wanted for row in deck_cards)
 
 
+def hypothesis_by_card(hypothesis_queue: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
+    rows: dict[str, Mapping[str, Any]] = {}
+    for row in as_list(hypothesis_queue.get("hypotheses")):
+        if isinstance(row, Mapping) and row.get("card_name"):
+            rows[str(row["card_name"]).lower()] = row
+    return rows
+
+
+def as_int(value: Any) -> int:
+    try:
+        return int(value or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def card_hypothesis_overlay(
+    card_name: str,
+    hypothesis_rows: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    row = hypothesis_rows.get(card_name.lower())
+    if not row:
+        return {
+            "hypothesis_queue_status": "missing_from_current_hypothesis_queue",
+            "readiness_status": "identity_runtime_cut_model_required_before_gate",
+            "priority": "unqueued_pressure_candidate",
+            "allowed_next_test": "forced_access_diagnostic_or_queue_rebuild_only",
+            "runtime_ready": None,
+            "same_lane_current_607_anchors": [],
+            "natural_gate_ready": False,
+        }
+    readiness = str(row.get("readiness_status") or "")
+    return {
+        "hypothesis_queue_status": "present",
+        "readiness_status": readiness,
+        "priority": row.get("priority") or "",
+        "allowed_next_test": row.get("allowed_next_test") or "",
+        "runtime_ready": row.get("runtime_ready"),
+        "same_lane_current_607_anchors": as_list(row.get("same_lane_current_607_anchors"))[:5],
+        "hypothesis_lanes": as_list(row.get("hypothesis_lanes")),
+        "natural_gate_ready": readiness == "natural_gate_ready",
+    }
+
+
+def package_hypothesis_alignment(
+    package_rows: Sequence[Mapping[str, Any]],
+    hypothesis_queue: Mapping[str, Any],
+) -> dict[str, Any]:
+    rows = hypothesis_by_card(hypothesis_queue)
+    overlays = {
+        str(row.get("card_name") or ""): card_hypothesis_overlay(
+            str(row.get("card_name") or ""),
+            rows,
+        )
+        for row in package_rows
+    }
+    matched = [
+        name
+        for name, overlay in overlays.items()
+        if overlay["hypothesis_queue_status"] == "present"
+    ]
+    missing = [
+        name
+        for name, overlay in overlays.items()
+        if overlay["hypothesis_queue_status"] != "present"
+    ]
+    status_counts: Counter[str] = Counter(
+        str(overlay.get("readiness_status") or "") for overlay in overlays.values()
+    )
+    natural_gate_ready_count = as_int(
+        (hypothesis_queue.get("summary") or {}).get("natural_gate_ready_count")
+    )
+    return {
+        "matched_cards": matched,
+        "missing_cards": missing,
+        "matched_hypothesis_count": len(matched),
+        "missing_hypothesis_count": len(missing),
+        "readiness_status_counts": dict(sorted(status_counts.items())),
+        "queue_natural_gate_ready_count": natural_gate_ready_count,
+        "queue_allows_natural_gate": natural_gate_ready_count > 0,
+        "cards": overlays,
+    }
+
+
 def deck_role_counts(deck_cards: Iterable[Mapping[str, Any]]) -> dict[str, int]:
     counts: Counter[str] = Counter()
     for row in deck_cards:
@@ -286,11 +394,13 @@ def executable_verified_rule_count(rows: Iterable[Mapping[str, Any]]) -> int:
 def build_candidate_preflight(
     package_rows: Sequence[Mapping[str, Any]],
     snapshot: Mapping[str, Any],
+    hypothesis_queue: Mapping[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     oracle_by_name = index_by_normalized(as_list(snapshot.get("oracle")))
     legalities = as_list(snapshot.get("legalities"))
     battle_rules = as_list(snapshot.get("battle_rules"))
     deck_cards = as_list(snapshot.get("deck_cards"))
+    hypothesis_rows = hypothesis_by_card(hypothesis_queue or {})
     result: list[dict[str, Any]] = []
     for row in package_rows:
         card_name = str(row.get("card_name") or "")
@@ -325,6 +435,10 @@ def build_candidate_preflight(
                 "already_in_607": deck_contains(deck_cards, card_name),
                 "preflight_status": status,
                 "blockers": blockers,
+                "hypothesis_queue_overlay": card_hypothesis_overlay(
+                    card_name,
+                    hypothesis_rows,
+                ),
             }
         )
     return result
@@ -389,19 +503,41 @@ def build_report(
     *,
     planner_report: Mapping[str, Any],
     db_snapshot: Mapping[str, Any],
+    hypothesis_queue: Mapping[str, Any] | None = None,
     diagnostic_planner_path: Path,
     knowledge_db_path: Path,
+    hypothesis_queue_path: Path | None = None,
     cut_plan: Sequence[str] = (),
 ) -> dict[str, Any]:
+    hypothesis_queue = hypothesis_queue or {}
     pressure_diagnostic = find_pressure_diagnostic(planner_report)
-    primary_preflight = build_candidate_preflight(PRIMARY_PACKAGE, db_snapshot)
-    secondary_preflight = build_candidate_preflight(SECONDARY_RESEARCH_QUEUE, db_snapshot)
+    primary_preflight = build_candidate_preflight(
+        PRIMARY_PACKAGE,
+        db_snapshot,
+        hypothesis_queue,
+    )
+    secondary_preflight = build_candidate_preflight(
+        SECONDARY_RESEARCH_QUEUE,
+        db_snapshot,
+        hypothesis_queue,
+    )
     preflight_summary = package_preflight_summary(primary_preflight)
+    hypothesis_alignment = package_hypothesis_alignment(PRIMARY_PACKAGE, hypothesis_queue)
     current_role_counts = deck_role_counts(as_list(db_snapshot.get("deck_cards")))
     cut_validation = validate_cut_plan(cut_plan, len(PRIMARY_PACKAGE))
     ready_for_cut_pool_resolver = bool(preflight_summary["all_primary_preflight_pass"])
     legal_variant_generation_allowed = ready_for_cut_pool_resolver and cut_validation["safe"]
     natural_battle_gate_allowed = legal_variant_generation_allowed and False
+    queue_natural_ready = as_int(
+        (hypothesis_queue.get("summary") or {}).get("natural_gate_ready_count")
+    )
+    diagnostic_contract_status = (
+        "pressure_safe_diagnostic_contract_ready_no_battle"
+        if ready_for_cut_pool_resolver and queue_natural_ready == 0
+        else "pressure_safe_diagnostic_contract_needs_local_preflight_repair"
+        if not ready_for_cut_pool_resolver
+        else "pressure_safe_diagnostic_contract_requires_structure_matrix_before_battle"
+    )
     next_action = (
         "build_pressure_safe_cut_pool_resolver_before_variant_battle"
         if ready_for_cut_pool_resolver and not cut_validation["safe"]
@@ -423,19 +559,33 @@ def build_report(
         "source_db_mutated": False,
         "deck_607_mutated": False,
         "diagnostic_planner": rel(diagnostic_planner_path),
+        "hypothesis_queue": rel(hypothesis_queue_path) if hypothesis_queue_path else "",
         "knowledge_db": rel(knowledge_db_path),
         "current_champion": "deck_607",
         "contract_key": "pressure_safe_spell_payoff_micro_shell",
         "summary": {
             "decision_status": decision_status,
+            "diagnostic_contract_status": diagnostic_contract_status,
+            "diagnostic_only": True,
             "ready_deck_change_count": 0,
+            "promotion_allowed_now": False,
             "ready_for_cut_pool_resolver": ready_for_cut_pool_resolver,
             "legal_variant_generation_allowed_now": legal_variant_generation_allowed,
             "natural_battle_gate_allowed_now": natural_battle_gate_allowed,
+            "natural_gate_ready_from_hypothesis_queue": queue_natural_ready,
+            "natural_gate_blocked_by_hypothesis_queue": queue_natural_ready == 0,
             "recommended_next_action": next_action,
             "primary_package_size": len(PRIMARY_PACKAGE),
+            "primary_package_missing_from_hypothesis_queue": hypothesis_alignment[
+                "missing_hypothesis_count"
+            ],
+            "primary_package_matched_in_hypothesis_queue": hypothesis_alignment[
+                "matched_hypothesis_count"
+            ],
             "required_cut_count_before_legal_variant": len(PRIMARY_PACKAGE),
             "protected_607_anchor_count": len(PROTECTED_607_ANCHORS),
+            "hard_stop_rule_count": 5,
+            "required_before_battle_count": 6,
         },
         "source_diagnostic": {
             "diagnostic_key": pressure_diagnostic.get("diagnostic_key") or "",
@@ -446,9 +596,14 @@ def build_report(
                 "predeclared_requirements"
             )
             or [],
+            "hypothesis_queue_alignment": pressure_diagnostic.get(
+                "hypothesis_queue_alignment"
+            )
+            or {},
         },
         "deck_607_current_role_counts": current_role_counts,
         "primary_package_preflight_summary": preflight_summary,
+        "primary_package_hypothesis_alignment": hypothesis_alignment,
         "primary_package_preflight": primary_preflight,
         "secondary_research_queue_preflight": secondary_preflight,
         "cut_plan_validation": cut_validation,
@@ -460,12 +615,48 @@ def build_report(
             "A cut is not safe because a replacement is famous; it is safe only after role, source, and battle trace evidence align.",
         ],
         "protected_607_anchors": PROTECTED_607_ANCHORS,
+        "hard_stop_rules": [
+            {
+                "rule": "no_natural_gate_when_queue_has_zero_ready_candidates",
+                "condition": "natural_gate_ready_from_hypothesis_queue == 0",
+                "action": "diagnostic_only_keep_607_protected",
+            },
+            {
+                "rule": "protected_anchor_generic_cuts_forbidden",
+                "condition": "cut plan contains Molecule Man, Bender's Waterskin, Creative Technique, or another protected anchor",
+                "action": "reject_cut_plan_before_variant_generation",
+            },
+            {
+                "rule": "do_not_repeat_storm_kiln_generic_mana_swap",
+                "condition": "Storm-Kiln Artist is tested as a generic Arcane Signet or Bender's Waterskin replacement without a new trace hypothesis",
+                "action": "reject_as_prior_reject_retest",
+            },
+            {
+                "rule": "winota_fast_pressure_floor_required",
+                "condition": "test plan omits Winota or fast-pressure regression checks",
+                "action": "reject_battle_gate_plan",
+            },
+            {
+                "rule": "card_level_claims_need_direct_events",
+                "condition": "pressure cards lack draw, cast, trigger, or use events in the candidate traces",
+                "action": "allow_learning_only_no_promotion_claim",
+            },
+        ],
+        "required_before_battle": [
+            "Confirm identity, Commander legality, ownership/access, and executable runtime rule for each pressure payoff.",
+            "Declare the exact shell and named cut model; do not use protected anchors as generic cuts.",
+            "Run a structure matrix that preserves 607 lands, ramp, topdeck, miracle, protection, and pressure-survival floors.",
+            "Run forced-access diagnostics only as learning until a safe-cut shell exists.",
+            "Require direct events for Monastery Mentor, Young Pyromancer, Guttersnipe, and Storm-Kiln Artist before card-level claims.",
+            "Require natural preflight to surface at least one gate-ready candidate before any equal battle gate.",
+        ],
         "battle_gate_contract": [
             "Create a legal decklist copy; deck 607 itself remains unchanged.",
             "Run structure matrix first; reject variants that regress lands, ramp, miracle/topdeck, or pressure-survival floors.",
             "Only after the matrix passes, run an equal opponent and seed gate against 607.",
             "Promotion requires tying or beating 607 overall and no Winota/fast-pressure regression.",
             "Card-level claims require direct draw/cast/trigger/use events for each included pressure payoff.",
+            "If the current hypothesis queue has zero natural gate-ready rows, the battle gate remains closed even when local card preflight passes.",
         ],
         "external_pressure_sources": EXTERNAL_PRESSURE_SOURCES,
         "method_notes": [
@@ -486,13 +677,19 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "- Source DB mutated: `false`",
         "- Deck 607 mutated: `false`",
         f"- Diagnostic planner: `{payload['diagnostic_planner']}`",
+        f"- Hypothesis queue: `{payload.get('hypothesis_queue') or ''}`",
         f"- Knowledge DB: `{payload['knowledge_db']}`",
         f"- Current champion: `{payload['current_champion']}`",
         f"- Decision status: `{summary['decision_status']}`",
+        f"- Diagnostic contract status: `{summary['diagnostic_contract_status']}`",
+        f"- Diagnostic only: `{str(summary['diagnostic_only']).lower()}`",
         f"- Ready deck changes: `{summary['ready_deck_change_count']}`",
+        f"- Promotion allowed now: `{str(summary['promotion_allowed_now']).lower()}`",
         f"- Ready for cut-pool resolver: `{str(summary['ready_for_cut_pool_resolver']).lower()}`",
         f"- Legal variant generation allowed now: `{str(summary['legal_variant_generation_allowed_now']).lower()}`",
         f"- Natural battle gate allowed now: `{str(summary['natural_battle_gate_allowed_now']).lower()}`",
+        f"- Natural gate-ready from hypothesis queue: `{summary['natural_gate_ready_from_hypothesis_queue']}`",
+        f"- Primary package missing from hypothesis queue: `{summary['primary_package_missing_from_hypothesis_queue']}`",
         f"- Recommended next action: `{summary['recommended_next_action']}`",
         "",
         "## Primary Package Preflight",
@@ -501,6 +698,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "| --- | --- | --- | --- | ---: | --- | --- |",
     ]
     for row in payload.get("primary_package_preflight") or []:
+        overlay = row.get("hypothesis_queue_overlay") or {}
         lines.append(
             "| {card} | `{role}` | `{oracle}` | `{legal}` | {rules} | `{in_607}` | `{status}` |".format(
                 card=row.get("card_name") or "",
@@ -512,6 +710,20 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
                 status=row.get("preflight_status") or "",
             )
         )
+        if overlay.get("hypothesis_queue_status") != "present":
+            lines.append(
+                f"<!-- {row.get('card_name')}: hypothesis queue `{overlay.get('hypothesis_queue_status')}` -->"
+            )
+    lines.extend(["", "## Primary Package Hypothesis Queue Alignment", ""])
+    alignment = payload.get("primary_package_hypothesis_alignment") or {}
+    lines.append(f"- Matched cards: `{', '.join(alignment.get('matched_cards') or []) or '-'}`")
+    lines.append(f"- Missing cards: `{', '.join(alignment.get('missing_cards') or []) or '-'}`")
+    lines.append(
+        f"- Queue natural gate-ready count: `{alignment.get('queue_natural_gate_ready_count')}`"
+    )
+    lines.append(
+        f"- Queue allows natural gate: `{str(bool(alignment.get('queue_allows_natural_gate'))).lower()}`"
+    )
     lines.extend(
         [
             "",
@@ -533,6 +745,18 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         lines.append(f"- {name}")
     lines.extend(["", "## Cut Policy", ""])
     for item in payload.get("cut_policy") or []:
+        lines.append(f"- {item}")
+    lines.extend(["", "## Hard Stop Rules", ""])
+    for item in payload.get("hard_stop_rules") or []:
+        lines.append(
+            "- `{rule}`: if {condition}, {action}.".format(
+                rule=item.get("rule") or "",
+                condition=item.get("condition") or "",
+                action=item.get("action") or "",
+            )
+        )
+    lines.extend(["", "## Required Before Battle", ""])
+    for item in payload.get("required_before_battle") or []:
         lines.append(f"- {item}")
     lines.extend(["", "## Battle Gate Contract", ""])
     for item in payload.get("battle_gate_contract") or []:
@@ -561,7 +785,8 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--diagnostic-planner", type=Path, default=DEFAULT_DIAGNOSTIC_PLANNER)
+    parser.add_argument("--diagnostic-planner", type=Path, default=None)
+    parser.add_argument("--hypothesis-queue", type=Path, default=None)
     parser.add_argument("--knowledge-db", type=Path, default=DEFAULT_KNOWLEDGE_DB)
     parser.add_argument("--deck-id", type=int, default=607)
     parser.add_argument("--stem", default=DEFAULT_STEM)
@@ -576,13 +801,17 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    diagnostic_planner_path = args.diagnostic_planner or default_diagnostic_planner()
+    hypothesis_queue_path = args.hypothesis_queue or default_hypothesis_queue()
     names = candidate_names()
     snapshot = load_db_snapshot(args.knowledge_db, names, args.deck_id)
     payload = build_report(
-        planner_report=read_json(args.diagnostic_planner),
+        planner_report=read_json(diagnostic_planner_path),
         db_snapshot=snapshot,
-        diagnostic_planner_path=args.diagnostic_planner,
+        hypothesis_queue=read_json(hypothesis_queue_path),
+        diagnostic_planner_path=diagnostic_planner_path,
         knowledge_db_path=args.knowledge_db,
+        hypothesis_queue_path=hypothesis_queue_path,
         cut_plan=args.cut,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)

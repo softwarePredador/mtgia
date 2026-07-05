@@ -1067,3 +1067,95 @@ Operational lesson:
   `0` gate-ready rows.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this goal remains open.
+
+## Pressure-Safe Spell-Payoff Contract Relearn - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_spell_payoff_contract_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_safe_spell_payoff_contract_20260705_current_relearn.json`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_pressure_safe_spell_contract_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_pressure_safe_spell_contract_current.json`
+
+The pressure-safe contract now consumes the current
+`lorehold_hypothesis_queue_from_value_model_20260705_current_relearn` queue
+instead of treating local card preflight as enough to authorize a battle. This
+keeps four separate states visible: local card/runtime readiness, hypothesis
+queue readiness, cut safety, and natural battle permission.
+
+Current result:
+
+- decision status: `preflight_pass_cut_pool_required`;
+- diagnostic contract status:
+  `pressure_safe_diagnostic_contract_ready_no_battle`;
+- diagnostic only: `true`;
+- ready deck changes: `0`;
+- promotion allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- natural gate-ready rows from the hypothesis queue: `0`;
+- primary pressure package size: `4`;
+- primary pressure cards matched in current hypothesis queue: `1`;
+- primary pressure cards missing from current hypothesis queue: `3`;
+- current matched card: `Storm-Kiln Artist`;
+- current missing queue cards: `Monastery Mentor`, `Young Pyromancer`, and
+  `Guttersnipe`;
+- required named cuts before a legal pressure variant: `4`;
+- protected `607` anchors tracked by the contract: `12`;
+- deckbuilding contract surface audit: `pass`.
+
+The pressure cards passed local card preflight:
+
+- `Monastery Mentor`: Commander legal, local oracle present, verified auto rule
+  present, not in `607`;
+- `Young Pyromancer`: Commander legal, local oracle present, verified auto rule
+  present, not in `607`;
+- `Guttersnipe`: Commander legal, local oracle present, verified auto rule
+  present, not in `607`;
+- `Storm-Kiln Artist`: Commander legal, local oracle present, verified auto rule
+  present, not in `607`.
+
+That pass is not promotion. The current queue still says:
+
+- `Storm-Kiln Artist` is `blocked_prior_reject`, with protected same-lane
+  anchors including `Molecule Man`, `Reforge the Soul`,
+  `Call Forth the Tempest`, `Hit the Mother Lode`, and
+  `Creative Technique`;
+- `Monastery Mentor`, `Young Pyromancer`, and `Guttersnipe` require queue/cut
+  modeling before they can become natural-gate candidates;
+- no natural battle can run while the current queue has `0` gate-ready rows.
+
+Hard stop rules now recorded in the contract:
+
+- stop if a natural battle is requested while the hypothesis queue has `0`
+  natural gate-ready candidates;
+- stop if a cut plan uses `Molecule Man`, `Bender's Waterskin`,
+  `Creative Technique`, or another protected anchor as a generic cut;
+- stop if `Storm-Kiln Artist` is retested as a generic `Arcane Signet` or
+  `Bender's Waterskin` replacement without a new trace hypothesis;
+- stop if the test plan omits Winota/fast-pressure regression checks;
+- stop if card-level claims are made without direct draw/cast/trigger/use
+  events for the pressure cards.
+
+Accessibility clarification for `Mana Vault` and `The One Ring`:
+
+- `Mana Vault` is Commander legal, colorless, bracket-allowed, a Game Changer,
+  and present in `format_staples`, but the local collection layer reports
+  `owned=false` and the current `607` promotion layer remains
+  `blocked_prior_gate_rejected`.
+- `The One Ring` is Commander legal, colorless, bracket-allowed, a Game
+  Changer, and owned locally, but it is missing from local `format_staples` and
+  the current `607` promotion layer remains
+  `blocked_existing_package_rejected` after direct card-use evidence.
+- Therefore neither card is "inaccessible to Lorehold" by legality. They are
+  inaccessible as automatic protected-`607` changes under the current app/deck
+  promotion contract.
+
+Operational lesson:
+
+- A local runtime pass tells us a card can be tested; it does not say a card
+  improves the deck.
+- The next useful implementation is a pressure-safe cut-pool resolver that
+  names four legal cuts without touching protected anchors, then a structure
+  matrix. Natural battle remains closed until that preflight changes.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.
