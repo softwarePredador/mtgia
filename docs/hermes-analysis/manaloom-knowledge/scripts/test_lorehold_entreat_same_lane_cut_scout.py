@@ -47,10 +47,15 @@ def _package(*, generated=True, applied=False):
 
 def _preflight(*, runtime_ready=True, active_rules=0):
     return {
-        "status": "entreat_x_token_runtime_primitive_ready_rule_still_blocked_keep_607",
+        "status": (
+            "entreat_x_token_runtime_and_rule_ready_cut_still_blocked_keep_607"
+            if active_rules
+            else "entreat_x_token_runtime_primitive_ready_rule_still_blocked_keep_607"
+        ),
         "summary": {
             "runtime_primitive_ready": runtime_ready,
             "entreat_active_rule_count": active_rules,
+            "entreat_active_rule_ready": active_rules > 0,
             "battle_ready_now_count": active_rules,
         },
     }
@@ -145,8 +150,21 @@ def test_current_like_state_blocks_entreat_without_safe_cut() -> None:
     )
     assert payload["summary"]["safe_cut_count"] == 0
     assert payload["summary"]["blocked_same_lane_cut_count"] == 2
+    assert payload["summary"]["recommended_next_action"] == "do_not_score_entreat_until_pg_apply_and_safe_cut_evidence"
     assert payload["decision"]["named_safe_cut_required_before_scoring"] is True
     assert payload["decision"]["natural_battle_allowed_now"] is False
+
+
+def test_active_rule_without_safe_cut_mines_cut_not_pg_apply() -> None:
+    payload = _build(entreat_preflight=_preflight(active_rules=1))
+
+    assert payload["summary"]["decision_status"] == (
+        "entreat_same_lane_cut_scout_blocked_no_safe_cut_keep_607"
+    )
+    assert payload["summary"]["postgres_writes_executed"] is True
+    assert payload["summary"]["entreat_active_rule_ready"] is True
+    assert payload["summary"]["recommended_next_action"] == "mine_entreat_named_same_lane_safe_cut_before_matrix_or_battle"
+    assert payload["decision"]["pg_apply_required_before_battle"] is False
 
 
 def test_synthetic_safe_cut_and_active_rule_can_only_feed_matrix_scoring() -> None:

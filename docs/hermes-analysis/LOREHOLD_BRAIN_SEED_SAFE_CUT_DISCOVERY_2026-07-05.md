@@ -151,3 +151,63 @@ apply local cache and run tests, but the evidence still does not justify a deck
 mutation. Keep `607` protected. The next real work is runtime implementation
 or focused evidence for `Entreat the Angels` and continued named same-lane
 safe-cut mining for Brain.
+
+## PG472 Entreat Runtime Apply Refresh
+
+Generated on 2026-07-05 under prefix `20260705_goal_continue_pg472_applied`.
+
+What changed:
+
+- Applied PostgreSQL package
+  `docs/hermes-analysis/master_optimizer_reports/pg472_lorehold_entreat_x_token_rule_20260705_current_apply.sql`
+  after precheck confirmed `target_card_rows=1`, `existing_rule_rows=0`, and
+  `expected_rule_rows_before=0`.
+- PostgreSQL postcheck confirmed `package_rule_rows=1`, `auto_rows=1`, and
+  `oracle_hash_rows=1` for `Entreat the Angels`.
+- Synced `Entreat the Angels` from PostgreSQL to local SQLite
+  `knowledge.db`; local `battle_card_rules` now has one
+  `verified`/`auto` rule with scope
+  `xmage_x_create_creature_tokens_spell_v1` and native miracle cost
+  `{X}{W}{W}`.
+- Updated the Entreat runtime preflight auditor so it distinguishes:
+  runtime primitive ready, active card rule ready, and still-blocked deck
+  action. Current status:
+  `entreat_x_token_runtime_and_rule_ready_cut_still_blocked_keep_607`.
+- Updated the Entreat same-lane cut scout so an active local rule removes the
+  stale "apply PG" blocker. Current status:
+  `entreat_same_lane_cut_scout_blocked_no_safe_cut_keep_607`.
+
+Current Entreat facts:
+
+- `runtime_primitive_ready=true`.
+- `entreat_active_rule_count=1`.
+- `entreat_active_rule_ready=true`.
+- Post-identity queue has `verified_auto_rule_ready_count=3`.
+- Entreat row now has only `named_safe_cut_missing` as its direct route
+  blocker.
+- Same-lane Entreat scout reviewed `10` miracle/finisher cut candidates.
+  `safe_cut_count=0`; all `10` are blocked under the current protected-`607`
+  contract.
+- Candidate row queue still has `scoreable_candidate_row_count=0` and
+  `named_seed_safe_cut_count=0`.
+- Miracle next route planner still selects `Brain in a Jar`, with state
+  `brain_rule_active_no_seed_safe_cut`, learning score `114`, and next action
+  `mine_named_brain_same_lane_seed_safe_cut_no_deck_action`.
+
+Validation evidence from this refresh:
+
+- Lorehold/Commander/global Commander tests: `823 passed`, `1 skipped`.
+- XMage exact-scope/runtime tests: `819 passed`.
+- `pg_hermes_sqlite_contract_audit.py` with local server env:
+  `51/51 pass`.
+- `deckbuilding_contract_surface_audit.py`: `pass`.
+- `lorehold_artifact_contract_audit.py`: `pass`.
+- `operational_surface_alignment_audit.py`: `pass`.
+- `legacy_contamination_audit.py`: `pass`.
+- `xmage_strategy_consistency_audit.py`: `26/26 pass`.
+
+Decision after PG472: Entreat is now executable enough for focused ManaLoom
+runtime evidence, but it is not a deck edit. Do not materialize or battle an
+Entreat candidate until a named same-lane safe cut exists and the matrix clears.
+The practical next work remains safe-cut mining: Brain first per planner, with
+Entreat cut mining available as a parallel miracle-finisher lane.

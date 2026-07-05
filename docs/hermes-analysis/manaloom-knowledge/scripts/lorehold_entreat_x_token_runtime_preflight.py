@@ -126,11 +126,35 @@ def build_payload(
     rules = active_rule_rows(db_path, "Entreat the Angels")
     contract_report = read_json(contract_report_path)
     runtime_primitive_ready = all(runtime.values()) and all(tests.values())
-    status = (
-        "entreat_x_token_runtime_primitive_ready_rule_still_blocked_keep_607"
-        if runtime_primitive_ready
-        else "entreat_x_token_runtime_primitive_incomplete_keep_607"
+    active_rule_ready = any(
+        row.get("review_status") in {"verified", "active"}
+        and row.get("execution_status") in {"auto", "executable"}
+        for row in rules
     )
+    if runtime_primitive_ready and active_rule_ready:
+        status = "entreat_x_token_runtime_and_rule_ready_cut_still_blocked_keep_607"
+        recommended_next_action = "mine_entreat_named_same_lane_safe_cut_before_matrix_or_battle"
+        reason = (
+            "The generic X token runtime primitive is present, focused Entreat tests cover "
+            "normal and native miracle X-token casting, and Entreat has a reviewed active "
+            "ManaLoom rule. Deck action is still blocked until a named same-lane safe cut "
+            "and later natural battle gate exist."
+        )
+    elif runtime_primitive_ready:
+        status = "entreat_x_token_runtime_primitive_ready_rule_still_blocked_keep_607"
+        recommended_next_action = "apply_entreat_rule_only_after_pg_precheck_then_run_607_battle_gate"
+        reason = (
+            "The generic X token runtime primitive is present and covered by a focused "
+            "Entreat-style fixture, but Entreat still has no reviewed active card rule and "
+            "has not passed a natural battle gate against protected deck 607."
+        )
+    else:
+        status = "entreat_x_token_runtime_primitive_incomplete_keep_607"
+        recommended_next_action = "complete_entreat_x_token_runtime_before_rule_or_deck_gate"
+        reason = (
+            "The Entreat X-token runtime primitive is incomplete, so no rule, matrix, battle, "
+            "or deck action is allowed."
+        )
     return {
         "generated_at": utc_now(),
         "artifact_type": "lorehold_entreat_x_token_runtime_preflight",
@@ -149,10 +173,11 @@ def build_payload(
             "current_baseline": "deck_607",
             "runtime_primitive_ready": runtime_primitive_ready,
             "entreat_active_rule_count": len(rules),
+            "entreat_active_rule_ready": active_rule_ready,
             "battle_ready_now_count": 0,
             "natural_battle_allowed_now": False,
             "promotion_allowed": False,
-            "recommended_next_action": "apply_entreat_rule_only_after_pg_precheck_then_run_607_battle_gate",
+            "recommended_next_action": recommended_next_action,
         },
         "prior_contract_status": contract_report.get("status"),
         "prior_contract_best_first": (contract_report.get("summary") or {}).get("best_first_runtime_contract"),
@@ -163,11 +188,7 @@ def build_payload(
             "keep_607_as_protected_baseline": True,
             "natural_battle_allowed_now": False,
             "promotion_allowed": False,
-            "reason": (
-                "The generic X token runtime primitive is now present and covered by a focused "
-                "Entreat-style fixture, but Entreat still has no reviewed active card rule and "
-                "has not passed a natural battle gate against protected deck 607."
-            ),
+            "reason": reason,
         },
     }
 
@@ -192,6 +213,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
     for key in [
         "runtime_primitive_ready",
         "entreat_active_rule_count",
+        "entreat_active_rule_ready",
         "battle_ready_now_count",
         "natural_battle_allowed_now",
         "promotion_allowed",

@@ -220,9 +220,12 @@ def package_state(entreat_package: Mapping[str, Any]) -> dict[str, Any]:
 
 def runtime_state(entreat_preflight: Mapping[str, Any]) -> dict[str, Any]:
     preflight_summary = summary(entreat_preflight)
+    active_rule_count = as_int(preflight_summary.get("entreat_active_rule_count"))
+    active_rule_ready = bool(preflight_summary.get("entreat_active_rule_ready")) or active_rule_count > 0
     return {
         "runtime_primitive_ready": bool(preflight_summary.get("runtime_primitive_ready")),
-        "entreat_active_rule_count": as_int(preflight_summary.get("entreat_active_rule_count")),
+        "entreat_active_rule_count": active_rule_count,
+        "entreat_active_rule_ready": active_rule_ready,
         "battle_ready_now_count": as_int(preflight_summary.get("battle_ready_now_count")),
         "preflight_status": entreat_preflight.get("status") or "",
     }
@@ -254,13 +257,19 @@ def decision_status(
             "finish_entreat_x_token_runtime_primitive",
             False,
         )
+    active_rule_ready = bool(runtime.get("entreat_active_rule_ready"))
     if safe_cut_count == 0:
+        next_action = (
+            "mine_entreat_named_same_lane_safe_cut_before_matrix_or_battle"
+            if active_rule_ready
+            else "do_not_score_entreat_until_pg_apply_and_safe_cut_evidence"
+        )
         return (
             "entreat_same_lane_cut_scout_blocked_no_safe_cut_keep_607",
-            "do_not_score_entreat_until_pg_apply_and_safe_cut_evidence",
+            next_action,
             False,
         )
-    if not pkg.get("postgres_writes_executed") or as_int(runtime.get("entreat_active_rule_count")) <= 0:
+    if not active_rule_ready:
         return (
             "entreat_same_lane_cut_scout_blocked_rule_not_applied_no_battle",
             "apply_entreat_rule_only_after_pg_precheck_then_refresh_candidate_queue",
@@ -294,6 +303,7 @@ def build_report(
     blocked_rows = [row for row in same_lane_rows if row["scout_status"] != "safe_same_lane_cut_candidate"]
     pkg = package_state(entreat_package)
     runtime = runtime_state(entreat_preflight)
+    entreat_rule_active = bool(runtime.get("entreat_active_rule_ready"))
     matrix_blocker_count = as_int(summary(candidate_queue).get("matrix_contract_blocker_count"))
     status, next_action, matrix_scoring_allowed = decision_status(
         entreat_row=entreat_row,
@@ -318,9 +328,10 @@ def build_report(
             "entreat_candidate_row_found": bool(entreat_row),
             "entreat_lane": entreat_row.get("lane") or "",
             "package_generated": bool(pkg.get("package_generated")),
-            "postgres_writes_executed": bool(pkg.get("postgres_writes_executed")),
+            "postgres_writes_executed": bool(pkg.get("postgres_writes_executed")) or entreat_rule_active,
             "runtime_primitive_ready": bool(runtime.get("runtime_primitive_ready")),
             "entreat_active_rule_count": as_int(runtime.get("entreat_active_rule_count")),
+            "entreat_active_rule_ready": entreat_rule_active,
             "same_lane_candidate_count": len(same_lane_rows),
             "safe_cut_count": len(safe_rows),
             "blocked_same_lane_cut_count": len(blocked_rows),
@@ -361,8 +372,7 @@ def build_report(
             "natural_battle_allowed_now": False,
             "promotion_allowed": False,
             "pg_apply_required_before_battle": (
-                not pkg.get("postgres_writes_executed")
-                or as_int(runtime.get("entreat_active_rule_count")) <= 0
+                not entreat_rule_active
             ),
             "named_safe_cut_required_before_scoring": len(safe_rows) == 0,
             "reason": (
@@ -401,6 +411,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- PostgreSQL writes executed: `{str(summary_row['postgres_writes_executed']).lower()}`",
         f"- Runtime primitive ready: `{str(summary_row['runtime_primitive_ready']).lower()}`",
         f"- Entreat active rule count: `{summary_row['entreat_active_rule_count']}`",
+        f"- Entreat active rule ready: `{str(summary_row['entreat_active_rule_ready']).lower()}`",
         f"- Same-lane candidates reviewed: `{summary_row['same_lane_candidate_count']}`",
         f"- Safe same-lane cuts: `{summary_row['safe_cut_count']}`",
         f"- Blocked same-lane cuts: `{summary_row['blocked_same_lane_cut_count']}`",
