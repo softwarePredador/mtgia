@@ -264,7 +264,12 @@ Operational priority after this pivot:
    trace exists; observed use by the target deck blocks automatic value-safe
    reclassification until same-lane replacement proof or stronger negative trace
    exists;
-27. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+27. run `global_commander_same_lane_replacement_model.py` after usage review
+   blocks contextual cuts; it must compare usage-blocked cuts with explicit
+   same-lane replacement routes from the synthesized package, treat incidental
+   role overlap as non-proof, and route to a new cut-source-lane evidence pass
+   when no explicit replacement route exists;
+28. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -308,6 +313,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -655,6 +661,19 @@ Current external refresh on 2026-07-05:
   because target-deck usage was observed for all three cards. The next gate is
   `find_new_cut_source_lane_or_same_lane_replacement_proof_before_candidate_copy`,
   not candidate copy, battle, or promotion.
+- Current same-lane replacement modeling finds no explicit replacement route
+  for those usage-blocked contextual cuts. The report
+  `global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  returns `same_lane_replacement_model_routes_to_new_cut_source_lane` with
+  `usage_blocked_cut_count=3`, `same_lane_replacement_route_count=0`,
+  `incidental_role_overlap_count=4`, and
+  `remaining_stage_only_cut_source_count=12`. `Bonehoard Dracosaur` and
+  `The Balrog of Moria` overlap incidentally with mana/card roles, but they
+  were selected for the Angel/Demon/Dragon payoff axis, so they are not proof
+  that `Professional Face-Breaker` or `Ornithopter of Paradise` can be cut.
+  Therefore candidate copy, battle, promotion, and value-safe reclassification
+  remain closed; the next gate is
+  `collect_new_cut_source_lane_evidence_after_contextual_usage_block`.
 
 ## Global Commander Rollout - 2026-07-01
 

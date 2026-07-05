@@ -500,6 +500,20 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `contextual_staple_same_lane_usage_review` antes de qualquer
     reclassificacao value-safe. Proximo gate:
     `collect_stage_only_cut_evidence_before_value_safe_reclassification`.
+    Esse gate ja avançou por trace contextual: o reviewer confirmou uso real
+    das tres cartas pelo deck alvo e manteve reclassificacao fechada. Em
+    seguida rode
+    `manaloom-knowledge/scripts/global_commander_same_lane_replacement_model.py`;
+    evidencia:
+    `master_optimizer_reports/global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `usage_blocked_cut_count=3`,
+    `same_lane_replacement_route_count=0`,
+    `incidental_role_overlap_count=4` e
+    `remaining_stage_only_cut_source_count=12`. Incidental role overlap de
+    payoff como `Bonehoard Dracosaur`/`The Balrog of Moria` nao prova a mesma
+    lane de `Professional Face-Breaker` ou `Ornithopter of Paradise`; o proximo
+    passo e uma new cut-source-lane evidence pass, nao candidate copy, battle
+    ou promocao.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

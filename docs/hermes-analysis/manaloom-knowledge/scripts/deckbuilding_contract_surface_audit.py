@@ -101,6 +101,12 @@ GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_REVIEWER = (
 GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_REVIEWER_TEST = (
     SCRIPT_DIR / "test_global_commander_contextual_usage_trace_reviewer.py"
 )
+GLOBAL_COMMANDER_SAME_LANE_REPLACEMENT_MODEL = (
+    SCRIPT_DIR / "global_commander_same_lane_replacement_model.py"
+)
+GLOBAL_COMMANDER_SAME_LANE_REPLACEMENT_MODEL_TEST = (
+    SCRIPT_DIR / "test_global_commander_same_lane_replacement_model.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -274,6 +280,10 @@ GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_USAGE_TRACE_GENERATOR_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_USAGE_TRACE_REVIEWER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_SAME_LANE_REPLACEMENT_MODEL_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -562,6 +572,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "contextual_usage_trace_review_blocks_value_safe_reclassification",
                 "find_new_cut_source_lane_or_same_lane_replacement_proof_before_candidate_copy",
+                "global_commander_same_lane_replacement_model.py",
+                "global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_replacement_model_routes_to_new_cut_source_lane",
+                "collect_new_cut_source_lane_evidence_after_contextual_usage_block",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -795,6 +809,9 @@ def build_audit() -> dict[str, Any]:
                 "Ornithopter of Paradise",
                 "contextual_staple_same_lane_usage_review",
                 "collect_stage_only_cut_evidence_before_value_safe_reclassification",
+                "global_commander_same_lane_replacement_model.py",
+                "Incidental role overlap",
+                "new cut-source-lane evidence pass",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1186,6 +1203,35 @@ def build_audit() -> dict[str, Any]:
                 "Diabolic Intent",
                 "Ornithopter of Paradise",
                 "contextual_usage_trace_review_blocks_value_safe_reclassification",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_REPLACEMENT_MODEL,
+            [
+                "global_commander_same_lane_replacement_model",
+                "same_lane_replacement_model_routes_to_new_cut_source_lane",
+                "same_lane_replacement_model_needs_proof_before_candidate_copy",
+                "incidental_role_overlap_not_same_lane_proof",
+                "collect_new_cut_source_lane_evidence_after_contextual_usage_block",
+                "same_lane_replacement_proof_allowed_now",
+                "value_safe_reclassification_allowed_now",
+                "candidate_copy_allowed_now",
+                "battle_gate_performed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_REPLACEMENT_MODEL_TEST,
+            [
+                "test_incidental_overlap_does_not_create_same_lane_proof",
+                "test_explicit_same_lane_route_still_requires_proof_before_copy",
+                "Bonehoard Dracosaur",
+                "Professional Face-Breaker",
+                "incidental_role_overlap_count",
+                "same_lane_replacement_route_count",
             ],
         )
     )
@@ -1858,6 +1904,26 @@ def build_audit() -> dict[str, Any]:
                 "Professional Face-Breaker",
                 "Diabolic Intent",
                 "Ornithopter of Paradise",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_SAME_LANE_REPLACEMENT_MODEL_REPORT,
+            [
+                "Global Commander Same-Lane Replacement Model",
+                "same_lane_replacement_model_routes_to_new_cut_source_lane",
+                "usage_blocked_cut_count: `3`",
+                "same_lane_replacement_route_count: `0`",
+                "incidental_role_overlap_count: `4`",
+                "remaining_stage_only_cut_source_count: `12`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "collect_new_cut_source_lane_evidence_after_contextual_usage_block",
+                "Professional Face-Breaker",
+                "Diabolic Intent",
+                "Ornithopter of Paradise",
+                "Jeska's Will",
             ],
         )
     )

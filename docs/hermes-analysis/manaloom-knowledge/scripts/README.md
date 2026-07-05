@@ -82,6 +82,13 @@ candidate DB. Follow it with
 target deck blocks automatic value-safe reclassification until a same-lane
 replacement proof exists.
 
+After the reviewer blocks contextual cuts, run
+`global_commander_same_lane_replacement_model.py`. It cross-checks usage-blocked
+cuts against the synthesized add package and the remaining stage-only cut pool.
+Incidental role overlap from a payoff card is not same-lane proof; if no
+explicit route exists, candidate copy stays closed and the next gate is a new
+cut-source-lane evidence pass.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

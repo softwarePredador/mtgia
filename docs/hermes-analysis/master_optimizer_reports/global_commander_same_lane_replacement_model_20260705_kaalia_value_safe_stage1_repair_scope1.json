@@ -1,0 +1,412 @@
+{
+  "artifact_type": "global_commander_same_lane_replacement_model",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "contextual_usage_blocked_cuts:Diabolic Intent,Ornithopter of Paradise,Professional Face-Breaker",
+    "no_explicit_same_lane_replacement_route_for_usage_blocked_contextual_cuts",
+    "value_safe_reclassification_still_closed"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T21:45:52.881767+00:00",
+  "input_artifacts": {
+    "cut_source_lane_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "package_synthesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "stage_only_cut_evidence_plan": "docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "usage_reviewer_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "incidental_overlap_boundary": "An added payoff with incidental mana/card text is not same-lane proof unless it explicitly covers the cut lane.",
+    "mutation_boundary": "This model does not copy decks, mutate DBs, run battles, reclassify cuts, or open promotion.",
+    "same_lane_boundary": "A card used by the target deck needs explicit same-lane replacement proof before reclassification."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "remaining_cut_source_lane_rows": [
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Sunforger",
+      "cut_roles": [
+        "tutors_access"
+      ],
+      "evidence_lanes": [
+        "attack_window_same_lane_replacement_trace"
+      ],
+      "maximum_evidence_burden": 3,
+      "recommended_next_route": "collect_attack_window_same_lane_replacement_trace",
+      "score": 59,
+      "stage_reasons": [
+        "attack_window_cut_requires_same_lane_stage_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Alicia Masters, Skilled Sculptor",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "evidence_lanes": [
+        "attack_window_same_lane_replacement_trace"
+      ],
+      "maximum_evidence_burden": 3,
+      "recommended_next_route": "collect_attack_window_same_lane_replacement_trace",
+      "score": 50,
+      "stage_reasons": [
+        "attack_window_cut_requires_same_lane_stage_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Jeska's Will",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 5,
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "score": 61,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Smothering Tithe",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 5,
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "score": 61,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Demonic Tutor",
+      "cut_roles": [
+        "tutors_access"
+      ],
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 5,
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "score": 55,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Enlightened Tutor",
+      "cut_roles": [
+        "tutors_access"
+      ],
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 5,
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "score": 55,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Vampiric Tutor",
+      "cut_roles": [
+        "tutors_access"
+      ],
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 5,
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "score": 55,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Arcane Signet",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 5,
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "score": 50,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Dark Ritual",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 5,
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "score": 50,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Mana Vault",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 5,
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "score": 50,
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Sol Ring",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "maximum_evidence_burden": 5,
+      "recommended_next_route": "collect_structural_staple_same_lane_or_equal_gate_proof",
+      "score": 50,
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "evidence_lanes": [
+        "global_battle_feedback_reopen_proof"
+      ],
+      "maximum_evidence_burden": 6,
+      "recommended_next_route": "collect_new_global_battle_feedback_reopen_proof",
+      "score": 61,
+      "stage_reasons": [
+        "global_battle_feedback_requires_new_same_lane_or_gate"
+      ],
+      "status": "remaining_stage_only_cut_source_requires_evidence",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "same_lane_replacement_proof_allowed_now": false,
+  "source_db_mutated": false,
+  "status": "same_lane_replacement_model_routes_to_new_cut_source_lane",
+  "summary": {
+    "candidate_copy_blocker_count": 3,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "incidental_role_overlap_count": 4,
+    "next_gate": "collect_new_cut_source_lane_evidence_after_contextual_usage_block",
+    "package_add_count": 6,
+    "remaining_stage_only_cut_source_count": 12,
+    "same_lane_replacement_route_count": 0,
+    "usage_blocked_cut_count": 3
+  },
+  "usage_blocked_replacement_rows": [
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Diabolic Intent",
+      "cut_roles": [
+        "tutors_access"
+      ],
+      "decision": "blocked_no_same_lane_replacement_route",
+      "decision_trace_count": 1,
+      "incidental_role_overlaps": [],
+      "required_next_evidence": [
+        "find_different_cut_source_lane",
+        "expand_same_lane_replacement_pool_for_cut_role",
+        "do_not_reclassify_used_contextual_card_as_value_safe"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "usage_blocked_cut_requires_replacement_proof",
+      "usage_event_count": 5,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Ornithopter of Paradise",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "decision": "blocked_no_same_lane_replacement_route",
+      "decision_trace_count": 15,
+      "incidental_role_overlaps": [
+        {
+          "add_card": "Bonehoard Dracosaur",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "mana_acceleration"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "mana_acceleration"
+          ],
+          "score": 97,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_role_overlap_not_same_lane_proof"
+        },
+        {
+          "add_card": "The Balrog of Moria",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "mana_acceleration"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "card_draw_selection",
+            "haste_protection_silence",
+            "mana_acceleration"
+          ],
+          "score": 96,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_role_overlap_not_same_lane_proof"
+        }
+      ],
+      "required_next_evidence": [
+        "find_different_cut_source_lane",
+        "expand_same_lane_replacement_pool_for_cut_role",
+        "do_not_reclassify_used_contextual_card_as_value_safe"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "usage_blocked_cut_requires_replacement_proof",
+      "usage_event_count": 12,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Professional Face-Breaker",
+      "cut_roles": [
+        "mana_acceleration"
+      ],
+      "decision": "blocked_no_same_lane_replacement_route",
+      "decision_trace_count": 14,
+      "incidental_role_overlaps": [
+        {
+          "add_card": "Bonehoard Dracosaur",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "mana_acceleration"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "mana_acceleration"
+          ],
+          "score": 97,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_role_overlap_not_same_lane_proof"
+        },
+        {
+          "add_card": "The Balrog of Moria",
+          "covered_axes": [
+            "angels_demons_dragons_payoffs"
+          ],
+          "overlap_roles": [
+            "mana_acceleration"
+          ],
+          "profile_roles": [
+            "angels_demons_dragons_payoffs",
+            "card_draw_selection",
+            "haste_protection_silence",
+            "mana_acceleration"
+          ],
+          "score": 96,
+          "selected_for_axis": "angels_demons_dragons_payoffs",
+          "status": "incidental_role_overlap_not_same_lane_proof"
+        }
+      ],
+      "required_next_evidence": [
+        "find_different_cut_source_lane",
+        "expand_same_lane_replacement_pool_for_cut_role",
+        "do_not_reclassify_used_contextual_card_as_value_safe"
+      ],
+      "same_lane_replacement_proof_allowed_now": false,
+      "same_lane_replacement_routes": [],
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "status": "usage_blocked_cut_requires_replacement_proof",
+      "usage_event_count": 6,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "value_safe_reclassification_allowed_now": false
+}
