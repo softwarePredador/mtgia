@@ -1,0 +1,267 @@
+{
+  "apply": {
+    "backup_rows": 0,
+    "deprecated_shadow_rows": 0,
+    "transaction": "commit",
+    "upserted_rows": 7
+  },
+  "artifacts": {
+    "apply_sql": "docs/hermes-analysis/master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_apply.sql",
+    "e2e_validation": "docs/hermes-analysis/master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_e2e_validation.json",
+    "full_pg_to_sqlite_sync": "docs/hermes-analysis/master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_full_pg_to_sqlite_sync_operational.json",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_manifest.json",
+    "metadata_sync": "docs/hermes-analysis/master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_metadata_sync_operational.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_package.md",
+    "post_sync_exact_split": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg463_creature_dies_gain_life_new_server_recheck.md",
+    "post_sync_queue": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg463_creature_dies_gain_life_new_server_commander_legal.md",
+    "postcheck_sql": "docs/hermes-analysis/master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_postcheck.sql",
+    "precheck_sql": "docs/hermes-analysis/master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_precheck.sql",
+    "raw_pg_apply_evidence": "docs/hermes-analysis/master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_pg_apply_evidence.json",
+    "rollback_sql": "docs/hermes-analysis/master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_rollback.sql"
+  },
+  "audits": {
+    "legacy_contamination": {
+      "active_file_count": 28,
+      "check_count": 32,
+      "status_counts": {
+        "pass": 32
+      }
+    },
+    "operational_surface": {
+      "check_count": 39,
+      "status_counts": {
+        "pass": 39
+      }
+    },
+    "pg_hermes_sqlite_contract": {
+      "check_count": 51,
+      "status_counts": {
+        "pass": 51
+      }
+    },
+    "xmage_strategy": {
+      "check_count": 26,
+      "status_counts": {
+        "pass": 26
+      }
+    }
+  },
+  "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg463",
+  "direct_postgresql_verification": {
+    "all_have_oracle_hash": true,
+    "all_verified_auto_curated": true,
+    "row_count": 7,
+    "rows": [
+      {
+        "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+        "card_name": "Anodet Lurker",
+        "execution_status": "auto",
+        "gain_life_when_this_dies": "3",
+        "has_oracle_hash": true,
+        "keywords": null,
+        "review_status": "verified",
+        "source": "curated",
+        "trigger": "dies"
+      },
+      {
+        "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+        "card_name": "Enatu Golem",
+        "execution_status": "auto",
+        "gain_life_when_this_dies": "4",
+        "has_oracle_hash": true,
+        "keywords": null,
+        "review_status": "verified",
+        "source": "curated",
+        "trigger": "dies"
+      },
+      {
+        "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+        "card_name": "Grasping Longneck",
+        "execution_status": "auto",
+        "gain_life_when_this_dies": "2",
+        "has_oracle_hash": true,
+        "keywords": [
+          "reach"
+        ],
+        "review_status": "verified",
+        "source": "curated",
+        "trigger": "dies"
+      },
+      {
+        "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+        "card_name": "Guardian Automaton",
+        "execution_status": "auto",
+        "gain_life_when_this_dies": "3",
+        "has_oracle_hash": true,
+        "keywords": null,
+        "review_status": "verified",
+        "source": "curated",
+        "trigger": "dies"
+      },
+      {
+        "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+        "card_name": "Highland Game",
+        "execution_status": "auto",
+        "gain_life_when_this_dies": "2",
+        "has_oracle_hash": true,
+        "keywords": null,
+        "review_status": "verified",
+        "source": "curated",
+        "trigger": "dies"
+      },
+      {
+        "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+        "card_name": "Onulet",
+        "execution_status": "auto",
+        "gain_life_when_this_dies": "2",
+        "has_oracle_hash": true,
+        "keywords": null,
+        "review_status": "verified",
+        "source": "curated",
+        "trigger": "dies"
+      },
+      {
+        "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+        "card_name": "Tarpan",
+        "execution_status": "auto",
+        "gain_life_when_this_dies": "1",
+        "has_oracle_hash": true,
+        "keywords": null,
+        "review_status": "verified",
+        "source": "curated",
+        "trigger": "dies"
+      }
+    ]
+  },
+  "e2e": {
+    "package_id": "pg463_xmage_creature_dies_gain_life_new_server_manifest",
+    "status": "pass"
+  },
+  "family": "xmage_creature_dies_gain_life",
+  "generated_at_utc": "2026-07-05T01:17:16.747124+00:00",
+  "post_sync_exact_split": {
+    "adapter_work_unit_counts": {
+      "bounce::targeted_return_to_hand_variant_v1": 2,
+      "direct_damage::targeted_damage_variant_v1": 3,
+      "draw_cards::xmage_draw_card_variant_review_v1": 19,
+      "draw_engine::xmage_draw_card_variant_review_v1": 9,
+      "passive::static_cast_as_flash_permission_variant_review_v1": 7,
+      "ramp_permanent::xmage_artifact_mana_source_variant_review_v1": 3,
+      "ramp_permanent::xmage_creature_mana_source_variant_review_v1": 1,
+      "recursion::xmage_graveyard_return_variant_review_v1": 20,
+      "removal_destroy::targeted_destroy_variant_v1": 5,
+      "tutor::xmage_library_search_variant_review_v1": 6,
+      "xmage_signature::BoostSourceEffect::SimpleActivatedAbility::no_target_class::no_condition_class::activated_ability": 4
+    },
+    "largest_remaining_exact_families": [
+      [
+        "xmage_fixed_draw_spell_self_cost_reduction",
+        7
+      ],
+      [
+        "xmage_static_cast_spells_as_flash_permission",
+        7
+      ],
+      [
+        "xmage_counter_target_draw_card_spell",
+        6
+      ],
+      [
+        "xmage_creature_etb_library_search_to_battlefield",
+        6
+      ],
+      [
+        "xmage_permanent_simple_activated_draw",
+        5
+      ],
+      [
+        "xmage_simple_mana_source_with_etb_draw",
+        4
+      ],
+      [
+        "xmage_destroy_target_spell",
+        4
+      ],
+      [
+        "xmage_creature_etb_dynamic_graveyard_count_damage",
+        4
+      ],
+      [
+        "xmage_creature_etb_draw_lose_life",
+        4
+      ],
+      [
+        "xmage_permanent_simple_activated_self_boost_until_eot",
+        4
+      ]
+    ],
+    "proposal_count": 79,
+    "safe_for_batch_pg_package_count": 79
+  },
+  "post_sync_queue": {
+    "adapter_work_unit_count": 11393,
+    "target_identity_count": 26418,
+    "xmage_authoritative_adapter_required_count": 26104,
+    "xmage_authoritative_parser_gap_count": 0,
+    "xmage_authoritative_source_count": 26104,
+    "xmage_missing_source_exception_count": 314
+  },
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Anodet Lurker",
+      "Enatu Golem",
+      "Grasping Longneck",
+      "Guardian Automaton",
+      "Highland Game",
+      "Onulet",
+      "Tarpan"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 7,
+    "promoted_rule_rows": 7,
+    "promoted_verified_auto_rows": 7,
+    "row_count": 7
+  },
+  "precheck": {
+    "cards": [
+      "Anodet Lurker",
+      "Enatu Golem",
+      "Grasping Longneck",
+      "Guardian Automaton",
+      "Highland Game",
+      "Onulet",
+      "Tarpan"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 7,
+    "total_target_card_rows": 7,
+    "would_deprecate_shadow_rows": 0
+  },
+  "selected_card_count": 7,
+  "selected_cards": [
+    "Anodet Lurker",
+    "Enatu Golem",
+    "Grasping Longneck",
+    "Guardian Automaton",
+    "Highland Game",
+    "Onulet",
+    "Tarpan"
+  ],
+  "status": "closed",
+  "sync": {
+    "canonical_snapshot_rows_exported": 4435,
+    "curated_rows": 145,
+    "generated_rows": 1947,
+    "metadata_postgres_cards_matched": 5631,
+    "metadata_requested_unique_names": 5446,
+    "metadata_sqlite_cache_alias_rows": 5541,
+    "metadata_unresolved_count": 1,
+    "oracle_normalized_rows": 274,
+    "pg_rows_loaded": 4468,
+    "sqlite_inserted_or_updated": 4460
+  }
+}

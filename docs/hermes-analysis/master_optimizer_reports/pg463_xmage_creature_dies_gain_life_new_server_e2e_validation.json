@@ -1,0 +1,300 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T01:08:58.994262+00:00",
+  "manifest": "../../master_optimizer_reports/pg463_xmage_creature_dies_gain_life_new_server_manifest.json",
+  "package_id": "pg463_xmage_creature_dies_gain_life_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Anodet Lurker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:758847ca30fb454036cec72854246bb0",
+          "oracle_hash": "a9c6230631d347882abbe6d015bb06e0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Enatu Golem",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a89277d577326cb47ef270db2344cb8",
+          "oracle_hash": "8f49e15bfa18c75f0217bc16c17aa6df",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Grasping Longneck",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7ed4957301a134d003ea8a3c1bc1183",
+          "oracle_hash": "705e45d3be0759b8eaebd4e9f73680fd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Guardian Automaton",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:758847ca30fb454036cec72854246bb0",
+          "oracle_hash": "a9c6230631d347882abbe6d015bb06e0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Highland Game",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90ada3943874c40067c8cde4d7e49fdc",
+          "oracle_hash": "796b7be4baaa8b00e7d04b453b468634",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Onulet",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90ada3943874c40067c8cde4d7e49fdc",
+          "oracle_hash": "796b7be4baaa8b00e7d04b453b468634",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Tarpan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0f97a1e681aa1afb50c4e774cb9808bd",
+          "oracle_hash": "1fd6a1149d32fb6b4f9ce8e236c1bbc6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Anodet Lurker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:758847ca30fb454036cec72854246bb0",
+          "oracle_hash": "a9c6230631d347882abbe6d015bb06e0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Enatu Golem",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a89277d577326cb47ef270db2344cb8",
+          "oracle_hash": "8f49e15bfa18c75f0217bc16c17aa6df",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Grasping Longneck",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e7ed4957301a134d003ea8a3c1bc1183",
+          "oracle_hash": "705e45d3be0759b8eaebd4e9f73680fd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Guardian Automaton",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:758847ca30fb454036cec72854246bb0",
+          "oracle_hash": "a9c6230631d347882abbe6d015bb06e0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Highland Game",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90ada3943874c40067c8cde4d7e49fdc",
+          "oracle_hash": "796b7be4baaa8b00e7d04b453b468634",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Onulet",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90ada3943874c40067c8cde4d7e49fdc",
+          "oracle_hash": "796b7be4baaa8b00e7d04b453b468634",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "card_name": "Tarpan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0f97a1e681aa1afb50c4e774cb9808bd",
+          "oracle_hash": "1fd6a1149d32fb6b4f9ce8e236c1bbc6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Anodet Lurker",
+          "logical_rule_key": "battle_rule_v1:758847ca30fb454036cec72854246bb0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Enatu Golem",
+          "logical_rule_key": "battle_rule_v1:4a89277d577326cb47ef270db2344cb8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Grasping Longneck",
+          "logical_rule_key": "battle_rule_v1:e7ed4957301a134d003ea8a3c1bc1183"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Guardian Automaton",
+          "logical_rule_key": "battle_rule_v1:758847ca30fb454036cec72854246bb0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Highland Game",
+          "logical_rule_key": "battle_rule_v1:90ada3943874c40067c8cde4d7e49fdc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Onulet",
+          "logical_rule_key": "battle_rule_v1:90ada3943874c40067c8cde4d7e49fdc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tarpan",
+          "logical_rule_key": "battle_rule_v1:0f97a1e681aa1afb50c4e774cb9808bd"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Anodet Lurker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:758847ca30fb454036cec72854246bb0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Enatu Golem",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a89277d577326cb47ef270db2344cb8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Grasping Longneck",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e7ed4957301a134d003ea8a3c1bc1183"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Guardian Automaton",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:758847ca30fb454036cec72854246bb0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Highland Game",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:90ada3943874c40067c8cde4d7e49fdc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Onulet",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:90ada3943874c40067c8cde4d7e49fdc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tarpan",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0f97a1e681aa1afb50c4e774cb9808bd"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

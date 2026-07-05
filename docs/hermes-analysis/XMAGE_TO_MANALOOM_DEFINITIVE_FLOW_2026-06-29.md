@@ -10414,6 +10414,55 @@ new server:
   followed by `xmage_counter_target_draw_card_spell` and
   `xmage_creature_etb_library_search_to_battlefield` with `6` cards each.
 
+## 2026-07-05 PG463 Creature Dies Gain Life Closure
+
+- Closed the exact XMage creature-dies fixed life-gain triggered family as
+  ManaLoom scope `xmage_creature_dies_gain_life_v1`.
+- The selected package accepted local XMage creature sources whose executable
+  behavior is `DiesSourceTriggeredAbility` with fixed `GainLifeEffect`,
+  preserving the dies trigger, fixed life amount, and any coexisting self
+  keywords.
+- The batch covers `7` cards: Anodet Lurker, Enatu Golem,
+  Grasping Longneck, Guardian Automaton, Highland Game, Onulet, and Tarpan.
+- Focused mapper/runtime tests covered dies life-gain mapping, graveyard
+  movement trigger resolution, and keyword preservation; PG463 performed no
+  code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `7` cards. Precheck found `7` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `7/7` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `7` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve
+  `gain_life_when_this_dies`, `trigger=dies`, and keywords. The selected
+  parameters are: Anodet Lurker `3`, Enatu Golem `4`,
+  Grasping Longneck `2` plus `reach`, Guardian Automaton `3`,
+  Highland Game `2`, Onulet `2`, and Tarpan `1`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4468` PostgreSQL runtime rows, wrote `4460` SQLite runtime
+  rows, and exported `4435` canonical fallback rows.
+- PG463 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `7` selected cards. Generic
+  battle scenario count remained `0`; dies life-gain behavior remains covered
+  by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26418`, `xmage_authoritative_source_count=26104`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26104`. This is an exact
+  reduction of `7` from the post-PG462 queue.
+- The post-PG463 exact split recheck reports `proposal_count=79` and
+  `safe_for_batch_pg_package_count=79`. The largest remaining exact families
+  are `xmage_fixed_draw_spell_self_cost_reduction` and
+  `xmage_static_cast_spells_as_flash_permission` with `7` cards each, followed
+  by `xmage_counter_target_draw_card_spell` and
+  `xmage_creature_etb_library_search_to_battlefield` with `6` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
