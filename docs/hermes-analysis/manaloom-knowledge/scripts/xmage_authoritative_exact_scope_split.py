@@ -905,19 +905,44 @@ def token_super_name_and_description(constructor_source: str) -> tuple[str, str]
     return token_name, description
 
 
-def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[str, Any], str | None]:
-    if not token_source:
-        return {}, "token_source_missing"
-    if "TokenImpl" not in token_source:
-        return {}, "token_source_not_token_impl"
+def token_noarg_constructor_body(token_source: str, token_class: str) -> str | None:
     constructor_match = re.search(
         rf"public\s+{re.escape(token_class)}\s*\(\s*\)\s*\{{(?P<body>.*?)\n\s*\}}",
         token_source,
         re.S,
     )
-    if not constructor_match:
+    return constructor_match.group("body") if constructor_match else None
+
+
+def token_constructor_body_with_literal_super(token_source: str, token_class: str) -> str | None:
+    noarg_body = token_noarg_constructor_body(token_source, token_class)
+    if noarg_body is None:
+        return None
+    if token_super_name_and_description(noarg_body) is not None:
+        return noarg_body
+    if not re.search(r"\bthis\s*\(", noarg_body):
+        return noarg_body
+    for constructor_match in re.finditer(
+        rf"public\s+{re.escape(token_class)}\s*\([^)]*\)\s*\{{(?P<body>.*?)\n\s*\}}",
+        token_source,
+        re.S,
+    ):
+        candidate_body = constructor_match.group("body")
+        if candidate_body == noarg_body:
+            continue
+        if token_super_name_and_description(candidate_body) is not None:
+            return candidate_body
+    return noarg_body
+
+
+def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[str, Any], str | None]:
+    if not token_source:
+        return {}, "token_source_missing"
+    if "TokenImpl" not in token_source:
+        return {}, "token_source_not_token_impl"
+    constructor_source = token_constructor_body_with_literal_super(token_source, token_class)
+    if constructor_source is None:
         return {}, "token_noarg_constructor_missing"
-    constructor_source = constructor_match.group("body")
     token_descriptor = token_super_name_and_description(constructor_source)
     if token_descriptor is None:
         return {}, "token_literal_description_missing"
@@ -956,7 +981,7 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
     description_keywords: list[str] = []
     with_match = re.search(r"\bwith (?P<keywords>.+)$", keyword_description)
     if with_match:
-        raw_keywords = with_match.group("keywords")
+        raw_keywords = re.sub(r"\s+named\s+.+$", "", with_match.group("keywords")).strip()
         keyword_parts = [
             part.strip().rstrip(".")
             for part in re.split(r",| and ", raw_keywords)

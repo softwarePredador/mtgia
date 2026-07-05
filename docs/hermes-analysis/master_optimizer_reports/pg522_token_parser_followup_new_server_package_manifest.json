@@ -1,0 +1,364 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg522_token_parser_followup_new_se_20260705_182136",
+  "deploy_id": "xmage_pg522_token_parser_followup_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Symbiotic Beast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a95b6d95a126ded98f6213ae483deadd",
+      "min_rule_version": 2,
+      "normalized_name": "symbiotic beast",
+      "oracle_hash": "1e47570a233b7b0fbe43940691324279",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "G"
+        ],
+        "dies_token_count": 4,
+        "dies_token_name": "Insect Token",
+        "dies_token_power": 1,
+        "dies_token_subtype": "Insect",
+        "dies_token_toughness": 1,
+        "effect": "creature",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Symbiotic Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:02e0b94c03be332462d3a5e83c8b47b4",
+      "min_rule_version": 2,
+      "normalized_name": "symbiotic elf",
+      "oracle_hash": "3271de0234185d4113bce43e9e7a6953",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "G"
+        ],
+        "dies_token_count": 2,
+        "dies_token_name": "Insect Token",
+        "dies_token_power": 1,
+        "dies_token_subtype": "Insect",
+        "dies_token_toughness": 1,
+        "effect": "creature",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Symbiotic Wurm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:147dbbe5c7544a2f09a560ed375a5334",
+      "min_rule_version": 2,
+      "normalized_name": "symbiotic wurm",
+      "oracle_hash": "480e3f57d3e6acaad92b73b54f1ee160",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "G"
+        ],
+        "dies_token_count": 7,
+        "dies_token_name": "Insect Token",
+        "dies_token_power": 1,
+        "dies_token_subtype": "Insect",
+        "dies_token_toughness": 1,
+        "effect": "creature",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "The Hive",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a35cd7f0279ed12043dd267d16d726f6",
+      "min_rule_version": 2,
+      "normalized_name": "the hive",
+      "oracle_hash": "4bbec4580c29dd078fa15ce8f91ba9e9",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 5,
+            "activation_cost_mana": "{5}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "1/1 colorless Insect artifact creature token with flying named Wasp",
+            "token_flying": true,
+            "token_keywords": [
+              "flying"
+            ],
+            "token_name": "Wasp",
+            "token_power": 1,
+            "token_subtype": "Insect",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "WaspToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 5,
+        "activation_cost_mana": "{5}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "artifact_tokens": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "artifact",
+        "token_count": 1,
+        "token_flying": true,
+        "token_keywords": [
+          "flying"
+        ],
+        "token_name": "Wasp",
+        "token_power": 1,
+        "token_subtype": "Insect",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_dies_create_tokens": 3,
+    "xmage_permanent_simple_activated_create_token": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg522_token_parser_followup_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg522_token_parser_followup_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg522_token_parser_followup_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg522_token_parser_followup_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg522_token_parser_followup_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg522_token_parser_followup_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-05T18:21:36+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Symbiotic Beast"
+      },
+      "card_name": "Symbiotic Beast",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a95b6d95a126ded98f6213ae483deadd",
+      "normalized_name": "symbiotic beast",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "G"
+        ],
+        "dies_token_count": 4,
+        "dies_token_name": "Insect Token",
+        "dies_token_power": 1,
+        "dies_token_subtype": "Insect",
+        "dies_token_toughness": 1,
+        "effect": "creature",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Symbiotic Elf"
+      },
+      "card_name": "Symbiotic Elf",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:02e0b94c03be332462d3a5e83c8b47b4",
+      "normalized_name": "symbiotic elf",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "G"
+        ],
+        "dies_token_count": 2,
+        "dies_token_name": "Insect Token",
+        "dies_token_power": 1,
+        "dies_token_subtype": "Insect",
+        "dies_token_toughness": 1,
+        "effect": "creature",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Symbiotic Wurm"
+      },
+      "card_name": "Symbiotic Wurm",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:147dbbe5c7544a2f09a560ed375a5334",
+      "normalized_name": "symbiotic wurm",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+        "dies_token_colors": [
+          "G"
+        ],
+        "dies_token_count": 7,
+        "dies_token_name": "Insect Token",
+        "dies_token_power": 1,
+        "dies_token_subtype": "Insect",
+        "dies_token_toughness": 1,
+        "effect": "creature",
+        "trigger": "dies",
+        "xmage_ability_class": "DiesSourceTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "The Hive"
+      },
+      "card_name": "The Hive",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a35cd7f0279ed12043dd267d16d726f6",
+      "normalized_name": "the hive",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "token_maker",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 5,
+            "activation_cost_mana": "{5}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "artifact_tokens": true,
+            "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+            "effect": "token_maker",
+            "token_count": 1,
+            "token_description": "1/1 colorless Insect artifact creature token with flying named Wasp",
+            "token_flying": true,
+            "token_keywords": [
+              "flying"
+            ],
+            "token_name": "Wasp",
+            "token_power": 1,
+            "token_subtype": "Insect",
+            "token_toughness": 1,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_token_class": "WaspToken"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "activated_effect": "token_maker",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 5,
+        "activation_cost_mana": "{5}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "artifact_tokens": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+        "effect": "artifact",
+        "token_count": 1,
+        "token_flying": true,
+        "token_keywords": [
+          "flying"
+        ],
+        "token_name": "Wasp",
+        "token_power": 1,
+        "token_subtype": "Insect",
+        "token_toughness": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Symbiotic Beast",
+    "Symbiotic Elf",
+    "Symbiotic Wurm",
+    "The Hive"
+  ],
+  "selected_count": 4,
+  "slug": "pg522_token_parser_followup_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Symbiotic Beast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a95b6d95a126ded98f6213ae483deadd",
+      "min_rule_version": 2,
+      "normalized_name": "symbiotic beast",
+      "oracle_hash": "1e47570a233b7b0fbe43940691324279",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Symbiotic Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:02e0b94c03be332462d3a5e83c8b47b4",
+      "min_rule_version": 2,
+      "normalized_name": "symbiotic elf",
+      "oracle_hash": "3271de0234185d4113bce43e9e7a6953",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Symbiotic Wurm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:147dbbe5c7544a2f09a560ed375a5334",
+      "min_rule_version": 2,
+      "normalized_name": "symbiotic wurm",
+      "oracle_hash": "480e3f57d3e6acaad92b73b54f1ee160",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_dies_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "The Hive",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a35cd7f0279ed12043dd267d16d726f6",
+      "min_rule_version": 2,
+      "normalized_name": "the hive",
+      "oracle_hash": "4bbec4580c29dd078fa15ce8f91ba9e9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

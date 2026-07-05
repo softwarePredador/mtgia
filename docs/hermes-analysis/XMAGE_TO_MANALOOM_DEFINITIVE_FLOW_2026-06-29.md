@@ -13698,6 +13698,63 @@ multiple token effects, `.withAdditionalTokens`, or broad
 blocked until token-land and Forest mana behavior are modeled. The next wave
 must start from the rebuilt post-PG521 queue.
 
+## PG522 Token Parser Follow-up Checkpoint
+
+As of 2026-07-05, PG522 is applied and synced against the new server target.
+It promotes exact local-XMage token rows that were already covered by existing
+runtime scopes but had been blocked by token-class parsing limitations.
+
+Promoted cards:
+
+- `Symbiotic Beast`
+- `Symbiotic Elf`
+- `Symbiotic Wurm`
+- `The Hive`
+
+Runtime scopes:
+
+- `xmage_creature_dies_create_tokens_v1`
+- `xmage_permanent_simple_activated_create_token_v1`
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg522_token_parser_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg522_token_parser_followup_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg522_token_parser_followup_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg522_token_parser_followup_new_server.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/battle_package_end_to_end_validation_20260705_pg522_token_parser_followup_new_server.md`
+- runtime smoke:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg522_token_parser_followup_new_server_runtime_smoke.out`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg522_token_parser_followup_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg522_token_parser_followup_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg522_token_parser_followup_new_server.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4985`
+- `battle_family_mapper_required=28888`
+- `target_identity_count=25965`
+- `xmage_authoritative_source_count=25651`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25651`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+
+Residual boundary: PG522 does not authorize infect, changeling, banding,
+decayed, token-printed death triggers, token-printed activated abilities,
+non-creature token behavior, dynamic token counts, multiple token effects, or
+broad `xmage_*_review_v1` promotions. The remaining token block must be split
+into separate runtime-backed subpatterns before PostgreSQL promotion.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

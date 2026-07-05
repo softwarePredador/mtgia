@@ -1,0 +1,16 @@
+{
+  "activated": true,
+  "symbiotic_dies_token_count": 2,
+  "symbiotic_dies_token_name": "Insect Token",
+  "symbiotic_dies_token_subtype": "Insect",
+  "symbiotic_rule": "battle_rule_v1:02e0b94c03be332462d3a5e83c8b47b4",
+  "symbiotic_scope": "xmage_creature_dies_create_tokens_v1",
+  "the_hive_rule": "battle_rule_v1:a35cd7f0279ed12043dd267d16d726f6",
+  "the_hive_scope": "xmage_permanent_simple_activated_create_token_v1",
+  "wasp_count": 1,
+  "wasp_flying": true,
+  "wasp_keywords": [
+    "flying"
+  ],
+  "wasp_type_line": "Artifact Creature Token \u2014 Insect"
+}

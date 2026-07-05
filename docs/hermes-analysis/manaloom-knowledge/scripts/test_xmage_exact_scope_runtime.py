@@ -3553,6 +3553,56 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_create_token_preserves_artifact_keyword_token(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(5)
+        permanent = {
+            "name": "The Hive",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "summoning_sick": False,
+            "_activated_rule_effects": [
+                {
+                    "effect": "token_maker",
+                    "battle_model_scope": "xmage_permanent_simple_activated_create_token_v1",
+                    "ability_kind": "activated",
+                    "activated_effect": "token_maker",
+                    "activation_cost_mana": "{5}",
+                    "activation_cost_generic": 5,
+                    "activation_cost_colors": [],
+                    "activation_requires_tap": True,
+                    "token_count": 1,
+                    "token_name": "Wasp",
+                    "token_subtype": "Insect",
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_keywords": ["flying"],
+                    "token_flying": True,
+                    "artifact_tokens": True,
+                    "_rule_logical_key": "battle_rule_v1:fixture_the_hive",
+                }
+            ],
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_token_maker_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=4,
+            rng=random.Random(4),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        tokens = [card for card in active.battlefield if card.get("name") == "Wasp"]
+        self.assertEqual(len(tokens), 1)
+        self.assertEqual(tokens[0].get("type_line"), "Artifact Creature Token — Insect")
+        self.assertTrue(tokens[0].get("flying"))
+        self.assertIn("flying", tokens[0].get("keywords", []))
+
     def test_fixed_create_creature_tokens_spell_preserves_static_token_keywords(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

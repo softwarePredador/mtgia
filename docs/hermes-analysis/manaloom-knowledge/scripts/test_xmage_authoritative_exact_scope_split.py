@@ -2558,6 +2558,86 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["token_toughness"], 5)
         self.assertEqual(effect["token_keywords"], ["trample"])
 
+    def test_token_class_parser_follows_delegating_noarg_constructor(self) -> None:
+        token_data, reason = split.parse_simple_token_class(
+            """
+            public final class InsectToken extends TokenImpl {
+                public InsectToken() {
+                    this((String) null);
+                }
+
+                public InsectToken(String setCode) {
+                    super("Insect Token", "1/1 green Insect creature token");
+                    cardType.add(CardType.CREATURE);
+                    color.setGreen(true);
+                    subtype.add(SubType.INSECT);
+                    power = new MageInt(1);
+                    toughness = new MageInt(1);
+                }
+            }
+            """,
+            "InsectToken",
+        )
+
+        self.assertIsNone(reason)
+        self.assertEqual(token_data["token_name"], "Insect Token")
+        self.assertEqual(token_data["token_power"], 1)
+        self.assertEqual(token_data["token_toughness"], 1)
+        self.assertEqual(token_data["token_subtype"], "Insect")
+        self.assertEqual(token_data["token_colors"], ["G"])
+
+    def test_permanent_activated_create_token_maps_named_keyword_artifact_token(self) -> None:
+        unit = (
+            split.ACTIVATED_TOKEN_PERMANENT_UNIT_PREFIX
+            + "no_target_class::no_condition_class::token,activated_ability"
+        )
+        row = queue_row(
+            unit,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["token", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="The Hive",
+                type_line="Artifact",
+                oracle_text=(
+                    "{5}, {T}: Create a 1/1 colorless Insect artifact creature "
+                    "token with flying named Wasp."
+                ),
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new CreateTokenEffect(new WaspToken(), 1),
+                    new GenericManaCost(5)
+                );
+                ability.addCost(new TapSourceCost());
+                this.addAbility(ability);
+                class WaspToken extends TokenImpl {
+                    public WaspToken() {
+                        super("Wasp", "1/1 colorless Insect artifact creature token with flying named Wasp");
+                        cardType.add(CardType.ARTIFACT);
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.INSECT);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(FlyingAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_TOKEN_SCOPE)
+        self.assertEqual(effect["token_name"], "Wasp")
+        self.assertEqual(effect["token_subtype"], "Insect")
+        self.assertEqual(effect["token_keywords"], ["flying"])
+        self.assertTrue(effect["token_flying"])
+        self.assertTrue(effect["artifact_tokens"])
+
     def test_fixed_create_creature_tokens_spell_maps_basic_landwalk_token_keyword(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(
