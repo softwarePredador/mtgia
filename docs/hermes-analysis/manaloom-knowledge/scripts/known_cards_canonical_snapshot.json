@@ -10243,6 +10243,56 @@
     "battle_rule_logical_key": "battle_rule_v1:470c595610435ab6794ef9ec95c7636f",
     "battle_rule_oracle_hash": "fd488c9f31f4c6a6a0f6343ff12ed46b"
   },
+  "Bone to Ash": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "creature_spell",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "draw_on_counter": 1,
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_spell",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_classes": [
+      "CounterTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3ddee6c0c459a32293a14e0e08d67e1b",
+    "battle_rule_oracle_hash": "92b12b3ba4600b216c658e32352b3dee"
+  },
   "Boneyard Wurm": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
@@ -17034,6 +17084,50 @@
     "battle_rule_logical_key": "battle_rule_v1:96c134fe95bf5a8397b9f1bcd8bbc1ef",
     "battle_rule_oracle_hash": "6b2ab191a364b742c0e4c8d4d2957106"
   },
+  "Contradict": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "draw_on_counter": 1,
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "spell",
+    "target_constraints": {
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_classes": [
+      "CounterTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0ac442694e412e8692ed60c8dde40e39",
+    "battle_rule_oracle_hash": "c60068c377a0eb72ac82760cfb688f04"
+  },
   "Cool but Rude": {
     "ability_kind": "triggered",
     "attack_trigger_optional_discard_draw": true,
@@ -22068,6 +22162,50 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:2f513570333d9f48be476602a7ce1593",
     "battle_rule_oracle_hash": "e3824a160f31571d21bccb7be33474cf"
+  },
+  "Dismiss": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "spell",
+        "target_constraints": {
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "draw_on_counter": 1,
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "spell",
+    "target_constraints": {
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_classes": [
+      "CounterTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0ac442694e412e8692ed60c8dde40e39",
+    "battle_rule_oracle_hash": "c60068c377a0eb72ac82760cfb688f04"
   },
   "Disorient": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
@@ -27185,6 +27323,56 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "db1f9fade004648f47a69a7c8bc6980d"
+  },
+  "Exclude": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "creature_spell",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "draw_on_counter": 1,
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_spell",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_classes": [
+      "CounterTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3ddee6c0c459a32293a14e0e08d67e1b",
+    "battle_rule_oracle_hash": "92b12b3ba4600b216c658e32352b3dee"
   },
   "Excoriate": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
@@ -38400,6 +38588,56 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "623aec40ba0c52a4c66b9b68e91e9390"
+  },
+  "Halt Order": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "artifact_spell",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "draw_on_counter": 1,
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "artifact_spell",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_classes": [
+      "CounterTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6765e747c75c91878d8e1c3bd4fb06e9",
+    "battle_rule_oracle_hash": "6d34c0b3921e3365c1ecc640b570c6cb"
   },
   "Hamato Ninp\u014d": {
     "amount": 4,
@@ -71559,6 +71797,56 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:758379aa90cbe2e5c114399d45d00bf1",
     "battle_rule_oracle_hash": "97ca2185bc707363b4789d65a99302ec"
+  },
+  "Scatter Arc": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_counter_target_spell_v1",
+        "effect": "counter",
+        "target": "noncreature_spell",
+        "target_constraints": {
+          "exclude_card_types": [
+            "creature"
+          ],
+          "stack_object": "spell",
+          "zone": "stack"
+        },
+        "xmage_effect_class": "CounterTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "draw_on_counter": 1,
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "noncreature_spell",
+    "target_constraints": {
+      "exclude_card_types": [
+        "creature"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_classes": [
+      "CounterTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4fdb28794edfce3835164e1addab88db",
+    "battle_rule_oracle_hash": "e20ac14e80c30672156e5dcc1d1751de"
   },
   "Scattered Groves": {
     "effect": "land",

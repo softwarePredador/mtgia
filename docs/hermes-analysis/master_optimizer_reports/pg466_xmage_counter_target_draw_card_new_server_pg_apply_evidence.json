@@ -1,0 +1,171 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg466",
+  "generated_at": "2026-07-05T01:32:59.640166+00:00",
+  "manifest": "../../master_optimizer_reports/pg466_xmage_counter_target_draw_card_new_server_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg466_xmage_counter_target_draw_card_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Bone to Ash",
+      "Contradict",
+      "Dismiss",
+      "Exclude",
+      "Halt Order",
+      "Scatter Arc"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 6,
+    "promoted_rule_rows": 6,
+    "promoted_verified_auto_rows": 6,
+    "row_count": 6
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Bone to Ash",
+      "logical_rule_key": "battle_rule_v1:3ddee6c0c459a32293a14e0e08d67e1b",
+      "normalized_name": "bone to ash",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Contradict",
+      "logical_rule_key": "battle_rule_v1:0ac442694e412e8692ed60c8dde40e39",
+      "normalized_name": "contradict",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Dismiss",
+      "logical_rule_key": "battle_rule_v1:0ac442694e412e8692ed60c8dde40e39",
+      "normalized_name": "dismiss",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Exclude",
+      "logical_rule_key": "battle_rule_v1:3ddee6c0c459a32293a14e0e08d67e1b",
+      "normalized_name": "exclude",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Halt Order",
+      "logical_rule_key": "battle_rule_v1:6765e747c75c91878d8e1c3bd4fb06e9",
+      "normalized_name": "halt order",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Scatter Arc",
+      "logical_rule_key": "battle_rule_v1:4fdb28794edfce3835164e1addab88db",
+      "normalized_name": "scatter arc",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Bone to Ash",
+      "Contradict",
+      "Dismiss",
+      "Exclude",
+      "Halt Order",
+      "Scatter Arc"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 6,
+    "total_target_card_rows": 6,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "b6070efe-5d74-4597-b0ef-c79630246dcc",
+      "card_name": "Bone to Ash",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3ddee6c0c459a32293a14e0e08d67e1b",
+      "normalized_name": "bone to ash",
+      "oracle_hash": "92b12b3ba4600b216c658e32352b3dee",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "cd53489c-0712-4070-993f-b6099b5124dc",
+      "card_name": "Contradict",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:0ac442694e412e8692ed60c8dde40e39",
+      "normalized_name": "contradict",
+      "oracle_hash": "c60068c377a0eb72ac82760cfb688f04",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "41af3d15-2392-4fc2-8c55-10798d8d53a9",
+      "card_name": "Dismiss",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:0ac442694e412e8692ed60c8dde40e39",
+      "normalized_name": "dismiss",
+      "oracle_hash": "c60068c377a0eb72ac82760cfb688f04",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "e4ea7dd7-7457-4cae-8f29-682b00b4ba92",
+      "card_name": "Exclude",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3ddee6c0c459a32293a14e0e08d67e1b",
+      "normalized_name": "exclude",
+      "oracle_hash": "92b12b3ba4600b216c658e32352b3dee",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "5e546703-8509-4cc3-b69d-88f75e6f6d4c",
+      "card_name": "Halt Order",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:6765e747c75c91878d8e1c3bd4fb06e9",
+      "normalized_name": "halt order",
+      "oracle_hash": "6d34c0b3921e3365c1ecc640b570c6cb",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "2e6f285c-d147-4702-9d1e-38dd929df0d7",
+      "card_name": "Scatter Arc",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:4fdb28794edfce3835164e1addab88db",
+      "normalized_name": "scatter arc",
+      "oracle_hash": "e20ac14e80c30672156e5dcc1d1751de",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_counter_target_draw_card_new_server"
+}

@@ -10581,6 +10581,56 @@ new server:
   `xmage_creature_etb_library_search_to_battlefield` with `6` cards each,
   followed by `xmage_permanent_simple_activated_draw` with `5` cards.
 
+## 2026-07-05 PG466 Counter Target Draw Card Closure
+
+- Closed the exact XMage counter-target-and-draw-card instant family as
+  ManaLoom scope `xmage_counter_target_and_draw_card_spell_v1`.
+- The selected package accepted local XMage instant sources whose executable
+  behavior is `CounterTargetEffect` followed by fixed
+  `DrawCardSourceControllerEffect`, preserving the counter target filter,
+  stack target constraints, draw count, `draw_on_counter`, timing, and the
+  composite counter/draw resolution model.
+- The batch covers `6` cards: Bone to Ash, Contradict, Dismiss, Exclude,
+  Halt Order, and Scatter Arc.
+- Focused mapper/runtime tests covered counter+draw extraction, target filter
+  preservation, composite component preservation, runtime lookup, and package
+  generation; PG466 performed no code mutation. The focused test lane passed
+  `718` checks.
+- The PostgreSQL package promoted `6` cards. Precheck found `6` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `6/6` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `6` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve
+  `target_constraints`, `draw_count=1`, `draw_on_counter=1`, and the two
+  composite components. The selected target filters are:
+  Bone to Ash `creature_spell`, Contradict `spell`, Dismiss `spell`,
+  Exclude `creature_spell`, Halt Order `artifact_spell`, and Scatter Arc
+  `noncreature_spell`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4488` PostgreSQL runtime rows, wrote `4480` SQLite runtime
+  rows, and exported `4455` canonical fallback rows.
+- PG466 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `6` selected cards. Generic
+  battle scenario count remained `0`; counter+draw behavior remains covered by
+  focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26398`, `xmage_authoritative_source_count=26084`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26084`. This is an exact
+  reduction of `6` from the post-PG465 queue.
+- The post-PG466 exact split recheck reports `proposal_count=59` and
+  `safe_for_batch_pg_package_count=59`. The largest remaining exact family is
+  `xmage_creature_etb_library_search_to_battlefield` with `6` cards, followed
+  by `xmage_permanent_simple_activated_draw` with `5` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
