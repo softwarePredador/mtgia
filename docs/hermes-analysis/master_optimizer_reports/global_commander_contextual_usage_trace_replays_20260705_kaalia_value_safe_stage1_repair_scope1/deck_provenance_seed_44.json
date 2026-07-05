@@ -1,0 +1,160 @@
+{
+  "blocker_domain_policy": "deck_source_or_legality_findings_are_reported_separately_from_battle_engine_findings",
+  "cached_metadata_used_for_replay_metrics": false,
+  "decks": [
+    {
+      "blocker_domain": "none",
+      "cached_metadata_used_for_metrics": false,
+      "construction_report": {
+        "color_identity_checked": true,
+        "commander_color_identity": [
+          "black",
+          "red",
+          "white"
+        ],
+        "commander_count": 1,
+        "commander_names": [
+          "Kaalia of the Vast"
+        ],
+        "format": "commander",
+        "is_valid": true,
+        "issues": [],
+        "main_quantity": 99,
+        "off_color_cards": [],
+        "singleton_violations": [],
+        "total_quantity": 100
+      },
+      "metrics": {
+        "avg_cmc_nonlands": 3.516,
+        "card_count": 99,
+        "curve": {
+          "0": 1,
+          "1": 12,
+          "2": 14,
+          "3": 12,
+          "4": 6,
+          "5": 7,
+          "6": 4,
+          "7+": 8
+        },
+        "lands": 35,
+        "nonlands": 64
+      },
+      "metrics_basis": "runtime_derived_from_resolved_card_list",
+      "name": "Kaalia of the Vast",
+      "source_kind": "sqlite_deck_cards",
+      "source_ref": "deck_id:619",
+      "target_deck_id": 619
+    },
+    {
+      "battle_card_count": 99,
+      "blocker_domain": "none",
+      "cached_metadata_used_for_metrics": false,
+      "commander": {
+        "cmc": 3.0,
+        "mana_cost": "{2}{W}",
+        "metadata_source": "oracle_cache",
+        "name": "Sisay, Weatherlight Captain",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Legendary Creature \u2014 Human Soldier"
+      },
+      "metrics": {
+        "avg_cmc_nonlands": 2.254,
+        "card_count": 99,
+        "curve": {
+          "0": 5,
+          "1": 22,
+          "2": 17,
+          "3": 14,
+          "4": 7,
+          "5": 4,
+          "6": 0,
+          "7+": 2
+        },
+        "lands": 28,
+        "nonlands": 71
+      },
+      "metrics_basis": "runtime_derived_from_resolved_built_deck",
+      "name": "Sisay, Weatherlight Captain #60 (real)",
+      "source_card_count": 100,
+      "source_kind": "learned_decks",
+      "source_ref": "learned_deck:60",
+      "source_system": "pg_meta_decks"
+    },
+    {
+      "battle_card_count": 99,
+      "blocker_domain": "none",
+      "cached_metadata_used_for_metrics": false,
+      "commander": {
+        "cmc": 0.0,
+        "mana_cost": "{2}{W}",
+        "metadata_source": "oracle_cache",
+        "name": "Brigid, Clachan's Heart // Brigid, Doun's Mind",
+        "power": 3,
+        "toughness": 2,
+        "type_line": "Legendary Creature \u2014 Kithkin Warrior"
+      },
+      "metrics": {
+        "avg_cmc_nonlands": 2.158,
+        "card_count": 99,
+        "curve": {
+          "0": 5,
+          "1": 23,
+          "2": 22,
+          "3": 14,
+          "4": 7,
+          "5": 3,
+          "6": 2,
+          "7+": 0
+        },
+        "lands": 23,
+        "nonlands": 76
+      },
+      "metrics_basis": "runtime_derived_from_resolved_built_deck",
+      "name": "Brigid, Clachan's Heart #68 (real)",
+      "source_card_count": 100,
+      "source_kind": "learned_decks",
+      "source_ref": "learned_deck:68",
+      "source_system": "pg_meta_decks"
+    },
+    {
+      "battle_card_count": 99,
+      "blocker_domain": "none",
+      "cached_metadata_used_for_metrics": false,
+      "commander": {
+        "cmc": 3.0,
+        "mana_cost": "{2}{W}",
+        "metadata_source": "oracle_cache",
+        "name": "Sisay, Weatherlight Captain",
+        "power": 2,
+        "toughness": 2,
+        "type_line": "Legendary Creature \u2014 Human Soldier"
+      },
+      "metrics": {
+        "avg_cmc_nonlands": 2.157,
+        "card_count": 99,
+        "curve": {
+          "0": 5,
+          "1": 20,
+          "2": 18,
+          "3": 17,
+          "4": 8,
+          "5": 1,
+          "6": 0,
+          "7+": 1
+        },
+        "lands": 29,
+        "nonlands": 70
+      },
+      "metrics_basis": "runtime_derived_from_resolved_built_deck",
+      "name": "Sisay, Weatherlight Captain #61 (real)",
+      "source_card_count": 100,
+      "source_kind": "learned_decks",
+      "source_ref": "learned_deck:61",
+      "source_system": "pg_meta_decks"
+    }
+  ],
+  "metrics_policy": "runtime_derived_from_resolved_card_lists",
+  "replay_id": "seed_44"
+}

@@ -1,0 +1,173 @@
+{
+  "artifact_type": "global_commander_contextual_usage_trace_reviewer",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "contextual_cards_used_by_target_deck:Diabolic Intent,Ornithopter of Paradise,Professional Face-Breaker"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T21:36:50.696909+00:00",
+  "input_artifacts": {
+    "trace_generator_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "This reviewer does not open battle or promotion gates.",
+    "replacement_boundary": "A used contextual staple needs same-lane replacement proof before any reclassification.",
+    "usage_boundary": "Observed use by the target deck is evidence against automatic value-safe cutting."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Diabolic Intent",
+      "decision": "not_value_safe_from_current_trace",
+      "decision_trace_count": 1,
+      "event_types": {
+        "additional_cost_paid": 1,
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "permanent_moved_from_battlefield": 1,
+        "priority_pass": 6,
+        "spell_cast": 1,
+        "spell_resolved": 1,
+        "tutor_resolved": 1
+      },
+      "exposure_event_count": 0,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "seed": 47,
+        "turn": 7
+      },
+      "first_exposure_event": null,
+      "first_usage_event": {
+        "card": "Diabolic Intent",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "seed": 47,
+        "turn": 7
+      },
+      "required_next_evidence": [
+        "same_lane_replacement_proof",
+        "strategy_matrix_recheck_after_replacement",
+        "battle_or_replay_gate_if_replacement_is_material"
+      ],
+      "status": "usage_observed_blocks_value_safe_reclassification",
+      "usage_event_count": 5,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Ornithopter of Paradise",
+      "decision": "not_value_safe_from_current_trace",
+      "decision_trace_count": 15,
+      "event_types": {
+        "additional_cost_paid": 1,
+        "cast_announced": 4,
+        "cost_paid": 4,
+        "creature_cast": 4,
+        "land_played": 5,
+        "mana_refreshed": 17,
+        "permanent_moved_from_battlefield": 3,
+        "turn_end": 21,
+        "turn_start": 5,
+        "utility_land_activated": 1
+      },
+      "exposure_event_count": 26,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "seed": 44,
+        "turn": 6
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "seed": 44,
+        "turn": 6
+      },
+      "first_usage_event": {
+        "card": "Ornithopter of Paradise",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "seed": 44,
+        "turn": 6
+      },
+      "required_next_evidence": [
+        "same_lane_replacement_proof",
+        "strategy_matrix_recheck_after_replacement",
+        "battle_or_replay_gate_if_replacement_is_material"
+      ],
+      "status": "usage_observed_blocks_value_safe_reclassification",
+      "usage_event_count": 12,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Professional Face-Breaker",
+      "decision": "not_value_safe_from_current_trace",
+      "decision_trace_count": 14,
+      "event_types": {
+        "additional_cost_paid": 1,
+        "cast_announced": 2,
+        "combat": 3,
+        "combat_step": 3,
+        "cost_paid": 2,
+        "creature_cast": 2,
+        "multi_defender_attack": 3,
+        "permanent_moved_from_battlefield": 2,
+        "turn_end": 8,
+        "turn_start": 4
+      },
+      "exposure_event_count": 12,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "seed": 43,
+        "turn": 6
+      },
+      "first_exposure_event": {
+        "event": "turn_end",
+        "player": "Kaalia of the Vast",
+        "seed": 43,
+        "turn": 6
+      },
+      "first_usage_event": {
+        "card": "Professional Face-Breaker",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "seed": 43,
+        "turn": 6
+      },
+      "required_next_evidence": [
+        "same_lane_replacement_proof",
+        "strategy_matrix_recheck_after_replacement",
+        "battle_or_replay_gate_if_replacement_is_material"
+      ],
+      "status": "usage_observed_blocks_value_safe_reclassification",
+      "usage_event_count": 6,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "contextual_usage_trace_review_blocks_value_safe_reclassification",
+  "summary": {
+    "candidate_copy_blocker_count": 1,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "next_gate": "find_new_cut_source_lane_or_same_lane_replacement_proof_before_candidate_copy",
+    "not_seen_card_count": 0,
+    "reviewed_card_count": 3,
+    "usage_blocked_card_count": 3,
+    "usage_blocked_cards": [
+      "Diabolic Intent",
+      "Ornithopter of Paradise",
+      "Professional Face-Breaker"
+    ]
+  },
+  "value_safe_reclassification_allowed_now": false
+}

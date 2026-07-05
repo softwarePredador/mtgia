@@ -75,6 +75,13 @@ local artifacts for current-scope replay/trace evidence. Historical planning,
 rule-coherence, Lorehold, or cross-deck occurrences are non-proof references;
 they must not unlock value-safe cuts without current-scope trace review.
 
+When existing artifacts have no current-scope trace, run
+`global_commander_contextual_usage_trace_generator.py` against the isolated
+candidate DB. Follow it with
+`global_commander_contextual_usage_trace_reviewer.py`; observed use by the
+target deck blocks automatic value-safe reclassification until a same-lane
+replacement proof exists.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

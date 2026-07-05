@@ -89,6 +89,18 @@ GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_SCOUT = (
 GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_SCOUT_TEST = (
     SCRIPT_DIR / "test_global_commander_contextual_usage_trace_scout.py"
 )
+GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_GENERATOR = (
+    SCRIPT_DIR / "global_commander_contextual_usage_trace_generator.py"
+)
+GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_GENERATOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_contextual_usage_trace_generator.py"
+)
+GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_REVIEWER = (
+    SCRIPT_DIR / "global_commander_contextual_usage_trace_reviewer.py"
+)
+GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_REVIEWER_TEST = (
+    SCRIPT_DIR / "test_global_commander_contextual_usage_trace_reviewer.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -254,6 +266,14 @@ GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_STAGE_CUT_EVIDENCE_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_USAGE_TRACE_SCOUT_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_USAGE_TRACE_GENERATOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_USAGE_TRACE_REVIEWER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -536,6 +556,12 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "contextual_usage_trace_scout_no_current_trace_evidence",
                 "generate_or_import_current_scope_usage_trace_before_reclassification",
+                "global_commander_contextual_usage_trace_generator.py",
+                "global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "global_commander_contextual_usage_trace_reviewer.py",
+                "global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "contextual_usage_trace_review_blocks_value_safe_reclassification",
+                "find_new_cut_source_lane_or_same_lane_replacement_proof_before_candidate_copy",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1105,6 +1131,61 @@ def build_audit() -> dict[str, Any]:
                 "Ornithopter of Paradise",
                 "planning_reference_not_usage_trace",
                 "historical_or_cross_deck_trace_reference_not_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_GENERATOR,
+            [
+                "global_commander_contextual_usage_trace_generator",
+                "contextual_usage_trace_generated_all_current_usage_review_required",
+                "contextual_usage_trace_generated_partial_current_usage_review_required",
+                "row_belongs_to_target_player",
+                "MANALOOM_KNOWLEDGE_DB",
+                "MANALOOM_BATTLE_TARGET_DECK_ID",
+                "battle_gate_performed",
+                "value_safe_reclassification_allowed_now",
+                "current_scope_usage_missing_for_cards",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_GENERATOR_TEST,
+            [
+                "test_generates_usage_trace_summary_without_opening_gates",
+                "test_generated_replay_without_target_exposure_keeps_blocker",
+                "Professional Face-Breaker",
+                "Diabolic Intent",
+                "Opponent",
+                "contextual_usage_trace_generated_partial_current_usage_review_required",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_REVIEWER,
+            [
+                "global_commander_contextual_usage_trace_reviewer",
+                "contextual_usage_trace_review_blocks_value_safe_reclassification",
+                "usage_observed_blocks_value_safe_reclassification",
+                "not_value_safe_from_current_trace",
+                "same_lane_replacement_proof",
+                "find_new_cut_source_lane_or_same_lane_replacement_proof_before_candidate_copy",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CONTEXTUAL_USAGE_TRACE_REVIEWER_TEST,
+            [
+                "test_usage_observed_blocks_value_safe_reclassification",
+                "test_not_seen_requires_more_trace",
+                "Diabolic Intent",
+                "Ornithopter of Paradise",
+                "contextual_usage_trace_review_blocks_value_safe_reclassification",
             ],
         )
     )
@@ -1740,6 +1821,43 @@ def build_audit() -> dict[str, Any]:
                 "Diabolic Intent",
                 "Ornithopter of Paradise",
                 "no_current_scope_usage_trace_evidence_for_contextual_stage_cuts",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_USAGE_TRACE_GENERATOR_REPORT,
+            [
+                "Global Commander Contextual Usage Trace Generator",
+                "contextual_usage_trace_generated_all_current_usage_review_required",
+                "seed_count: `8`",
+                "generated_replay_count: `8`",
+                "usage_event_card_count: `3`",
+                "battle_replay_performed: `true`",
+                "battle_gate_performed: `false`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "Professional Face-Breaker",
+                "Diabolic Intent",
+                "Ornithopter of Paradise",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_CONTEXTUAL_USAGE_TRACE_REVIEWER_REPORT,
+            [
+                "Global Commander Contextual Usage Trace Reviewer",
+                "contextual_usage_trace_review_blocks_value_safe_reclassification",
+                "usage_blocked_card_count: `3`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "find_new_cut_source_lane_or_same_lane_replacement_proof_before_candidate_copy",
+                "usage_observed_blocks_value_safe_reclassification",
+                "not_value_safe_from_current_trace",
+                "Professional Face-Breaker",
+                "Diabolic Intent",
+                "Ornithopter of Paradise",
             ],
         )
     )

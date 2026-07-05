@@ -256,7 +256,15 @@ Operational priority after this pivot:
    commander/deck usage traces, classify planning/rule-coherence/cross-deck
    references as non-proof, and keep candidate copy plus reclassification closed
    when no current-scope trace exists;
-25. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+25. run `global_commander_contextual_usage_trace_generator.py` when the scout
+   finds no current-scope trace; it may run structured replays against the
+   isolated candidate DB and summarize target-deck exposure/usage, but it is
+   evidence collection only, not a battle gate or promotion gate;
+26. run `global_commander_contextual_usage_trace_reviewer.py` after generated
+   trace exists; observed use by the target deck blocks automatic value-safe
+   reclassification until same-lane replacement proof or stronger negative trace
+   exists;
+27. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -298,6 +306,8 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_stage_only_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_stage_cut_evidence_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_scout_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -629,6 +639,22 @@ Current external refresh on 2026-07-05:
   `contextual_usage_trace_scout_no_current_trace_evidence` keeps
   `value_safe_reclassification_allowed_now=false` and routes to
   `generate_or_import_current_scope_usage_trace_before_reclassification`.
+- Current contextual usage-trace generation produced current target-deck
+  evidence without opening battle gates. The report
+  `global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  runs `8` structured replays from seeds `42-49` against the isolated scope1 DB
+  for deck `619`, confirms provenance `deck_id:619`, and records target-player
+  usage events for `Professional Face-Breaker`, `Diabolic Intent`, and
+  `Ornithopter of Paradise`. It keeps `battle_gate_performed=false`,
+  `candidate_copy_allowed_now=false`, and
+  `value_safe_reclassification_allowed_now=false`.
+- Current contextual usage-trace review blocks all three contextual cuts from
+  automatic value-safe reclassification. The report
+  `global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  returns `contextual_usage_trace_review_blocks_value_safe_reclassification`
+  because target-deck usage was observed for all three cards. The next gate is
+  `find_new_cut_source_lane_or_same_lane_replacement_proof_before_candidate_copy`,
+  not candidate copy, battle, or promotion.
 
 ## Global Commander Rollout - 2026-07-01
 
