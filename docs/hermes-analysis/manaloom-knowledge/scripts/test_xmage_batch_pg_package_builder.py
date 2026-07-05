@@ -943,6 +943,34 @@ def test_aura_static_power_toughness_execution_scenario_targets_boost_to_control
     assert scenario["expected_moved_to_graveyard"] is False
 
 
+def test_creature_etb_create_treasure_execution_scenario() -> None:
+    rule = {
+        "normalized_name": "prosperous pirates",
+        "card_name": "Prosperous Pirates",
+        "logical_rule_key": "battle_rule_v1:prosperous-pirates",
+        "required_effect_fields": {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+            "etb_treasure_count": 2,
+            "treasure_count": 2,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario == {
+        "name": "Prosperous Pirates ETB creates Treasure",
+        "type": "creature_etb_create_treasure",
+        "card": {
+            "name": "Prosperous Pirates",
+            "type_line": "Creature - Pirate",
+            "effect": "creature",
+        },
+        "expected_treasure_count": 2,
+        "logical_rule_key": "battle_rule_v1:prosperous-pirates",
+    }
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",

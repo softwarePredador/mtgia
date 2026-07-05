@@ -805,6 +805,67 @@ def run_destroy_target_create_treasure(
     }
 
 
+def run_creature_etb_create_treasure(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Treasure Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    effect_data = battle.get_card_effect(card)
+    permanent = battle.prepare_entering_permanent(
+        battle.enrich_card({**card, **effect_data}),
+        controller=active,
+        all_players=[active, opponent],
+        turn=int(scenario.get("turn") or 6),
+    )
+    active.battlefield.append(permanent)
+    before_treasures = int(getattr(active, "treasures", 0) or 0)
+    before_events = len(events)
+    expected_treasure_count = int(scenario.get("expected_treasure_count") or 1)
+
+    battle.resolve_generic_permanent_etb(
+        active,
+        [opponent],
+        permanent,
+        effect_data,
+        int(scenario.get("turn") or 6),
+        random.Random(int(scenario.get("seed") or 6064)),
+        all_players=[active, opponent],
+    )
+
+    treasure_delta = int(active.treasures or 0) - before_treasures
+    if treasure_delta != expected_treasure_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} ETB treasure delta={treasure_delta}, expected {expected_treasure_count}",
+        )
+    treasure_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "treasure_created"
+            and data.get("card") == card.get("name")
+            and data.get("trigger") == "enters_battlefield"
+        ),
+        None,
+    )
+    if treasure_event is None:
+        fail("battle_events", f"missing {card['name']} ETB treasure_created event")
+    if int(treasure_event.get("treasures_created") or 0) != expected_treasure_count:
+        fail(
+            "battle_events",
+            f"{card['name']} event treasures_created={treasure_event.get('treasures_created')}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "treasures_created": treasure_delta,
+        "controller_treasures_after": active.treasures,
+    }
+
+
 def run_conditional_land_play(
     battle,
     scenario: dict[str, Any],
@@ -1830,6 +1891,7 @@ SCENARIO_RUNNERS = {
     "copy_stack_ability_response": run_copy_stack_ability_response,
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "change_single_target_response": run_change_single_target_response,
+    "creature_etb_create_treasure": run_creature_etb_create_treasure,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
     "fixed_create_creature_tokens": run_fixed_create_creature_tokens,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,

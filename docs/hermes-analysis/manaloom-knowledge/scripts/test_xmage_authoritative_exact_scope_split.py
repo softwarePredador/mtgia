@@ -3084,6 +3084,68 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["controller_treasure_tokens"], 2)
         self.assertEqual(effect["treasure_recipient"], "controller")
 
+    def test_creature_etb_create_treasure_maps_exact_scope(self) -> None:
+        row = queue_row(
+            split.ETB_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Prosperous Pirates",
+                type_line="Creature - Human Pirate",
+                oracle_text=(
+                    "When this creature enters, create two Treasure tokens. "
+                    "(They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new CreateTokenEffect(new TreasureToken(), 2)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TREASURE_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_treasure_count"], 2)
+        self.assertEqual(effect["treasure_count"], 2)
+        self.assertEqual(effect["treasure_trigger"], "enters_battlefield")
+        self.assertEqual(effect["xmage_token_class"], "TreasureToken")
+
+    def test_creature_etb_create_treasure_blocks_non_treasure_artifact_token(self) -> None:
+        row = queue_row(
+            split.ETB_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Cartographer's Companion",
+                type_line="Creature - Robot",
+                oracle_text="When this creature enters, create a Map token.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new CreateTokenEffect(new MapToken())));
+                class MapToken extends TokenImpl {
+                    public MapToken() {
+                        super("Map Token", "Map token");
+                    }
+                }
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "token_description_not_creature_token")
+
     def test_destroy_target_create_treasure_spell_maps_artifact_or_enchantment(self) -> None:
         row = queue_row(
             split.TREASURE_UNIT,
@@ -3463,7 +3525,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_token_subtype"], "Goblin")
         self.assertEqual(effect["etb_token_colors"], ["R"])
 
-    def test_creature_etb_create_tokens_blocks_non_creature_token(self) -> None:
+    def test_creature_etb_create_treasure_maps_legacy_enters_battlefield_wording(self) -> None:
         row = queue_row(
             split.ETB_TOKEN_CREATURE_UNIT,
             effect_classes=["CreateTokenEffect"],
@@ -3490,8 +3552,11 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "token_description_not_creature_token")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TREASURE_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_treasure_count"], 1)
+        self.assertEqual(effect["treasure_trigger"], "enters_battlefield")
 
     def test_creature_etb_create_tokens_maps_static_token_keyword(self) -> None:
         row = queue_row(

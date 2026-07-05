@@ -14535,6 +14535,72 @@ triggered or activated token makers beyond already modeled scopes, token classes
 with unsupported abilities, `entersWithCounters`, additional costs, or
 `withAdditionalTokens(...)`.
 
+## 2026-07-05 PG536 Creature ETB Treasure Checkpoint
+
+Applied package: `PG536 etb_treasure_new_server`.
+
+Closed family:
+
+- `6` exact creature ETB Treasure rows from XMage
+  `CreateTokenEffect(new TreasureToken(), N)` under
+  `EntersBattlefieldTriggeredAbility`.
+
+Promoted cards:
+
+- `Brazen Freebooter`
+- `Plundering Pirate`
+- `Prosperous Pirates`
+- `Redcap Thief`
+- `Sailor of Means`
+- `Wily Goblin`
+
+Runtime scope:
+
+- `xmage_creature_etb_create_treasure_v1`
+
+Supported exact forms:
+
+- creature permanents with a simple enters-the-battlefield trigger that creates
+  a fixed positive number of Treasure tokens for the controller, where XMage
+  source and normalized Oracle text agree on the Treasure count.
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg536_etb_treasure_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg536_etb_treasure_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg536_etb_treasure_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg536_etb_treasure_new_server_pg_to_sqlite_sync.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg536_etb_treasure_new_server_e2e_validation.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg536_etb_treasure_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg536_etb_treasure_new_server.md`
+- final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg536_etb_treasure_new_server.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg536_etb_treasure_new_server_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg536_etb_treasure_new_server.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg536_etb_treasure_new_server.md`
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25821`
+- post-cycle `target_identity_count=25815`
+- post-cycle `xmage_authoritative_source_count=25501`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_adapter_required_count=25501`
+- `token_maker` reduced from `2381` to `2375`
+
+Residual boundary: PG536 does not authorize artifact tokens outside Treasure,
+Treasure creation from spells, Treasure creation attached to destroy/removal
+spells, triggered or activated Treasure makers outside creature ETB, dynamic
+Treasure counts, choice/optional Treasure creation, or Treasure effects with
+additional non-Treasure behavior.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

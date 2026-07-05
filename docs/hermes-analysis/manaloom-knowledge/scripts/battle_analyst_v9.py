@@ -18315,6 +18315,26 @@ def resolve_generic_permanent_etb(
         resolve_etb_library_tutor_to_hand(player, opponents, permanent, effect_data, turn)
     if effect_data.get("etb_remove_target") or effect_data.get("etb_removal_target"):
         resolve_etb_removal(player, opponents, permanent, effect_data, turn, rng)
+    if effect_data.get("etb_treasure_count"):
+        treasure_count = max(0, int(effect_data.get("etb_treasure_count") or 0))
+        if treasure_count > 0:
+            treasures_before = int(getattr(player, "treasures", 0) or 0)
+            player.treasures = treasures_before + treasure_count
+            emit_replay_event(
+                "treasure_created",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="enters_battlefield",
+                effect="create_treasure",
+                treasures_created=treasure_count,
+                treasures_before=treasures_before,
+                treasures=player.treasures,
+                treasures_after=player.treasures,
+                treasure_recipient="controller",
+                turn=turn,
+                phase=phase,
+                **replay_rule_fields(effect_data),
+            )
     if effect_data.get("etb_token_count"):
         for _ in range(min(int(effect_data.get("etb_token_count") or 1), 20)):
             create_creature_token(

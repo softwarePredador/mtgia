@@ -298,6 +298,7 @@ TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
 X_TOKEN_SPELL_SCOPE = "xmage_x_create_creature_tokens_spell_v1"
 MULTI_TOKEN_SPELL_SCOPE = "xmage_multi_create_creature_tokens_spell_v1"
 ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
+ETB_TREASURE_CREATURE_SCOPE = "xmage_creature_etb_create_treasure_v1"
 DIES_TOKEN_CREATURE_SCOPE = "xmage_creature_dies_create_tokens_v1"
 PERMANENT_ACTIVATED_TOKEN_SCOPE = "xmage_permanent_simple_activated_create_token_v1"
 ETB_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_etb_add_counters_target_creature_v1"
@@ -1748,6 +1749,21 @@ def destroy_target_create_treasure_from_source(source: str) -> int | str:
     if token_class != "TreasureToken":
         return "destroy_treasure_source_token_not_treasure"
     return int(token_count)
+
+
+def creature_etb_create_treasure_from_oracle(metadata: dict[str, Any]) -> int | str:
+    text = normalized_token_oracle_phrase(oracle_text(metadata))
+    match = re.fullmatch(
+        r"when (?:this creature|[a-z0-9 ,'-]+) enters(?: the battlefield)?, create "
+        r"(?P<count>a|an|one|two|three|four|five|\d+) treasure tokens?",
+        text,
+    )
+    if not match:
+        return "etb_treasure_oracle_not_exact"
+    count = fixed_treasure_count_word(match.group("count"))
+    if count is None or count <= 0:
+        return "etb_treasure_oracle_count_not_fixed_positive"
+    return int(count)
 
 
 def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
@@ -17613,6 +17629,31 @@ def split_row(
         if isinstance(parsed_parts, str):
             return None, parsed_parts
         token_class, token_count, parsed_token_fields = parsed_parts
+        if token_class == "TreasureToken":
+            oracle_treasure_count = creature_etb_create_treasure_from_oracle(metadata)
+            if isinstance(oracle_treasure_count, str):
+                return None, oracle_treasure_count
+            if int(token_count) != int(oracle_treasure_count):
+                return None, "etb_treasure_source_oracle_count_mismatch"
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": ETB_TREASURE_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "etb_treasure_count": int(oracle_treasure_count),
+                "treasure_count": int(oracle_treasure_count),
+                "treasure_recipient": "controller",
+                "treasure_trigger": "enters_battlefield",
+                "xmage_effect_class": "CreateTokenEffect",
+                "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+                "xmage_token_class": "TreasureToken",
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_etb_create_treasure",
+            ), "selected_exact_scope"
         token_data, token_reason = parse_simple_token_class(
             token_class_source(row, source_text, token_class),
             token_class,

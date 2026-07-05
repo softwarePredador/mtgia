@@ -99,6 +99,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "etb_damage_target",
     "etb_remove_effect",
     "etb_remove_target",
+    "etb_treasure_count",
     "etb_token_count",
     "token_count",
     "token_count_source",
@@ -974,6 +975,29 @@ def destroy_target_create_treasure_execution_scenario_from_expected_rule(
     }
 
 
+def creature_etb_create_treasure_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_etb_create_treasure_v1":
+        return None
+    return {
+        "name": f"{rule['card_name']} ETB creates Treasure",
+        "type": "creature_etb_create_treasure",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Creature - Pirate",
+            "effect": "creature",
+        },
+        "expected_treasure_count": int(
+            required.get("etb_treasure_count")
+            or required.get("treasure_count")
+            or 1
+        ),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def fixed_create_creature_tokens_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -1043,6 +1067,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
+        or creature_etb_create_treasure_execution_scenario_from_expected_rule(rule)
         or fixed_create_creature_tokens_execution_scenario_from_expected_rule(rule)
         or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)
     )

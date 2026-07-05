@@ -4256,6 +4256,46 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertIn("flying", token.get("keywords", []))
         self.assertTrue(token.get("tapped"))
 
+    def test_creature_etb_create_treasure_adds_controller_treasures(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Prosperous Pirates", "type_line": "Creature - Human Pirate"}
+        active.battlefield.append(permanent)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_treasure_count": 2,
+            "treasure_count": 2,
+            "treasure_recipient": "controller",
+            "treasure_trigger": "enters_battlefield",
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_treasure",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=3,
+            rng=random.Random(3),
+        )
+
+        self.assertEqual(active.treasures, 2)
+        self.assertEqual(opponent.treasures, 0)
+        self.assertTrue(
+            any(
+                event == "treasure_created"
+                and data.get("card") == "Prosperous Pirates"
+                and data.get("trigger") == "enters_battlefield"
+                and data.get("treasures_created") == 2
+                and data.get("treasure_recipient") == "controller"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_etb_treasure"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_target_spell_deals_numeric_damage_to_player(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
