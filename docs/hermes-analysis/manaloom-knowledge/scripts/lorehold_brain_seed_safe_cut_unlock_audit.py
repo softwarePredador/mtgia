@@ -24,7 +24,7 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_SAFE_CUT_GAP = REPORT_DIR / "lorehold_brain_safe_cut_gap_audit_20260705_current.json"
-DEFAULT_FLOOR_TRACE = REPORT_DIR / "lorehold_gap_floor_trace_miner_20260705_current.json"
+DEFAULT_CUT_SLOT_TRACE = REPORT_DIR / "lorehold_brain_cut_slot_trace_miner_20260705_current_summary.json"
 DEFAULT_CURRENT_BEST = (
     REPORT_DIR / "lorehold_current_best_baseline_synthesis_20260705_current.json"
 )
@@ -328,18 +328,18 @@ def decision_status(*, missing_inputs: list[str], unlockable_now_count: int, mat
 def build_report(
     *,
     safe_cut_gap: Mapping[str, Any],
-    floor_trace: Mapping[str, Any],
+    cut_slot_trace: Mapping[str, Any],
     current_best: Mapping[str, Any],
     paths: Mapping[str, Path],
 ) -> dict[str, Any]:
     missing_inputs = [name for name, payload in {
         "safe_cut_gap": safe_cut_gap,
-        "floor_trace": floor_trace,
+        "cut_slot_trace": cut_slot_trace,
         "current_best": current_best,
     }.items() if not payload]
     gap_summary = summary(safe_cut_gap)
     current_best_summary = summary(current_best)
-    rows = enriched_rows(safe_cut_gap=safe_cut_gap, floor_trace=floor_trace)
+    rows = enriched_rows(safe_cut_gap=safe_cut_gap, floor_trace=cut_slot_trace)
     class_counts = Counter(row["unlock_class"] for row in rows)
     unlockable_now_count = sum(1 for row in rows if row["can_unlock_now"])
     matrix_allowed = (
@@ -355,6 +355,11 @@ def build_report(
     diagnostic_focus = choose_diagnostic_focus(rows)
     target_floor_missing_count = sum(
         1 for row in rows if "targeted_floor_trace_for_this_cut_slot" in row["missing_evidence"]
+    )
+    next_action = (
+        "mine_targeted_same_lane_cut_traces_or_request_pg_apply_review_separately"
+        if target_floor_missing_count
+        else "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action"
     )
     return {
         "generated_at": utc_now(),
@@ -401,14 +406,12 @@ def build_report(
             "promotion_allowed_now": False,
             "postgres_writes_allowed_now": False,
             "deck_action_allowed_now": False,
-            "recommended_next_action": (
-                "mine_targeted_same_lane_cut_traces_or_request_pg_apply_review_separately"
-            ),
+            "recommended_next_action": next_action,
         },
         "external_deckbuilding_lessons": EXTERNAL_DECKBUILDING_LESSONS,
         "source_summaries": {
             "safe_cut_gap": gap_summary,
-            "floor_trace": summary(floor_trace),
+            "cut_slot_trace": summary(cut_slot_trace),
             "current_best": current_best_summary,
         },
         "unlock_rows": rows,
@@ -436,7 +439,11 @@ def build_report(
                 "do_not_materialize_brain_candidate_deck",
                 "do_not_run_natural_battle_from_this_audit",
                 "keep_pg_apply_as_explicit_manual_approval_only",
-                "mine_targeted_floor_trace_for_brain_cut_slots",
+                (
+                    "mine_targeted_floor_trace_for_brain_cut_slots"
+                    if target_floor_missing_count
+                    else "use_brain_cut_slot_traces_as_cut_protection_evidence"
+                ),
                 "reopen_prior_rejected_slots_only_with_new_same_lane_trace_evidence",
             ],
         },
@@ -534,7 +541,13 @@ def write_outputs(payload: Mapping[str, Any], out_prefix: Path) -> tuple[Path, P
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--safe-cut-gap", type=Path, default=DEFAULT_SAFE_CUT_GAP)
-    parser.add_argument("--floor-trace", type=Path, default=DEFAULT_FLOOR_TRACE)
+    parser.add_argument(
+        "--cut-slot-trace",
+        "--floor-trace",
+        dest="cut_slot_trace",
+        type=Path,
+        default=DEFAULT_CUT_SLOT_TRACE,
+    )
     parser.add_argument("--current-best", type=Path, default=DEFAULT_CURRENT_BEST)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     return parser.parse_args()
@@ -544,12 +557,12 @@ def main() -> int:
     args = parse_args()
     paths = {
         "current_best": args.current_best,
-        "floor_trace": args.floor_trace,
+        "cut_slot_trace": args.cut_slot_trace,
         "safe_cut_gap": args.safe_cut_gap,
     }
     payload = build_report(
         safe_cut_gap=read_json(args.safe_cut_gap),
-        floor_trace=read_json(args.floor_trace),
+        cut_slot_trace=read_json(args.cut_slot_trace),
         current_best=read_json(args.current_best),
         paths=paths,
     )

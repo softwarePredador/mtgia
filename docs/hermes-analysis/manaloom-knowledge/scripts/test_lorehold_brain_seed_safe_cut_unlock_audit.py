@@ -118,6 +118,30 @@ def _floor_trace():
     }
 
 
+def _all_floor_trace():
+    return {
+        "summary": {
+            "decision_status": "brain_cut_slot_trace_miner_found_floor_evidence_keep_607",
+            "target_with_floor_trace_count": 5,
+        },
+        "target_floor_summaries": [
+            {
+                "card_name": name,
+                "floor_trace_status": "brain_cut_slot_floor_trace_found_cut_blocked",
+                "same_slot_607_win_candidate_loss_trace_count": 3,
+                "positive_target_delta_trace_count": 2,
+            }
+            for name in [
+                "Molecule Man",
+                "Scroll Rack",
+                "The Mind Stone",
+                "Urza's Saga",
+                "Lorehold, the Historian",
+            ]
+        ],
+    }
+
+
 def _current_best():
     return {
         "summary": {
@@ -131,7 +155,7 @@ def _current_best():
 def _paths():
     return {
         "safe_cut_gap": Path("/tmp/safe_cut_gap.json"),
-        "floor_trace": Path("/tmp/floor_trace.json"),
+        "cut_slot_trace": Path("/tmp/cut_slot_trace.json"),
         "current_best": Path("/tmp/current_best.json"),
     }
 
@@ -139,7 +163,7 @@ def _paths():
 def _build(**overrides):
     return audit.build_report(
         safe_cut_gap=overrides.get("safe_cut_gap", _safe_cut_gap()),
-        floor_trace=overrides.get("floor_trace", _floor_trace()),
+        cut_slot_trace=overrides.get("cut_slot_trace", _floor_trace()),
         current_best=overrides.get("current_best", _current_best()),
         paths=_paths(),
     )
@@ -214,6 +238,17 @@ def test_safe_row_with_active_rule_allows_matrix_only_not_battle() -> None:
     assert payload["summary"]["matrix_scoring_allowed_now"] is True
     assert payload["summary"]["candidate_deck_materialization_allowed_now"] is False
     assert payload["summary"]["natural_battle_gate_allowed_now"] is False
+
+
+def test_all_slots_with_trace_moves_next_action_to_cut_discovery_or_pg_review() -> None:
+    payload = _build(cut_slot_trace=_all_floor_trace())
+
+    assert payload["summary"]["targeted_floor_trace_missing_slot_count"] == 0
+    assert payload["summary"]["recommended_next_action"] == (
+        "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action"
+    )
+    assert "use_brain_cut_slot_traces_as_cut_protection_evidence" in payload["decision"]["next_actions"]
+    assert payload["summary"]["unlockable_now_count"] == 0
 
 
 def test_markdown_surfaces_unlock_queue_and_external_lessons() -> None:

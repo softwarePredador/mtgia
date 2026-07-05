@@ -810,6 +810,33 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertFalse(classification.canonical_summary["deck_607_mutated"])
 
+    def test_brain_cut_slot_trace_miner_is_recognized(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_brain_cut_slot_trace_miner",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "deck_607_mutated": False,
+            "summary": {
+                "decision_status": "brain_cut_slot_trace_miner_found_floor_evidence_keep_607",
+                "target_with_floor_trace_count": 1,
+            },
+            "target_floor_summaries": [{"card_name": "Molecule Man"}],
+            "floor_trace_rows": [{"target_card": "Molecule Man"}],
+            "source_evidence": {"brain_safe_cut_gap_summary": {}},
+            "decision": {"keep_607_as_protected_baseline": True},
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "brain_cut_slot_trace.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(
+            classification.artifact_kind,
+            "lorehold_brain_cut_slot_trace_miner",
+        )
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+
     def test_unknown_schema_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "unknown.json"

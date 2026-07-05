@@ -1,6 +1,6 @@
 # Lorehold Brain in a Jar Seed-Safe Cut Unlock Audit
 
-- Generated at: `2026-07-05T09:42:07Z`
+- Generated at: `2026-07-05T09:57:31Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
@@ -11,18 +11,18 @@
 - Safe cut count: `0`
 - Unlockable now: `0`
 - Diagnostic focus: `Molecule Man`
-- Targeted floor trace missing slots: `7`
+- Targeted floor trace missing slots: `0`
 - Current best status: `current_best_baseline_synthesis_keep_607`
 - Current best top deck is 607: `true`
 - Matrix scoring allowed now: `false`
 - Candidate deck materialization allowed now: `false`
 - Natural battle gate allowed now: `false`
-- Recommended next action: `mine_targeted_same_lane_cut_traces_or_request_pg_apply_review_separately`
+- Recommended next action: `continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action`
 
 ## Source Reports
 
 - `current_best`: `docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_current.json`
-- `floor_trace`: `docs/hermes-analysis/master_optimizer_reports/lorehold_gap_floor_trace_miner_20260705_current.json`
+- `cut_slot_trace`: `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_cut_slot_trace_miner_20260705_current_summary.json`
 - `safe_cut_gap`: `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_safe_cut_gap_audit_20260705_current.json`
 
 ## External Deckbuilding Lessons
@@ -42,15 +42,15 @@
 
 | Slot | Unlock class | Role requirement | Exposure | Floor trace | Missing evidence | Action |
 | --- | --- | --- | ---: | --- | --- | --- |
-| Molecule Man | `diagnostic_only_prior_reject_requires_new_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 102 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, new_trace_evidence_reverses_prior_rejected_cut, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | mine_new_trace_evidence_before_reopening_prior_rejected_cut |
-| Land Tax | `diagnostic_only_prior_reject_requires_new_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 3449 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, new_trace_evidence_reverses_prior_rejected_cut, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | mine_new_trace_evidence_before_reopening_prior_rejected_cut |
-| Library of Leng | `protected_topdeck_anchor_requires_role_preservation` | preserve_topdeck_miracle_access_or_discard_to_top_role | 855 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, replacement_preserves_topdeck_miracle_anchor_role, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | prove_replacement_preserves_topdeck_miracle_anchor_before_matrix |
-| Scroll Rack | `protected_topdeck_anchor_requires_role_preservation` | preserve_topdeck_miracle_access_or_discard_to_top_role | 2957 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, replacement_preserves_topdeck_miracle_anchor_role, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | prove_replacement_preserves_topdeck_miracle_anchor_before_matrix |
-| Sensei's Divining Top | `protected_topdeck_anchor_requires_role_preservation` | preserve_topdeck_miracle_access_or_discard_to_top_role | 3816 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, replacement_preserves_topdeck_miracle_anchor_role, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | prove_replacement_preserves_topdeck_miracle_anchor_before_matrix |
-| The Scarlet Witch | `protected_floor_requires_floor_replacement_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 362 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, replacement_preserves_mana_or_curve_floor, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | collect_floor_replacement_trace_before_matrix |
-| The Mind Stone | `protected_floor_requires_floor_replacement_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 2312 | `missing` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, targeted_floor_trace_for_this_cut_slot, replacement_preserves_mana_or_curve_floor, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | collect_floor_replacement_trace_before_matrix |
-| Urza's Saga | `locked_no_unlock_current_607_contract` | not_applicable_never_cut_slot | 2656 | `missing` | cannot_unlock_under_current_607_contract | do_not_use_as_brain_cut_under_current_607_contract |
-| Lorehold, the Historian | `locked_no_unlock_current_607_contract` | not_applicable_never_cut_slot | 5768 | `missing` | cannot_unlock_under_current_607_contract | do_not_use_as_brain_cut_under_current_607_contract |
+| Molecule Man | `diagnostic_only_prior_reject_requires_new_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 102 | `brain_cut_slot_floor_trace_found_cut_blocked` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, new_trace_evidence_reverses_prior_rejected_cut, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | mine_new_trace_evidence_before_reopening_prior_rejected_cut |
+| Land Tax | `diagnostic_only_prior_reject_requires_new_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 3449 | `brain_cut_slot_floor_trace_found_cut_blocked` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, new_trace_evidence_reverses_prior_rejected_cut, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | mine_new_trace_evidence_before_reopening_prior_rejected_cut |
+| Library of Leng | `protected_topdeck_anchor_requires_role_preservation` | preserve_topdeck_miracle_access_or_discard_to_top_role | 855 | `brain_cut_slot_floor_trace_found_cut_blocked` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, replacement_preserves_topdeck_miracle_anchor_role, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | prove_replacement_preserves_topdeck_miracle_anchor_before_matrix |
+| Scroll Rack | `protected_topdeck_anchor_requires_role_preservation` | preserve_topdeck_miracle_access_or_discard_to_top_role | 2957 | `brain_cut_slot_floor_trace_found_cut_blocked` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, replacement_preserves_topdeck_miracle_anchor_role, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | prove_replacement_preserves_topdeck_miracle_anchor_before_matrix |
+| Sensei's Divining Top | `protected_topdeck_anchor_requires_role_preservation` | preserve_topdeck_miracle_access_or_discard_to_top_role | 3816 | `brain_cut_slot_floor_trace_found_cut_blocked` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, replacement_preserves_topdeck_miracle_anchor_role, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | prove_replacement_preserves_topdeck_miracle_anchor_before_matrix |
+| The Scarlet Witch | `protected_floor_requires_floor_replacement_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 362 | `brain_cut_slot_floor_trace_found_cut_blocked` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, replacement_preserves_mana_or_curve_floor, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | collect_floor_replacement_trace_before_matrix |
+| The Mind Stone | `protected_floor_requires_floor_replacement_trace` | preserve_topdeck_miracle_access_or_discard_to_top_role | 2312 | `brain_cut_slot_floor_trace_found_cut_blocked` | explicit_pg_apply_approval_and_postcheck_active_brain_rule, named_same_lane_seed_safe_cut_evidence, replacement_preserves_mana_or_curve_floor, refresh_candidate_queue_and_strategy_matrix, battle_gate_only_after_matrix_candidate | collect_floor_replacement_trace_before_matrix |
+| Urza's Saga | `locked_no_unlock_current_607_contract` | not_applicable_never_cut_slot | 2656 | `brain_cut_slot_floor_trace_found_cut_blocked` | cannot_unlock_under_current_607_contract | do_not_use_as_brain_cut_under_current_607_contract |
+| Lorehold, the Historian | `locked_no_unlock_current_607_contract` | not_applicable_never_cut_slot | 5768 | `brain_cut_slot_floor_trace_found_cut_blocked` | cannot_unlock_under_current_607_contract | do_not_use_as_brain_cut_under_current_607_contract |
 
 ## Decision
 
@@ -65,5 +65,5 @@
   - do_not_materialize_brain_candidate_deck
   - do_not_run_natural_battle_from_this_audit
   - keep_pg_apply_as_explicit_manual_approval_only
-  - mine_targeted_floor_trace_for_brain_cut_slots
+  - use_brain_cut_slot_traces_as_cut_protection_evidence
   - reopen_prior_rejected_slots_only_with_new_same_lane_trace_evidence

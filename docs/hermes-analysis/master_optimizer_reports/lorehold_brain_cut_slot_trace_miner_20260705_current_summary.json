@@ -1,0 +1,522 @@
+{
+  "artifact_type": "lorehold_brain_cut_slot_trace_miner",
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "forced_access_allowed_now": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "feed_brain_cut_slot_traces_into_unlock_audit_keep_607",
+      "do_not_mutate_deck_607",
+      "do_not_treat_low_exposure_as_cut_safety",
+      "do_not_materialize_brain_candidate_deck_from_trace_rows",
+      "require active Brain rule and named same-lane seed-safe cut before matrix"
+    ],
+    "postgres_writes_allowed": false,
+    "promotion_allowed": false,
+    "reason": "At least one Brain cut-slot card produced real 607 events in same-slot games where protected 607 won and a candidate lost. These rows protect the slot; they do not unlock Brain.",
+    "structure_matrix_allowed_now": false
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T09:57:26Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_reports": {
+    "brain_safe_cut_gap": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_safe_cut_gap_audit_20260705_current.json"
+  },
+  "status": "brain_cut_slot_trace_miner_found_floor_evidence_keep_607",
+  "summary": {
+    "brain_safe_cut_gap_status": "brain_safe_cut_gap_no_active_rule_no_seed_safe_cut_keep_607",
+    "candidate_deck_materialization_allowed_now": false,
+    "decision_status": "brain_cut_slot_trace_miner_found_floor_evidence_keep_607",
+    "deck_action_allowed_now": false,
+    "forced_access_allowed_now": false,
+    "missing_inputs": [],
+    "natural_battle_gate_allowed_now": false,
+    "positive_target_delta_trace_count": 1128,
+    "postgres_writes_allowed_now": false,
+    "promotion_allowed_now": false,
+    "recommended_next_action": "feed_brain_cut_slot_traces_into_unlock_audit_keep_607",
+    "same_slot_607_win_candidate_loss_trace_count": 1435,
+    "scanned_game_result_report_count": 171,
+    "scanned_gate_report_count": 966,
+    "structure_matrix_allowed_now": false,
+    "target_card_count": 9,
+    "target_with_floor_trace_count": 9,
+    "target_without_same_slot_trace_count": 0
+  },
+  "target_floor_summaries": [
+    {
+      "baseline_target_event_total": 93,
+      "card_name": "Molecule Man",
+      "cut_decision": "protect_brain_cut_slot_until_same_lane_replacement_preserves_floor",
+      "cut_lane": "draw",
+      "floor_trace_status": "brain_cut_slot_floor_trace_found_cut_blocked",
+      "functional_tag": "draw",
+      "gap_category": "prior_rejected_protected_slot",
+      "positive_target_delta_trace_count": 30,
+      "positive_target_event_delta_total": 90,
+      "same_slot_607_win_candidate_loss_trace_count": 31,
+      "source_report_count": 48,
+      "target_event_family_counts": {
+        "cost_paid": 31,
+        "spell_cast": 31,
+        "spell_resolved": 31
+      },
+      "top_positive_strategic_deltas": [
+        {
+          "delta_total": 336,
+          "event": "lorehold_cost_paid"
+        },
+        {
+          "delta_total": 310,
+          "event": "lorehold_spell_cast"
+        },
+        {
+          "delta_total": 196,
+          "event": "miracle_cast"
+        },
+        {
+          "delta_total": 160,
+          "event": "lorehold_upkeep_rummage"
+        },
+        {
+          "delta_total": 132,
+          "event": "topdeck_manipulation_activated"
+        },
+        {
+          "delta_total": 89,
+          "event": "static_cost_reduction_total"
+        },
+        {
+          "delta_total": 44,
+          "event": "discard_to_top_replacement"
+        },
+        {
+          "delta_total": 43,
+          "event": "lorehold_rummage_discard_to_top"
+        }
+      ]
+    },
+    {
+      "baseline_target_event_total": 504,
+      "card_name": "The Scarlet Witch",
+      "cut_decision": "protect_brain_cut_slot_until_same_lane_replacement_preserves_floor",
+      "cut_lane": "misc",
+      "floor_trace_status": "brain_cut_slot_floor_trace_found_cut_blocked",
+      "functional_tag": "creature",
+      "gap_category": "protected_structural_floor",
+      "positive_target_delta_trace_count": 146,
+      "positive_target_event_delta_total": 441,
+      "same_slot_607_win_candidate_loss_trace_count": 165,
+      "source_report_count": 104,
+      "target_event_family_counts": {
+        "cost_paid": 174,
+        "spell_cast": 165,
+        "spell_resolved": 165
+      },
+      "top_positive_strategic_deltas": [
+        {
+          "delta_total": 1630,
+          "event": "lorehold_cost_paid"
+        },
+        {
+          "delta_total": 1358,
+          "event": "lorehold_spell_cast"
+        },
+        {
+          "delta_total": 602,
+          "event": "static_cost_reduction_total"
+        },
+        {
+          "delta_total": 540,
+          "event": "lorehold_upkeep_rummage"
+        },
+        {
+          "delta_total": 528,
+          "event": "topdeck_manipulation_activated"
+        },
+        {
+          "delta_total": 438,
+          "event": "miracle_cast"
+        },
+        {
+          "delta_total": 151,
+          "event": "discard_to_top_replacement"
+        },
+        {
+          "delta_total": 107,
+          "event": "lorehold_rummage_discard_to_top"
+        }
+      ]
+    },
+    {
+      "baseline_target_event_total": 354,
+      "card_name": "Library of Leng",
+      "cut_decision": "protect_brain_cut_slot_until_same_lane_replacement_preserves_floor",
+      "cut_lane": "early_mana",
+      "floor_trace_status": "brain_cut_slot_floor_trace_found_cut_blocked",
+      "functional_tag": "engine",
+      "gap_category": "protected_core_topdeck_engine",
+      "positive_target_delta_trace_count": 86,
+      "positive_target_event_delta_total": 258,
+      "same_slot_607_win_candidate_loss_trace_count": 118,
+      "source_report_count": 94,
+      "target_event_family_counts": {
+        "cost_paid": 118,
+        "spell_cast": 118,
+        "spell_resolved": 118
+      },
+      "top_positive_strategic_deltas": [
+        {
+          "delta_total": 1357,
+          "event": "lorehold_cost_paid"
+        },
+        {
+          "delta_total": 1300,
+          "event": "lorehold_spell_cast"
+        },
+        {
+          "delta_total": 590,
+          "event": "lorehold_upkeep_rummage"
+        },
+        {
+          "delta_total": 408,
+          "event": "miracle_cast"
+        },
+        {
+          "delta_total": 385,
+          "event": "topdeck_manipulation_activated"
+        },
+        {
+          "delta_total": 355,
+          "event": "discard_to_top_replacement"
+        },
+        {
+          "delta_total": 328,
+          "event": "static_cost_reduction_total"
+        },
+        {
+          "delta_total": 298,
+          "event": "lorehold_rummage_discard_to_top"
+        }
+      ]
+    },
+    {
+      "baseline_target_event_total": 774,
+      "card_name": "The Mind Stone",
+      "cut_decision": "protect_brain_cut_slot_until_same_lane_replacement_preserves_floor",
+      "cut_lane": "early_mana",
+      "floor_trace_status": "brain_cut_slot_floor_trace_found_cut_blocked",
+      "functional_tag": "ramp",
+      "gap_category": "protected_structural_floor",
+      "positive_target_delta_trace_count": 155,
+      "positive_target_event_delta_total": 702,
+      "same_slot_607_win_candidate_loss_trace_count": 181,
+      "source_report_count": 121,
+      "target_event_family_counts": {
+        "cost_paid": 181,
+        "spell_cast": 181,
+        "spell_resolved": 4,
+        "trigger_resolved": 342,
+        "utility_artifact_activated": 66
+      },
+      "top_positive_strategic_deltas": [
+        {
+          "delta_total": 2028,
+          "event": "lorehold_cost_paid"
+        },
+        {
+          "delta_total": 1744,
+          "event": "lorehold_spell_cast"
+        },
+        {
+          "delta_total": 736,
+          "event": "static_cost_reduction_total"
+        },
+        {
+          "delta_total": 727,
+          "event": "lorehold_upkeep_rummage"
+        },
+        {
+          "delta_total": 637,
+          "event": "miracle_cast"
+        },
+        {
+          "delta_total": 531,
+          "event": "topdeck_manipulation_activated"
+        },
+        {
+          "delta_total": 87,
+          "event": "discard_to_top_replacement"
+        },
+        {
+          "delta_total": 74,
+          "event": "lorehold_rummage_discard_to_top"
+        }
+      ]
+    },
+    {
+      "baseline_target_event_total": 93,
+      "card_name": "Urza's Saga",
+      "cut_decision": "protect_brain_cut_slot_until_same_lane_replacement_preserves_floor",
+      "cut_lane": "mana_base",
+      "floor_trace_status": "brain_cut_slot_floor_trace_found_cut_blocked",
+      "functional_tag": "land",
+      "gap_category": "never_cut_mana_base",
+      "positive_target_delta_trace_count": 59,
+      "positive_target_event_delta_total": 74,
+      "same_slot_607_win_candidate_loss_trace_count": 71,
+      "source_report_count": 81,
+      "target_event_family_counts": {
+        "land_played": 71,
+        "utility_land_activated": 22
+      },
+      "top_positive_strategic_deltas": [
+        {
+          "delta_total": 962,
+          "event": "lorehold_cost_paid"
+        },
+        {
+          "delta_total": 855,
+          "event": "lorehold_spell_cast"
+        },
+        {
+          "delta_total": 355,
+          "event": "lorehold_upkeep_rummage"
+        },
+        {
+          "delta_total": 344,
+          "event": "static_cost_reduction_total"
+        },
+        {
+          "delta_total": 291,
+          "event": "topdeck_manipulation_activated"
+        },
+        {
+          "delta_total": 268,
+          "event": "miracle_cast"
+        },
+        {
+          "delta_total": 72,
+          "event": "discard_to_top_replacement"
+        },
+        {
+          "delta_total": 53,
+          "event": "lorehold_rummage_discard_to_top"
+        }
+      ]
+    },
+    {
+      "baseline_target_event_total": 1187,
+      "card_name": "Scroll Rack",
+      "cut_decision": "protect_brain_cut_slot_until_same_lane_replacement_preserves_floor",
+      "cut_lane": "early_mana",
+      "floor_trace_status": "brain_cut_slot_floor_trace_found_cut_blocked",
+      "functional_tag": "draw",
+      "gap_category": "protected_core_topdeck_engine",
+      "positive_target_delta_trace_count": 177,
+      "positive_target_event_delta_total": 1035,
+      "same_slot_607_win_candidate_loss_trace_count": 188,
+      "source_report_count": 115,
+      "target_event_family_counts": {
+        "cost_paid": 173,
+        "miracle_cast": 15,
+        "spell_cast": 173,
+        "spell_resolved": 188,
+        "topdeck_manipulation_activated": 638
+      },
+      "top_positive_strategic_deltas": [
+        {
+          "delta_total": 1753,
+          "event": "lorehold_spell_cast"
+        },
+        {
+          "delta_total": 1672,
+          "event": "lorehold_cost_paid"
+        },
+        {
+          "delta_total": 798,
+          "event": "static_cost_reduction_total"
+        },
+        {
+          "delta_total": 754,
+          "event": "topdeck_manipulation_activated"
+        },
+        {
+          "delta_total": 550,
+          "event": "lorehold_upkeep_rummage"
+        },
+        {
+          "delta_total": 508,
+          "event": "miracle_cast"
+        },
+        {
+          "delta_total": 120,
+          "event": "discard_to_top_replacement"
+        },
+        {
+          "delta_total": 74,
+          "event": "lorehold_rummage_discard_to_top"
+        }
+      ]
+    },
+    {
+      "baseline_target_event_total": 438,
+      "card_name": "Land Tax",
+      "cut_decision": "protect_brain_cut_slot_until_same_lane_replacement_preserves_floor",
+      "cut_lane": "misc",
+      "floor_trace_status": "brain_cut_slot_floor_trace_found_cut_blocked",
+      "functional_tag": "tutor",
+      "gap_category": "prior_rejected_protected_slot",
+      "positive_target_delta_trace_count": 120,
+      "positive_target_event_delta_total": 360,
+      "same_slot_607_win_candidate_loss_trace_count": 146,
+      "source_report_count": 104,
+      "target_event_family_counts": {
+        "cost_paid": 146,
+        "spell_cast": 146,
+        "spell_resolved": 146
+      },
+      "top_positive_strategic_deltas": [
+        {
+          "delta_total": 1378,
+          "event": "lorehold_cost_paid"
+        },
+        {
+          "delta_total": 1313,
+          "event": "lorehold_spell_cast"
+        },
+        {
+          "delta_total": 559,
+          "event": "static_cost_reduction_total"
+        },
+        {
+          "delta_total": 467,
+          "event": "lorehold_upkeep_rummage"
+        },
+        {
+          "delta_total": 428,
+          "event": "miracle_cast"
+        },
+        {
+          "delta_total": 409,
+          "event": "topdeck_manipulation_activated"
+        },
+        {
+          "delta_total": 186,
+          "event": "discard_to_top_replacement"
+        },
+        {
+          "delta_total": 161,
+          "event": "lorehold_rummage_discard_to_top"
+        }
+      ]
+    },
+    {
+      "baseline_target_event_total": 1416,
+      "card_name": "Sensei's Divining Top",
+      "cut_decision": "protect_brain_cut_slot_until_same_lane_replacement_preserves_floor",
+      "cut_lane": "draw",
+      "floor_trace_status": "brain_cut_slot_floor_trace_found_cut_blocked",
+      "functional_tag": "draw",
+      "gap_category": "protected_core_topdeck_engine",
+      "positive_target_delta_trace_count": 133,
+      "positive_target_event_delta_total": 1275,
+      "same_slot_607_win_candidate_loss_trace_count": 145,
+      "source_report_count": 104,
+      "target_event_family_counts": {
+        "cost_paid": 271,
+        "spell_cast": 271,
+        "spell_resolved": 271,
+        "topdeck_manipulation_activated": 603
+      },
+      "top_positive_strategic_deltas": [
+        {
+          "delta_total": 1660,
+          "event": "lorehold_cost_paid"
+        },
+        {
+          "delta_total": 1542,
+          "event": "lorehold_spell_cast"
+        },
+        {
+          "delta_total": 661,
+          "event": "topdeck_manipulation_activated"
+        },
+        {
+          "delta_total": 643,
+          "event": "lorehold_upkeep_rummage"
+        },
+        {
+          "delta_total": 532,
+          "event": "miracle_cast"
+        },
+        {
+          "delta_total": 495,
+          "event": "static_cost_reduction_total"
+        },
+        {
+          "delta_total": 264,
+          "event": "discard_to_top_replacement"
+        },
+        {
+          "delta_total": 228,
+          "event": "lorehold_rummage_discard_to_top"
+        }
+      ]
+    },
+    {
+      "baseline_target_event_total": 670,
+      "card_name": "Lorehold, the Historian",
+      "cut_decision": "protect_brain_cut_slot_until_same_lane_replacement_preserves_floor",
+      "cut_lane": "commander",
+      "floor_trace_status": "brain_cut_slot_floor_trace_found_cut_blocked",
+      "functional_tag": "engine",
+      "gap_category": "never_cut_commander",
+      "positive_target_delta_trace_count": 222,
+      "positive_target_event_delta_total": 341,
+      "same_slot_607_win_candidate_loss_trace_count": 390,
+      "source_report_count": 126,
+      "target_event_family_counts": {
+        "cost_paid": 670
+      },
+      "top_positive_strategic_deltas": [
+        {
+          "delta_total": 3421,
+          "event": "lorehold_cost_paid"
+        },
+        {
+          "delta_total": 3395,
+          "event": "lorehold_spell_cast"
+        },
+        {
+          "delta_total": 1326,
+          "event": "lorehold_upkeep_rummage"
+        },
+        {
+          "delta_total": 1286,
+          "event": "static_cost_reduction_total"
+        },
+        {
+          "delta_total": 1135,
+          "event": "miracle_cast"
+        },
+        {
+          "delta_total": 1096,
+          "event": "topdeck_manipulation_activated"
+        },
+        {
+          "delta_total": 349,
+          "event": "discard_to_top_replacement"
+        },
+        {
+          "delta_total": 280,
+          "event": "lorehold_rummage_discard_to_top"
+        }
+      ]
+    }
+  ]
+}

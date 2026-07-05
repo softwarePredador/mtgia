@@ -3299,10 +3299,30 @@ The Brain cut blocker is now split into explicit learning classes:
 - Safe cut count: `0`.
 - Unlockable cuts now: `0`.
 - Diagnostic focus: `Molecule Man`.
+- Targeted floor trace missing slots: `0`.
 - Current best status: `current_best_baseline_synthesis_keep_607`, with
   `top_deck_is_607=true` and protected baseline rank `1`.
 - Matrix scoring, candidate materialization, natural battle, deck action,
   PostgreSQL writes, and promotion all remain `false`.
+
+Brain cut-slot trace miner:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_cut_slot_trace_miner_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_cut_slot_trace_miner_20260705_current.json`.
+- Summary JSON used by the unlock audit:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_cut_slot_trace_miner_20260705_current_summary.json`.
+- Status:
+  `brain_cut_slot_trace_miner_found_floor_evidence_keep_607`.
+- Scanned gate reports: `964`.
+- Scanned game-result reports: `171`.
+- Target slots: `9`.
+- Slots with floor trace: `9`.
+- Same-slot 607-win/candidate-loss traces: `1435`.
+- Positive target-delta traces: `1128`.
+- Deck action, candidate materialization, natural battle, PostgreSQL writes,
+  and promotion remain `false`.
 
 Current slot classes:
 
@@ -3317,17 +3337,22 @@ Current slot classes:
 
 Deckbuilding lesson:
 
-- `Molecule Man` remains the lowest-exposure diagnostic row, not a cut. It can
-  only be reopened by explicit Brain rule activation, named same-lane
-  seed-safe evidence, targeted floor trace, and new trace evidence that reverses
-  the prior rejected cut.
+- `Molecule Man` remains the lowest-exposure diagnostic row, not a cut. It now
+  has targeted floor trace (`31` same-slot traces, `30` positive deltas), which
+  protects the slot rather than unlocking it. It can only be reopened by
+  explicit Brain rule activation, named same-lane seed-safe evidence, and new
+  trace evidence that reverses the prior rejected cut.
+- Every Brain cut-slot row now has real floor trace evidence:
+  `Molecule Man`, `Land Tax`, `Library of Leng`, `Scroll Rack`,
+  `Sensei's Divining Top`, `The Scarlet Witch`, `The Mind Stone`,
+  `Urza's Saga`, and `Lorehold, the Historian`.
 - Public Lorehold evidence is useful for learning lanes: EDHREC shows the
   commander as Topdeck/Spellslinger/Discard and reinforces the topdeck anchor
   role of `Library of Leng`, `Sensei's Divining Top`, and `Scroll Rack`.
 - Official Commander bracket guidance keeps `Mana Vault` and `The One Ring` as
   high-pressure Game Changer lessons, not automatic 607 inclusions. They still
   require the same local role-fit, cut-safety, and battle gates.
-- The next valid work is targeted same-lane cut trace mining or separate manual
+- The next valid work is continued seed-safe cut discovery or separate manual
   PostgreSQL apply review for Brain; neither path is a deck mutation.
 
 Deck `607` remains untouched and protected.

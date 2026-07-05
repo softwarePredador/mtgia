@@ -1838,14 +1838,22 @@ Brain seed-safe cut unlock audit added on 2026-07-05:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_seed_safe_cut_unlock_audit_20260705_current.md`.
 - Status:
   `brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607`.
-- The audit consumes the Brain safe-cut gap, protected floor trace miner, and
+- The audit consumes the Brain safe-cut gap, Brain cut-slot trace miner, and
   current-best baseline synthesis. It must preserve explicit mutation flags:
   PostgreSQL writes `false`, source DB mutation `false`, and deck `607`
   mutation `false`.
+- Brain cut-slot trace miner:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_cut_slot_trace_miner_20260705_current.md`.
+  The unlock audit consumes the compact summary JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_cut_slot_trace_miner_20260705_current_summary.json`.
+  It scanned `964` gate reports and `171` game-result reports, found floor
+  trace for all `9` current Brain cut slots, and produced `1435` same-slot
+  607-win/candidate-loss traces with `1128` positive target deltas.
 - A low-exposure slot is not a safe cut. `Molecule Man` is only the diagnostic
-  focus because it has the lowest exposure among prior-rejected rows; it still
-  requires active Brain rule proof, named same-lane seed-safe evidence,
-  targeted floor trace, and new trace evidence that reverses the prior rejected
+  focus because it has the lowest exposure among prior-rejected rows. The new
+  floor trace evidence protects it (`31` traces, `30` positive deltas) rather
+  than unlocking it; it still requires active Brain rule proof, named same-lane
+  seed-safe evidence, and new trace evidence that reverses the prior rejected
   cut before any matrix scoring.
 - Hard locks:
   `Lorehold, the Historian` and `Urza's Saga` cannot unlock under the current
