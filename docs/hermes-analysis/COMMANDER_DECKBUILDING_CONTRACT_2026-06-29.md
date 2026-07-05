@@ -233,6 +233,13 @@ Current external refresh on 2026-07-05:
   identity, Commander legality, current deck membership, nonland type, and
   role-confirming Oracle text, then emits add/cut hypotheses only. Wincon gaps
   stay blocked on commander-specific win-plan/source evidence.
+- Current runtime profile fallback now includes `Kaalia of the Vast` in
+  `server/lib/ai/commander_reference_profile_support.dart`. This is a local
+  aggregate source lane for generation prompts only: it requires Mardu color
+  identity, haste/protection, real interaction, Angel/Demon/Dragon payoff
+  density, and an explicit plan-B lane; it must not copy public decklists or
+  promote the current Kaalia variant without the normal structure, strategy,
+  battle, and replay gates.
 
 ## Global Commander Rollout - 2026-07-01
 

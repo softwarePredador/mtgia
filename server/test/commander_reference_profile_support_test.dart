@@ -120,6 +120,31 @@ void main() {
       );
     });
 
+    test(
+        'falls back to the built-in Kaalia profile when source lane is missing',
+        () {
+      final resolved = resolveRuntimeCommanderReferenceProfile(
+        commanderName: '  kaalia   of the vast ',
+        persistedProfile: {
+          'commander': kaaliaReferenceCommanderName,
+          'confidence': 'low',
+          'source_count': 0,
+        },
+        fallbackUpdatedAt: DateTime.utc(2026, 7, 5, 12),
+      );
+
+      expect(resolved, isNotNull);
+      expect(resolved!['commander'], equals(kaaliaReferenceCommanderName));
+      expect(resolved['confidence'], equals('medium_high'));
+      expect(resolved['source_count'], equals(5));
+      expect(resolved['color_identity'], equals(['B', 'R', 'W']));
+      expect(resolved['runtime_profile_origin'], equals('built_in_fallback'));
+      expect(
+        (resolved['source_refs'] as List).join(' '),
+        contains('commanderspellbook.com/combo/29-137'),
+      );
+    });
+
     test('does not invent a built-in fallback for unrelated commanders', () {
       final resolved = resolveRuntimeCommanderReferenceProfile(
         commanderName: 'Atraxa, Praetors\' Voice',
@@ -190,6 +215,62 @@ void main() {
       );
     });
 
+    test('Kaalia profile requires attack enablers and real interaction', () {
+      final profile = buildKaaliaReferenceProfilePayload(
+        updatedAt: DateTime.utc(2026, 7, 5, 12),
+      );
+      final packages = (profile['expected_packages'] as Map).map(
+        (key, value) => MapEntry(
+          key.toString(),
+          (value as List).map((entry) => entry.toString()).toSet(),
+        ),
+      );
+      final avoid = (profile['avoid_patterns'] as List)
+          .cast<Map>()
+          .map((entry) => entry['pattern'].toString())
+          .toSet();
+
+      expect(profile['commander'], equals(kaaliaReferenceCommanderName));
+      expect(profile['confidence'], equals('medium_high'));
+      expect(
+        packages['commander_attack_enablers'],
+        containsAll([
+          'Lightning Greaves',
+          'Hall of the Bandit Lord',
+          'Grand Abolisher',
+          'Teferi\'s Protection',
+        ]),
+      );
+      expect(
+        packages['interaction_and_resets'],
+        containsAll([
+          'Swords to Plowshares',
+          'Path to Exile',
+          'Feed the Swarm',
+          'Anguished Unmaking',
+          'Terminate',
+          'Damn',
+        ]),
+      );
+      expect(
+        packages['angels_demons_dragons_payoffs'],
+        containsAll([
+          'Master of Cruelties',
+          'Avacyn, Angel of Hope',
+          'Balefire Dragon',
+          'Rune-Scarred Demon',
+        ]),
+      );
+      expect(
+        avoid,
+        contains('non_angel_demon_dragon_haymaker_as_kaalia_payoff'),
+      );
+      expect(
+        (profile['avoid_patterns'] as List).toString(),
+        contains('Blightsteel Colossus'),
+      );
+    });
+
     test('builds a generic commander profile payload for future commanders',
         () {
       final profile = buildCommanderReferenceProfilePayload(
@@ -247,6 +328,24 @@ void main() {
       expect(prompt, contains('B/G'));
       expect(prompt, contains('graveyard_value'));
       expect(prompt, isNot(contains('Lorehold')));
+    });
+
+    test('prompt guidance uses Kaalia identity and source-backed themes', () {
+      final profile = buildKaaliaReferenceProfilePayload(
+        updatedAt: DateTime.utc(2026, 7, 5, 12),
+      );
+      final prompt = buildCommanderReferenceProfilePrompt(profile);
+
+      expect(prompt, contains('"Kaalia of the Vast"'));
+      expect(prompt, contains('Color identity is exactly B/R/W'));
+      expect(prompt, contains('mardu_attack_cheat_big_creatures'));
+      expect(prompt, contains('haste_and_protection_for_attack_window'));
+      expect(prompt, contains('commander_attack_enablers'));
+      expect(
+        prompt,
+        contains('non_angel_demon_dragon_haymaker_as_kaalia_payoff'),
+      );
+      expect(prompt, contains('Do not copy a public decklist'));
     });
 
     test('prompt guidance forces Lorehold, R/W identity and avoid patterns',

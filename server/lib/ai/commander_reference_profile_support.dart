@@ -7,6 +7,10 @@ const loreholdReferenceCommanderName = 'Lorehold, the Historian';
 const loreholdReferenceProfileVersion =
     'lorehold_reference_profile_v1_2026-05-11';
 const loreholdReferenceProfileSource = 'aggregate_reference_profile_v1';
+const kaaliaReferenceCommanderName = 'Kaalia of the Vast';
+const kaaliaReferenceProfileVersion =
+    'kaalia_of_the_vast_reference_profile_v1_2026-07-05';
+const kaaliaReferenceProfileSource = 'aggregate_reference_profile_v1';
 
 const commanderReferenceRequiredTables = <String>[
   'commander_reference_profiles',
@@ -44,6 +48,12 @@ bool isLoreholdCommanderReferenceCandidate(String? commanderName) {
   if (commanderName == null) return false;
   return normalizeCommanderReferenceName(commanderName) ==
       normalizeCommanderReferenceName(loreholdReferenceCommanderName);
+}
+
+bool isKaaliaCommanderReferenceCandidate(String? commanderName) {
+  if (commanderName == null) return false;
+  return normalizeCommanderReferenceName(commanderName) ==
+      normalizeCommanderReferenceName(kaaliaReferenceCommanderName);
 }
 
 bool isReferenceProfileConfidenceUsable(Object? confidence) {
@@ -226,6 +236,198 @@ Map<String, dynamic> buildLoreholdReferenceProfilePayload({
     ],
     updatedAt: updatedAt,
   );
+}
+
+Map<String, dynamic> buildKaaliaReferenceProfilePayload({
+  DateTime? updatedAt,
+}) {
+  return {
+    ...buildCommanderReferenceProfilePayload(
+      commanderName: kaaliaReferenceCommanderName,
+      version: kaaliaReferenceProfileVersion,
+      source: kaaliaReferenceProfileSource,
+      confidence: 'medium_high',
+      sourceCount: 5,
+      colorIdentity: const ['B', 'R', 'W'],
+      sourceLimitNotes: const [
+        'Aggregate/manual reference only; no copied public decklist.',
+        'Sources reviewed: EDHREC commander aggregate, EDHREC Hidden Gems, Draftsim guide, Flipside deck tech, and Commander Spellbook combo reference.',
+        'Use as tuned casual/bracket guidance, not as cEDH truth or automatic card promotion.',
+      ],
+      themes: const [
+        {
+          'name': 'mardu_attack_cheat_big_creatures',
+          'confidence': 'high',
+          'notes':
+              'Kaalia converts one safe attack into mana advantage by putting Angels, Demons, or Dragons from hand onto the battlefield tapped and attacking.',
+        },
+        {
+          'name': 'haste_and_protection_for_attack_window',
+          'confidence': 'high',
+          'notes':
+              'The commander is a removal magnet; haste, silence, protection, and attack safety are structural requirements, not luxury slots.',
+        },
+        {
+          'name': 'angels_demons_dragons_with_etb_or_combat_impact',
+          'confidence': 'high',
+          'notes':
+              'Threats should create damage, removal, protection, tutor, card advantage, or extra combat when cheated in.',
+        },
+        {
+          'name': 'reanimation_and_plan_b_when_kaalia_removed',
+          'confidence': 'medium_high',
+          'notes':
+              'The deck needs a plan when Kaalia is answered: reanimation, Sneak Attack style effects, and enough mana to hard-cast threats.',
+        },
+        {
+          'name': 'removal_dense_mardu_control_floor',
+          'confidence': 'medium_high',
+          'notes':
+              'Mardu gives efficient spot removal and wraths; low interaction leaves Kaalia unable to force profitable attacks.',
+        },
+        {
+          'name': 'master_of_cruelties_pressure_combo',
+          'confidence': 'medium',
+          'notes':
+              'Master of Cruelties is a validated pressure finish only when attack/block prerequisites are met.',
+        },
+      ],
+      roleTargets: const {
+        'lands': {'min': 35, 'max': 37},
+        'mana_acceleration': {'min': 10, 'max': 14},
+        'haste_protection_silence': {'min': 8, 'max': 12},
+        'angels_demons_dragons_payoffs': {'min': 22, 'max': 30},
+        'spot_interaction': {'min': 8, 'max': 12},
+        'board_wipes_resets': {'min': 2, 'max': 4},
+        'card_draw_selection': {'min': 7, 'max': 11},
+        'tutors_access': {'min': 4, 'max': 8},
+        'reanimation_plan_b': {'min': 3, 'max': 6},
+        'dedicated_win_conditions': {'min': 3, 'max': 6},
+      },
+      expectedPackages: const {
+        'commander_attack_enablers': [
+          'Lightning Greaves',
+          'Swiftfoot Boots',
+          'Hall of the Bandit Lord',
+          'Arena of Glory',
+          'Grand Abolisher',
+          'Silence',
+          'Ranger-Captain of Eos',
+          'Teferi\'s Protection',
+          'Boros Charm',
+          'Akroma\'s Will',
+          'Deflecting Swat',
+          'Flawless Maneuver',
+        ],
+        'angels_demons_dragons_payoffs': [
+          'Master of Cruelties',
+          'Avacyn, Angel of Hope',
+          'Balefire Dragon',
+          'Ancient Copper Dragon',
+          'Rune-Scarred Demon',
+          'Razaketh, the Foulblooded',
+          'Aurelia, the Warleader',
+          'Bloodthirster',
+          'Hoarding Broodlord',
+          'Angel of Serenity',
+          'Angel of the Ruins',
+        ],
+        'interaction_and_resets': [
+          'Swords to Plowshares',
+          'Path to Exile',
+          'Feed the Swarm',
+          'Anguished Unmaking',
+          'Despark',
+          'Terminate',
+          'Bedevil',
+          'Vindicate',
+          'Damn',
+          'Farewell',
+          'Ruinous Ultimatum',
+        ],
+        'mana_ramp_foundation': [
+          'Sol Ring',
+          'Arcane Signet',
+          'Fellwar Stone',
+          'Boros Signet',
+          'Orzhov Signet',
+          'Rakdos Signet',
+          'Talisman of Conviction',
+          'Talisman of Hierarchy',
+          'Talisman of Indulgence',
+          'Ancient Tomb',
+          'Sword of the Animist',
+        ],
+        'card_flow_and_access': [
+          'Demonic Tutor',
+          'Vampiric Tutor',
+          'Enlightened Tutor',
+          'Rune-Scarred Demon',
+          'Necropotence',
+          'Night\'s Whisper',
+          'Esper Sentinel',
+        ],
+        'reanimation_plan_b': [
+          'Reanimate',
+          'Animate Dead',
+          'Necromancy',
+          'Living Death',
+          'Karmic Guide',
+          'Sneak Attack',
+          'Incarnation Technique',
+        ],
+      },
+      avoidPatterns: const [
+        {
+          'pattern': 'non_angel_demon_dragon_haymaker_as_kaalia_payoff',
+          'examples': ['Blightsteel Colossus', 'generic Eldrazi titan'],
+          'reason':
+              'Kaalia only cheats Angels, Demons, and Dragons; non-ADD haymakers need an explicit alternate-cheat package.',
+        },
+        {
+          'pattern': 'equipment_combo_over_core_floor',
+          'examples': [
+            'too many equipment-only payoffs before removal/protection'
+          ],
+          'reason':
+              'Equipment support cannot crowd out interaction, haste, protection, or threat density.',
+        },
+        {
+          'pattern': 'all_in_ritual_plan_without_protection',
+          'examples': ['ritual burst into unprotected Kaalia'],
+          'reason':
+              'Fast starts fail if Kaalia cannot attack safely or if the hand lacks a payoff.',
+        },
+        {
+          'pattern': 'low_removal_kaalia_shell',
+          'examples': [
+            'fewer than eight spot interaction pieces in tuned builds'
+          ],
+          'reason':
+              'Kaalia must clear blockers, answer hate, and survive table pressure.',
+        },
+        {
+          'pattern': 'off_color_or_illegal_cards',
+          'examples': ['blue counterspell package', 'banned Commander cards'],
+          'reason': 'Color identity and Commander legality remain hard gates.',
+        },
+        {
+          'pattern': 'cedh_assumption_without_source_lane',
+          'examples': ['full cEDH fast-mana/stax shell'],
+          'reason':
+              'Competitive relevance must be separately proven before bracket-4/5 assumptions.',
+        },
+      ],
+      updatedAt: updatedAt,
+    ),
+    'source_refs': const [
+      'https://edhrec.com/commanders/kaalia-of-the-vast',
+      'https://edhrec.com/articles/hidden-gems-for-kaalia-of-the-vast',
+      'https://draftsim.com/kaalia-of-the-vast-edh-deck/',
+      'https://flipsidegaming.com/blogs/magic-blog/commander-deck-tech-kaalia-of-the-vast',
+      'https://commanderspellbook.com/combo/29-137/',
+    ],
+  };
 }
 
 Map<String, dynamic> buildCommanderReferenceProfilePayload({
@@ -496,6 +698,13 @@ Map<String, dynamic>? _resolveBuiltInCommanderReferenceProfile(
   if (isLoreholdCommanderReferenceCandidate(commanderName)) {
     return {
       ...buildLoreholdReferenceProfilePayload(updatedAt: updatedAt),
+      'runtime_profile_origin': 'built_in_fallback',
+      'runtime_profile_reason': 'persisted_profile_missing_or_not_usable',
+    };
+  }
+  if (isKaaliaCommanderReferenceCandidate(commanderName)) {
+    return {
+      ...buildKaaliaReferenceProfilePayload(updatedAt: updatedAt),
       'runtime_profile_origin': 'built_in_fallback',
       'runtime_profile_reason': 'persisted_profile_missing_or_not_usable',
     };

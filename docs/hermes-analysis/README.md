@@ -237,6 +237,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     de wincon continuam bloqueados ate existir source-lane/plano de vitoria do
     comandante. Evidencia local atual:
     `master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`.
+    O suporte runtime de profiles agora tambem tem fallback agregado para
+    `Kaalia of the Vast` em
+    `server/lib/ai/commander_reference_profile_support.dart`: esse fallback
+    desbloqueia prompts com identidade `B/R/W`, protecao/haste, interacao real,
+    payoffs Angel/Demon/Dragon e plano B, mas nao substitui matriz estrategica,
+    battle gate nem replay trace.
     Para ordenar o proximo aprendizado global sem voltar a focar no `607`,
     rode `manaloom-knowledge/scripts/global_commander_learning_priority_audit.py`;
     evidencia local atual:

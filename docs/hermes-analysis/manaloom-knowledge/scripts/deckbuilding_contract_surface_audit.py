@@ -16,6 +16,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 CONTRACT_DOC = REPO_ROOT / "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
 SUPPORT_FILE = REPO_ROOT / "server/lib/ai/commander_deckbuilding_contract_support.dart"
+REFERENCE_PROFILE_SUPPORT_FILE = REPO_ROOT / "server/lib/ai/commander_reference_profile_support.dart"
 STAPLE_POLICY_FILE = REPO_ROOT / "server/lib/ai/commander_staple_impact_policy.dart"
 REBUILD_GUIDED_SERVICE = REPO_ROOT / "server/lib/ai/rebuild_guided_service.dart"
 GENERATE_ROUTE = REPO_ROOT / "server/routes/ai/generate/index.dart"
@@ -186,6 +187,18 @@ def build_audit() -> dict[str, Any]:
                 "commanderStapleImpactPolicyDiagnostics",
                 "buildCommanderDeckbuildingContractDiagnostics",
                 "ready_for_battle_gate",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            REFERENCE_PROFILE_SUPPORT_FILE,
+            [
+                "kaaliaReferenceCommanderName",
+                "buildKaaliaReferenceProfilePayload",
+                "isKaaliaCommanderReferenceCandidate",
+                "non_angel_demon_dragon_haymaker_as_kaalia_payoff",
+                "haste_and_protection_for_attack_window",
             ],
         )
     )
