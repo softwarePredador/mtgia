@@ -1658,3 +1658,60 @@ Operational lesson:
   and preserve miracle, topdeck, upkeep-rummage, and spell-floor metrics.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Closing-Window Next Shell Target Router - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_next_shell_target_router_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_next_shell_target_router_20260705_current_relearn.json`
+
+This router combines the closing-window trace, failed from-scratch shell
+synthesis, cut-evidence miner, and miracle-trace failure miner. It decides what
+the next shell contract should target before any new structure matrix or battle.
+
+Current result:
+
+- decision status:
+  `closing_window_shell_target_selected_no_battle`;
+- selected hypothesis:
+  `preserve_topdeck_miracle_floor_micro_package`;
+- selected status:
+  `primary_shell_contract_target_blocked_but_actionable_as_design`;
+- candidate hypotheses: `3`;
+- closing-window comparisons: `13`;
+- average 607 turn advantage: `10.15`;
+- ready micro-package hypotheses from the closing trace: `3`;
+- from-scratch promotable shell signals: `0`;
+- from-scratch next battle gate allowed: `false`;
+- named seed-safe cuts: `0`;
+- cut shortage: `2`;
+- miracle failure flags: `7`;
+- ready deck changes: `0`;
+- promotion allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- recommended next action:
+  `write_miracle_access_first_shell_contract_no_battle`.
+
+Selected shell contract:
+
+- contract key: `miracle_access_first_shell_contract`;
+- shell type: `micro_shell_before_full_generation`;
+- must preserve:
+  `Sensei's Divining Top`, `Scroll Rack`, `Bender's Waterskin`,
+  `Victory Chimes`, and `Approach of the Second Sun`;
+- target metrics:
+  `miracle_cast`, `topdeck_manipulation_activated`,
+  `lorehold_spell_cast`, `lorehold_upkeep_rummage`, and
+  `static_cost_reduction_total`.
+
+Routing conclusion:
+
+- Pressure survival and Guttersnipe/Storm-Kiln remain downstream diagnostic
+  ideas, not the next shell, because the engine floor is still unproven.
+- The next shell cannot be broad from-scratch, because the failed-shell
+  synthesis already showed broad shells below protected `607`.
+- The next valid work is to write the miracle-access-first shell contract with
+  no battle, no deck mutation, and predeclared metric floors.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.
