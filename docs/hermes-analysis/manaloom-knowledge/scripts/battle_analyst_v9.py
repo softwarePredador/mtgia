@@ -10796,7 +10796,7 @@ def _choose_forced_access_replacement(hand, focus_names):
 
 def apply_forced_focus_access_to_opening_keep(player, *, mode=None, focus_cards=None):
     """Traceable test hook: force explicit focus cards into early access windows."""
-    if getattr(player, "name", None) != "Lorehold":
+    if not player_is_evaluation_target(player):
         return []
     mode = str(mode or "none").strip().lower()
     if mode not in FORCED_FOCUS_ACCESS_MODES or mode == "none":
@@ -11019,7 +11019,7 @@ def focus_card_zone_snapshot(player):
 
 def emit_focus_card_access_snapshot(player, *, turn, phase, **context):
     """Emit bounded card-access evidence without changing simulation behavior."""
-    if getattr(player, "name", None) != "Lorehold":
+    if not player_is_evaluation_target(player):
         return
     zones = focus_card_zone_snapshot(player)
     top_library = [

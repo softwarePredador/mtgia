@@ -21,6 +21,10 @@ STAPLE_POLICY_FILE = REPO_ROOT / "server/lib/ai/commander_staple_impact_policy.d
 REBUILD_GUIDED_SERVICE = REPO_ROOT / "server/lib/ai/rebuild_guided_service.dart"
 GENERATE_ROUTE = REPO_ROOT / "server/routes/ai/generate/index.dart"
 SUPPORT_TEST = REPO_ROOT / "server/test/commander_deckbuilding_contract_support_test.dart"
+BATTLE_ANALYST = SCRIPT_DIR / "battle_analyst_v9.py"
+GLOBAL_COMMANDER_FORCE_FOCUS_ACCESS_SCOPE_TEST = (
+    SCRIPT_DIR / "test_global_commander_force_focus_access_scope.py"
+)
 VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
 VARIANT_GATE = SCRIPT_DIR / "lorehold_variant_battle_gate.py"
 ARTIFACT_CONTRACT_AUDIT = SCRIPT_DIR / "lorehold_artifact_contract_audit.py"
@@ -112,6 +116,12 @@ GLOBAL_COMMANDER_NEW_CUT_SOURCE_LANE_TRACE_COLLECTOR = (
 )
 GLOBAL_COMMANDER_NEW_CUT_SOURCE_LANE_TRACE_COLLECTOR_TEST = (
     SCRIPT_DIR / "test_global_commander_new_cut_source_lane_trace_collector.py"
+)
+GLOBAL_COMMANDER_FORCED_CUT_ACCESS_TRACE_GENERATOR = (
+    SCRIPT_DIR / "global_commander_forced_cut_access_trace_generator.py"
+)
+GLOBAL_COMMANDER_FORCED_CUT_ACCESS_TRACE_GENERATOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_forced_cut_access_trace_generator.py"
 )
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
@@ -294,6 +304,10 @@ GLOBAL_COMMANDER_SCOPE1_SAME_LANE_REPLACEMENT_MODEL_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_NEW_CUT_SOURCE_LANE_TRACE_COLLECTOR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_FORCED_CUT_ACCESS_TRACE_GENERATOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -590,6 +604,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "new_cut_source_lane_trace_blocks_used_remaining_cuts",
                 "force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts",
+                "global_commander_forced_cut_access_trace_generator.py",
+                "global_commander_forced_cut_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "forced_cut_access_trace_blocks_used_unresolved_cuts",
+                "expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -828,6 +846,9 @@ def build_audit() -> dict[str, Any]:
                 "new cut-source-lane evidence pass",
                 "global_commander_new_cut_source_lane_trace_collector.py",
                 "force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts",
+                "global_commander_forced_cut_access_trace_generator.py",
+                "evaluation target atual",
+                "expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1277,6 +1298,59 @@ def build_audit() -> dict[str, Any]:
                 "Dark Ritual",
                 "Opponent",
                 "remaining_cut_used_by_target_trace_blocks_value_safe",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            BATTLE_ANALYST,
+            [
+                "MANALOOM_FORCE_FOCUS_ACCESS_MODE",
+                "MANALOOM_FOCUS_ACCESS_CARDS",
+                "apply_forced_focus_access_to_opening_keep",
+                "player_is_evaluation_target(player)",
+                "forced_focus_access_applied",
+                "emit_focus_card_access_snapshot",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_FORCE_FOCUS_ACCESS_SCOPE_TEST,
+            [
+                "test_forced_focus_access_applies_to_current_evaluation_target",
+                "test_forced_focus_access_does_not_apply_to_non_target_player",
+                "Kaalia of the Vast",
+                "Dark Ritual",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_FORCED_CUT_ACCESS_TRACE_GENERATOR,
+            [
+                "global_commander_forced_cut_access_trace_generator",
+                "forced_cut_access_trace_blocks_used_unresolved_cuts",
+                "forced_access_usage_observed_blocks_value_safe",
+                "MANALOOM_FORCE_FOCUS_ACCESS_MODE",
+                "MANALOOM_FOCUS_ACCESS_CARDS",
+                "expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts",
+                "forced_access_boundary",
+                "target_boundary",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_FORCED_CUT_ACCESS_TRACE_GENERATOR_TEST,
+            [
+                "test_forced_access_usage_blocks_value_safe_reclassification",
+                "test_forced_access_available_without_usage_needs_manual_review",
+                "Dark Ritual",
+                "Kaalia of the Vast",
+                "forced_access_usage_observed_blocks_value_safe",
             ],
         )
     )
@@ -1987,6 +2061,25 @@ def build_audit() -> dict[str, Any]:
                 "force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts",
                 "Sunforger",
                 "Smothering Tithe",
+                "Dark Ritual",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_FORCED_CUT_ACCESS_TRACE_GENERATOR_REPORT,
+            [
+                "Global Commander Forced Cut Access Trace Generator",
+                "forced_cut_access_trace_blocks_used_unresolved_cuts",
+                "focus_card_count: `3`",
+                "usage_blocked_count: `3`",
+                "manual_review_count: `0`",
+                "force_failure_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts",
+                "Alicia Masters, Skilled Sculptor",
+                "Vampiric Tutor",
                 "Dark Ritual",
             ],
         )

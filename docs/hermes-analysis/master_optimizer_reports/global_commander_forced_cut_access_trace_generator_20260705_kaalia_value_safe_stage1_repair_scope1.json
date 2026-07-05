@@ -1,0 +1,396 @@
+{
+  "artifact_type": "global_commander_forced_cut_access_trace_generator",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "forced_access_usage_observed:Alicia Masters, Skilled Sculptor,Vampiric Tutor,Dark Ritual",
+    "candidate_copy_closed_after_forced_access_trace"
+  ],
+  "deck_action_allowed": false,
+  "forced_access_replay_performed": true,
+  "generated_at": "2026-07-05T22:00:37.416084+00:00",
+  "input_artifacts": {
+    "battle_replay": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+    "cut_trace_collector_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1",
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+    "trace_generator_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "forced_access_boundary": "Forced access is diagnostic evidence only; it is not a natural battle gate.",
+    "promotion_boundary": "No candidate copy, deck mutation, battle gate, or promotion is opened by this report.",
+    "target_boundary": "Forced access applies only to the current evaluation target player."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "decision": "not_value_safe_after_forced_access_usage",
+      "decision_trace_count": 48,
+      "event_types": {
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "creature_cast": 1,
+        "focus_card_access_snapshot": 143,
+        "forced_focus_access_applied": 3,
+        "permanent_moved_from_battlefield": 1,
+        "turn_end": 28,
+        "turn_start": 24
+      },
+      "exposure_event_count": 52,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_forced_access_event": {
+        "card": "Alicia Masters, Skilled Sculptor",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": "Ancient Tomb",
+        "status": "moved",
+        "turn": 0
+      },
+      "first_usage_event": {
+        "card": "Alicia Masters, Skilled Sculptor",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 9
+      },
+      "forced_access_moved_or_present_count": 3,
+      "forced_access_not_found_count": 0,
+      "next_gate": "find_different_cut_or_same_lane_replacement_proof",
+      "status": "forced_access_usage_observed_blocks_value_safe",
+      "usage_event_count": 3,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Vampiric Tutor",
+      "decision": "not_value_safe_after_forced_access_usage",
+      "decision_trace_count": 38,
+      "event_types": {
+        "cast_announced": 2,
+        "cost_paid": 2,
+        "countered_spell_moved_to_graveyard": 1,
+        "focus_card_access_snapshot": 143,
+        "forced_focus_access_applied": 3,
+        "priority_pass": 5,
+        "spell_cast": 2,
+        "spell_resolved": 1,
+        "turn_end": 18,
+        "turn_start": 20,
+        "tutor_life_loss_resolved": 1,
+        "tutor_resolved": 1
+      },
+      "exposure_event_count": 38,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_forced_access_event": {
+        "card": "Vampiric Tutor",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": "Fabled Passage",
+        "status": "moved",
+        "turn": 0
+      },
+      "first_usage_event": {
+        "card": "Vampiric Tutor",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 8
+      },
+      "forced_access_moved_or_present_count": 3,
+      "forced_access_not_found_count": 0,
+      "next_gate": "find_different_cut_or_same_lane_replacement_proof",
+      "status": "forced_access_usage_observed_blocks_value_safe",
+      "usage_event_count": 8,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Dark Ritual",
+      "decision": "not_value_safe_after_forced_access_usage",
+      "decision_trace_count": 39,
+      "event_types": {
+        "cast_announced": 1,
+        "cost_paid": 1,
+        "end_step_instant": 1,
+        "focus_card_access_snapshot": 143,
+        "forced_focus_access_applied": 3,
+        "ritual_mana_added": 1,
+        "spell_cast": 1,
+        "spell_resolved": 1,
+        "turn_end": 19,
+        "turn_start": 20
+      },
+      "exposure_event_count": 39,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_forced_access_event": {
+        "card": "Dark Ritual",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": "Plains // Plains",
+        "status": "moved",
+        "turn": 0
+      },
+      "first_usage_event": {
+        "card": "Dark Ritual",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 7
+      },
+      "forced_access_moved_or_present_count": 3,
+      "forced_access_not_found_count": 0,
+      "next_gate": "find_different_cut_or_same_lane_replacement_proof",
+      "status": "forced_access_usage_observed_blocks_value_safe",
+      "usage_event_count": 4,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "seed_reports": [
+    {
+      "decision_count": 190,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_50.decision_trace.jsonl",
+      "event_count": 1180,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_50.events.jsonl",
+      "forced_access": {
+        "Alicia Masters, Skilled Sculptor": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Alicia Masters, Skilled Sculptor",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Ancient Tomb",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Dark Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Dark Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Plains // Plains",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Vampiric Tutor": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Vampiric Tutor",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Fabled Passage",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_deck_provenance_seed_50.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_50.txt",
+      "returncode": 0,
+      "seed": 50,
+      "status": "forced_replay_generated"
+    },
+    {
+      "decision_count": 87,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_51.decision_trace.jsonl",
+      "event_count": 585,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_51.events.jsonl",
+      "forced_access": {
+        "Alicia Masters, Skilled Sculptor": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Alicia Masters, Skilled Sculptor",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Sol Ring",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Dark Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Dark Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Ancient Tomb",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Vampiric Tutor": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Vampiric Tutor",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Arcane Signet",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_deck_provenance_seed_51.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_51.txt",
+      "returncode": 0,
+      "seed": 51,
+      "status": "forced_replay_generated"
+    },
+    {
+      "decision_count": 104,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_52.decision_trace.jsonl",
+      "event_count": 670,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_52.events.jsonl",
+      "forced_access": {
+        "Alicia Masters, Skilled Sculptor": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Alicia Masters, Skilled Sculptor",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Ornithopter of Paradise",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Dark Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Dark Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "City of Traitors",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Vampiric Tutor": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Vampiric Tutor",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Despark",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_deck_provenance_seed_52.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_replays_20260705_kaalia_value_safe_stage1_repair_scope1/forced_replay_seed_52.txt",
+      "returncode": 0,
+      "seed": 52,
+      "status": "forced_replay_generated"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "forced_cut_access_trace_blocks_used_unresolved_cuts",
+  "summary": {
+    "candidate_copy_blocker_count": 2,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "focus_card_count": 3,
+    "focus_cards": [
+      "Alicia Masters, Skilled Sculptor",
+      "Vampiric Tutor",
+      "Dark Ritual"
+    ],
+    "force_failure_count": 0,
+    "forced_access_mode": "opening_hand",
+    "manual_review_count": 0,
+    "next_gate": "expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts",
+    "seed_count": 3,
+    "seed_start": 50,
+    "usage_blocked_count": 3
+  },
+  "value_safe_reclassification_allowed_now": false
+}

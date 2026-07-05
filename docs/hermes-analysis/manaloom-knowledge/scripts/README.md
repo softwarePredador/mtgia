@@ -95,6 +95,14 @@ the remaining stage-only cut pool, counts only target-deck traces, and keeps
 value-safe reclassification closed for cards that were used, merely seen without
 usage, or not seen in that replay window.
 
+If that collector leaves cards unresolved, run
+`global_commander_forced_cut_access_trace_generator.py` with forced access
+against the current evaluation target. The battle runtime must apply
+`MANALOOM_FORCE_FOCUS_ACCESS_MODE` to the evaluation target, not only to
+Lorehold. Forced access is diagnostic: card use still blocks value-safe
+reclassification, and no candidate copy, battle gate, or promotion opens from
+forced-access traces.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

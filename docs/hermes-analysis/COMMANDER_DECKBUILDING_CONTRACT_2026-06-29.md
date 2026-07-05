@@ -274,7 +274,12 @@ Operational priority after this pivot:
    existing replay artifacts first, count only target-deck traces, and keep
    value-safe reclassification closed for any remaining cut that was used,
    merely seen without usage, or not seen in the current replay window;
-29. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+29. run `global_commander_forced_cut_access_trace_generator.py` only for
+   unresolved remaining cuts after natural/current-scope trace collection; it
+   may use `MANALOOM_FORCE_FOCUS_ACCESS_MODE=opening_hand` against the current
+   evaluation target player, but forced access is diagnostic evidence only and
+   must not count as a natural battle gate or promotion gate;
+30. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -320,6 +325,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_contextual_usage_trace_reviewer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -692,6 +698,19 @@ Current external refresh on 2026-07-05:
   Therefore candidate copy, battle, promotion, and value-safe reclassification
   remain closed; the next gate is
   `force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts`.
+- Current forced cut-access trace generation fixed the old Lorehold-only focus
+  hook by applying force access to the current evaluation target player, then
+  tested only the unresolved cuts from the prior collector. The report
+  `global_commander_forced_cut_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  forced opening-hand access for `Alicia Masters, Skilled Sculptor`,
+  `Vampiric Tutor`, and `Dark Ritual` over seeds `50-52`. All three were
+  present through force access and then used by the target deck, so the report
+  status is `forced_cut_access_trace_blocks_used_unresolved_cuts` with
+  `usage_blocked_count=3`, `manual_review_count=0`, and
+  `force_failure_count=0`. This closes the current stage-only cut lane for
+  value-safe reclassification. Candidate copy, battle, promotion, and
+  value-safe reclassification remain closed; the next gate is
+  `expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts`.
 
 ## Global Commander Rollout - 2026-07-01
 

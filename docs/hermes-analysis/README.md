@@ -521,6 +521,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Resultado: dos `12` cortes restantes, `9` foram usados pelo deck alvo,
     `2` foram vistos sem uso e `1` nao apareceu; o proximo gate e
     `force_access_or_expand_cut_source_lane_for_unresolved_remaining_cuts`.
+    O gate de force-access foi globalizado para o evaluation target atual e
+    executado por
+    `manaloom-knowledge/scripts/global_commander_forced_cut_access_trace_generator.py`;
+    evidencia:
+    `master_optimizer_reports/global_commander_forced_cut_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `Alicia Masters, Skilled Sculptor`, `Vampiric Tutor` e
+    `Dark Ritual` foram forcados para acesso inicial em `3` seeds e todos foram
+    usados pelo deck alvo. A lane atual de cortes segue fechada; o proximo gate
+    e `expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
