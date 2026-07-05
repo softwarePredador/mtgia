@@ -328,7 +328,13 @@ Operational priority after this pivot:
     with same-lane axis requirements or external nonpayoff cut-lane corpus
     research without opening candidate copy, battle, promotion, or value-safe
     reclassification;
-40. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+40. run `global_commander_same_lane_package_resynthesizer.py` after package-axis
+    broadening routes to same-lane resynthesis; it must convert each exhausted
+    target cut role into an explicit required add axis, hold payoff-only adds
+    until they have their own same-lane cuts, and route to same-lane add source
+    lane expansion while candidate copy, battle, promotion, and value-safe
+    reclassification remain closed;
+41. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -386,6 +392,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_corpus_cut_policy_mapper_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_package_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -855,6 +862,13 @@ Current external refresh on 2026-07-05:
   `tutors_access`. Secondary text on payoffs such as haste, treasure, draw, or
   protection is incidental and does not prove a same-lane replacement. The next
   gate is `resynthesize_package_with_same_lane_axis_requirements`.
+- Current same-lane package resynthesis returns
+  `same_lane_package_resynthesis_blocks_candidate_copy_needs_source_lanes` with
+  `held_payoff_add_count=6`, `same_lane_axis_requirement_count=3`,
+  `satisfied_same_lane_axis_count=0`, `value_safe_cut_count=0`, and
+  `ready_pair_count=0`. The required add axes are `commander_attack_window`,
+  `mana_acceleration_replacement`, and `tutors_access_replacement`. The next
+  gate is `expand_same_lane_add_source_lanes_for_target_cut_roles`.
 
 ## Global Commander Rollout - 2026-07-01
 

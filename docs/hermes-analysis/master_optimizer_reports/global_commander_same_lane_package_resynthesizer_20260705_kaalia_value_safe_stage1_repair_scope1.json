@@ -1,0 +1,278 @@
+{
+  "artifact_type": "global_commander_same_lane_package_resynthesizer",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "same_lane_add_source_lanes_missing_for_target_cut_roles",
+    "payoff_adds_held_until_payoff_lane_has_own_cuts",
+    "candidate_copy_closed_until_named_same_lane_value_safe_pairs_exist"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T23:17:11.718186+00:00",
+  "held_payoff_adds": [
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Dragon Mage",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_damage_trigger",
+        "card_flow_payload"
+      ],
+      "guardrail": "payoff_axis_needs_own_value_safe_cut_or_same_lane_package_cut",
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "status": "held_payoff_add_not_pairable_with_current_cut_roles"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Bonehoard Dracosaur",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_keywords",
+        "mana_or_treasure_payload",
+        "card_flow_payload"
+      ],
+      "guardrail": "payoff_axis_needs_own_value_safe_cut_or_same_lane_package_cut",
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "status": "held_payoff_add_not_pairable_with_current_cut_roles"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Drakuseth, Maw of Flames",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "attack_trigger",
+        "removal_payload"
+      ],
+      "guardrail": "payoff_axis_needs_own_value_safe_cut_or_same_lane_package_cut",
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "status": "held_payoff_add_not_pairable_with_current_cut_roles"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "The Balrog of Moria",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "haste",
+        "combat_keywords",
+        "mana_or_treasure_payload",
+        "card_flow_payload"
+      ],
+      "guardrail": "payoff_axis_needs_own_value_safe_cut_or_same_lane_package_cut",
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "status": "held_payoff_add_not_pairable_with_current_cut_roles"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Wrathful Red Dragon",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "removal_payload",
+        "life_total_or_damage_multiplier"
+      ],
+      "guardrail": "payoff_axis_needs_own_value_safe_cut_or_same_lane_package_cut",
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "status": "held_payoff_add_not_pairable_with_current_cut_roles"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Akroma, Angel of Wrath",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "haste",
+        "combat_keywords",
+        "protection_or_lock_payload"
+      ],
+      "guardrail": "payoff_axis_needs_own_value_safe_cut_or_same_lane_package_cut",
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "status": "held_payoff_add_not_pairable_with_current_cut_roles"
+    }
+  ],
+  "input_artifacts": {
+    "broadening_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_package_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.json",
+    "package_synthesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "payoff_source_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "No battle or promotion opens from requirements alone.",
+    "payoff_boundary": "Payoff source candidates stay held when current cut pressure is ramp, tutor, or attack-window pressure.",
+    "resynthesis_boundary": "This gate creates source-lane requirements, not deck changes.",
+    "same_lane_boundary": "A cut role must be replaced by an explicit same-lane add axis or separately proven by equal-gate evidence."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "resynthesis_actions": [
+    {
+      "action": "expand_same_lane_add_source_lanes_for_target_cut_roles",
+      "candidate_copy_allowed": false,
+      "priority": "P0",
+      "reason": "Every exhausted cut role needs an explicit replacement add lane before package pairing.",
+      "status": "required_now",
+      "target_roles": [
+        "haste_protection_silence",
+        "mana_acceleration",
+        "tutors_access"
+      ]
+    },
+    {
+      "action": "hold_payoff_package_until_payoff_lane_has_own_cuts",
+      "candidate_copy_allowed": false,
+      "held_add_count": 6,
+      "priority": "P1",
+      "reason": "Payoff adds remain useful source candidates but cannot consume ramp, tutor, or attack-window cuts.",
+      "status": "held"
+    },
+    {
+      "action": "keep_package_resynthesis_closed_to_deck_action",
+      "candidate_copy_allowed": false,
+      "priority": "P3",
+      "reason": "Requirements are not a materialized package and do not open battle or promotion.",
+      "status": "closed_no_deck_action"
+    }
+  ],
+  "same_lane_axis_requirements": [
+    {
+      "candidate_copy_allowed": false,
+      "cut_role": "haste_protection_silence",
+      "explicit_same_lane_add_count": 0,
+      "explicit_same_lane_adds": [],
+      "next_gate": "expand_same_lane_add_source_lane_for_role",
+      "required_add_axis": "commander_attack_window",
+      "status": "source_lane_required_before_package_resynthesis",
+      "target_cut_count": 4
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_role": "mana_acceleration",
+      "explicit_same_lane_add_count": 0,
+      "explicit_same_lane_adds": [],
+      "next_gate": "expand_same_lane_add_source_lane_for_role",
+      "required_add_axis": "mana_acceleration_replacement",
+      "status": "source_lane_required_before_package_resynthesis",
+      "target_cut_count": 1
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_role": "tutors_access",
+      "explicit_same_lane_add_count": 0,
+      "explicit_same_lane_adds": [],
+      "next_gate": "expand_same_lane_add_source_lane_for_role",
+      "required_add_axis": "tutors_access_replacement",
+      "status": "source_lane_required_before_package_resynthesis",
+      "target_cut_count": 8
+    }
+  ],
+  "selected_cut_diagnostics": [
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Diabolic Intent",
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "required_replacement_axes": [
+        "tutors_access_replacement"
+      ],
+      "status": "cut_held_until_same_lane_replacement_and_value_safe_proof"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Jeska's Will",
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "required_replacement_axes": [
+        "mana_acceleration_replacement"
+      ],
+      "status": "cut_held_until_same_lane_replacement_and_value_safe_proof"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Professional Face-Breaker",
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "required_replacement_axes": [
+        "mana_acceleration_replacement"
+      ],
+      "status": "cut_held_until_same_lane_replacement_and_value_safe_proof"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Ornithopter of Paradise",
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "required_replacement_axes": [
+        "mana_acceleration_replacement"
+      ],
+      "status": "cut_held_until_same_lane_replacement_and_value_safe_proof"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Dark Ritual",
+      "matching_over_target_roles": [
+        "mana_acceleration"
+      ],
+      "required_replacement_axes": [
+        "mana_acceleration_replacement"
+      ],
+      "status": "cut_held_until_same_lane_replacement_and_value_safe_proof"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "same_lane_package_resynthesis_blocks_candidate_copy_needs_source_lanes",
+  "summary": {
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "held_payoff_add_count": 6,
+    "next_gate": "expand_same_lane_add_source_lanes_for_target_cut_roles",
+    "package_axes": [
+      "angels_demons_dragons_payoffs"
+    ],
+    "payoff_source_ready_candidate_count": 30,
+    "ready_pair_count": 0,
+    "same_lane_axis_requirement_count": 3,
+    "satisfied_same_lane_axis_count": 0,
+    "selected_add_count": 6,
+    "selected_cut_count": 5,
+    "target_cut_roles": {
+      "haste_protection_silence": 4,
+      "mana_acceleration": 1,
+      "tutors_access": 8
+    },
+    "value_safe_cut_count": 0
+  },
+  "value_safe_reclassification_allowed_now": false
+}

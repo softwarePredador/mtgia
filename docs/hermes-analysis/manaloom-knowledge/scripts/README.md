@@ -167,6 +167,13 @@ secondary text on payoff cards as non-proof, and routes to
 cut-lane corpus research. Candidate copy, battle, promotion, and value-safe
 reclassification remain closed.
 
+Then run `global_commander_same_lane_package_resynthesizer.py`. It converts each
+exhausted cut role into a required same-lane add axis, holds payoff-only adds
+until payoff-lane cuts exist, and routes to
+`expand_same_lane_add_source_lanes_for_target_cut_roles`. This is still a
+requirements gate only; no deck copy, battle, promotion, or value-safe
+reclassification opens.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

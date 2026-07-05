@@ -611,6 +611,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `tutors_access`; texto secundario nos payoffs e incidental, nao prova
     same-lane. Proximo gate:
     `resynthesize_package_with_same_lane_axis_requirements`.
+    A resintese same-lane fica em
+    `global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado:
+    `same_lane_package_resynthesis_blocks_candidate_copy_needs_source_lanes`,
+    com `held_payoff_add_count=6`,
+    `same_lane_axis_requirement_count=3`,
+    `satisfied_same_lane_axis_count=0`, `value_safe_cut_count=0` e
+    `ready_pair_count=0`. Os eixos requeridos agora sao
+    `commander_attack_window`, `mana_acceleration_replacement` e
+    `tutors_access_replacement`. Proximo gate:
+    `expand_same_lane_add_source_lanes_for_target_cut_roles`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

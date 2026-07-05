@@ -174,6 +174,12 @@ GLOBAL_COMMANDER_PACKAGE_AXIS_BROADENING_PLAN = (
 GLOBAL_COMMANDER_PACKAGE_AXIS_BROADENING_PLAN_TEST = (
     SCRIPT_DIR / "test_global_commander_package_axis_broadening_plan.py"
 )
+GLOBAL_COMMANDER_SAME_LANE_PACKAGE_RESYNTHESIZER = (
+    SCRIPT_DIR / "global_commander_same_lane_package_resynthesizer.py"
+)
+GLOBAL_COMMANDER_SAME_LANE_PACKAGE_RESYNTHESIZER_TEST = (
+    SCRIPT_DIR / "test_global_commander_same_lane_package_resynthesizer.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -403,6 +409,10 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_CORPUS_CUT_POLICY_MAPPER_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_PACKAGE_AXIS_BROADENING_PLAN_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_package_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md"
+)
+GLOBAL_COMMANDER_SCOPE1_SAME_LANE_PACKAGE_RESYNTHESIZER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -740,6 +750,10 @@ def build_audit() -> dict[str, Any]:
                 "commander_package_axis_broadening_plan_ready_no_deck_action",
                 "package_axis_mismatch_with_exhausted_cut_lanes",
                 "resynthesize_package_with_same_lane_axis_requirements",
+                "global_commander_same_lane_package_resynthesizer.py",
+                "global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_package_resynthesis_blocks_candidate_copy_needs_source_lanes",
+                "expand_same_lane_add_source_lanes_for_target_cut_roles",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1018,6 +1032,10 @@ def build_audit() -> dict[str, Any]:
                 "commander_package_axis_broadening_plan_ready_no_deck_action",
                 "lane_alignment_status=package_axis_mismatch_with_exhausted_cut_lanes",
                 "resynthesize_package_with_same_lane_axis_requirements",
+                "global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_package_resynthesis_blocks_candidate_copy_needs_source_lanes",
+                "held_payoff_add_count=6",
+                "expand_same_lane_add_source_lanes_for_target_cut_roles",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1613,6 +1631,36 @@ def build_audit() -> dict[str, Any]:
                 "resynthesize_package_with_same_lane_axis_requirements",
                 "collect_external_nonpayoff_cut_lane_corpus",
                 "same_lane_axis_still_needs_value_safe_cut_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_PACKAGE_RESYNTHESIZER,
+            [
+                "global_commander_same_lane_package_resynthesizer",
+                "same_lane_package_resynthesis_blocks_candidate_copy_needs_source_lanes",
+                "same_lane_package_resynthesis_has_pair_candidates",
+                "expand_same_lane_add_source_lanes_for_target_cut_roles",
+                "hold_payoff_package_until_payoff_lane_has_own_cuts",
+                "same_lane_add_source_lanes_missing_for_target_cut_roles",
+                "payoff_axis_needs_own_value_safe_cut_or_same_lane_package_cut",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_PACKAGE_RESYNTHESIZER_TEST,
+            [
+                "test_payoff_only_package_blocks_candidate_copy_and_names_requirements",
+                "test_existing_same_lane_axis_still_needs_value_safe_cut_proof",
+                "test_ready_pair_count_only_opens_when_same_lane_axis_and_value_safe_cut_exist",
+                "same_lane_package_resynthesis_blocks_candidate_copy_needs_source_lanes",
+                "mana_acceleration_replacement",
+                "tutors_access_replacement",
+                "same_lane_axes_still_need_value_safe_cut_proof",
             ],
         )
     )
@@ -2614,6 +2662,28 @@ def build_audit() -> dict[str, Any]:
                 "resynthesize_package_with_same_lane_axis_requirements",
                 "collect_external_nonpayoff_cut_lane_corpus",
                 "incidental_payload_is_not_same_lane_cut_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_SAME_LANE_PACKAGE_RESYNTHESIZER_REPORT,
+            [
+                "Global Commander Same-Lane Package Resynthesizer",
+                "same_lane_package_resynthesis_blocks_candidate_copy_needs_source_lanes",
+                "held_payoff_add_count: `6`",
+                "same_lane_axis_requirement_count: `3`",
+                "satisfied_same_lane_axis_count: `0`",
+                "value_safe_cut_count: `0`",
+                "ready_pair_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "expand_same_lane_add_source_lanes_for_target_cut_roles",
+                "commander_attack_window",
+                "mana_acceleration_replacement",
+                "tutors_access_replacement",
+                "hold_payoff_package_until_payoff_lane_has_own_cuts",
+                "same_lane_add_source_lanes_missing_for_target_cut_roles",
             ],
         )
     )
