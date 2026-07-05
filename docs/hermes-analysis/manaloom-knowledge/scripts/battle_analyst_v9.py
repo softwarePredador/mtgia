@@ -300,6 +300,7 @@ OPENING_HAND_REACTIVE_EFFECTS = {
     "silence_opponents",
     "silence_spell",
     "stat_modifier_until_eot",
+    "global_stat_modifier_until_eot",
 }
 OPENING_HAND_CARD_FLOW_EFFECTS = {
     "draw_cards",
@@ -4808,6 +4809,66 @@ def resolve_controlled_stat_modifier_until_eot_spell(player, opponents, card, ef
         "controlled_stat_modifier_until_eot_resolved",
         player=player.name,
         card=card.get("name", "?"),
+        affected_count=len(affected),
+        affected=[dict(item) for item in affected],
+        moved_to_graveyard=moved,
+        power_delta=power_delta,
+        toughness_delta=toughness_delta,
+        result=result,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return affected
+
+
+def resolve_global_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn):
+    power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
+    toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
+    controller_scope = str(effect_data.get("target_controller") or "all").lower()
+    if controller_scope in {"opponent", "opponents"}:
+        participants = list(opponents or [])
+    elif controller_scope in {"self", "you", "controller", "controlled"}:
+        participants = [player]
+    else:
+        participants = [player] + list(opponents or [])
+        controller_scope = "all"
+    affected = []
+    moved = []
+    for owner in participants:
+        for target in list(getattr(owner, "battlefield", []) or []):
+            if not is_battlefield_creature(target):
+                continue
+            power_before = _numeric_card_stat(target, "power")
+            toughness_before = _numeric_card_stat(target, "toughness", "power")
+            remember_until_eot(target, "power")
+            remember_until_eot(target, "toughness")
+            target["power"] = power_before + power_delta
+            target["toughness"] = toughness_before + toughness_delta
+            record = {
+                "target_player": owner.name,
+                "target": target.get("name", "?"),
+                "power_before": power_before,
+                "toughness_before": toughness_before,
+                "power_after": target.get("power"),
+                "toughness_after": target.get("toughness"),
+            }
+            affected.append(record)
+            if int(float(target.get("toughness") or 0)) <= 0:
+                destination = move_creature_from_battlefield(
+                    owner,
+                    target,
+                    reason="zero_toughness",
+                    source=card,
+                )
+                record["destination"] = destination
+                moved.append({"target_player": owner.name, "target": target.get("name", "?")})
+    result = "stat_modifier_until_eot_applied" if affected else "no_affected_creatures"
+    emit_replay_event(
+        "global_stat_modifier_until_eot_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_controller=controller_scope,
         affected_count=len(affected),
         affected=[dict(item) for item in affected],
         moved_to_graveyard=moved,
@@ -55220,6 +55281,8 @@ def apply_effect_immediate(
         resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn)
     elif effect == "controlled_stat_modifier_until_eot":
         resolve_controlled_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn)
+    elif effect == "global_stat_modifier_until_eot":
+        resolve_global_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn)
     elif effect == "damage_each_opponent":
         apply_damage_each_opponent(player, opponents, card, effect_data, turn)
     elif effect == "damage_each_opponent_and_opponent_creatures":

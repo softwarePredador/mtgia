@@ -1,0 +1,263 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "PG526",
+  "generated_at": "2026-07-05T19:41:05.451403+00:00",
+  "manifest": "../../master_optimizer_reports/pg526_boost_all_new_server_package_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg526_boost_all_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Cower in Fear",
+      "Hell Swarm",
+      "Hysterical Blindness",
+      "Infest",
+      "Languish",
+      "Magnify",
+      "Marsh Gas",
+      "Nausea",
+      "Rollick of Abandon",
+      "Shrivel"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 10,
+    "promoted_rule_rows": 10,
+    "promoted_verified_auto_rows": 10,
+    "row_count": 10
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Cower in Fear",
+      "logical_rule_key": "battle_rule_v1:337d66b30a687e5e150f482158801abc",
+      "normalized_name": "cower in fear",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Hell Swarm",
+      "logical_rule_key": "battle_rule_v1:baaab7ad1a72b3e32f10ae9aad54dd2e",
+      "normalized_name": "hell swarm",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Hysterical Blindness",
+      "logical_rule_key": "battle_rule_v1:a2f2072bd8f5a0309e414d33c73998aa",
+      "normalized_name": "hysterical blindness",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Infest",
+      "logical_rule_key": "battle_rule_v1:61acff86c382b352911a02e78ce6247f",
+      "normalized_name": "infest",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Languish",
+      "logical_rule_key": "battle_rule_v1:947c46100669395b8987c123809e4a28",
+      "normalized_name": "languish",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Magnify",
+      "logical_rule_key": "battle_rule_v1:11b4966577ba19d9e1d3f515557fa5b0",
+      "normalized_name": "magnify",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Marsh Gas",
+      "logical_rule_key": "battle_rule_v1:e55fb97c2ca407fb32118fa2439c7df8",
+      "normalized_name": "marsh gas",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Nausea",
+      "logical_rule_key": "battle_rule_v1:8779b0605241adfc7eeff5e5749628ca",
+      "normalized_name": "nausea",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Rollick of Abandon",
+      "logical_rule_key": "battle_rule_v1:d2e31f17c284efb49cab9e5a41f642a2",
+      "normalized_name": "rollick of abandon",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Shrivel",
+      "logical_rule_key": "battle_rule_v1:8779b0605241adfc7eeff5e5749628ca",
+      "normalized_name": "shrivel",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Cower in Fear",
+      "Hell Swarm",
+      "Hysterical Blindness",
+      "Infest",
+      "Languish",
+      "Magnify",
+      "Marsh Gas",
+      "Nausea",
+      "Rollick of Abandon",
+      "Shrivel"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 10,
+    "total_target_card_rows": 10,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "a27cd9a1-30f4-467f-ba8e-6e261e0f7649",
+      "card_name": "Cower in Fear",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:337d66b30a687e5e150f482158801abc",
+      "normalized_name": "cower in fear",
+      "oracle_hash": "d0311c1b77837fc4fc3002c1cc658da2",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "d2b5ad49-1ab5-43e9-b5fd-3736e4b1eedb",
+      "card_name": "Hell Swarm",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:baaab7ad1a72b3e32f10ae9aad54dd2e",
+      "normalized_name": "hell swarm",
+      "oracle_hash": "51f6af0039eec27db65207f4fe67a4cb",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "f4627e80-a1f7-4006-ade3-32ccf6b3a358",
+      "card_name": "Hysterical Blindness",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:a2f2072bd8f5a0309e414d33c73998aa",
+      "normalized_name": "hysterical blindness",
+      "oracle_hash": "05dd7a0df25f6404bbe1d94a6fd3e65e",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "8bf27d26-7262-4d17-9393-8fde4504dee4",
+      "card_name": "Infest",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:61acff86c382b352911a02e78ce6247f",
+      "normalized_name": "infest",
+      "oracle_hash": "de675042b01e8a73e81030a56668db6d",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "c7b8e64d-5304-4068-9982-24eac647f9f8",
+      "card_name": "Languish",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:947c46100669395b8987c123809e4a28",
+      "normalized_name": "languish",
+      "oracle_hash": "bac50aeeb74271c0cde0535bae01c6fe",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "23d9b4eb-6843-44ac-8022-b7fcbeb0a67b",
+      "card_name": "Magnify",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:11b4966577ba19d9e1d3f515557fa5b0",
+      "normalized_name": "magnify",
+      "oracle_hash": "7e278e44bc95d6ffc235a568753d226e",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "193e1c76-7c97-45f2-84dc-e0974fb3448d",
+      "card_name": "Marsh Gas",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:e55fb97c2ca407fb32118fa2439c7df8",
+      "normalized_name": "marsh gas",
+      "oracle_hash": "8a0d48ff220104dcca1ff68cfce9104e",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "4b527670-0be8-4fff-8026-6e9ef0532056",
+      "card_name": "Nausea",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:8779b0605241adfc7eeff5e5749628ca",
+      "normalized_name": "nausea",
+      "oracle_hash": "d616f39ce55b12fe55a9c3c060f72cff",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "6522a1fa-d1d9-4943-8c7a-f7eeec6de801",
+      "card_name": "Rollick of Abandon",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:d2e31f17c284efb49cab9e5a41f642a2",
+      "normalized_name": "rollick of abandon",
+      "oracle_hash": "7e1e6ba5e37207b13d95ce0c9a8b437b",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "784696d6-894f-4b9c-8e50-a564c94c26e9",
+      "card_name": "Shrivel",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:8779b0605241adfc7eeff5e5749628ca",
+      "normalized_name": "shrivel",
+      "oracle_hash": "d616f39ce55b12fe55a9c3c060f72cff",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "boost_all_new_server"
+}

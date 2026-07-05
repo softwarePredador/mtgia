@@ -13040,6 +13040,106 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(best["power"], 4)
         self.assertEqual(best["toughness"], 4)
 
+    def test_global_stat_modifier_until_eot_spell_buffs_all_creatures_and_cleans_up(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        own = {"name": "Own Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 3, "toughness": 3}
+        active.battlefield.append(own)
+        opponent.battlefield.append(enemy)
+        effect = {
+            "effect": "global_stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+            "target": "all_creatures",
+            "target_controller": "all",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 1,
+            "toughness_delta": 1,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Magnify",
+                "type_line": "Instant",
+                "oracle_text": "All creatures get +1/+1 until end of turn.",
+            },
+            turn=14,
+            rng=random.Random(14),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(own["power"], 3)
+        self.assertEqual(own["toughness"], 3)
+        self.assertEqual(enemy["power"], 4)
+        self.assertEqual(enemy["toughness"], 4)
+        self.assertTrue(
+            any(
+                event == "global_stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Magnify"
+                and data.get("target_controller") == "all"
+                and data.get("affected_count") == 2
+                and data.get("result") == "stat_modifier_until_eot_applied"
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+        self.battle.clear_until_eot(opponent)
+        self.assertEqual(own["power"], 2)
+        self.assertEqual(own["toughness"], 2)
+        self.assertEqual(enemy["power"], 3)
+        self.assertEqual(enemy["toughness"], 3)
+
+    def test_global_stat_modifier_until_eot_spell_hits_only_opponents_and_can_kill(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        own = {"name": "Own Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield.append(own)
+        opponent.battlefield.append(enemy)
+        effect = {
+            "effect": "global_stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+            "target": "opponents_creatures",
+            "target_controller": "opponents",
+            "target_constraints": {"controller": "opponents", "card_types": ["creature"]},
+            "power_delta": -2,
+            "toughness_delta": -2,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Cower",
+                "type_line": "Instant",
+                "oracle_text": "Creatures your opponents control get -2/-2 until end of turn.",
+            },
+            turn=15,
+            rng=random.Random(15),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.battlefield, [own])
+        self.assertEqual(own["power"], 2)
+        self.assertEqual(own["toughness"], 2)
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Enemy Bear"])
+        self.assertTrue(
+            any(
+                event == "global_stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Cower"
+                and data.get("target_controller") == "opponents"
+                and data.get("affected_count") == 1
+                and data.get("moved_to_graveyard") == [{"target_player": "Opponent", "target": "Enemy Bear"}]
+                for event, data in self.events
+            )
+        )
+
     def test_static_combat_keyword_creature_effect_enriches_permanent_keywords(self) -> None:
         card = {
             "name": "Fixture Keyword Creature",

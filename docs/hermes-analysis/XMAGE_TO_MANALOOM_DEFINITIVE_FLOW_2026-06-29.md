@@ -13946,6 +13946,68 @@ conditional dies triggers, optional mana triggers, dynamic mana, ETB conditioned
 mana such as `Coal Stoker`, `Hidden Herbalists`, or `Iridescent Tiger`, nor
 broader artifact mana-source review rows.
 
+## PG526 BoostAll Fixed Creature Modifier Checkpoint
+
+As of 2026-07-05, PG526 is applied and synced against the new server target.
+It promotes exact local-XMage one-shot `BoostAllEffect` spells where Oracle and
+XMage agree on fixed power/toughness deltas for either all creatures or
+opponents' creatures until end of turn.
+
+Promoted cards:
+
+- `Cower in Fear`
+- `Hell Swarm`
+- `Hysterical Blindness`
+- `Infest`
+- `Languish`
+- `Magnify`
+- `Marsh Gas`
+- `Nausea`
+- `Rollick of Abandon`
+- `Shrivel`
+
+Runtime scope:
+
+- `xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1`
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg526_boost_all_new_server_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg526_boost_all_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg526_boost_all_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg526_boost_all_new_server.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/battle_package_end_to_end_validation_20260705_pg526_boost_all_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg526_boost_all_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg526_boost_all_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg526_boost_all_new_server.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=5005`
+- `battle_family_mapper_required=28868`
+- `target_identity_count=25945`
+- `xmage_authoritative_source_count=25631`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25631`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+
+Residual boundary: PG526 only authorizes fixed `BoostAllEffect` one-shot spell
+rows for `All creatures get N/M until end of turn` and `Creatures your
+opponents control get N/M until end of turn`. It does not authorize modal
+boosts, dynamic `X` boosts, additional-cost boosts, color/subtype/nonartifact
+filters, attacking/blocking-only filters, static lord effects, or
+`BoostAllEffect` permanents.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

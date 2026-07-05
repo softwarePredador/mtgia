@@ -1,0 +1,653 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg526_boost_all_new_server_20260705_194024",
+  "deploy_id": "PG526",
+  "expected_rules": [
+    {
+      "card_name": "Cower in Fear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:337d66b30a687e5e150f482158801abc",
+      "min_rule_version": 2,
+      "normalized_name": "cower in fear",
+      "oracle_hash": "d0311c1b77837fc4fc3002c1cc658da2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "opponents_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "opponents"
+        },
+        "target_controller": "opponents",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hell Swarm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:baaab7ad1a72b3e32f10ae9aad54dd2e",
+      "min_rule_version": 2,
+      "normalized_name": "hell swarm",
+      "oracle_hash": "51f6af0039eec27db65207f4fe67a4cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hysterical Blindness",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a2f2072bd8f5a0309e414d33c73998aa",
+      "min_rule_version": 2,
+      "normalized_name": "hysterical blindness",
+      "oracle_hash": "05dd7a0df25f6404bbe1d94a6fd3e65e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -4,
+        "target": "opponents_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "opponents"
+        },
+        "target_controller": "opponents",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Infest",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:61acff86c382b352911a02e78ce6247f",
+      "min_rule_version": 2,
+      "normalized_name": "infest",
+      "oracle_hash": "de675042b01e8a73e81030a56668db6d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -2,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": -2,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Languish",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:947c46100669395b8987c123809e4a28",
+      "min_rule_version": 2,
+      "normalized_name": "languish",
+      "oracle_hash": "bac50aeeb74271c0cde0535bae01c6fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -4,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": -4,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magnify",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:11b4966577ba19d9e1d3f515557fa5b0",
+      "min_rule_version": 2,
+      "normalized_name": "magnify",
+      "oracle_hash": "7e278e44bc95d6ffc235a568753d226e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 1,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": 1,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Marsh Gas",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e55fb97c2ca407fb32118fa2439c7df8",
+      "min_rule_version": 2,
+      "normalized_name": "marsh gas",
+      "oracle_hash": "8a0d48ff220104dcca1ff68cfce9104e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -2,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nausea",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8779b0605241adfc7eeff5e5749628ca",
+      "min_rule_version": 2,
+      "normalized_name": "nausea",
+      "oracle_hash": "d616f39ce55b12fe55a9c3c060f72cff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rollick of Abandon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2e31f17c284efb49cab9e5a41f642a2",
+      "min_rule_version": 2,
+      "normalized_name": "rollick of abandon",
+      "oracle_hash": "7e1e6ba5e37207b13d95ce0c9a8b437b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": -2,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shrivel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8779b0605241adfc7eeff5e5749628ca",
+      "min_rule_version": 2,
+      "normalized_name": "shrivel",
+      "oracle_hash": "d616f39ce55b12fe55a9c3c060f72cff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_boost_all_or_opponents_creatures_until_eot_spell": 10
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg526_boost_all_new_server_package_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg526_boost_all_new_server_package_manifest.json",
+    "package": "../../master_optimizer_reports/pg526_boost_all_new_server_package_package.md",
+    "postcheck": "../../master_optimizer_reports/pg526_boost_all_new_server_package_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg526_boost_all_new_server_package_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg526_boost_all_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-05T19:40:24+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Cower in Fear"
+      },
+      "card_name": "Cower in Fear",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:337d66b30a687e5e150f482158801abc",
+      "normalized_name": "cower in fear",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "opponents_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "opponents"
+        },
+        "target_controller": "opponents",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hell Swarm"
+      },
+      "card_name": "Hell Swarm",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:baaab7ad1a72b3e32f10ae9aad54dd2e",
+      "normalized_name": "hell swarm",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hysterical Blindness"
+      },
+      "card_name": "Hysterical Blindness",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a2f2072bd8f5a0309e414d33c73998aa",
+      "normalized_name": "hysterical blindness",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -4,
+        "target": "opponents_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "opponents"
+        },
+        "target_controller": "opponents",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Infest"
+      },
+      "card_name": "Infest",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:61acff86c382b352911a02e78ce6247f",
+      "normalized_name": "infest",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -2,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": -2,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Languish"
+      },
+      "card_name": "Languish",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:947c46100669395b8987c123809e4a28",
+      "normalized_name": "languish",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -4,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": -4,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Magnify"
+      },
+      "card_name": "Magnify",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:11b4966577ba19d9e1d3f515557fa5b0",
+      "normalized_name": "magnify",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 1,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": 1,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Marsh Gas"
+      },
+      "card_name": "Marsh Gas",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e55fb97c2ca407fb32118fa2439c7df8",
+      "normalized_name": "marsh gas",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -2,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Nausea"
+      },
+      "card_name": "Nausea",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8779b0605241adfc7eeff5e5749628ca",
+      "normalized_name": "nausea",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rollick of Abandon"
+      },
+      "card_name": "Rollick of Abandon",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2e31f17c284efb49cab9e5a41f642a2",
+      "normalized_name": "rollick of abandon",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": -2,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Shrivel"
+      },
+      "card_name": "Shrivel",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8779b0605241adfc7eeff5e5749628ca",
+      "normalized_name": "shrivel",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "all_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "all",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Cower in Fear",
+    "Hell Swarm",
+    "Hysterical Blindness",
+    "Infest",
+    "Languish",
+    "Magnify",
+    "Marsh Gas",
+    "Nausea",
+    "Rollick of Abandon",
+    "Shrivel"
+  ],
+  "selected_count": 10,
+  "slug": "boost_all_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Cower in Fear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:337d66b30a687e5e150f482158801abc",
+      "min_rule_version": 2,
+      "normalized_name": "cower in fear",
+      "oracle_hash": "d0311c1b77837fc4fc3002c1cc658da2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hell Swarm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:baaab7ad1a72b3e32f10ae9aad54dd2e",
+      "min_rule_version": 2,
+      "normalized_name": "hell swarm",
+      "oracle_hash": "51f6af0039eec27db65207f4fe67a4cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hysterical Blindness",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a2f2072bd8f5a0309e414d33c73998aa",
+      "min_rule_version": 2,
+      "normalized_name": "hysterical blindness",
+      "oracle_hash": "05dd7a0df25f6404bbe1d94a6fd3e65e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Infest",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:61acff86c382b352911a02e78ce6247f",
+      "min_rule_version": 2,
+      "normalized_name": "infest",
+      "oracle_hash": "de675042b01e8a73e81030a56668db6d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Languish",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:947c46100669395b8987c123809e4a28",
+      "min_rule_version": 2,
+      "normalized_name": "languish",
+      "oracle_hash": "bac50aeeb74271c0cde0535bae01c6fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magnify",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:11b4966577ba19d9e1d3f515557fa5b0",
+      "min_rule_version": 2,
+      "normalized_name": "magnify",
+      "oracle_hash": "7e278e44bc95d6ffc235a568753d226e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Marsh Gas",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e55fb97c2ca407fb32118fa2439c7df8",
+      "min_rule_version": 2,
+      "normalized_name": "marsh gas",
+      "oracle_hash": "8a0d48ff220104dcca1ff68cfce9104e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nausea",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8779b0605241adfc7eeff5e5749628ca",
+      "min_rule_version": 2,
+      "normalized_name": "nausea",
+      "oracle_hash": "d616f39ce55b12fe55a9c3c060f72cff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rollick of Abandon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d2e31f17c284efb49cab9e5a41f642a2",
+      "min_rule_version": 2,
+      "normalized_name": "rollick of abandon",
+      "oracle_hash": "7e1e6ba5e37207b13d95ce0c9a8b437b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shrivel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8779b0605241adfc7eeff5e5749628ca",
+      "min_rule_version": 2,
+      "normalized_name": "shrivel",
+      "oracle_hash": "d616f39ce55b12fe55a9c3c060f72cff",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

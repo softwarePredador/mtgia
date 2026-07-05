@@ -64,6 +64,10 @@ BOOST_CONTROLLED_SPELL_UNIT = (
     "xmage_signature::BoostControlledEffect::no_ability_class::"
     "no_target_class::no_condition_class::no_signal"
 )
+BOOST_ALL_SPELL_UNIT = (
+    "xmage_signature::BoostAllEffect::no_ability_class::"
+    "no_target_class::no_condition_class::no_signal"
+)
 SELF_BOOST_ACTIVATED_UNIT = (
     "xmage_signature::BoostSourceEffect::SimpleActivatedAbility::"
     "no_target_class::no_condition_class::activated_ability"
@@ -119,6 +123,7 @@ SUPPORTED_UNITS = {
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
     BOOST_CONTROLLED_SPELL_UNIT,
+    BOOST_ALL_SPELL_UNIT,
     STATIC_CONTROLLED_PT_UNIT,
     TOKEN_SPELL_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
@@ -216,6 +221,7 @@ DYNAMIC_GRAVEYARD_COUNT_BOOST_TARGET_SCOPE = (
 )
 DYNAMIC_COUNT_BOOST_TARGET_SCOPE = "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1"
 BOOST_CONTROLLED_SPELL_SCOPE = "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1"
+BOOST_ALL_SPELL_SCOPE = "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
 BOOST_KEYWORD_SCOPE = "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
 ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE = (
     "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1"
@@ -300,6 +306,7 @@ SPELL_UNITS = {
     ADD_COUNTERS_SOURCE_UNIT,
     BOOST_TARGET_UNIT,
     BOOST_CONTROLLED_SPELL_UNIT,
+    BOOST_ALL_SPELL_UNIT,
     TOKEN_SPELL_UNIT,
     LOOK_LIBRARY_PICK_SPELL_UNIT,
 }
@@ -5844,6 +5851,63 @@ def fixed_boost_controlled_from_source(source: str) -> tuple[int, int] | str | N
         if any(marker in text for marker in STATIC_CONTROLLED_PT_BLOCKED_SOURCE_MARKERS):
             return "boost_controlled_source_filter_not_supported"
     return int(power_raw), int(toughness_raw)
+
+
+def fixed_boost_all_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | str | None:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    lowered = text.lower()
+    if (
+        "choose one" in lowered
+        or "+x/" in lowered
+        or "/+x" in lowered
+        or "-x/" in lowered
+        or "/-x" in lowered
+        or "additional cost" in lowered
+    ):
+        return "boost_all_oracle_not_simple"
+    patterns = [
+        (
+            r"^all creatures get ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
+            "all",
+        ),
+        (
+            r"^creatures your opponents control get ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
+            "opponents",
+        ),
+    ]
+    for pattern, controller_scope in patterns:
+        match = re.match(pattern, text, re.I)
+        if not match:
+            continue
+        power = signed_int_from_oracle(match.group(1))
+        toughness = signed_int_from_oracle(match.group(2))
+        if power is None or toughness is None:
+            return None
+        return power, toughness, controller_scope
+    return None
+
+
+def fixed_boost_all_from_source(source: str) -> tuple[int, int, str] | str | None:
+    text = source or ""
+    matches = re.findall(
+        r"new\s+BoostAllEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*"
+        r"Duration\.EndOfTurn(?P<rest>[^)]*)\)",
+        text,
+        re.S,
+    )
+    if len(matches) != 1:
+        return None
+    power_raw, toughness_raw, rest = matches[0]
+    rest_text = str(rest or "")
+    if not rest_text.strip():
+        controller_scope = "all"
+    elif "StaticFilters.FILTER_PERMANENT_ALL_CREATURES" in rest_text:
+        controller_scope = "all"
+    elif "StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURES" in rest_text:
+        controller_scope = "opponents"
+    else:
+        return "boost_all_source_filter_not_supported"
+    return int(power_raw), int(toughness_raw), controller_scope
 
 
 def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str, str] | None:
@@ -14258,6 +14322,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
     elif scope == BOOST_CONTROLLED_SPELL_SCOPE:
         scope_kind = "fixed controlled-creature boost until end of turn spell"
+    elif scope == BOOST_ALL_SPELL_SCOPE:
+        scope_kind = "fixed all/opponents-creature boost until end of turn spell"
     elif scope == TARGET_BOOST_ACTIVATED_SCOPE:
         scope_kind = "permanent simple activated target-creature boost until end of turn"
     elif scope == TARGET_KEYWORD_ACTIVATED_SCOPE:
@@ -20949,6 +21015,46 @@ def split_row(
             family_id="xmage_boost_controlled_creatures_until_eot_spell",
         ), "selected_exact_scope"
 
+    if unit == BOOST_ALL_SPELL_UNIT:
+        if classes != {"BoostAllEffect"}:
+            return None, "boost_all_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "boost_all_ability_class_not_simple"
+        source_boost = fixed_boost_all_from_source(source_text)
+        if isinstance(source_boost, str):
+            return None, source_boost
+        if source_boost is None:
+            return None, "boost_all_source_not_single_fixed"
+        oracle_boost = fixed_boost_all_from_oracle(metadata)
+        if isinstance(oracle_boost, str):
+            return None, oracle_boost
+        if oracle_boost is None:
+            return None, "boost_all_oracle_not_simple"
+        if source_boost != oracle_boost:
+            return None, "boost_all_source_oracle_mismatch"
+        power, toughness, controller_scope = oracle_boost
+        target = "opponents_creatures" if controller_scope == "opponents" else "all_creatures"
+        target_constraints = {"card_types": ["creature"]}
+        if controller_scope == "opponents":
+            target_constraints["controller"] = "opponents"
+        effect_json = {
+            "effect": "global_stat_modifier_until_eot",
+            "battle_model_scope": BOOST_ALL_SPELL_SCOPE,
+            "target": target,
+            "target_controller": controller_scope,
+            "target_constraints": target_constraints,
+            "power_delta": power,
+            "toughness_delta": toughness,
+            "xmage_effect_class": "BoostAllEffect",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_boost_all_or_opponents_creatures_until_eot_spell",
+        ), "selected_exact_scope"
+
     if unit == BOOST_TARGET_UNIT:
         if classes != {"BoostTargetEffect"}:
             return None, "boost_target_effect_class_not_pure"
@@ -21586,6 +21692,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, no extra ability class, exact graveyard-to-library top/bottom Oracle text, and self-graveyard targets only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with RevealLibraryPickControllerEffect, no extra ability class, exact reveal-top-library pick-to-hand Oracle/source agreement, and graveyard rest destination",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
+                "xmage_signature BoostAllEffect one-shot spell rows with exact fixed all-creatures or opponents-creatures boost until EOT and no modal, dynamic, color, subtype, attacking, or blocking filters",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
                 "token_maker CreateTokenEffect rows with DiesSourceTriggeredAbility, a fixed token count, literal safe creature token class, and exact non-conditional dies Oracle text",
                 "token_maker CreateTokenEffect rows with SimpleActivatedAbility, a fixed creature token class, exact Oracle/source token text, and mana/tap/source self-sacrifice costs only",
