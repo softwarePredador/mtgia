@@ -8519,6 +8519,457 @@ def register_tests(battle, player):
             assert black_creature in opponent.battlefield
             assert white_creature not in opponent.battlefield
             assert white_creature in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Armaggon, Future Shark",
+                "type_line": "Legendary Creature - Shark Horror Mutant",
+                "effect": "creature",
+                "power": 9,
+                "toughness": 6,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            target_one = {
+                "name": "Largest Creature",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 5,
+                "cmc": 5,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            target_two = {
+                "name": "Middle Creature",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "cmc": 4,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            target_three = {
+                "name": "Small Creature",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "cmc": 3,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            target_four = {
+                "name": "Extra Creature",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "cmc": 1,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [target_four, target_three, target_two, target_one]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_creature",
+                    "etb_remove_target": "creature",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "max_targets": 3,
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg508-up-to-three",
+                    "_rule_oracle_hash": "pg508-up-to-three-hash",
+                },
+                16,
+                random.Random(508),
+                all_players=[active, opponent],
+            )
+
+            assert target_one not in opponent.battlefield
+            assert target_two not in opponent.battlefield
+            assert target_three not in opponent.battlefield
+            assert target_four in opponent.battlefield
+            assert target_one in opponent.graveyard
+            assert target_two in opponent.graveyard
+            assert target_three in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Final-Sting Faerie",
+                "type_line": "Creature - Faerie Assassin",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            undamaged = {
+                "name": "Healthy Creature",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            damaged = {
+                "name": "Damaged Creature",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            battle.mark_permanent_dealt_damage_this_turn(damaged, 1, 17)
+            opponent.battlefield = [undamaged, damaged]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_creature",
+                    "etb_remove_target": "creature",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"], "damaged_this_turn": True},
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg508-damaged",
+                    "_rule_oracle_hash": "pg508-damaged-hash",
+                },
+                17,
+                random.Random(508),
+                all_players=[active, opponent],
+            )
+
+            assert undamaged in opponent.battlefield
+            assert damaged not in opponent.battlefield
+            assert damaged in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Gilt-Leaf Winnower",
+                "type_line": "Creature - Elf Warrior",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 3,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            elf_unequal = {
+                "name": "Elf Unequal",
+                "type_line": "Creature - Elf Warrior",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 4,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            nonelf_equal = {
+                "name": "Equal Beast",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            nonelf_unequal = {
+                "name": "Unequal Beast",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 3,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [elf_unequal, nonelf_equal, nonelf_unequal]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_creature",
+                    "etb_remove_target": "creature",
+                    "target": "creature",
+                    "target_constraints": {
+                        "card_types": ["creature"],
+                        "exclude_subtypes": ["elf"],
+                        "power_toughness_not_equal": True,
+                    },
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg508-unequal",
+                    "_rule_oracle_hash": "pg508-unequal-hash",
+                },
+                18,
+                random.Random(508),
+                all_players=[active, opponent],
+            )
+
+            assert elf_unequal in opponent.battlefield
+            assert nonelf_equal in opponent.battlefield
+            assert nonelf_unequal not in opponent.battlefield
+            assert nonelf_unequal in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Kraul Whipcracker",
+                "type_line": "Creature - Insect Assassin",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            nontoken = {
+                "name": "Real Permanent",
+                "type_line": "Artifact",
+                "effect": "artifact",
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            token = {
+                "name": "Clue Token",
+                "type_line": "Token Artifact - Clue",
+                "effect": "artifact",
+                "is_token": True,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [nontoken, token]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_permanent",
+                    "etb_remove_target": "permanent",
+                    "target": "permanent",
+                    "target_controller": "opponent",
+                    "target_constraints": {
+                        "card_types": ["permanent"],
+                        "controller_scope": "opponent",
+                        "token": True,
+                    },
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg508-token",
+                    "_rule_oracle_hash": "pg508-token-hash",
+                },
+                19,
+                random.Random(508),
+                all_players=[active, opponent],
+            )
+
+            assert nontoken in opponent.battlefield
+            assert token not in opponent.battlefield
+            assert token not in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Nekrataal",
+                "type_line": "Creature - Human Assassin",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 1,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            artifact_creature = {
+                "name": "Artifact Soldier",
+                "type_line": "Artifact Creature - Soldier",
+                "effect": "creature",
+                "colors": ["W"],
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            black_creature = {
+                "name": "Black Soldier",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "colors": ["B"],
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            legal_creature = {
+                "name": "White Soldier",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "colors": ["W"],
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [artifact_creature, black_creature, legal_creature]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_creature",
+                    "etb_remove_target": "creature",
+                    "target": "creature",
+                    "target_constraints": {
+                        "card_types": ["creature"],
+                        "exclude_card_types": ["artifact"],
+                        "exclude_colors": ["B"],
+                    },
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg508-nonartifact-nonblack",
+                    "_rule_oracle_hash": "pg508-nonartifact-nonblack-hash",
+                },
+                20,
+                random.Random(508),
+                all_players=[active, opponent],
+            )
+
+            assert artifact_creature in opponent.battlefield
+            assert black_creature in opponent.battlefield
+            assert legal_creature not in opponent.battlefield
+            assert legal_creature in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Ogre Gatecrasher",
+                "type_line": "Creature - Ogre Rogue",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            nondefender = {
+                "name": "Aggressive Wallbreaker",
+                "type_line": "Creature - Ogre",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            defender = {
+                "name": "Defender Wall",
+                "type_line": "Creature - Wall",
+                "effect": "creature",
+                "power": 0,
+                "toughness": 4,
+                "defender": True,
+                "keywords": ["defender"],
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [nondefender, defender]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_creature",
+                    "etb_remove_target": "creature",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"], "required_keywords": ["defender"]},
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg508-defender",
+                    "_rule_oracle_hash": "pg508-defender-hash",
+                },
+                21,
+                random.Random(508),
+                all_players=[active, opponent],
+            )
+
+            assert nondefender in opponent.battlefield
+            assert defender not in opponent.battlefield
+            assert defender in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Stingerfling Spider",
+                "type_line": "Creature - Spider",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 5,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            ground = {
+                "name": "Ground Creature",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 4,
+                "toughness": 4,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            flyer = {
+                "name": "Flying Creature",
+                "type_line": "Creature - Bird",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 2,
+                "flying": True,
+                "keywords": ["flying"],
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            opponent.battlefield = [ground, flyer]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_creature",
+                    "etb_remove_target": "creature",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"], "required_keywords": ["flying"]},
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg508-flying",
+                    "_rule_oracle_hash": "pg508-flying-hash",
+                },
+                22,
+                random.Random(508),
+                all_players=[active, opponent],
+            )
+
+            assert ground in opponent.battlefield
+            assert flyer not in opponent.battlefield
+            assert flyer in opponent.graveyard
         finally:
             battle.REPLAY_EVENT_HANDLER = previous_handler
 
@@ -8534,6 +8985,13 @@ def register_tests(battle, player):
             "Diregraf Ghoul",
             "Ghostly Prison",
             "White Knight",
+            "Largest Creature",
+            "Damaged Creature",
+            "Unequal Beast",
+            "Clue Token",
+            "White Soldier",
+            "Defender Wall",
+            "Flying Creature",
         ]
 
     def test_pg494_etb_destroy_requires_damaged_this_turn_target():

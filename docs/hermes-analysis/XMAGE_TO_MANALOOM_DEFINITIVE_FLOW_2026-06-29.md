@@ -12975,6 +12975,62 @@ unsupported target predicates, modal forms, or broad review-scope rows. The
 remaining `etb_destroy_target_not_supported=8` cards must be split into their
 own exact runtime-backed subpatterns before PostgreSQL promotion.
 
+## PG508 Exact ETB Destroy Residual Target Checkpoint
+
+As of 2026-07-05, PG508 is applied and synced against the new server target.
+It closes the eight exact ETB destroy residual target predicates left after
+PG507:
+
+- `Armaggon, Future Shark`: `remove_creature`, `target=creature`,
+  `max_targets=3`.
+- `Final-Sting Faerie`: `remove_creature`, `target=creature`,
+  `target_constraints.damaged_this_turn=true`.
+- `Gilt-Leaf Winnower`: `remove_creature`, `target=creature`,
+  `target_constraints.exclude_subtypes=["elf"]` and
+  `target_constraints.power_toughness_not_equal=true`.
+- `Kraul Whipcracker`: `remove_permanent`, `target=permanent`,
+  `target_controller=opponent`, `target_constraints.token=true`.
+- `Lurking Deadeye`: `remove_creature`, `target=creature`,
+  `target_constraints.damaged_this_turn=true`.
+- `Nekrataal`: `remove_creature`, `target=creature`,
+  `target_constraints.exclude_card_types=["artifact"]` and
+  `target_constraints.exclude_colors=["B"]`.
+- `Ogre Gatecrasher`: `remove_creature`, `target=creature`,
+  `target_constraints.required_keywords=["defender"]`.
+- `Stingerfling Spider`: `remove_creature`, `target=creature`,
+  `target_constraints.required_keywords=["flying"]`.
+
+Evidence:
+
+- package and apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_pg_to_sqlite_sync.json`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg508_etb_destroy_residual_new_server_final_recheck.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg508_etb_destroy_residual_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg508_etb_destroy_residual_new_server_commander_legal.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4925`
+- `battle_family_mapper_required=28948`
+- `target_identity_count=26025`
+- `xmage_authoritative_source_count=25711`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25711`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+- `etb_destroy_target_not_supported` is absent from blocked reasons
+
+Residual boundary: PG508 does not authorize broad `xmage_*_review_v1`
+promotion, modal ETB destroy effects, unsupported source-effect-count rows, or
+unrelated destroy target blockers. The next wave must start from the rebuilt
+post-PG508 queue, not from historical PG507 residual counts.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

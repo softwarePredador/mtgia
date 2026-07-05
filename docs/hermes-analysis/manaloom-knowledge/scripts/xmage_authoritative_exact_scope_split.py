@@ -7541,8 +7541,11 @@ def restricted_target_base(target: str) -> str:
         "creature_toughness_2_or_less",
         "creature_damaged_this_turn",
         "creature_damaged_this_turn_opponent_controls",
+        "creature_up_to_three",
+        "creature_with_defender",
         "creature_mana_value_3_or_greater",
         "non_angel_demon_devil_dragon_creature",
+        "non_elf_power_toughness_not_equal_creature",
         "non_elf_creature",
         "non_merfolk_creature",
         "non_spirit_creature",
@@ -7553,7 +7556,7 @@ def restricted_target_base(target: str) -> str:
         "wall_creature",
     }:
         return "creature"
-    if target in {"black_or_red_permanent", "nonwhite_permanent", "noncreature_permanent"}:
+    if target in {"black_or_red_permanent", "nonwhite_permanent", "noncreature_permanent", "token_opponent_controls"}:
         return "permanent"
     if target in {"noncreature_artifact", "equipment"}:
         return "artifact"
@@ -11811,8 +11814,36 @@ def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] 
             ("remove_creature", "creature_toughness_2_or_less"),
         ),
         (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy up to three target creatures\.?$",
+            ("remove_creature", "creature_up_to_three"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target creature that was dealt damage this turn\.?$",
+            ("remove_creature", "creature_damaged_this_turn"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target creature with flying\.?$",
+            ("remove_creature", "flying_creature"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target creature with defender\.?$",
+            ("remove_creature", "creature_with_defender"),
+        ),
+        (
             rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target nonblack creature(?:\. it can't be regenerated)?\.?$",
             ("remove_creature", "nonblack_creature"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target nonartifact, nonblack creature(?:\. that creature can't be regenerated)?\.?$",
+            ("remove_creature", "nonartifact_nonblack_creature"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target non-elf creature whose power and toughness aren't equal\.?$",
+            ("remove_creature", "non_elf_power_toughness_not_equal_creature"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target token an opponent controls\.?$",
+            ("remove_permanent", "token_opponent_controls"),
         ),
         (
             rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target creature an opponent controls that was dealt damage this turn\.?$",
@@ -11896,7 +11927,22 @@ def etb_destroy_source_supported(source: str, target: str) -> str | None:
     checks: dict[str, Callable[[str], bool]] = {
         "creature_power_1_or_less": lambda value: "PowerPredicate" in value and "ComparisonType.FEWER_THAN, 2" in value,
         "creature_toughness_2_or_less": lambda value: "ToughnessPredicate" in value and "ComparisonType.FEWER_THAN, 3" in value,
+        "creature_up_to_three": lambda value: re.search(r"new\s+TargetCreaturePermanent\s*\(\s*0\s*,\s*3\s*\)", value) is not None,
+        "creature_damaged_this_turn": lambda value: "FILTER_CREATURE_DAMAGED_THIS_TURN" in value,
+        "flying_creature": lambda value: "FILTER_CREATURE_FLYING" in value or "AbilityPredicate(FlyingAbility.class)" in value,
+        "creature_with_defender": lambda value: "AbilityPredicate(DefenderAbility.class)" in value,
         "nonblack_creature": lambda value: "FILTER_PERMANENT_CREATURE_NON_BLACK" in value,
+        "nonartifact_nonblack_creature": lambda value: (
+            "nonartifact, nonblack creature" in value
+            and "CardType.ARTIFACT" in value
+            and "ObjectColor.BLACK" in value
+        ),
+        "non_elf_power_toughness_not_equal_creature": lambda value: (
+            "non-Elf creature whose power and toughness aren't equal" in value
+            and "SubType.ELF" in value
+            and "PowerToughnessNotEqualPredicate" in value
+        ),
+        "token_opponent_controls": lambda value: "TokenPredicate.TRUE" in value and "TargetController.OPPONENT" in value,
         "creature_damaged_this_turn_opponent_controls": lambda value: "FILTER_OPPONENTS_CREATURE_DAMAGED_THIS_TURN" in value,
         "creature_or_planeswalker_damaged_this_turn_opponent_controls": lambda value: (
             "FilterCreatureOrPlaneswalkerPermanent" in value
@@ -13359,6 +13405,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "tapped_state": "untapped"}
     if target == "flying_creature":
         return {"card_types": ["creature"], "required_keywords": ["flying"]}
+    if target == "creature_with_defender":
+        return {"card_types": ["creature"], "required_keywords": ["defender"]}
     if target == "nonblack_creature":
         return {"card_types": ["creature"], "exclude_colors": ["B"]}
     if target == "nongreen_creature":
@@ -13387,6 +13435,12 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_subtypes": ["angel", "demon", "devil", "dragon"]}
     if target == "non_elf_creature":
         return {"card_types": ["creature"], "exclude_subtypes": ["elf"]}
+    if target == "non_elf_power_toughness_not_equal_creature":
+        return {
+            "card_types": ["creature"],
+            "exclude_subtypes": ["elf"],
+            "power_toughness_not_equal": True,
+        }
     if target == "non_merfolk_creature":
         return {"card_types": ["creature"], "exclude_subtypes": ["merfolk"]}
     if target == "non_spirit_creature":
@@ -13399,6 +13453,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "toughness_max": 2}
     if target == "creature_damaged_this_turn":
         return {"card_types": ["creature"], "damaged_this_turn": True}
+    if target == "creature_up_to_three":
+        return {"card_types": ["creature"]}
     if target == "creature_damaged_this_turn_opponent_controls":
         return {"card_types": ["creature"], "controller_scope": "opponent", "damaged_this_turn": True}
     if target == "creature_or_planeswalker_damaged_this_turn_opponent_controls":
@@ -13415,6 +13471,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "required_subtypes": ["spirit"]}
     if target == "wall_creature":
         return {"card_types": ["creature"], "required_subtypes": ["wall"]}
+    if target == "token_opponent_controls":
+        return {"card_types": ["permanent"], "controller_scope": "opponent", "token": True}
     if target == "spirit_or_enchantment":
         return {
             "any_of": [
@@ -16785,12 +16843,15 @@ def split_row(
             "xmage_effect_class": "DestroyTargetEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
         }
+        if target_type == "creature_up_to_three":
+            effect_json["max_targets"] = 3
         if target_type in {"permanent", "nonbasic_land", "aura", "equipment"}:
             effect_json["target_controller"] = "any"
         if target_type in {
             "island_or_swamp_opponent_controls",
             "creature_damaged_this_turn_opponent_controls",
             "creature_or_planeswalker_damaged_this_turn_opponent_controls",
+            "token_opponent_controls",
         }:
             effect_json["target_controller"] = "opponent"
         keyword_list = ordered_keywords(keywords_from_ability_classes(row))

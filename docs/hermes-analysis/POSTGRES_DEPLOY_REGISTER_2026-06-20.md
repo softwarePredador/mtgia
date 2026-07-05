@@ -15110,3 +15110,79 @@ Register decision:
 - The remaining ETB destroy backlog must continue through exact subpatterns,
   especially multi-target and unsupported target forms, not broad generic
   review-scope promotion.
+
+## 2026-07-05 - PG508 creature ETB destroy residual target parser
+
+- Deploy id: `xmage_pg508_etb_destroy_residual_new_server`.
+- Runtime family: `xmage_creature_etb_destroy_target_v1`.
+- Promoted cards: `8`.
+- Promoted card names: `Armaggon, Future Shark`, `Final-Sting Faerie`,
+  `Gilt-Leaf Winnower`, `Kraul Whipcracker`, `Lurking Deadeye`, `Nekrataal`,
+  `Ogre Gatecrasher`, and `Stingerfling Spider`.
+- Scope boundary: only exact creature enters-the-battlefield destroy target
+  predicates backed by local XMage `EntersBattlefieldTriggeredAbility` plus
+  `DestroyTargetEffect` and matching ManaLoom runtime target constraints are
+  allowed in this package. Broad review scopes, modal variants, and unsupported
+  source-effect-count rows remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=8`, `COMMIT`.
+- Postcheck:
+  all 8 promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- Field postcheck:
+  PG508 covers up-to-three creature targets, damaged-this-turn creature
+  targets, non-Elf unequal power/toughness creature targets, opponent token
+  permanent targets, nonartifact/nonblack creature targets, defender creature
+  targets, and flying creature targets.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_pg_to_sqlite_sync.json`;
+  `selected_card_count=8`, `pg_rows_loaded=8`,
+  `sqlite_inserted_or_updated=8`, and
+  `canonical_snapshot_rows_exported=5992`.
+- Runtime lookup:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_runtime_get_card_effect.out`
+  resolves all 8 cards to the expected runtime scope and target constraints.
+- Validation:
+  splitter unit suite `526` tests passed, focused battle runtime test exited
+  `0`, full battle runtime suite has `632` PASS lines, XMage strategy `26/26`
+  pass, deckbuilding contract `pass`, operational surface `pass`, legacy
+  contamination `pass`, and PG/Hermes/SQLite `51/51` pass.
+- Post-sync queue:
+  `target_identity_count=26025`, `xmage_authoritative_source_count=25711`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25711`.
+- Global readiness:
+  `battle_and_oracle_ready=4925` and
+  `battle_family_mapper_required=28948`.
+- Final exact-scope recheck:
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`, and
+  `etb_destroy_target_not_supported` is absent from blocked reasons.
+
+Register decision:
+
+- PG508 is applied and should not be rebuilt.
+- The ETB destroy target parser/runtime now supports the eight exact residual
+  target predicates listed in this package.
+- Remaining destroy/ETB backlog must continue through exact subpatterns, not
+  broad generic review-scope promotion.

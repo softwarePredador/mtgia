@@ -1,0 +1,11 @@
+       card_name        |    normalized_name     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+------------------------+------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Armaggon, Future Shark | armaggon, future shark | battle_rule_v1:f96dc72f401683ff611868a4b8f983e4 |                  1 |                           1 |                         1 |           0
+ Final-Sting Faerie     | final-sting faerie     | battle_rule_v1:2c266d73b60612c1698b37380e2569bd |                  1 |                           1 |                         1 |           0
+ Gilt-Leaf Winnower     | gilt-leaf winnower     | battle_rule_v1:c9a712d3ef34819b410ce03a92e5e520 |                  1 |                           1 |                         1 |           0
+ Kraul Whipcracker      | kraul whipcracker      | battle_rule_v1:dd9bbbfafb8d905d6c63ad502a4b3705 |                  1 |                           1 |                         1 |           0
+ Lurking Deadeye        | lurking deadeye        | battle_rule_v1:88a7268178877454ebebb8065e85ffdb |                  1 |                           1 |                         1 |           0
+ Nekrataal              | nekrataal              | battle_rule_v1:37c237dafb6102dd303e7e6032f5aa26 |                  1 |                           1 |                         1 |           0
+ Ogre Gatecrasher       | ogre gatecrasher       | battle_rule_v1:42db1519409feeb45390c07a693f6f60 |                  1 |                           1 |                         1 |           0
+ Stingerfling Spider    | stingerfling spider    | battle_rule_v1:0dd5fc990d260f811c5aac9dc86150c7 |                  1 |                           1 |                         1 |           0
+(8 rows)

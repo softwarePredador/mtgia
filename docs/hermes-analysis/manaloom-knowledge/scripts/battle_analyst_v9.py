@@ -11605,6 +11605,19 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         or constraints.get("dealt_damage_this_turn")
     ) and not permanent_was_dealt_damage_this_turn(target, CURRENT_REPLAY_TURN):
         return False
+    if bool(
+        constraints.get("token")
+        or constraints.get("is_token")
+        or constraints.get("token_only")
+        or constraints.get("target_token")
+    ) and not is_token_permanent(target):
+        return False
+    if bool(
+        constraints.get("non_token")
+        or constraints.get("nontoken")
+        or constraints.get("target_non_token")
+    ) and is_token_permanent(target):
+        return False
     required_keywords = [
         str(value or "").strip().lower().replace(" ", "_")
         for value in _as_list(constraints.get("required_keywords") or constraints.get("target_keywords"))
@@ -11716,6 +11729,16 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
     if toughness_max is not None:
         try:
             if int(target.get("toughness") or 0) > int(float(toughness_max)):
+                return False
+        except Exception:
+            return False
+    if bool(
+        constraints.get("power_toughness_not_equal")
+        or constraints.get("power_toughness_unequal")
+        or constraints.get("power_not_equal_toughness")
+    ):
+        try:
+            if int(target.get("power") or 0) == int(target.get("toughness") or target.get("power") or 0):
                 return False
         except Exception:
             return False
@@ -41403,6 +41426,24 @@ def resolve_etb_removal(player, opponents, card, effect_data, turn, rng):
         )
         return False
     if resolve_declared_single_removal(
+        player,
+        opponents,
+        card,
+        removal_effect,
+        turn,
+        rng,
+    ):
+        emit_replay_event(
+            "etb_removal_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            trigger="enters_battlefield",
+            turn=turn,
+            **replay_fields_for_declared_targets(removal_effect),
+            **replay_rule_fields(effect_data),
+        )
+        return True
+    if len(declared_targets) > 1 and resolve_multi_target_removal(
         player,
         opponents,
         card,

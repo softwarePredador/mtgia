@@ -12957,6 +12957,112 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 "any",
             ),
             (
+                "Armaggon, Future Shark",
+                "Flash\nWhen Armaggon enters, destroy up to three target creatures.",
+                (
+                    "this.addAbility(FlashAbility.getInstance());"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect());"
+                    "ability.addTarget(new TargetCreaturePermanent(0, 3));"
+                ),
+                "creature",
+                {"card_types": ["creature"]},
+                None,
+            ),
+            (
+                "Final-Sting Faerie",
+                "Flying\nWhen this creature enters, destroy target creature that was dealt damage this turn.",
+                (
+                    "this.addAbility(FlyingAbility.getInstance());"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect());"
+                    "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_CREATURE_DAMAGED_THIS_TURN));"
+                ),
+                "creature",
+                {"card_types": ["creature"], "damaged_this_turn": True},
+                None,
+            ),
+            (
+                "Gilt-Leaf Winnower",
+                (
+                    "Menace\n"
+                    "When this creature enters, you may destroy target non-Elf creature "
+                    "whose power and toughness aren't equal."
+                ),
+                (
+                    "private static final FilterCreaturePermanent filter = "
+                    "new FilterCreaturePermanent(\"non-Elf creature whose power and toughness aren't equal\");"
+                    "filter.add(Predicates.not(SubType.ELF.getPredicate()));"
+                    "filter.add(new PowerToughnessNotEqualPredicate());"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), true);"
+                    "ability.addTarget(new TargetPermanent(filter));"
+                ),
+                "creature",
+                {
+                    "card_types": ["creature"],
+                    "exclude_subtypes": ["elf"],
+                    "power_toughness_not_equal": True,
+                },
+                None,
+            ),
+            (
+                "Kraul Whipcracker",
+                "Reach\nWhen this creature enters, destroy target token an opponent controls.",
+                (
+                    "private static final FilterPermanent filter = new FilterPermanent(\"token an opponent controls\");"
+                    "filter.add(TokenPredicate.TRUE);"
+                    "filter.add(TargetController.OPPONENT.getControllerPredicate());"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect());"
+                    "ability.addTarget(new TargetPermanent(filter));"
+                ),
+                "permanent",
+                {"card_types": ["permanent"], "controller_scope": "opponent", "token": True},
+                "opponent",
+            ),
+            (
+                "Nekrataal",
+                (
+                    "First strike\n"
+                    "When this creature enters, destroy target nonartifact, nonblack creature. "
+                    "That creature can't be regenerated."
+                ),
+                (
+                    "private static final FilterCreaturePermanent filter = "
+                    "new FilterCreaturePermanent(\"nonartifact, nonblack creature\");"
+                    "filter.add(Predicates.not(CardType.ARTIFACT.getPredicate()));"
+                    "filter.add(Predicates.not(new ColorPredicate(ObjectColor.BLACK)));"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(true));"
+                    "ability.addTarget(new TargetPermanent(filter));"
+                ),
+                "creature",
+                {"card_types": ["creature"], "exclude_card_types": ["artifact"], "exclude_colors": ["B"]},
+                None,
+            ),
+            (
+                "Ogre Gatecrasher",
+                "When this creature enters, destroy target creature with defender.",
+                (
+                    "private static final FilterCreaturePermanent filter = "
+                    "new FilterCreaturePermanent(\"creature with defender\");"
+                    "filter.add(new AbilityPredicate(DefenderAbility.class));"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), false);"
+                    "ability.addTarget(new TargetPermanent(filter));"
+                ),
+                "creature",
+                {"card_types": ["creature"], "required_keywords": ["defender"]},
+                None,
+            ),
+            (
+                "Stingerfling Spider",
+                "Reach\nWhen this creature enters, you may destroy target creature with flying.",
+                (
+                    "this.addAbility(ReachAbility.getInstance());"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), true);"
+                    "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_CREATURE_FLYING));"
+                ),
+                "creature",
+                {"card_types": ["creature"], "required_keywords": ["flying"]},
+                None,
+            ),
+            (
                 "Fathom Fleet Cutthroat",
                 (
                     "When Fathom Fleet Cutthroat enters the battlefield, destroy target creature "
@@ -13050,6 +13156,8 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["battle_model_scope"], split.ETB_DESTROY_CREATURE_SCOPE)
                 self.assertEqual(effect["etb_remove_target"], target)
                 self.assertEqual(effect["target_constraints"], constraints)
+                if name == "Armaggon, Future Shark":
+                    self.assertEqual(effect["max_targets"], 3)
                 if controller:
                     self.assertEqual(effect["target_controller"], controller)
                 else:

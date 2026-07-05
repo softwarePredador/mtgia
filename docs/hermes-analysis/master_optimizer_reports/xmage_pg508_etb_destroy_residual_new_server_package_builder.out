@@ -1,0 +1,4 @@
+manifest=docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_manifest.json
+package=docs/hermes-analysis/master_optimizer_reports/xmage_pg508_etb_destroy_residual_new_server_package.md
+selected_count=8
+mutations_performed=[]
