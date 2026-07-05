@@ -2000,3 +2000,56 @@ Operational lesson:
   named same-lane cut is seed-safe.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Miracle Next Route Planner - 2026-07-05
+
+The next route-selection artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_next_route_planner_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_next_route_planner_20260705_current.json`
+
+This planner ranks the current post-identity miracle/topdeck candidates after
+the Entreat same-lane scout. It uses the candidate queue, Brain/Entreat/Haze
+runtime contracts, Entreat cut scout, protected `607` cut miner, and external
+card/combo source lanes. It is read-only and cannot score a deck, materialize a
+candidate, run battle, mutate deck `607`, or write PostgreSQL.
+
+Current result:
+
+- decision status:
+  `miracle_next_route_planner_selected_brain_runtime_learning_keep_607`;
+- route candidates reviewed: `5`;
+- selected card: `Brain in a Jar`;
+- selected lane: `topdeck_miracle_access`;
+- selected route state: `next_single_card_runtime_lesson`;
+- selected learning score: `104`;
+- `Entreat the Angels` safe same-lane cuts: `0`;
+- active Entreat rule rows: `0`;
+- named seed-safe cuts across the current cut miner: `0`;
+- matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- PostgreSQL writes allowed now: `false`;
+- recommended next action:
+  `draft_brain_in_a_jar_runtime_contract_and_cut_miner_no_deck_action`.
+
+Ranked learning interpretation:
+
+- `Entreat the Angels` remains parked because the rule is not active in
+  PostgreSQL and the scout found no named safe same-lane cut.
+- `Brain in a Jar` is the next best learning route because it teaches
+  charge-counter timing, exact mana-value free casting, and scry decisions in
+  the same topdeck/miracle-access thesis without requiring a deck mutation.
+- `Haze of Rage` is real combo research with `Storm-Kiln Artist`, but it is a
+  package-only route and needs combo runtime plus cut safety before it can
+  compete with protected `607`.
+- `Burning Prophet` and `Inti, Seneschal of the Sun` stay deferred because they
+  are lower-priority runtime/cut reviews after the core miracle-access lane.
+
+Operational lesson:
+
+- The persistent goal should continue with a Brain in a Jar runtime contract
+  and cut miner, not by modifying `607` or forcing a battle.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion until a candidate ties or beats it under the same strategy,
+  matrix, battle, and trace gates.
