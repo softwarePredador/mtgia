@@ -10682,6 +10682,58 @@ new server:
   `xmage_permanent_simple_activated_draw` with `5` cards, followed by several
   `4`-card exact families.
 
+## 2026-07-05 PG468 Permanent Simple Activated Draw Closure
+
+- Closed the exact XMage permanent simple activated draw family as ManaLoom
+  scope `xmage_permanent_simple_activated_draw_v1`.
+- The selected package accepted local XMage permanent sources whose executable
+  behavior is `SimpleActivatedAbility` with `DrawCardSourceControllerEffect`,
+  preserving activation mana cost, tap requirement, discard cost, and fixed
+  draw count.
+- The batch covers `5` cards: Goblin Picker, Mental Discipline,
+  Merchant of the Vale // Haggle, Oread of Mountain's Blaze, and Rummaging
+  Goblin.
+- Focused mapper/runtime tests covered activated draw extraction, activation
+  cost fields, discard cost fields, runtime lookup, and package generation;
+  PG468 performed no code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `5` cards. Precheck found `5` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` generated shadow
+  rows to deprecate; apply/postcheck verified `5/5` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `5` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve
+  `activated_draw_count=1`, `activation_discard_count=1`, the activation mana
+  cost, and the tap requirement. The selected costs are:
+  Goblin Picker `{R}` with tap, Mental Discipline `{1}{U}` without tap,
+  Merchant of the Vale // Haggle `{2}{R}` without tap, Oread of Mountain's
+  Blaze `{2}{R}` without tap, and Rummaging Goblin `{0}` with tap.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4499` PostgreSQL runtime rows, wrote `4491` SQLite runtime
+  rows, and exported `4466` canonical fallback rows.
+- PG468 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `5` selected cards. Generic
+  battle scenario count remained `0`; activated draw behavior remains covered
+  by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26387`, `xmage_authoritative_source_count=26073`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26073`. This is an exact
+  reduction of `5` from the post-PG467 queue.
+- The post-PG468 exact split recheck reports `proposal_count=48` and
+  `safe_for_batch_pg_package_count=48`. The largest remaining exact families
+  are `xmage_creature_etb_draw_lose_life`,
+  `xmage_creature_etb_dynamic_graveyard_count_damage`,
+  `xmage_destroy_target_spell`, `xmage_dynamic_graveyard_count_damage_spell`,
+  `xmage_permanent_simple_activated_self_boost_until_eot`, and
+  `xmage_simple_mana_source_with_etb_draw`, each with `4` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

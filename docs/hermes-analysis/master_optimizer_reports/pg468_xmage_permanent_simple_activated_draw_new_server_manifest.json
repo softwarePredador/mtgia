@@ -1,0 +1,415 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg468_xmage_permanent_simple_activated_draw_new_server_2",
+  "deploy_id": "pg468",
+  "expected_rules": [
+    {
+      "card_name": "Goblin Picker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5ed484b4acd7c7e98517563f60a676be",
+      "min_rule_version": 2,
+      "normalized_name": "goblin picker",
+      "oracle_hash": "0017710f731e6751d874b4c0fbb1f9a6",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mental Discipline",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16337c44c22faf4cfc4a6e57366b2a38",
+      "min_rule_version": 2,
+      "normalized_name": "mental discipline",
+      "oracle_hash": "560fe87384d9f47726aca4af1d3ab790",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_cost_colors": [
+          "U"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{U}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "enchantment",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Merchant of the Vale // Haggle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:26b884cd8d9f751d78fec341b3074df7",
+      "min_rule_version": 2,
+      "normalized_name": "merchant of the vale // haggle",
+      "oracle_hash": "b0f4662b119d93ea24108a7ac73eb12c",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Oread of Mountain's Blaze",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:26b884cd8d9f751d78fec341b3074df7",
+      "min_rule_version": 2,
+      "normalized_name": "oread of mountain's blaze",
+      "oracle_hash": "b0f4662b119d93ea24108a7ac73eb12c",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rummaging Goblin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ef96d97e572155d12c9568c27367b976",
+      "min_rule_version": 2,
+      "normalized_name": "rummaging goblin",
+      "oracle_hash": "156447c4727ecfb2e265442d3495cf64",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_draw": 5
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg468_xmage_permanent_simple_activated_draw_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg468_xmage_permanent_simple_activated_draw_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg468_xmage_permanent_simple_activated_draw_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg468_xmage_permanent_simple_activated_draw_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg468_xmage_permanent_simple_activated_draw_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg468_xmage_permanent_simple_activated_draw_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T01:48:40+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Goblin Picker"
+      },
+      "card_name": "Goblin Picker",
+      "effect": "draw_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5ed484b4acd7c7e98517563f60a676be",
+      "normalized_name": "goblin picker",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mental Discipline"
+      },
+      "card_name": "Mental Discipline",
+      "effect": "draw_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16337c44c22faf4cfc4a6e57366b2a38",
+      "normalized_name": "mental discipline",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_cost_colors": [
+          "U"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{U}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "enchantment",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Merchant of the Vale // Haggle"
+      },
+      "card_name": "Merchant of the Vale // Haggle",
+      "effect": "draw_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:26b884cd8d9f751d78fec341b3074df7",
+      "normalized_name": "merchant of the vale // haggle",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Oread of Mountain's Blaze"
+      },
+      "card_name": "Oread of Mountain's Blaze",
+      "effect": "draw_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:26b884cd8d9f751d78fec341b3074df7",
+      "normalized_name": "oread of mountain's blaze",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{R}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rummaging Goblin"
+      },
+      "card_name": "Rummaging Goblin",
+      "effect": "draw_engine",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ef96d97e572155d12c9568c27367b976",
+      "normalized_name": "rummaging goblin",
+      "required_effect_fields": {
+        "ability_kind": "activated",
+        "activated_draw": true,
+        "activated_draw_count": 1,
+        "activated_effect": "draw_cards",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+        "count": 1,
+        "effect": "draw_engine",
+        "permanent_type": "creature",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Goblin Picker",
+    "Mental Discipline",
+    "Merchant of the Vale // Haggle",
+    "Oread of Mountain's Blaze",
+    "Rummaging Goblin"
+  ],
+  "selected_count": 5,
+  "slug": "xmage_permanent_simple_activated_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Goblin Picker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5ed484b4acd7c7e98517563f60a676be",
+      "min_rule_version": 2,
+      "normalized_name": "goblin picker",
+      "oracle_hash": "0017710f731e6751d874b4c0fbb1f9a6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mental Discipline",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16337c44c22faf4cfc4a6e57366b2a38",
+      "min_rule_version": 2,
+      "normalized_name": "mental discipline",
+      "oracle_hash": "560fe87384d9f47726aca4af1d3ab790",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Merchant of the Vale // Haggle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:26b884cd8d9f751d78fec341b3074df7",
+      "min_rule_version": 2,
+      "normalized_name": "merchant of the vale // haggle",
+      "oracle_hash": "b0f4662b119d93ea24108a7ac73eb12c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Oread of Mountain's Blaze",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:26b884cd8d9f751d78fec341b3074df7",
+      "min_rule_version": 2,
+      "normalized_name": "oread of mountain's blaze",
+      "oracle_hash": "b0f4662b119d93ea24108a7ac73eb12c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rummaging Goblin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ef96d97e572155d12c9568c27367b976",
+      "min_rule_version": 2,
+      "normalized_name": "rummaging goblin",
+      "oracle_hash": "156447c4727ecfb2e265442d3495cf64",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_draw_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
