@@ -1,0 +1,368 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T00:25:48.687279+00:00",
+  "manifest": "../../master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_manifest.json",
+  "package_id": "pg457_xmage_fixed_scry_draw_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Behold the Multiverse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ece086c9664b69de9394f97db5ea756c",
+          "oracle_hash": "b5dcf35d4caca8940babf328de8c1f31",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Deliberate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e1fba59c194355b5d702d2384ba7255e",
+          "oracle_hash": "f2f55a062b4f6ad52bd1fb7c63529cef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Foresee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111",
+          "oracle_hash": "1b64fbbd0f8f87760ea58c00aaac5830",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Introduction to Prophecy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+          "oracle_hash": "f2f55a062b4f6ad52bd1fb7c63529cef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Opt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:448911d91036b97ef7d8cd638e13eb53",
+          "oracle_hash": "a4b8e16d9deabd12619e9bef807b8c29",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Preordain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+          "oracle_hash": "fe08a291a061e602c16e75baf7f59d07",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Scour All Possibilities",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+          "oracle_hash": "a4250e42e446bf2476fc20bb27cba9a9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Serum Visions",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3672976f55360ae7e7d98412801098e2",
+          "oracle_hash": "b7221a769af9d2b428fb7d01e6a3aa00",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Tamiyo's Epiphany",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111",
+          "oracle_hash": "1b64fbbd0f8f87760ea58c00aaac5830",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Behold the Multiverse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ece086c9664b69de9394f97db5ea756c",
+          "oracle_hash": "b5dcf35d4caca8940babf328de8c1f31",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Deliberate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e1fba59c194355b5d702d2384ba7255e",
+          "oracle_hash": "f2f55a062b4f6ad52bd1fb7c63529cef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Foresee",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111",
+          "oracle_hash": "1b64fbbd0f8f87760ea58c00aaac5830",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Introduction to Prophecy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+          "oracle_hash": "f2f55a062b4f6ad52bd1fb7c63529cef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Opt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:448911d91036b97ef7d8cd638e13eb53",
+          "oracle_hash": "a4b8e16d9deabd12619e9bef807b8c29",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Preordain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+          "oracle_hash": "fe08a291a061e602c16e75baf7f59d07",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Scour All Possibilities",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+          "oracle_hash": "a4250e42e446bf2476fc20bb27cba9a9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Serum Visions",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3672976f55360ae7e7d98412801098e2",
+          "oracle_hash": "b7221a769af9d2b428fb7d01e6a3aa00",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "card_name": "Tamiyo's Epiphany",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111",
+          "oracle_hash": "1b64fbbd0f8f87760ea58c00aaac5830",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Behold the Multiverse",
+          "logical_rule_key": "battle_rule_v1:ece086c9664b69de9394f97db5ea756c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deliberate",
+          "logical_rule_key": "battle_rule_v1:e1fba59c194355b5d702d2384ba7255e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Foresee",
+          "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Introduction to Prophecy",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Opt",
+          "logical_rule_key": "battle_rule_v1:448911d91036b97ef7d8cd638e13eb53"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Preordain",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scour All Possibilities",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Serum Visions",
+          "logical_rule_key": "battle_rule_v1:3672976f55360ae7e7d98412801098e2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tamiyo's Epiphany",
+          "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Behold the Multiverse",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:ece086c9664b69de9394f97db5ea756c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deliberate",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:e1fba59c194355b5d702d2384ba7255e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Foresee",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Introduction to Prophecy",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Opt",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:448911d91036b97ef7d8cd638e13eb53"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Preordain",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scour All Possibilities",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Serum Visions",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:3672976f55360ae7e7d98412801098e2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tamiyo's Epiphany",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

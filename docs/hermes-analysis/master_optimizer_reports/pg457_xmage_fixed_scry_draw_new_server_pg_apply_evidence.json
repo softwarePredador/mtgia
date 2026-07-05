@@ -1,0 +1,240 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg457",
+  "generated_at": "2026-07-05T00:25:24.731061+00:00",
+  "manifest": "../../master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg457_xmage_fixed_scry_draw_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 6,
+    "cards": [
+      "Behold the Multiverse",
+      "Deliberate",
+      "Foresee",
+      "Introduction to Prophecy",
+      "Opt",
+      "Preordain",
+      "Scour All Possibilities",
+      "Serum Visions",
+      "Tamiyo's Epiphany"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 9,
+    "promoted_rule_rows": 9,
+    "promoted_verified_auto_rows": 9,
+    "row_count": 9
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 6,
+      "card_name": "Behold the Multiverse",
+      "logical_rule_key": "battle_rule_v1:ece086c9664b69de9394f97db5ea756c",
+      "normalized_name": "behold the multiverse",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 6,
+      "card_name": "Deliberate",
+      "logical_rule_key": "battle_rule_v1:e1fba59c194355b5d702d2384ba7255e",
+      "normalized_name": "deliberate",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 6,
+      "card_name": "Foresee",
+      "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111",
+      "normalized_name": "foresee",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 6,
+      "card_name": "Introduction to Prophecy",
+      "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+      "normalized_name": "introduction to prophecy",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 6,
+      "card_name": "Opt",
+      "logical_rule_key": "battle_rule_v1:448911d91036b97ef7d8cd638e13eb53",
+      "normalized_name": "opt",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 6,
+      "card_name": "Preordain",
+      "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+      "normalized_name": "preordain",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 6,
+      "card_name": "Scour All Possibilities",
+      "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+      "normalized_name": "scour all possibilities",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 6,
+      "card_name": "Serum Visions",
+      "logical_rule_key": "battle_rule_v1:3672976f55360ae7e7d98412801098e2",
+      "normalized_name": "serum visions",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 6,
+      "card_name": "Tamiyo's Epiphany",
+      "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111",
+      "normalized_name": "tamiyo's epiphany",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Behold the Multiverse",
+      "Deliberate",
+      "Foresee",
+      "Introduction to Prophecy",
+      "Opt",
+      "Preordain",
+      "Scour All Possibilities",
+      "Serum Visions",
+      "Tamiyo's Epiphany"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 9,
+    "total_target_card_rows": 9,
+    "would_deprecate_shadow_rows": 6
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "ef3c57a1-271f-43e7-9339-a1dad5abd742",
+      "card_name": "Behold the Multiverse",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:ece086c9664b69de9394f97db5ea756c",
+      "normalized_name": "behold the multiverse",
+      "oracle_hash": "b5dcf35d4caca8940babf328de8c1f31",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "1b0d5f41-0621-4673-a183-c43b927fddd4",
+      "card_name": "Deliberate",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:e1fba59c194355b5d702d2384ba7255e",
+      "normalized_name": "deliberate",
+      "oracle_hash": "f2f55a062b4f6ad52bd1fb7c63529cef",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "21babb5f-e48e-4940-8c73-b8aa7b9a0781",
+      "card_name": "Foresee",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111",
+      "normalized_name": "foresee",
+      "oracle_hash": "1b64fbbd0f8f87760ea58c00aaac5830",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "7b7a9db7-80e4-46dd-8e9f-1a08abe998dd",
+      "card_name": "Introduction to Prophecy",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+      "normalized_name": "introduction to prophecy",
+      "oracle_hash": "f2f55a062b4f6ad52bd1fb7c63529cef",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "96cd1896-d7c8-4057-95c3-df5b958cd553",
+      "card_name": "Opt",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:448911d91036b97ef7d8cd638e13eb53",
+      "normalized_name": "opt",
+      "oracle_hash": "a4b8e16d9deabd12619e9bef807b8c29",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "canonical_card_id": "bedf456d-c54d-4df9-bb8a-8c1fc9f44d1c",
+      "card_name": "Preordain",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+      "normalized_name": "preordain",
+      "oracle_hash": "fe08a291a061e602c16e75baf7f59d07",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "canonical_card_id": "85366688-732f-445b-a188-9051eb757105",
+      "card_name": "Scour All Possibilities",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+      "normalized_name": "scour all possibilities",
+      "oracle_hash": "a4250e42e446bf2476fc20bb27cba9a9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "80731d3c-0a9c-43b4-af33-73bfc0ff251f",
+      "card_name": "Serum Visions",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3672976f55360ae7e7d98412801098e2",
+      "normalized_name": "serum visions",
+      "oracle_hash": "b7221a769af9d2b428fb7d01e6a3aa00",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "canonical_card_id": "2cbf9014-cc55-4db7-91f1-a9be81b176c6",
+      "card_name": "Tamiyo's Epiphany",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111",
+      "normalized_name": "tamiyo's epiphany",
+      "oracle_hash": "1b64fbbd0f8f87760ea58c00aaac5830",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_fixed_scry_draw_new_server"
+}

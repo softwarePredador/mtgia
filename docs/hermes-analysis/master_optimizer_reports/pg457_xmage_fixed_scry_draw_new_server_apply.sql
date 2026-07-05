@@ -1,0 +1,202 @@
+BEGIN;
+
+CREATE SCHEMA IF NOT EXISTS manaloom_deploy_audit;
+
+CREATE TABLE IF NOT EXISTS manaloom_deploy_audit.pg457_xmage_fixed_scry_draw_new_server_20260705_002433 AS
+SELECT *
+FROM public.card_battle_rules
+WHERE normalized_name IN ('behold the multiverse', 'deliberate', 'foresee', 'introduction to prophecy', 'opt', 'preordain', 'scour all possibilities', 'serum visions', 'tamiyo''s epiphany')
+   OR normalized_name LIKE 'behold the multiverse // %'
+   OR normalized_name LIKE 'deliberate // %'
+   OR normalized_name LIKE 'foresee // %'
+   OR normalized_name LIKE 'introduction to prophecy // %'
+   OR normalized_name LIKE 'opt // %'
+   OR normalized_name LIKE 'preordain // %'
+   OR normalized_name LIKE 'scour all possibilities // %'
+   OR normalized_name LIKE 'serum visions // %'
+   OR normalized_name LIKE 'tamiyo''s epiphany // %';
+
+DO $$
+DECLARE
+  v_missing jsonb;
+BEGIN
+  WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('behold the multiverse', 'Behold the Multiverse', 'b5dcf35d4caca8940babf328de8c1f31', 'battle_rule_v1:ece086c9664b69de9394f97db5ea756c', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":2,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":2,"draw_count":2,"effect":"composite_resolution","instant":true,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":false,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class BeholdTheMultiverse translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('deliberate', 'Deliberate', 'f2f55a062b4f6ad52bd1fb7c63529cef', 'battle_rule_v1:e1fba59c194355b5d702d2384ba7255e', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":true,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":false,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Deliberate translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('foresee', 'Foresee', '1b64fbbd0f8f87760ea58c00aaac5830', 'battle_rule_v1:30f99495b1c991685ef9c793b6d34111', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":4,"effect":"scry","scry_count":4,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":2,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":2,"draw_count":2,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":4,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Foresee translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('introduction to prophecy', 'Introduction to Prophecy', 'f2f55a062b4f6ad52bd1fb7c63529cef', 'battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class IntroductionToProphecy translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('opt', 'Opt', 'a4b8e16d9deabd12619e9bef807b8c29', 'battle_rule_v1:448911d91036b97ef7d8cd638e13eb53', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":1,"effect":"scry","scry_count":1,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":true,"resolution_order":"scry_then_draw","scry_count":1,"sorcery":false,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Opt translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('preordain', 'Preordain', 'fe08a291a061e602c16e75baf7f59d07', 'battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Preordain translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('scour all possibilities', 'Scour All Possibilities', 'a4250e42e446bf2476fc20bb27cba9a9', 'battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class ScourAllPossibilities translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('serum visions', 'Serum Visions', 'b7221a769af9d2b428fb7d01e6a3aa00', 'battle_rule_v1:3672976f55360ae7e7d98412801098e2', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"draw_then_scry","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SerumVisions translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('tamiyo''s epiphany', 'Tamiyo''s Epiphany', '1b64fbbd0f8f87760ea58c00aaac5830', 'battle_rule_v1:30f99495b1c991685ef9c793b6d34111', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":4,"effect":"scry","scry_count":4,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":2,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":2,"draw_count":2,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":4,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class TamiyosEpiphany translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+  counts AS (
+    SELECT
+      p.card_name,
+      p.normalized_name,
+      p.oracle_hash,
+      count(c.id) AS target_card_rows,
+      min(c.id::text)::uuid AS canonical_card_id
+    FROM proposed p
+    LEFT JOIN public.cards c
+      ON (
+           lower(c.name) = p.normalized_name
+           OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+         )
+     AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
+    GROUP BY p.card_name, p.normalized_name, p.oracle_hash
+  )
+  SELECT jsonb_agg(counts ORDER BY card_name)
+    INTO v_missing
+  FROM counts
+  WHERE target_card_rows < 1;
+
+  IF v_missing IS NOT NULL THEN
+    RAISE EXCEPTION 'XMage batch package abort: expected at least one Oracle-hash-matched card row for every proposed card: %', v_missing;
+  END IF;
+END $$;
+
+WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('behold the multiverse', 'Behold the Multiverse', 'b5dcf35d4caca8940babf328de8c1f31', 'battle_rule_v1:ece086c9664b69de9394f97db5ea756c', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":2,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":2,"draw_count":2,"effect":"composite_resolution","instant":true,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":false,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class BeholdTheMultiverse translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('deliberate', 'Deliberate', 'f2f55a062b4f6ad52bd1fb7c63529cef', 'battle_rule_v1:e1fba59c194355b5d702d2384ba7255e', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":true,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":false,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Deliberate translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('foresee', 'Foresee', '1b64fbbd0f8f87760ea58c00aaac5830', 'battle_rule_v1:30f99495b1c991685ef9c793b6d34111', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":4,"effect":"scry","scry_count":4,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":2,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":2,"draw_count":2,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":4,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Foresee translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('introduction to prophecy', 'Introduction to Prophecy', 'f2f55a062b4f6ad52bd1fb7c63529cef', 'battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class IntroductionToProphecy translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('opt', 'Opt', 'a4b8e16d9deabd12619e9bef807b8c29', 'battle_rule_v1:448911d91036b97ef7d8cd638e13eb53', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":1,"effect":"scry","scry_count":1,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":true,"resolution_order":"scry_then_draw","scry_count":1,"sorcery":false,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Opt translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('preordain', 'Preordain', 'fe08a291a061e602c16e75baf7f59d07', 'battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Preordain translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('scour all possibilities', 'Scour All Possibilities', 'a4250e42e446bf2476fc20bb27cba9a9', 'battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class ScourAllPossibilities translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('serum visions', 'Serum Visions', 'b7221a769af9d2b428fb7d01e6a3aa00', 'battle_rule_v1:3672976f55360ae7e7d98412801098e2', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"draw_then_scry","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SerumVisions translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('tamiyo''s epiphany', 'Tamiyo''s Epiphany', '1b64fbbd0f8f87760ea58c00aaac5830', 'battle_rule_v1:30f99495b1c991685ef9c793b6d34111', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":4,"effect":"scry","scry_count":4,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":2,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":2,"draw_count":2,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":4,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class TamiyosEpiphany translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+deprecated AS (
+  UPDATE public.card_battle_rules r
+  SET
+    review_status = 'deprecated',
+    execution_status = 'disabled',
+    updated_at = now(),
+    notes = concat_ws(E'\n', nullif(r.notes, ''), 'XMage batch package: deprecated stale shadow before curated batch rule upsert.')
+  FROM proposed p
+  WHERE (
+        r.normalized_name = p.normalized_name
+        OR r.normalized_name LIKE p.normalized_name || ' // %'
+      )
+    AND p.shadow_handling <> 'preserve_existing_rows'
+    AND r.logical_rule_key <> p.logical_rule_key
+  RETURNING r.*
+)
+SELECT count(*) AS deprecated_shadow_rows FROM deprecated;
+
+WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('behold the multiverse', 'Behold the Multiverse', 'b5dcf35d4caca8940babf328de8c1f31', 'battle_rule_v1:ece086c9664b69de9394f97db5ea756c', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":2,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":2,"draw_count":2,"effect":"composite_resolution","instant":true,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":false,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class BeholdTheMultiverse translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('deliberate', 'Deliberate', 'f2f55a062b4f6ad52bd1fb7c63529cef', 'battle_rule_v1:e1fba59c194355b5d702d2384ba7255e', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":true,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":false,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Deliberate translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('foresee', 'Foresee', '1b64fbbd0f8f87760ea58c00aaac5830', 'battle_rule_v1:30f99495b1c991685ef9c793b6d34111', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":4,"effect":"scry","scry_count":4,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":2,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":2,"draw_count":2,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":4,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Foresee translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('introduction to prophecy', 'Introduction to Prophecy', 'f2f55a062b4f6ad52bd1fb7c63529cef', 'battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class IntroductionToProphecy translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('opt', 'Opt', 'a4b8e16d9deabd12619e9bef807b8c29', 'battle_rule_v1:448911d91036b97ef7d8cd638e13eb53', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":1,"effect":"scry","scry_count":1,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":true,"resolution_order":"scry_then_draw","scry_count":1,"sorcery":false,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Opt translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('preordain', 'Preordain', 'fe08a291a061e602c16e75baf7f59d07', 'battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Preordain translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('scour all possibilities', 'Scour All Possibilities', 'a4250e42e446bf2476fc20bb27cba9a9', 'battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class ScourAllPossibilities translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('serum visions', 'Serum Visions', 'b7221a769af9d2b428fb7d01e6a3aa00', 'battle_rule_v1:3672976f55360ae7e7d98412801098e2', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"},{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":2,"effect":"scry","scry_count":2,"xmage_effect_class":"ScryEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"resolution_order":"draw_then_scry","scry_count":2,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class SerumVisions translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('tamiyo''s epiphany', 'Tamiyo''s Epiphany', '1b64fbbd0f8f87760ea58c00aaac5830', 'battle_rule_v1:30f99495b1c991685ef9c793b6d34111', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_scry_spell_v1","compose_on_resolution":true,"count":4,"effect":"scry","scry_count":4,"xmage_effect_class":"ScryEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":2,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_scry_and_draw_cards_spell_v1","count":2,"draw_count":2,"effect":"composite_resolution","instant":false,"resolution_order":"scry_then_draw","scry_count":4,"sorcery":true,"xmage_effect_classes":["ScryEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class TamiyosEpiphany translated into ManaLoom runtime scope xmage_fixed_scry_and_draw_cards_spell_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+matched_cards AS (
+  SELECT
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    c.id AS card_id,
+    c.name AS db_card_name
+  FROM proposed p
+  JOIN public.cards c
+    ON (
+         lower(c.name) = p.normalized_name
+         OR split_part(lower(c.name), ' // ', 1) = p.normalized_name
+       )
+   AND md5(coalesce(c.oracle_text, '')) = p.oracle_hash
+),
+canonical_target_cards AS (
+  SELECT
+    p.*,
+    min(m.card_id::text)::uuid AS card_id,
+    min(m.db_card_name) AS db_card_name
+  FROM proposed p
+  JOIN matched_cards m
+    USING (normalized_name, card_name, oracle_hash)
+  GROUP BY
+    p.normalized_name,
+    p.card_name,
+    p.oracle_hash,
+    p.logical_rule_key,
+    p.effect_json,
+    p.deck_role_json,
+    p.source,
+    p.confidence,
+    p.review_status,
+    p.execution_status,
+    p.notes,
+    p.shadow_handling
+),
+upserted AS (
+  INSERT INTO public.card_battle_rules (
+    normalized_name,
+    card_id,
+    card_name,
+    effect_json,
+    deck_role_json,
+    source,
+    confidence,
+    review_status,
+    rule_version,
+    oracle_hash,
+    notes,
+    reviewed_by,
+    reviewed_at,
+    created_at,
+    updated_at,
+    last_seen_at,
+    logical_rule_key,
+    execution_status
+  )
+  SELECT
+    normalized_name,
+    card_id,
+    db_card_name,
+    effect_json,
+    deck_role_json,
+    source,
+    confidence,
+    review_status,
+    2,
+    oracle_hash,
+    notes,
+    'codex-xmage-batch',
+    now(),
+    now(),
+    now(),
+    now(),
+    logical_rule_key,
+    execution_status
+  FROM canonical_target_cards
+  ON CONFLICT (normalized_name, logical_rule_key) DO UPDATE
+  SET
+    card_id = EXCLUDED.card_id,
+    card_name = EXCLUDED.card_name,
+    effect_json = EXCLUDED.effect_json,
+    deck_role_json = EXCLUDED.deck_role_json,
+    source = EXCLUDED.source,
+    confidence = EXCLUDED.confidence,
+    review_status = EXCLUDED.review_status,
+    rule_version = EXCLUDED.rule_version,
+    oracle_hash = EXCLUDED.oracle_hash,
+    notes = EXCLUDED.notes,
+    reviewed_by = EXCLUDED.reviewed_by,
+    reviewed_at = EXCLUDED.reviewed_at,
+    updated_at = EXCLUDED.updated_at,
+    last_seen_at = EXCLUDED.last_seen_at,
+    execution_status = EXCLUDED.execution_status
+  RETURNING *
+)
+SELECT count(*) AS upserted_rows FROM upserted;
+
+COMMIT;

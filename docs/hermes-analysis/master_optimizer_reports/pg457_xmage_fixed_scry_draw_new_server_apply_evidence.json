@@ -1,0 +1,406 @@
+{
+  "apply": {
+    "backup_rows": 6,
+    "deprecated_shadow_rows": 6,
+    "transaction": "commit",
+    "upserted_rows": 9
+  },
+  "artifacts": {
+    "apply_sql": "docs/hermes-analysis/master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_apply.sql",
+    "e2e_validation": "docs/hermes-analysis/master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_e2e_validation.json",
+    "full_pg_to_sqlite_sync": "docs/hermes-analysis/master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_full_pg_to_sqlite_sync_operational.json",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_manifest.json",
+    "metadata_sync": "docs/hermes-analysis/master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_metadata_sync_operational.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_package.md",
+    "post_sync_exact_split": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg457_fixed_scry_draw_new_server_recheck.md",
+    "post_sync_queue": "docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg457_fixed_scry_draw_new_server_commander_legal.md",
+    "postcheck_sql": "docs/hermes-analysis/master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_postcheck.sql",
+    "precheck_sql": "docs/hermes-analysis/master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_precheck.sql",
+    "raw_pg_apply_evidence": "docs/hermes-analysis/master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_pg_apply_evidence.json",
+    "rollback_sql": "docs/hermes-analysis/master_optimizer_reports/pg457_xmage_fixed_scry_draw_new_server_rollback.sql"
+  },
+  "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg457",
+  "direct_postgresql_verification": {
+    "all_have_oracle_hash": true,
+    "all_verified_auto_curated": true,
+    "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+    "deprecated_shadow_rows": [
+      {
+        "card_name": "Opt",
+        "deprecated_disabled_rows": 2
+      },
+      {
+        "card_name": "Preordain",
+        "deprecated_disabled_rows": 2
+      },
+      {
+        "card_name": "Serum Visions",
+        "deprecated_disabled_rows": 2
+      }
+    ],
+    "rows": [
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Behold the Multiverse",
+        "draw_count": 2,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": true,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": false,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Deliberate",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": true,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": false,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Foresee",
+        "draw_count": 2,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 4,
+        "sorcery": true,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Introduction to Prophecy",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": true,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Opt",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": true,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 1,
+        "sorcery": false,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Preordain",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": true,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Scour All Possibilities",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": true,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Serum Visions",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "draw_then_scry",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": true,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Tamiyo's Epiphany",
+        "draw_count": 2,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 4,
+        "sorcery": true,
+        "source": "curated"
+      }
+    ],
+    "validated_cards": 9
+  },
+  "family": "xmage_fixed_scry_draw_card_spell",
+  "generated_at_utc": "2026-07-05T00:29:17Z",
+  "post_sync_exact_split": {
+    "largest_remaining_families": [
+      {
+        "count": 8,
+        "family": "xmage_creature_dies_fixed_damage_target"
+      },
+      {
+        "count": 8,
+        "family": "xmage_destroy_target_scry_spell"
+      },
+      {
+        "count": 8,
+        "family": "xmage_fixed_damage_scry_spell"
+      },
+      {
+        "count": 8,
+        "family": "xmage_fixed_draw_lose_life_spell"
+      },
+      {
+        "count": 8,
+        "family": "xmage_static_self_protection_from_subtypes_creature"
+      }
+    ],
+    "proposal_count": 126,
+    "safe_for_batch_pg_package_count": 126
+  },
+  "post_sync_queue": {
+    "adapter_work_unit_count": 11397,
+    "target_identity_count": 26465,
+    "xmage_authoritative_adapter_required_count": 26151,
+    "xmage_authoritative_parser_gap_count": 0,
+    "xmage_authoritative_source_count": 26151,
+    "xmage_missing_source_exception_count": 314
+  },
+  "postcheck": {
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 9,
+    "promoted_rule_rows": 9,
+    "promoted_verified_auto_rows": 9,
+    "validated_cards": 9
+  },
+  "precheck": {
+    "existing_expected_rows_before": 0,
+    "missing_targets": 0,
+    "target_rows": 9,
+    "would_deprecate_shadow_rows": 6
+  },
+  "scry_draw_parameters": {
+    "required_fields": [
+      "scry_count",
+      "draw_count",
+      "resolution_order"
+    ],
+    "rows": [
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Behold the Multiverse",
+        "draw_count": 2,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": true,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": false,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Deliberate",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": true,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": false,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Foresee",
+        "draw_count": 2,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 4,
+        "sorcery": true,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Introduction to Prophecy",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": true,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Opt",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": true,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 1,
+        "sorcery": false,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Preordain",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": true,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Scour All Possibilities",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": true,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Serum Visions",
+        "draw_count": 1,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "draw_then_scry",
+        "review_status": "verified",
+        "scry_count": 2,
+        "sorcery": true,
+        "source": "curated"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+        "card_name": "Tamiyo's Epiphany",
+        "draw_count": 2,
+        "execution_status": "auto",
+        "has_oracle_hash": true,
+        "instant": false,
+        "resolution_order": "scry_then_draw",
+        "review_status": "verified",
+        "scry_count": 4,
+        "sorcery": true,
+        "source": "curated"
+      }
+    ],
+    "scope": "fixed scry and draw instant-or-sorcery controller effect"
+  },
+  "selected_cards": [
+    "Behold the Multiverse",
+    "Deliberate",
+    "Foresee",
+    "Introduction to Prophecy",
+    "Opt",
+    "Preordain",
+    "Scour All Possibilities",
+    "Serum Visions",
+    "Tamiyo's Epiphany"
+  ],
+  "selected_count": 9,
+  "slug": "xmage_fixed_scry_draw_new_server",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "status": "closed",
+  "sync": {
+    "canonical_snapshot_rows_exported": 4388,
+    "curated_rows": 145,
+    "generated_rows": 1947,
+    "metadata_card_id_rows_updated": 105,
+    "metadata_deck_cards_matched_cache_rows": 2699,
+    "metadata_deck_cards_rows_total": 2699,
+    "metadata_postgres_cards_matched": 5587,
+    "metadata_requested_unique_names": 5402,
+    "metadata_sqlite_cache_alias_rows": 5497,
+    "metadata_unresolved_count": 1,
+    "metadata_unresolved_sample": [
+      "Surgical Suite/Hospital Room"
+    ],
+    "oracle_normalized_rows": 274,
+    "pg_rows_loaded": 4421,
+    "sqlite_inserted_or_updated": 4413
+  },
+  "validation": {
+    "audits": {
+      "legacy_contamination": {
+        "checks": 32,
+        "status": "pass"
+      },
+      "operational_surface_alignment": {
+        "checks": 39,
+        "status": "pass"
+      },
+      "pg_hermes_sqlite_contract": {
+        "checks": 51,
+        "status": "pass"
+      },
+      "xmage_strategy_consistency": {
+        "checks": 26,
+        "status": "pass"
+      }
+    },
+    "e2e": {
+      "battle_execution_events": 0,
+      "battle_execution_scenarios": 0,
+      "canonical_snapshot_cards": 9,
+      "postgres_source_of_truth_rows": 9,
+      "runtime_get_card_effect_cards": 9,
+      "sqlite_hermes_cache_rows": 9,
+      "status": "pass"
+    },
+    "focused_tests": {
+      "checks": 718,
+      "status": "pass"
+    }
+  }
+}

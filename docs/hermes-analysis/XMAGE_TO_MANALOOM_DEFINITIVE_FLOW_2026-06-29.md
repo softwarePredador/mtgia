@@ -10073,6 +10073,64 @@ new server:
   `xmage_destroy_target_scry_spell`, `xmage_fixed_damage_scry_spell`, and
   `xmage_static_self_protection_from_subtypes_creature` with `8` cards each.
 
+## 2026-07-05 PG457 Fixed Scry Draw Closure
+
+- Closed the exact XMage fixed scry/draw instant-or-sorcery family as ManaLoom
+  scope `xmage_fixed_scry_and_draw_cards_spell_v1`.
+- The selected package accepted local XMage spell sources whose executable
+  behavior is fixed `ScryEffect` plus fixed
+  `DrawCardSourceControllerEffect`, with Oracle/source agreement on scry count,
+  draw count, and resolution order.
+- The batch covers `9` cards: Behold the Multiverse, Deliberate, Foresee,
+  Introduction to Prophecy, Opt, Preordain, Scour All Possibilities, Serum
+  Visions, and Tamiyo's Epiphany.
+- Focused mapper/runtime tests covered composite scry/draw resolution,
+  top-library reordering, draw movement, and generated event evidence; PG457
+  performed no code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `9` cards. Precheck found `9` target rows,
+  `0` missing targets, `0` existing expected rows, and `6` stale generated
+  shadow rows to deprecate; apply/postcheck verified `9/9` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `6` rows;
+  `failed_cards=[]`.
+- The stale generated shadows were disabled as deprecated rows for Opt (`2`),
+  Preordain (`2`), and Serum Visions (`2`), replacing older generated split
+  rows with one curated executable composite rule per card.
+- Direct PostgreSQL verification confirmed all `9` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and expose complete
+  scry/draw parameters. The selected counts are:
+  Behold the Multiverse `scry=2 draw=2 scry_then_draw`, Deliberate
+  `scry=2 draw=1 scry_then_draw`, Foresee
+  `scry=4 draw=2 scry_then_draw`, Introduction to Prophecy
+  `scry=2 draw=1 scry_then_draw`, Opt
+  `scry=1 draw=1 scry_then_draw`, Preordain
+  `scry=2 draw=1 scry_then_draw`, Scour All Possibilities
+  `scry=2 draw=1 scry_then_draw`, Serum Visions
+  `scry=2 draw=1 draw_then_scry`, and Tamiyo's Epiphany
+  `scry=4 draw=2 scry_then_draw`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4421` PostgreSQL runtime rows, wrote `4413` SQLite runtime
+  rows, and exported `4388` canonical fallback rows.
+- PG457 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `9` selected cards. Generic
+  battle scenario count remained `0`; scry/draw spell execution remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26465`, `xmage_authoritative_source_count=26151`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26151`. This is an exact
+  reduction of `9` from the post-PG456 queue.
+- The post-PG457 exact split recheck reports `proposal_count=126` and
+  `safe_for_batch_pg_package_count=126`. The largest remaining exact families
+  are `xmage_creature_dies_fixed_damage_target`,
+  `xmage_destroy_target_scry_spell`, `xmage_fixed_damage_scry_spell`,
+  `xmage_fixed_draw_lose_life_spell`, and
+  `xmage_static_self_protection_from_subtypes_creature` with `8` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

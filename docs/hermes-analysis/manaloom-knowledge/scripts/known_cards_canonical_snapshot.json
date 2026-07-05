@@ -7517,6 +7517,44 @@
     "battle_rule_logical_key": "battle_rule_v1:ae7cb661641c2688dc26049f2952d09c",
     "battle_rule_oracle_hash": "51762dddef01d1e2c3d89133073cbcc2"
   },
+  "Behold the Multiverse": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "scry",
+        "scry_count": 2,
+        "xmage_effect_class": "ScryEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+    "count": 2,
+    "draw_count": 2,
+    "effect": "composite_resolution",
+    "instant": true,
+    "resolution_order": "scry_then_draw",
+    "scry_count": 2,
+    "sorcery": false,
+    "xmage_effect_classes": [
+      "ScryEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ece086c9664b69de9394f97db5ea756c",
+    "battle_rule_oracle_hash": "b5dcf35d4caca8940babf328de8c1f31"
+  },
   "Behold the Sinister Six!": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
     "battlefield_controller": "self",
@@ -20342,6 +20380,44 @@
     "battle_rule_logical_key": "battle_rule_v1:a2c478eb91086987f990c46671af3084",
     "battle_rule_oracle_hash": "75b54b0b388337bf882817a27b315963"
   },
+  "Deliberate": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "scry",
+        "scry_count": 2,
+        "xmage_effect_class": "ScryEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "resolution_order": "scry_then_draw",
+    "scry_count": 2,
+    "sorcery": false,
+    "xmage_effect_classes": [
+      "ScryEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e1fba59c194355b5d702d2384ba7255e",
+    "battle_rule_oracle_hash": "f2f55a062b4f6ad52bd1fb7c63529cef"
+  },
   "Delighted Halfling": {
     "ability_kind": "static",
     "activation_requires_tap": true,
@@ -31549,6 +31625,44 @@
     "battle_rule_logical_key": "battle_rule_v1:7c760cde02cb7568435f549d534a802f",
     "battle_rule_oracle_hash": "edb63d2c5c5ec84d9f50886abc88fac0"
   },
+  "Foresee": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 4,
+        "effect": "scry",
+        "scry_count": 4,
+        "xmage_effect_class": "ScryEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+    "count": 2,
+    "draw_count": 2,
+    "effect": "composite_resolution",
+    "instant": false,
+    "resolution_order": "scry_then_draw",
+    "scry_count": 4,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "ScryEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111",
+    "battle_rule_oracle_hash": "1b64fbbd0f8f87760ea58c00aaac5830"
+  },
   "Forest": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -41843,6 +41957,44 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:643cb2ee6b30c8f266da6e0404dae862",
     "battle_rule_oracle_hash": "bc846fd3be2dcc0f1289cb69136332a9"
+  },
+  "Introduction to Prophecy": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "scry",
+        "scry_count": 2,
+        "xmage_effect_class": "ScryEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": false,
+    "resolution_order": "scry_then_draw",
+    "scry_count": 2,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "ScryEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+    "battle_rule_oracle_hash": "f2f55a062b4f6ad52bd1fb7c63529cef"
   },
   "Intuition": {
     "effect": "tutor",
@@ -56162,6 +56314,44 @@
     "battle_rule_logical_key": "battle_rule_v1:0c28c8ded1b243187c890e17a32c8ad7",
     "battle_rule_oracle_hash": "2118b1e4c7600ddb3a7618ec0c9f0360"
   },
+  "Opt": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "scry",
+        "scry_count": 1,
+        "xmage_effect_class": "ScryEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "resolution_order": "scry_then_draw",
+    "scry_count": 1,
+    "sorcery": false,
+    "xmage_effect_classes": [
+      "ScryEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:448911d91036b97ef7d8cd638e13eb53",
+    "battle_rule_oracle_hash": "a4b8e16d9deabd12619e9bef807b8c29"
+  },
   "Opulent Palace": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -59921,6 +60111,44 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
     "battle_rule_oracle_hash": "e759ab086a019bc274394a4df42984f5"
+  },
+  "Preordain": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "scry",
+        "scry_count": 2,
+        "xmage_effect_class": "ScryEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": false,
+    "resolution_order": "scry_then_draw",
+    "scry_count": 2,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "ScryEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+    "battle_rule_oracle_hash": "fe08a291a061e602c16e75baf7f59d07"
   },
   "Pretending Poxbearers": {
     "ability_kind": "triggered",
@@ -70486,6 +70714,44 @@
     "battle_rule_logical_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
     "battle_rule_oracle_hash": "c5ef5760409d5c5315e84d96621eebd2"
   },
+  "Scour All Possibilities": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "scry",
+        "scry_count": 2,
+        "xmage_effect_class": "ScryEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": false,
+    "resolution_order": "scry_then_draw",
+    "scry_count": 2,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "ScryEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1397e7484b9f0eb7b8d6c223d0649aa6",
+    "battle_rule_oracle_hash": "a4250e42e446bf2476fc20bb27cba9a9"
+  },
   "Scour for Scrap": {
     "ability_kind": "one_shot",
     "battle_model_scope": "modal_artifact_tutor_or_artifact_graveyard_to_hand_v1",
@@ -72353,6 +72619,44 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "316a803248170d76e5c68bd4f04e53d9"
+  },
+  "Serum Visions": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "scry",
+        "scry_count": 2,
+        "xmage_effect_class": "ScryEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": false,
+    "resolution_order": "draw_then_scry",
+    "scry_count": 2,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "ScryEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3672976f55360ae7e7d98412801098e2",
+    "battle_rule_oracle_hash": "b7221a769af9d2b428fb7d01e6a3aa00"
   },
   "Seton's Scout": {
     "_keywords_are_self": true,
@@ -82382,6 +82686,44 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:33e1dd27537361327415a737afccc230",
     "battle_rule_oracle_hash": "f4f7253661dc3bf12544fc82fdcf4efb"
+  },
+  "Tamiyo's Epiphany": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 4,
+        "effect": "scry",
+        "scry_count": 4,
+        "xmage_effect_class": "ScryEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+    "count": 2,
+    "draw_count": 2,
+    "effect": "composite_resolution",
+    "instant": false,
+    "resolution_order": "scry_then_draw",
+    "scry_count": 4,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "ScryEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:30f99495b1c991685ef9c793b6d34111",
+    "battle_rule_oracle_hash": "1b64fbbd0f8f87760ea58c00aaac5830"
   },
   "Tangle Mantis": {
     "_keywords_are_self": true,
