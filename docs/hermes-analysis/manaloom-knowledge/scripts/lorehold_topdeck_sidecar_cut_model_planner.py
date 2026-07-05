@@ -27,6 +27,9 @@ DEFAULT_SIDECAR_QUEUE = (
 )
 DEFAULT_VALUE_MODEL = REPORT_DIR / "lorehold_deckbuilding_value_model_20260704_current.json"
 DEFAULT_SAFE_CUT_MINER = REPORT_DIR / "lorehold_topdeck_safe_cut_miner_20260705_current.json"
+DEFAULT_GAP_FLOOR_TRACE_MINER = (
+    REPORT_DIR / "lorehold_gap_floor_trace_miner_20260705_current.json"
+)
 DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_topdeck_sidecar_cut_model_planner_20260705_current"
 
 TARGET_TAGS = {
@@ -103,6 +106,35 @@ def attempted_package_cuts(safe_cut_miner: Mapping[str, Any]) -> set[str]:
     return names
 
 
+def compact_floor_trace_summary(row: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "card_name": row.get("card_name") or "",
+        "floor_trace_status": row.get("floor_trace_status") or "",
+        "cut_decision": row.get("cut_decision") or "",
+        "same_slot_607_win_candidate_loss_trace_count": as_int(
+            row.get("same_slot_607_win_candidate_loss_trace_count")
+        ),
+        "positive_target_delta_trace_count": as_int(row.get("positive_target_delta_trace_count")),
+        "baseline_target_event_total": as_int(row.get("baseline_target_event_total")),
+    }
+
+
+def floor_trace_cut_blockers(gap_floor_trace_miner: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
+    blockers: dict[str, dict[str, Any]] = {}
+    for row in as_list(gap_floor_trace_miner.get("target_floor_summaries")):
+        if not isinstance(row, Mapping):
+            continue
+        name = normalize_name(row.get("card_name"))
+        if not name:
+            continue
+        if row.get("floor_trace_status") != "floor_trace_found_cut_blocked":
+            continue
+        if row.get("cut_decision") != "protect_cut_slot_until_same_lane_replacement_preserves_floor":
+            continue
+        blockers[name] = compact_floor_trace_summary(row)
+    return blockers
+
+
 def target_queue_rows(sidecar_queue: Mapping[str, Any]) -> list[dict[str, Any]]:
     rows = [dict(row) for row in as_list(sidecar_queue.get("candidate_queue")) if isinstance(row, Mapping)]
     selected: list[dict[str, Any]] = []
@@ -130,7 +162,12 @@ def cut_row_matches_target(cut_row: Mapping[str, Any], target_tag: str) -> bool:
     return False
 
 
-def probe_blockers(cut_row: Mapping[str, Any], target_tag: str, attempted_cuts: set[str]) -> list[str]:
+def probe_blockers(
+    cut_row: Mapping[str, Any],
+    target_tag: str,
+    attempted_cuts: set[str],
+    floor_trace_blockers: Mapping[str, Mapping[str, Any]],
+) -> list[str]:
     blockers = [
         "safe_cut_miner_zero_current_ready",
         "requires_exposure_trace_before_safe_cut",
@@ -142,6 +179,9 @@ def probe_blockers(cut_row: Mapping[str, Any], target_tag: str, attempted_cuts: 
         blockers.append("protected_anchor_do_not_cut")
     if name in attempted_cuts:
         blockers.append("prior_attempt_or_blocked_package_cut")
+    if name in floor_trace_blockers:
+        blockers.append("floor_trace_cut_blocked")
+        blockers.append("requires_same_lane_replacement_floor_preservation")
     if policy.startswith("no_generic_cut"):
         blockers.append("no_generic_cut_policy")
     if "protect_floor" in policy or tier == "tier_1_structural_floor":
@@ -160,9 +200,12 @@ def cut_probe(
     queue_row: Mapping[str, Any],
     cut_row: Mapping[str, Any],
     attempted_cuts: set[str],
+    floor_trace_blockers: Mapping[str, Mapping[str, Any]],
 ) -> dict[str, Any]:
     target_tag = str(queue_row.get("sidecar_tag") or "")
-    blockers = probe_blockers(cut_row, target_tag, attempted_cuts)
+    normalized_cut = normalize_name(cut_row.get("card_name"))
+    floor_trace_summary = as_dict(floor_trace_blockers.get(normalized_cut))
+    blockers = probe_blockers(cut_row, target_tag, attempted_cuts, floor_trace_blockers)
     return {
         "add_card": queue_row.get("add_card") or "",
         "cut_card": cut_row.get("card_name") or "",
@@ -174,6 +217,8 @@ def cut_probe(
         "cut_policy": cut_row.get("cut_policy") or "",
         "protected_anchor": bool(cut_row.get("protected_anchor")),
         "attempted_or_prior_blocked": normalize_name(cut_row.get("card_name")) in attempted_cuts,
+        "floor_trace_blocked": bool(floor_trace_summary),
+        "floor_trace_summary": floor_trace_summary,
         "probe_status": "review_only_not_safe",
         "matrix_candidate_row_eligible_now": False,
         "cut_usable_now": False,
@@ -203,6 +248,7 @@ def target_probe_row(
     queue_row: Mapping[str, Any],
     value_rows: list[Mapping[str, Any]],
     attempted_cuts: set[str],
+    floor_trace_blockers: Mapping[str, Mapping[str, Any]],
     probes_per_target: int,
 ) -> dict[str, Any]:
     tag = str(queue_row.get("sidecar_tag") or "")
@@ -225,7 +271,12 @@ def target_probe_row(
         )
     )
     probes = [
-        cut_probe(queue_row=queue_row, cut_row=row, attempted_cuts=attempted_cuts)
+        cut_probe(
+            queue_row=queue_row,
+            cut_row=row,
+            attempted_cuts=attempted_cuts,
+            floor_trace_blockers=floor_trace_blockers,
+        )
         for row in non_protected[: max(1, probes_per_target)]
     ]
     return {
@@ -257,6 +308,7 @@ def build_report(
     sidecar_queue: Mapping[str, Any],
     value_model: Mapping[str, Any],
     safe_cut_miner: Mapping[str, Any],
+    gap_floor_trace_miner: Mapping[str, Any],
     paths: Mapping[str, Path],
     probes_per_target: int = 4,
 ) -> dict[str, Any]:
@@ -264,16 +316,19 @@ def build_report(
         "sidecar_queue": sidecar_queue,
         "value_model": value_model,
         "safe_cut_miner": safe_cut_miner,
+        "gap_floor_trace_miner": gap_floor_trace_miner,
     }
     health = input_health(payloads)
     value_rows = current_value_rows(value_model)
     attempted_cuts = attempted_package_cuts(safe_cut_miner)
+    floor_trace_blockers = floor_trace_cut_blockers(gap_floor_trace_miner)
     targets = target_queue_rows(sidecar_queue) if not health["missing_inputs"] else []
     probe_rows = [
         target_probe_row(
             queue_row=row,
             value_rows=value_rows,
             attempted_cuts=attempted_cuts,
+            floor_trace_blockers=floor_trace_blockers,
             probes_per_target=probes_per_target,
         )
         for row in targets
@@ -309,17 +364,30 @@ def build_report(
             "promotion_allowed_now": False,
             "deck_action_allowed_now": False,
             "attempted_package_cut_name_count": len(attempted_cuts),
+            "floor_trace_cut_blocker_count": len(floor_trace_blockers),
+            "floor_trace_blocked_probe_count": sum(
+                1 for probe in all_probes if probe.get("floor_trace_blocked")
+            ),
+            "floor_trace_cut_blocker_names": sorted(
+                str(row.get("card_name") or "") for row in floor_trace_blockers.values()
+            ),
             "protected_near_miss_count": sum(len(as_list(row.get("protected_near_misses"))) for row in probe_rows),
             "tag_counts": dict(sorted(tag_counts.items())),
             "blocker_counts": dict(sorted(blocker_counts.items())),
             "missing_inputs": as_list(health.get("missing_inputs")),
-            "recommended_next_action": "collect_probe_evidence_for_named_topdeck_and_mana_cuts",
+            "recommended_next_action": (
+                "collect_probe_evidence_for_non_floor_trace_cut_slots_only"
+                if floor_trace_blockers
+                else "collect_probe_evidence_for_named_topdeck_and_mana_cuts"
+            ),
         },
         "cut_model_targets": probe_rows,
         "source_evidence": {
             "sidecar_queue_summary": summary(sidecar_queue),
             "value_model_summary": summary(value_model),
             "safe_cut_summary": summary(safe_cut_miner),
+            "gap_floor_trace_miner_summary": summary(gap_floor_trace_miner),
+            "floor_trace_cut_blockers": dict(sorted(floor_trace_blockers.items())),
             "attempted_package_cut_names": sorted(attempted_cuts),
             "input_health": health,
         },
@@ -334,13 +402,14 @@ def build_report(
             "promotion_allowed": False,
             "reason": (
                 "Named cut probes exist for review, but every probe remains blocked "
-                "by safe-cut, exposure-trace, or floor-equivalence requirements."
+                "by safe-cut, exposure-trace, floor-trace, or floor-equivalence requirements."
             )
             if all_probes
             else "No trustworthy named cut probes were available from the current inputs.",
             "next_actions": [
                 "do_not_mutate_deck_607",
                 "do_not_turn_review_probes_into_cuts_without trace evidence",
+                "exclude floor-trace-blocked cuts from structure matrix inputs",
                 "mine exposure and floor-equivalence traces for topdeck and mana probes",
                 "feed only safe-cut-ready rows into the structure matrix",
             ],
@@ -363,6 +432,8 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Named cut probes: `{summary_row['named_cut_probe_count']}`",
         f"- Safe-cut ready count: `{summary_row['safe_cut_ready_count']}`",
         f"- Matrix candidate rows eligible: `{summary_row['matrix_candidate_row_eligible_count']}`",
+        f"- Floor trace cut blockers: `{summary_row.get('floor_trace_cut_blocker_count', 0)}`",
+        f"- Floor trace blocked probes: `{summary_row.get('floor_trace_blocked_probe_count', 0)}`",
         f"- Candidate deck materialization allowed now: `{str(summary_row['candidate_deck_materialization_allowed_now']).lower()}`",
         f"- Natural battle gate allowed now: `{str(summary_row['natural_battle_gate_allowed_now']).lower()}`",
         f"- Recommended next action: `{summary_row['recommended_next_action']}`",
@@ -375,21 +446,25 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
     lines.extend(["", "## Probe Summary", ""])
     lines.append(f"- tag_counts: `{json.dumps(summary_row.get('tag_counts') or {}, sort_keys=True)}`")
     lines.append(f"- blocker_counts: `{json.dumps(summary_row.get('blocker_counts') or {}, sort_keys=True)}`")
+    lines.append(
+        f"- floor_trace_cut_blocker_names: `{json.dumps(summary_row.get('floor_trace_cut_blocker_names') or [], sort_keys=True)}`"
+    )
     lines.extend(["", "## Cut Model Targets", ""])
     for row in as_list(payload.get("cut_model_targets")):
         lines.append(f"### {row.get('add_card')}")
         lines.append(f"- sidecar_tag: `{row.get('sidecar_tag')}`")
         lines.append(f"- named_cut_probe_count: `{row.get('named_cut_probe_count')}`")
         lines.append(f"- target_cut_lanes: `{', '.join(as_list(row.get('target_cut_lanes')))}`")
-        lines.append("| Probe cut | Score | Tier | Usable now | Blockers |")
-        lines.append("| --- | ---: | --- | ---: | --- |")
+        lines.append("| Probe cut | Score | Tier | Floor trace blocked | Usable now | Blockers |")
+        lines.append("| --- | ---: | --- | ---: | ---: | --- |")
         for probe in as_list(row.get("candidate_cut_probes")):
-            blockers = ", ".join(as_list(probe.get("blockers"))[:4])
+            blockers = ", ".join(as_list(probe.get("blockers"))[:5])
             lines.append(
-                "| {cut} | {score} | `{tier}` | `{usable}` | `{blockers}` |".format(
+                "| {cut} | {score} | `{tier}` | `{floor_blocked}` | `{usable}` | `{blockers}` |".format(
                     cut=probe.get("cut_card") or "",
                     score=probe.get("cut_value_score") or 0,
                     tier=probe.get("cut_value_tier") or "",
+                    floor_blocked=str(bool(probe.get("floor_trace_blocked"))).lower(),
                     usable=str(bool(probe.get("cut_usable_now"))).lower(),
                     blockers=blockers,
                 )
@@ -427,6 +502,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sidecar-queue", type=Path, default=DEFAULT_SIDECAR_QUEUE)
     parser.add_argument("--value-model", type=Path, default=DEFAULT_VALUE_MODEL)
     parser.add_argument("--safe-cut-miner", type=Path, default=DEFAULT_SAFE_CUT_MINER)
+    parser.add_argument("--gap-floor-trace-miner", type=Path, default=DEFAULT_GAP_FLOOR_TRACE_MINER)
     parser.add_argument("--probes-per-target", type=int, default=4)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     return parser.parse_args()
@@ -438,11 +514,13 @@ def main() -> int:
         "sidecar_queue": args.sidecar_queue,
         "value_model": args.value_model,
         "safe_cut_miner": args.safe_cut_miner,
+        "gap_floor_trace_miner": args.gap_floor_trace_miner,
     }
     payload = build_report(
         sidecar_queue=read_json(args.sidecar_queue),
         value_model=read_json(args.value_model),
         safe_cut_miner=read_json(args.safe_cut_miner),
+        gap_floor_trace_miner=read_json(args.gap_floor_trace_miner),
         paths=paths,
         probes_per_target=args.probes_per_target,
     )

@@ -3318,3 +3318,46 @@ Next allowed work:
   report.
 
 Deck `607` remains untouched and protected.
+
+## Floor Blockers Wired Into Cut Planner - 2026-07-05
+
+The sidecar cut model planner now consumes the gap floor trace miner directly:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.json`
+
+Current result:
+
+- status:
+  `topdeck_sidecar_cut_model_planner_review_probes_ready_no_safe_cut_keep_607`;
+- target rows: `12`;
+- named cut probes: `48`;
+- safe-cut ready count: `0`;
+- matrix candidate rows eligible: `0`;
+- floor trace cut blockers: `6`;
+- floor trace blocked probes in the current 48 probes: `0`;
+- candidate deck materialization allowed now: `false`;
+- forced access allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`.
+
+Floor-blocked cut slots now carried by the planner:
+
+- `Call Forth the Tempest`;
+- `Hit the Mother Lode`;
+- `Everything Comes to Dust`;
+- `Rise of the Eldrazi`;
+- `Surge to Victory`;
+- `Esper Sentinel`.
+
+Cut-planning lesson:
+
+- The current named probes avoid those six slots, so no probe was newly marked
+  as floor-trace blocked.
+- The planner now still carries the six blockers globally, which prevents a
+  later score-based expansion from accidentally selecting one as a generic cut.
+- A replacement for any of these slots must be same-lane, preserve the observed
+  protected-`607` floor, and pass structure plus battle gates before it can
+  become a real deck change.
+
+Deck `607` remains untouched and protected.

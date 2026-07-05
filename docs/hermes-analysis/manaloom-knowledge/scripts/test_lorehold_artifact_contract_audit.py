@@ -534,6 +534,47 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertFalse(classification.canonical_summary["deck_607_mutated"])
 
+    def test_lorehold_topdeck_sidecar_cut_model_planner_is_recognized(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_topdeck_sidecar_cut_model_planner",
+            "current_baseline": "deck_607",
+            "cut_model_targets": [{"add_card": "Penance", "candidate_cut_probes": []}],
+            "decision": {
+                "keep_607_as_protected_baseline": True,
+                "candidate_deck_materialization_allowed_now": False,
+            },
+            "deck_607_mutated": False,
+            "generated_at": "2026-07-05T00:00:00Z",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "source_evidence": {
+                "floor_trace_cut_blockers": {
+                    "hit the mother lode": {"card_name": "Hit the Mother Lode"}
+                }
+            },
+            "source_reports": {},
+            "status": "topdeck_sidecar_cut_model_planner_review_probes_ready_no_safe_cut_keep_607",
+            "summary": {
+                "floor_trace_cut_blocker_count": 1,
+                "candidate_deck_materialization_allowed_now": False,
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lorehold_topdeck_sidecar_cut_model_planner.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(
+            classification.artifact_kind,
+            "lorehold_topdeck_sidecar_cut_model_planner",
+        )
+        self.assertEqual(
+            classification.schema_version,
+            "lorehold_topdeck_sidecar_cut_model_planner_v1",
+        )
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+
     def test_cut_methodology_reaudit_payload_is_recognized(self) -> None:
         payload = {
             "candidate_report": "candidate.json",

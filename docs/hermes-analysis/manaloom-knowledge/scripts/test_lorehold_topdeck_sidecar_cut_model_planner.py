@@ -85,11 +85,33 @@ def _safe_cut(*, attempted=None):
     }
 
 
+def _gap_floor_trace(*, blocked=None):
+    blocked = blocked or []
+    return {
+        "summary": {
+            "target_card_count": len(blocked),
+            "target_with_floor_trace_count": len(blocked),
+        },
+        "target_floor_summaries": [
+            {
+                "card_name": card,
+                "floor_trace_status": "floor_trace_found_cut_blocked",
+                "cut_decision": "protect_cut_slot_until_same_lane_replacement_preserves_floor",
+                "same_slot_607_win_candidate_loss_trace_count": 3,
+                "positive_target_delta_trace_count": 2,
+                "baseline_target_event_total": 11,
+            }
+            for card in blocked
+        ],
+    }
+
+
 def _paths():
     return {
         "sidecar_queue": Path("/tmp/queue.json"),
         "value_model": Path("/tmp/value.json"),
         "safe_cut_miner": Path("/tmp/safe.json"),
+        "gap_floor_trace_miner": Path("/tmp/gap_floor.json"),
     }
 
 
@@ -98,6 +120,7 @@ def _build(**overrides):
         sidecar_queue=overrides.get("sidecar_queue", _queue()),
         value_model=overrides.get("value_model", _value_model()),
         safe_cut_miner=overrides.get("safe_cut_miner", _safe_cut()),
+        gap_floor_trace_miner=overrides.get("gap_floor_trace_miner", _gap_floor_trace()),
         paths=_paths(),
         probes_per_target=2,
     )
@@ -112,6 +135,7 @@ def test_current_like_planner_creates_review_probes_but_zero_safe_cuts():
     assert payload["summary"]["target_row_count"] == 2
     assert payload["summary"]["named_cut_probe_count"] == 3
     assert payload["summary"]["safe_cut_ready_count"] == 0
+    assert payload["summary"]["floor_trace_cut_blocker_count"] == 0
     assert payload["decision"]["deck_action_allowed"] is False
 
 
@@ -142,10 +166,26 @@ def test_prior_attempted_cut_gets_blocker_and_sorted_after_new_probe():
     assert penance["candidate_cut_probes"][0]["cut_usable_now"] is False
 
 
+def test_floor_trace_blocked_cut_gets_explicit_blocker_and_evidence_summary():
+    payload = _build(gap_floor_trace_miner=_gap_floor_trace(blocked=["Artist's Talent"]))
+    penance = {row["add_card"]: row for row in payload["cut_model_targets"]}["Penance"]
+    probe = penance["candidate_cut_probes"][0]
+
+    assert payload["summary"]["floor_trace_cut_blocker_count"] == 1
+    assert payload["summary"]["floor_trace_blocked_probe_count"] == 1
+    assert probe["cut_card"] == "Artist's Talent"
+    assert probe["floor_trace_blocked"] is True
+    assert probe["floor_trace_summary"]["same_slot_607_win_candidate_loss_trace_count"] == 3
+    assert "floor_trace_cut_blocked" in probe["blockers"]
+    assert "requires_same_lane_replacement_floor_preservation" in probe["blockers"]
+    assert probe["cut_usable_now"] is False
+
+
 def test_markdown_surfaces_no_materialization_and_probe_names():
     markdown = planner.render_markdown(_build())
 
     assert "Deck 607 mutated: `false`" in markdown
     assert "Candidate deck materialization allowed now: `false`" in markdown
+    assert "Floor trace cut blockers: `0`" in markdown
     assert "Artist's Talent" in markdown
     assert "Mountain // Mountain" in markdown

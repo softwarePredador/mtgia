@@ -1544,5 +1544,38 @@ Operational lesson:
   and then passes the normal structure and battle gates.
 - Do not turn this report into a deck change; it is cut-protection evidence.
 
+Floor blockers wired into cut model planner on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.json`.
+- Status:
+  `topdeck_sidecar_cut_model_planner_review_probes_ready_no_safe_cut_keep_607`.
+- Scope: consume the sidecar queue, deckbuilding value model, safe-cut miner,
+  and gap floor trace miner before any structure-matrix input can be trusted.
+- Current counts: `target_row_count=12`, `named_cut_probe_count=48`,
+  `safe_cut_ready_count=0`, `matrix_candidate_row_eligible_count=0`,
+  `floor_trace_cut_blocker_count=6`, and
+  `floor_trace_blocked_probe_count=0`.
+- The current 48 named probes do not attempt to cut the six floor-blocked
+  cards. The planner still records them globally as unavailable cut slots:
+  `Call Forth the Tempest`, `Hit the Mother Lode`,
+  `Everything Comes to Dust`, `Rise of the Eldrazi`, `Surge to Victory`, and
+  `Esper Sentinel`.
+- Structure-matrix scoring: `false`; candidate deck materialization: `false`;
+  forced access: `false`; natural battle gate: `false`; promotion: `false`.
+- Next allowed work:
+  `collect_probe_evidence_for_non_floor_trace_cut_slots_only`.
+
+Operational lesson:
+
+- Floor-trace blockers must be applied before score-based or same-lane cut
+  heuristics. A future planner expansion cannot reintroduce these six cards as
+  generic cuts merely because they look underexposed or expensive.
+- If a future candidate wants one of those slots, it must name a same-lane
+  replacement, preserve the observed floor traces, and then pass structure and
+  battle gates.
+
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

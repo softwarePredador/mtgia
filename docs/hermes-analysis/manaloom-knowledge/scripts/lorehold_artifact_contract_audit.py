@@ -486,6 +486,25 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             },
         )
 
+    if (
+        payload.get("artifact_type") == "lorehold_topdeck_sidecar_cut_model_planner"
+        and {"cut_model_targets", "decision", "source_evidence", "summary"} <= keys
+    ):
+        return ArtifactClassification(
+            **base,
+            artifact_kind="lorehold_topdeck_sidecar_cut_model_planner",
+            schema_version="lorehold_topdeck_sidecar_cut_model_planner_v1",
+            status="pass",
+            detail="Lorehold topdeck sidecar cut model planner with floor blockers",
+            canonical_summary={
+                "schema_keys": sorted(keys),
+                "summary": payload.get("summary") if isinstance(payload.get("summary"), Mapping) else {},
+                "source_db_mutated": payload.get("source_db_mutated", False),
+                "postgres_writes": payload.get("postgres_writes", False),
+                "deck_607_mutated": payload.get("deck_607_mutated", False),
+            },
+        )
+
     support_signatures: list[tuple[str, set[str], str]] = [
         ("candidate_matrix", {"rows", "summary"}, "candidate matrix rows"),
         ("variant_staging", {"reports", "valid_count", "invalid_count"}, "variant staging report"),
