@@ -279,7 +279,11 @@ Operational priority after this pivot:
    may use `MANALOOM_FORCE_FOCUS_ACCESS_MODE=opening_hand` against the current
    evaluation target player, but forced access is diagnostic evidence only and
    must not count as a natural battle gate or promotion gate;
-30. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+30. rerun `global_commander_cut_source_lane_expander.py` with the forced
+   cut-access report before reducing scope again; if forced access proves the
+   unresolved cuts are used, candidate copy remains closed and the next route is
+   a new value-safe cut source or a smaller package with fresh cut proof;
+31. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -326,6 +330,8 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_replacement_model_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_new_cut_source_lane_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -711,6 +717,16 @@ Current external refresh on 2026-07-05:
   value-safe reclassification. Candidate copy, battle, promotion, and
   value-safe reclassification remain closed; the next gate is
   `expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts`.
+- Current post-forced cut source-lane expansion consumed that forced-access
+  report and returned
+  `commander_cut_source_lane_still_blocks_full_package` with
+  `value_safe_cut_count=0`, `forced_usage_blocked_count=3`, and
+  `forced_cut_access_blocks_unresolved_cut_reclassification:3`. The reducer
+  `global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md`
+  also returns `commander_package_scope_reduction_blocks_candidate_copy` with
+  `scoped_pair_count=0`, `dropped_add_count=6`, and candidate copy, battle, and
+  promotion still closed. The next gate is
+  `synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block`.
 
 ## Global Commander Rollout - 2026-07-01
 

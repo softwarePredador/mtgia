@@ -169,6 +169,43 @@ class GlobalCommanderCutSourceLaneExpanderTests(unittest.TestCase):
         self.assertEqual(report["summary"]["value_safe_cut_count"], 2)
         self.assertEqual(report["summary"]["next_gate"], "materialize_value_safe_commander_package_copy")
 
+    def test_forced_access_usage_blocks_unresolved_cut_reclassification(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        db = self._db(root)
+        package = self._reports(root, db, selected_add_count=6, package_size_limit=8)
+        forced = self._json(
+            root,
+            "forced.json",
+            {
+                "status": "forced_cut_access_trace_blocks_used_unresolved_cuts",
+                "summary": {
+                    "usage_blocked_count": 3,
+                    "manual_review_count": 0,
+                    "force_failure_count": 0,
+                    "focus_cards": ["Alicia Masters", "Vampiric Tutor", "Dark Ritual"],
+                },
+            },
+        )
+
+        report = expander.build_report(
+            package_synthesis_report=package,
+            forced_cut_access_report=forced,
+        )
+
+        self.assertEqual(report["status"], "commander_cut_source_lane_still_blocks_full_package")
+        self.assertFalse(report["candidate_copy_allowed_now"])
+        self.assertEqual(report["summary"]["forced_usage_blocked_count"], 3)
+        self.assertEqual(
+            report["summary"]["next_gate"],
+            "backfill_value_safe_cuts_or_reduce_package_scope_after_forced_access_block",
+        )
+        self.assertIn(
+            "forced_cut_access_blocks_unresolved_cut_reclassification:3",
+            report["candidate_copy_blockers"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

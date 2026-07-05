@@ -70,6 +70,9 @@ GLOBAL_COMMANDER_PAYOFF_PACKAGE_SYNTHESIZER = (
 GLOBAL_COMMANDER_CUT_SOURCE_LANE_EXPANDER = (
     SCRIPT_DIR / "global_commander_cut_source_lane_expander.py"
 )
+GLOBAL_COMMANDER_CUT_SOURCE_LANE_EXPANDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_cut_source_lane_expander.py"
+)
 GLOBAL_COMMANDER_VALUE_SAFE_STAGE_SPLITTER = (
     SCRIPT_DIR / "global_commander_value_safe_stage_splitter.py"
 )
@@ -308,6 +311,14 @@ GLOBAL_COMMANDER_SCOPE1_NEW_CUT_SOURCE_LANE_TRACE_COLLECTOR_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_FORCED_CUT_ACCESS_TRACE_GENERATOR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_forced_cut_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_POST_FORCED_CUT_SOURCE_LANE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md"
+)
+GLOBAL_COMMANDER_SCOPE1_POST_FORCED_PACKAGE_SCOPE_REDUCER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -608,6 +619,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_forced_cut_access_trace_generator_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "forced_cut_access_trace_blocks_used_unresolved_cuts",
                 "expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts",
+                "global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md",
+                "global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md",
+                "forced_cut_access_blocks_unresolved_cut_reclassification:3",
+                "synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -849,6 +864,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_forced_cut_access_trace_generator.py",
                 "evaluation target atual",
                 "expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts",
+                "global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md",
+                "global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md",
+                "forced_usage_blocked_count=3",
+                "synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1078,6 +1097,8 @@ def build_audit() -> dict[str, Any]:
                 "full_package_candidate_copy_allowed_now",
                 "materialize_reduced_scope_candidate_copy",
                 "backfill_value_safe_cuts_or_reduce_package_scope",
+                "forced_usage_blocked_count",
+                "synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block",
                 "selection_policy",
                 "no_value_safe_reduced_scope_pair_ready",
             ],
@@ -1089,9 +1110,11 @@ def build_audit() -> dict[str, Any]:
             [
                 "test_reduces_scope_to_axis_closing_pair_when_cut_is_scarce",
                 "test_blocks_when_no_value_safe_cut_exists",
+                "test_post_forced_cut_block_routes_to_new_source_or_smaller_package",
                 "Necromancy",
                 "Cabal Ritual",
                 "reduced_scope_dropped_adds:1",
+                "forced_cut_access_blocks_unresolved_cut_reclassification:3",
                 "no_value_safe_reduced_scope_pair_ready",
             ],
         )
@@ -1524,9 +1547,25 @@ def build_audit() -> dict[str, Any]:
                 "structural_foundation_staple_requires_same_lane_or_battle_proof",
                 "commander_expected_package_anchor_requires_stage_proof",
                 "global_battle_feedback_requires_new_same_lane_or_gate",
+                "forced_cut_access_evidence",
+                "forced_cut_access_blocks_unresolved_cut_reclassification",
+                "--forced-cut-access-report",
+                "backfill_value_safe_cuts_or_reduce_package_scope_after_forced_access_block",
+                "forced_access_boundary",
                 "split_synthesized_package_into_value_safe_stages",
                 "battle_or_optimization_performed",
                 "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CUT_SOURCE_LANE_EXPANDER_TEST,
+            [
+                "test_forced_access_usage_blocks_unresolved_cut_reclassification",
+                "forced_cut_access_trace_blocks_used_unresolved_cuts",
+                "forced_cut_access_blocks_unresolved_cut_reclassification:3",
+                "backfill_value_safe_cuts_or_reduce_package_scope_after_forced_access_block",
             ],
         )
     )
@@ -2081,6 +2120,39 @@ def build_audit() -> dict[str, Any]:
                 "Alicia Masters, Skilled Sculptor",
                 "Vampiric Tutor",
                 "Dark Ritual",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_POST_FORCED_CUT_SOURCE_LANE_REPORT,
+            [
+                "Global Commander Cut Source Lane Expander",
+                "commander_cut_source_lane_still_blocks_full_package",
+                "value_safe_cut_count: `0`",
+                "forced_cut_access_status: `forced_cut_access_trace_blocks_used_unresolved_cuts`",
+                "forced_usage_blocked_count: `3`",
+                "candidate_copy_allowed_now: `false`",
+                "forced_cut_access_blocks_unresolved_cut_reclassification:3",
+                "backfill_value_safe_cuts_or_reduce_package_scope_after_forced_access_block",
+                "Dark Ritual",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_POST_FORCED_PACKAGE_SCOPE_REDUCER_REPORT,
+            [
+                "Global Commander Package Scope Reducer",
+                "commander_package_scope_reduction_blocks_candidate_copy",
+                "value_safe_cut_count: `0`",
+                "scoped_pair_count: `0`",
+                "dropped_add_count: `6`",
+                "forced_usage_blocked_count: `3`",
+                "reduced_scope_candidate_copy_allowed_now: `false`",
+                "forced_cut_access_blocks_unresolved_cut_reclassification:3",
+                "synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block",
+                "Akroma, Angel of Wrath",
             ],
         )
     )

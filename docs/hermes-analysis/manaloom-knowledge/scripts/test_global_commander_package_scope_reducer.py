@@ -106,6 +106,41 @@ class GlobalCommanderPackageScopeReducerTests(unittest.TestCase):
         self.assertFalse(report["candidate_copy_allowed_now"])
         self.assertIn("no_value_safe_reduced_scope_pair_ready", report["candidate_copy_blockers"])
 
+    def test_post_forced_cut_block_routes_to_new_source_or_smaller_package(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        package = self._json(root, "package.json", package_payload())
+        cuts = self._json(
+            root,
+            "cuts.json",
+            {
+                "summary": {
+                    "deck_id": "619",
+                    "commander": "Kaalia of the Vast",
+                    "forced_usage_blocked_count": 3,
+                    "next_gate": "backfill_value_safe_cuts_or_reduce_package_scope_after_forced_access_block",
+                },
+                "candidate_copy_blockers": [
+                    "forced_cut_access_blocks_unresolved_cut_reclassification:3",
+                ],
+                "selected_value_safe_cuts": [],
+            },
+        )
+
+        report = reducer.build_report(package_synthesis_report=package, cut_source_lane_report=cuts)
+
+        self.assertFalse(report["candidate_copy_allowed_now"])
+        self.assertEqual(report["summary"]["forced_usage_blocked_count"], 3)
+        self.assertEqual(
+            report["summary"]["next_gate"],
+            "synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block",
+        )
+        self.assertIn(
+            "forced_cut_access_blocks_unresolved_cut_reclassification:3",
+            report["candidate_copy_blockers"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

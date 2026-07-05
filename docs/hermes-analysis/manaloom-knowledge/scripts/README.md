@@ -103,6 +103,14 @@ Lorehold. Forced access is diagnostic: card use still blocks value-safe
 reclassification, and no candidate copy, battle gate, or promotion opens from
 forced-access traces.
 
+After forced access blocks unresolved cuts, rerun
+`global_commander_cut_source_lane_expander.py` with
+`--forced-cut-access-report` and then run
+`global_commander_package_scope_reducer.py` against that post-forced cut report.
+If `value_safe_cut_count=0` and `scoped_pair_count=0`, the next valid route is a
+new value-safe cut source or a smaller package with fresh cut proof, not
+candidate copy or battle.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

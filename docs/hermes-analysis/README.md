@@ -530,6 +530,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Dark Ritual` foram forcados para acesso inicial em `3` seeds e todos foram
     usados pelo deck alvo. A lane atual de cortes segue fechada; o proximo gate
     e `expand_cut_source_lane_after_forced_access_blocks_current_unresolved_cuts`.
+    Esse gate foi executado com o relatorio de force-access como entrada em
+    `global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md`
+    e depois reduzido por
+    `global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md`.
+    Resultado: `value_safe_cut_count=0`, `scoped_pair_count=0`,
+    `forced_usage_blocked_count=3`; candidate copy, battle e promocao seguem
+    fechados. O proximo gate e
+    `synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

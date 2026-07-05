@@ -215,6 +215,25 @@ def package_size_limit(package_payload: Mapping[str, Any]) -> int:
     return int(summary.get("package_size_limit") or 8)
 
 
+def forced_cut_access_evidence(forced_payload: Mapping[str, Any]) -> dict[str, Any]:
+    if not forced_payload:
+        return {
+            "status": "not_provided",
+            "usage_blocked_count": 0,
+            "manual_review_count": 0,
+            "force_failure_count": 0,
+            "focus_cards": [],
+        }
+    summary = forced_payload.get("summary") or {}
+    return {
+        "status": str(forced_payload.get("status") or "unknown"),
+        "usage_blocked_count": int(summary.get("usage_blocked_count") or 0),
+        "manual_review_count": int(summary.get("manual_review_count") or 0),
+        "force_failure_count": int(summary.get("force_failure_count") or 0),
+        "focus_cards": [str(card) for card in summary.get("focus_cards") or [] if card],
+    }
+
+
 def staple_tier(staple: Mapping[str, Any] | None) -> str:
     if not staple:
         return "not_format_staple"
@@ -363,8 +382,15 @@ def build_report(
     *,
     package_synthesis_report: Path,
     sqlite_db: Path | None = None,
+    forced_cut_access_report: Path | None = None,
 ) -> dict[str, Any]:
     package_payload = load_json(package_synthesis_report)
+    forced_payload = (
+        load_json(forced_cut_access_report)
+        if forced_cut_access_report is not None and forced_cut_access_report.exists()
+        else {}
+    )
+    forced_evidence = forced_cut_access_evidence(forced_payload)
     profile_report, strategy_report = resolve_input_reports(package_payload)
     strategy_payload = load_json(strategy_report) if strategy_report.exists() else {}
     db_path, db_resolution = resolve_working_db(
@@ -405,13 +431,30 @@ def build_report(
         candidate_copy_allowed = False
     else:
         status = "commander_cut_source_lane_still_blocks_full_package"
-        next_gate = "backfill_value_safe_cuts_or_reduce_package_scope"
+        next_gate = (
+            "backfill_value_safe_cuts_or_reduce_package_scope_after_forced_access_block"
+            if forced_evidence["usage_blocked_count"] > 0
+            else "backfill_value_safe_cuts_or_reduce_package_scope"
+        )
         candidate_copy_allowed = False
     blockers: list[str] = []
     if len(selected) < required_count:
         blockers.append(f"value_safe_cut_shortfall:required_{required_count}_ready_{len(selected)}")
     if required_count > limit:
         blockers.append(f"full_package_size_exceeds_stage_limit:required_{required_count}_limit_{limit}")
+    if forced_evidence["usage_blocked_count"] > 0:
+        blockers.append(
+            "forced_cut_access_blocks_unresolved_cut_reclassification:"
+            f"{forced_evidence['usage_blocked_count']}"
+        )
+    input_artifacts = {
+        "package_synthesis_report": rel(package_synthesis_report),
+        "repair_candidate_model_report": rel(profile_report),
+        "strategy_matrix_report": rel(strategy_report),
+        "selected_db": rel(db_path),
+    }
+    if forced_cut_access_report is not None:
+        input_artifacts["forced_cut_access_report"] = rel(forced_cut_access_report)
     return {
         "generated_at": utc_now(),
         "status": status,
@@ -424,12 +467,7 @@ def build_report(
         "promotion_allowed": False,
         "battle_gate_allowed_now": False,
         "candidate_copy_allowed_now": candidate_copy_allowed,
-        "input_artifacts": {
-            "package_synthesis_report": rel(package_synthesis_report),
-            "repair_candidate_model_report": rel(profile_report),
-            "strategy_matrix_report": rel(strategy_report),
-            "selected_db": rel(db_path),
-        },
+        "input_artifacts": input_artifacts,
         "db_resolution": db_resolution,
         "summary": {
             "deck_id": deck_id,
@@ -443,6 +481,10 @@ def build_report(
             "blocked_cut_count": len(blocked_pool),
             "remaining_cut_budget_after_selection": remaining_budget,
             "candidate_copy_blocker_count": len(blockers),
+            "forced_cut_access_status": forced_evidence["status"],
+            "forced_usage_blocked_count": forced_evidence["usage_blocked_count"],
+            "forced_manual_review_count": forced_evidence["manual_review_count"],
+            "forced_focus_cards": forced_evidence["focus_cards"],
             "next_gate": next_gate,
         },
         "candidate_copy_blockers": blockers,
@@ -453,6 +495,7 @@ def build_report(
             "cut_boundary": "Expanded cuts are source-lane evidence, not deck changes.",
             "staple_boundary": "Structural staples require same-lane replacement or battle proof before cutting.",
             "protected_role_boundary": "Lands, commander payoffs, spot interaction, and attack-window protection stay protected while below target or strategically required.",
+            "forced_access_boundary": "Forced access can block reclassification; it cannot create value-safe cut proof.",
             "battle_boundary": "No battle or promotion opens from cut source-lane expansion alone.",
         },
     }
@@ -471,6 +514,8 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- value_safe_cut_count: `{summary['value_safe_cut_count']}`",
         f"- stage_only_cut_count: `{summary['stage_only_cut_count']}`",
         f"- blocked_cut_count: `{summary['blocked_cut_count']}`",
+        f"- forced_cut_access_status: `{summary['forced_cut_access_status']}`",
+        f"- forced_usage_blocked_count: `{summary['forced_usage_blocked_count']}`",
         f"- package_size_limit: `{summary['package_size_limit']}`",
         f"- candidate_copy_allowed_now: `{str(payload['candidate_copy_allowed_now']).lower()}`",
         f"- battle_gate_allowed_now: `{str(payload['battle_gate_allowed_now']).lower()}`",
@@ -541,9 +586,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--package-synthesis-report", type=Path, default=DEFAULT_PACKAGE_SYNTHESIS_REPORT)
     parser.add_argument("--db", type=Path)
+    parser.add_argument("--forced-cut-access-report", type=Path)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     args = parser.parse_args()
-    payload = build_report(package_synthesis_report=args.package_synthesis_report, sqlite_db=args.db)
+    payload = build_report(
+        package_synthesis_report=args.package_synthesis_report,
+        sqlite_db=args.db,
+        forced_cut_access_report=args.forced_cut_access_report,
+    )
     json_path, md_path = write_outputs(payload, args.out_prefix)
     print(
         json.dumps(

@@ -162,6 +162,11 @@ def source_db_from_cut_payload(cut_payload: Mapping[str, Any]) -> str:
     return str(input_artifacts.get("selected_db") or "")
 
 
+def forced_usage_blocked_count(cut_payload: Mapping[str, Any]) -> int:
+    summary = cut_payload.get("summary") or {}
+    return int(summary.get("forced_usage_blocked_count") or 0)
+
+
 def build_report(
     *,
     package_synthesis_report: Path,
@@ -183,11 +188,19 @@ def build_report(
     original_blockers = list(package_payload.get("candidate_copy_blockers") or [])
     cut_blockers = list(cut_payload.get("candidate_copy_blockers") or [])
     blockers = [*original_blockers, *cut_blockers]
+    forced_blocked = forced_usage_blocked_count(cut_payload)
     if dropped_adds:
         blockers.append(f"reduced_scope_dropped_adds:{len(dropped_adds)}")
     if not scoped_pairs:
         blockers.append("no_value_safe_reduced_scope_pair_ready")
     source_db = source_db_from_cut_payload(cut_payload)
+    next_gate = "materialize_reduced_scope_candidate_copy"
+    if not ready:
+        next_gate = (
+            "synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block"
+            if forced_blocked > 0
+            else "backfill_value_safe_cuts_or_reduce_package_scope"
+        )
     return {
         "generated_at": utc_now(),
         "status": (
@@ -226,11 +239,9 @@ def build_report(
                 if int(value or 0) > 0 and int(remaining.get(axis) or 0) == 0
             ),
             "candidate_copy_blocker_count": len(blockers),
-            "next_gate": (
-                "materialize_reduced_scope_candidate_copy"
-                if ready
-                else "backfill_value_safe_cuts_or_reduce_package_scope"
-            ),
+            "cut_source_next_gate": str(cut_summary.get("next_gate") or ""),
+            "forced_usage_blocked_count": forced_blocked,
+            "next_gate": next_gate,
         },
         "candidate_copy_blockers": blockers,
         "scoped_pairs": scoped_pairs,
@@ -262,6 +273,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- full_package_candidate_copy_allowed_now: `{str(payload['full_package_candidate_copy_allowed_now']).lower()}`",
         f"- battle_gate_allowed_now: `{str(payload['battle_gate_allowed_now']).lower()}`",
         f"- promotion_allowed: `{str(payload['promotion_allowed']).lower()}`",
+        f"- forced_usage_blocked_count: `{summary['forced_usage_blocked_count']}`",
         f"- next_gate: `{summary['next_gate']}`",
         "",
         "## Requirements",
