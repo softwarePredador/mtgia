@@ -211,3 +211,106 @@ runtime evidence, but it is not a deck edit. Do not materialize or battle an
 Entreat candidate until a named same-lane safe cut exists and the matrix clears.
 The practical next work remains safe-cut mining: Brain first per planner, with
 Entreat cut mining available as a parallel miracle-finisher lane.
+
+## Total Authorization Revalidation Refresh
+
+Generated on 2026-07-05 under prefix `20260705_total_authorization_*`.
+
+Current runtime/card-rule state:
+
+- `Brain in a Jar` is confirmed active in PostgreSQL and SQLite as
+  `verified`/`auto`, scope
+  `xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1`, oracle hash
+  `41468898bf6400763de517269fdeb456`.
+- PostgreSQL postcheck for the Brain package confirmed
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, and `promoted_scope_rows=1`.
+- `Entreat the Angels` remains confirmed active in SQLite as
+  `verified`/`auto`, scope `xmage_x_create_creature_tokens_spell_v1`, oracle
+  hash `30f38db3fe030a6002c9a8120d216ec8`.
+- The fresh miracle next route planner sees both active rules:
+  `brain_active_rule_count=1`, `entreat_active_rule_count=1`. It still selects
+  `Brain in a Jar` because `brain_safe_cut_count=0`,
+  `entreat_safe_cut_count=0`, `named_seed_safe_cut_count=0`, and
+  `candidate_queue_scoreable_row_count=0`.
+
+Fresh cut evidence:
+
+- Seed-safe cut hypothesis:
+  `seed_safe_cut_ready_count=0`, `same_lane_only_count=2`, and blocked slots
+  `94/94`.
+- Brain cut-slot trace miner scanned `1179` gate reports and `229` game-result
+  reports. It found `1905` same-slot traces and `1504` positive target-delta
+  traces across all `9` Brain cut-slot candidates, so those slots are floor
+  evidence, not free cuts.
+- Brain unlock audit closed with `unlockable_now_count=0`,
+  `targeted_floor_trace_missing_slot_count=0`, and
+  `matrix_scoring_allowed_now=false`.
+- Entreat same-lane cut scout reviewed `10` miracle/finisher candidates;
+  all `10` are blocked as current-`607` hard stops.
+- Trace cut evidence expander found `seed_safe_ready_count=0`,
+  `reviewable_evidence_gap_count=0`, `same_lane_hard_blocked_count=2`, and
+  `hard_blocked_count=92`.
+- Topdeck safe-cut miner and topdeck new-cut scout both kept `607` closed:
+  `seed_safe_cut_candidate_count=0`, `internal_candidate_count=0`.
+- Engine-preserving Guttersnipe + Storm-Kiln cut miner reviewed all `94` slots
+  and classified all as `closed_hard_stop_current_607`.
+
+Fresh battle and simulator evidence:
+
+- Structural matrix still ranks `deck_607` first:
+  `ranked_deck_keys[0]=deck_607`, with `deck_615` second and `deck_614` third.
+- Full registered Lorehold battle window:
+  `lorehold_variant_battle_gate_20260705_total_authorization_revalidate`.
+  It ran `12` Lorehold decks, `2` games per opponent, `4` real opponents,
+  isolated deck processes, no candidate materialization, and no DB mutation.
+  In this short window, `deck_609` and `deck_613` each went `4W/4L`; `deck_607`
+  went `2W/6L`.
+- Focused confirmation:
+  `lorehold_variant_battle_gate_20260705_total_authorization_focused_607_609_613_615`.
+  It ran `deck_607`, `deck_609`, `deck_613`, and `deck_615`, `4` games per
+  opponent, same `4` real opponents, isolated deck processes, no candidate
+  materialization, and no DB mutation.
+- Focused result: `deck_615` went `10W/6L` (`62.50%`), `deck_613` went
+  `7W/9L` (`43.75%`), `deck_607` went `6W/10L` (`37.50%`), and `deck_609`
+  went `3W/13L` (`18.75%`).
+- Larger 607-vs-615 confirmation:
+  `lorehold_variant_battle_gate_20260705_total_authorization_focused_607_vs_615_g8`.
+  It ran `8` games per opponent, the same `4` real opponents, isolated deck
+  processes, no forced access, no candidate materialization, and no DB
+  mutation. `deck_615` went `14W/18L` (`43.75%`, avg win turn `15.29`);
+  `deck_607` went `11W/21L` (`34.38%`, avg win turn `18.73`).
+- In the larger window, `615` produced more miracle casts (`86` vs `62`) and
+  more discard-to-top replacements (`39` vs `17`), while `607` produced more
+  static cost-reduction volume (`99` vs `1`) and more Lorehold spell casts
+  (`324` vs `292`). This points to a shell-level question, not a one-card
+  Brain/Entreat cut question.
+- `deck_615` and `deck_607` are both valid Commander lists with `100` total
+  cards and `1` commander. `deck_615` differs from `607` by `47` added cards
+  and `57` removed singleton rows, so this is a shell-vs-shell challenger, not
+  a safe one-card swap.
+- Notable `615` additions over `607` include `Mana Vault`, `The One Ring`,
+  `Birgi, God of Storytelling // Harnfel, Horn of Bounty`, `Guttersnipe`,
+  `Underworld Breach`, `Reiterate`, `Galvanoth`, `Enlightened Tutor`,
+  `Boros Charm`, `Brass's Bounty`, `Apex of Power`, and `Twinflame Tyrant`.
+- Notable `607` cards absent from `615` include `Scroll Rack`,
+  `The Mind Stone`, `Creative Technique`, `Bender's Waterskin`,
+  `Molecule Man`, `Ruby Medallion`, `Pearl Medallion`, `Flawless Maneuver`,
+  `Dawn's Truce`, `Stroke of Midnight`, `Winds of Abandon`, and several fetch
+  or fixing lands.
+
+Decision after total authorization refresh:
+
+- Authorization is broad enough for runtime validation, PostgreSQL checks,
+  simulator windows, and future deck action when the evidence gate clears.
+- The current one-card Brain/Entreat path still cannot mutate `607`: no named
+  same-lane seed-safe cut exists, no matrix row is scoreable, and no candidate
+  deck is materializable from those card hypotheses.
+- The statement "607 is unquestionably best" is no longer supported by fresh
+  simulator evidence. `607` remains the protected structural baseline, but
+  `615` is now the strongest live battle challenger and has survived one
+  larger confirmation window.
+- Next practical work: inspect `615`'s high-impact additions as package groups,
+  run a wider/opponent-rotated 607-vs-615 shell gate, and only then decide
+  whether to promote a full-shell replacement, create a 615-derived learned
+  candidate, or preserve 607 while continuing safe-cut mining.
