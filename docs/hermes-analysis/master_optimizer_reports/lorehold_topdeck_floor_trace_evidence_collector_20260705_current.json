@@ -1,0 +1,835 @@
+{
+  "artifact_type": "lorehold_topdeck_floor_trace_evidence_collector",
+  "current_baseline": "deck_607",
+  "decision": {
+    "allow_candidate_materialization_now": false,
+    "allow_deck_mutation_now": false,
+    "allow_forced_access_now": false,
+    "allow_natural_battle_gate_now": false,
+    "allow_structure_matrix_now": false,
+    "keep_607_as_protected_baseline": true,
+    "next_actions": [
+      "mine_new_nonanchor_same_lane_cut_models_before_any_trace_execution",
+      "do_not_run_forced_access_until_a_safe_cut_model_exists",
+      "do_not_convert target trace rows into matrix rows",
+      "keep Mana Vault and The One Ring blocked until same-lane trace proof exists"
+    ],
+    "promotion_allowed": false,
+    "reason": "Current topdeck targets have trace designs and external/source support, but every target remains blocked from execution by prior rejects, cut safety, or the absence of a named same-lane nonanchor cut."
+  },
+  "deck_607_mutated": false,
+  "external_source_touchpoints": [
+    {
+      "source": "Scryfall",
+      "url": "https://scryfall.com/",
+      "use": "Oracle, legality, color identity, and rules text normalization before runtime or matrix work."
+    },
+    {
+      "source": "EDHREC Lorehold pages",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian",
+      "use": "Commander-specific discovery signal for topdeck and spellslinger candidates, not cut proof."
+    },
+    {
+      "source": "Card Kingdom Lorehold synergy review",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/",
+      "use": "External support for Penance as a hand-to-library setup card, still below local cut and trace proof."
+    }
+  ],
+  "generated_at": "2026-07-05T07:08:17Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "forced_access_audit_summary": {
+      "anchor_access_floor_count": 7,
+      "blocker_counts": {
+        "deck_607_protected_no_mutation": 5,
+        "miracle_access_first_preflight_closed": 5,
+        "needs_named_same_lane_safe_cut_model": 5,
+        "no_natural_gate_ready_row": 5
+      },
+      "candidate_count": 5,
+      "deck_607_mutated": false,
+      "deck_action_allowed_now": false,
+      "diagnostic_ready_count": 5,
+      "hypothesis_queue_status": "lorehold_hypothesis_queue_ready_no_natural_gate",
+      "keep_607_as_protected_baseline": true,
+      "missing_inputs": [],
+      "natural_gate_allowed_now": false,
+      "natural_gate_ready_count": 0,
+      "postgres_writes": false,
+      "preflight_gate_ready_now_count": 0,
+      "preflight_status": "no_current_candidate_passes_miracle_access_first_preflight",
+      "promotion_allowed": false,
+      "protected_anchor_count": 14,
+      "recommended_first_diagnostic": "Penance",
+      "safe_cut_ready_count": 0,
+      "source_db_mutated": false,
+      "strategic_floor_count": 5,
+      "target_card_count": 5,
+      "trace_status": "lorehold_miracle_trace_failure_learning_ready",
+      "value_priority_status": "card_value_priority_no_direct_cut_ready_current_607"
+    },
+    "microbenchmark_plan_summary": {
+      "blocker_counts": {
+        "cut_safety_blocked": 3,
+        "deck_607_protected_no_mutation": 5,
+        "miracle_access_first_preflight_closed": 5,
+        "needs_named_same_lane_safe_cut_model": 5,
+        "no_natural_gate_ready_row": 5,
+        "prior_exact_or_strategy_reject": 4
+      },
+      "deck_607_mutated": false,
+      "keep_607_as_protected_baseline": true,
+      "microbenchmark_design_count": 5,
+      "missing_inputs": [],
+      "natural_promotion_allowed_count": 0,
+      "opening_hand_mode_count": 5,
+      "package_status_counts": {
+        "blocked_cut_safety_new_cut_required": 1,
+        "blocked_prior_reject_and_cut_safety": 2,
+        "blocked_prior_reject_new_cut_required": 2
+      },
+      "postgres_writes": false,
+      "recommended_next_action": "mine_new_safe_cut_models_before_running_topdeck_forced_access",
+      "runnable_now_count": 0,
+      "source_db_mutated": false,
+      "target_card_count": 5
+    },
+    "safe_cut_miner_summary": {
+      "action_counts": {
+        "no_current_safe_cut_for_target": 5
+      },
+      "attempted_package_cut_count": 9,
+      "deck_607_mutated": false,
+      "natural_promotion_allowed_count": 0,
+      "package_execution_counts": {
+        "blocked_cut_safety_new_cut_required": 1,
+        "blocked_prior_reject_and_cut_safety": 2,
+        "blocked_prior_reject_new_cut_required": 2
+      },
+      "postgres_writes": false,
+      "recommended_next_action": "do_not_run_forced_access_until_new_nonanchor_cut_evidence",
+      "reviewable_same_lane_gap_count": 0,
+      "runnable_now_count": 0,
+      "same_lane_hard_blocked_count": 1,
+      "seed_safe_cut_candidate_count": 0,
+      "source_db_mutated": false,
+      "target_count": 5,
+      "trace_cut_expander_status": "",
+      "trace_cut_expander_summary": {
+        "hard_blocked_count": 92,
+        "reviewable_evidence_gap_count": 0,
+        "same_lane_hard_blocked_count": 2,
+        "seed_safe_ready_count": 0
+      }
+    },
+    "trace_contract_summary": {
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_floor_trace_contract_written_no_deck_action_keep_607",
+      "forced_access_allowed_now": false,
+      "frontier_selected_route": "topdeck_floor_trace_target_contract",
+      "matrix_candidate_row_eligible_count": 0,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "probe_row_count": 48,
+      "promotion_allowed_now": false,
+      "queue_row_count": 40,
+      "recommended_next_action": "collect_trace_floor_evidence_for_targets_before_matrix_or_sidecar",
+      "safe_cut_ready_count": 0,
+      "structure_matrix_allowed_now": false,
+      "target_card_count": 5,
+      "trace_collection_allowed_now": true,
+      "trace_contract_ready": true
+    }
+  },
+  "source_reports": {
+    "forced_access_audit": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_forced_access_audit_20260705_current.json",
+    "microbenchmark_plan": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_forced_access_microbenchmark_plan_20260705_current.json",
+    "safe_cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_safe_cut_miner_20260705_current.json",
+    "trace_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_target_contract_20260705_current.json"
+  },
+  "status": "topdeck_floor_trace_evidence_collected_no_execution_keep_607",
+  "summary": {
+    "candidate_deck_materialization_allowed_now": false,
+    "cut_safety_blocked_target_count": 5,
+    "cut_safety_blocked_targets": [
+      "Penance",
+      "Galvanoth",
+      "Dragon's Rage Channeler",
+      "Valakut Awakening // Valakut Stoneforge",
+      "Wheel of Fortune"
+    ],
+    "decision_status": "topdeck_floor_trace_evidence_collected_no_execution_keep_607",
+    "forced_access_allowed_now": false,
+    "microbenchmark_runnable_count": 0,
+    "missing_inputs": [],
+    "natural_battle_gate_allowed_now": false,
+    "prior_reject_target_count": 4,
+    "prior_reject_targets": [
+      "Penance",
+      "Galvanoth",
+      "Valakut Awakening // Valakut Stoneforge",
+      "Wheel of Fortune"
+    ],
+    "promotion_allowed_now": false,
+    "recommended_next_action": "mine_new_nonanchor_same_lane_cut_models_before_any_trace_execution",
+    "seed_safe_same_lane_count": 0,
+    "status_counts": {
+      "prior_reject_requires_new_same_lane_cut_model": 4,
+      "trace_design_ready_but_cut_safety_blocked": 1
+    },
+    "structure_matrix_allowed_now": false,
+    "target_card_count": 5,
+    "trace_collection_allowed_count": 5
+  },
+  "target_evidence_rows": [
+    {
+      "attempted_package_cut_count": 2,
+      "attempted_package_cuts": [
+        {
+          "cut": "Hexing Squelcher",
+          "cut_safety_status": "blocked_cut_safety",
+          "package_decision": "not_run_cut_safety_blocked",
+          "package_key": "penance_topdeck_protection_cut_squelcher",
+          "prior_delta_pp": -7.41,
+          "prior_evidence_status": "blocked_prior_reject"
+        },
+        {
+          "cut": "Promise of Loyalty",
+          "cut_safety_status": "blocked_cut_safety",
+          "package_decision": "not_run_cut_safety_blocked",
+          "package_key": "penance_runtime_topdeck_cut_promise",
+          "prior_delta_pp": null,
+          "prior_evidence_status": "blocked_prior_reject"
+        }
+      ],
+      "baseline_floor_metrics": [
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "miracle_cast",
+          "why": "The candidate cannot reduce Lorehold's primary miracle window."
+        },
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "topdeck_manipulation_activated",
+          "why": "The candidate must preserve active top-library control."
+        },
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "lorehold_upkeep_rummage",
+          "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+        },
+        {
+          "floor_rule": "no_material_regression_against_607",
+          "metric": "lorehold_spell_cast",
+          "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+        },
+        {
+          "floor_rule": "no_material_regression_against_607",
+          "metric": "static_cost_reduction_total",
+          "why": "Cost reduction is part of converting the miracle window into action."
+        },
+        {
+          "floor_rule": "tie_or_improve_current_607_before_promotion",
+          "metric": "Winota_fast_pressure_slice",
+          "why": "Prior positive-looking packages failed because fast pressure regressed."
+        }
+      ],
+      "blockers": [
+        "cut_safety_blocked",
+        "deck_607_protected_no_mutation",
+        "miracle_access_first_preflight_closed",
+        "missing_named_same_lane_cut",
+        "must_preserve_607_topdeck_miracle_floor",
+        "must_preserve_protected_anchors",
+        "needs_named_same_lane_safe_cut_model",
+        "needs_safe_cut_model",
+        "no_natural_gate_ready_row",
+        "prior_exact_or_strategy_reject"
+      ],
+      "candidate_materialization_allowed_now": false,
+      "card_name": "Penance",
+      "existing_packages": [
+        {
+          "cut_safety_status": "blocked_cut_safety",
+          "cuts": [
+            "Hexing Squelcher"
+          ],
+          "package_key": "penance_topdeck_protection_cut_squelcher",
+          "prior_delta_pp": -7.41,
+          "prior_evidence_status": "blocked_prior_reject",
+          "status": "skipped_cut_safety"
+        },
+        {
+          "cut_safety_status": "blocked_cut_safety",
+          "cuts": [
+            "Promise of Loyalty"
+          ],
+          "package_key": "penance_runtime_topdeck_cut_promise",
+          "prior_delta_pp": null,
+          "prior_evidence_status": "blocked_prior_reject",
+          "status": "skipped_cut_safety"
+        }
+      ],
+      "external_evidence": {
+        "risk": "card disadvantage unless the top-card setup converts immediately",
+        "role": "turns cards in hand into known top-library cards for miracle windows",
+        "runtime_ready": true,
+        "signal": "direct_hand_to_top_setup",
+        "source": "Card Kingdom Lorehold synergy review",
+        "staple_tier": "not_format_staple",
+        "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/",
+        "variant_deck_count": 4,
+        "variant_deck_ids": [
+          609,
+          611,
+          613,
+          614
+        ]
+      },
+      "forced_access_allowed_now": false,
+      "learning_priority_rank": 1,
+      "microbenchmark_runnable_now": false,
+      "natural_battle_gate_allowed_now": false,
+      "next_action": "mine_new_nonanchor_same_lane_cut_before_any_trace_execution",
+      "package_execution_status": "blocked_prior_reject_and_cut_safety",
+      "primary_forced_access_mode": "opening_hand",
+      "prior_package_count": 2,
+      "prior_reject_count": 2,
+      "promotion_allowed_now": false,
+      "required_trace_signals": [
+        "forced_focus_access_applied",
+        "candidate_card_drawn_or_accessed",
+        "candidate_card_cast_or_activated",
+        "miracle_cast",
+        "topdeck_manipulation_activated",
+        "lorehold_upkeep_rummage",
+        "lorehold_cost_paid",
+        "same_seed_head_to_head_vs_607",
+        "candidate_card_cast_or_resolved",
+        "hand_to_topdeck_activation",
+        "miracle_cast_after_hand_to_top_setup"
+      ],
+      "reviewable_same_lane_gap_count": 0,
+      "safe_cut_status": "no_current_safe_cut_for_target",
+      "seed_safe_same_lane_count": 0,
+      "structure_matrix_allowed_now": false,
+      "trace_collection_allowed_now": true,
+      "trace_evidence_status": "prior_reject_requires_new_same_lane_cut_model"
+    },
+    {
+      "attempted_package_cut_count": 4,
+      "attempted_package_cuts": [
+        {
+          "cut": "Bender's Waterskin",
+          "cut_safety_status": "blocked_cut_safety",
+          "package_decision": "not_run_cut_safety_blocked",
+          "package_key": "galvanoth_topdeck_freecast",
+          "prior_delta_pp": 0.0,
+          "prior_evidence_status": "blocked_prior_reject"
+        },
+        {
+          "cut": "Hexing Squelcher",
+          "cut_safety_status": "blocked_cut_safety",
+          "package_decision": "not_run_cut_safety_blocked",
+          "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+          "prior_delta_pp": -7.41,
+          "prior_evidence_status": "blocked_prior_reject"
+        },
+        {
+          "cut": "Victory Chimes",
+          "cut_safety_status": "blocked_cut_safety",
+          "package_decision": "not_run_cut_safety_blocked",
+          "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+          "prior_delta_pp": -3.7,
+          "prior_evidence_status": "blocked_prior_reject"
+        },
+        {
+          "cut": "Thor, God of Thunder",
+          "cut_safety_status": "blocked_cut_safety",
+          "package_decision": "not_run_cut_safety_blocked",
+          "package_key": "galvanoth_topdeck_freecast_cut_thor",
+          "prior_delta_pp": -55.56,
+          "prior_evidence_status": "blocked_prior_reject"
+        }
+      ],
+      "baseline_floor_metrics": [
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "miracle_cast",
+          "why": "The candidate cannot reduce Lorehold's primary miracle window."
+        },
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "topdeck_manipulation_activated",
+          "why": "The candidate must preserve active top-library control."
+        },
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "lorehold_upkeep_rummage",
+          "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+        },
+        {
+          "floor_rule": "no_material_regression_against_607",
+          "metric": "lorehold_spell_cast",
+          "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+        },
+        {
+          "floor_rule": "no_material_regression_against_607",
+          "metric": "static_cost_reduction_total",
+          "why": "Cost reduction is part of converting the miracle window into action."
+        },
+        {
+          "floor_rule": "tie_or_improve_current_607_before_promotion",
+          "metric": "Winota_fast_pressure_slice",
+          "why": "Prior positive-looking packages failed because fast pressure regressed."
+        }
+      ],
+      "blockers": [
+        "cut_safety_blocked",
+        "deck_607_protected_no_mutation",
+        "miracle_access_first_preflight_closed",
+        "missing_named_same_lane_cut",
+        "must_preserve_607_topdeck_miracle_floor",
+        "must_preserve_protected_anchors",
+        "needs_named_same_lane_safe_cut_model",
+        "needs_safe_cut_model",
+        "no_natural_gate_ready_row",
+        "prior_exact_or_strategy_reject"
+      ],
+      "candidate_materialization_allowed_now": false,
+      "card_name": "Galvanoth",
+      "existing_packages": [
+        {
+          "cut_safety_status": "blocked_cut_safety",
+          "cuts": [
+            "Bender's Waterskin"
+          ],
+          "package_key": "galvanoth_topdeck_freecast",
+          "prior_delta_pp": 0.0,
+          "prior_evidence_status": "blocked_prior_reject",
+          "status": "skipped_cut_safety"
+        },
+        {
+          "cut_safety_status": "blocked_cut_safety",
+          "cuts": [
+            "Hexing Squelcher"
+          ],
+          "package_key": "galvanoth_topdeck_freecast_cut_squelcher",
+          "prior_delta_pp": -7.41,
+          "prior_evidence_status": "blocked_prior_reject",
+          "status": "skipped_cut_safety"
+        },
+        {
+          "cut_safety_status": "blocked_cut_safety",
+          "cuts": [
+            "Victory Chimes"
+          ],
+          "package_key": "galvanoth_topdeck_freecast_cut_chimes",
+          "prior_delta_pp": -3.7,
+          "prior_evidence_status": "blocked_prior_reject",
+          "status": "skipped_cut_safety"
+        },
+        {
+          "cut_safety_status": "blocked_cut_safety",
+          "cuts": [
+            "Thor, God of Thunder"
+          ],
+          "package_key": "galvanoth_topdeck_freecast_cut_thor",
+          "prior_delta_pp": -55.56,
+          "prior_evidence_status": "blocked_prior_reject",
+          "status": "skipped_cut_safety"
+        }
+      ],
+      "external_evidence": {
+        "risk": "five-mana setup can be too slow if it does not protect miracle cadence",
+        "role": "tests whether extra top-card spell casting improves conversion after setup",
+        "runtime_ready": true,
+        "signal": "top_card_free_cast_engine",
+        "source": "EDHREC Lorehold commander page",
+        "staple_tier": "not_format_staple",
+        "url": "https://edhrec.com/commanders/lorehold-the-historian",
+        "variant_deck_count": 4,
+        "variant_deck_ids": [
+          611,
+          613,
+          614,
+          615
+        ]
+      },
+      "forced_access_allowed_now": false,
+      "learning_priority_rank": 2,
+      "microbenchmark_runnable_now": false,
+      "natural_battle_gate_allowed_now": false,
+      "next_action": "mine_new_nonanchor_same_lane_cut_before_any_trace_execution",
+      "package_execution_status": "blocked_prior_reject_and_cut_safety",
+      "primary_forced_access_mode": "opening_hand",
+      "prior_package_count": 4,
+      "prior_reject_count": 4,
+      "promotion_allowed_now": false,
+      "required_trace_signals": [
+        "forced_focus_access_applied",
+        "candidate_card_drawn_or_accessed",
+        "candidate_card_cast_or_activated",
+        "miracle_cast",
+        "topdeck_manipulation_activated",
+        "lorehold_upkeep_rummage",
+        "lorehold_cost_paid",
+        "same_seed_head_to_head_vs_607",
+        "candidate_card_cast_or_resolved",
+        "top_card_spell_cast_attempt",
+        "free_or_discounted_spell_conversion"
+      ],
+      "reviewable_same_lane_gap_count": 0,
+      "safe_cut_status": "no_current_safe_cut_for_target",
+      "seed_safe_same_lane_count": 0,
+      "structure_matrix_allowed_now": false,
+      "trace_collection_allowed_now": true,
+      "trace_evidence_status": "prior_reject_requires_new_same_lane_cut_model"
+    },
+    {
+      "attempted_package_cut_count": 1,
+      "attempted_package_cuts": [
+        {
+          "cut": "The Scarlet Witch",
+          "cut_safety_status": "blocked_cut_safety",
+          "package_decision": "not_run_cut_safety_blocked",
+          "package_key": "dragon_rage_channeler_cut_scarlet_witch",
+          "prior_delta_pp": null,
+          "prior_evidence_status": "clear"
+        }
+      ],
+      "baseline_floor_metrics": [
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "miracle_cast",
+          "why": "The candidate cannot reduce Lorehold's primary miracle window."
+        },
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "topdeck_manipulation_activated",
+          "why": "The candidate must preserve active top-library control."
+        },
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "lorehold_upkeep_rummage",
+          "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+        },
+        {
+          "floor_rule": "no_material_regression_against_607",
+          "metric": "lorehold_spell_cast",
+          "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+        },
+        {
+          "floor_rule": "no_material_regression_against_607",
+          "metric": "static_cost_reduction_total",
+          "why": "Cost reduction is part of converting the miracle window into action."
+        },
+        {
+          "floor_rule": "tie_or_improve_current_607_before_promotion",
+          "metric": "Winota_fast_pressure_slice",
+          "why": "Prior positive-looking packages failed because fast pressure regressed."
+        }
+      ],
+      "blockers": [
+        "cut_safety_blocked",
+        "deck_607_protected_no_mutation",
+        "miracle_access_first_preflight_closed",
+        "missing_named_same_lane_cut",
+        "must_preserve_607_topdeck_miracle_floor",
+        "must_preserve_protected_anchors",
+        "needs_named_same_lane_safe_cut_model",
+        "needs_safe_cut_model",
+        "no_natural_gate_ready_row"
+      ],
+      "candidate_materialization_allowed_now": false,
+      "card_name": "Dragon's Rage Channeler",
+      "existing_packages": [
+        {
+          "cut_safety_status": "blocked_cut_safety",
+          "cuts": [
+            "The Scarlet Witch"
+          ],
+          "package_key": "dragon_rage_channeler_cut_scarlet_witch",
+          "prior_delta_pp": null,
+          "prior_evidence_status": "clear",
+          "status": "skipped_cut_safety"
+        }
+      ],
+      "external_evidence": {
+        "risk": "surveil is selection, not guaranteed topdeck placement for miracle",
+        "role": "tests whether cheap surveil selection increases live first-draw setup",
+        "runtime_ready": true,
+        "signal": "noncreature_spell_surveillance",
+        "source": "EDHREC Lorehold commander page",
+        "staple_tier": "not_format_staple",
+        "url": "https://edhrec.com/commanders/lorehold-the-historian",
+        "variant_deck_count": 3,
+        "variant_deck_ids": [
+          609,
+          613,
+          614
+        ]
+      },
+      "forced_access_allowed_now": false,
+      "learning_priority_rank": 3,
+      "microbenchmark_runnable_now": false,
+      "natural_battle_gate_allowed_now": false,
+      "next_action": "collect non-execution trace requirements and search for safe cut evidence",
+      "package_execution_status": "blocked_cut_safety_new_cut_required",
+      "primary_forced_access_mode": "opening_hand",
+      "prior_package_count": 1,
+      "prior_reject_count": 0,
+      "promotion_allowed_now": false,
+      "required_trace_signals": [
+        "forced_focus_access_applied",
+        "candidate_card_drawn_or_accessed",
+        "candidate_card_cast_or_activated",
+        "miracle_cast",
+        "topdeck_manipulation_activated",
+        "lorehold_upkeep_rummage",
+        "lorehold_cost_paid",
+        "same_seed_head_to_head_vs_607",
+        "candidate_card_cast_or_resolved",
+        "noncreature_spell_trigger_seen",
+        "surveil_or_selection_changed_topdeck_outcome"
+      ],
+      "reviewable_same_lane_gap_count": 0,
+      "safe_cut_status": "no_current_safe_cut_for_target",
+      "seed_safe_same_lane_count": 0,
+      "structure_matrix_allowed_now": false,
+      "trace_collection_allowed_now": true,
+      "trace_evidence_status": "trace_design_ready_but_cut_safety_blocked"
+    },
+    {
+      "attempted_package_cut_count": 1,
+      "attempted_package_cuts": [
+        {
+          "cut": "Big Score",
+          "cut_safety_status": "clear",
+          "package_decision": "not_run_prior_reject_blocked",
+          "package_key": "valakut_hand_filter_cut_big_score",
+          "prior_delta_pp": -100.0,
+          "prior_evidence_status": "blocked_prior_reject"
+        }
+      ],
+      "baseline_floor_metrics": [
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "miracle_cast",
+          "why": "The candidate cannot reduce Lorehold's primary miracle window."
+        },
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "topdeck_manipulation_activated",
+          "why": "The candidate must preserve active top-library control."
+        },
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "lorehold_upkeep_rummage",
+          "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+        },
+        {
+          "floor_rule": "no_material_regression_against_607",
+          "metric": "lorehold_spell_cast",
+          "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+        },
+        {
+          "floor_rule": "no_material_regression_against_607",
+          "metric": "static_cost_reduction_total",
+          "why": "Cost reduction is part of converting the miracle window into action."
+        },
+        {
+          "floor_rule": "tie_or_improve_current_607_before_promotion",
+          "metric": "Winota_fast_pressure_slice",
+          "why": "Prior positive-looking packages failed because fast pressure regressed."
+        }
+      ],
+      "blockers": [
+        "deck_607_protected_no_mutation",
+        "miracle_access_first_preflight_closed",
+        "missing_named_same_lane_cut",
+        "must_preserve_607_topdeck_miracle_floor",
+        "must_preserve_protected_anchors",
+        "needs_named_same_lane_safe_cut_model",
+        "needs_safe_cut_model",
+        "no_natural_gate_ready_row",
+        "prior_exact_or_strategy_reject"
+      ],
+      "candidate_materialization_allowed_now": false,
+      "card_name": "Valakut Awakening // Valakut Stoneforge",
+      "existing_packages": [
+        {
+          "cut_safety_status": "clear",
+          "cuts": [
+            "Big Score"
+          ],
+          "package_key": "valakut_hand_filter_cut_big_score",
+          "prior_delta_pp": -100.0,
+          "prior_evidence_status": "blocked_prior_reject",
+          "status": "skipped_prior_evidence"
+        }
+      ],
+      "external_evidence": {
+        "risk": "can become a tap-land or hand churn that does not preserve topdeck anchors",
+        "role": "tests whether a modal land/filter card improves bad-hand recovery without land-floor loss",
+        "runtime_ready": true,
+        "signal": "modal_hand_refresh",
+        "source": "Scryfall Oracle plus EDHREC topdeck shell context",
+        "staple_tier": "not_format_staple",
+        "url": "https://scryfall.com/card/znr/174/valakut-awakening-valakut-stoneforge",
+        "variant_deck_count": 4,
+        "variant_deck_ids": [
+          608,
+          609,
+          610,
+          611
+        ]
+      },
+      "forced_access_allowed_now": false,
+      "learning_priority_rank": 4,
+      "microbenchmark_runnable_now": false,
+      "natural_battle_gate_allowed_now": false,
+      "next_action": "mine_new_nonanchor_same_lane_cut_before_any_trace_execution",
+      "package_execution_status": "blocked_prior_reject_new_cut_required",
+      "primary_forced_access_mode": "opening_hand",
+      "prior_package_count": 1,
+      "prior_reject_count": 1,
+      "promotion_allowed_now": false,
+      "required_trace_signals": [
+        "forced_focus_access_applied",
+        "candidate_card_drawn_or_accessed",
+        "candidate_card_cast_or_activated",
+        "miracle_cast",
+        "topdeck_manipulation_activated",
+        "lorehold_upkeep_rummage",
+        "lorehold_cost_paid",
+        "same_seed_head_to_head_vs_607",
+        "candidate_card_cast_or_modal_land_choice",
+        "hand_refresh_resolved",
+        "topdeck_anchor_access_after_hand_refresh"
+      ],
+      "reviewable_same_lane_gap_count": 0,
+      "safe_cut_status": "no_current_safe_cut_for_target",
+      "seed_safe_same_lane_count": 0,
+      "structure_matrix_allowed_now": false,
+      "trace_collection_allowed_now": true,
+      "trace_evidence_status": "prior_reject_requires_new_same_lane_cut_model"
+    },
+    {
+      "attempted_package_cut_count": 1,
+      "attempted_package_cuts": [
+        {
+          "cut": "Big Score",
+          "cut_safety_status": "clear",
+          "package_decision": "not_run_prior_reject_blocked",
+          "package_key": "wheel_hand_filter_cut_big_score",
+          "prior_delta_pp": -100.0,
+          "prior_evidence_status": "blocked_prior_reject"
+        }
+      ],
+      "baseline_floor_metrics": [
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "miracle_cast",
+          "why": "The candidate cannot reduce Lorehold's primary miracle window."
+        },
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "topdeck_manipulation_activated",
+          "why": "The candidate must preserve active top-library control."
+        },
+        {
+          "floor_rule": "meet_or_exceed_current_607_same_seed_floor",
+          "metric": "lorehold_upkeep_rummage",
+          "why": "Lorehold's opponent-turn discard/draw setup is the engine timing."
+        },
+        {
+          "floor_rule": "no_material_regression_against_607",
+          "metric": "lorehold_spell_cast",
+          "why": "Topdeck access is only useful if it keeps spell-chain volume intact."
+        },
+        {
+          "floor_rule": "no_material_regression_against_607",
+          "metric": "static_cost_reduction_total",
+          "why": "Cost reduction is part of converting the miracle window into action."
+        },
+        {
+          "floor_rule": "tie_or_improve_current_607_before_promotion",
+          "metric": "Winota_fast_pressure_slice",
+          "why": "Prior positive-looking packages failed because fast pressure regressed."
+        }
+      ],
+      "blockers": [
+        "deck_607_protected_no_mutation",
+        "miracle_access_first_preflight_closed",
+        "missing_named_same_lane_cut",
+        "must_preserve_607_topdeck_miracle_floor",
+        "must_preserve_protected_anchors",
+        "needs_named_same_lane_safe_cut_model",
+        "needs_safe_cut_model",
+        "no_natural_gate_ready_row",
+        "prior_exact_or_strategy_reject"
+      ],
+      "candidate_materialization_allowed_now": false,
+      "card_name": "Wheel of Fortune",
+      "existing_packages": [
+        {
+          "cut_safety_status": "clear",
+          "cuts": [
+            "Big Score"
+          ],
+          "package_key": "wheel_hand_filter_cut_big_score",
+          "prior_delta_pp": -100.0,
+          "prior_evidence_status": "blocked_prior_reject",
+          "status": "skipped_prior_evidence"
+        }
+      ],
+      "external_evidence": {
+        "risk": "symmetrical refill can help opponents and reset a prepared top card",
+        "role": "tests whether a full hand reset improves spell-chain conversion after topdeck setup",
+        "runtime_ready": true,
+        "signal": "mass_redraw_high_variance",
+        "source": "Format staple signal plus Lorehold hand-filter lane",
+        "staple_tier": "format_staple_long_tail",
+        "url": "https://edhrec.com/top",
+        "variant_deck_count": 4,
+        "variant_deck_ids": [
+          608,
+          609,
+          612,
+          616
+        ]
+      },
+      "forced_access_allowed_now": false,
+      "learning_priority_rank": 5,
+      "microbenchmark_runnable_now": false,
+      "natural_battle_gate_allowed_now": false,
+      "next_action": "mine_new_nonanchor_same_lane_cut_before_any_trace_execution",
+      "package_execution_status": "blocked_prior_reject_new_cut_required",
+      "primary_forced_access_mode": "opening_hand",
+      "prior_package_count": 1,
+      "prior_reject_count": 1,
+      "promotion_allowed_now": false,
+      "required_trace_signals": [
+        "forced_focus_access_applied",
+        "candidate_card_drawn_or_accessed",
+        "candidate_card_cast_or_activated",
+        "miracle_cast",
+        "topdeck_manipulation_activated",
+        "lorehold_upkeep_rummage",
+        "lorehold_cost_paid",
+        "same_seed_head_to_head_vs_607",
+        "candidate_card_cast_or_resolved",
+        "mass_redraw_resolved",
+        "opponent_refill_risk_observed"
+      ],
+      "reviewable_same_lane_gap_count": 0,
+      "safe_cut_status": "no_current_safe_cut_for_target",
+      "seed_safe_same_lane_count": 0,
+      "structure_matrix_allowed_now": false,
+      "trace_collection_allowed_now": true,
+      "trace_evidence_status": "prior_reject_requires_new_same_lane_cut_model"
+    }
+  ]
+}

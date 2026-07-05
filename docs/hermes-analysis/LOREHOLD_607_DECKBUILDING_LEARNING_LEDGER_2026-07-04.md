@@ -2902,3 +2902,59 @@ Operational lesson:
 - For mana, do not retest the exact `Plateau` pairs without new evidence; the
   current mana route is closed by decisions.
 - Deck `607` remains untouched and protected.
+
+## Topdeck Floor Trace Evidence Collector - 2026-07-05
+
+The current trace-evidence artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_evidence_collector_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_evidence_collector_20260705_current.json`
+
+This collector consumes:
+
+- `lorehold_topdeck_floor_trace_target_contract_20260705_current`;
+- `lorehold_topdeck_forced_access_audit_20260705_current`;
+- `lorehold_topdeck_forced_access_microbenchmark_plan_20260705_current`;
+- `lorehold_topdeck_safe_cut_miner_20260705_current`.
+
+Current result:
+
+- status:
+  `topdeck_floor_trace_evidence_collected_no_execution_keep_607`;
+- target cards reviewed: `5`;
+- trace-collection-allowed rows: `5`;
+- microbenchmark-runnable rows: `0`;
+- seed-safe same-lane cuts: `0`;
+- prior-reject target count: `4`;
+- cut-safety blocked target count: `5`;
+- forced access allowed now: `false`;
+- structure matrix allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- recommended next action:
+  `mine_new_nonanchor_same_lane_cut_models_before_any_trace_execution`.
+
+Per-card evidence state:
+
+- `Penance`: prior rejects `2`; no current safe cut; still the first learning
+  target, but cannot execute without a new same-lane nonanchor cut model.
+- `Galvanoth`: prior rejects `4`; no current safe cut; old cuts such as
+  `Bender's Waterskin` and `Victory Chimes` remain blocked.
+- `Dragon's Rage Channeler`: prior rejects `0`; no current safe cut; this is
+  the cleanest topdeck target from prior-result perspective, but the tested
+  `The Scarlet Witch` cut is protected and cannot be reused.
+- `Valakut Awakening // Valakut Stoneforge`: prior rejects `1`; no current
+  safe cut; do not rerun the exact `Big Score` pair without a new hand-filter
+  hypothesis that protects the miracle/topdeck floor.
+- `Wheel of Fortune`: prior rejects `1`; no current safe cut; do not rerun the
+  exact `Big Score` pair, because high draw power still needs floor and
+  pressure validation in the current `607` shell.
+
+Operational lesson:
+
+- Trace collection is now structured enough to compare the five targets, but
+  it is not execution permission.
+- The next useful deckbuilding-learning task is to mine new nonanchor same-lane
+  cut models, starting with `Dragon's Rage Channeler` because it lacks a prior
+  reject but still needs a legal, nonprotected cut.
+- Deck `607` remains untouched and protected.

@@ -1362,6 +1362,16 @@ Learning-frontier closure generated on 2026-07-05:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_learning_frontier_after_probe_closure_20260705_current.md`.
 - Trace target contract:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_target_contract_20260705_current.md`.
+- Trace evidence collector:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_floor_trace_evidence_collector_20260705_current.md`.
+- Collector result: all `5` topdeck targets permit trace collection as learning,
+  but `microbenchmark_runnable_count=0`, `seed_safe_same_lane_count=0`, and all
+  `5` remain cut-safety blocked. `Penance`, `Galvanoth`,
+  `Valakut Awakening // Valakut Stoneforge`, and `Wheel of Fortune` also carry
+  prior-reject blockers; `Dragon's Rage Channeler` has no current prior reject
+  but still needs a nonanchor same-lane cut model before any forced-access run.
+- Current next action:
+  `mine_new_nonanchor_same_lane_cut_models_before_any_trace_execution`.
 
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.
