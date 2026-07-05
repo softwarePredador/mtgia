@@ -1,0 +1,493 @@
+{
+  "artifact_type": "global_commander_same_lane_package_source_synthesizer",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "selected_adds_are_unpaired",
+    "value_safe_same_lane_cut_pairs_missing",
+    "candidate_copy_closed_until_scope_reducer_pairs_adds_and_cuts"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T23:37:01.990983+00:00",
+  "held_source_candidate_sample": [
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Flawless Maneuver",
+      "score": 113,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Loyal Apprentice",
+      "score": 112,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Hall of the Bandit Lord",
+      "score": 111,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Anger",
+      "score": 109,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Rising of the Day",
+      "score": 106,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Conqueror's Flail",
+      "score": 103,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Emperor of Bones",
+      "score": 99,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Gingerbrute",
+      "score": 99,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Lavaspur Boots",
+      "score": 99,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Skateboard",
+      "score": 99,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Sting, the Glinting Dagger",
+      "score": 99,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Caduceus, Staff of Hermes",
+      "score": 96,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Expedite",
+      "score": 96,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Deflecting Swat",
+      "score": 94,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Untimely Malfunction",
+      "score": 94,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Gogo, Mysterious Mime",
+      "score": 92,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Haunted Cloak",
+      "score": 92,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Helm of the Host",
+      "score": 92,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "mana_acceleration_replacement",
+      "card_name": "Orzhov Signet",
+      "score": 135,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    },
+    {
+      "axis": "mana_acceleration_replacement",
+      "card_name": "Rakdos Signet",
+      "score": 135,
+      "status": "held_same_lane_source_candidate_not_in_bounded_package"
+    }
+  ],
+  "input_artifacts": {
+    "source_lane_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "No battle or promotion opens before cut pairing, candidate copy, strategy matrix, and replay evidence.",
+    "cut_boundary": "No cut is value-safe until a later cut-pairing gate proves it.",
+    "package_boundary": "This report chooses review-only adds from source lanes; it does not pair cuts.",
+    "same_lane_boundary": "Every selected add carries an explicit required add axis tied to a target cut role."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "selected_add_package": [
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Boros Charm",
+      "cmc": 2.0,
+      "color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "fit_reasons": [
+        "commander_legal",
+        "commander_expected_package",
+        "format_staple_rank_173",
+        "profile_role_haste_protection_silence",
+        "attack_window_text",
+        "cheap_attack_window_support"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "replaces_cut_role": "haste_protection_silence",
+      "required_gates": [
+        "value_safe_same_lane_cut_pairing",
+        "package_scope_reducer",
+        "isolated_candidate_copy",
+        "commander_strategy_matrix",
+        "battle_gate_with_added_card_exercised"
+      ],
+      "score": 132,
+      "selected_for_axis": "commander_attack_window",
+      "source_lanes": [
+        "commander_reference_profile_expected_package",
+        "format_staples",
+        "local_oracle_same_lane_scan"
+      ],
+      "status": "review_only_same_lane_package_add",
+      "type_line": "Instant"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Fellwar Stone",
+      "cmc": 2.0,
+      "color_identity": [],
+      "commander_legality": "legal",
+      "fit_reasons": [
+        "commander_legal",
+        "commander_expected_package",
+        "format_staple_rank_18",
+        "profile_role_mana_acceleration",
+        "cheap_ramp",
+        "mana_production_text"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "replaces_cut_role": "mana_acceleration",
+      "required_gates": [
+        "value_safe_same_lane_cut_pairing",
+        "package_scope_reducer",
+        "isolated_candidate_copy",
+        "commander_strategy_matrix",
+        "battle_gate_with_added_card_exercised"
+      ],
+      "score": 136,
+      "selected_for_axis": "mana_acceleration_replacement",
+      "source_lanes": [
+        "commander_reference_profile_expected_package",
+        "format_staples",
+        "local_oracle_same_lane_scan"
+      ],
+      "status": "review_only_same_lane_package_add",
+      "type_line": "Artifact"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Gamble",
+      "cmc": 1.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "fit_reasons": [
+        "commander_legal",
+        "format_staple_rank_231",
+        "profile_role_tutors_access",
+        "unrestricted_tutor",
+        "tutor_to_hand",
+        "cheap_tutor_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "replaces_cut_role": "tutors_access",
+      "required_gates": [
+        "value_safe_same_lane_cut_pairing",
+        "package_scope_reducer",
+        "isolated_candidate_copy",
+        "commander_strategy_matrix",
+        "battle_gate_with_added_card_exercised"
+      ],
+      "score": 124,
+      "selected_for_axis": "tutors_access_replacement",
+      "source_lanes": [
+        "format_staples",
+        "local_oracle_same_lane_scan"
+      ],
+      "status": "review_only_same_lane_package_add",
+      "type_line": "Sorcery"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Swiftfoot Boots",
+      "cmc": 2.0,
+      "color_identity": [],
+      "commander_legality": "legal",
+      "fit_reasons": [
+        "commander_legal",
+        "commander_expected_package",
+        "profile_role_haste_protection_silence",
+        "attack_window_text",
+        "haste_enabler",
+        "cheap_attack_window_support"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "replaces_cut_role": "haste_protection_silence",
+      "required_gates": [
+        "value_safe_same_lane_cut_pairing",
+        "package_scope_reducer",
+        "isolated_candidate_copy",
+        "commander_strategy_matrix",
+        "battle_gate_with_added_card_exercised"
+      ],
+      "score": 123,
+      "selected_for_axis": "commander_attack_window",
+      "source_lanes": [
+        "commander_reference_profile_expected_package",
+        "local_oracle_same_lane_scan"
+      ],
+      "status": "review_only_same_lane_package_add",
+      "type_line": "Artifact \u2014 Equipment"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Wishclaw Talisman",
+      "cmc": 2.0,
+      "color_identity": [
+        "B"
+      ],
+      "commander_legality": "legal",
+      "fit_reasons": [
+        "commander_legal",
+        "format_staple_rank_503",
+        "profile_role_tutors_access",
+        "unrestricted_tutor",
+        "tutor_to_hand",
+        "cheap_tutor_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "replaces_cut_role": "tutors_access",
+      "required_gates": [
+        "value_safe_same_lane_cut_pairing",
+        "package_scope_reducer",
+        "isolated_candidate_copy",
+        "commander_strategy_matrix",
+        "battle_gate_with_added_card_exercised"
+      ],
+      "score": 121,
+      "selected_for_axis": "tutors_access_replacement",
+      "source_lanes": [
+        "format_staples",
+        "local_oracle_same_lane_scan"
+      ],
+      "status": "review_only_same_lane_package_add",
+      "type_line": "Artifact"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Entomb",
+      "cmc": 1.0,
+      "color_identity": [
+        "B"
+      ],
+      "commander_legality": "legal",
+      "fit_reasons": [
+        "commander_legal",
+        "format_staple_rank_316",
+        "profile_role_tutors_access",
+        "unrestricted_tutor",
+        "tutor_to_setup_zone",
+        "cheap_tutor_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "replaces_cut_role": "tutors_access",
+      "required_gates": [
+        "value_safe_same_lane_cut_pairing",
+        "package_scope_reducer",
+        "isolated_candidate_copy",
+        "commander_strategy_matrix",
+        "battle_gate_with_added_card_exercised"
+      ],
+      "score": 120,
+      "selected_for_axis": "tutors_access_replacement",
+      "source_lanes": [
+        "format_staples",
+        "local_oracle_same_lane_scan"
+      ],
+      "status": "review_only_same_lane_package_add",
+      "type_line": "Instant"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Imperial Seal",
+      "cmc": 1.0,
+      "color_identity": [
+        "B"
+      ],
+      "commander_legality": "legal",
+      "fit_reasons": [
+        "commander_legal",
+        "format_staple_rank_489",
+        "profile_role_tutors_access",
+        "unrestricted_tutor",
+        "tutor_to_setup_zone",
+        "cheap_tutor_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "replaces_cut_role": "tutors_access",
+      "required_gates": [
+        "value_safe_same_lane_cut_pairing",
+        "package_scope_reducer",
+        "isolated_candidate_copy",
+        "commander_strategy_matrix",
+        "battle_gate_with_added_card_exercised"
+      ],
+      "score": 119,
+      "selected_for_axis": "tutors_access_replacement",
+      "source_lanes": [
+        "format_staples",
+        "local_oracle_same_lane_scan"
+      ],
+      "status": "review_only_same_lane_package_add",
+      "type_line": "Sorcery"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Diabolic Tutor",
+      "cmc": 4.0,
+      "color_identity": [
+        "B"
+      ],
+      "commander_legality": "legal",
+      "fit_reasons": [
+        "commander_legal",
+        "format_staple_rank_442",
+        "profile_role_tutors_access",
+        "unrestricted_tutor",
+        "tutor_to_hand"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "replaces_cut_role": "tutors_access",
+      "required_gates": [
+        "value_safe_same_lane_cut_pairing",
+        "package_scope_reducer",
+        "isolated_candidate_copy",
+        "commander_strategy_matrix",
+        "battle_gate_with_added_card_exercised"
+      ],
+      "score": 114,
+      "selected_for_axis": "tutors_access_replacement",
+      "source_lanes": [
+        "format_staples",
+        "local_oracle_same_lane_scan"
+      ],
+      "status": "review_only_same_lane_package_add",
+      "type_line": "Sorcery"
+    }
+  ],
+  "source_db_mutated": false,
+  "source_lane_diagnostics": [
+    {
+      "cut_role": "haste_protection_silence",
+      "ready_candidate_count": 351,
+      "required_add_axis": "commander_attack_window",
+      "selected_add_count": 2,
+      "status": "source_lane_contributed_to_package",
+      "target_cut_count": 4
+    },
+    {
+      "cut_role": "mana_acceleration",
+      "ready_candidate_count": 304,
+      "required_add_axis": "mana_acceleration_replacement",
+      "selected_add_count": 1,
+      "status": "source_lane_contributed_to_package",
+      "target_cut_count": 1
+    },
+    {
+      "cut_role": "tutors_access",
+      "ready_candidate_count": 105,
+      "required_add_axis": "tutors_access_replacement",
+      "selected_add_count": 5,
+      "status": "source_lane_contributed_to_package",
+      "target_cut_count": 8
+    }
+  ],
+  "status": "same_lane_source_package_synthesized_no_cut_pairs",
+  "summary": {
+    "axes_covered": [
+      "commander_attack_window",
+      "mana_acceleration_replacement",
+      "tutors_access_replacement"
+    ],
+    "axes_covered_count": 3,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "missing_axes": [],
+    "missing_axis_count": 0,
+    "next_gate": "collect_value_safe_same_lane_cut_pairs_for_resynthesized_package",
+    "package_size_limit": 8,
+    "ready_pair_count": 0,
+    "ready_source_lane_count": 3,
+    "selected_add_count": 8,
+    "source_lane_count": 3,
+    "unpaired_add_count": 8
+  },
+  "value_safe_reclassification_allowed_now": false
+}

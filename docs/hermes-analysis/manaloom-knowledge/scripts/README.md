@@ -181,6 +181,12 @@ color/legality matches. If all lanes have review-only source candidates, route
 to `resynthesize_same_lane_package_from_source_lanes_before_cut_pairing`; this
 still does not pair cuts, copy a deck, run battle, or promote anything.
 
+Then run `global_commander_same_lane_package_source_synthesizer.py`. It selects a
+bounded, review-only add package from the source lanes and keeps every add
+unpaired until a later cut-pairing gate proves value-safe same-lane cuts. The
+next route is `collect_value_safe_same_lane_cut_pairs_for_resynthesized_package`,
+not candidate copy or battle.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

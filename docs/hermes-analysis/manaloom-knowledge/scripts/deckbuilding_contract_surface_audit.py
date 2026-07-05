@@ -186,6 +186,12 @@ GLOBAL_COMMANDER_SAME_LANE_ADD_SOURCE_LANE_EXPANDER = (
 GLOBAL_COMMANDER_SAME_LANE_ADD_SOURCE_LANE_EXPANDER_TEST = (
     SCRIPT_DIR / "test_global_commander_same_lane_add_source_lane_expander.py"
 )
+GLOBAL_COMMANDER_SAME_LANE_PACKAGE_SOURCE_SYNTHESIZER = (
+    SCRIPT_DIR / "global_commander_same_lane_package_source_synthesizer.py"
+)
+GLOBAL_COMMANDER_SAME_LANE_PACKAGE_SOURCE_SYNTHESIZER_TEST = (
+    SCRIPT_DIR / "test_global_commander_same_lane_package_source_synthesizer.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -423,6 +429,10 @@ GLOBAL_COMMANDER_SCOPE1_SAME_LANE_PACKAGE_RESYNTHESIZER_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_SAME_LANE_ADD_SOURCE_LANE_EXPANDER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_SAME_LANE_PACKAGE_SOURCE_SYNTHESIZER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -768,6 +778,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "same_lane_add_source_lanes_expanded_no_deck_action",
                 "resynthesize_same_lane_package_from_source_lanes_before_cut_pairing",
+                "global_commander_same_lane_package_source_synthesizer.py",
+                "global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_source_package_synthesized_no_cut_pairs",
+                "collect_value_safe_same_lane_cut_pairs_for_resynthesized_package",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1054,6 +1068,10 @@ def build_audit() -> dict[str, Any]:
                 "same_lane_add_source_lanes_expanded_no_deck_action",
                 "ready_axis_count=3",
                 "resynthesize_same_lane_package_from_source_lanes_before_cut_pairing",
+                "global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "same_lane_source_package_synthesized_no_cut_pairs",
+                "selected_add_count=8",
+                "collect_value_safe_same_lane_cut_pairs_for_resynthesized_package",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1710,6 +1728,35 @@ def build_audit() -> dict[str, Any]:
                 "resynthesize_same_lane_package_from_source_lanes_before_cut_pairing",
                 "missing_same_lane_add_source_axes:tutors_access_replacement",
                 "not_commander_color_identity_compatible",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_PACKAGE_SOURCE_SYNTHESIZER,
+            [
+                "global_commander_same_lane_package_source_synthesizer",
+                "same_lane_source_package_synthesized_no_cut_pairs",
+                "same_lane_source_package_synthesis_blocks_on_missing_axes",
+                "collect_value_safe_same_lane_cut_pairs_for_resynthesized_package",
+                "review_only_same_lane_package_add",
+                "selected_adds_are_unpaired",
+                "value_safe_same_lane_cut_pairs_missing",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SAME_LANE_PACKAGE_SOURCE_SYNTHESIZER_TEST,
+            [
+                "test_synthesizes_bounded_package_with_all_axes_covered",
+                "test_missing_axis_blocks_source_package_synthesis",
+                "test_package_size_limit_is_respected",
+                "same_lane_source_package_synthesized_no_cut_pairs",
+                "collect_value_safe_same_lane_cut_pairs_for_resynthesized_package",
+                "external_same_lane_source_research_for_missing_axes",
             ],
         )
     )
@@ -2755,6 +2802,28 @@ def build_audit() -> dict[str, Any]:
                 "Fellwar Stone",
                 "Gamble",
                 "source_lanes_are_review_only_not_deck_actions",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_SAME_LANE_PACKAGE_SOURCE_SYNTHESIZER_REPORT,
+            [
+                "Global Commander Same-Lane Package Source Synthesizer",
+                "same_lane_source_package_synthesized_no_cut_pairs",
+                "package_size_limit: `8`",
+                "selected_add_count: `8`",
+                "axes_covered_count: `3`",
+                "unpaired_add_count: `8`",
+                "ready_pair_count: `0`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "collect_value_safe_same_lane_cut_pairs_for_resynthesized_package",
+                "Boros Charm",
+                "Fellwar Stone",
+                "Gamble",
+                "Wishclaw Talisman",
+                "selected_adds_are_unpaired",
             ],
         )
     )

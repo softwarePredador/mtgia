@@ -340,7 +340,13 @@ Operational priority after this pivot:
     separate review-only candidates from blocked color/legality/existing-deck
     rows, and route to package resynthesis from source lanes while candidate
     copy, battle, promotion, and value-safe reclassification stay closed;
-42. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+42. run `global_commander_same_lane_package_source_synthesizer.py` after all
+    required same-lane add source lanes have review candidates; it must select a
+    bounded review-only add package with explicit required axes, keep every add
+    unpaired until value-safe cuts are proven, and route to same-lane cut-pair
+    collection without opening candidate copy, battle, promotion, or value-safe
+    reclassification;
+43. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -400,6 +406,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_package_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1_external_policy.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_resynthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_add_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -887,6 +894,15 @@ Current external refresh on 2026-07-05:
   Talisman`, `Entomb`, and `Imperial Seal`. These are review-only source lanes,
   not paired swaps. The next gate is
   `resynthesize_same_lane_package_from_source_lanes_before_cut_pairing`.
+- Current same-lane package source synthesis returns
+  `same_lane_source_package_synthesized_no_cut_pairs` with
+  `package_size_limit=8`, `selected_add_count=8`, `axes_covered_count=3`,
+  `unpaired_add_count=8`, and `ready_pair_count=0`. It selects review-only adds
+  from the same-lane lanes: `Boros Charm`, `Fellwar Stone`, `Gamble`,
+  `Swiftfoot Boots`, `Wishclaw Talisman`, `Entomb`, `Imperial Seal`, and
+  `Diabolic Tutor`. Candidate copy, battle, promotion, and value-safe
+  reclassification remain closed. The next gate is
+  `collect_value_safe_same_lane_cut_pairs_for_resynthesized_package`.
 
 ## Global Commander Rollout - 2026-07-01
 

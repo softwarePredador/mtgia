@@ -632,6 +632,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Imperial Seal` para acesso/tutor. Isso ainda e source-lane de revisao,
     nao par add/cut. Proximo gate:
     `resynthesize_same_lane_package_from_source_lanes_before_cut_pairing`.
+    A sintese de pacote same-lane fica em
+    `global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `same_lane_source_package_synthesized_no_cut_pairs`, com
+    `package_size_limit=8`, `selected_add_count=8`, `axes_covered_count=3`,
+    `unpaired_add_count=8` e `ready_pair_count=0`. Adds selecionados:
+    `Boros Charm`, `Fellwar Stone`, `Gamble`, `Swiftfoot Boots`,
+    `Wishclaw Talisman`, `Entomb`, `Imperial Seal` e `Diabolic Tutor`.
+    Proximo gate:
+    `collect_value_safe_same_lane_cut_pairs_for_resynthesized_package`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie
