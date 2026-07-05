@@ -3809,6 +3809,59 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_damage_target_spell_respects_excluded_target_colors(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        red_creature = {
+            "name": "Red Guard",
+            "type_line": "Creature - Warrior",
+            "colors": ["R"],
+            "power": 2,
+            "toughness": 2,
+        }
+        legal_creature = {
+            "name": "White Guard",
+            "type_line": "Creature - Soldier",
+            "colors": ["W"],
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.battlefield.extend([red_creature, legal_creature])
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "exclude_colors": ["R"]},
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Strafe",
+                "type_line": "Sorcery",
+                "oracle_text": "Strafe deals 3 damage to target nonred creature.",
+            },
+            turn=2,
+            rng=random.Random(36),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Red Guard"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["White Guard"])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Strafe"
+                and data.get("target") == "White Guard"
+                and data.get("result") == "creature_destroyed"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_exile_if_dies_spell_exiles_lethal_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

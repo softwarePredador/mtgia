@@ -1,0 +1,5 @@
+ card_name | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+-----------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Strafe    | strafe          | 4810b35ee5ab7da765fd1a1d04e4c6d7 | battle_rule_v1:572a7e591d1365d57af44902db710701 | deprecate_nonmatching_rows |                1 | 71325f12-3e94-4b80-92ba-bea47a06ae5b |                  0 |                         0 |                           0
+ Sunlance  | sunlance        | 9925bcaefd9f8793bd21b4aa9b88e1e8 | battle_rule_v1:2e641aea968159cade8055400155ae8b | deprecate_nonmatching_rows |                1 | 27f46128-9978-44df-a119-61f1aaa4e319 |                  0 |                         0 |                           0
+(2 rows)

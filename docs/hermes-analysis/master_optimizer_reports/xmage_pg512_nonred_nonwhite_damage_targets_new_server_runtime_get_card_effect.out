@@ -1,0 +1,2 @@
+Strafe {"amount": 3, "battle_model_scope": "xmage_fixed_damage_target_spell_v1", "damage": 3, "effect": "direct_damage", "target": "creature", "target_constraints": {"card_types": ["creature"], "exclude_colors": ["R"]}}
+Sunlance {"amount": 3, "battle_model_scope": "xmage_fixed_damage_target_spell_v1", "damage": 3, "effect": "direct_damage", "target": "creature", "target_constraints": {"card_types": ["creature"], "exclude_colors": ["W"]}}

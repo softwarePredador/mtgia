@@ -13180,6 +13180,47 @@ Residual boundary: PG511 does not authorize composite dynamic count rows,
 mana-spent color count rows, unsupported costs, or any `xmage_*_review_v1`
 promotion. The next wave must start from the rebuilt post-PG511 queue.
 
+## PG512 Nonred/Nonwhite Creature Damage Target Checkpoint
+
+As of 2026-07-05, PG512 is applied and synced against the new server target.
+It closes two exact fixed damage spell rows:
+
+- `Strafe`: 3 damage to target nonred creature with
+  `target_constraints={"card_types":["creature"],"exclude_colors":["R"]}`.
+- `Sunlance`: 3 damage to target nonwhite creature with
+  `target_constraints={"card_types":["creature"],"exclude_colors":["W"]}`.
+
+Evidence:
+
+- package and apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg512_nonred_nonwhite_damage_targets_new_server.json`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg512_nonred_nonwhite_damage_targets_new_server.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg512_nonred_nonwhite_damage_targets_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg512_nonred_nonwhite_damage_targets_new_server.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4945`
+- `battle_family_mapper_required=28928`
+- `target_identity_count=26005`
+- `xmage_authoritative_source_count=25691`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25691`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+- final exact-scope recheck `adapter_work_unit_counts={}`
+
+Residual boundary: PG512 does not authorize modal damage rows, multi-target
+rows, X amount rows, or any target filter beyond the exact nonred/nonwhite
+creature constraints promoted here. The next wave must start from the rebuilt
+post-PG512 queue.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

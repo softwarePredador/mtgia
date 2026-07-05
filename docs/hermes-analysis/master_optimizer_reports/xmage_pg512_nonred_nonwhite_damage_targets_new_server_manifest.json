@@ -1,0 +1,161 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg512_xmage_pg512_nonred_nonwhite_damage_20260705_144951",
+  "deploy_id": "PG512",
+  "expected_rules": [
+    {
+      "card_name": "Strafe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:572a7e591d1365d57af44902db710701",
+      "min_rule_version": 2,
+      "normalized_name": "strafe",
+      "oracle_hash": "4810b35ee5ab7da765fd1a1d04e4c6d7",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "R"
+          ]
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sunlance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2e641aea968159cade8055400155ae8b",
+      "min_rule_version": 2,
+      "normalized_name": "sunlance",
+      "oracle_hash": "9925bcaefd9f8793bd21b4aa9b88e1e8",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "W"
+          ]
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_damage_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T14:49:51+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Strafe"
+      },
+      "card_name": "Strafe",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:572a7e591d1365d57af44902db710701",
+      "normalized_name": "strafe",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "R"
+          ]
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sunlance"
+      },
+      "card_name": "Sunlance",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2e641aea968159cade8055400155ae8b",
+      "normalized_name": "sunlance",
+      "required_effect_fields": {
+        "amount": 3,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "W"
+          ]
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Strafe",
+    "Sunlance"
+  ],
+  "selected_count": 2,
+  "slug": "xmage_pg512_nonred_nonwhite_damage_targets_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Strafe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:572a7e591d1365d57af44902db710701",
+      "min_rule_version": 2,
+      "normalized_name": "strafe",
+      "oracle_hash": "4810b35ee5ab7da765fd1a1d04e4c6d7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sunlance",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2e641aea968159cade8055400155ae8b",
+      "min_rule_version": 2,
+      "normalized_name": "sunlance",
+      "oracle_hash": "9925bcaefd9f8793bd21b4aa9b88e1e8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

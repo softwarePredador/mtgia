@@ -15403,3 +15403,69 @@ Register decision:
   cards listed in this package.
 - The next wave must start from the rebuilt post-PG511 queue and choose a new
   exact subpattern; do not reuse the pre-PG511 candidate queue.
+
+## 2026-07-05 - PG512 nonred/nonwhite creature damage targets
+
+- Deploy id: `xmage_pg512_nonred_nonwhite_damage_targets_new_server`.
+- Runtime family: `xmage_fixed_damage_target_spell_v1`.
+- Promoted cards: `2`.
+- Promoted card names: `Strafe` and `Sunlance`.
+- Scope boundary: only fixed direct-damage spells backed by local XMage
+  `DamageTargetEffect` and exact nonred/nonwhite creature target filters are
+  allowed in this package. Modal, multi-target, X amount, and unsupported
+  target rows remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg512_nonred_nonwhite_damage_targets_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=2`, `COMMIT`.
+- Postcheck:
+  both promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg512_nonred_nonwhite_damage_targets_new_server.json`;
+  `selected_card_count=2`, `pg_rows_loaded=2`,
+  `sqlite_inserted_or_updated=2`, and
+  `canonical_snapshot_rows_exported=6012`.
+- Validation:
+  combined exact-scope/runtime suite `819` tests passed, XMage strategy
+  `26/26` pass, operational surface `39/39` pass, legacy contamination
+  `32/32` pass, and PG/Hermes/SQLite `51/51` pass.
+- Post-sync queue:
+  `target_identity_count=26005`, `xmage_authoritative_source_count=25691`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25691`.
+- Global readiness:
+  `battle_and_oracle_ready=4945`,
+  `battle_family_mapper_required=28928`,
+  `snapshot_has_any_rule=6015`, and
+  `snapshot_has_verified_rule=4767`.
+- Final exact-scope recheck:
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`, and
+  `adapter_work_unit_counts={}`.
+
+Register decision:
+
+- PG512 is applied and should not be rebuilt.
+- Nonred/nonwhite creature target constraints are now exact-scope supported
+  for the two promoted damage spells.
+- The next wave must start from the rebuilt post-PG512 queue and choose a new
+  exact subpattern; do not reuse the pre-PG512 candidate queue.

@@ -4446,6 +4446,43 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["amount"], 3)
         self.assertEqual(effect["target"], "any_target")
 
+    def test_fixed_damage_spell_maps_nonred_and_nonwhite_creature_targets(self) -> None:
+        cases = [
+            (
+                "Strafe",
+                "Strafe deals 3 damage to target nonred creature.",
+                'new FilterCreaturePermanent("nonred creature");'
+                "filter.add(Predicates.not(new ColorPredicate(ObjectColor.RED)));",
+                {"card_types": ["creature"], "exclude_colors": ["R"]},
+            ),
+            (
+                "Sunlance",
+                "Sunlance deals 3 damage to target nonwhite creature.",
+                'new FilterCreaturePermanent("nonwhite creature");'
+                "filter.add(Predicates.not(new ColorPredicate(ObjectColor.WHITE)));",
+                {"card_types": ["creature"], "exclude_colors": ["W"]},
+            ),
+        ]
+        for name, oracle, source_filter, constraints in cases:
+            with self.subTest(card=name):
+                row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"], xmage_signals=["targeting"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, type_line="Sorcery", oracle_text=oracle),
+                    source_text=(
+                        source_filter
+                        + "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                        + "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    ),
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCOPE)
+                self.assertEqual(effect["amount"], 3)
+                self.assertEqual(effect["target"], "creature")
+                self.assertEqual(effect["target_constraints"], constraints)
+
     def test_fixed_damage_spell_maps_creature_sacrifice_additional_cost(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(

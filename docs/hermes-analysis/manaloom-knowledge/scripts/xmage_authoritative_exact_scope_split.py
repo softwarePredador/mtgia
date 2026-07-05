@@ -7583,6 +7583,8 @@ def restricted_target_base(target: str) -> str:
         "flying_creature",
         "nonblack_creature",
         "nongreen_creature",
+        "nonred_creature",
+        "nonwhite_creature",
         "black_creature",
         "white_creature",
         "blue_creature",
@@ -7685,6 +7687,8 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target nonartifact creature", "nonartifact_creature"),
         (r"target nonblack creature(?:\. it can't be regenerated)?", "nonblack_creature"),
         (r"target nongreen creature(?:\. it can't be regenerated)?", "nongreen_creature"),
+        (r"target nonred creature", "nonred_creature"),
+        (r"target nonwhite creature", "nonwhite_creature"),
         (r"target black creature", "black_creature"),
         (r"target artifact creature", "artifact_creature"),
         (r"target green or white creature", "green_or_white_creature"),
@@ -7794,6 +7798,18 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         or "nongreen creature" in text
     ):
         return "nongreen_creature"
+    if (
+        'FilterCreaturePermanent("nonred creature")' in text
+        or "nonred creature" in text
+        or ("ObjectColor.RED" in text and "Predicates.not" in text and "ColorPredicate" in text)
+    ):
+        return "nonred_creature"
+    if (
+        'FilterCreaturePermanent("nonwhite creature")' in text
+        or "nonwhite creature" in text
+        or ("ObjectColor.WHITE" in text and "Predicates.not" in text and "ColorPredicate" in text)
+    ):
+        return "nonwhite_creature"
     if 'FilterCreaturePermanent("black creature")' in text or "black creature" in text:
         return "black_creature"
     if 'FilterCreaturePermanent("green or white creature")' in text or "green or white creature" in text:
@@ -13500,6 +13516,10 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "exclude_colors": ["B"]}
     if target == "nongreen_creature":
         return {"card_types": ["creature"], "exclude_colors": ["G"]}
+    if target == "nonred_creature":
+        return {"card_types": ["creature"], "exclude_colors": ["R"]}
+    if target == "nonwhite_creature":
+        return {"card_types": ["creature"], "exclude_colors": ["W"]}
     if target == "black_creature":
         return {"card_types": ["creature"], "target_colors": ["B"]}
     if target == "white_creature":
