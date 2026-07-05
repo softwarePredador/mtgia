@@ -57,6 +57,12 @@ def _preflight(*, governed=True):
     }
 
 
+def _legacy_preflight():
+    payload = _preflight()
+    payload["summary"]["route_planner_status"] = pkg.LEGACY_TARGET_ROUTE_PLANNER_STATUS
+    return payload
+
+
 def test_proposed_rule_uses_current_oracle_hash_and_brain_scope() -> None:
     rule = pkg.build_proposed_rule(_exact_contract())
 
@@ -114,6 +120,20 @@ def test_ungoverned_runtime_preflight_blocks_apply_readiness() -> None:
     assert manifest["summary"]["runtime_preflight_route_gate_valid"] is False
     assert manifest["summary"]["recommended_next_action"] == (
         "rerun_governed_brain_runtime_cut_preflight_before_pg_package"
+    )
+
+
+def test_legacy_route_planner_status_remains_apply_ready() -> None:
+    manifest = pkg.build_manifest(
+        exact_contract=_exact_contract(),
+        preflight=_legacy_preflight(),
+        paths={},
+    )
+
+    assert manifest["status"] == "prepared_read_only_pending_apply_approval"
+    assert manifest["summary"]["apply_ready_for_manual_review"] is True
+    assert manifest["summary"]["runtime_preflight_route_planner_status"] == (
+        pkg.LEGACY_TARGET_ROUTE_PLANNER_STATUS
     )
 
 

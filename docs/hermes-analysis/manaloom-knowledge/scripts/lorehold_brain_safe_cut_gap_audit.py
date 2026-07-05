@@ -35,7 +35,11 @@ BRAIN = "Brain in a Jar"
 TARGET_RUNTIME_PREFLIGHT_STATUS = (
     "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607"
 )
-TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_package_review_keep_607"
+LEGACY_TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_package_review_keep_607"
+TARGET_ROUTE_PLANNER_STATUS = (
+    "miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607"
+)
+TARGET_ROUTE_PLANNER_STATUSES = {TARGET_ROUTE_PLANNER_STATUS, LEGACY_TARGET_ROUTE_PLANNER_STATUS}
 TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
 TOPDECK_CORE_ANCHORS = {
     "Sensei's Divining Top",
@@ -305,7 +309,7 @@ def package_runtime_preflight_governed(package_summary: Mapping[str, Any]) -> bo
     return (
         package_summary.get("runtime_preflight_status") == TARGET_RUNTIME_PREFLIGHT_STATUS
         and bool(package_summary.get("runtime_preflight_route_gate_valid"))
-        and package_summary.get("runtime_preflight_route_planner_status") == TARGET_ROUTE_PLANNER_STATUS
+        and package_summary.get("runtime_preflight_route_planner_status") in TARGET_ROUTE_PLANNER_STATUSES
         and bool(package_summary.get("runtime_preflight_candidate_queue_governed"))
         and package_summary.get("runtime_preflight_candidate_queue_next_shell_status")
         == TARGET_NEXT_SHELL_STATUS

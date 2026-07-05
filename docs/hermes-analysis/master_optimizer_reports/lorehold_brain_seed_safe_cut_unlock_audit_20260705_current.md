@@ -1,6 +1,6 @@
 # Lorehold Brain in a Jar Seed-Safe Cut Unlock Audit
 
-- Generated at: `2026-07-05T09:57:31Z`
+- Generated at: `2026-07-05T10:07:36Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`

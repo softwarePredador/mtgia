@@ -42,7 +42,11 @@ DEFAULT_OUT_PREFIX = (
 
 BRAIN = "Brain in a Jar"
 BRAIN_LANE = "topdeck_miracle_engine"
-TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_package_review_keep_607"
+LEGACY_TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_package_review_keep_607"
+TARGET_ROUTE_PLANNER_STATUS = (
+    "miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607"
+)
+TARGET_ROUTE_PLANNER_STATUSES = {TARGET_ROUTE_PLANNER_STATUS, LEGACY_TARGET_ROUTE_PLANNER_STATUS}
 TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
 TARGET_MATRIX_CONTRACT = "miracle_access_first_shell_contract"
 BRAIN_SAME_LANE_PRIORITY = {
@@ -167,7 +171,7 @@ def brain_route_row(route_planner: Mapping[str, Any]) -> dict[str, Any]:
 def route_planner_governed(route_planner: Mapping[str, Any]) -> bool:
     route_summary = summary(route_planner)
     return bool(
-        route_summary.get("decision_status") == TARGET_ROUTE_PLANNER_STATUS
+        route_summary.get("decision_status") in TARGET_ROUTE_PLANNER_STATUSES
         and route_summary.get("selected_card") == BRAIN
         and route_summary.get("candidate_queue_matrix_route_governed") is True
         and route_summary.get("candidate_queue_matrix_next_shell_status") == TARGET_NEXT_SHELL_STATUS

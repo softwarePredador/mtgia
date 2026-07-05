@@ -85,6 +85,14 @@ def _package(*, active_rules=0, ready=True, applied=False):
     }
 
 
+def _legacy_package():
+    payload = _package()
+    payload["summary"]["runtime_preflight_route_planner_status"] = (
+        audit.LEGACY_TARGET_ROUTE_PLANNER_STATUS
+    )
+    return payload
+
+
 def _value_model():
     return {"summary": {"deck_id": 607, "quantity_total": 100}}
 
@@ -151,6 +159,18 @@ def test_ready_package_without_governed_route_blocks_pg_review_path() -> None:
         "rerun_governed_brain_runtime_and_package_preflight"
     )
     assert payload["summary"]["matrix_scoring_allowed_now"] is False
+
+
+def test_legacy_route_planner_status_keeps_pg_route_governed() -> None:
+    payload = _build(brain_pg_package=_legacy_package())
+
+    assert payload["summary"]["decision_status"] == (
+        "brain_safe_cut_gap_no_active_rule_no_seed_safe_cut_keep_607"
+    )
+    assert payload["summary"]["brain_pg_package_route_governed"] is True
+    assert payload["summary"]["runtime_preflight_route_planner_status"] == (
+        audit.LEGACY_TARGET_ROUTE_PLANNER_STATUS
+    )
 
 
 def test_external_brain_signal_is_low_context_not_staple_proof() -> None:

@@ -24,6 +24,12 @@ def _route_planner(*, governed=True):
     }
 
 
+def _legacy_route_planner():
+    payload = _route_planner()
+    payload["summary"]["decision_status"] = brain.LEGACY_TARGET_ROUTE_PLANNER_STATUS
+    return payload
+
+
 def _runtime_contract(*, active_rules=0, include_brain=True):
     contracts = []
     if include_brain:
@@ -257,6 +263,16 @@ def test_ungoverned_route_planner_blocks_preflight() -> None:
     )
     assert payload["decision"]["active_rule_required_before_battle"] is False
     assert payload["decision"]["named_safe_cut_required_before_scoring"] is False
+
+
+def test_legacy_route_planner_status_remains_governed() -> None:
+    payload = _build(route_planner=_legacy_route_planner())
+
+    assert payload["summary"]["route_gate_valid"] is True
+    assert payload["summary"]["route_planner_status"] == brain.LEGACY_TARGET_ROUTE_PLANNER_STATUS
+    assert payload["summary"]["decision_status"] == (
+        "brain_in_a_jar_runtime_cut_preflight_blocked_no_active_rule_no_safe_cut_keep_607"
+    )
 
 
 def test_markdown_surfaces_brain_sources_and_closed_gates() -> None:

@@ -1766,14 +1766,14 @@ Miracle next route planner refreshed on 2026-07-05:
 - JSON:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_next_route_planner_20260705_current.json`.
 - Status:
-  `miracle_next_route_planner_selected_brain_package_review_keep_607`.
+  `miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607`.
 - Candidate queue gate:
   `candidate_queue_matrix_route_governed=true`,
   `candidate_queue_matrix_next_shell_status=next_shell_cut_path_closed_route_miracle_access_first_keep_607`,
   and `candidate_queue_scoreable_row_count=0`.
 - Selected route:
   `Brain in a Jar`, lane `topdeck_miracle_access`, route state
-  `brain_package_prepared_no_active_rule_no_seed_safe_cut`, learning score
+  `brain_floor_traces_protect_all_cut_slots_no_seed_safe_cut`, learning score
   `110`.
 - Brain package state:
   `prepared_read_only_pending_apply_approval`, with
@@ -1784,6 +1784,9 @@ Miracle next route planner refreshed on 2026-07-05:
   `named_seed_safe_cut_count=0`, Entreat safe cuts `0`, Entreat active rule
   rows `0`, matrix scoring `false`, natural battle `false`, deck action
   `false`, PostgreSQL writes `false`, and promotion `false`.
+- Brain unlock audit:
+  `brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607`, with
+  unlockable cuts `0` and targeted floor trace missing slots `0`.
 
 Operational lesson:
 
@@ -1791,7 +1794,7 @@ Operational lesson:
 - The planner must block route selection when the candidate queue is not
   governed by the routed miracle-access matrix.
 - The next allowed work is:
-  `review_brain_pg_package_then_request_explicit_apply_or_continue_seed_safe_cut_mining_no_deck_action`.
+  `continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action`.
 
 Brain route-governed runtime/package preflight refreshed on 2026-07-05:
 
@@ -1807,7 +1810,7 @@ Brain route-governed runtime/package preflight refreshed on 2026-07-05:
   gated.
 - Route gate:
   `route_gate_valid=true`,
-  `route_planner_status=miracle_next_route_planner_selected_brain_package_review_keep_607`,
+  `route_planner_status=miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607`,
   `route_planner_candidate_queue_governed=true`,
   and
   `route_planner_candidate_queue_next_shell_status=next_shell_cut_path_closed_route_miracle_access_first_keep_607`.
@@ -1846,7 +1849,7 @@ Brain seed-safe cut unlock audit added on 2026-07-05:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_cut_slot_trace_miner_20260705_current.md`.
   The unlock audit consumes the compact summary JSON:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_brain_cut_slot_trace_miner_20260705_current_summary.json`.
-  It scanned `964` gate reports and `171` game-result reports, found floor
+  It scanned `966` gate reports and `171` game-result reports, found floor
   trace for all `9` current Brain cut slots, and produced `1435` same-slot
   607-win/candidate-loss traces with `1128` positive target deltas.
 - A low-exposure slot is not a safe cut. `Molecule Man` is only the diagnostic

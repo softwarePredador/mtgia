@@ -172,6 +172,35 @@ def _brain_safe_cut_gap(*, present=True, governed=True, active_rules=0, safe_cut
     }
 
 
+def _brain_unlock_audit(
+    *,
+    present=True,
+    governed=True,
+    active_rules=0,
+    safe_cuts=0,
+    unlockable=0,
+    targeted_missing=0,
+):
+    if not present:
+        return {}
+    return {
+        "summary": {
+            "decision_status": planner.BRAIN_UNLOCK_AUDIT_STATUS,
+            "brain_pg_package_route_governed": governed,
+            "brain_active_rule_count": active_rules,
+            "safe_cut_count": safe_cuts,
+            "unlockable_now_count": unlockable,
+            "targeted_floor_trace_missing_slot_count": targeted_missing,
+            "matrix_scoring_allowed_now": False,
+            "candidate_deck_materialization_allowed_now": False,
+            "natural_battle_gate_allowed_now": False,
+            "promotion_allowed_now": False,
+            "deck_action_allowed_now": False,
+            "recommended_next_action": planner.BRAIN_FLOOR_PROTECTED_ROUTE_PLANNER_ACTION,
+        }
+    }
+
+
 def _paths():
     return {"post_identity": Path("/tmp/post_identity.json")}
 
@@ -184,15 +213,16 @@ def _build(**overrides):
         entreat_scout=overrides.get("entreat_scout", _entreat_scout()),
         cut_miner=overrides.get("cut_miner", _cut_miner()),
         brain_safe_cut_gap=overrides.get("brain_safe_cut_gap", _brain_safe_cut_gap()),
+        brain_unlock_audit=overrides.get("brain_unlock_audit", _brain_unlock_audit()),
         paths=_paths(),
     )
 
 
-def test_current_like_state_selects_brain_package_review_without_deck_action() -> None:
+def test_current_like_state_selects_brain_floor_protected_route_without_deck_action() -> None:
     payload = _build()
 
     assert payload["summary"]["decision_status"] == (
-        planner.BRAIN_ROUTE_PLANNER_STATUS
+        planner.BRAIN_FLOOR_PROTECTED_ROUTE_PLANNER_STATUS
     )
     assert payload["summary"]["candidate_queue_matrix_route_governed"] is True
     assert payload["summary"]["candidate_queue_matrix_next_shell_status"] == (
@@ -200,20 +230,37 @@ def test_current_like_state_selects_brain_package_review_without_deck_action() -
     )
     assert payload["summary"]["selected_card"] == "Brain in a Jar"
     assert payload["summary"]["selected_route_state"] == (
-        "brain_package_prepared_no_active_rule_no_seed_safe_cut"
+        planner.BRAIN_FLOOR_PROTECTED_ROUTE_STATE
     )
     assert payload["summary"]["brain_pg_package_route_governed"] is True
     assert payload["summary"]["brain_apply_ready_for_manual_review"] is True
     assert payload["summary"]["brain_active_rule_count"] == 0
     assert payload["summary"]["brain_safe_cut_count"] == 0
+    assert payload["summary"]["brain_unlock_audit_status"] == planner.BRAIN_UNLOCK_AUDIT_STATUS
+    assert payload["summary"]["brain_unlockable_now_count"] == 0
+    assert payload["summary"]["brain_targeted_floor_trace_missing_slot_count"] == 0
     assert payload["summary"]["candidate_deck_materialization_allowed_now"] is False
     assert payload["summary"]["natural_battle_gate_allowed_now"] is False
     assert payload["decision"]["deck_action_allowed"] is False
     assert payload["decision"]["postgres_writes_allowed"] is False
 
 
+def test_missing_unlock_audit_falls_back_to_brain_package_review() -> None:
+    payload = _build(brain_unlock_audit=_brain_unlock_audit(present=False))
+
+    assert payload["summary"]["decision_status"] == planner.BRAIN_ROUTE_PLANNER_STATUS
+    assert payload["summary"]["selected_card"] == "Brain in a Jar"
+    assert payload["summary"]["selected_route_state"] == (
+        "brain_package_prepared_no_active_rule_no_seed_safe_cut"
+    )
+    assert payload["summary"]["recommended_next_action"] == planner.BRAIN_ROUTE_PLANNER_ACTION
+
+
 def test_missing_brain_progress_artifact_uses_old_runtime_learning_route() -> None:
-    payload = _build(brain_safe_cut_gap=_brain_safe_cut_gap(present=False))
+    payload = _build(
+        brain_safe_cut_gap=_brain_safe_cut_gap(present=False),
+        brain_unlock_audit=_brain_unlock_audit(present=False),
+    )
 
     assert payload["summary"]["decision_status"] == (
         "miracle_next_route_planner_selected_brain_runtime_learning_keep_607"
@@ -278,6 +325,7 @@ def test_markdown_surfaces_selected_route_and_closed_gates() -> None:
     assert "Selected card: `Brain in a Jar`" in markdown
     assert "Deck 607 mutated: `false`" in markdown
     assert "Natural battle gate allowed now: `false`" in markdown
-    assert planner.BRAIN_ROUTE_PLANNER_ACTION in markdown
+    assert planner.BRAIN_FLOOR_PROTECTED_ROUTE_PLANNER_ACTION in markdown
     assert "Brain PG package route governed: `true`" in markdown
+    assert "Brain targeted floor trace missing slots: `0`" in markdown
     assert "https://scryfall.com/card/soi/252/brain-in-a-jar" in markdown

@@ -47,7 +47,11 @@ BRAIN_SCOPE = "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1"
 TARGET_RUNTIME_PREFLIGHT_STATUS = (
     "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607"
 )
-TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_package_review_keep_607"
+LEGACY_TARGET_ROUTE_PLANNER_STATUS = "miracle_next_route_planner_selected_brain_package_review_keep_607"
+TARGET_ROUTE_PLANNER_STATUS = (
+    "miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607"
+)
+TARGET_ROUTE_PLANNER_STATUSES = {TARGET_ROUTE_PLANNER_STATUS, LEGACY_TARGET_ROUTE_PLANNER_STATUS}
 TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
 BACKUP_TABLE = (
     "manaloom_deploy_audit."
@@ -485,7 +489,7 @@ def runtime_preflight_governed(preflight: Mapping[str, Any]) -> bool:
         bool(preflight)
         and (preflight.get("status") or summary.get("decision_status")) == TARGET_RUNTIME_PREFLIGHT_STATUS
         and bool(summary.get("route_gate_valid"))
-        and summary.get("route_planner_status") == TARGET_ROUTE_PLANNER_STATUS
+        and summary.get("route_planner_status") in TARGET_ROUTE_PLANNER_STATUSES
         and bool(summary.get("route_planner_candidate_queue_governed"))
         and summary.get("route_planner_candidate_queue_next_shell_status") == TARGET_NEXT_SHELL_STATUS
         and bool(summary.get("candidate_queue_matrix_route_governed"))

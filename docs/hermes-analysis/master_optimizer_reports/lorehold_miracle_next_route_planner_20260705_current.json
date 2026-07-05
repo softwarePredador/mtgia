@@ -11,15 +11,15 @@
       "do_not_mutate_deck_607",
       "do_not_materialize_candidate_deck_from_route_planner_output",
       "do_not_run_natural_battle_from_route_planner_output",
-      "review_brain_pg_package_then_request_explicit_apply_or_continue_seed_safe_cut_mining_no_deck_action",
+      "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action",
       "rerun deckbuilding contract surface audit after generating the route report"
     ],
     "postgres_writes_allowed": false,
     "promotion_allowed": false,
-    "reason": "Brain in a Jar is no longer at the draft-runtime step: the current package is review-ready but still has no active PostgreSQL rule and no seed-safe cut. Deck 607 stays protected."
+    "reason": "Brain in a Jar now has targeted floor trace evidence for every current 607 cut slot. That evidence protects the slots rather than unlocking a seed-safe cut, so the planner keeps 607 and routes only to continued learning or explicit PG review."
   },
   "deck_607_mutated": false,
-  "generated_at": "2026-07-05T09:30:24Z",
+  "generated_at": "2026-07-05T10:07:40Z",
   "postgres_writes": false,
   "route_rows": [
     {
@@ -45,11 +45,11 @@
         "topdeck_miracle_access",
         "turn_cycle_miracle_mana"
       ],
-      "next_action": "review_brain_pg_package_then_request_explicit_apply_or_continue_seed_safe_cut_mining_no_deck_action",
+      "next_action": "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action",
       "priority_rank": 1,
       "required_contract": "single_card_runtime_contract_then_cut_safety",
       "route_class": "runtime_or_manual_review",
-      "route_state": "brain_package_prepared_no_active_rule_no_seed_safe_cut",
+      "route_state": "brain_floor_traces_protect_all_cut_slots_no_seed_safe_cut",
       "runtime_readiness": "blocked_requires_new_runtime_family",
       "runtime_slice_count": 5,
       "xmage_class_found": true
@@ -193,11 +193,11 @@
       "topdeck_miracle_access",
       "turn_cycle_miracle_mana"
     ],
-    "next_action": "review_brain_pg_package_then_request_explicit_apply_or_continue_seed_safe_cut_mining_no_deck_action",
+    "next_action": "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action",
     "priority_rank": 1,
     "required_contract": "single_card_runtime_contract_then_cut_safety",
     "route_class": "runtime_or_manual_review",
-    "route_state": "brain_package_prepared_no_active_rule_no_seed_safe_cut",
+    "route_state": "brain_floor_traces_protect_all_cut_slots_no_seed_safe_cut",
     "runtime_readiness": "blocked_requires_new_runtime_family",
     "runtime_slice_count": 5,
     "xmage_class_found": true
@@ -238,7 +238,7 @@
       "runtime_preflight_candidate_queue_matrix_route_governed": true,
       "runtime_preflight_candidate_queue_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
       "runtime_preflight_route_gate_valid": true,
-      "runtime_preflight_route_planner_status": "miracle_next_route_planner_selected_brain_package_review_keep_607",
+      "runtime_preflight_route_planner_status": "miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607",
       "runtime_preflight_status": "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607",
       "safe_cut_count": 0,
       "same_lane_candidate_count": 9,
@@ -256,6 +256,39 @@
         "protected_cut": 4,
         "structural_dependency": 3
       }
+    },
+    "brain_seed_safe_cut_unlock_summary": {
+      "blocked_same_lane_cut_count": 9,
+      "brain_active_rule_count": 0,
+      "brain_apply_executed_by_this_script": false,
+      "brain_apply_ready_for_manual_review": true,
+      "brain_pg_package_route_governed": true,
+      "brain_pg_package_status": "prepared_read_only_pending_apply_approval",
+      "brain_safe_cut_gap_status": "brain_safe_cut_gap_no_active_rule_no_seed_safe_cut_keep_607",
+      "candidate_deck_materialization_allowed_now": false,
+      "current_best_protected_baseline_rank": 1,
+      "current_best_status": "current_best_baseline_synthesis_keep_607",
+      "current_best_top_deck_is_607": true,
+      "decision_status": "brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "diagnostic_focus_card": "Molecule Man",
+      "diagnostic_focus_unlock_class": "diagnostic_only_prior_reject_requires_new_trace",
+      "matrix_scoring_allowed_now": false,
+      "missing_inputs": [],
+      "natural_battle_gate_allowed_now": false,
+      "postgres_writes_allowed_now": false,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action",
+      "safe_cut_count": 0,
+      "slot_count": 9,
+      "targeted_floor_trace_missing_slot_count": 0,
+      "unlock_class_counts": {
+        "diagnostic_only_prior_reject_requires_new_trace": 2,
+        "locked_no_unlock_current_607_contract": 2,
+        "protected_floor_requires_floor_replacement_trace": 2,
+        "protected_topdeck_anchor_requires_role_preservation": 3
+      },
+      "unlockable_now_count": 0
     },
     "candidate_queue_summary": {
       "blocked_candidate_row_count": 5,
@@ -427,13 +460,14 @@
   },
   "source_reports": {
     "brain_safe_cut_gap": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_safe_cut_gap_audit_20260705_current.json",
+    "brain_unlock_audit": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_seed_safe_cut_unlock_audit_20260705_current.json",
     "candidate_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_candidate_row_queue_20260705_current_relearn.json",
     "cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json",
     "entreat_scout": "docs/hermes-analysis/master_optimizer_reports/lorehold_entreat_same_lane_cut_scout_20260705_current.json",
     "post_identity": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_identity_queue_split_20260705_current.json",
     "runtime_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_entreat_haze_runtime_contract_20260705_current.json"
   },
-  "status": "miracle_next_route_planner_selected_brain_package_review_keep_607",
+  "status": "miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607",
   "summary": {
     "brain_active_rule_count": 0,
     "brain_apply_executed_by_this_script": false,
@@ -441,13 +475,17 @@
     "brain_pg_package_route_governed": true,
     "brain_pg_package_status": "prepared_read_only_pending_apply_approval",
     "brain_safe_cut_count": 0,
+    "brain_targeted_floor_trace_missing_slot_count": 0,
+    "brain_unlock_audit_status": "brain_seed_safe_cut_unlock_audit_closed_no_unlockable_cut_keep_607",
+    "brain_unlock_recommended_next_action": "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action",
+    "brain_unlockable_now_count": 0,
     "candidate_deck_materialization_allowed_now": false,
     "candidate_queue_matrix_fallback_route_key": "miracle_access_first_shell_contract",
     "candidate_queue_matrix_next_shell_status": "next_shell_cut_path_closed_route_miracle_access_first_keep_607",
     "candidate_queue_matrix_route_governed": true,
     "candidate_queue_scoreable_row_count": 0,
     "candidate_queue_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
-    "decision_status": "miracle_next_route_planner_selected_brain_package_review_keep_607",
+    "decision_status": "miracle_next_route_planner_selected_brain_floor_protected_no_seed_safe_cut_keep_607",
     "deck_action_allowed_now": false,
     "entreat_active_rule_count": 0,
     "entreat_safe_cut_count": 0,
@@ -456,14 +494,14 @@
     "natural_battle_gate_allowed_now": false,
     "postgres_writes_allowed_now": false,
     "promotion_allowed_now": false,
-    "recommended_next_action": "review_brain_pg_package_then_request_explicit_apply_or_continue_seed_safe_cut_mining_no_deck_action",
+    "recommended_next_action": "continue_seed_safe_cut_discovery_or_request_explicit_brain_pg_apply_review_no_deck_action",
     "route_candidate_count": 5,
     "selected_card": "Brain in a Jar",
     "selected_lane": "topdeck_miracle_access",
     "selected_learning_score": 110,
-    "selected_route_state": "brain_package_prepared_no_active_rule_no_seed_safe_cut",
+    "selected_route_state": "brain_floor_traces_protect_all_cut_slots_no_seed_safe_cut",
     "state_counts": {
-      "brain_package_prepared_no_active_rule_no_seed_safe_cut": 1,
+      "brain_floor_traces_protect_all_cut_slots_no_seed_safe_cut": 1,
       "combo_package_runtime_lesson": 1,
       "defer_lower_priority_runtime_review": 2,
       "parked_entreat_no_safe_cut": 1
