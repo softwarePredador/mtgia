@@ -1,0 +1,2927 @@
+{
+  "cut_slots": [
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Creative Technique",
+      "cut_safety_decision": "manual_review",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "risky_cut_only_same_lane",
+      "direct_event_count": 54,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "big_spell_value",
+      "manual_status": "same_lane_only",
+      "normalized_name": "creative technique",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 42,
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 58
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Bender's Waterskin",
+      "cut_safety_decision": "flex_but_cut_risky",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "risky_cut_only_same_lane",
+      "direct_event_count": 216,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "early_mana",
+      "manual_status": "same_lane_only",
+      "normalized_name": "bender s waterskin",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 268
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "card_name": "Radiant Summit",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 7,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "radiant summit",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 103,
+      "status": "blocked",
+      "unique_exposure_count": 7
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Call Forth the Tempest",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 4,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "normalized_name": "call forth the tempest",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Elegant Parlor",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 8,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "elegant parlor",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature"
+      ],
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 7,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "recursion_engine",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "pinnacle monk mystic peak",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "card_name": "Turbulent Steppe",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 8,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "turbulent steppe",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "card_name": "Redirect Lightning",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 1,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "spot_removal",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "redirect lightning",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 101,
+      "status": "blocked",
+      "unique_exposure_count": 9
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Spectator Seating",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 9,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "spectator seating",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 101,
+      "status": "blocked",
+      "unique_exposure_count": 9
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Hit the Mother Lode",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 7,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "draw_filter_value",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "hit the mother lode",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 99,
+      "status": "blocked",
+      "unique_exposure_count": 11
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Windswept Heath",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 11,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "windswept heath",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 99,
+      "status": "blocked",
+      "unique_exposure_count": 11
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Arid Mesa",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 13,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "arid mesa",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 97,
+      "status": "blocked",
+      "unique_exposure_count": 13
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "War Room",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 13,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "war room",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 97,
+      "status": "blocked",
+      "unique_exposure_count": 13
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Exotic Orchard",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 14,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "exotic orchard",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 96,
+      "status": "blocked",
+      "unique_exposure_count": 14
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Prismatic Vista",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 14,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "prismatic vista",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 96,
+      "status": "blocked",
+      "unique_exposure_count": 14
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Battlefield Forge",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 15,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "battlefield forge",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 95,
+      "status": "blocked",
+      "unique_exposure_count": 15
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Flawless Maneuver",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 12,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "normalized_name": "flawless maneuver",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 94,
+      "status": "blocked",
+      "unique_exposure_count": 16
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Dawn's Truce",
+      "cut_safety_decision": "core_engine_or_probation",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "locked_do_not_cut",
+      "direct_event_count": 1,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "hand_filter",
+      "manual_status": "blocked_by_cut_safety",
+      "normalized_name": "dawn s truce",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 93,
+      "status": "blocked",
+      "unique_exposure_count": 17
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Plaza of Heroes",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 17,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "plaza of heroes",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 93,
+      "status": "blocked",
+      "unique_exposure_count": 17
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Tibalt's Trickery",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 0,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "tibalt s trickery",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 93,
+      "status": "blocked",
+      "unique_exposure_count": 17
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Command Beacon",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 18,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "command beacon",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 92,
+      "status": "blocked",
+      "unique_exposure_count": 18
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Flooded Strand",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 18,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "flooded strand",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 92,
+      "status": "blocked",
+      "unique_exposure_count": 18
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Insurrection",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 22,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "normalized_name": "insurrection",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 87,
+      "status": "blocked",
+      "unique_exposure_count": 23
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Reforge the Soul",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 15,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "draw_filter_value",
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "reforge the soul",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 87,
+      "status": "blocked",
+      "unique_exposure_count": 23
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Teferi's Protection",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 12,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "normalized_name": "teferi s protection",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 86,
+      "status": "blocked",
+      "unique_exposure_count": 24
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Storm Herd",
+      "cut_safety_decision": "finisher_benchmark_lane",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "locked_do_not_cut",
+      "direct_event_count": 20,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "big_spell_value",
+      "manual_status": "blocked_by_cut_safety",
+      "normalized_name": "storm herd",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 75,
+      "status": "blocked",
+      "unique_exposure_count": 25
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Marsh Flats",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 29,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "marsh flats",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 71,
+      "status": "blocked",
+      "unique_exposure_count": 29
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Sunbaked Canyon",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 30,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "sunbaked canyon",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 70,
+      "status": "blocked",
+      "unique_exposure_count": 30
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Bloodstained Mire",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 31,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "bloodstained mire",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 69,
+      "status": "blocked",
+      "unique_exposure_count": 31
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Reliquary Tower",
+      "cut_safety_decision": "mana_base_core",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "locked_do_not_cut",
+      "direct_event_count": 31,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "reliquary tower",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 69,
+      "status": "blocked",
+      "unique_exposure_count": 31
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Tempt with Bunnies",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 3,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "draw_filter_value",
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "normalized_name": "tempt with bunnies",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 69,
+      "status": "blocked",
+      "unique_exposure_count": 31
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Sunbillow Verge",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 32,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "sunbillow verge",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 68,
+      "status": "blocked",
+      "unique_exposure_count": 32
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Unexpected Windfall",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 25,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "discard_ramp_value",
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "normalized_name": "unexpected windfall",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 67,
+      "status": "blocked",
+      "unique_exposure_count": 33
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Everything Comes to Dust",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 31,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "board_wipe_pressure_reset",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "normalized_name": "everything comes to dust",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 66,
+      "status": "blocked",
+      "unique_exposure_count": 34
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Scalding Tarn",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 38,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "scalding tarn",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 62,
+      "status": "blocked",
+      "unique_exposure_count": 38
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Ancient Tomb",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 39,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "tutor_access",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "ancient tomb",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 61,
+      "status": "blocked",
+      "unique_exposure_count": 39
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Big Score",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 33,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "discard_ramp_value",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "big score",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 60,
+      "status": "blocked",
+      "unique_exposure_count": 40
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Stroke of Midnight",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 32,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "spot_removal",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "stroke of midnight",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 57,
+      "status": "blocked",
+      "unique_exposure_count": 43
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Jeska's Will",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_source_section": "untested_flex_pool",
+      "cut_safety_status": "core_support",
+      "direct_event_count": 6,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "jeska s will",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 56,
+      "status": "blocked",
+      "unique_exposure_count": 44
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Wooded Foothills",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 44,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "wooded foothills",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 56,
+      "status": "blocked",
+      "unique_exposure_count": 44
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Sacred Foundry",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 46,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "sacred foundry",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 54,
+      "status": "blocked",
+      "unique_exposure_count": 46
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Generous Gift",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 19,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "spot_removal",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "normalized_name": "generous gift",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 48,
+      "status": "blocked",
+      "unique_exposure_count": 52
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Promise of Loyalty",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 46,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "board_wipe_pressure_reset",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "promise of loyalty",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 47,
+      "status": "blocked",
+      "unique_exposure_count": 53
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Improvisation Capstone",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 49,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "draw_filter_value",
+      "lane": "draw",
+      "manual_status": "structural_dependency",
+      "normalized_name": "improvisation capstone",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 41,
+      "status": "blocked",
+      "unique_exposure_count": 59
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Winds of Abandon",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 32,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "spot_removal",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "winds of abandon",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 41,
+      "status": "blocked",
+      "unique_exposure_count": 59
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Rise of the Eldrazi",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 48,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "spot_removal",
+      "lane": "removal",
+      "manual_status": "structural_dependency",
+      "normalized_name": "rise of the eldrazi",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 40,
+      "status": "blocked",
+      "unique_exposure_count": 60
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Boros Signet",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_source_section": "untested_flex_pool",
+      "cut_safety_status": "core_support",
+      "direct_event_count": 14,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "boros signet",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 35,
+      "status": "blocked",
+      "unique_exposure_count": 65
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Prismari Pianist",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 40,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "wincon",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "prismari pianist",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 35,
+      "status": "blocked",
+      "unique_exposure_count": 65
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "High Noon",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 2,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "high noon",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 34,
+      "status": "blocked",
+      "unique_exposure_count": 66
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Talisman of Conviction",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_source_section": "untested_flex_pool",
+      "cut_safety_status": "core_support",
+      "direct_event_count": 0,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "talisman of conviction",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 31,
+      "status": "blocked",
+      "unique_exposure_count": 69
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Giver of Runes",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 12,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "normalized_name": "giver of runes",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 28,
+      "status": "blocked",
+      "unique_exposure_count": 72
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Monument to Endurance",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 19,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "discard_ramp_value",
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "normalized_name": "monument to endurance",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 27,
+      "status": "blocked",
+      "unique_exposure_count": 73
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Swiftfoot Boots",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 2,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "normalized_name": "swiftfoot boots",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 27,
+      "status": "blocked",
+      "unique_exposure_count": 73
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Glittering Massif",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 75,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "glittering massif",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 25,
+      "status": "blocked",
+      "unique_exposure_count": 75
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protected_cut"
+      ],
+      "card_name": "Tragic Arrogance",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 72,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "board_wipe_pressure_reset",
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "tragic arrogance",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 20,
+      "status": "blocked",
+      "unique_exposure_count": 80
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Lightning Greaves",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 34,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "normalized_name": "lightning greaves",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 15,
+      "status": "blocked",
+      "unique_exposure_count": 85
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 82,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "token_protection_rebuild",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "emeria s call emeria shattered skyclave",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 14,
+      "status": "blocked",
+      "unique_exposure_count": 86
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Fellwar Stone",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_source_section": "untested_flex_pool",
+      "cut_safety_status": "core_support",
+      "direct_event_count": 1,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "fellwar stone",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 14,
+      "status": "blocked",
+      "unique_exposure_count": 86
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "card_name": "Mother of Runes",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 24,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "mother of runes",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 11,
+      "status": "blocked",
+      "unique_exposure_count": 89
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Command Tower",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 93,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "tutor_access",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "command tower",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 7,
+      "status": "blocked",
+      "unique_exposure_count": 93
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Hexing Squelcher",
+      "cut_safety_decision": "flex_cut_tested_negative",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "locked_do_not_cut",
+      "direct_event_count": 17,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "contextual",
+      "manual_status": "blocked_by_cut_safety",
+      "normalized_name": "hexing squelcher",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 7,
+      "status": "blocked",
+      "unique_exposure_count": 93
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Eiganjo, Seat of the Empire",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 96,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "eiganjo seat of the empire",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 4,
+      "status": "blocked",
+      "unique_exposure_count": 96
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Mizzix's Mastery",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 76,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "normalized_name": "mizzix s mastery",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 3,
+      "status": "blocked",
+      "unique_exposure_count": 97
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Approach of the Second Sun",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 82,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "normalized_name": "approach of the second sun",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 140
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Arcane Signet",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_source_section": "untested_flex_pool",
+      "cut_safety_status": "core_support",
+      "direct_event_count": 114,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "arcane signet",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 195
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Artist's Talent",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 500,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "draw_filter_value",
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "artist s talent",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 535
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protection_shell"
+      ],
+      "card_name": "Avatar's Wrath",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 74,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "avatar s wrath",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 118
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Blasphemous Act",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 218,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "board_wipe_pressure_reset",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "normalized_name": "blasphemous act",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 368
+    },
+    {
+      "blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Deflecting Swat",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 43,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "spot_removal",
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "normalized_name": "deflecting swat",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 126
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Esper Sentinel",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 442,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "draw_filter_value",
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "normalized_name": "esper sentinel",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 527
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Farewell",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 195,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "board_wipe_pressure_reset",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "normalized_name": "farewell",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 231
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Fated Clash",
+      "cut_safety_decision": "core_support",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "locked_do_not_cut",
+      "direct_event_count": 266,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "board_wipe_pressure_reset",
+      "lane": "protection",
+      "manual_status": "blocked_by_cut_safety",
+      "normalized_name": "fated clash",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 267
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Furygale Flocking",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 2,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "normalized_name": "furygale flocking",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 160
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Land Tax",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 3395,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "tutor_access",
+      "lane": "misc",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "land tax",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 3449
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Library of Leng",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 816,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "normalized_name": "library of leng",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 855
+    },
+    {
+      "blockers": [
+        "commander_never_cut",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Lorehold, the Historian",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 5558,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "commander",
+      "manual_status": "never_cut",
+      "normalized_name": "lorehold the historian",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 5768
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Molecule Man",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 101,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "molecule man",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 102
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Mountain // Mountain",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 402,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "mountain mountain",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 402
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Path to Exile",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 117,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "spot_removal",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "normalized_name": "path to exile",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 166
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Pearl Medallion",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "locked_do_not_cut",
+      "direct_event_count": 0,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "normalized_name": "pearl medallion",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 184
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Plains // Plains",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 244,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "plains plains",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 244
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Ruby Medallion",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "locked_do_not_cut",
+      "direct_event_count": 29,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "normalized_name": "ruby medallion",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 219
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Scroll Rack",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 2745,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "normalized_name": "scroll rack",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 2957
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut"
+      ],
+      "card_name": "Sensei's Divining Top",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 3514,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "normalized_name": "sensei s divining top",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 3816
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Smothering Tithe",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 801,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "normalized_name": "smothering tithe",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 859
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "card_name": "Sol Ring",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_source_section": "untested_flex_pool",
+      "cut_safety_status": "core_support",
+      "direct_event_count": 158,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "normalized_name": "sol ring",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 226
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Starfall Invocation",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 392,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "board_wipe_pressure_reset",
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "normalized_name": "starfall invocation",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 396
+    },
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Surge to Victory",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 243,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "removal",
+      "manual_status": "structural_dependency",
+      "normalized_name": "surge to victory",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 275
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Swords to Plowshares",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 240,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "spot_removal",
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "normalized_name": "swords to plowshares",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 271
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "The Mind Stone",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 2266,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "normalized_name": "the mind stone",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 2312
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "The Scarlet Witch",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 304,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "misc",
+      "manual_status": "blocked_by_prior_rejection",
+      "normalized_name": "the scarlet witch",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 362
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Thor, God of Thunder",
+      "cut_safety_decision": "modeled_not_deck_proven",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "locked_do_not_cut",
+      "direct_event_count": 85,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "graveyard_recursion",
+      "manual_status": "blocked_by_cut_safety",
+      "normalized_name": "thor god of thunder",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 152
+    },
+    {
+      "blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Urza's Saga",
+      "cut_safety_decision": "",
+      "cut_safety_source_section": null,
+      "cut_safety_status": "",
+      "direct_event_count": 2656,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "normalized_name": "urza s saga",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 2656
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Victory Chimes",
+      "cut_safety_decision": "flex_cut_tested_negative",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "locked_do_not_cut",
+      "direct_event_count": 236,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "normalized_name": "victory chimes",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 283
+    }
+  ],
+  "deck_id": 607,
+  "exposure_profile": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260704_role_tag_repair_deck607.json",
+  "generated_at": "2026-07-05T13:28:50Z",
+  "manifest": {
+    "cut_slots": [],
+    "deck_id": 607,
+    "generated_at": "2026-07-05T13:28:50Z",
+    "postgres_writes": false,
+    "purpose": "Seed-safe cut slots for future Lorehold package design.",
+    "source_db_mutated": false
+  },
+  "manual_review": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_manual_cut_review_20260704_role_tag_repair.json",
+  "method_notes": [
+    "This report is a cut-slot synthesis, not a deck promotion.",
+    "A same-lane-only cut is not seed-safe without a concrete same-lane add and gate.",
+    "Early mana, protection, miracle core, lands, commander, high-exposure slots, and prior-negative slots are blocked.",
+    "PostgreSQL and SQLite are not mutated by this script."
+  ],
+  "postgres_writes": false,
+  "safe_cut_replanner": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_safe_cut_replanner_20260704_role_tag_repair.json",
+  "same_lane_only_cut_slots": [
+    {
+      "blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Creative Technique",
+      "cut_safety_decision": "manual_review",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "risky_cut_only_same_lane",
+      "direct_event_count": 54,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "runtime_ready_unexposed",
+      "lane": "big_spell_value",
+      "manual_status": "same_lane_only",
+      "normalized_name": "creative technique",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 42,
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 58
+    },
+    {
+      "blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Bender's Waterskin",
+      "cut_safety_decision": "flex_but_cut_risky",
+      "cut_safety_source_section": "cuts",
+      "cut_safety_status": "risky_cut_only_same_lane",
+      "direct_event_count": 216,
+      "hypothesis_constraints": [
+        "candidate package must target a named weak-seed failure mode",
+        "candidate package must preserve seed-42 miracle/topdeck telemetry",
+        "candidate card must be drawn/accessed/used in gate evidence",
+        "candidate must tie or beat protected 607 without Winota regression"
+      ],
+      "inferred_role": "ramp_engine",
+      "lane": "early_mana",
+      "manual_status": "same_lane_only",
+      "normalized_name": "bender s waterskin",
+      "recommended_action": "do_not_gate_from_this_cut",
+      "score": 0,
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 268
+    }
+  ],
+  "seed_safe_cut_candidates": [],
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "strategy_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+  "summary": {
+    "blocked_count": 94,
+    "blocker_counts": {
+      "commander_never_cut": 1,
+      "cut_is_early_mana_floor_support": 14,
+      "cut_is_miracle_core_big_spell": 25,
+      "cut_is_protection_shell": 14,
+      "cut_not_flex_decision": 84,
+      "cut_safety_not_seed_safe": 11,
+      "early_mana_floor_support": 18,
+      "mana_base_never_cut": 28,
+      "manual_review_cut_safety_block": 8,
+      "manual_status_not_seed_safe": 94,
+      "measured_high_cut_exposure": 34,
+      "miracle_or_finisher_core": 24,
+      "missing_cut_safety_row": 77,
+      "never_cut_lane": 29,
+      "never_cut_or_mana_base": 29,
+      "prior_rejected_cut": 37,
+      "prior_rejected_cut_slot": 24,
+      "prior_rejected_signature": 4,
+      "protected_cut": 22,
+      "protection_shell": 14,
+      "same_lane_only_requires_concrete_same_lane_add": 2,
+      "structural_dependency": 24
+    },
+    "deck_card_count": 94,
+    "lane_counts": {
+      "big_spell_value": 2,
+      "commander": 1,
+      "contextual": 1,
+      "draw": 6,
+      "early_mana": 18,
+      "graveyard_recursion": 1,
+      "hand_filter": 1,
+      "mana_base": 28,
+      "misc": 2,
+      "protection": 13,
+      "removal": 10,
+      "spell_velocity": 5,
+      "wincon": 6
+    },
+    "missing_inputs": [],
+    "ready_cut_cards": [],
+    "recommended_next_action": "expand_cut_safety_model_or_multi_card_shell_before_gate",
+    "same_lane_only_count": 2,
+    "same_lane_only_cut_cards": [
+      "Creative Technique",
+      "Bender's Waterskin"
+    ],
+    "seed_safe_cut_ready_count": 0,
+    "status_counts": {
+      "blocked": 92,
+      "same_lane_only_not_seed_safe": 2
+    }
+  }
+}
