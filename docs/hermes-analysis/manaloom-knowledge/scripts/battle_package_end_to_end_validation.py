@@ -448,6 +448,97 @@ def run_token_maker_attack_each_opponent(battle, scenario: dict[str, Any], event
     }
 
 
+def run_multi_create_creature_tokens(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = dict(scenario["card"])
+    active = battle.Player(str(scenario.get("player") or "Token Controller"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    before_events = len(events)
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6065)),
+    )
+
+    expected_tokens = scenario.get("expected_tokens") or []
+    expected_total = int(
+        scenario.get("expected_total_tokens")
+        or sum(int(token.get("count") or 0) for token in expected_tokens)
+    )
+    actual_tokens = [
+        permanent
+        for permanent in active.battlefield
+        if isinstance(permanent, dict) and battle.is_token_permanent(permanent)
+    ]
+    if len(actual_tokens) != expected_total:
+        fail("battle_execution", f"{card['name']} token total={len(actual_tokens)}, expected {expected_total}")
+
+    for expected in expected_tokens:
+        token_name = str(expected.get("name") or "")
+        matches = [token for token in actual_tokens if token.get("name") == token_name]
+        expected_count = int(expected.get("count") or 1)
+        if len(matches) != expected_count:
+            fail("battle_execution", f"{card['name']} {token_name} count={len(matches)}, expected {expected_count}")
+        for token in matches:
+            if expected.get("power") is not None and int(token.get("power") or 0) != int(expected["power"]):
+                fail("battle_execution", f"{card['name']} {token_name} power={token.get('power')}")
+            if expected.get("toughness") is not None and int(token.get("toughness") or 0) != int(expected["toughness"]):
+                fail("battle_execution", f"{card['name']} {token_name} toughness={token.get('toughness')}")
+            expected_subtype = expected.get("subtype")
+            if expected_subtype and str(expected_subtype) not in str(token.get("type_line") or ""):
+                fail("battle_execution", f"{card['name']} {token_name} type_line={token.get('type_line')!r}")
+            expected_colors = expected.get("colors") or []
+            if expected_colors and list(token.get("colors") or []) != list(expected_colors):
+                fail("battle_execution", f"{card['name']} {token_name} colors={token.get('colors')!r}")
+            for keyword in expected.get("keywords") or []:
+                if not battle.card_has_keyword(token, str(keyword)):
+                    fail("battle_execution", f"{card['name']} {token_name} missing keyword {keyword!r}")
+            if bool(expected.get("artifact")) and "artifact" not in str(token.get("type_line") or "").lower():
+                fail("battle_execution", f"{card['name']} {token_name} artifact token type missing")
+
+    composite_event = next(
+        (
+            data
+            for event, data in events[before_events:]
+            if event == "composite_rule_resolved"
+            and data.get("card") == card.get("name")
+        ),
+        None,
+    )
+    if composite_event is None:
+        fail("battle_events", f"missing {card['name']} composite_rule_resolved event")
+    expected_component_count = int(scenario.get("expected_component_count") or len(expected_tokens))
+    if int(composite_event.get("components_applied") or 0) != expected_component_count:
+        fail(
+            "battle_events",
+            f"{card['name']} components_applied={composite_event.get('components_applied')}",
+        )
+    if int(composite_event.get("components_skipped") or 0) != 0:
+        fail("battle_events", f"{card['name']} skipped composite components")
+
+    component_events = [
+        data
+        for event, data in events[before_events:]
+        if event == "composite_rule_component_resolved"
+        and data.get("card") == card.get("name")
+        and data.get("component_effect") == "token_maker"
+    ]
+    if len(component_events) != expected_component_count:
+        fail("battle_events", f"{card['name']} component events={len(component_events)}")
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "tokens_created": len(actual_tokens),
+        "component_count": len(component_events),
+        "token_names": sorted(token.get("name") for token in actual_tokens),
+    }
+
+
 def run_tempting_offer_decline(battle, scenario: dict[str, Any], events: list[tuple[str, dict[str, Any]]]) -> dict[str, Any]:
     card = scenario["card"]
     active = battle.Player(
@@ -1670,6 +1761,7 @@ SCENARIO_RUNNERS = {
     "change_single_target_response": run_change_single_target_response,
     "destroy_target_create_treasure": run_destroy_target_create_treasure,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
+    "multi_create_creature_tokens": run_multi_create_creature_tokens,
     "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
     "static_global_power_toughness_boost": run_static_global_power_toughness_boost,

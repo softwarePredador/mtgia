@@ -1,0 +1,102 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg534",
+  "generated_at": "2026-07-05T22:41:48.817867+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg534_multi_tokens_new_server_package_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg534_multi_tokens_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Bestial Menace",
+      "Forbidden Friendship",
+      "Mascot Exhibition"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 3,
+    "promoted_rule_rows": 3,
+    "promoted_verified_auto_rows": 3,
+    "row_count": 3
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Bestial Menace",
+      "logical_rule_key": "battle_rule_v1:7bd0274870194298d04700a6cfdd764e",
+      "normalized_name": "bestial menace",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Forbidden Friendship",
+      "logical_rule_key": "battle_rule_v1:d389d66da23728fa4e8d296036357ec2",
+      "normalized_name": "forbidden friendship",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Mascot Exhibition",
+      "logical_rule_key": "battle_rule_v1:e3cb683bd2371654f0aa9d57b630e774",
+      "normalized_name": "mascot exhibition",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Bestial Menace",
+      "Forbidden Friendship",
+      "Mascot Exhibition"
+    ],
+    "existing_expected_rows_before": 3,
+    "missing_targets": [],
+    "row_count": 3,
+    "total_target_card_rows": 3,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "d796090c-8c13-498a-9929-35c0646b7c8b",
+      "card_name": "Bestial Menace",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:7bd0274870194298d04700a6cfdd764e",
+      "normalized_name": "bestial menace",
+      "oracle_hash": "776667960e301f39134e382444e0d528",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "241aee8d-1769-4259-b16d-d299c421da73",
+      "card_name": "Forbidden Friendship",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:d389d66da23728fa4e8d296036357ec2",
+      "normalized_name": "forbidden friendship",
+      "oracle_hash": "153c16e01b9313ee675ec174b8232ed6",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "e7cece46-2413-4cfa-a066-700b145aa981",
+      "card_name": "Mascot Exhibition",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:e3cb683bd2371654f0aa9d57b630e774",
+      "normalized_name": "mascot exhibition",
+      "oracle_hash": "ade5d3577a9263f1ce4504a5f6adf502",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "multi_tokens_new_server"
+}

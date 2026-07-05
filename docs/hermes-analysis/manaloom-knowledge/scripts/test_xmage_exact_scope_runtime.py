@@ -3941,6 +3941,80 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertIn("trample", token.get("keywords", []))
         self.assertTrue(self.battle.card_has_keyword(token, "trample"))
 
+    def test_multi_create_creature_tokens_spell_resolves_all_components(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_multi_create_creature_tokens_spell_v1",
+            "ability_kind": "one_shot",
+            "token_component_count": 2,
+            "token_total_count": 2,
+            "_rule_logical_key": "battle_rule_v1:fixture_multi_token_spell",
+            "_composite_rule_components": [
+                {
+                    "effect": "token_maker",
+                    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+                    "ability_kind": "one_shot",
+                    "compose_on_resolution": True,
+                    "token_count": 1,
+                    "token_name": "Dinosaur Token",
+                    "token_subtype": "Dinosaur",
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_colors": ["R"],
+                    "token_keywords": ["haste"],
+                    "token_haste": True,
+                },
+                {
+                    "effect": "token_maker",
+                    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+                    "ability_kind": "one_shot",
+                    "compose_on_resolution": True,
+                    "token_count": 1,
+                    "token_name": "Human Soldier Token",
+                    "token_subtype": "Human Soldier",
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_colors": ["W"],
+                },
+            ],
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Friendship",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Create a 1/1 red Dinosaur creature token with haste and "
+                    "a 1/1 white Human Soldier creature token."
+                ),
+            },
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        dinosaur = [card for card in active.battlefield if card.get("name") == "Dinosaur Token"]
+        soldier = [card for card in active.battlefield if card.get("name") == "Human Soldier Token"]
+        self.assertEqual(len(dinosaur), 1)
+        self.assertEqual(len(soldier), 1)
+        self.assertTrue(dinosaur[0].get("haste"))
+        self.assertIn("haste", dinosaur[0].get("keywords", []))
+        self.assertEqual(soldier[0].get("type_line"), "Creature Token — Human Soldier")
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Friendship"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_multi_token_spell"
+                for event, data in self.events
+            )
+        )
+
     def test_x_create_creature_tokens_spell_uses_cast_context_x_value(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -2789,7 +2789,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_token_source_cost_not_supported")
 
-    def test_fixed_create_creature_tokens_spell_blocks_additional_tokens(self) -> None:
+    def test_multi_create_creature_tokens_spell_blocks_missing_token_source(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(
             row,
@@ -2808,7 +2808,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "token_source_additional_tokens_not_supported")
+        self.assertEqual(reason, "token_source_missing")
 
     def test_fixed_create_creature_tokens_spell_maps_static_token_keyword(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
@@ -3252,6 +3252,65 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["token_count"], 3)
         self.assertTrue(effect["token_sacrifice_for_colorless_mana"])
         self.assertEqual(effect["token_produced_mana_symbols"], ["C"])
+
+    def test_multi_create_creature_tokens_spell_maps_additional_tokens(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Menace",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Create a 1/1 green Snake creature token, "
+                    "a 2/2 green Wolf creature token, and "
+                    "a 3/3 green Elephant creature token."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new FixtureSnakeToken()).withAdditionalTokens(new FixtureWolfToken(), new FixtureElephantToken()));
+                public final class FixtureSnakeToken extends TokenImpl {
+                    public FixtureSnakeToken() {
+                        super("Snake Token", "1/1 green Snake creature token");
+                        cardType.add(CardType.CREATURE);
+                        color.setGreen(true);
+                        subtype.add(SubType.SNAKE);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+                public final class FixtureWolfToken extends TokenImpl {
+                    public FixtureWolfToken() {
+                        super("Wolf Token", "2/2 green Wolf creature token");
+                        cardType.add(CardType.CREATURE);
+                        color.setGreen(true);
+                        subtype.add(SubType.WOLF);
+                        power = new MageInt(2);
+                        toughness = new MageInt(2);
+                    }
+                }
+                public final class FixtureElephantToken extends TokenImpl {
+                    public FixtureElephantToken() {
+                        super("Elephant Token", "3/3 green Elephant creature token");
+                        cardType.add(CardType.CREATURE);
+                        color.setGreen(true);
+                        subtype.add(SubType.ELEPHANT);
+                        power = new MageInt(3);
+                        toughness = new MageInt(3);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.MULTI_TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_component_count"], 3)
+        self.assertEqual(effect["token_total_count"], 3)
+        self.assertEqual(effect["xmage_token_classes"], ["FixtureSnakeToken", "FixtureWolfToken", "FixtureElephantToken"])
+        components = effect["_composite_rule_components"]
+        self.assertEqual([component["token_name"] for component in components], ["Snake Token", "Wolf Token", "Elephant Token"])
+        self.assertEqual([component["token_power"] for component in components], [1, 2, 3])
 
     def test_dies_create_tokens_matches_plural_keyword_token_description(self) -> None:
         row = queue_row(

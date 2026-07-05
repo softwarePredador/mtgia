@@ -850,6 +850,12 @@ patterns:
   `first_strike`, `flying`, `haste`, `hexproof`, `indestructible`, `lifelink`,
   `menace`, `reach`, `trample`, `vigilance`) ->
   `xmage_fixed_create_creature_tokens_spell_v1`
+- `token_maker::xmage_signature::CreateTokenEffect::no_ability_class::no_target_class::no_condition_class::token` with
+  one spell-resolution `CreateTokenEffect(...).withAdditionalTokens(...)`,
+  each token argument as a literal no-arg creature token class, fixed count one
+  per component, no counters/custom text/additional costs, and runtime-supported
+  static token keywords ->
+  `xmage_multi_create_creature_tokens_spell_v1`
 - `token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility::no_target_class::no_condition_class::token,triggered_ability` with
   one fixed ETB `CreateTokenEffect`, a literal token class constructor, no
   additional token fanout, no custom effect text, and token keywords limited to
@@ -14392,6 +14398,74 @@ Residual boundary: PG533 does not authorize triggered Treasure makers,
 activated Treasure makers, Treasure plus damage, Treasure plus
 initiative/venture, Treasure plus exile/play, Aura/Equipment Treasure patterns,
 or target-controller compensation tokens.
+
+## 2026-07-05 PG534 Multi Creature Tokens Checkpoint
+
+Applied package: `PG534 multi_tokens_new_server`.
+
+Closed family:
+
+- `3` exact one-shot multi-creature-token rows from XMage
+  `CreateTokenEffect(...).withAdditionalTokens(...)`.
+
+Promoted cards:
+
+- `Bestial Menace`
+- `Forbidden Friendship`
+- `Mascot Exhibition`
+
+Runtime scope:
+
+- `xmage_multi_create_creature_tokens_spell_v1`
+
+Supported exact form:
+
+- sorcery/instant one-shot token creation where XMage has exactly one
+  `CreateTokenEffect(...).withAdditionalTokens(...)`, no auxiliary ability
+  class, no additional cost, each token class is a simple creature token with
+  fixed power/toughness/color/subtype, and static token keywords are already
+  modeled by ManaLoom.
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg534_multi_tokens_new_server_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg534_multi_tokens_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg534_multi_tokens_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg534_multi_tokens_new_server_pg_to_sqlite_sync.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg534_multi_tokens_new_server_e2e_validation.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg534_multi_tokens_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg534_multi_tokens_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg534_multi_tokens_new_server_recheck.md`
+- final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg534_multi_tokens_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg534_multi_tokens_new_server_final_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg534_multi_tokens_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg534_multi_tokens_new_server_final.md`
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25826`
+- post-cycle `target_identity_count=25823`
+- post-cycle `xmage_authoritative_source_count=25509`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_adapter_required_count=25509`
+- `token_maker` reduced from `2386` to `2383`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+
+Residual boundary: PG534 does not authorize non-creature tokens, dynamic token
+counts, `entersWithCounters`, custom effect text, token classes with
+unsupported abilities, token land creatures, additional costs, triggered token
+makers, activated token makers, or multi-token spells whose token arguments are
+not literal no-arg token constructors.
 
 ## Required Artifacts Per Cycle
 

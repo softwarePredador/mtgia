@@ -103,6 +103,9 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "token_count",
     "token_count_source",
     "token_count_per_x",
+    "token_component_count",
+    "token_total_count",
+    "xmage_token_classes",
     "token_name",
     "token_power",
     "token_toughness",
@@ -968,11 +971,51 @@ def destroy_target_create_treasure_execution_scenario_from_expected_rule(
     }
 
 
+def multi_create_creature_tokens_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_multi_create_creature_tokens_spell_v1":
+        return None
+    components = required.get("_composite_rule_components") or []
+    if not isinstance(components, list) or not components:
+        return None
+    expected_tokens = []
+    for component in components:
+        if not isinstance(component, dict) or component.get("effect") != "token_maker":
+            return None
+        expected_tokens.append(
+            {
+                "name": component.get("token_name"),
+                "count": int(component.get("token_count") or 1),
+                "power": component.get("token_power"),
+                "toughness": component.get("token_toughness"),
+                "subtype": component.get("token_subtype"),
+                "colors": component.get("token_colors") or [],
+                "keywords": component.get("token_keywords") or [],
+                "artifact": bool(component.get("artifact_tokens")),
+            }
+        )
+    return {
+        "name": f"{rule['card_name']} creates multiple modeled creature tokens",
+        "type": "multi_create_creature_tokens",
+        "card": {"name": rule["card_name"]},
+        "expected_tokens": expected_tokens,
+        "expected_component_count": int(required.get("token_component_count") or len(components)),
+        "expected_total_tokens": int(
+            required.get("token_total_count")
+            or sum(int(token.get("count") or 0) for token in expected_tokens)
+        ),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
         or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
+        or multi_create_creature_tokens_execution_scenario_from_expected_rule(rule)
     )
 
 

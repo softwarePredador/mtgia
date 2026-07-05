@@ -1,0 +1,197 @@
+{
+  "battle_execution": {
+    "event_count": 14,
+    "results": [
+      {
+        "card_name": "Bestial Menace",
+        "component_count": 3,
+        "scenario": "Bestial Menace creates multiple modeled creature tokens",
+        "token_names": [
+          "Elephant Token",
+          "Snake Token",
+          "Wolf Token"
+        ],
+        "tokens_created": 3
+      },
+      {
+        "card_name": "Forbidden Friendship",
+        "component_count": 2,
+        "scenario": "Forbidden Friendship creates multiple modeled creature tokens",
+        "token_names": [
+          "Dinosaur Token",
+          "Human Soldier Token"
+        ],
+        "tokens_created": 2
+      },
+      {
+        "card_name": "Mascot Exhibition",
+        "component_count": 3,
+        "scenario": "Mascot Exhibition creates multiple modeled creature tokens",
+        "token_names": [
+          "Elemental Token",
+          "Inkling Token",
+          "Spirit Token"
+        ],
+        "tokens_created": 3
+      }
+    ],
+    "scenario_count": 3
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T22:41:25.010993+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg534_multi_tokens_new_server_package_manifest.json",
+  "package_id": "pg534_multi_tokens_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_multi_create_creature_tokens_spell_v1",
+          "card_name": "Bestial Menace",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7bd0274870194298d04700a6cfdd764e",
+          "oracle_hash": "776667960e301f39134e382444e0d528",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_multi_create_creature_tokens_spell_v1",
+          "card_name": "Forbidden Friendship",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d389d66da23728fa4e8d296036357ec2",
+          "oracle_hash": "153c16e01b9313ee675ec174b8232ed6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_multi_create_creature_tokens_spell_v1",
+          "card_name": "Mascot Exhibition",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3cb683bd2371654f0aa9d57b630e774",
+          "oracle_hash": "ade5d3577a9263f1ce4504a5f6adf502",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_multi_create_creature_tokens_spell_v1",
+          "card_name": "Bestial Menace",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7bd0274870194298d04700a6cfdd764e",
+          "oracle_hash": "776667960e301f39134e382444e0d528",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_multi_create_creature_tokens_spell_v1",
+          "card_name": "Forbidden Friendship",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d389d66da23728fa4e8d296036357ec2",
+          "oracle_hash": "153c16e01b9313ee675ec174b8232ed6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_multi_create_creature_tokens_spell_v1",
+          "card_name": "Mascot Exhibition",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e3cb683bd2371654f0aa9d57b630e774",
+          "oracle_hash": "ade5d3577a9263f1ce4504a5f6adf502",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_multi_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bestial Menace",
+          "logical_rule_key": "battle_rule_v1:7bd0274870194298d04700a6cfdd764e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_multi_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Forbidden Friendship",
+          "logical_rule_key": "battle_rule_v1:d389d66da23728fa4e8d296036357ec2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_multi_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mascot Exhibition",
+          "logical_rule_key": "battle_rule_v1:e3cb683bd2371654f0aa9d57b630e774"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Bestial Menace",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:7bd0274870194298d04700a6cfdd764e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Forbidden Friendship",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:d389d66da23728fa4e8d296036357ec2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mascot Exhibition",
+          "component_keys": [],
+          "effect": "composite_resolution",
+          "logical_rule_key": "battle_rule_v1:e3cb683bd2371654f0aa9d57b630e774"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 14,
+        "scenarios": 3
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

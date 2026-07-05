@@ -296,6 +296,7 @@ DIES_FIXED_MANA_PERMANENT_SCOPE = "xmage_permanent_dies_add_fixed_mana_v1"
 DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_hand_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
 X_TOKEN_SPELL_SCOPE = "xmage_x_create_creature_tokens_spell_v1"
+MULTI_TOKEN_SPELL_SCOPE = "xmage_multi_create_creature_tokens_spell_v1"
 ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
 DIES_TOKEN_CREATURE_SCOPE = "xmage_creature_dies_create_tokens_v1"
 PERMANENT_ACTIVATED_TOKEN_SCOPE = "xmage_permanent_simple_activated_create_token_v1"
@@ -921,6 +922,41 @@ def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | dict
     if count <= 0:
         return "token_source_count_not_positive"
     return token_class, count
+
+
+def multi_create_token_effects_from_source(source: str) -> list[dict[str, Any]] | str:
+    text = source or ""
+    if len(re.findall(r"new\s+CreateTokenEffect\s*\(", text)) != 1:
+        return "multi_token_source_not_single_create_token_effect"
+    if ".withAdditionalTokens" not in text:
+        return "multi_token_source_no_additional_tokens"
+    if ".entersWithCounters" in text:
+        return "multi_token_source_counters_not_supported"
+    if ".setText" in text:
+        return "multi_token_source_custom_text_not_supported"
+    base_match = re.search(
+        r"new\s+CreateTokenEffect\s*\(\s*new\s+(?P<class>\w+)\s*\(\s*\)\s*"
+        r"(?:,\s*(?P<count>\d+))?\s*\)\s*\.withAdditionalTokens\s*\(",
+        text,
+        re.S,
+    )
+    if not base_match:
+        return "multi_token_source_base_create_token_not_fixed"
+    base_count = int(base_match.group("count") or "1")
+    if base_count != 1:
+        return "multi_token_source_base_count_not_supported"
+    additional_args = extract_java_call_args(text, "withAdditionalTokens")
+    if additional_args is None:
+        return "multi_token_source_additional_args_missing"
+    token_classes = [base_match.group("class")]
+    for arg in split_java_args(additional_args):
+        token_match = re.fullmatch(r"new\s+(\w+)\s*\(\s*\)", arg.strip(), re.S)
+        if not token_match:
+            return "multi_token_source_additional_token_not_fixed"
+        token_classes.append(token_match.group(1))
+    if len(token_classes) < 2:
+        return "multi_token_source_additional_tokens_empty"
+    return [{"token_class": token_class, "token_count": 1} for token_class in token_classes]
 
 
 def token_class_source(row: dict[str, Any], source_text: str, token_class: str) -> str:
@@ -14963,6 +14999,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "activated mana-source permanent"
     elif scope == TOKEN_SPELL_SCOPE:
         scope_kind = "fixed spell-resolution creature-token maker"
+    elif scope == MULTI_TOKEN_SPELL_SCOPE:
+        scope_kind = "fixed spell-resolution multi-creature-token maker"
     elif scope == DAMAGE_GAIN_LIFE_SCOPE:
         scope_kind = "fixed damage plus controller life-gain spell"
     elif scope == DAMAGE_EXILE_IF_DIES_SCOPE:
@@ -17381,6 +17419,46 @@ def split_row(
         ), "selected_exact_scope"
 
     if fixed_token_spell_unit:
+        multi_tokens = multi_create_token_effects_from_source(source_text)
+        if not isinstance(multi_tokens, str):
+            components: list[dict[str, Any]] = []
+            token_classes: list[str] = []
+            for parsed_token in multi_tokens:
+                token_class = str(parsed_token["token_class"])
+                token_data, token_reason = parse_simple_token_class(
+                    token_class_source(row, source_text, token_class),
+                    token_class,
+                )
+                if token_reason:
+                    return None, token_reason
+                token_classes.append(token_class)
+                components.append(
+                    {
+                        "effect": "token_maker",
+                        "battle_model_scope": TOKEN_SPELL_SCOPE,
+                        "ability_kind": "one_shot",
+                        "compose_on_resolution": True,
+                        "token_count": int(parsed_token["token_count"]),
+                        "xmage_effect_class": "CreateTokenEffect",
+                        **token_data,
+                    }
+                )
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": MULTI_TOKEN_SPELL_SCOPE,
+                "ability_kind": "one_shot",
+                "xmage_effect_class": "CreateTokenEffect",
+                "xmage_token_classes": token_classes,
+                "token_component_count": len(components),
+                "token_total_count": sum(int(component.get("token_count") or 0) for component in components),
+                "_composite_rule_components": components,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_multi_create_creature_tokens_spell",
+            ), "selected_exact_scope"
         parsed_effect = fixed_create_token_effect_from_source(source_text)
         if isinstance(parsed_effect, str):
             return None, parsed_effect
