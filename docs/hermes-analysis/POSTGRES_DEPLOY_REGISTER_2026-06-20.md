@@ -14828,3 +14828,73 @@ Register decision:
   `resolve_generic_permanent_etb`.
 - The remaining ETB mana backlog must continue as exact subpatterns, not as a
   generic ETB mana promotion.
+
+## 2026-07-05 - PG504 activated damage target parser
+
+- Deploy id: `xmage_pg504_activated_damage_target_parser_new_server`.
+- Runtime families:
+  - `xmage_permanent_simple_activated_damage_v1`.
+  - `xmage_permanent_simple_activated_destroy_target_v1`.
+- Promoted cards: `11`.
+- Promoted card names: `Deadeye Duelist`, `Elite Headhunter`,
+  `Femeref Archers`, `Pyroclastic Elemental`, `Razortip Whip`,
+  `Shauku's Minion`, `Slingshot Goblin`, `Sorcerer of the Fang`,
+  `Spinal Villain`, `Western Paladin`, and `Zealot of the God-Pharaoh`.
+- Only exact activated permanent damage/destroy target-parser shapes are
+  allowed in this batch. Dynamic damage, unsupported activation costs, modal
+  abilities, random targets, multi-target damage, and non-matching
+  Oracle/XMage target pairs remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg504_activated_damage_target_parser_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg504_activated_damage_target_parser_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg504_activated_damage_target_parser_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg504_activated_damage_target_parser_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg504_activated_damage_target_parser_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg504_activated_damage_target_parser_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg504_activated_damage_target_parser_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=11`, `COMMIT`.
+- Postcheck:
+  all 11 promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- Field postcheck:
+  all 11 promoted rows have expected activated scope, target, target
+  constraints, and fixed damage amount where applicable.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg504_activated_damage_target_parser_new_server_pg_to_sqlite_sync.json`;
+  `pg_rows_loaded=8446`, `sqlite_inserted_or_updated=8210`,
+  `canonical_snapshot_rows_exported=5972`.
+- Runtime lookup:
+  all 11 cards resolve from the curated runtime cache with expected activated
+  damage/destroy scope.
+- Battle suite:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg504_activated_damage_target_parser_new_server_full_battle_suite_post_sync.out`
+  has `632` PASS lines and no `Traceback`, `FAILED`, `ERROR`, or `SkipTest`.
+- Audits:
+  PG/Hermes/SQLite `51/51` pass, XMage strategy `26/26` pass, operational
+  surface `pass`, and legacy contamination `pass`.
+- Post-sync queue:
+  `target_identity_count=26045`, `xmage_authoritative_source_count=25731`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25731`.
+- Final exact-scope recheck:
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`.
+
+Register decision:
+
+- PG504 is applied and should not be rebuilt.
+- The remaining activated damage/destroy backlog must continue as exact
+  subpatterns, not broad generic review-scope promotion.

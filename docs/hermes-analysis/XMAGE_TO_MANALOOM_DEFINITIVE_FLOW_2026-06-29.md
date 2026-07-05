@@ -12827,8 +12827,11 @@ PostgreSQL and cache evidence:
 - PG -> Hermes/SQLite sync:
   `pg_rows_loaded=8446`, `sqlite_inserted_or_updated=8210`, and
   `canonical_snapshot_rows_exported=5972`.
-- Focused split/runtime tests passed `804` checks with `60` subtests; full
-  script suite passed `2807` tests, `5` skipped, and `167` subtests.
+- Focused splitter suite passed `520` unit tests.
+- Full battle runtime suite:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg504_activated_damage_target_parser_new_server_full_battle_suite_post_sync.out`
+  contains `632` PASS lines and no `Traceback`, `FAILED`, `ERROR`, or
+  `SkipTest`.
 - Contract/alignment audits passed: PG/Hermes/SQLite `51/51`, XMage strategy
   `26/26`, operational surface `pass`, and legacy contamination `pass`.
 
