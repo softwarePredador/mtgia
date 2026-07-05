@@ -178,3 +178,20 @@ def test_markdown_surfaces_turn_cycle_policy_and_sources(tmp_path):
     assert "keep_607_mana_sequence_policy: `true`" in markdown
     assert "opponents' turns" in markdown
     assert "Card Kingdom Lorehold synergy article" in markdown
+
+
+def test_newest_report_uses_current_family_not_hardcoded_day(tmp_path):
+    old = tmp_path / "lorehold_mana_foundation_audit_20260704_learning.json"
+    current = tmp_path / "lorehold_mana_foundation_audit_20260705_current_relearn.json"
+    fallback = tmp_path / "fallback.json"
+    old.write_text("{}", encoding="utf-8")
+    current.write_text("{}", encoding="utf-8")
+    fallback.write_text("{}", encoding="utf-8")
+
+    selected = synth.newest_report(
+        "lorehold_mana_foundation_audit_*.json",
+        fallback,
+        report_dir=tmp_path,
+    )
+
+    assert selected == current

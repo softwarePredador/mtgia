@@ -844,3 +844,62 @@ Operational lesson:
 - Current `607` remains protected: Game Changer discovery coverage changes
   what the app can explain and queue, but it does not bypass same-lane cut,
   natural battle, Winota/fast-pressure, and card-use gates.
+
+## Mana Foundation And Sequence Relearn - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_mana_foundation_audit_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_mana_foundation_audit_20260705_current_relearn.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_validator_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_validator_20260705_current_relearn.json`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_mana_sequence_policy_synthesis_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_mana_sequence_policy_synthesis_20260705_current_relearn.json`
+
+Current mana-foundation result for protected `607`:
+
+- status: `mana_foundation_pass_with_watch_items`;
+- lands: `34`;
+- ramp: `15`;
+- total mana package including `Land Tax`: `50`;
+- early foundation pieces: `8`;
+- true early mana pieces: `6`;
+- red sources: `24`;
+- white sources: `25`;
+- blockers: `0`;
+- watch items: `colorless_utility_land_pressure`,
+  `tapped_land_tempo_pressure`, and
+  `late_or_contextual_ramp_should_not_be_counted_as_opening_fixing`.
+
+Current mana-base validator result:
+
+- deck lands: `34` total, `28` unique;
+- source counts: `21` red, `22` white, `7` colorless, and `4`
+  always-or-conditionally tapped lands under validator heuristics;
+- evaluated land swaps: `84`;
+- ready swaps: `0`;
+- manual review swaps: `4`;
+- blocked swaps: `78`.
+
+Current mana-sequence policy result:
+
+- status: `mana_sequence_no_direct_auto_upgrade_current_607`;
+- the synthesis now consumes the latest matching report family instead of
+  hardcoding `20260704`, so the `20260705` mana foundation evidence is not
+  skipped by default;
+- current candidate backlog: `50` mana/land/ramp cards;
+- `Mana Vault` remains `blocked_prior_gate_rejected`;
+- `Grim Monolith`, `City of Traitors`, `Gemstone Caverns`, `Plateau`, `City of
+  Brass`, and `Mana Confluence` remain hypotheses requiring a named current
+  land/ramp cut plus equal gate, not automatic upgrades;
+- `Bender's Waterskin` and `Victory Chimes` remain protected
+  turn-cycle-miracle mana, not generic three-mana rocks.
+
+Operational lesson:
+
+- The current `607` mana foundation is not perfect, but it is coherent for the
+  Lorehold plan: it balances early Boros access, colorless acceleration, and
+  opponent-turn miracle mana.
+- Future land/ramp challengers must name the exact sequencing failure they fix
+  and the exact current land/ramp slot they cut. Prestige, Game Changer status,
+  ownership, or global staple rank is not sufficient.

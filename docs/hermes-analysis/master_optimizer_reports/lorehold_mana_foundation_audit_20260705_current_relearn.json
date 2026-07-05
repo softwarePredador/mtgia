@@ -1,0 +1,869 @@
+{
+  "artifact_type": "lorehold_mana_foundation_audit",
+  "candidate_staples": [
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "fast_mana_artifact_partial_v1"
+        ]
+      },
+      "card_name": "Mana Vault",
+      "commander_legality": "legal",
+      "current_decision": "blocked_for_current_known_cuts",
+      "decision_reasons": [
+        "legal_and_accessible_but_colorless_only",
+        "arcane_signet_cut_loses_boros_fixing_and_recurring_source",
+        "benders_waterskin_cut_has_prior_exact_reject"
+      ],
+      "edhrec_lorehold": {
+        "inclusion": 447,
+        "pct": 5.8,
+        "potential_decks": 7651,
+        "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+        "synergy": 0.02,
+        "trend_zscore": 0
+      },
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Mana Vault",
+        "category": "",
+        "color_identity": "",
+        "edhrec_rank": 144,
+        "is_banned": 0
+      },
+      "in_protected_607": false,
+      "mana_vault_over_benders_waterskin": {
+        "blockers": [
+          "prior_exact_reject"
+        ],
+        "score": 112,
+        "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_607_unprotected_profiled_cut_benchmark_generator_20260704_current.md",
+        "status": "blocked"
+      },
+      "oracle": {
+        "cmc": 1.0,
+        "oracle_text": "This artifact doesn't untap during your untap step.\nAt the beginning of your upkeep, you may pay {4}. If you do, untap this artifact.\nAt the beginning of your draw step, if this artifact is tapped, it deals 1 damage to you.\n{T}: Add {C}{C}{C}.",
+        "type_line": "Artifact"
+      },
+      "role_interpretation": "fast_colorless_burst_not_colored_fixing"
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "the_one_ring_etb_protection_burden_draw_v1"
+        ]
+      },
+      "card_name": "The One Ring",
+      "commander_legality": "legal",
+      "current_decision": "blocked_for_current_607_shell",
+      "decision_reasons": [
+        "legal_and_accessible_but_low_lorehold_specific_synergy",
+        "four_mana_non_instant_non_sorcery_value_piece_competes_with_big_spell_slots",
+        "confirmed_value_lane_retest_lost_to_607"
+      ],
+      "edhrec_lorehold": {
+        "inclusion": 645,
+        "pct": 8.4,
+        "potential_decks": 7651,
+        "source": "docs/hermes-analysis/manaloom-knowledge/scripts/_edhrec_card_data.json",
+        "synergy": 0.02,
+        "trend_zscore": -0.31292642136359516
+      },
+      "format_staple": null,
+      "in_protected_607": false,
+      "one_ring_current_shell_decision": {
+        "aggregate": {
+          "baseline_games": 72,
+          "baseline_wins": 30,
+          "candidate_games": 72,
+          "candidate_wins": 25
+        },
+        "card_use": {
+          "accessed_games": 24,
+          "cost_paid": 42,
+          "resolved": 17,
+          "spell_cast": 21,
+          "utility_activations": 26
+        },
+        "decision": "reject_current_607_shell",
+        "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_one_ring_cut_decision_20260630.md",
+        "status": "rejected_keep_607_baseline"
+      },
+      "oracle": {
+        "cmc": 4.0,
+        "oracle_text": "Indestructible\nWhen The One Ring enters, if you cast it, you gain protection from everything until your next turn.\nAt the beginning of your upkeep, you lose 1 life for each burden counter on The One Ring.\n{T}: Put a burden counter on The One Ring, then draw a card for each burden counter on The One Ring.",
+        "type_line": "Legendary Artifact"
+      },
+      "role_interpretation": "draw_protection_value_not_miracle_or_mana_foundation"
+    }
+  ],
+  "deck_id": 607,
+  "external_learning": [
+    {
+      "learning": "Commander legality starts with 100 cards, singleton rules, commander count, and color identity.",
+      "source": "Wizards Commander format",
+      "url": "https://magic.wizards.com/en/formats/commander"
+    },
+    {
+      "learning": "Ramp must accelerate the deck at the correct turn; ramp competing with the commander curve is a real cost.",
+      "source": "EDHREC ramp guide",
+      "url": "https://edhrec.com/guides/the-edhrec-guide-to-ramp-in-commander"
+    },
+    {
+      "learning": "Category ratios are a starting point; the list still has to play the intended commander plan.",
+      "source": "EDHREC Commander deckbuilding guide",
+      "url": "https://edhrec.com/articles/how-to-build-a-commander-deck"
+    },
+    {
+      "learning": "Lorehold-specific adoption protects topdeck, miracle, turn-cycle mana, and spell-value packages over generic staples.",
+      "source": "EDHREC Lorehold commander page",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian"
+    }
+  ],
+  "generated_at": "2026-07-05T02:57:43Z",
+  "lands": {
+    "basic_land_count": 8,
+    "colorless_only_lands": [
+      "Ancient Tomb",
+      "Command Beacon",
+      "Reliquary Tower",
+      "Urza's Saga",
+      "War Room"
+    ],
+    "colorless_source_count": 7,
+    "land_count": 34,
+    "land_role_counts": {
+      "artifact_tutor_land": 1,
+      "basic_count_for_land_tax": 8,
+      "commander_recast_recovery": 1,
+      "cycling_flood_escape": 1,
+      "fast_colorless_acceleration": 1,
+      "fetch_or_basic_access": 8,
+      "land_card_flow": 3,
+      "legendary_protection": 1,
+      "life_cost": 10,
+      "no_max_hand_size": 1,
+      "topdeck_or_graveyard_selection": 1
+    },
+    "lands": [
+      {
+        "card_name": "Ancient Tomb",
+        "colors": [
+          "C"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "fast_colorless_acceleration",
+          "life_cost"
+        ]
+      },
+      {
+        "card_name": "Arid Mesa",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "fetch_or_basic_access",
+          "life_cost"
+        ]
+      },
+      {
+        "card_name": "Battlefield Forge",
+        "colors": [
+          "C",
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": []
+      },
+      {
+        "card_name": "Bloodstained Mire",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "fetch_or_basic_access",
+          "life_cost"
+        ]
+      },
+      {
+        "card_name": "Command Beacon",
+        "colors": [
+          "C"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "commander_recast_recovery"
+        ]
+      },
+      {
+        "card_name": "Command Tower",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": []
+      },
+      {
+        "card_name": "Eiganjo, Seat of the Empire",
+        "colors": [
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": []
+      },
+      {
+        "card_name": "Elegant Parlor",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "always_tapped",
+        "quantity": 1,
+        "roles": [
+          "topdeck_or_graveyard_selection"
+        ]
+      },
+      {
+        "card_name": "Exotic Orchard",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": []
+      },
+      {
+        "card_name": "Flooded Strand",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "fetch_or_basic_access",
+          "life_cost"
+        ]
+      },
+      {
+        "card_name": "Glittering Massif",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "always_tapped",
+        "quantity": 1,
+        "roles": [
+          "cycling_flood_escape",
+          "land_card_flow"
+        ]
+      },
+      {
+        "card_name": "Marsh Flats",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "fetch_or_basic_access",
+          "life_cost"
+        ]
+      },
+      {
+        "card_name": "Mountain // Mountain",
+        "colors": [
+          "R"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 4,
+        "roles": [
+          "basic_count_for_land_tax"
+        ]
+      },
+      {
+        "card_name": "Plains // Plains",
+        "colors": [
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 4,
+        "roles": [
+          "basic_count_for_land_tax"
+        ]
+      },
+      {
+        "card_name": "Plaza of Heroes",
+        "colors": [
+          "C",
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "legendary_protection"
+        ]
+      },
+      {
+        "card_name": "Prismatic Vista",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "fetch_or_basic_access",
+          "life_cost"
+        ]
+      },
+      {
+        "card_name": "Radiant Summit",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "conditional_tapped",
+        "quantity": 1,
+        "roles": []
+      },
+      {
+        "card_name": "Reliquary Tower",
+        "colors": [
+          "C"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "no_max_hand_size"
+        ]
+      },
+      {
+        "card_name": "Sacred Foundry",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "optional_life_untapped",
+        "quantity": 1,
+        "roles": []
+      },
+      {
+        "card_name": "Scalding Tarn",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "fetch_or_basic_access",
+          "life_cost"
+        ]
+      },
+      {
+        "card_name": "Spectator Seating",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped_commander_multiplayer",
+        "quantity": 1,
+        "roles": []
+      },
+      {
+        "card_name": "Sunbaked Canyon",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "land_card_flow",
+          "life_cost"
+        ]
+      },
+      {
+        "card_name": "Sunbillow Verge",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": []
+      },
+      {
+        "card_name": "Turbulent Steppe",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "conditional_tapped",
+        "quantity": 1,
+        "roles": []
+      },
+      {
+        "card_name": "Urza's Saga",
+        "colors": [
+          "C"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "artifact_tutor_land"
+        ]
+      },
+      {
+        "card_name": "War Room",
+        "colors": [
+          "C"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "land_card_flow"
+        ]
+      },
+      {
+        "card_name": "Windswept Heath",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "fetch_or_basic_access",
+          "life_cost"
+        ]
+      },
+      {
+        "card_name": "Wooded Foothills",
+        "colors": [
+          "R",
+          "W"
+        ],
+        "etb_mode": "untapped",
+        "quantity": 1,
+        "roles": [
+          "fetch_or_basic_access",
+          "life_cost"
+        ]
+      }
+    ],
+    "red_source_count": 24,
+    "tapped_mode_counts": {
+      "always_tapped": 2,
+      "conditional_tapped": 2,
+      "optional_life_untapped": 1,
+      "untapped": 28,
+      "untapped_commander_multiplayer": 1
+    },
+    "white_source_count": 25
+  },
+  "next_learning_actions": [
+    "Do not repeat Mana Vault over Arcane Signet or Bender's Waterskin without a new cut hypothesis.",
+    "Do not retest The One Ring in protected 607 unless a new shell changes draw/protection pressure.",
+    "Next mana work should test only named same-lane changes that preserve Boros fixing and miracle cadence."
+  ],
+  "postgres_writes": false,
+  "ramp": {
+    "burst_or_treasure_count": 5,
+    "early_foundation_count": 8,
+    "kind_counts": {
+      "burst_or_treasure_ramp": 4,
+      "early_colorless_acceleration": 1,
+      "early_cost_reducer": 2,
+      "early_recurring_colored_mana": 5,
+      "table_tax_treasure_engine": 1,
+      "turn_cycle_miracle_mana": 2
+    },
+    "ramp_count": 15,
+    "ramp_profiles": [
+      {
+        "card_name": "Sol Ring",
+        "cmc": 1.0,
+        "colors": [
+          "C"
+        ],
+        "early_foundation": true,
+        "kind": "early_colorless_acceleration",
+        "quantity": 1,
+        "risk_flags": [
+          "colorless_only"
+        ],
+        "true_early_mana": true
+      },
+      {
+        "card_name": "Arcane Signet",
+        "cmc": 2.0,
+        "colors": [
+          "R",
+          "W"
+        ],
+        "early_foundation": true,
+        "kind": "early_recurring_colored_mana",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": true
+      },
+      {
+        "card_name": "Boros Signet",
+        "cmc": 2.0,
+        "colors": [
+          "R",
+          "W"
+        ],
+        "early_foundation": true,
+        "kind": "early_recurring_colored_mana",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": true
+      },
+      {
+        "card_name": "Fellwar Stone",
+        "cmc": 2.0,
+        "colors": [
+          "R",
+          "W"
+        ],
+        "early_foundation": true,
+        "kind": "early_recurring_colored_mana",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": true
+      },
+      {
+        "card_name": "Pearl Medallion",
+        "cmc": 2.0,
+        "colors": [],
+        "early_foundation": true,
+        "kind": "early_cost_reducer",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": false
+      },
+      {
+        "card_name": "Ruby Medallion",
+        "cmc": 2.0,
+        "colors": [],
+        "early_foundation": true,
+        "kind": "early_cost_reducer",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": false
+      },
+      {
+        "card_name": "Talisman of Conviction",
+        "cmc": 2.0,
+        "colors": [
+          "C",
+          "R",
+          "W"
+        ],
+        "early_foundation": true,
+        "kind": "early_recurring_colored_mana",
+        "quantity": 1,
+        "risk_flags": [
+          "life_loss"
+        ],
+        "true_early_mana": true
+      },
+      {
+        "card_name": "The Mind Stone",
+        "cmc": 2.0,
+        "colors": [
+          "W"
+        ],
+        "early_foundation": true,
+        "kind": "early_recurring_colored_mana",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": true
+      },
+      {
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "colors": [
+          "R",
+          "W"
+        ],
+        "early_foundation": false,
+        "kind": "turn_cycle_miracle_mana",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": false
+      },
+      {
+        "card_name": "Jeska's Will",
+        "cmc": 3.0,
+        "colors": [
+          "R"
+        ],
+        "early_foundation": false,
+        "kind": "burst_or_treasure_ramp",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": false
+      },
+      {
+        "card_name": "Monument to Endurance",
+        "cmc": 3.0,
+        "colors": [
+          "R",
+          "W"
+        ],
+        "early_foundation": false,
+        "kind": "burst_or_treasure_ramp",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": false
+      },
+      {
+        "card_name": "Victory Chimes",
+        "cmc": 3.0,
+        "colors": [
+          "C"
+        ],
+        "early_foundation": false,
+        "kind": "turn_cycle_miracle_mana",
+        "quantity": 1,
+        "risk_flags": [
+          "colorless_only"
+        ],
+        "true_early_mana": false
+      },
+      {
+        "card_name": "Big Score",
+        "cmc": 4.0,
+        "colors": [
+          "R",
+          "W"
+        ],
+        "early_foundation": false,
+        "kind": "burst_or_treasure_ramp",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": false
+      },
+      {
+        "card_name": "Smothering Tithe",
+        "cmc": 4.0,
+        "colors": [
+          "R",
+          "W"
+        ],
+        "early_foundation": false,
+        "kind": "table_tax_treasure_engine",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": false
+      },
+      {
+        "card_name": "Unexpected Windfall",
+        "cmc": 4.0,
+        "colors": [
+          "R",
+          "W"
+        ],
+        "early_foundation": false,
+        "kind": "burst_or_treasure_ramp",
+        "quantity": 1,
+        "risk_flags": [],
+        "true_early_mana": false
+      }
+    ],
+    "risk_counts": {
+      "colorless_only": 2,
+      "life_loss": 1
+    },
+    "true_early_mana_count": 6,
+    "turn_cycle_miracle_mana_count": 2
+  },
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "status": "mana_foundation_pass_with_watch_items",
+  "structural_assessment": {
+    "blockers": [],
+    "heuristics": {
+      "lorehold_commander_cmc": 5,
+      "target_boros_color_sources_each": 20,
+      "target_early_foundation_for_mv5_commander": 8,
+      "target_land_floor_with_high_ramp": 33,
+      "target_total_mana_package": "48-50"
+    },
+    "land_tax_present": true,
+    "status": "mana_foundation_pass_with_watch_items",
+    "total_mana_package_including_land_tax": 50,
+    "watch_items": [
+      "colorless_utility_land_pressure",
+      "tapped_land_tempo_pressure",
+      "late_or_contextual_ramp_should_not_be_counted_as_opening_fixing"
+    ]
+  },
+  "summary": {
+    "blocker_count": 0,
+    "colorless_only_land_count": 5,
+    "deck_id": 607,
+    "early_foundation_count": 8,
+    "land_count": 34,
+    "land_tax_present": true,
+    "mana_vault_decision": "blocked_for_current_known_cuts",
+    "one_ring_decision": "blocked_for_current_607_shell",
+    "ramp_count": 15,
+    "red_source_count": 24,
+    "role_counts": {
+      "board_wipe": 8,
+      "commander": 1,
+      "creature": 2,
+      "draw": 9,
+      "engine": 2,
+      "land": 34,
+      "protection": 12,
+      "ramp": 15,
+      "removal": 7,
+      "tutor": 1,
+      "wincon": 9
+    },
+    "total_cards": 100,
+    "total_mana_package_including_land_tax": 50,
+    "true_early_mana_count": 6,
+    "watch_item_count": 3,
+    "white_source_count": 25
+  },
+  "variant_role_comparison": [
+    {
+      "avg_nonland_cmc": 3.66,
+      "deck_id": 606,
+      "draw": 13,
+      "lands": 39,
+      "protection": 7,
+      "ramp": 17,
+      "removal": 4,
+      "total_cards": 100
+    },
+    {
+      "avg_nonland_cmc": 3.88,
+      "deck_id": 607,
+      "draw": 9,
+      "lands": 34,
+      "protection": 12,
+      "ramp": 15,
+      "removal": 7,
+      "total_cards": 100
+    },
+    {
+      "avg_nonland_cmc": 2.96,
+      "deck_id": 608,
+      "draw": 31,
+      "lands": 31,
+      "protection": 2,
+      "ramp": 18,
+      "removal": 4,
+      "total_cards": 100
+    },
+    {
+      "avg_nonland_cmc": 3.74,
+      "deck_id": 609,
+      "draw": 20,
+      "lands": 30,
+      "protection": 7,
+      "ramp": 11,
+      "removal": 6,
+      "total_cards": 100
+    },
+    {
+      "avg_nonland_cmc": 3.79,
+      "deck_id": 610,
+      "draw": 10,
+      "lands": 30,
+      "protection": 2,
+      "ramp": 17,
+      "removal": 3,
+      "total_cards": 100
+    },
+    {
+      "avg_nonland_cmc": 4.23,
+      "deck_id": 611,
+      "draw": 24,
+      "lands": 34,
+      "protection": 1,
+      "ramp": 15,
+      "removal": 1,
+      "total_cards": 100
+    },
+    {
+      "avg_nonland_cmc": 3.27,
+      "deck_id": 612,
+      "draw": 7,
+      "lands": 27,
+      "protection": 5,
+      "ramp": 18,
+      "removal": 1,
+      "total_cards": 100
+    },
+    {
+      "avg_nonland_cmc": 3.71,
+      "deck_id": 613,
+      "draw": 22,
+      "lands": 32,
+      "protection": 8,
+      "ramp": 15,
+      "removal": 1,
+      "total_cards": 100
+    },
+    {
+      "avg_nonland_cmc": 3.93,
+      "deck_id": 614,
+      "draw": 14,
+      "lands": 33,
+      "protection": 7,
+      "ramp": 19,
+      "removal": 1,
+      "total_cards": 100
+    },
+    {
+      "avg_nonland_cmc": 3.68,
+      "deck_id": 615,
+      "draw": 14,
+      "lands": 34,
+      "protection": 9,
+      "ramp": 12,
+      "removal": 4,
+      "total_cards": 100
+    },
+    {
+      "avg_nonland_cmc": 3.97,
+      "deck_id": 616,
+      "draw": 15,
+      "lands": 29,
+      "protection": 9,
+      "ramp": 8,
+      "removal": 10,
+      "total_cards": 100
+    }
+  ]
+}

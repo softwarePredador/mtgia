@@ -1,0 +1,2204 @@
+{
+  "artifact_type": "lorehold_mana_sequence_policy_synthesis",
+  "candidate_mana_backlog": [
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Flooded Strand",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": 42,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing",
+          "fetch_or_basic_access"
+        ],
+        "score": 7
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Bloodstained Mire",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": 43,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing",
+          "fetch_or_basic_access"
+        ],
+        "score": 7
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Windswept Heath",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": 46,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing",
+          "fetch_or_basic_access"
+        ],
+        "score": 7
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Wooded Foothills",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": 49,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing",
+          "fetch_or_basic_access"
+        ],
+        "score": 7
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Scalding Tarn",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": 50,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing",
+          "fetch_or_basic_access"
+        ],
+        "score": 7
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Marsh Flats",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": 51,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing",
+          "fetch_or_basic_access"
+        ],
+        "score": 7
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "fetchland_land_play_with_direct_activation_v1"
+        ]
+      },
+      "card_name": "Arid Mesa",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": 55,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing",
+          "fetch_or_basic_access"
+        ],
+        "score": 7
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": []
+      },
+      "card_name": "Command Tower",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing"
+        ],
+        "score": 5
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "surveil_dual_typed_land_etb_runtime_v1"
+        ]
+      },
+      "card_name": "Elegant Parlor",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "always_tapped_tempo_cost"
+        ],
+        "score": 1
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "shock_dual_typed_land_life_payment_runtime_v1"
+        ]
+      },
+      "card_name": "Sacred Foundry",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "can_enter_untapped_for_life"
+        ],
+        "score": 4
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "bond_land_dual_source_etb_opponent_count_runtime_v1"
+        ]
+      },
+      "card_name": "Spectator Seating",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source"
+        ],
+        "score": 3
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "rule_count": 2,
+        "scopes": [
+          "pain_cycle_sac_draw_land_v1"
+        ]
+      },
+      "card_name": "Sunbaked Canyon",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing",
+          "flood_escape"
+        ],
+        "score": 6
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "static_cost_reduction_for_matching_spells_v1"
+        ]
+      },
+      "card_name": "Pearl Medallion",
+      "colors": [],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "cost_reducer",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 2.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "static_cost_reduction_for_matching_spells_v1"
+        ]
+      },
+      "card_name": "Ruby Medallion",
+      "colors": [],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "cost_reducer",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 2.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "commander_identity_mana_rock_deck_scoped_v1"
+        ]
+      },
+      "card_name": "Arcane Signet",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": 3,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "early_colored_rock",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 2.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "conditional_opponent_color_mana_rock_v1"
+        ]
+      },
+      "card_name": "Fellwar Stone",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": 18,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "early_colored_rock",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 2.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "pain_talisman_color_pair_partial_v1"
+        ]
+      },
+      "card_name": "Talisman of Conviction",
+      "colors": [
+        "C",
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": 155,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "early_colored_rock",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 2.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "activation_cost_net_mana_pair_rock_v1"
+        ]
+      },
+      "card_name": "Boros Signet",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": 226,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "early_colored_rock",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 2.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "two_colorless_mana_rock_v1"
+        ]
+      },
+      "card_name": "Sol Ring",
+      "colors": [
+        "C"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": 1,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "early_colorless_burst",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 1.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "rule_count": 2,
+        "scopes": [
+          "ancient_tomb_bonus_mana_on_tap_v1"
+        ]
+      },
+      "card_name": "Ancient Tomb",
+      "colors": [
+        "C"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "untapped_timing",
+          "fast_land_mana",
+          "colorless_only_pressure"
+        ],
+        "score": 4
+      },
+      "lane": "fast_or_utility_land",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "choose_both_with_commander_red_by_target_opponent_hand_impulse_top_three_v1"
+        ]
+      },
+      "card_name": "Jeska's Will",
+      "colors": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": 102,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "ritual_or_spell_burst",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 3.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "opponent_draw_tax_treasure_v1"
+        ]
+      },
+      "card_name": "Smothering Tithe",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": 57,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "treasure_or_discard_ramp",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 4.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "discard_draw_two_create_two_treasures_v1"
+        ]
+      },
+      "card_name": "Big Score",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_mana_package",
+      "decision_reasons": [
+        "current_607_card"
+      ],
+      "edhrec_rank": 172,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "treasure_or_discard_ramp",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 4.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "discard_draw_create_treasures_v1"
+        ]
+      },
+      "card_name": "Unexpected Windfall",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": 303,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "treasure_or_discard_ramp",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 4.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1"
+        ]
+      },
+      "card_name": "Monument to Endurance",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "treasure_or_discard_ramp",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 3.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1"
+        ]
+      },
+      "card_name": "Bender's Waterskin",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_turn_cycle_miracle_mana",
+      "decision_reasons": [
+        "opponent_turn_miracle_mana_is_not_generic_ramp"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "turn_cycle_miracle_mana",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 3.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "political_colorless_mana_rock_multiplayer_untap_v1"
+        ]
+      },
+      "card_name": "Victory Chimes",
+      "colors": [
+        "C"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_turn_cycle_miracle_mana",
+      "decision_reasons": [
+        "opponent_turn_miracle_mana_is_not_generic_ramp"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {},
+      "lane": "turn_cycle_miracle_mana",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 3.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "rule_count": 2,
+        "scopes": [
+          "saga_land_token_then_tutor_partial_v1"
+        ]
+      },
+      "card_name": "Urza's Saga",
+      "colors": [
+        "C"
+      ],
+      "commander_legality": "legal",
+      "decision": "already_in_607_protected_mana_foundation",
+      "decision_reasons": [
+        "current_607_role_card"
+      ],
+      "edhrec_rank": 119,
+      "evidence": {},
+      "in_protected_607": true,
+      "land_sequence_score": {
+        "reasons": [
+          "untapped_timing",
+          "artifact_tutor_land",
+          "colorless_only_pressure"
+        ],
+        "score": 3
+      },
+      "lane": "utility_land",
+      "policy_class": "current_protected_or_watch",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 0,
+        "rule_count": 0,
+        "scopes": []
+      },
+      "card_name": "Jeweled Lotus",
+      "colors": [],
+      "commander_legality": "banned",
+      "decision": "blocked_commander_banned_or_not_accessible",
+      "decision_reasons": [
+        "commander_ban_or_legality_block"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "banned_fast_mana",
+      "policy_class": "not_accessible",
+      "safe_cmc": 99.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 0,
+        "rule_count": 0,
+        "scopes": []
+      },
+      "card_name": "Mana Crypt",
+      "colors": [
+        "C"
+      ],
+      "commander_legality": "banned",
+      "decision": "blocked_commander_banned_or_not_accessible",
+      "decision_reasons": [
+        "commander_ban_or_legality_block"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "banned_fast_mana",
+      "policy_class": "not_accessible",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "rule_count": 2,
+        "scopes": [
+          "artifact_land_colored_source_v1"
+        ]
+      },
+      "card_name": "Great Furnace",
+      "colors": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_requires_same_lane_cut_and_gate",
+      "decision_reasons": [
+        "staple_policy:candidate_requires_same_lane_cut_and_gate"
+      ],
+      "edhrec_rank": 415,
+      "evidence": {
+        "staple_policy_lane": "mana_base",
+        "staple_policy_reasons": [
+          "staple_signal_without_current_cut_proof"
+        ]
+      },
+      "in_protected_607": false,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing"
+        ],
+        "score": 5
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "tested_or_policy_blocked",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "rule_count": 2,
+        "scopes": [
+          "artifact_land_colored_source_v1"
+        ]
+      },
+      "card_name": "Ancient Den",
+      "colors": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_land_upgrade_requires_current_land_cut",
+      "decision_reasons": [
+        "mana_base_already_passes_current_foundation"
+      ],
+      "edhrec_rank": 528,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing"
+        ],
+        "score": 5
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "land_hypothesis",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "five_color_tap_damage_land_runtime_v1"
+        ]
+      },
+      "card_name": "City of Brass",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_land_upgrade_requires_current_land_cut",
+      "decision_reasons": [
+        "mana_base_already_passes_current_foundation"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing"
+        ],
+        "score": 5
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "land_hypothesis",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "five_color_life_paid_land_runtime_v1"
+        ]
+      },
+      "card_name": "Mana Confluence",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_land_upgrade_requires_current_land_cut",
+      "decision_reasons": [
+        "mana_base_already_passes_current_foundation"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing"
+        ],
+        "score": 5
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "land_hypothesis",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": []
+      },
+      "card_name": "Plateau",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_land_upgrade_requires_current_land_cut",
+      "decision_reasons": [
+        "mana_base_already_passes_current_foundation"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing"
+        ],
+        "score": 5
+      },
+      "lane": "colored_land_fixing",
+      "policy_class": "land_hypothesis",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "single_shot_red_ritual_v1"
+        ]
+      },
+      "card_name": "Seething Song",
+      "colors": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "decision": "blocked_prior_exact_reject",
+      "decision_reasons": [
+        "staple_policy:blocked_prior_exact_reject"
+      ],
+      "edhrec_rank": 370,
+      "evidence": {
+        "staple_policy_lane": "ramp",
+        "staple_policy_reasons": [
+          "profiled_cut_prior_exact_reject"
+        ]
+      },
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "contextual_mana_source",
+      "policy_class": "tested_or_policy_blocked",
+      "safe_cmc": 3.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "creature_pay_three_life_add_one_red_mana_dethrone_v1"
+        ]
+      },
+      "card_name": "Treasonous Ogre",
+      "colors": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_requires_same_lane_cut_and_sequence_gate",
+      "decision_reasons": [
+        "must_preserve_commander_turn_and_current_protected_anchors"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "contextual_mana_source",
+      "policy_class": "same_lane_hypothesis",
+      "safe_cmc": 4.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "zero_mana_artifact_sacrifice_one_mana_one_shot_runtime_v1"
+        ]
+      },
+      "card_name": "Lotus Petal",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "blocked_prior_exact_reject",
+      "decision_reasons": [
+        "staple_policy:blocked_prior_exact_reject"
+      ],
+      "edhrec_rank": 117,
+      "evidence": {
+        "staple_policy_lane": "ramp",
+        "staple_policy_reasons": [
+          "profiled_cut_prior_exact_reject"
+        ]
+      },
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "early_colored_rock",
+      "policy_class": "tested_or_policy_blocked",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "three_red_mana_ritual_v1"
+        ]
+      },
+      "card_name": "Pyretic Ritual",
+      "colors": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_requires_same_lane_cut_and_sequence_gate",
+      "decision_reasons": [
+        "must_preserve_commander_turn_and_current_protected_anchors"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "early_colored_rock",
+      "policy_class": "same_lane_hypothesis",
+      "safe_cmc": 2.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "fast_mana_artifact_partial_v1"
+        ]
+      },
+      "card_name": "Mana Vault",
+      "colors": [
+        "C"
+      ],
+      "commander_legality": "legal",
+      "decision": "blocked_prior_gate_rejected",
+      "decision_reasons": [
+        "mana_vault_current_pair_lost_with_real_card_use"
+      ],
+      "edhrec_rank": 144,
+      "evidence": {
+        "latest_gate_delta_pp": -66.67,
+        "promotion_allowed": false
+      },
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "fast_colorless_burst",
+      "policy_class": "tested_or_policy_blocked",
+      "safe_cmc": 1.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "three_colorless_monolith_mana_rock_v1"
+        ]
+      },
+      "card_name": "Grim Monolith",
+      "colors": [
+        "C"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_fast_mana_requires_fixing_and_use_gate",
+      "decision_reasons": [
+        "colorless_burst_must_not_reduce_boros_fixing_or_miracle_cadence"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "fast_colorless_burst",
+      "policy_class": "fast_mana_hypothesis",
+      "safe_cmc": 2.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": []
+      },
+      "card_name": "City of Traitors",
+      "colors": [
+        "C"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_land_requires_named_land_cut_and_equal_gate",
+      "decision_reasons": [
+        "fast_or_utility_land_cannot_cut_colored_or_protected_land_by_rank"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {
+        "reasons": [
+          "untapped_timing",
+          "fast_land_mana",
+          "colorless_only_pressure"
+        ],
+        "score": 4
+      },
+      "lane": "fast_or_utility_land",
+      "policy_class": "land_hypothesis",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 2,
+        "rule_count": 2,
+        "scopes": [
+          "pregame_fixing_land_partial_v1"
+        ]
+      },
+      "card_name": "Gemstone Caverns",
+      "colors": [
+        "C",
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_land_requires_named_land_cut_and_equal_gate",
+      "decision_reasons": [
+        "fast_or_utility_land_cannot_cut_colored_or_protected_land_by_rank"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {
+        "reasons": [
+          "boros_color_source",
+          "untapped_timing"
+        ],
+        "score": 5
+      },
+      "lane": "fast_or_utility_land",
+      "policy_class": "land_hypothesis",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "zero_mana_artifact_imprint_nonartifact_nonland_tap_add_imprinted_color_v1"
+        ]
+      },
+      "card_name": "Chrome Mox",
+      "colors": [],
+      "commander_legality": "legal",
+      "decision": "policy_blocked_no_premium_mox",
+      "decision_reasons": [
+        "staple_policy:policy_blocked_no_premium_mox"
+      ],
+      "edhrec_rank": 142,
+      "evidence": {
+        "staple_policy_lane": "ramp",
+        "staple_policy_reasons": [
+          "premium_mox_policy_blocker"
+        ]
+      },
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "premium_mox_fast_mana",
+      "policy_class": "tested_or_policy_blocked",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "legend_gated_fast_mana_v1"
+        ]
+      },
+      "card_name": "Mox Amber",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "policy_blocked_no_premium_mox",
+      "decision_reasons": [
+        "staple_policy:policy_blocked_no_premium_mox"
+      ],
+      "edhrec_rank": 208,
+      "evidence": {
+        "staple_policy_lane": "ramp",
+        "staple_policy_reasons": [
+          "premium_mox_requires_explicit_policy_and_same_lane_gate"
+        ]
+      },
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "premium_mox_fast_mana",
+      "policy_class": "tested_or_policy_blocked",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "metalcraft_three_artifacts_any_color_mana_rock_v1"
+        ]
+      },
+      "card_name": "Mox Opal",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "policy_blocked_no_premium_mox",
+      "decision_reasons": [
+        "staple_policy:policy_blocked_no_premium_mox"
+      ],
+      "edhrec_rank": 239,
+      "evidence": {
+        "staple_policy_lane": "ramp",
+        "staple_policy_reasons": [
+          "premium_mox_policy_blocker"
+        ]
+      },
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "premium_mox_fast_mana",
+      "policy_class": "tested_or_policy_blocked",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "zero_mana_artifact_discard_land_etb_tap_add_any_color_v1"
+        ]
+      },
+      "card_name": "Mox Diamond",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "policy_blocked_no_premium_mox",
+      "decision_reasons": [
+        "staple_policy:policy_blocked_no_premium_mox"
+      ],
+      "edhrec_rank": 246,
+      "evidence": {
+        "staple_policy_lane": "ramp",
+        "staple_policy_reasons": [
+          "premium_mox_requires_explicit_policy_and_same_lane_gate"
+        ]
+      },
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "premium_mox_fast_mana",
+      "policy_class": "tested_or_policy_blocked",
+      "safe_cmc": 0.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "rite_of_flame_singleton_baseline_red_ritual_v1"
+        ]
+      },
+      "card_name": "Rite of Flame",
+      "colors": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_spell_ramp_requires_spell_slot_gate",
+      "decision_reasons": [
+        "one_shot_or_contextual_ramp_is_not_opening_fixing"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "ritual_or_spell_burst",
+      "policy_class": "spell_ramp_hypothesis",
+      "safe_cmc": 1.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "creature_body_artifact_power_magecraft_treasure_annotation_v1"
+        ]
+      },
+      "card_name": "Storm-Kiln Artist",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_hypothesis_requires_named_cut_and_equal_gate",
+      "decision_reasons": [
+        "staple_policy:candidate_hypothesis_requires_named_cut_and_equal_gate"
+      ],
+      "edhrec_rank": 233,
+      "evidence": {
+        "staple_policy_lane": "ramp",
+        "staple_policy_reasons": [
+          "payoff_synthesis_decision"
+        ]
+      },
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "treasure_or_discard_ramp",
+      "policy_class": "tested_or_policy_blocked",
+      "safe_cmc": 4.0
+    },
+    {
+      "battle_rule_summary": {
+        "active_rule_count": 1,
+        "rule_count": 1,
+        "scopes": [
+          "single_treasure_creation_v1"
+        ]
+      },
+      "card_name": "Strike It Rich",
+      "colors": [
+        "R",
+        "W"
+      ],
+      "commander_legality": "legal",
+      "decision": "candidate_spell_ramp_requires_spell_slot_gate",
+      "decision_reasons": [
+        "one_shot_or_contextual_ramp_is_not_opening_fixing"
+      ],
+      "edhrec_rank": null,
+      "evidence": {},
+      "in_protected_607": false,
+      "land_sequence_score": {},
+      "lane": "treasure_or_discard_ramp",
+      "policy_class": "spell_ramp_hypothesis",
+      "safe_cmc": 1.0
+    }
+  ],
+  "current_mana_package": [
+    {
+      "card_name": "Arid Mesa",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "fetch_or_basic_access",
+        "life_cost"
+      ]
+    },
+    {
+      "card_name": "Battlefield Forge",
+      "cmc": 0.0,
+      "colors": [
+        "C",
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": []
+    },
+    {
+      "card_name": "Bloodstained Mire",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "fetch_or_basic_access",
+        "life_cost"
+      ]
+    },
+    {
+      "card_name": "Command Tower",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": []
+    },
+    {
+      "card_name": "Eiganjo, Seat of the Empire",
+      "cmc": 0.0,
+      "colors": [
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": []
+    },
+    {
+      "card_name": "Elegant Parlor",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "always_tapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "topdeck_or_graveyard_selection"
+      ]
+    },
+    {
+      "card_name": "Exotic Orchard",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": []
+    },
+    {
+      "card_name": "Flooded Strand",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "fetch_or_basic_access",
+        "life_cost"
+      ]
+    },
+    {
+      "card_name": "Glittering Massif",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "always_tapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "cycling_flood_escape",
+        "land_card_flow"
+      ]
+    },
+    {
+      "card_name": "Marsh Flats",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "fetch_or_basic_access",
+        "life_cost"
+      ]
+    },
+    {
+      "card_name": "Mountain // Mountain",
+      "cmc": 0.0,
+      "colors": [
+        "R"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 4,
+      "roles": [
+        "basic_count_for_land_tax"
+      ]
+    },
+    {
+      "card_name": "Plains // Plains",
+      "cmc": 0.0,
+      "colors": [
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 4,
+      "roles": [
+        "basic_count_for_land_tax"
+      ]
+    },
+    {
+      "card_name": "Plaza of Heroes",
+      "cmc": 0.0,
+      "colors": [
+        "C",
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "legendary_protection"
+      ]
+    },
+    {
+      "card_name": "Prismatic Vista",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "fetch_or_basic_access",
+        "life_cost"
+      ]
+    },
+    {
+      "card_name": "Radiant Summit",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "conditional_tapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": []
+    },
+    {
+      "card_name": "Sacred Foundry",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "optional_life_untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": []
+    },
+    {
+      "card_name": "Scalding Tarn",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "fetch_or_basic_access",
+        "life_cost"
+      ]
+    },
+    {
+      "card_name": "Spectator Seating",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped_commander_multiplayer",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": []
+    },
+    {
+      "card_name": "Sunbaked Canyon",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "land_card_flow",
+        "life_cost"
+      ]
+    },
+    {
+      "card_name": "Sunbillow Verge",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": []
+    },
+    {
+      "card_name": "Turbulent Steppe",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "conditional_tapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": []
+    },
+    {
+      "card_name": "Windswept Heath",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "fetch_or_basic_access",
+        "life_cost"
+      ]
+    },
+    {
+      "card_name": "Wooded Foothills",
+      "cmc": 0.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": "untapped",
+      "lane": "colored_land_fixing",
+      "policy_class": "current_fixing_floor",
+      "quantity": 1,
+      "roles": [
+        "fetch_or_basic_access",
+        "life_cost"
+      ]
+    },
+    {
+      "card_name": "Pearl Medallion",
+      "cmc": 2.0,
+      "colors": [],
+      "etb_mode": null,
+      "lane": "cost_reducer",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "early_cost_reducer"
+      ]
+    },
+    {
+      "card_name": "Ruby Medallion",
+      "cmc": 2.0,
+      "colors": [],
+      "etb_mode": null,
+      "lane": "cost_reducer",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "early_cost_reducer"
+      ]
+    },
+    {
+      "card_name": "Land Tax",
+      "cmc": 1.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "early_colored_rock",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": []
+    },
+    {
+      "card_name": "Arcane Signet",
+      "cmc": 2.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "early_colored_rock",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "early_recurring_colored_mana"
+      ]
+    },
+    {
+      "card_name": "Boros Signet",
+      "cmc": 2.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "early_colored_rock",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "early_recurring_colored_mana"
+      ]
+    },
+    {
+      "card_name": "Fellwar Stone",
+      "cmc": 2.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "early_colored_rock",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "early_recurring_colored_mana"
+      ]
+    },
+    {
+      "card_name": "Talisman of Conviction",
+      "cmc": 2.0,
+      "colors": [
+        "C",
+        "R",
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "early_colored_rock",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "early_recurring_colored_mana"
+      ]
+    },
+    {
+      "card_name": "The Mind Stone",
+      "cmc": 2.0,
+      "colors": [
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "early_colored_rock",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "early_recurring_colored_mana"
+      ]
+    },
+    {
+      "card_name": "Sol Ring",
+      "cmc": 1.0,
+      "colors": [
+        "C"
+      ],
+      "etb_mode": null,
+      "lane": "early_colorless_burst",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "early_colorless_acceleration"
+      ]
+    },
+    {
+      "card_name": "Ancient Tomb",
+      "cmc": 0.0,
+      "colors": [
+        "C"
+      ],
+      "etb_mode": "untapped",
+      "lane": "fast_or_utility_land",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "fast_colorless_acceleration",
+        "life_cost"
+      ]
+    },
+    {
+      "card_name": "Jeska's Will",
+      "cmc": 3.0,
+      "colors": [
+        "R"
+      ],
+      "etb_mode": null,
+      "lane": "ritual_or_spell_burst",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "burst_or_treasure_ramp"
+      ]
+    },
+    {
+      "card_name": "Monument to Endurance",
+      "cmc": 3.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "treasure_or_discard_ramp",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "burst_or_treasure_ramp"
+      ]
+    },
+    {
+      "card_name": "Big Score",
+      "cmc": 4.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "treasure_or_discard_ramp",
+      "policy_class": "current_mana_role_card",
+      "quantity": 1,
+      "roles": [
+        "burst_or_treasure_ramp"
+      ]
+    },
+    {
+      "card_name": "Smothering Tithe",
+      "cmc": 4.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "treasure_or_discard_ramp",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "table_tax_treasure_engine"
+      ]
+    },
+    {
+      "card_name": "Unexpected Windfall",
+      "cmc": 4.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "treasure_or_discard_ramp",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "burst_or_treasure_ramp"
+      ]
+    },
+    {
+      "card_name": "Bender's Waterskin",
+      "cmc": 3.0,
+      "colors": [
+        "R",
+        "W"
+      ],
+      "etb_mode": null,
+      "lane": "turn_cycle_miracle_mana",
+      "policy_class": "protected_turn_cycle_miracle_mana",
+      "quantity": 1,
+      "roles": [
+        "turn_cycle_miracle_mana"
+      ]
+    },
+    {
+      "card_name": "Victory Chimes",
+      "cmc": 3.0,
+      "colors": [
+        "C"
+      ],
+      "etb_mode": null,
+      "lane": "turn_cycle_miracle_mana",
+      "policy_class": "protected_turn_cycle_miracle_mana",
+      "quantity": 1,
+      "roles": [
+        "turn_cycle_miracle_mana"
+      ]
+    },
+    {
+      "card_name": "Command Beacon",
+      "cmc": 0.0,
+      "colors": [
+        "C"
+      ],
+      "etb_mode": "untapped",
+      "lane": "utility_land",
+      "policy_class": "current_utility_land_watch",
+      "quantity": 1,
+      "roles": [
+        "commander_recast_recovery"
+      ]
+    },
+    {
+      "card_name": "Reliquary Tower",
+      "cmc": 0.0,
+      "colors": [
+        "C"
+      ],
+      "etb_mode": "untapped",
+      "lane": "utility_land",
+      "policy_class": "current_utility_land_watch",
+      "quantity": 1,
+      "roles": [
+        "no_max_hand_size"
+      ]
+    },
+    {
+      "card_name": "Urza's Saga",
+      "cmc": 0.0,
+      "colors": [
+        "C"
+      ],
+      "etb_mode": "untapped",
+      "lane": "utility_land",
+      "policy_class": "protected_current_mana_foundation",
+      "quantity": 1,
+      "roles": [
+        "artifact_tutor_land"
+      ]
+    },
+    {
+      "card_name": "War Room",
+      "cmc": 0.0,
+      "colors": [
+        "C"
+      ],
+      "etb_mode": "untapped",
+      "lane": "utility_land",
+      "policy_class": "current_utility_land_watch",
+      "quantity": 1,
+      "roles": [
+        "land_card_flow"
+      ]
+    }
+  ],
+  "decision": {
+    "keep_607_mana_sequence_policy": true,
+    "next_action": "only generate a land/ramp challenger when it names the exact current land or ramp slot being cut and states which sequencing failure it is trying to fix",
+    "reason": "The protected 607 shell already passes the current land/ramp foundation and contains both early fixing and Lorehold-specific turn-cycle mana. Missing fast mana and land staples are either already in the deck, blocked by legality/policy, previously rejected, or require a named same-lane cut plus equal battle gate."
+  },
+  "deck_id": 607,
+  "external_learning": [
+    {
+      "learning": "The cEDH average list runs very low land count plus dense fast mana. That is a velocity signal, not proof that protected 607 should cut a colored source or miracle engine.",
+      "source": "EDHREC Lorehold cEDH average deck",
+      "url": "https://edhrec.com/average-decks/lorehold-the-historian/cedh"
+    },
+    {
+      "learning": "Lorehold's critical window is the first draw on each turn; Top, Scroll Rack, Library of Leng, and opponent-turn mana matter more than generic value cards when they preserve miracle cadence.",
+      "source": "EDHREC Miracles Every Turn with Lorehold",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander"
+    },
+    {
+      "learning": "Victory Chimes and Bender's Waterskin are specifically turn-cycle miracle mana, not interchangeable three-mana rocks.",
+      "source": "Card Kingdom Lorehold synergy article",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/"
+    },
+    {
+      "learning": "Generic land/ramp math is a baseline. ManaLoom should adjust by deck plan, curve, commander cost, and how the ramp actually sequences.",
+      "source": "CoolStuffInc Commander ramp discussion",
+      "url": "https://www.coolstuffinc.com/a/markwischkaemper-06222023-how-much-ramp-is-right-for-your-commander-deck"
+    }
+  ],
+  "generated_at": "2026-07-05T02:58:53Z",
+  "mana_sequence_policy": {
+    "commander_turn_target": "cast Lorehold on or before turn 5 while preserving RW access",
+    "post_commander_target": "keep mana available across opponents' turns for first-draw miracle windows",
+    "protected_principles": [
+      "do not cut turn-cycle miracle mana as if it were a generic three-mana rock",
+      "do not cut colored/fetchable sources for colorless burst without equal-gate proof",
+      "do not treat rituals or treasures as opening fixing",
+      "do not promote a land by prestige unless a current land cut is named"
+    ]
+  },
+  "postgres_writes": false,
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_reports": {
+    "mana_foundation": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_foundation_audit_20260705_current_relearn.json",
+    "mana_vault": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_evidence_synthesis_20260704_learning_refresh.json",
+    "ramp_package": "docs/hermes-analysis/master_optimizer_reports/lorehold_ramp_package_evaluation_20260704_learning_refresh_20260704_195019.json",
+    "staple_policy": "docs/hermes-analysis/master_optimizer_reports/lorehold_staple_policy_synthesis_20260704_sequence_learning_probe.json"
+  },
+  "status": "mana_sequence_no_direct_auto_upgrade_current_607",
+  "summary": {
+    "candidate_count": 50,
+    "candidate_decision_counts": {
+      "already_in_607_mana_package": 13,
+      "already_in_607_protected_mana_foundation": 13,
+      "already_in_607_protected_turn_cycle_miracle_mana": 2,
+      "blocked_commander_banned_or_not_accessible": 2,
+      "blocked_prior_exact_reject": 2,
+      "blocked_prior_gate_rejected": 1,
+      "candidate_fast_mana_requires_fixing_and_use_gate": 1,
+      "candidate_hypothesis_requires_named_cut_and_equal_gate": 1,
+      "candidate_land_requires_named_land_cut_and_equal_gate": 2,
+      "candidate_land_upgrade_requires_current_land_cut": 4,
+      "candidate_requires_same_lane_cut_and_gate": 1,
+      "candidate_requires_same_lane_cut_and_sequence_gate": 2,
+      "candidate_spell_ramp_requires_spell_slot_gate": 2,
+      "policy_blocked_no_premium_mox": 4
+    },
+    "candidate_lane_counts": {
+      "banned_fast_mana": 2,
+      "colored_land_fixing": 17,
+      "contextual_mana_source": 2,
+      "cost_reducer": 2,
+      "early_colored_rock": 6,
+      "early_colorless_burst": 1,
+      "fast_colorless_burst": 2,
+      "fast_or_utility_land": 3,
+      "premium_mox_fast_mana": 4,
+      "ritual_or_spell_burst": 2,
+      "treasure_or_discard_ramp": 6,
+      "turn_cycle_miracle_mana": 2,
+      "utility_land": 1
+    },
+    "colorless_only_land_count": 5,
+    "current_policy_counts": {
+      "current_fixing_floor": 23,
+      "current_mana_role_card": 1,
+      "current_utility_land_watch": 3,
+      "protected_current_mana_foundation": 15,
+      "protected_turn_cycle_miracle_mana": 2
+    },
+    "early_foundation_count": 8,
+    "land_count": 34,
+    "mana_foundation_blocker_count": 0,
+    "mana_foundation_status": "mana_foundation_pass_with_watch_items",
+    "mana_foundation_watch_item_count": 3,
+    "ramp_count": 15,
+    "ramp_package_count": 1,
+    "ramp_package_summary_count": 0,
+    "red_source_count": 24,
+    "role_counts": {
+      "board_wipe": 8,
+      "commander": 1,
+      "creature": 2,
+      "draw": 9,
+      "engine": 2,
+      "land": 34,
+      "protection": 12,
+      "ramp": 15,
+      "removal": 7,
+      "tutor": 1,
+      "wincon": 9
+    },
+    "tapped_land_pressure_count": 4,
+    "total_cards": 100,
+    "true_early_mana_count": 6,
+    "white_source_count": 25
+  }
+}

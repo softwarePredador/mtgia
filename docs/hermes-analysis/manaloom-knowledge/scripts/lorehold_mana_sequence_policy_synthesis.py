@@ -182,28 +182,28 @@ def newest_report(pattern: str, fallback: Path, *, report_dir: Path = REPORT_DIR
 
 def default_mana_foundation_report() -> Path:
     return newest_report(
-        "lorehold_mana_foundation_audit_20260704*.json",
+        "lorehold_mana_foundation_audit_*.json",
         REPORT_DIR / "lorehold_mana_foundation_audit_20260704_learning.json",
     )
 
 
 def default_staple_policy_report() -> Path:
     return newest_report(
-        "lorehold_staple_policy_synthesis_20260704*.json",
+        "lorehold_staple_policy_synthesis_*.json",
         REPORT_DIR / "lorehold_staple_policy_synthesis_20260704_learning.json",
     )
 
 
 def default_ramp_package_report() -> Path:
     return newest_report(
-        "lorehold_ramp_package_evaluation_20260704*.json",
+        "lorehold_ramp_package_evaluation_*.json",
         REPORT_DIR / "lorehold_ramp_package_evaluation_20260704_learning_refresh_20260704_195019.json",
     )
 
 
 def default_mana_vault_report() -> Path:
     return newest_report(
-        "lorehold_mana_vault_evidence_synthesis_20260704*.json",
+        "lorehold_mana_vault_evidence_synthesis_*.json",
         REPORT_DIR / "lorehold_mana_vault_evidence_synthesis_20260704_learning_refresh.json",
     )
 
