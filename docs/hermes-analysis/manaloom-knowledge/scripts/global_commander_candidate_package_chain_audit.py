@@ -48,24 +48,41 @@ def load_json(path: Path) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
-def materializer_step(path: Path, payload: Mapping[str, Any]) -> dict[str, Any]:
+def materializer_steps(path: Path, payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     summary = payload.get("summary") or {}
-    return {
-        "path": rel(path),
-        "status": payload.get("status"),
-        "deck_id": summary.get("deck_id"),
-        "commander": summary.get("commander"),
-        "add": summary.get("add"),
-        "cut": summary.get("cut"),
-        "role": summary.get("role"),
-        "candidate_db": payload.get("candidate_db"),
-        "source_unchanged": bool(summary.get("source_unchanged")),
-        "source_matches_pair_report": bool(summary.get("source_matches_pair_report")),
-        "source_candidate_hash_differs": bool(summary.get("source_candidate_hash_differs")),
-        "allow_next_strategy_matrix": bool(summary.get("allow_next_strategy_matrix")),
-        "allow_battle_gate_now": bool(summary.get("allow_battle_gate_now")),
-        "promotion_allowed": bool(summary.get("promotion_allowed")),
-    }
+    model_pairs = payload.get("model_pairs") or []
+    if not isinstance(model_pairs, list) or not model_pairs:
+        model_pairs = [
+            {
+                "add": summary.get("add"),
+                "cut": summary.get("cut"),
+                "role": summary.get("role"),
+            }
+        ]
+    steps = []
+    for index, pair in enumerate(model_pairs, start=1):
+        if not isinstance(pair, Mapping):
+            continue
+        steps.append(
+            {
+                "path": rel(path),
+                "materializer_pair_index": index,
+                "status": payload.get("status"),
+                "deck_id": summary.get("deck_id"),
+                "commander": summary.get("commander"),
+                "add": pair.get("add"),
+                "cut": pair.get("cut"),
+                "role": pair.get("role") or summary.get("role"),
+                "candidate_db": payload.get("candidate_db"),
+                "source_unchanged": bool(summary.get("source_unchanged")),
+                "source_matches_pair_report": bool(summary.get("source_matches_pair_report")),
+                "source_candidate_hash_differs": bool(summary.get("source_candidate_hash_differs")),
+                "allow_next_strategy_matrix": bool(summary.get("allow_next_strategy_matrix")),
+                "allow_battle_gate_now": bool(summary.get("allow_battle_gate_now")),
+                "promotion_allowed": bool(summary.get("promotion_allowed")),
+            }
+        )
+    return steps
 
 
 def deck_core_row(core_payload: Mapping[str, Any], deck_id: str) -> dict[str, Any]:
@@ -96,7 +113,9 @@ def build_report(
     final_core_report: Path,
     final_strategy_report: Path,
 ) -> dict[str, Any]:
-    steps = [materializer_step(path, load_json(path)) for path in materializer_reports]
+    steps: list[dict[str, Any]] = []
+    for path in materializer_reports:
+        steps.extend(materializer_steps(path, load_json(path)))
     final_step = steps[-1] if steps else {}
     deck_id = str(final_step.get("deck_id") or "")
     commander = str(final_step.get("commander") or "")

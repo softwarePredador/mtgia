@@ -131,8 +131,28 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
                 ),
                 (
                     619,
+                    "Smuggler's Share",
+                    1,
+                    "card_draw_selection",
+                    '["card_draw_selection"]',
+                    "test",
+                    0,
+                    0,
+                    3,
+                    "Enchantment",
+                    "Whenever an opponent draws their second card each turn, you draw a card.",
+                    "smugglers-share",
+                    "[]",
+                    "[]",
+                    "seed",
+                    "old",
+                    "old",
+                    "old",
+                ),
+                (
+                    619,
                     "Plains",
-                    97,
+                    96,
                     "land",
                     '["land"]',
                     "test",
@@ -164,6 +184,38 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
               2,
               'scryfall-feed',
               'feed'
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO card_oracle_cache VALUES (
+              'Arena of Glory',
+              'arena of glory',
+              '',
+              '[]',
+              '["R"]',
+              'Land',
+              'Arena of Glory enters the battlefield tapped unless you control a Mountain.',
+              0,
+              'scryfall-arena',
+              'arena'
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO card_oracle_cache VALUES (
+              'Despark',
+              'despark',
+              '{W}{B}',
+              '["W", "B"]',
+              '["W", "B"]',
+              'Instant',
+              'Exile target permanent with mana value 4 or greater.',
+              2,
+              'scryfall-despark',
+              'despark'
             )
             """
         )
@@ -291,6 +343,102 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
                 out_prefix=Path(tmp.name) / "out",
                 deck_id="619",
             )
+
+    def test_materializes_value_safe_stage_pairs_only_in_candidate_copy(self) -> None:
+        tmp, source_db = self._db()
+        self.addCleanup(tmp.cleanup)
+        cut_report = Path(tmp.name) / "cut_report.json"
+        cut_report.write_text(
+            json.dumps(
+                {
+                    "input_artifacts": {"selected_db": str(source_db.resolve())},
+                    "blocked_cut_candidates": [
+                        {
+                            "card_name": "Protected Payoff",
+                            "status": "blocked_commander_specific_payoff_cut",
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        stage_report = Path(tmp.name) / "stage_report.json"
+        stage_report.write_text(
+            json.dumps(
+                {
+                    "artifact_type": "global_commander_value_safe_stage_splitter",
+                    "summary": {
+                        "deck_id": "619",
+                        "commander": "Kaalia of the Vast",
+                    },
+                    "input_artifacts": {
+                        "cut_source_lane_report": str(cut_report),
+                    },
+                    "stages": [
+                        {
+                            "stage": 1,
+                            "status": "stage_ready_for_candidate_copy",
+                            "candidate_copy_allowed_now": True,
+                            "next_gate": "materialize_value_safe_stage_1_candidate_copy",
+                            "pairs": [
+                                {
+                                    "add": "Arena of Glory",
+                                    "cut": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+                                    "add_axis": "commander_attack_window",
+                                    "cut_primary_role": "engine",
+                                },
+                                {
+                                    "add": "Despark",
+                                    "cut": "Smuggler's Share",
+                                    "add_axis": "spot_interaction",
+                                    "cut_primary_role": "card_draw_selection",
+                                },
+                            ],
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        payload = audit.build_payload(
+            source_db=source_db,
+            pair_report=stage_report,
+            out_prefix=Path(tmp.name) / "out",
+            deck_id="619",
+            stage=1,
+        )
+
+        candidate_db = Path(payload["candidate_db"])
+        self.assertEqual(payload["status"], "candidate_materialized_structure_ready_next_gate_closed")
+        self.assertTrue(payload["summary"]["source_unchanged"])
+        self.assertEqual(payload["summary"]["pair_count"], 2)
+        self.assertEqual(payload["summary"]["stage"], 1)
+        self.assertEqual(payload["structure_validation"]["status"], "pass")
+        self.assertTrue(payload["structure_validation"]["checks"]["all_adds_present_once"])
+        self.assertTrue(payload["structure_validation"]["checks"]["all_cuts_absent"])
+
+        source_conn = sqlite3.connect(source_db)
+        candidate_conn = sqlite3.connect(candidate_db)
+        self.addCleanup(source_conn.close)
+        self.addCleanup(candidate_conn.close)
+
+        source_names = {
+            row[0]
+            for row in source_conn.execute("SELECT card_name FROM deck_cards WHERE deck_id=619").fetchall()
+        }
+        candidate_names = {
+            row[0]
+            for row in candidate_conn.execute("SELECT card_name FROM deck_cards WHERE deck_id=619").fetchall()
+        }
+        self.assertIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", source_names)
+        self.assertIn("Smuggler's Share", source_names)
+        self.assertNotIn("Arena of Glory", source_names)
+        self.assertNotIn("Despark", source_names)
+        self.assertIn("Arena of Glory", candidate_names)
+        self.assertIn("Despark", candidate_names)
+        self.assertNotIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", candidate_names)
+        self.assertNotIn("Smuggler's Share", candidate_names)
 
 
 if __name__ == "__main__":

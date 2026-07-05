@@ -57,11 +57,47 @@ def read_json(path: Path) -> dict[str, Any]:
     return dict(payload) if isinstance(payload, Mapping) else {}
 
 
+def repo_path(path: str | Path) -> Path:
+    candidate = Path(path)
+    return candidate if candidate.is_absolute() else REPO_ROOT / candidate
+
+
 def table_columns(conn: sqlite3.Connection, table: str) -> list[str]:
     return [str(row[1]) for row in conn.execute(f"PRAGMA table_info({table})")]
 
 
-def load_top_pair(
+def stage_source_payload(stage_payload: Mapping[str, Any], stage_report: Path) -> dict[str, Any]:
+    input_artifacts = stage_payload.get("input_artifacts") or {}
+    cut_report = input_artifacts.get("cut_source_lane_report")
+    if not cut_report:
+        return {}
+    cut_report_path = repo_path(str(cut_report))
+    if not cut_report_path.exists():
+        raise RuntimeError(f"stage source cut-lane report not found: {cut_report_path}")
+    return read_json(cut_report_path)
+
+
+def expected_source_db(payload: Mapping[str, Any], report_path: Path) -> str:
+    source_db = str(payload.get("source_db") or "")
+    if source_db:
+        return source_db
+    db_resolution = payload.get("db_resolution") or {}
+    selected = str(db_resolution.get("selected_db") or "")
+    if selected:
+        return selected
+    input_artifacts = payload.get("input_artifacts") or {}
+    selected = str(input_artifacts.get("selected_db") or "")
+    if selected:
+        return selected
+
+    if payload.get("artifact_type") == "global_commander_value_safe_stage_splitter":
+        cut_payload = stage_source_payload(payload, report_path)
+        if cut_payload:
+            return expected_source_db(cut_payload, report_path)
+    return ""
+
+
+def load_top_pair_from_pool(
     pair_report: Path,
     *,
     deck_id: str | None = None,
@@ -69,7 +105,7 @@ def load_top_pair(
     cut: str | None = None,
 ) -> dict[str, Any]:
     payload = read_json(pair_report)
-    source_report_db = str(payload.get("source_db") or "")
+    source_report_db = expected_source_db(payload, pair_report)
     pools = payload.get("nonland_pools") or payload.get("deck_cut_pools") or []
     for pool in pools:
         if not isinstance(pool, Mapping):
@@ -112,19 +148,126 @@ def load_top_pair(
     raise RuntimeError(f"no matching pair found in {pair_report}")
 
 
+def load_stage_pairs(
+    stage_report: Path,
+    *,
+    deck_id: str | None = None,
+    add: str | None = None,
+    cut: str | None = None,
+    stage: int = 1,
+) -> dict[str, Any]:
+    payload = read_json(stage_report)
+    if payload.get("artifact_type") != "global_commander_value_safe_stage_splitter":
+        raise RuntimeError(f"{stage_report} is not a value-safe stage splitter report")
+    summary = payload.get("summary") or {}
+    if deck_id and str(summary.get("deck_id")) != str(deck_id):
+        raise RuntimeError(f"stage report deck_id mismatch: expected {deck_id}, got {summary.get('deck_id')}")
+    stage_rows = [
+        row
+        for row in payload.get("stages") or []
+        if isinstance(row, Mapping) and int(row.get("stage") or 0) == int(stage)
+    ]
+    if not stage_rows:
+        raise RuntimeError(f"stage {stage} not found in {stage_report}")
+    stage_row = dict(stage_rows[0])
+    if stage_row.get("status") != "stage_ready_for_candidate_copy":
+        raise RuntimeError(f"stage {stage} is not ready for candidate copy")
+    if not stage_row.get("candidate_copy_allowed_now"):
+        raise RuntimeError(f"stage {stage} candidate copy is not allowed")
+
+    pairs: list[dict[str, Any]] = []
+    for pair in stage_row.get("pairs") or []:
+        if not isinstance(pair, Mapping):
+            continue
+        pair_add = str(pair.get("add") or "")
+        pair_cut = str(pair.get("cut") or "")
+        if add and normalize_name(pair_add) != normalize_name(add):
+            continue
+        if cut and normalize_name(pair_cut) != normalize_name(cut):
+            continue
+        pairs.append(
+            {
+                "deck_id": str(summary.get("deck_id") or ""),
+                "commander": summary.get("commander"),
+                "role": pair.get("add_axis") or pair.get("cut_primary_role") or "",
+                "add": pair_add,
+                "cut": pair_cut,
+                "pair": dict(pair),
+                "candidate": {
+                    "card_name": pair_add,
+                    "role": pair.get("add_axis") or "",
+                    "covered_axes": pair.get("add_covered_axes") or [],
+                    "score": pair.get("add_score") or 0,
+                    "source": "value_safe_stage_splitter",
+                },
+                "cut_candidate": {
+                    "card_name": pair_cut,
+                    "role": pair.get("cut_primary_role") or "",
+                    "matching_over_target_roles": pair.get("cut_matching_over_target_roles") or [],
+                    "score": pair.get("cut_score") or 0,
+                },
+                "source_pool_status": stage_row.get("status"),
+            }
+        )
+    if not pairs:
+        raise RuntimeError(f"no matching stage pairs found in {stage_report}")
+
+    cut_payload = stage_source_payload(payload, stage_report)
+    return {
+        "deck_id": str(summary.get("deck_id") or ""),
+        "deck_name": None,
+        "commander": summary.get("commander"),
+        "role": "value_safe_stage",
+        "stage": int(stage),
+        "pairs": pairs,
+        "source_pool_status": stage_row.get("status"),
+        "source_report_db": expected_source_db(payload, stage_report),
+        "blocked_cut_candidates": list(cut_payload.get("blocked_cut_candidates") or []),
+        "source_artifact_type": payload.get("artifact_type"),
+        "next_gate": stage_row.get("next_gate"),
+    }
+
+
+def load_materialization_package(
+    pair_report: Path,
+    *,
+    deck_id: str | None = None,
+    add: str | None = None,
+    cut: str | None = None,
+    stage: int = 1,
+) -> dict[str, Any]:
+    payload = read_json(pair_report)
+    if payload.get("artifact_type") == "global_commander_value_safe_stage_splitter":
+        return load_stage_pairs(pair_report, deck_id=deck_id, add=add, cut=cut, stage=stage)
+    pair = load_top_pair_from_pool(pair_report, deck_id=deck_id, add=add, cut=cut)
+    return {
+        "deck_id": pair["deck_id"],
+        "deck_name": pair.get("deck_name"),
+        "commander": pair.get("commander"),
+        "role": pair.get("role"),
+        "stage": None,
+        "pairs": [pair],
+        "source_pool_status": pair.get("source_pool_status"),
+        "source_report_db": pair.get("source_report_db"),
+        "blocked_cut_candidates": pair.get("blocked_cut_candidates") or [],
+        "source_artifact_type": payload.get("artifact_type") or "candidate_pair_pool",
+        "next_gate": None,
+    }
+
+
 def source_db_report_path(source_db: Path) -> str:
     return rel(source_db.resolve())
 
 
-def validate_source_db_for_pair(
+def validate_source_db_for_package(
     conn: sqlite3.Connection,
     *,
     source_db: Path,
-    pair: Mapping[str, Any],
+    package: Mapping[str, Any],
     deck_id: int,
     allow_chained_source: bool,
 ) -> dict[str, Any]:
-    expected_source = str(pair.get("source_report_db") or "")
+    expected_source = str(package.get("source_report_db") or "")
     actual_source = source_db_report_path(source_db)
     source_matches = not expected_source or actual_source == expected_source
     if not source_matches and not allow_chained_source:
@@ -137,16 +280,37 @@ def validate_source_db_for_pair(
     deck_names = {normalize_name(str(row["card_name"])) for row in deck_rows(conn, deck_id)}
     protected_cards = [
         str(row.get("card_name") or "")
-        for row in pair.get("blocked_cut_candidates", [])
+        for row in package.get("blocked_cut_candidates", [])
         if isinstance(row, Mapping) and str(row.get("card_name") or "").strip()
     ]
     missing_protected = [
         card for card in protected_cards if normalize_name(card) not in deck_names
     ]
+    pairs = [row for row in package.get("pairs") or [] if isinstance(row, Mapping)]
+    missing_cuts = [
+        str(row.get("cut") or "")
+        for row in pairs
+        if normalize_name(str(row.get("cut") or "")) not in deck_names
+    ]
+    already_present_adds = [
+        str(row.get("add") or "")
+        for row in pairs
+        if normalize_name(str(row.get("add") or "")) in deck_names
+    ]
     if missing_protected:
         raise RuntimeError(
             "source DB is stale or already mutated; protected blocked cut cards are absent: "
             + ", ".join(missing_protected)
+        )
+    if missing_cuts:
+        raise RuntimeError(
+            "source DB is stale or already mutated; stage cut cards are absent: "
+            + ", ".join(missing_cuts)
+        )
+    if already_present_adds:
+        raise RuntimeError(
+            "source DB is stale or already mutated; stage add cards are already present: "
+            + ", ".join(already_present_adds)
         )
     return {
         "expected_source_db": expected_source,
@@ -155,6 +319,8 @@ def validate_source_db_for_pair(
         "allow_chained_source": allow_chained_source,
         "protected_blocked_cut_cards": protected_cards,
         "missing_protected_blocked_cut_cards": missing_protected,
+        "missing_stage_cut_cards": missing_cuts,
+        "already_present_stage_add_cards": already_present_adds,
     }
 
 
@@ -336,6 +502,28 @@ def materialize_swap(
     }
 
 
+def materialize_swaps(
+    conn: sqlite3.Connection,
+    *,
+    deck_id: int,
+    pairs: list[Mapping[str, Any]],
+    sync_run_id: str,
+) -> list[dict[str, Any]]:
+    materialized = []
+    for pair in pairs:
+        materialized.append(
+            materialize_swap(
+                conn,
+                deck_id=deck_id,
+                add=str(pair.get("add") or ""),
+                cut=str(pair.get("cut") or ""),
+                role=str(pair.get("role") or ""),
+                sync_run_id=sync_run_id,
+            )
+        )
+    return materialized
+
+
 def nonbasic_singleton_violations(rows: list[sqlite3.Row]) -> list[str]:
     violations: list[str] = []
     for row in rows:
@@ -347,34 +535,56 @@ def nonbasic_singleton_violations(rows: list[sqlite3.Row]) -> list[str]:
     return violations
 
 
-def validate_candidate_structure(
+def validate_candidate_structure_for_pairs(
     conn: sqlite3.Connection,
     *,
     deck_id: int,
-    add: str,
-    cut: str,
-    role: str,
+    pairs: list[Mapping[str, Any]],
 ) -> dict[str, Any]:
     rows = deck_rows(conn, deck_id)
     summary = get_deck_summary(conn, deck_id)
-    add_rows = [row for row in rows if normalize_name(str(row["card_name"])) == normalize_name(add)]
-    cut_rows = [row for row in rows if normalize_name(str(row["card_name"])) == normalize_name(cut)]
+    deck_rows_by_name: dict[str, list[sqlite3.Row]] = {}
+    for row in rows:
+        deck_rows_by_name.setdefault(normalize_name(str(row["card_name"])), []).append(row)
+    add_rows_by_name = {
+        str(pair.get("add") or ""): deck_rows_by_name.get(normalize_name(str(pair.get("add") or "")), [])
+        for pair in pairs
+    }
+    cut_rows_by_name = {
+        str(pair.get("cut") or ""): deck_rows_by_name.get(normalize_name(str(pair.get("cut") or "")), [])
+        for pair in pairs
+    }
     commander_count = sum(int(row["quantity"] or 1) for row in rows if int(row["is_commander"] or 0))
     unresolved = [
         str(row["card_name"])
         for row in rows
         if not str(row["type_line"] or "").strip() and not str(row["oracle_text"] or "").strip()
     ]
-    added_tags = set()
-    if add_rows:
-        added_tags = set(json_list(add_rows[0]["functional_tags_json"])) | {str(add_rows[0]["functional_tag"] or "")}
+    missing_role_cards = []
+    for pair in pairs:
+        role = str(pair.get("role") or "")
+        if not role:
+            continue
+        add = str(pair.get("add") or "")
+        add_rows = add_rows_by_name.get(add) or []
+        added_tags = set()
+        if add_rows:
+            added_tags = set(json_list(add_rows[0]["functional_tags_json"])) | {str(add_rows[0]["functional_tag"] or "")}
+        if role not in added_tags:
+            missing_role_cards.append(add)
     violations = nonbasic_singleton_violations(rows)
+    duplicate_adds = [
+        add
+        for add, add_rows in add_rows_by_name.items()
+        if len(add_rows) != 1 or int(add_rows[0]["quantity"] or 1) != 1
+    ]
+    retained_cuts = [cut for cut, cut_rows in cut_rows_by_name.items() if cut_rows]
     checks = {
         "total_cards_100": int(summary["cards"]) == 100,
         "commander_count_1": commander_count == 1,
-        "add_present_once": len(add_rows) == 1 and int(add_rows[0]["quantity"] or 1) == 1,
-        "cut_absent": not cut_rows,
-        "added_role_present": not role or role in added_tags,
+        "all_adds_present_once": not duplicate_adds,
+        "all_cuts_absent": not retained_cuts,
+        "added_roles_present": not missing_role_cards,
         "nonbasic_singleton_ok": not violations,
         "unresolved_card_rows_0": not unresolved,
     }
@@ -383,9 +593,29 @@ def validate_candidate_structure(
         "deck_summary": summary,
         "commander_count": commander_count,
         "checks": checks,
+        "add_cards": list(add_rows_by_name),
+        "cut_cards": list(cut_rows_by_name),
+        "duplicate_or_missing_add_cards": duplicate_adds,
+        "retained_cut_cards": retained_cuts,
+        "missing_added_role_cards": missing_role_cards,
         "nonbasic_singleton_violations": violations,
         "unresolved_card_rows": unresolved,
     }
+
+
+def validate_candidate_structure(
+    conn: sqlite3.Connection,
+    *,
+    deck_id: int,
+    add: str,
+    cut: str,
+    role: str,
+) -> dict[str, Any]:
+    return validate_candidate_structure_for_pairs(
+        conn,
+        deck_id=deck_id,
+        pairs=[{"add": add, "cut": cut, "role": role}],
+    )
 
 
 def materialize_candidate_db(
@@ -393,9 +623,7 @@ def materialize_candidate_db(
     source_db: Path,
     candidate_db: Path,
     deck_id: int,
-    add: str,
-    cut: str,
-    role: str,
+    pairs: list[Mapping[str, Any]],
     sync_run_id: str,
 ) -> dict[str, Any]:
     candidate_db.parent.mkdir(parents=True, exist_ok=True)
@@ -403,15 +631,13 @@ def materialize_candidate_db(
         candidate_db.unlink()
     shutil.copy2(source_db, candidate_db)
     with connect(candidate_db) as conn:
-        swap_meta = materialize_swap(
+        swap_meta = materialize_swaps(
             conn,
             deck_id=deck_id,
-            add=add,
-            cut=cut,
-            role=role,
+            pairs=pairs,
             sync_run_id=sync_run_id,
         )
-        validation = validate_candidate_structure(conn, deck_id=deck_id, add=add, cut=cut, role=role)
+        validation = validate_candidate_structure_for_pairs(conn, deck_id=deck_id, pairs=pairs)
         candidate_hash = deck_hash(conn, deck_id)
     return {
         "candidate_db": rel(candidate_db),
@@ -429,22 +655,24 @@ def build_payload(
     deck_id: str | None = "619",
     add: str | None = None,
     cut: str | None = None,
+    stage: int = 1,
     allow_chained_source: bool = False,
 ) -> dict[str, Any]:
-    pair = load_top_pair(pair_report, deck_id=deck_id, add=add, cut=cut)
-    deck_id_int = int(pair["deck_id"])
-    add_name = str(pair["add"])
-    cut_name = str(pair["cut"])
-    role = str(pair.get("role") or "")
+    package = load_materialization_package(pair_report, deck_id=deck_id, add=add, cut=cut, stage=stage)
+    pairs = [dict(row) for row in package["pairs"]]
+    deck_id_int = int(package["deck_id"])
+    add_names = [str(row.get("add") or "") for row in pairs]
+    cut_names = [str(row.get("cut") or "") for row in pairs]
+    role = str(package.get("role") or "")
     candidate_dir = out_prefix.parent / f"{out_prefix.name}_candidate"
     candidate_db = candidate_dir / "knowledge_candidate.db"
     sync_run_id = out_prefix.name
 
     with connect(source_db) as conn:
-        source_pair_guard = validate_source_db_for_pair(
+        source_pair_guard = validate_source_db_for_package(
             conn,
             source_db=source_db,
-            pair=pair,
+            package=package,
             deck_id=deck_id_int,
             allow_chained_source=allow_chained_source,
         )
@@ -455,9 +683,7 @@ def build_payload(
         source_db=source_db,
         candidate_db=candidate_db,
         deck_id=deck_id_int,
-        add=add_name,
-        cut=cut_name,
-        role=role,
+        pairs=pairs,
         sync_run_id=sync_run_id,
     )
 
@@ -483,10 +709,16 @@ def build_payload(
         "candidate_db": materialized["candidate_db"],
         "summary": {
             "deck_id": deck_id_int,
-            "commander": pair.get("commander"),
+            "commander": package.get("commander"),
             "role": role,
-            "add": add_name,
-            "cut": cut_name,
+            "add": add_names[0] if add_names else "",
+            "cut": cut_names[0] if cut_names else "",
+            "adds": add_names,
+            "cuts": cut_names,
+            "pair_count": len(pairs),
+            "stage": package.get("stage"),
+            "source_artifact_type": package.get("source_artifact_type"),
+            "stage_next_gate": package.get("next_gate"),
             "source_unchanged": source_unchanged,
             "source_deck_hash_before": source_hash_before,
             "source_deck_hash_after": source_hash_after,
@@ -498,13 +730,15 @@ def build_payload(
             "source_matches_pair_report": source_pair_guard["source_matches_pair_report"],
         },
         "source_pair_guard": source_pair_guard,
-        "model_pair": pair,
-        "materialization": materialized["swap_meta"],
+        "model_pair": pairs[0] if len(pairs) == 1 else {},
+        "model_pairs": pairs,
+        "materialization": materialized["swap_meta"][0] if len(materialized["swap_meta"]) == 1 else {},
+        "materializations": materialized["swap_meta"],
         "structure_validation": materialized["structure_validation"],
         "source_deck_summary_before": source_summary_before,
         "source_deck_summary_after": source_summary_after,
         "policy": {
-            "candidate_scope": "The swap exists only inside the copied Hermes SQLite candidate DB.",
+            "candidate_scope": "The swap or value-safe stage exists only inside the copied Hermes SQLite candidate DB.",
             "promotion_gate": "Promotion stays closed until structure, strategy matrix, battle gate, and replay trace pass.",
             "source_boundary": "Source DB and PostgreSQL are not mutated by this materializer.",
         },
@@ -523,7 +757,9 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "- source_db_mutated: `false`",
         f"- deck_id: `{summary['deck_id']}`",
         f"- commander: `{summary['commander']}`",
-        f"- candidate: `+{summary['add']} / -{summary['cut']}`",
+        f"- candidate: `{summary['pair_count']}` swap(s)",
+        f"- stage: `{summary['stage']}`",
+        f"- source_artifact_type: `{summary['source_artifact_type']}`",
         f"- role: `{summary['role']}`",
         f"- candidate_db: `{payload['candidate_db']}`",
         f"- source_unchanged: `{str(summary['source_unchanged']).lower()}`",
@@ -545,6 +781,16 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
     ]
     for key, value in validation["checks"].items():
         lines.append(f"| `{key}` | `{str(value).lower()}` |")
+    lines.extend(["", "## Swaps", "", "| # | Add | Cut | Role |", "| ---: | --- | --- | --- |"])
+    for index, pair in enumerate(payload.get("model_pairs") or [], start=1):
+        lines.append(
+            "| {index} | `{add}` | `{cut}` | `{role}` |".format(
+                index=index,
+                add=pair.get("add") or "",
+                cut=pair.get("cut") or "",
+                role=pair.get("role") or "",
+            )
+        )
     lines.extend(["", "## Policy", ""])
     for key, value in payload["policy"].items():
         lines.append(f"- {key}: {value}")
@@ -568,6 +814,7 @@ def main() -> int:
     parser.add_argument("--deck-id", default="619")
     parser.add_argument("--add")
     parser.add_argument("--cut")
+    parser.add_argument("--stage", type=int, default=1)
     parser.add_argument(
         "--allow-chained-source",
         action="store_true",
@@ -581,6 +828,7 @@ def main() -> int:
         deck_id=args.deck_id,
         add=args.add,
         cut=args.cut,
+        stage=args.stage,
         allow_chained_source=args.allow_chained_source,
     )
     json_path, md_path = write_outputs(payload, args.out_prefix)

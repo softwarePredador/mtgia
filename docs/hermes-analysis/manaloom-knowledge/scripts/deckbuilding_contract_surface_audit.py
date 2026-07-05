@@ -45,6 +45,9 @@ GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL = SCRIPT_DIR / "global_commander_battle_f
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_package_chain_audit.py"
 )
+GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT_TEST = (
+    SCRIPT_DIR / "test_global_commander_candidate_package_chain_audit.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_MATRIX = (
     SCRIPT_DIR / "global_commander_candidate_package_strategy_matrix.py"
 )
@@ -168,6 +171,18 @@ GLOBAL_COMMANDER_VALUE_SAFE_STAGE_SPLITTER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5.md"
 )
+GLOBAL_COMMANDER_VALUE_SAFE_STAGE1_MATERIALIZER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1.md"
+)
+GLOBAL_COMMANDER_VALUE_SAFE_STAGE1_CHAIN_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1.md"
+)
+GLOBAL_COMMANDER_VALUE_SAFE_STAGE1_STRATEGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1.md"
+)
 
 REQUIRED_FOCUS_CARDS = {
     "Aetherflux Reservoir",
@@ -230,6 +245,43 @@ VOLATILE_HISTORICAL_REPORTS = {
             "Rakdos Charm",
             "Terminate",
             "run_commander_specific_strategy_matrix_for_package_before_battle",
+        ],
+    },
+    GLOBAL_COMMANDER_VALUE_SAFE_STAGE1_MATERIALIZER_REPORT: {
+        "reason": "value-safe stage candidate copy depends on ignored local Hermes DB artifacts",
+        "patterns": [
+            "Global Commander Candidate Copy Materializer",
+            "candidate_materialized_structure_ready_next_gate_closed",
+            "candidate: `8` swap(s)",
+            "stage: `1`",
+            "source_artifact_type: `global_commander_value_safe_stage_splitter`",
+            "source_unchanged: `true`",
+            "allow_battle_gate_now: `false`",
+            "Arena of Glory",
+            "Goldlust Triad",
+        ],
+    },
+    GLOBAL_COMMANDER_VALUE_SAFE_STAGE1_CHAIN_REPORT: {
+        "reason": "value-safe stage chain snapshot depends on ignored candidate-copy lineage artifacts",
+        "patterns": [
+            "Global Commander Candidate Package Chain Audit",
+            "status: `blocked`",
+            "swap_count: `8`",
+            "materializer_chain_pass: `true`",
+            "core_floor_repaired: `false`",
+            "final_core_floor_not_repaired",
+            "package_battle_probe_not_run",
+        ],
+    },
+    GLOBAL_COMMANDER_VALUE_SAFE_STAGE1_STRATEGY_REPORT: {
+        "reason": "value-safe stage package strategy matrix depends on ignored candidate DB artifact",
+        "patterns": [
+            "Global Commander Candidate Package Strategy Matrix",
+            "package_strategy_blocks_battle",
+            "battle_gate_allowed_now: `false`",
+            "package_core_floor_not_repaired",
+            "profile_angels_demons_dragons_payoffs_below_target",
+            "profile_spot_interaction_below_target",
         ],
     },
 }
@@ -377,6 +429,13 @@ def build_audit() -> dict[str, Any]:
                 "commander_value_safe_stage_split_ready_for_stage_candidate_copy",
                 "full_package_unpaired_adds:required_21_paired_18",
                 "materialize_value_safe_stage_1_candidate_copy",
+                "global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1.md",
+                "global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1.md",
+                "global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1.md",
+                "candidate_materialized_structure_ready_next_gate_closed",
+                "final_core_status=core_role_gap",
+                "package_core_floor_not_repaired",
+                "repair_commander_profile_blockers_before_battle",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -583,6 +642,13 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5.md",
                 "commander_value_safe_stage_split_ready_for_stage_candidate_copy",
                 "materialize_value_safe_stage_1_candidate_copy",
+                "global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1.md",
+                "global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1.md",
+                "global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1.md",
+                "candidate_materialized_structure_ready_next_gate_closed",
+                "final_core_status=core_role_gap",
+                "package_core_floor_not_repaired",
+                "repair_commander_profile_blockers_before_battle",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -767,7 +833,12 @@ def build_audit() -> dict[str, Any]:
                 "candidate_materialized_structure_ready_next_gate_closed",
                 "source_db_mutated",
                 "source_unchanged",
-                "validate_source_db_for_pair",
+                "validate_source_db_for_package",
+                "global_commander_value_safe_stage_splitter",
+                "load_stage_pairs",
+                "model_pairs",
+                "--stage",
+                "stage add cards are already present",
                 "source_matches_pair_report",
                 "protected_blocked_cut_cards",
                 "protected blocked cut cards are absent",
@@ -784,8 +855,11 @@ def build_audit() -> dict[str, Any]:
             [
                 "test_blocks_chained_source_db_by_default",
                 "test_blocks_source_missing_protected_cut_candidate",
+                "test_materializes_value_safe_stage_pairs_only_in_candidate_copy",
                 "source_matches_pair_report",
                 "Protected Payoff",
+                "Arena of Glory",
+                "Smuggler's Share",
             ],
         )
     )
@@ -823,6 +897,9 @@ def build_audit() -> dict[str, Any]:
             GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT,
             [
                 "global_commander_candidate_package_chain_audit",
+                "materializer_steps",
+                "materializer_pair_index",
+                "model_pairs",
                 "materializer_chain_pass",
                 "core_floor_repaired",
                 "strategy_ready",
@@ -831,6 +908,19 @@ def build_audit() -> dict[str, Any]:
                 "run_commander_specific_strategy_matrix_for_package_before_battle",
                 "battle_or_optimization_performed",
                 "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT_TEST,
+            [
+                "test_stage_materializer_expands_model_pairs_as_package_swaps",
+                "stage_materializer_payload",
+                "Arena of Glory",
+                "Smuggler's Share",
+                "swap_count",
+                "final_candidate_db",
             ],
         )
     )

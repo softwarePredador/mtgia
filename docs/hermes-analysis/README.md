@@ -400,6 +400,30 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `full_package_candidate_copy_allowed_now=false`,
     `battle_gate_allowed_now=false` e o proximo gate e
     `materialize_value_safe_stage_1_candidate_copy`.
+    A materializacao do stage 1 agora foi executada apenas em copia isolada por
+    `manaloom-knowledge/scripts/global_commander_candidate_copy_materializer.py`
+    com evidencia local
+    `master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1.md`.
+    Resultado: `candidate_materialized_structure_ready_next_gate_closed` com
+    `8` swaps, `source_unchanged=true`, `source_matches_pair_report=true`,
+    `all_adds_present_once=true`, `all_cuts_absent=true`,
+    `total_cards_100=true`, `commander_count_1=true`,
+    `allow_battle_gate_now=false` e `promotion_allowed=false`. A copia final
+    fica em
+    `master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_candidate/knowledge_candidate.db`.
+    Os audits posteriores do stage 1 estao em
+    `master_optimizer_reports/global_commander_core_role_audit_20260705_kaalia_value_safe_stage1_hermes_only.md`,
+    `master_optimizer_reports/global_commander_strategy_matrix_20260705_kaalia_value_safe_stage1_hermes_only.md`,
+    `master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1.md`
+    e
+    `master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1.md`.
+    A cadeia continua bloqueada antes de batalha: `final_core_status=core_role_gap`,
+    `removal=3` abaixo do piso `6`, e a matriz especifica retorna
+    `package_strategy_blocks_battle` por
+    `package_core_floor_not_repaired`,
+    `profile_angels_demons_dragons_payoffs_below_target` e
+    `profile_spot_interaction_below_target`. Proximo gate:
+    `repair_commander_profile_blockers_before_battle`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

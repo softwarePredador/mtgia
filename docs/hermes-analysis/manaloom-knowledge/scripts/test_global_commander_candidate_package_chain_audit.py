@@ -31,6 +31,25 @@ def materializer_payload(add: str, cut: str, *, source_clean: bool = True) -> di
     }
 
 
+def stage_materializer_payload() -> dict[str, object]:
+    payload = materializer_payload("Arena of Glory", "Archaeomancer's Map")
+    payload["candidate_db"] = "stage1_candidate.db"
+    payload["summary"]["role"] = "value_safe_stage"
+    payload["model_pairs"] = [
+        {
+            "add": "Arena of Glory",
+            "cut": "Archaeomancer's Map",
+            "role": "commander_attack_window",
+        },
+        {
+            "add": "Despark",
+            "cut": "Smuggler's Share",
+            "role": "spot_interaction",
+        },
+    ]
+    return payload
+
+
 def core_payload(*, repaired: bool) -> dict[str, object]:
     missing = [] if repaired else [{"role": "removal", "missing": 1}]
     return {
@@ -110,6 +129,28 @@ class GlobalCommanderCandidatePackageChainAuditTests(unittest.TestCase):
         self.assertEqual(report["status"], "blocked")
         self.assertFalse(report["summary"]["core_floor_repaired"])
         self.assertIn("final_core_floor_not_repaired", report["blocker_reasons"])
+
+    def test_stage_materializer_expands_model_pairs_as_package_swaps(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        materializers = [
+            self._write(root, "stage1.json", stage_materializer_payload()),
+        ]
+        core = self._write(root, "core.json", core_payload(repaired=True))
+        strategy = self._write(root, "strategy.json", strategy_payload())
+
+        report = audit.build_report(
+            materializer_reports=materializers,
+            final_core_report=core,
+            final_strategy_report=strategy,
+        )
+
+        self.assertEqual(report["status"], "pass")
+        self.assertEqual(report["summary"]["swap_count"], 2)
+        self.assertEqual(report["summary"]["package_adds"], ["Arena of Glory", "Despark"])
+        self.assertEqual(report["summary"]["package_cuts"], ["Archaeomancer's Map", "Smuggler's Share"])
+        self.assertEqual(report["summary"]["final_candidate_db"], "stage1_candidate.db")
 
 
 if __name__ == "__main__":

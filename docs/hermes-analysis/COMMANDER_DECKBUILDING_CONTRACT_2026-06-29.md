@@ -477,6 +477,29 @@ Current external refresh on 2026-07-05:
   copy gate only, `full_package_candidate_copy_allowed_now=false`,
   `battle_gate_allowed_now=false`, and the next gate is
   `materialize_value_safe_stage_1_candidate_copy`.
+- Current value-safe stage 1 materialization is isolated copied-DB evidence,
+  not a deck change. The materializer report
+  `global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1.md`
+  has status `candidate_materialized_structure_ready_next_gate_closed` and
+  applies `8` swaps from stage 1 into
+  `global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_candidate/knowledge_candidate.db`.
+  It proves `source_unchanged=true`, `source_matches_pair_report=true`, all
+  adds present once, all cuts absent, `total_cards_100=true`,
+  `commander_count_1=true`, `promotion_allowed=false`, and
+  `allow_battle_gate_now=false`. Follow-up candidate audits are
+  `global_commander_core_role_audit_20260705_kaalia_value_safe_stage1_hermes_only.md`,
+  `global_commander_strategy_matrix_20260705_kaalia_value_safe_stage1_hermes_only.md`,
+  `global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1.md`,
+  and
+  `global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1.md`.
+  The stage remains blocked before battle: chain status is `blocked`,
+  `final_core_status=core_role_gap`, final generic core counts include
+  `removal=3` below the floor `6`, and the commander-specific strategy matrix
+  returns `package_strategy_blocks_battle` with blockers
+  `package_core_floor_not_repaired`,
+  `profile_angels_demons_dragons_payoffs_below_target`, and
+  `profile_spot_interaction_below_target`. The next gate is
+  `repair_commander_profile_blockers_before_battle`, not battle or promotion.
 
 ## Global Commander Rollout - 2026-07-01
 
