@@ -7076,6 +7076,7 @@ def restricted_target_base(target: str) -> str:
         "creature_power_4_or_greater",
         "creature_power_1_or_less",
         "creature_toughness_2_or_less",
+        "creature_damaged_this_turn_opponent_controls",
         "creature_mana_value_3_or_greater",
         "non_angel_demon_devil_dragon_creature",
         "non_elf_creature",
@@ -7096,6 +7097,8 @@ def restricted_target_base(target: str) -> str:
         return "enchantment"
     if target in {"island_or_swamp_opponent_controls", "nonbasic_land"}:
         return "land"
+    if target == "creature_or_planeswalker_damaged_this_turn_opponent_controls":
+        return "creature_or_planeswalker"
     if target == "spirit_or_enchantment":
         return "permanent"
     return target
@@ -10955,6 +10958,14 @@ def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] 
             ("remove_creature", "nonblack_creature"),
         ),
         (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target creature an opponent controls that was dealt damage this turn\.?$",
+            ("remove_creature", "creature_damaged_this_turn_opponent_controls"),
+        ),
+        (
+            rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target creature or planeswalker an opponent controls that was dealt damage this turn\.?$",
+            ("remove_permanent", "creature_or_planeswalker_damaged_this_turn_opponent_controls"),
+        ),
+        (
             rf"^when {etb_subject} enters(?: the battlefield)?, (?:you may )?destroy target island or swamp an opponent controls\.?$",
             ("remove_permanent", "island_or_swamp_opponent_controls"),
         ),
@@ -11021,6 +11032,12 @@ def etb_destroy_source_supported(source: str, target: str) -> str | None:
         "creature_power_1_or_less": lambda value: "PowerPredicate" in value and "ComparisonType.FEWER_THAN, 2" in value,
         "creature_toughness_2_or_less": lambda value: "ToughnessPredicate" in value and "ComparisonType.FEWER_THAN, 3" in value,
         "nonblack_creature": lambda value: "FILTER_PERMANENT_CREATURE_NON_BLACK" in value,
+        "creature_damaged_this_turn_opponent_controls": lambda value: "FILTER_OPPONENTS_CREATURE_DAMAGED_THIS_TURN" in value,
+        "creature_or_planeswalker_damaged_this_turn_opponent_controls": lambda value: (
+            "FilterCreatureOrPlaneswalkerPermanent" in value
+            and "WasDealtDamageThisTurnPredicate" in value
+            and "TargetController.OPPONENT" in value
+        ),
         "island_or_swamp_opponent_controls": lambda value: (
             "SubType.ISLAND" in value
             and "SubType.SWAMP" in value
@@ -12414,6 +12431,14 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "power_max": 1}
     if target == "creature_toughness_2_or_less":
         return {"card_types": ["creature"], "toughness_max": 2}
+    if target == "creature_damaged_this_turn_opponent_controls":
+        return {"card_types": ["creature"], "controller_scope": "opponent", "damaged_this_turn": True}
+    if target == "creature_or_planeswalker_damaged_this_turn_opponent_controls":
+        return {
+            "card_types": ["creature", "planeswalker"],
+            "controller_scope": "opponent",
+            "damaged_this_turn": True,
+        }
     if target == "vampire_werewolf_or_zombie_creature":
         return {"card_types": ["creature"], "required_subtypes": ["vampire", "werewolf", "zombie"]}
     if target == "human_creature":
@@ -15678,7 +15703,11 @@ def split_row(
         }
         if target_type in {"nonbasic_land", "aura", "equipment"}:
             effect_json["target_controller"] = "any"
-        if target_type == "island_or_swamp_opponent_controls":
+        if target_type in {
+            "island_or_swamp_opponent_controls",
+            "creature_damaged_this_turn_opponent_controls",
+            "creature_or_planeswalker_damaged_this_turn_opponent_controls",
+        }:
             effect_json["target_controller"] = "opponent"
         return build_proposal(
             row,

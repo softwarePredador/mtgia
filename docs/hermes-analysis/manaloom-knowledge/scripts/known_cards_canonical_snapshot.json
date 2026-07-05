@@ -31692,6 +31692,32 @@
     "battle_rule_logical_key": "battle_rule_v1:68b640b6fc369ce5f5d3edef4b64011a",
     "battle_rule_oracle_hash": "3428cb3bde9dbe62c71c75556792951e"
   },
+  "Fathom Fleet Cutthroat": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller_scope": "opponent",
+      "damaged_this_turn": true
+    },
+    "target_controller": "opponent",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:997c57587cd2ed55a7bc2ef18efdf3fe",
+    "battle_rule_oracle_hash": "54287d1bc91a2325e59cb5b8cc87572d"
+  },
   "Fathom Fleet Firebrand": {
     "_activated_rule_effects": [
       {
@@ -104582,6 +104608,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:4199b96cb5aa8ac98612fda29ac6f4e5",
     "battle_rule_oracle_hash": "ce22f69a4e8be557a74fc13b7aeb1532"
+  },
+  "Vraska's Finisher": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "creature_or_planeswalker",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "planeswalker"
+      ],
+      "controller_scope": "opponent",
+      "damaged_this_turn": true
+    },
+    "target_controller": "opponent",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7dd3b0bd5cb9a4fa81e54a33f392c683",
+    "battle_rule_oracle_hash": "b96118952d712f3bd93114a8c8429594"
   },
   "Vulpine Goliath": {
     "_keywords_are_self": true,

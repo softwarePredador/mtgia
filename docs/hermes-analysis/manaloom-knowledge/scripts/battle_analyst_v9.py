@@ -638,6 +638,7 @@ def clear_turn_scoped_permanent_flags(all_players):
             if not isinstance(permanent, dict):
                 continue
             permanent.pop("discard_modal_modes_used_this_turn", None)
+            clear_permanent_damage_this_turn_flags(permanent)
         participant.noncombat_damage_modifiers = []
         participant.cards_drawn_this_turn = 0
         participant._cards_drawn_turn_marker = CURRENT_REPLAY_TURN
@@ -2530,6 +2531,7 @@ def activate_loyalty_ability(player, planeswalker, loyalty_delta, phase, stack):
 def damage_to_planeswalker(source, planeswalker, amount):
     if not is_planeswalker_permanent(planeswalker) or amount <= 0:
         return False
+    mark_permanent_dealt_damage_this_turn(planeswalker, amount, CURRENT_REPLAY_TURN)
     planeswalker["loyalty"] = int(planeswalker.get("loyalty", 0) or 0) - int(amount)
     emit_replay_event(
         "planeswalker_damage",
@@ -11517,6 +11519,12 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         return False
     if tapped_state == "untapped" and bool(target.get("tapped")):
         return False
+    if bool(
+        constraints.get("damaged_this_turn")
+        or constraints.get("was_dealt_damage_this_turn")
+        or constraints.get("dealt_damage_this_turn")
+    ) and not permanent_was_dealt_damage_this_turn(target, CURRENT_REPLAY_TURN):
+        return False
     required_keywords = [
         str(value or "").strip().lower().replace(" ", "_")
         for value in _as_list(constraints.get("required_keywords") or constraints.get("target_keywords"))
@@ -12259,6 +12267,50 @@ def _clear_battlefield_only_state(permanent):
         "until_eot",
     ):
         permanent.pop(key, None)
+    clear_permanent_damage_this_turn_flags(permanent)
+
+
+def clear_permanent_damage_this_turn_flags(permanent):
+    if not isinstance(permanent, dict):
+        return
+    for key in (
+        "damaged_this_turn",
+        "was_dealt_damage_this_turn",
+        "damage_marked_this_turn",
+        "dealt_damage_this_turn",
+        "last_damage_turn",
+    ):
+        permanent.pop(key, None)
+
+
+def mark_permanent_dealt_damage_this_turn(permanent, amount, turn):
+    if not isinstance(permanent, dict) or int(amount or 0) <= 0:
+        return
+    current = int(permanent.get("damage_marked_this_turn") or 0)
+    permanent["damage_marked_this_turn"] = current + int(amount or 0)
+    permanent["damaged_this_turn"] = True
+    permanent["was_dealt_damage_this_turn"] = True
+    if turn is not None:
+        permanent["last_damage_turn"] = int(turn)
+
+
+def permanent_was_dealt_damage_this_turn(permanent, turn=None):
+    if not isinstance(permanent, dict):
+        return False
+    if bool(permanent.get("damaged_this_turn") or permanent.get("was_dealt_damage_this_turn")):
+        return True
+    for key in ("damage_marked_this_turn", "damage_marked", "dealt_damage_this_turn"):
+        try:
+            if int(permanent.get(key) or 0) > 0:
+                return True
+        except Exception:
+            continue
+    if turn is not None:
+        try:
+            return int(permanent.get("last_damage_turn") or -1) == int(turn)
+        except Exception:
+            return False
+    return False
 
 
 def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, source=None, turn=None):
@@ -15217,6 +15269,7 @@ def clear_until_eot(player):
                 else:
                     card[key] = original
             card.pop("_landfall_triggers_this_turn", None)
+            clear_permanent_damage_this_turn_flags(card)
     player.indestructible = False
     player.hexproof = False
     player.hexproof_source = None
@@ -42163,6 +42216,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
             defense_before = None
             defense_after = None
             if target_kind == "creature":
+                mark_permanent_dealt_damage_this_turn(target, target_amount, turn)
                 trigger_creature_damage_controller_reflect(
                     [player, *list(opponents)],
                     player,
@@ -58129,6 +58183,7 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
             phase="combat_damage",
         )
         marked_damage[id(damaged)] += final_amount
+        mark_permanent_dealt_damage_this_turn(damaged, final_amount, turn)
         trigger_creature_damage_controller_reflect(
             all_players or [attacker, *list(opponents or []), target],
             source_controller,

@@ -8276,6 +8276,143 @@ def register_tests(battle, player):
         ]
         assert resolved_targets == ["Weak Creature", "Command Tower", "Diregraf Ghoul"]
 
+    def test_pg494_etb_destroy_requires_damaged_this_turn_target():
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Fathom Fleet Cutthroat",
+                "type_line": "Creature - Human Pirate",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 3,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            undamaged = {
+                "name": "Undamaged Engine",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 5,
+                "toughness": 5,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            damaged = {
+                "name": "Damaged Engine",
+                "type_line": "Creature - Soldier",
+                "effect": "creature",
+                "power": 2,
+                "toughness": 4,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            battle.mark_permanent_dealt_damage_this_turn(damaged, 1, 14)
+            opponent.battlefield = [undamaged, damaged]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_creature",
+                    "etb_remove_target": "creature",
+                    "target": "creature",
+                    "target_controller": "opponent",
+                    "target_constraints": {
+                        "card_types": ["creature"],
+                        "controller_scope": "opponent",
+                        "damaged_this_turn": True,
+                    },
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg494-damaged-creature",
+                    "_rule_oracle_hash": "pg494-damaged-creature-hash",
+                },
+                14,
+                random.Random(494),
+                all_players=[active, opponent],
+            )
+
+            assert undamaged in opponent.battlefield
+            assert damaged not in opponent.battlefield
+            assert damaged in opponent.graveyard
+
+            active = player("Active")
+            opponent = player("Opponent")
+            source = {
+                "name": "Vraska's Finisher",
+                "type_line": "Creature - Gorgon Assassin",
+                "effect": "creature",
+                "power": 3,
+                "toughness": 2,
+                "controller": "Active",
+                "owner": "Active",
+            }
+            undamaged_creature = {
+                "name": "Healthy Beast",
+                "type_line": "Creature - Beast",
+                "effect": "creature",
+                "power": 6,
+                "toughness": 6,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            damaged_planeswalker = {
+                "name": "Wounded Planeswalker",
+                "type_line": "Legendary Planeswalker - Fixture",
+                "effect": "planeswalker",
+                "loyalty": 4,
+                "controller": "Opponent",
+                "owner": "Opponent",
+            }
+            battle.mark_permanent_dealt_damage_this_turn(damaged_planeswalker, 1, 14)
+            opponent.battlefield = [undamaged_creature, damaged_planeswalker]
+            battle.resolve_generic_permanent_etb(
+                active,
+                [opponent],
+                source,
+                {
+                    **source,
+                    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_remove_effect": "remove_permanent",
+                    "etb_remove_target": "creature_or_planeswalker",
+                    "target": "creature_or_planeswalker",
+                    "target_controller": "opponent",
+                    "target_constraints": {
+                        "card_types": ["creature", "planeswalker"],
+                        "controller_scope": "opponent",
+                        "damaged_this_turn": True,
+                    },
+                    "destination": "graveyard",
+                    "_rule_logical_key": "battle_rule_v1:pg494-damaged-creature-planeswalker",
+                    "_rule_oracle_hash": "pg494-damaged-creature-planeswalker-hash",
+                },
+                14,
+                random.Random(494),
+                all_players=[active, opponent],
+            )
+
+            assert undamaged_creature in opponent.battlefield
+            assert damaged_planeswalker not in opponent.battlefield
+            assert damaged_planeswalker in opponent.graveyard
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        resolved_targets = [
+            data.get("target")
+            for event, data in events
+            if event == "etb_removal_resolved"
+        ]
+        assert resolved_targets == ["Damaged Engine", "Wounded Planeswalker"]
+
     def test_pg086_removal_targets_filter_nontoken_and_mana_value_max():
         active = player("Active")
         opponent = player("Opponent")
@@ -22712,6 +22849,7 @@ def register_tests(battle, player):
         test_pg491_self_etb_bounce_respects_controller_and_exclude_source,
         test_pg492_etb_bounce_respects_subtype_and_historic_constraints,
         test_pg493_etb_destroy_respects_extended_target_constraints,
+        test_pg494_etb_destroy_requires_damaged_this_turn_target,
         test_pg086_angels_grace_rule_resolves_from_sqlite_cache,
         test_pg087_deck606_remaining_semantic_rules_resolve_from_sqlite_cache,
         test_pg087_hexing_squelcher_static_counter_shield_uses_sqlite_rule,

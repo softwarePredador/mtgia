@@ -11921,6 +11921,42 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 None,
             ),
             (
+                "Fathom Fleet Cutthroat",
+                (
+                    "When Fathom Fleet Cutthroat enters the battlefield, destroy target creature "
+                    "an opponent controls that was dealt damage this turn."
+                ),
+                (
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), false);"
+                    "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_OPPONENTS_CREATURE_DAMAGED_THIS_TURN));"
+                ),
+                "creature",
+                {"card_types": ["creature"], "controller_scope": "opponent", "damaged_this_turn": True},
+                "opponent",
+            ),
+            (
+                "Vraska's Finisher",
+                (
+                    "When Vraska's Finisher enters the battlefield, destroy target creature or planeswalker "
+                    "an opponent controls that was dealt damage this turn."
+                ),
+                (
+                    "private static final FilterPermanent filter = new FilterCreatureOrPlaneswalkerPermanent("
+                    "\"creature or planeswalker an opponent controls that was dealt damage this turn\");"
+                    "filter.add(WasDealtDamageThisTurnPredicate.instance);"
+                    "filter.add(TargetController.OPPONENT.getControllerPredicate());"
+                    "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect());"
+                    "ability.addTarget(new TargetPermanent(filter));"
+                ),
+                "creature_or_planeswalker",
+                {
+                    "card_types": ["creature", "planeswalker"],
+                    "controller_scope": "opponent",
+                    "damaged_this_turn": True,
+                },
+                "opponent",
+            ),
+            (
                 "Ravenous Baboons",
                 "When Ravenous Baboons enters the battlefield, destroy target nonbasic land.",
                 (
@@ -11983,7 +12019,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 else:
                     self.assertNotIn("target_controller", effect)
 
-    def test_creature_etb_destroy_blocks_damage_this_turn_target(self) -> None:
+    def test_creature_etb_destroy_blocks_damage_this_turn_source_mismatch(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,
             effect_classes=["DestroyTargetEffect"],
@@ -12003,12 +12039,12 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
             source_text=(
                 "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect());"
-                "ability.addTarget(new TargetPermanent(FILTER_OPPONENTS_CREATURE_DAMAGED_THIS_TURN));"
+                "ability.addTarget(new TargetCreaturePermanent());"
             ),
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "etb_destroy_target_not_supported")
+        self.assertEqual(reason, "etb_destroy_source_target_not_supported")
 
     def test_creature_etb_bounce_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(

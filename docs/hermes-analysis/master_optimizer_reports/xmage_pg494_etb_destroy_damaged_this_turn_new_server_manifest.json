@@ -1,0 +1,175 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg494_etb_destroy_damaged_this_turn_new_20260705_083727",
+  "deploy_id": "PG494",
+  "expected_rules": [
+    {
+      "card_name": "Fathom Fleet Cutthroat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:997c57587cd2ed55a7bc2ef18efdf3fe",
+      "min_rule_version": 2,
+      "normalized_name": "fathom fleet cutthroat",
+      "oracle_hash": "54287d1bc91a2325e59cb5b8cc87572d",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent",
+          "damaged_this_turn": true
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vraska's Finisher",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7dd3b0bd5cb9a4fa81e54a33f392c683",
+      "min_rule_version": 2,
+      "normalized_name": "vraska's finisher",
+      "oracle_hash": "b96118952d712f3bd93114a8c8429594",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "etb_remove_effect": "remove_permanent",
+        "etb_remove_target": "creature_or_planeswalker",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "planeswalker"
+          ],
+          "controller_scope": "opponent",
+          "damaged_this_turn": true
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_destroy_target": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg494_etb_destroy_damaged_this_turn_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg494_etb_destroy_damaged_this_turn_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg494_etb_destroy_damaged_this_turn_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg494_etb_destroy_damaged_this_turn_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg494_etb_destroy_damaged_this_turn_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg494_etb_destroy_damaged_this_turn_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T08:37:27+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Fathom Fleet Cutthroat"
+      },
+      "card_name": "Fathom Fleet Cutthroat",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:997c57587cd2ed55a7bc2ef18efdf3fe",
+      "normalized_name": "fathom fleet cutthroat",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "etb_remove_effect": "remove_creature",
+        "etb_remove_target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent",
+          "damaged_this_turn": true
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Vraska's Finisher"
+      },
+      "card_name": "Vraska's Finisher",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7dd3b0bd5cb9a4fa81e54a33f392c683",
+      "normalized_name": "vraska's finisher",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "etb_remove_effect": "remove_permanent",
+        "etb_remove_target": "creature_or_planeswalker",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "planeswalker"
+          ],
+          "controller_scope": "opponent",
+          "damaged_this_turn": true
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Fathom Fleet Cutthroat",
+    "Vraska's Finisher"
+  ],
+  "selected_count": 2,
+  "slug": "etb_destroy_damaged_this_turn_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Fathom Fleet Cutthroat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:997c57587cd2ed55a7bc2ef18efdf3fe",
+      "min_rule_version": 2,
+      "normalized_name": "fathom fleet cutthroat",
+      "oracle_hash": "54287d1bc91a2325e59cb5b8cc87572d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_destroy_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vraska's Finisher",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7dd3b0bd5cb9a4fa81e54a33f392c683",
+      "min_rule_version": 2,
+      "normalized_name": "vraska's finisher",
+      "oracle_hash": "b96118952d712f3bd93114a8c8429594",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_destroy_target_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

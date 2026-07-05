@@ -12123,6 +12123,58 @@ new server:
   `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
   `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
 
+## 2026-07-05 PG494 ETB Destroy Damaged-This-Turn Target Closure
+
+- PG494 closes the two ETB-destroy neighbors deliberately left out of PG493:
+  Fathom Fleet Cutthroat and Vraska's Finisher. Both use local XMage as the
+  authoritative source and require target state for permanents that were dealt
+  damage during the current turn.
+- The mapper now recognizes XMage ETB `DestroyTargetEffect` source shapes with
+  `FILTER_OPPONENTS_CREATURE_DAMAGED_THIS_TURN` and with
+  `FilterCreatureOrPlaneswalkerPermanent + WasDealtDamageThisTurnPredicate +
+  TargetController.OPPONENT`. The exact runtime scope remains
+  `xmage_creature_etb_destroy_target_v1`, but its `target_constraints` may now
+  carry `damaged_this_turn=true` for opponent-controlled creature or
+  creature/planeswalker targets.
+- The battle runtime now marks battlefield permanents as dealt damage this turn
+  from combat damage, direct creature damage, and planeswalker damage, clears
+  that turn-scoped state at cleanup/turn reset, and enforces the
+  `damaged_this_turn` target constraint during legal target selection. This
+  keeps the rule stateful without turning all ETB destroy effects into broad
+  removal.
+- Validation passed: `py_compile` for touched parser/runtime/test files,
+  focused exact-scope tests for the supported and mismatch cases, the focused
+  PG494 runtime test, the full exact-scope splitter suite (`492` tests OK),
+  and the full `test_battle_analyst_v10_3.py` suite (`621` PASS lines) with
+  the live PostgreSQL environment loaded.
+- PostgreSQL package PG494 applied against `143.198.230.247:5433/halder` and
+  promoted `2/2` selected cards as verified/auto rows with matching Oracle
+  hashes. The apply upserted `2` rows and deprecated `0` shadow rows.
+- Hermes metadata sync matched `5931` PostgreSQL cards, wrote `5842` SQLite
+  cache aliases, updated `94` deck-card ids, and left the known
+  `unresolved=1` residual unchanged. The targeted battle-rule sync loaded `2`
+  PostgreSQL rows, wrote `2` SQLite rows, exported `4737` canonical fallback
+  rows, and refreshed the tracked default canonical snapshot.
+- Generic E2E validation passed across PostgreSQL, SQLite
+  `battle_card_rules`, the default canonical snapshot, and runtime
+  `get_card_effect` for both selected cards. The manifest does not define
+  battle-execution scenarios for this generic family, so scenario execution
+  remains `0`; concrete damaged-this-turn targeting behavior is covered by the
+  focused PG494 runtime test.
+- Final governance audits passed: XMage strategy (`26/26`), operational
+  surface, deckbuilding contract surface, legacy contamination, and
+  PG/Hermes/SQLite contract with live PostgreSQL connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26120`, `xmage_authoritative_source_count=25806`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25806`. This is an exact
+  reduction of `2` from the post-PG493 queue. The destroy work unit fell from
+  `585` before PG494 to `583` after PG494.
+- Post-sync global readiness is now `34331` known cards, `4830`
+  `battle_and_oracle_ready`, `29043` `battle_family_mapper_required`, `360`
+  `generic_runtime_or_no_card_rule`, `4` `oracle_data_sync`, `3`
+  `commander_legality_sync`, and `2` `oracle_identity_rule_link_or_copy`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
