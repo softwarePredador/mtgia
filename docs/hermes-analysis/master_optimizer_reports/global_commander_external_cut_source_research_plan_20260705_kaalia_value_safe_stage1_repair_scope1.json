@@ -1,0 +1,292 @@
+{
+  "artifact_type": "global_commander_external_cut_source_research_plan",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "external_research_is_not_cut_permission",
+    "target_usage_or_seen_without_usage_still_blocks_value_safe_reclassification",
+    "candidate_copy_closed_until_external_corpus_maps_to_negative_or_same_lane_evidence"
+  ],
+  "deck_action_allowed": false,
+  "external_cut_permission_now": false,
+  "external_sources": [
+    {
+      "limitation": "policy context only; it does not prove a card belongs in a specific commander deck",
+      "observed_on": "2026-07-05",
+      "signal": "Commander brackets and Game Changers are still active, evolving pregame power-context signals.",
+      "source_id": "wizards_commander_brackets_2026_02_09",
+      "source_type": "official_commander_policy",
+      "url": "https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026",
+      "use_for_cut_research": "classify power/bracket risk before cutting high-power staples or Game Changers"
+    },
+    {
+      "limitation": "bracket intent is not a same-lane replacement proof",
+      "observed_on": "2026-07-05",
+      "signal": "Bracket 3/4 expectations separate strong synergy, tutors, fast mana, and efficient disruption by deck intent.",
+      "source_id": "wizards_commander_brackets_2025_10_21",
+      "source_type": "official_commander_policy",
+      "url": "https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-october-21-2025",
+      "use_for_cut_research": "avoid flattening optimized staples into generic over-target cut pressure"
+    },
+    {
+      "limitation": "EDHREC popularity is an evidence lane, not final deck truth or battle proof",
+      "observed_on": "2026-07-05",
+      "signal": "The public Kaalia page centers Flying, Angels, and Aggro and surfaces Angel/Demon/Dragon payoff cards as high-synergy anchors.",
+      "source_id": "edhrec_kaalia_current",
+      "source_type": "commander_public_usage",
+      "url": "https://edhrec.com/commanders/kaalia-of-the-vast",
+      "use_for_cut_research": "build a commander-specific public corpus and separate payoff adds from unrelated cut lanes"
+    },
+    {
+      "limitation": "sample-size constrained and not enough to authorize cuts by itself",
+      "observed_on": "2026-07-05",
+      "signal": "The filtered expensive-midrange sample is small but highlights payoff anchors and high-power staples such as tutors, fast mana, and protection.",
+      "source_id": "edhrec_kaalia_expensive_midrange_2026_06_24",
+      "source_type": "commander_public_usage_filtered",
+      "url": "https://edhrec.com/commanders/kaalia-of-the-vast/midrange/expensive",
+      "use_for_cut_research": "treat small filtered samples as source-lane hints requiring local corroboration"
+    },
+    {
+      "limitation": "article recommendations are qualitative and must be validated against the target deck and battle traces",
+      "observed_on": "2026-07-05",
+      "signal": "Kaalia's plan depends on attacking to cheat Angels, Demons, or Dragons, and needs haste/protection plus ways to recover after removal.",
+      "source_id": "edhrec_kaalia_hidden_gems_2026_03_26",
+      "source_type": "commander_strategy_article",
+      "url": "https://edhrec.com/articles/hidden-gems-for-kaalia-of-the-vast",
+      "use_for_cut_research": "protect attack-window, recast, and payoff-density lanes from generic cuts"
+    },
+    {
+      "limitation": "generic categories must bend to commander intent and same-lane evidence",
+      "observed_on": "2026-07-05",
+      "signal": "General Commander construction starts from functional categories and then checks whether the list plays its intended way.",
+      "source_id": "edhrec_commander_deckbuilding_guide",
+      "source_type": "general_deckbuilding_method",
+      "url": "https://edhrec.com/articles/how-to-build-a-commander-deck",
+      "use_for_cut_research": "keep ramp/draw/removal/protection categories as floors, not automatic cut permissions"
+    }
+  ],
+  "generated_at": "2026-07-05T22:45:34.642189+00:00",
+  "hypothesis_external_research_rows": [
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Biotransference",
+      "cut_roles": [],
+      "external_cut_permission_now": false,
+      "incidental_overlap_count": 0,
+      "required_evidence": [
+        "current_commander_reference_corpus_for_cut_card",
+        "same_lane_replacement_or_equal_gate_if_cut_remains_candidate",
+        "target_replay_negative_or_battle_evidence_before_reclassification"
+      ],
+      "research_lane": "off_profile_or_unclassified_cut_lane",
+      "research_status": "external_research_cannot_override_target_usage",
+      "same_lane_route_count": 0,
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Maskwood Nexus",
+      "cut_roles": [],
+      "external_cut_permission_now": false,
+      "incidental_overlap_count": 0,
+      "required_evidence": [
+        "current_commander_reference_corpus_for_cut_card",
+        "same_lane_replacement_or_equal_gate_if_cut_remains_candidate",
+        "target_replay_negative_or_battle_evidence_before_reclassification"
+      ],
+      "research_lane": "off_profile_or_unclassified_cut_lane",
+      "research_status": "external_research_cannot_override_target_usage",
+      "same_lane_route_count": 0,
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Necromancy",
+      "cut_roles": [
+        "reanimation_plan_b"
+      ],
+      "external_cut_permission_now": false,
+      "incidental_overlap_count": 0,
+      "required_evidence": [
+        "current_commander_reference_corpus_for_cut_card",
+        "same_lane_replacement_or_equal_gate_if_cut_remains_candidate",
+        "target_replay_negative_or_battle_evidence_before_reclassification"
+      ],
+      "research_lane": "reanimation_plan_b",
+      "research_status": "external_research_cannot_override_target_usage",
+      "same_lane_route_count": 0,
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Necropotence",
+      "cut_roles": [
+        "card_draw_selection",
+        "reanimation_plan_b"
+      ],
+      "external_cut_permission_now": false,
+      "incidental_overlap_count": 2,
+      "required_evidence": [
+        "current_commander_reference_corpus_for_cut_card",
+        "same_lane_replacement_or_equal_gate_if_cut_remains_candidate",
+        "target_replay_negative_or_battle_evidence_before_reclassification"
+      ],
+      "research_lane": "card_draw_selection,reanimation_plan_b",
+      "research_status": "external_research_cannot_override_target_usage",
+      "same_lane_route_count": 0,
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Puresteel Paladin",
+      "cut_roles": [
+        "card_draw_selection"
+      ],
+      "external_cut_permission_now": false,
+      "incidental_overlap_count": 2,
+      "required_evidence": [
+        "manual_negative_trace_review_or_force_access",
+        "external_corpus_check_for_current_commander_and_bracket",
+        "do_not_use_seen_without_usage_as_cut_proof"
+      ],
+      "research_lane": "card_draw_selection",
+      "research_status": "external_research_requires_negative_trace_review_first",
+      "same_lane_route_count": 0,
+      "trace_group": "seen_without_usage",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Sigarda's Aid",
+      "cut_roles": [],
+      "external_cut_permission_now": false,
+      "incidental_overlap_count": 0,
+      "required_evidence": [
+        "current_commander_reference_corpus_for_cut_card",
+        "same_lane_replacement_or_equal_gate_if_cut_remains_candidate",
+        "target_replay_negative_or_battle_evidence_before_reclassification"
+      ],
+      "research_lane": "off_profile_or_unclassified_cut_lane",
+      "research_status": "external_research_cannot_override_target_usage",
+      "same_lane_route_count": 0,
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Sram, Senior Edificer",
+      "cut_roles": [
+        "card_draw_selection"
+      ],
+      "external_cut_permission_now": false,
+      "incidental_overlap_count": 2,
+      "required_evidence": [
+        "current_commander_reference_corpus_for_cut_card",
+        "same_lane_replacement_or_equal_gate_if_cut_remains_candidate",
+        "target_replay_negative_or_battle_evidence_before_reclassification"
+      ],
+      "research_lane": "card_draw_selection",
+      "research_status": "external_research_cannot_override_target_usage",
+      "same_lane_route_count": 0,
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "candidate_copy_allowed": false,
+      "cut_card": "Trouble in Pairs",
+      "cut_roles": [
+        "card_draw_selection",
+        "dedicated_win_conditions"
+      ],
+      "external_cut_permission_now": false,
+      "incidental_overlap_count": 3,
+      "required_evidence": [
+        "manual_negative_trace_review_or_force_access",
+        "external_corpus_check_for_current_commander_and_bracket",
+        "do_not_use_seen_without_usage_as_cut_proof"
+      ],
+      "research_lane": "card_draw_selection,dedicated_win_conditions",
+      "research_status": "external_research_requires_negative_trace_review_first",
+      "same_lane_route_count": 0,
+      "trace_group": "seen_without_usage",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "input_artifacts": {
+    "package_synthesis_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "same_lane_proof_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "mutation_boundary": "This plan does not copy decks, mutate DBs, run battles, or promote a package.",
+    "same_lane_boundary": "A payoff add axis cannot replace draw, reanimation, equipment, or off-profile cuts without explicit proof.",
+    "source_boundary": "External usage and articles are evidence lanes, not final deck truth.",
+    "trace_boundary": "Target-deck usage remains stronger than external popularity for value-safe cut decisions."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "research_actions": [
+    {
+      "action": "collect_external_commander_reference_corpus_for_cut_candidates",
+      "candidate_copy_allowed": false,
+      "priority": "P0",
+      "reason": "Internal mined hypotheses either were used or lacked explicit same-lane replacement proof.",
+      "status": "required_next",
+      "target_lanes": [
+        "card_draw_selection",
+        "card_draw_selection,dedicated_win_conditions",
+        "card_draw_selection,reanimation_plan_b",
+        "off_profile_or_unclassified_cut_lane",
+        "reanimation_plan_b"
+      ]
+    },
+    {
+      "action": "separate_payoff_add_axis_from_cut_lane_research",
+      "candidate_copy_allowed": false,
+      "package_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "priority": "P1",
+      "reason": "The package add axes are explicit payoff repairs and do not automatically replace draw, reanimation, equipment, or off-profile cuts.",
+      "status": "required"
+    },
+    {
+      "action": "annotate_high_power_staples_with_bracket_and_game_changer_context",
+      "candidate_copy_allowed": false,
+      "priority": "P2",
+      "reason": "Official bracket policy makes tutors, fast mana, value engines, and efficient disruption bracket-context signals, not generic cut fodder.",
+      "status": "required_before_cut"
+    },
+    {
+      "action": "rerun_internal_hypothesis_miner_after_external_annotations",
+      "candidate_copy_allowed": false,
+      "priority": "P3",
+      "reason": "No new deck action should occur until external corpus evidence is mapped back to named current-deck cards.",
+      "status": "blocked_until_corpus_collected"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "external_cut_source_research_plan_ready_no_deck_action",
+  "summary": {
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "explicit_same_lane_route_count": 0,
+    "external_source_count": 6,
+    "hypothesis_count": 8,
+    "next_gate": "collect_external_commander_reference_corpus_for_cut_candidates",
+    "package_explicit_add_axes": [
+      "angels_demons_dragons_payoffs"
+    ],
+    "research_action_count": 4,
+    "seen_without_usage_count": 2,
+    "usage_blocked_hypothesis_count": 6
+  },
+  "value_safe_reclassification_allowed_now": false
+}

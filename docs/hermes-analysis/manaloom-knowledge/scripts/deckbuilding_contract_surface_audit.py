@@ -150,6 +150,12 @@ GLOBAL_COMMANDER_CUT_HYPOTHESIS_SAME_LANE_PROOF = (
 GLOBAL_COMMANDER_CUT_HYPOTHESIS_SAME_LANE_PROOF_TEST = (
     SCRIPT_DIR / "test_global_commander_cut_hypothesis_same_lane_proof.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_CUT_SOURCE_RESEARCH_PLAN = (
+    SCRIPT_DIR / "global_commander_external_cut_source_research_plan.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_CUT_SOURCE_RESEARCH_PLAN_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_cut_source_research_plan.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -359,6 +365,10 @@ GLOBAL_COMMANDER_SCOPE1_CUT_SOURCE_HYPOTHESIS_TRACE_COLLECTOR_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_CUT_HYPOTHESIS_SAME_LANE_PROOF_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_CUT_SOURCE_RESEARCH_PLAN_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -676,6 +686,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "cut_hypothesis_same_lane_proof_routes_to_more_mining",
                 "mine_more_hypotheses_or_external_cut_source_research",
+                "global_commander_external_cut_source_research_plan.py",
+                "global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_cut_source_research_plan_ready_no_deck_action",
+                "collect_external_commander_reference_corpus_for_cut_candidates",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -932,6 +946,10 @@ def build_audit() -> dict[str, Any]:
                 "explicit_same_lane_route_count=0",
                 "incidental_role_overlap_count=9",
                 "mine_more_hypotheses_or_external_cut_source_research",
+                "global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_cut_source_research_plan_ready_no_deck_action",
+                "external_source_count=6",
+                "collect_external_commander_reference_corpus_for_cut_candidates",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1549,6 +1567,35 @@ def build_audit() -> dict[str, Any]:
                 "Dedicated Draw Replacement",
                 "cut_hypothesis_same_lane_proof_routes_to_more_mining",
                 "manual_negative_review_or_force_access_for_seen_hypotheses",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_CUT_SOURCE_RESEARCH_PLAN,
+            [
+                "global_commander_external_cut_source_research_plan",
+                "external_cut_source_research_plan_ready_no_deck_action",
+                "collect_external_commander_reference_corpus_for_cut_candidates",
+                "wizards_commander_brackets_2026_02_09",
+                "edhrec_kaalia_current",
+                "external_research_cannot_override_target_usage",
+                "external_research_requires_negative_trace_review_first",
+                "External usage and articles are evidence lanes, not final deck truth.",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_CUT_SOURCE_RESEARCH_PLAN_TEST,
+            [
+                "test_external_research_plan_keeps_deck_actions_closed",
+                "external_cut_source_research_plan_ready_no_deck_action",
+                "collect_external_commander_reference_corpus_for_cut_candidates",
+                "external_research_cannot_override_target_usage",
+                "external_research_requires_negative_trace_review_first",
             ],
         )
     )
@@ -2408,6 +2455,28 @@ def build_audit() -> dict[str, Any]:
                 "Biotransference",
                 "Necropotence",
                 "Trouble in Pairs",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_CUT_SOURCE_RESEARCH_PLAN_REPORT,
+            [
+                "Global Commander External Cut-Source Research Plan",
+                "external_cut_source_research_plan_ready_no_deck_action",
+                "hypothesis_count: `8`",
+                "usage_blocked_hypothesis_count: `6`",
+                "seen_without_usage_count: `2`",
+                "explicit_same_lane_route_count: `0`",
+                "external_source_count: `6`",
+                "package_explicit_add_axes: `angels_demons_dragons_payoffs`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "collect_external_commander_reference_corpus_for_cut_candidates",
+                "wizards_commander_brackets_2026_02_09",
+                "edhrec_kaalia_current",
+                "external_research_cannot_override_target_usage",
+                "external_research_requires_negative_trace_review_first",
             ],
         )
     )

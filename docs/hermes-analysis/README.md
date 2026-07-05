@@ -569,6 +569,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Proximo gate: `mine_more_hypotheses_or_external_cut_source_research`;
     candidate copy, battle, promocao e reclassificacao value-safe seguem
     fechados.
+    A pesquisa externa foi registrada por
+    `global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `external_cut_source_research_plan_ready_no_deck_action`, com
+    `external_source_count=6` e proximo gate
+    `collect_external_commander_reference_corpus_for_cut_candidates`. As fontes
+    externas atuais sustentam bracket/power context, payoff density,
+    attack-window e metodologia de categorias, mas nao substituem trace do deck
+    alvo nem abrem permissao de corte.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

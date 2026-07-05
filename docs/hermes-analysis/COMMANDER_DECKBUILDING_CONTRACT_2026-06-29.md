@@ -301,7 +301,13 @@ Operational priority after this pivot:
     profile-role overlap as incidental unless the add covers that lane, and
     route to more cut-source mining or external cut research when no explicit
     same-lane route exists;
-35. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+35. run `global_commander_external_cut_source_research_plan.py` when same-lane
+    proof routes to more mining or external research; it must record current
+    official/Commander source lanes, separate popularity and strategy articles
+    from deck truth, and route to external commander reference corpus collection
+    without opening candidate copy, battle, promotion, or value-safe
+    reclassification;
+36. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -354,6 +360,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -783,6 +790,15 @@ Current external refresh on 2026-07-05:
   next gate is `mine_more_hypotheses_or_external_cut_source_research`;
   candidate copy, battle, promotion, and value-safe reclassification remain
   closed.
+- Current external cut-source research planning returns
+  `external_cut_source_research_plan_ready_no_deck_action` with
+  `external_source_count=6` and next gate
+  `collect_external_commander_reference_corpus_for_cut_candidates`. The external
+  source snapshot covers Wizards bracket/Game Changer policy plus EDHREC
+  commander usage, filtered midrange, Kaalia strategy, and general Commander
+  deckbuilding method. These are evidence lanes only: target usage and
+  seen-without-usage blockers still prevent candidate copy, battle, promotion,
+  and value-safe reclassification.
 
 ## Global Commander Rollout - 2026-07-01
 

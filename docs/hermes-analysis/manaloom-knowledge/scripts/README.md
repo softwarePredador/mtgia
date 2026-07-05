@@ -137,6 +137,13 @@ not incidental profile-role overlap. When no explicit same-lane route exists,
 candidate copy, battle, promotion, and value-safe reclassification stay closed
 and the next work is more cut-source mining or external cut research.
 
+When same-lane proof routes to external research, run
+`global_commander_external_cut_source_research_plan.py`. It records the current
+official Commander policy and public commander/source lanes as evidence only,
+then routes to external commander reference corpus collection. Popularity,
+articles, and bracket context must not override target-deck usage traces or open
+candidate copy by themselves.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative
