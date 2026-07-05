@@ -260,6 +260,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Storytelling // Harnfel, Horn of Bounty` no deck `619`, com source DB
     intacto e gate de batalha/promocao ainda fechado:
     `master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md`.
+    Depois da copia candidata, rode
+    `manaloom-knowledge/scripts/global_commander_candidate_battle_probe_audit.py`
+    sobre um probe pequeno base-vs-candidato com replay estruturado. A primeira
+    evidencia Kaalia mostrou o alvo correto (`Kaalia of the Vast`) e zero
+    contaminacao de `Lorehold`, mas bloqueou promocao: candidato `33.3%` vs
+    base `66.7%`, e nenhuma das cinco remocoes adicionadas foi exercida nos
+    eventos do replay:
+    `master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

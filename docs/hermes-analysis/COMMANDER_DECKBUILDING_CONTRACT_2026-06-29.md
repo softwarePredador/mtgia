@@ -185,7 +185,12 @@ Operational priority after this pivot:
    copied Hermes SQLite DB, must prove the source DB hash is unchanged, and
    still keeps promotion/battle gates closed until strategy, battle, and replay
    evidence pass;
-12. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+12. run `global_commander_candidate_battle_probe_audit.py` after a candidate
+   copy has a small equal-seed battle/replay probe; it must compare base versus
+   candidate metrics, prove replay target identity is commander-specific, and
+   require added cards to be exercised in replay events before any larger gate
+   can be trusted;
+13. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -202,6 +207,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
 credentials are unavailable. It must report source lanes as unavailable and route
@@ -255,6 +261,12 @@ Current external refresh on 2026-07-05:
   // Harnfel, Horn of Bounty`, passed 100-card/singleton/source-unchanged
   structure checks, and still reports `promotion_allowed=false` plus
   `allow_battle_gate_now=false`.
+- Current candidate battle probe auditing is diagnostic only. The Kaalia
+  nonland-floor candidate copy fixed the removal floor structurally, and the
+  replay wrapper now names the target as `Kaalia of the Vast` instead of stale
+  `Lorehold`; however the small equal-seed probe underperformed the base
+  (`33.3%` versus `66.7%`) and none of the five added removal cards were
+  exercised in replay events, so promotion remains blocked.
 
 ## Global Commander Rollout - 2026-07-01
 

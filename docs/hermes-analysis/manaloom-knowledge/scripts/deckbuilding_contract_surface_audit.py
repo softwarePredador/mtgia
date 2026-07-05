@@ -35,6 +35,9 @@ GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_land_
 GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_nonland_core_candidate_model.py"
 GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT = SCRIPT_DIR / "global_commander_learning_priority_audit.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
+GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_AUDIT = (
+    SCRIPT_DIR / "global_commander_candidate_battle_probe_audit.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -96,6 +99,10 @@ GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md"
+)
+GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -177,6 +184,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
+                "global_commander_candidate_battle_probe_audit.py",
+                "global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md",
+                "33.3%",
+                "66.7%",
                 "five Commander",
                 "brackets `1..5`",
                 "Game Changer budgets",
@@ -317,6 +328,10 @@ def build_audit() -> dict[str, Any]:
                 "Angel/Demon/Dragon ficam bloqueadas",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
+                "global_commander_candidate_battle_probe_audit.py",
+                "global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md",
+                "candidato `33.3%` vs",
+                "nenhuma das cinco remocoes adicionadas foi exercida",
             ],
         )
     )
@@ -497,6 +512,20 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_AUDIT,
+            [
+                "global_commander_candidate_battle_probe_audit",
+                "battle_probe_blocks_promotion",
+                "candidate_underperformed_base_probe",
+                "added_cards_not_exercised_in_replay_events",
+                "stale_lorehold_mentions",
+                "promotion_allowed",
+                "larger_battle_gate_required",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -589,6 +618,19 @@ def build_audit() -> dict[str, Any]:
             if GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT.exists()
             else ["global_commander_candidate_copy_materializer_report"],
         }
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT,
+            [
+                "battle_probe_blocks_promotion",
+                "base_wr: `66.7`",
+                "candidate_wr: `33.3`",
+                "candidate_underperformed_base_probe",
+                "added_cards_not_exercised_in_replay_events",
+                "stale_lorehold_mentions: `0`",
+            ],
+        )
     )
 
     historical = []
