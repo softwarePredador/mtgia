@@ -56648,6 +56648,11 @@ def can_attack_this_combat(creature):
         return False
     if creature.get("summoning_sick") and not has_haste(creature):
         return False
+    if creature.get("defender") and not (
+        creature.get("can_attack_with_defender")
+        or creature.get("can_attack_as_though_no_defender")
+    ):
+        return False
     return True
 
 

@@ -1310,6 +1310,35 @@ def register_tests(battle, player):
         assert defender.battlefield == []
         assert defender.life == -2
 
+    def test_defender_creature_cannot_attack_without_explicit_exception():
+        attacker = player("Attacker")
+        defender = player("Defender")
+        defender.life = 4
+        wall = {
+            "name": "Defender Wall",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+            "defender": True,
+            "summoning_sick": False,
+            "tapped": False,
+        }
+        attacker.battlefield = [wall]
+
+        assert battle.can_attack_this_combat(wall) is False
+        assert battle.declare_attackers_step(attacker, [defender], [attacker, defender], 2) is None
+
+        exception_wall = dict(wall)
+        exception_wall["can_attack_as_though_no_defender"] = True
+        attacker.battlefield = [exception_wall]
+        assert battle.can_attack_this_combat(exception_wall) is True
+
+        battle.combat_phase_v8(
+            attacker, [defender], [attacker, defender], 2, random.Random(17), battle.Stack()
+        )
+
+        assert defender.life == 0
+
     return [
         test_only_attacked_player_can_block,
         test_combat_prioritizes_visible_lethal,
@@ -1340,4 +1369,5 @@ def register_tests(battle, player):
         test_indestructible_blocker_survives_lethal_combat_damage,
         test_teferis_protection_is_held_for_lethal_combat_damage,
         test_double_strike_trample_deals_excess_in_both_steps,
+        test_defender_creature_cannot_attack_without_explicit_exception,
     ]
