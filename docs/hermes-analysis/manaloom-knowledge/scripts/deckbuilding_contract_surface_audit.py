@@ -48,6 +48,9 @@ GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT = (
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_MATRIX = (
     SCRIPT_DIR / "global_commander_candidate_package_strategy_matrix.py"
 )
+GLOBAL_COMMANDER_PROFILE_BLOCKER_REPAIR_PLAN = (
+    SCRIPT_DIR / "global_commander_profile_blocker_repair_plan.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -125,6 +128,10 @@ GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_REPORT = (
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.md"
+)
+GLOBAL_COMMANDER_PROFILE_BLOCKER_REPAIR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260705_kaalia_removal_floor_step5.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -238,6 +245,13 @@ def build_audit() -> dict[str, Any]:
                 "profile_spot_interaction_below_target",
                 "attack_window_cut_without_replacement",
                 "repair_commander_profile_blockers_before_battle",
+                "global_commander_profile_blocker_repair_plan.py",
+                "global_commander_profile_blocker_repair_plan_20260705_kaalia_removal_floor_step5.md",
+                "profile_blocker_repair_plan_ready",
+                "repair_or_restore_commander_attack_window_before_more_interaction",
+                "repair_mana_base_to_commander_land_floor",
+                "repair_commander_payoff_density_with_legal_source_lanes",
+                "finish_spot_interaction_floor_with_same_lane_cut",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -417,6 +431,12 @@ def build_audit() -> dict[str, Any]:
                 "profile_spot_interaction_below_target",
                 "attack_window_cut_without_replacement",
                 "repair_commander_profile_blockers_before_battle",
+                "global_commander_profile_blocker_repair_plan.py",
+                "global_commander_profile_blocker_repair_plan_20260705_kaalia_removal_floor_step5.md",
+                "repair_or_restore_commander_attack_window_before_more_interaction",
+                "repair_mana_base_to_commander_land_floor",
+                "repair_commander_payoff_density_with_legal_source_lanes",
+                "finish_spot_interaction_floor_with_same_lane_cut",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -685,6 +705,23 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PROFILE_BLOCKER_REPAIR_PLAN,
+            [
+                "global_commander_profile_blocker_repair_plan",
+                "profile_blocker_repair_plan_ready",
+                "profile_strategy_ready_no_repair_needed",
+                "materialize_profile_repair_candidate_copy",
+                "repair_or_restore_commander_attack_window_before_more_interaction",
+                "repair_mana_base_to_commander_land_floor",
+                "repair_commander_payoff_density_with_legal_source_lanes",
+                "finish_spot_interaction_floor_with_same_lane_cut",
+                "battle_or_optimization_performed",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -838,6 +875,26 @@ def build_audit() -> dict[str, Any]:
                 "repair_commander_profile_blockers_before_battle",
                 "Path to Exile",
                 "Rakdos Charm",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PROFILE_BLOCKER_REPAIR_REPORT,
+            [
+                "Global Commander Profile Blocker Repair Plan",
+                "profile_blocker_repair_plan_ready",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "profile_lands_below_target",
+                "profile_angels_demons_dragons_payoffs_below_target",
+                "profile_spot_interaction_below_target",
+                "attack_window_cut_without_replacement",
+                "materialize_profile_repair_candidate_copy",
+                "repair_or_restore_commander_attack_window_before_more_interaction",
+                "repair_mana_base_to_commander_land_floor",
+                "repair_commander_payoff_density_with_legal_source_lanes",
+                "finish_spot_interaction_floor_with_same_lane_cut",
             ],
         )
     )

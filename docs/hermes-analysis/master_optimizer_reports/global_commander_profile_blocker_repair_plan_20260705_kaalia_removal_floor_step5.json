@@ -1,0 +1,174 @@
+{
+  "artifact_type": "global_commander_profile_blocker_repair_plan",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T19:35:01.628012+00:00",
+  "input_artifacts": {
+    "strategy_matrix_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.json"
+  },
+  "mutation_allowed": false,
+  "over_target_review_roles": [
+    {
+      "candidate_count": 23,
+      "cut_policy": "review only; never cut cards carrying blocker roles or attack-window risk",
+      "max": 14,
+      "overage": 9,
+      "role": "mana_acceleration"
+    },
+    {
+      "candidate_count": 13,
+      "cut_policy": "review only; never cut cards carrying blocker roles or attack-window risk",
+      "max": 11,
+      "overage": 2,
+      "role": "card_draw_selection"
+    },
+    {
+      "candidate_count": 18,
+      "cut_policy": "review only; never cut cards carrying blocker roles or attack-window risk",
+      "max": 8,
+      "overage": 10,
+      "role": "tutors_access"
+    }
+  ],
+  "policy": {
+    "battle_boundary": "Any blocker keeps equal battle probes closed until the strategy matrix is rerun clean.",
+    "cut_boundary": "Above-target roles are candidate review pressure, not automatic cut authorization.",
+    "repair_boundary": "This plan names repair lanes only; it never mutates decks or opens promotion."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "recommended_repair_sequence": [
+    "repair_or_restore_commander_attack_window_before_more_interaction",
+    "repair_mana_base_to_commander_land_floor",
+    "repair_commander_payoff_density_with_legal_source_lanes",
+    "finish_spot_interaction_floor_with_same_lane_cut",
+    "rerun_global_commander_candidate_package_strategy_matrix"
+  ],
+  "repair_actions": [
+    {
+      "battle_policy": "repair and rerun package strategy matrix before any equal battle probe",
+      "blocker": "profile_lands_below_target",
+      "candidate_count": 34,
+      "cut_policy": "use same-lane or proven excess cuts only; do not cut attack-window, hard-floor, or source-anchor cards",
+      "missing_expected_package_cards": [],
+      "repair_axis": "lands",
+      "shortfall_to_min": 1,
+      "source_lanes": [
+        "global_commander_mana_base_profile",
+        "global_commander_named_land_candidate_pool",
+        "same_lane_land_cut_review"
+      ],
+      "target_max": 37,
+      "target_min": 35
+    },
+    {
+      "battle_policy": "repair and rerun package strategy matrix before any equal battle probe",
+      "blocker": "profile_angels_demons_dragons_payoffs_below_target",
+      "candidate_count": 4,
+      "cut_policy": "use same-lane or proven excess cuts only; do not cut attack-window, hard-floor, or source-anchor cards",
+      "missing_expected_package_cards": [
+        "Avacyn, Angel of Hope",
+        "Balefire Dragon",
+        "Ancient Copper Dragon",
+        "Aurelia, the Warleader",
+        "Hoarding Broodlord",
+        "Angel of Serenity",
+        "Angel of the Ruins"
+      ],
+      "repair_axis": "angels_demons_dragons_payoffs",
+      "shortfall_to_min": 18,
+      "source_lanes": [
+        "commander_reference_profile_expected_packages",
+        "oracle_type_identity_legal_filter",
+        "source_lane_payoff_density_review"
+      ],
+      "target_max": 30,
+      "target_min": 22
+    },
+    {
+      "battle_policy": "repair and rerun package strategy matrix before any equal battle probe",
+      "blocker": "profile_spot_interaction_below_target",
+      "candidate_count": 6,
+      "cut_policy": "use same-lane or proven excess cuts only; do not cut attack-window, hard-floor, or source-anchor cards",
+      "missing_expected_package_cards": [
+        "Anguished Unmaking",
+        "Despark",
+        "Bedevil",
+        "Vindicate",
+        "Damn",
+        "Farewell",
+        "Ruinous Ultimatum"
+      ],
+      "repair_axis": "spot_interaction",
+      "shortfall_to_min": 2,
+      "source_lanes": [
+        "commander_reference_profile_interaction_package",
+        "oracle_targeted_interaction_filter",
+        "same_lane_nonprotected_cut_review"
+      ],
+      "target_max": 12,
+      "target_min": 8
+    },
+    {
+      "battle_policy": "restore or replace attack-window function before replay",
+      "blocker": "attack_window_cut_without_replacement",
+      "cut_cards": [
+        {
+          "card": "Genji Glove",
+          "repair_policy": "restore this lane or add same-lane attack enabler before replay",
+          "risk_flags": [
+            "attack_window_or_extra_combat_cut"
+          ]
+        },
+        {
+          "card": "Karlach, Fury of Avernus",
+          "repair_policy": "restore this lane or add same-lane attack enabler before replay",
+          "risk_flags": [
+            "attack_window_or_extra_combat_cut"
+          ]
+        },
+        {
+          "card": "Ardenn, Intrepid Archaeologist",
+          "repair_policy": "restore this lane or add same-lane attack enabler before replay",
+          "risk_flags": [
+            "attack_window_or_extra_combat_cut"
+          ]
+        }
+      ],
+      "cut_policy": "interaction upgrades cannot hide extra-combat, equipment, haste, or attack-trigger cuts",
+      "missing_expected_package_cards": [
+        "Swiftfoot Boots",
+        "Hall of the Bandit Lord",
+        "Arena of Glory",
+        "Teferi's Protection",
+        "Boros Charm",
+        "Akroma's Will",
+        "Deflecting Swat",
+        "Flawless Maneuver"
+      ],
+      "repair_axis": "commander_attack_window",
+      "source_lanes": [
+        "commander_attack_enabler_package",
+        "protection_silence_source_lane_review",
+        "same_lane_attack_window_cut_review"
+      ]
+    }
+  ],
+  "source_blockers": [
+    "profile_lands_below_target",
+    "profile_angels_demons_dragons_payoffs_below_target",
+    "profile_spot_interaction_below_target",
+    "attack_window_cut_without_replacement"
+  ],
+  "source_db_mutated": false,
+  "status": "profile_blocker_repair_plan_ready",
+  "summary": {
+    "blocker_count": 4,
+    "commander": "Kaalia of the Vast",
+    "deck_id": "619",
+    "next_gate": "materialize_profile_repair_candidate_copy",
+    "repair_action_count": 4,
+    "source_strategy_status": "package_strategy_blocks_battle"
+  }
+}

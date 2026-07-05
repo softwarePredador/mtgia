@@ -209,7 +209,11 @@ Operational priority after this pivot:
    final copied candidate against the commander's role targets, expected
    packages, and cut-risk lanes, then keep battle and promotion closed when a
    package fixes generic core floors but weakens commander-specific strategy;
-16. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+16. run `global_commander_profile_blocker_repair_plan.py` whenever the package
+   strategy matrix blocks battle; it must convert profile blockers into repair
+   axes, source lanes, same-lane cut policies, and a rerun sequence without
+   mutating decks or opening battle/promotion;
+17. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -230,6 +234,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260705_kaalia_removal_floor_step5.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
 credentials are unavailable. It must report source lanes as unavailable and route
@@ -354,6 +359,17 @@ Current external refresh on 2026-07-05:
   `attack_window_cut_without_replacement`; `battle_gate_allowed_now=false`,
   `promotion_allowed=false`, and the next gate is
   `repair_commander_profile_blockers_before_battle`.
+- Current profile blocker repair planning is read-only and maps the blocked
+  Kaalia package to concrete repair axes in
+  `global_commander_profile_blocker_repair_plan_20260705_kaalia_removal_floor_step5.md`.
+  The report status is `profile_blocker_repair_plan_ready`, and the required
+  sequence is `repair_or_restore_commander_attack_window_before_more_interaction`,
+  `repair_mana_base_to_commander_land_floor`,
+  `repair_commander_payoff_density_with_legal_source_lanes`,
+  `finish_spot_interaction_floor_with_same_lane_cut`, and
+  `rerun_global_commander_candidate_package_strategy_matrix`. Above-target mana
+  acceleration, card-flow, and tutor roles are review pressure only, not
+  automatic cut authorization.
 
 ## Global Commander Rollout - 2026-07-01
 
