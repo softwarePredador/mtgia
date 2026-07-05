@@ -15262,3 +15262,76 @@ Register decision:
   target predicates listed in this package.
 - Remaining ETB damage backlog must continue through dynamic amount and
   unsupported target subpatterns, not broad generic review-scope promotion.
+
+## 2026-07-05 - PG510 creature ETB dynamic count damage parser
+
+- Deploy id: `xmage_pg510_etb_dynamic_count_damage_new_server`.
+- Runtime family: `xmage_creature_etb_dynamic_count_damage_target_v1`.
+- Promoted cards: `8`.
+- Promoted card names: `Basalt Ravager`, `Explosive Prodigy`,
+  `Firefist Adept`, `Gruesome Scourger`, `Kessig Malcontents`,
+  `Outrage Shaman`, `Thundering Sparkmage`, and `Volley Veteran`.
+- Scope boundary: only exact creature enters-the-battlefield dynamic damage
+  triggers backed by local XMage `EntersBattlefieldTriggeredAbility` plus
+  `DamageTargetEffect` and matching ManaLoom count/target fields are allowed
+  in this package. Composite counts, unsupported costs, unrelated direct damage
+  rows, and broad review scopes remain blocked.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_package.md`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_manifest.json`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_rollback.sql`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_apply_evidence.md`.
+- Apply:
+  `deprecated_shadow_rows=0`, `upserted_rows=8`, `COMMIT`.
+- Postcheck:
+  all 8 promoted rows have `promoted_rule_rows=1`,
+  `promoted_verified_auto_rows=1`, and `promoted_oracle_hash_rows=1`.
+- PG -> Hermes SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg510_etb_dynamic_count_damage_new_server.json`;
+  `selected_card_count=8`, `pg_rows_loaded=8`,
+  `sqlite_inserted_or_updated=8`, and
+  `canonical_snapshot_rows_exported=6005`.
+- Runtime lookup:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_runtime_get_card_effect.out`
+  resolves all 8 cards to the expected runtime scope, damage amount source,
+  target, and target controller where applicable.
+- Validation:
+  combined parser/runtime/sync guard suite `845` tests passed,
+  XMage strategy `26/26` pass, operational surface `pass`, legacy
+  contamination `pass`, and PG/Hermes/SQLite `51/51` pass.
+- Post-sync queue:
+  `target_identity_count=26012`, `xmage_authoritative_source_count=25698`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25698`.
+- Global readiness:
+  `battle_and_oracle_ready=4938`,
+  `battle_family_mapper_required=28935`,
+  `snapshot_has_any_rule=6008`, and
+  `snapshot_has_verified_rule=4760`.
+- Final exact-scope recheck:
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`, and
+  `adapter_work_unit_counts={}`.
+
+Register decision:
+
+- PG510 is applied and should not be rebuilt.
+- The ETB dynamic count damage parser/runtime now supports the eight exact
+  cards listed in this package.
+- The next wave must start from the rebuilt post-PG510 queue and choose a new
+  exact subpattern; do not reuse the pre-PG510 queue.

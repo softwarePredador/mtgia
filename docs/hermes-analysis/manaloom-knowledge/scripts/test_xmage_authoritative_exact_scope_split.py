@@ -906,6 +906,172 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 if fixture.get("target_controller"):
                     self.assertEqual(effect["target_constraints"]["controller"], fixture["target_controller"])
 
+    def test_creature_etb_dynamic_battlefield_count_damage_maps_to_runtime(self) -> None:
+        fixtures = [
+            {
+                "name": "Basalt Ravager",
+                "oracle": (
+                    "When this creature enters, it deals X damage to any target, where X is the "
+                    "greatest number of creatures you control that have a creature type in common."
+                ),
+                "source": """
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DamageTargetEffect(
+                        GreatestSharedCreatureTypeCount.instance)));
+                    ability.addTarget(new TargetAnyTarget());
+                """,
+                "target": "any_target",
+                "amount_source": "greatest_shared_creature_type_count",
+            },
+            {
+                "name": "Explosive Prodigy",
+                "oracle": (
+                    "Vivid — When this creature enters, it deals X damage to target creature an opponent "
+                    "controls, where X is the number of colors among permanents you control."
+                ),
+                "source": """
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(
+                        new DamageTargetEffect(ColorsAmongControlledPermanentsCount.ALL_PERMANENTS)));
+                    ability.addTarget(new TargetOpponentsCreaturePermanent());
+                """,
+                "target": "creature",
+                "target_controller": "opponent",
+                "amount_source": "colors_among_permanents_you_control",
+            },
+            {
+                "name": "Firefist Adept",
+                "oracle": (
+                    "When this creature enters, it deals X damage to target creature an opponent controls, "
+                    "where X is the number of Wizards you control."
+                ),
+                "source": """
+                    private static final FilterControlledPermanent filterCount =
+                        new FilterControlledPermanent("Wizards you control");
+                    static { filterCount.add(SubType.WIZARD.getPredicate()); }
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(
+                        new DamageTargetEffect(new PermanentsOnBattlefieldCount(filterCount))));
+                    ability.addTarget(new TargetOpponentsCreaturePermanent());
+                """,
+                "target": "creature",
+                "target_controller": "opponent",
+                "amount_source": "battlefield_permanent_count",
+                "count_fields": {"battlefield_count_subtypes": ["wizard"]},
+            },
+            {
+                "name": "Gruesome Scourger",
+                "oracle": (
+                    "When this creature enters, it deals damage to target opponent or planeswalker "
+                    "equal to the number of creatures you control."
+                ),
+                "source": """
+                    DynamicValue xValue = new PermanentsOnBattlefieldCount(
+                        StaticFilters.FILTER_CONTROLLED_CREATURES, 1);
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DamageTargetEffect(xValue)));
+                    ability.addTarget(new TargetOpponentOrPlaneswalker());
+                """,
+                "target": "opponent_or_planeswalker",
+                "amount_source": "battlefield_permanent_count",
+                "count_fields": {"battlefield_count_card_types": ["creature"]},
+            },
+            {
+                "name": "Kessig Malcontents",
+                "oracle": (
+                    "When this creature enters, it deals damage to target player or planeswalker "
+                    "equal to the number of Humans you control."
+                ),
+                "source": """
+                    private static final FilterControlledPermanent filter =
+                        new FilterControlledPermanent("Humans you control");
+                    static { filter.add(SubType.HUMAN.getPredicate()); }
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(
+                        new DamageTargetEffect(new PermanentsOnBattlefieldCount(filter), "it")));
+                    ability.addTarget(new TargetPlayerOrPlaneswalker());
+                """,
+                "target": "player_or_planeswalker",
+                "amount_source": "battlefield_permanent_count",
+                "count_fields": {"battlefield_count_subtypes": ["human"]},
+            },
+            {
+                "name": "Outrage Shaman",
+                "oracle": (
+                    "Chroma — When this creature enters, it deals damage to target creature equal to the "
+                    "number of red mana symbols in the mana costs of permanents you control."
+                ),
+                "source": """
+                    DynamicValue xValue = new ChromaCount(ManaType.RED);
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(new DamageTargetEffect(xValue)));
+                    ability.addTarget(new TargetCreaturePermanent());
+                """,
+                "target": "creature",
+                "amount_source": "controlled_permanents_mana_symbol_count",
+                "count_fields": {"mana_symbol_count_color": "R"},
+            },
+            {
+                "name": "Thundering Sparkmage",
+                "oracle": (
+                    "When this creature enters, it deals X damage to target creature or planeswalker, "
+                    "where X is the number of creatures in your party. (Your party consists of up to one "
+                    "each of Cleric, Rogue, Warrior, and Wizard.)"
+                ),
+                "source": """
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(
+                        new DamageTargetEffect(PartyCount.instance)));
+                    ability.addTarget(new TargetCreatureOrPlaneswalker());
+                """,
+                "target": "creature_or_planeswalker",
+                "amount_source": "party_count",
+            },
+            {
+                "name": "Volley Veteran",
+                "oracle": (
+                    "When this creature enters, it deals damage to target creature an opponent controls "
+                    "equal to the number of Goblins you control."
+                ),
+                "source": """
+                    private static final FilterControlledPermanent filter =
+                        new FilterControlledPermanent("Goblins you control");
+                    static { filter.add(SubType.GOBLIN.getPredicate()); }
+                    this.addAbility(new EntersBattlefieldTriggeredAbility(
+                        new DamageTargetEffect(new PermanentsOnBattlefieldCount(filter))));
+                    ability.addTarget(new TargetOpponentsCreaturePermanent());
+                """,
+                "target": "creature",
+                "target_controller": "opponent",
+                "amount_source": "battlefield_permanent_count",
+                "count_fields": {"battlefield_count_subtypes": ["goblin"]},
+            },
+        ]
+
+        for fixture in fixtures:
+            with self.subTest(card=fixture["name"]):
+                row = queue_row(
+                    split.DAMAGE_UNIT,
+                    effect_classes=["DamageTargetEffect"],
+                    card_id=fixture["name"],
+                    ability_kind="triggered",
+                    ability_classes=["EntersBattlefieldTriggeredAbility"],
+                    xmage_signals=["targeting", "triggered_ability"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=fixture["name"],
+                        type_line="Creature",
+                        oracle_text=fixture["oracle"],
+                    ),
+                    source_text=fixture["source"],
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["effect"], "creature")
+                self.assertEqual(effect["battle_model_scope"], split.ETB_DYNAMIC_COUNT_DAMAGE_CREATURE_SCOPE)
+                self.assertTrue(effect["etb_dynamic_damage"])
+                self.assertEqual(effect["damage_amount_source"], fixture["amount_source"])
+                self.assertEqual(effect["target"], fixture["target"])
+                self.assertEqual(effect.get("target_controller"), fixture.get("target_controller"))
+                for key, value in fixture.get("count_fields", {}).items():
+                    self.assertEqual(effect.get(key), value)
+
     def test_dynamic_graveyard_count_damage_blocks_unsupported_neighbors(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
@@ -6408,7 +6574,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_damage_amount"], 1)
         self.assertEqual(effect["etb_damage_target"], "any_target")
 
-    def test_creature_etb_damage_blocks_variable_amount(self) -> None:
+    def test_creature_etb_dynamic_count_damage_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,
             effect_classes=["DamageTargetEffect"],
@@ -6416,24 +6582,100 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ability_classes=["EntersBattlefieldTriggeredAbility"],
             xmage_signals=["targeting", "triggered_ability"],
         )
-        proposal, reason = split.split_row(
-            row,
-            metadata(
-                name="Fixture Ravager",
-                type_line="Creature - Giant Wizard",
-                oracle_text=(
+        fixtures = [
+            {
+                "name": "Fixture Ravager",
+                "oracle": (
                     "When this creature enters, it deals X damage to any target, "
                     "where X is the greatest number of creatures you control that have a creature type in common."
                 ),
-            ),
-            source_text=(
-                "this.addAbility(new EntersBattlefieldTriggeredAbility("
-                "new DamageTargetEffect(new GreatestSharedCreatureTypeCount())));"
-            ),
-        )
+                "source": (
+                    "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                    "new DamageTargetEffect(new GreatestSharedCreatureTypeCount())));"
+                ),
+                "target": "any_target",
+                "constraints": {"scope": "any_target"},
+                "source_key": "greatest_shared_creature_type_count",
+            },
+            {
+                "name": "Fixture Party Mage",
+                "oracle": (
+                    "When this creature enters, it deals damage to target creature an opponent controls "
+                    "equal to the number of creatures in your party."
+                ),
+                "source": (
+                    "Ability ability = new EntersBattlefieldTriggeredAbility("
+                    "new DamageTargetEffect(PartyCount.instance));"
+                    "ability.addTarget(new TargetCreaturePermanent());"
+                    "this.addAbility(ability);"
+                ),
+                "target": "creature",
+                "target_controller": "opponent",
+                "constraints": {"card_types": ["creature"], "controller_scope": "opponent"},
+                "source_key": "party_count",
+            },
+            {
+                "name": "Fixture Chromatic",
+                "oracle": (
+                    "When this creature enters, it deals damage to target opponent equal to "
+                    "the number of colors among permanents you control."
+                ),
+                "source": (
+                    "Ability ability = new EntersBattlefieldTriggeredAbility("
+                    "new DamageTargetEffect(ColorsAmongControlledPermanentsCount.instance));"
+                    "ability.addTarget(new TargetOpponent());"
+                    "this.addAbility(ability);"
+                ),
+                "target": "opponent",
+                "constraints": {"scope": "opponent"},
+                "source_key": "colors_among_permanents_you_control",
+            },
+            {
+                "name": "Fixture Chroma",
+                "oracle": (
+                    "When this creature enters, it deals damage to target player equal to the number "
+                    "of red mana symbols in the mana costs of permanents you control."
+                ),
+                "source": (
+                    "Ability ability = new EntersBattlefieldTriggeredAbility("
+                    "new DamageTargetEffect(new ChromaCount(ManaType.RED)));"
+                    "ability.addTarget(new TargetPlayer());"
+                    "this.addAbility(ability);"
+                ),
+                "target": "player",
+                "constraints": {"scope": "player"},
+                "source_key": "controlled_permanents_mana_symbol_count",
+                "mana_symbol_count_color": "R",
+            },
+        ]
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "etb_damage_target_not_supported")
+        for fixture in fixtures:
+            with self.subTest(card=fixture["name"]):
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=fixture["name"],
+                        type_line="Creature - Giant Wizard",
+                        oracle_text=fixture["oracle"],
+                    ),
+                    source_text=fixture["source"],
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["effect"], "creature")
+                self.assertEqual(effect["battle_model_scope"], split.ETB_DYNAMIC_COUNT_DAMAGE_CREATURE_SCOPE)
+                self.assertTrue(effect["etb_dynamic_damage"])
+                self.assertEqual(effect["etb_damage_target"], fixture["target"])
+                self.assertEqual(effect["target"], fixture["target"])
+                self.assertEqual(effect["target_constraints"], fixture["constraints"])
+                self.assertEqual(effect["damage_amount_source"], fixture["source_key"])
+                self.assertEqual(effect["damage_base_amount"], 0)
+                self.assertEqual(effect["damage_per_count"], 1)
+                if "target_controller" in fixture:
+                    self.assertEqual(effect["target_controller"], fixture["target_controller"])
+                if "mana_symbol_count_color" in fixture:
+                    self.assertEqual(effect["mana_symbol_count_color"], fixture["mana_symbol_count_color"])
 
     def test_creature_etb_damage_maps_restricted_flying_target(self) -> None:
         row = queue_row(

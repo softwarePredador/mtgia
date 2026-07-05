@@ -1,0 +1,591 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg510_xmage_pg510_etb_dynamic_count_dama_20260705_141441",
+  "deploy_id": "PG510",
+  "expected_rules": [
+    {
+      "card_name": "Basalt Ravager",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2ae1e68342721c6d1e6f939f7a083b5",
+      "min_rule_version": 2,
+      "normalized_name": "basalt ravager",
+      "oracle_hash": "cac67c66affc0628f40c1811b0873ae9",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "greatest_shared_creature_type_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "any_target",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Explosive Prodigy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1282c6f503ecc1b764fb82ec1ca73ef2",
+      "min_rule_version": 2,
+      "normalized_name": "explosive prodigy",
+      "oracle_hash": "1e447151ab8aa3df1306d5d1db6c8fa0",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "colors_among_permanents_you_control",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent"
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Firefist Adept",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0d910538c746d80f8fafe09e19cf67d2",
+      "min_rule_version": 2,
+      "normalized_name": "firefist adept",
+      "oracle_hash": "2dbcc9991de1570f0ae1eed570d9250e",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "battlefield_permanent_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent"
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gruesome Scourger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4caec1a33ceadbea7dfb82ef563888ea",
+      "min_rule_version": 2,
+      "normalized_name": "gruesome scourger",
+      "oracle_hash": "dcb48cabe9a66fe7a9ed1da0092575ef",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "battlefield_permanent_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "opponent_or_planeswalker",
+        "target": "opponent_or_planeswalker",
+        "target_constraints": {
+          "scope": "opponent_or_planeswalker"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kessig Malcontents",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:12df6f8c33b63f99bcc89c6b6444dedc",
+      "min_rule_version": 2,
+      "normalized_name": "kessig malcontents",
+      "oracle_hash": "8620d16e48cf01bf3f08cad8b985b752",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "battlefield_permanent_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "player_or_planeswalker",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Outrage Shaman",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ef46a599a0428bf700b4e8d908835d77",
+      "min_rule_version": 2,
+      "normalized_name": "outrage shaman",
+      "oracle_hash": "6573f249c0ad49ee7c5fa5f88b7daf8c",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "controlled_permanents_mana_symbol_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thundering Sparkmage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dce4d2fc86d58bf503032bc12e78c447",
+      "min_rule_version": 2,
+      "normalized_name": "thundering sparkmage",
+      "oracle_hash": "caa6744bfdfeabfa57bd621cf6dbc15c",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "party_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "creature_or_planeswalker",
+        "target": "creature_or_planeswalker",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "planeswalker"
+          ]
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Volley Veteran",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4bba8c2ade6fc9360d9fecb24654d190",
+      "min_rule_version": 2,
+      "normalized_name": "volley veteran",
+      "oracle_hash": "da37d347529c9a3813d5db00dd9a8ef9",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "battlefield_permanent_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent"
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_dynamic_count_damage_target": 8
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T14:14:41+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Basalt Ravager"
+      },
+      "card_name": "Basalt Ravager",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2ae1e68342721c6d1e6f939f7a083b5",
+      "normalized_name": "basalt ravager",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "greatest_shared_creature_type_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "any_target",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Explosive Prodigy"
+      },
+      "card_name": "Explosive Prodigy",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1282c6f503ecc1b764fb82ec1ca73ef2",
+      "normalized_name": "explosive prodigy",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "colors_among_permanents_you_control",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent"
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Firefist Adept"
+      },
+      "card_name": "Firefist Adept",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0d910538c746d80f8fafe09e19cf67d2",
+      "normalized_name": "firefist adept",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "battlefield_permanent_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent"
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Gruesome Scourger"
+      },
+      "card_name": "Gruesome Scourger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4caec1a33ceadbea7dfb82ef563888ea",
+      "normalized_name": "gruesome scourger",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "battlefield_permanent_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "opponent_or_planeswalker",
+        "target": "opponent_or_planeswalker",
+        "target_constraints": {
+          "scope": "opponent_or_planeswalker"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kessig Malcontents"
+      },
+      "card_name": "Kessig Malcontents",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:12df6f8c33b63f99bcc89c6b6444dedc",
+      "normalized_name": "kessig malcontents",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "battlefield_permanent_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "player_or_planeswalker",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Outrage Shaman"
+      },
+      "card_name": "Outrage Shaman",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ef46a599a0428bf700b4e8d908835d77",
+      "normalized_name": "outrage shaman",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "controlled_permanents_mana_symbol_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Thundering Sparkmage"
+      },
+      "card_name": "Thundering Sparkmage",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dce4d2fc86d58bf503032bc12e78c447",
+      "normalized_name": "thundering sparkmage",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "party_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "creature_or_planeswalker",
+        "target": "creature_or_planeswalker",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "planeswalker"
+          ]
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Volley Veteran"
+      },
+      "card_name": "Volley Veteran",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4bba8c2ade6fc9360d9fecb24654d190",
+      "normalized_name": "volley veteran",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+        "damage_amount_source": "battlefield_permanent_count",
+        "damage_base_amount": 0,
+        "effect": "creature",
+        "etb_damage_amount": 0,
+        "etb_damage_target": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "opponent"
+        },
+        "target_controller": "opponent",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Basalt Ravager",
+    "Explosive Prodigy",
+    "Firefist Adept",
+    "Gruesome Scourger",
+    "Kessig Malcontents",
+    "Outrage Shaman",
+    "Thundering Sparkmage",
+    "Volley Veteran"
+  ],
+  "selected_count": 8,
+  "slug": "xmage_pg510_etb_dynamic_count_damage_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Basalt Ravager",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2ae1e68342721c6d1e6f939f7a083b5",
+      "min_rule_version": 2,
+      "normalized_name": "basalt ravager",
+      "oracle_hash": "cac67c66affc0628f40c1811b0873ae9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Explosive Prodigy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1282c6f503ecc1b764fb82ec1ca73ef2",
+      "min_rule_version": 2,
+      "normalized_name": "explosive prodigy",
+      "oracle_hash": "1e447151ab8aa3df1306d5d1db6c8fa0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Firefist Adept",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0d910538c746d80f8fafe09e19cf67d2",
+      "min_rule_version": 2,
+      "normalized_name": "firefist adept",
+      "oracle_hash": "2dbcc9991de1570f0ae1eed570d9250e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gruesome Scourger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4caec1a33ceadbea7dfb82ef563888ea",
+      "min_rule_version": 2,
+      "normalized_name": "gruesome scourger",
+      "oracle_hash": "dcb48cabe9a66fe7a9ed1da0092575ef",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kessig Malcontents",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:12df6f8c33b63f99bcc89c6b6444dedc",
+      "min_rule_version": 2,
+      "normalized_name": "kessig malcontents",
+      "oracle_hash": "8620d16e48cf01bf3f08cad8b985b752",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Outrage Shaman",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ef46a599a0428bf700b4e8d908835d77",
+      "min_rule_version": 2,
+      "normalized_name": "outrage shaman",
+      "oracle_hash": "6573f249c0ad49ee7c5fa5f88b7daf8c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Thundering Sparkmage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dce4d2fc86d58bf503032bc12e78c447",
+      "min_rule_version": 2,
+      "normalized_name": "thundering sparkmage",
+      "oracle_hash": "caa6744bfdfeabfa57bd621cf6dbc15c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Volley Veteran",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4bba8c2ade6fc9360d9fecb24654d190",
+      "min_rule_version": 2,
+      "normalized_name": "volley veteran",
+      "oracle_hash": "da37d347529c9a3813d5db00dd9a8ef9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -13078,6 +13078,64 @@ unrelated direct-damage review scopes, or broad `xmage_*_review_v1`
 promotion. The remaining `etb_damage_target_not_supported` rows require a
 separate dynamic amount/modeling pass.
 
+## PG510 Exact ETB Dynamic Count Damage Checkpoint
+
+As of 2026-07-05, PG510 is applied and synced against the new server target.
+It closes eight exact ETB dynamic count damage rows:
+
+- `Basalt Ravager`: `damage_amount_source=greatest_shared_creature_type_count`,
+  `target=any_target`.
+- `Explosive Prodigy`:
+  `damage_amount_source=colors_among_permanents_you_control`,
+  `target=creature`, `target_controller=opponent`.
+- `Firefist Adept`: `damage_amount_source=battlefield_permanent_count`,
+  `battlefield_count_subtypes=["wizard"]`, `target=creature`,
+  `target_controller=opponent`.
+- `Gruesome Scourger`: `damage_amount_source=battlefield_permanent_count`,
+  `battlefield_count_card_types=["creature"]`,
+  `target=opponent_or_planeswalker`.
+- `Kessig Malcontents`: `damage_amount_source=battlefield_permanent_count`,
+  `battlefield_count_subtypes=["human"]`, `target=player_or_planeswalker`.
+- `Outrage Shaman`:
+  `damage_amount_source=controlled_permanents_mana_symbol_count`,
+  `mana_symbol_count_color=R`, `target=creature`.
+- `Thundering Sparkmage`: `damage_amount_source=party_count`,
+  `target=creature_or_planeswalker`.
+- `Volley Veteran`: `damage_amount_source=battlefield_permanent_count`,
+  `battlefield_count_subtypes=["goblin"]`, `target=creature`,
+  `target_controller=opponent`.
+
+Evidence:
+
+- package and apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg510_etb_dynamic_count_damage_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg510_etb_dynamic_count_damage_new_server.json`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg510_etb_dynamic_count_damage_next.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg510_etb_dynamic_count_damage.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg510_etb_dynamic_count_damage.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=4938`
+- `battle_family_mapper_required=28935`
+- `target_identity_count=26012`
+- `xmage_authoritative_source_count=25698`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25698`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+- final exact-scope recheck `adapter_work_unit_counts={}`
+
+Residual boundary: PG510 does not authorize broad direct-damage review scopes,
+composite dynamic count rows, unsupported costs, or any `xmage_*_review_v1`
+promotion. The next wave must start from the rebuilt post-PG510 queue, not from
+historical PG509 residual counts.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -244,6 +244,9 @@ ETB_OPTIONAL_DISCARD_DRAW_CREATURE_SCOPE = "xmage_creature_etb_optional_discard_
 ETB_DYNAMIC_DRAW_CREATURE_SCOPE = "xmage_creature_etb_dynamic_draw_cards_v1"
 ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE = "xmage_creature_etb_draw_lose_life_v1"
 ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
+ETB_DYNAMIC_COUNT_DAMAGE_CREATURE_SCOPE = (
+    "xmage_creature_etb_dynamic_count_damage_target_v1"
+)
 ETB_GRAVEYARD_COUNT_DAMAGE_CREATURE_SCOPE = (
     "xmage_creature_etb_dynamic_graveyard_count_damage_v1"
 )
@@ -4598,6 +4601,12 @@ def _controlled_battlefield_count_fields(filter_text: str) -> dict[str, Any] | N
             "battlefield_count_scope": "controller_battlefield",
             "battlefield_count_subtypes": ["goblin"],
         }
+    if re.fullmatch(r"[a-z][a-z_ -]*", token):
+        subtype = token.replace(" ", "_").replace("-", "_")
+        return {
+            "battlefield_count_scope": "controller_battlefield",
+            "battlefield_count_subtypes": [subtype],
+        }
     return None
 
 
@@ -7212,10 +7221,16 @@ def _dynamic_damage_target_from_phrase(phrase: str) -> str | None:
         return "creature_or_planeswalker"
     if token == "target creature":
         return "creature"
+    if token == "target creature an opponent controls":
+        return "creature_opponent_controls"
     if token == "target player or planeswalker":
         return "player_or_planeswalker"
+    if token == "target opponent or planeswalker":
+        return "opponent_or_planeswalker"
     if token == "target player":
         return "player"
+    if token == "target opponent":
+        return "opponent"
     return None
 
 
@@ -7227,6 +7242,17 @@ def _dynamic_damage_count_fields_from_filter(filter_text: str) -> dict[str, Any]
         return {"damage_amount_source": "domain_basic_land_types"}
     if token == "cards in your hand":
         return {"damage_amount_source": "controller_hand_count"}
+    if token == "colors among permanents you control":
+        return {"damage_amount_source": "colors_among_permanents_you_control"}
+    if token == "creatures in your party":
+        return {"damage_amount_source": "party_count"}
+    if token == "red mana symbols in the mana costs of permanents you control":
+        return {
+            "damage_amount_source": "controlled_permanents_mana_symbol_count",
+            "mana_symbol_count_color": "R",
+        }
+    if token == "creatures you control that have a creature type in common":
+        return {"damage_amount_source": "greatest_shared_creature_type_count"}
     if token == "attacking creatures":
         return {
             "damage_amount_source": "battlefield_permanent_count",
@@ -7241,11 +7267,7 @@ def _dynamic_damage_count_fields_from_filter(filter_text: str) -> dict[str, Any]
             "battlefield_count_card_types": ["creature"],
             "battlefield_count_combat_state": "attacking",
         }
-    controlled = re.match(
-        r"^(?P<filter>equipment|artifact|artifacts|creature|creatures|land|lands|mountain|mountains|goblin|goblins) "
-        r"you control$",
-        token,
-    )
+    controlled = re.match(r"^(?P<filter>[a-z][a-z_ -]*?) you control$", token)
     if controlled:
         filter_name = controlled.group("filter").rstrip("s")
         count_fields = _controlled_battlefield_count_fields(filter_name)
@@ -7273,7 +7295,7 @@ def dynamic_count_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
         )
     where_match = re.match(
         r"^.+ deals x damage to (?P<target>.+?), where x is "
-        r"(?:(?P<base>\d+) plus )?the number of (?P<filter>.+?)\.?$",
+        r"(?:(?P<base>\d+) plus )?(?:the number of|the greatest number of) (?P<filter>.+?)\.?$",
         text,
     )
     if where_match:
@@ -7293,7 +7315,7 @@ def dynamic_count_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
             **count_fields,
         )
     equal_match = re.match(
-        r"^.+ deals damage to (?P<target>.+?) equal to the number of (?P<filter>.+?)\.?$",
+        r"^.+ deals damage to (?P<target>.+?) equal to (?:the number of|the greatest number of) (?P<filter>.+?)\.?$",
         text,
     )
     if equal_match:
@@ -7308,7 +7330,7 @@ def dynamic_count_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
         amount_source = str(count_fields.pop("damage_amount_source"))
         return _dynamic_count_damage_dict(amount_source, target=target, **count_fields)
     reversed_equal_match = re.match(
-        r"^.+ deals damage equal to the number of (?P<filter>.+?) to (?P<target>.+?)\.?$",
+        r"^.+ deals damage equal to (?:the number of|the greatest number of) (?P<filter>.+?) to (?P<target>.+?)\.?$",
         text,
     )
     if reversed_equal_match:
@@ -7328,6 +7350,9 @@ def dynamic_count_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
 def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[str, Any] | str | None:
     text = source or ""
     token = re.sub(r"\s+", " ", str(expr or "")).strip()
+    parts = split_top_level_args(token)
+    if len(parts) > 1 and any(part.strip().startswith('"') for part in parts[1:]):
+        token = parts[0].strip()
     if "GetXValue" in token or "ManacostVariableValue" in token:
         return "dynamic_count_damage_x_cost_not_supported"
     if "CardsInTargetHandCount" in token or (token == "xValue" and "CardsInTargetHandCount" in text):
@@ -7339,7 +7364,20 @@ def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[
     ):
         return "dynamic_count_damage_greatest_value_not_supported"
     if "PartyCount" in token or (token == "xValue" and "PartyCount" in text):
-        return "dynamic_count_damage_party_count_not_supported"
+        return {"damage_amount_source": "party_count"}
+    if "GreatestSharedCreatureTypeCount" in token or (
+        token == "xValue" and "GreatestSharedCreatureTypeCount" in text
+    ):
+        return {"damage_amount_source": "greatest_shared_creature_type_count"}
+    if "ColorsAmongControlledPermanentsCount" in token or (
+        token == "xValue" and "ColorsAmongControlledPermanentsCount" in text
+    ):
+        return {"damage_amount_source": "colors_among_permanents_you_control"}
+    if "ChromaCount(ManaType.RED)" in token or (token == "xValue" and "ChromaCount(ManaType.RED)" in text):
+        return {
+            "damage_amount_source": "controlled_permanents_mana_symbol_count",
+            "mana_symbol_count_color": "R",
+        }
     if "ThunderSalvoValue" in token or (token == "xValue" and "ThunderSalvoValue" in text):
         return "dynamic_count_damage_spell_count_not_supported"
     if "ElectrostaticBoltDamageValue" in token:
@@ -7409,13 +7447,22 @@ def _dynamic_count_damage_source_spec_from_expr(source: str, expr: str) -> dict[
     if "Predicates.or" in text and "PermanentsOnBattlefieldCount" in token:
         return "dynamic_count_damage_composite_count_not_supported"
     subtype_match = re.search(
-        r"FilterControlledPermanent\s*\(\s*SubType\.(MOUNTAIN|GOBLIN)",
+        r"FilterControlledPermanent\s*\(\s*SubType\.([A-Z_]+)",
         text if token == "xValue" else token,
     )
+    if subtype_match is None and "PermanentsOnBattlefieldCount" in token:
+        constructor_args = extract_constructor_args(token, "PermanentsOnBattlefieldCount") or ""
+        constructor_parts = split_top_level_args(constructor_args)
+        filter_ref = constructor_parts[0].strip() if constructor_parts else ""
+        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", filter_ref):
+            subtype_match = re.search(
+                rf"\b{re.escape(filter_ref)}\.add\s*\(\s*SubType\.([A-Z_]+)\.getPredicate\(\)\s*\)",
+                text,
+            )
     if subtype_match is None and "Predicates.or" not in text:
         subtype_match = re.search(
-            r"SubType\.(MOUNTAIN|GOBLIN)\.getPredicate\(\)",
-            text if "PermanentsOnBattlefieldCount" in token or token == "xValue" else "",
+            r"SubType\.([A-Z_]+)\.getPredicate\(\)",
+            token if "PermanentsOnBattlefieldCount" in token or token == "xValue" else "",
         )
     if subtype_match:
         subtype = subtype_match.group(1).lower()
@@ -7541,6 +7588,7 @@ def restricted_target_base(target: str) -> str:
         "creature_toughness_2_or_less",
         "creature_damaged_this_turn",
         "creature_damaged_this_turn_opponent_controls",
+        "creature_opponent_controls",
         "creature_up_to_three",
         "creature_with_defender",
         "creature_mana_value_3_or_greater",
@@ -11796,6 +11844,8 @@ def damage_target_from_source(source: str) -> str | None:
         return "any_target"
     if re.search(r"new\s+TargetPlayerOrPlaneswalker\s*\(", text):
         return "player_or_planeswalker"
+    if re.search(r"new\s+TargetOpponentOrPlaneswalker\s*\(", text):
+        return "opponent_or_planeswalker"
     if re.search(r"new\s+TargetOpponent\s*\(", text):
         return "opponent"
     if re.search(r"new\s+TargetPlayer\s*\(", text):
@@ -11806,6 +11856,8 @@ def damage_target_from_source(source: str) -> str | None:
         return "creature_or_planeswalker"
     if re.search(r"new\s+TargetControlledCreaturePermanent\s*\(", text):
         return "creature_you_control"
+    if re.search(r"new\s+TargetOpponentsCreaturePermanent\s*\(", text):
+        return "creature_opponent_controls"
     if (
         re.search(r"new\s+TargetCreaturePermanent\s*\(", text)
         or "FilterCreaturePermanent" in text
@@ -13481,6 +13533,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"]}
     if target == "creature_damaged_this_turn_opponent_controls":
         return {"card_types": ["creature"], "controller_scope": "opponent", "damaged_this_turn": True}
+    if target == "creature_opponent_controls":
+        return {"card_types": ["creature"], "controller_scope": "opponent"}
     if target == "creature_or_planeswalker_damaged_this_turn_opponent_controls":
         return {
             "card_types": ["creature", "planeswalker"],
@@ -13589,6 +13643,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "dynamic graveyard-count damage spell"
     elif scope == ETB_GRAVEYARD_COUNT_DAMAGE_CREATURE_SCOPE:
         scope_kind = "creature ETB dynamic graveyard-count damage trigger"
+    elif scope == ETB_DYNAMIC_COUNT_DAMAGE_CREATURE_SCOPE:
+        scope_kind = "creature ETB dynamic battlefield-count damage trigger"
     elif scope == ETB_BOUNCE_CREATURE_SCOPE:
         scope_kind = "creature ETB return target permanent to hand trigger"
     elif scope == DESTROY_GAIN_LIFE_SCOPE:
@@ -13640,6 +13696,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_DRAW_CREATURE_SCOPE,
         ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE,
         ETB_DAMAGE_CREATURE_SCOPE,
+        ETB_DYNAMIC_COUNT_DAMAGE_CREATURE_SCOPE,
         ETB_DESTROY_CREATURE_SCOPE,
         ETB_RECURSION_CREATURE_SCOPE,
         ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE,
@@ -16818,6 +16875,62 @@ def split_row(
     if etb_damage_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "etb_damage_not_creature"
+        dynamic_damage = dynamic_count_damage_from_oracle(metadata)
+        if isinstance(dynamic_damage, str):
+            return None, dynamic_damage
+        if dynamic_damage is not None:
+            source_dynamic_damage = dynamic_count_damage_from_source(source_text)
+            if isinstance(source_dynamic_damage, str):
+                return None, source_dynamic_damage
+            if source_dynamic_damage is None:
+                return None, "etb_dynamic_damage_source_not_supported"
+            for key in (
+                "damage_amount_source",
+                "damage_base_amount",
+                "damage_per_count",
+                "battlefield_count_scope",
+                "battlefield_count_card_types",
+                "battlefield_count_subtypes",
+                "battlefield_count_combat_state",
+                "mana_symbol_count_color",
+            ):
+                if dynamic_damage.get(key) != source_dynamic_damage.get(key):
+                    return None, f"etb_dynamic_damage_source_oracle_{key}_mismatch"
+            target = str(dynamic_damage["target"])
+            target_controller = None
+            target_base = restricted_target_base(target)
+            if target == "creature_opponent_controls":
+                target_base = "creature"
+                target_controller = "opponent"
+            source_target = damage_target_from_source(source_text)
+            if source_target is not None and source_target not in {target, target_base}:
+                return None, "etb_dynamic_damage_source_target_mismatch"
+            target_constraints = target_constraints_for(target)
+            if target_controller:
+                target_constraints["controller_scope"] = target_controller
+            dynamic_damage_fields = {key: value for key, value in dynamic_damage.items() if key != "target"}
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": ETB_DYNAMIC_COUNT_DAMAGE_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "enters_battlefield",
+                "etb_dynamic_damage": True,
+                "etb_damage_amount": 0,
+                "etb_damage_target": target_base,
+                "target": target_base,
+                "target_constraints": target_constraints,
+                "xmage_effect_class": "DamageTargetEffect",
+                "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+                **dynamic_damage_fields,
+            }
+            if target_controller:
+                effect_json["target_controller"] = target_controller
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_creature_etb_dynamic_count_damage_target",
+            ), "selected_exact_scope"
         parsed = etb_damage_target_from_oracle(metadata)
         if parsed is None:
             return None, "etb_damage_target_not_supported"

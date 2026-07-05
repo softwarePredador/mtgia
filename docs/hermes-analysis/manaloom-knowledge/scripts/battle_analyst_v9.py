@@ -11518,6 +11518,18 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         or target.get("owner")
         or getattr(target_controller, "name", None)
     )
+    required_controller = str(
+        constraints.get("controller")
+        or constraints.get("controller_scope")
+        or constraints.get("target_controller")
+        or ""
+    ).lower()
+    if required_controller in {"self", "you", "controller", "controlled"}:
+        if target_controller_name != getattr(controller, "name", None):
+            return False
+    elif required_controller in {"opponent", "opponents"}:
+        if target_controller_name == getattr(controller, "name", None):
+            return False
     if target.get("hexproof") and controller.name != target_controller_name:
         return False
     # Shroud: can't be targeted at all
@@ -17989,6 +18001,11 @@ def resolve_generic_permanent_etb(
                 "graveyard_count_card_types",
                 "graveyard_count_subtypes",
                 "graveyard_count_card_names",
+                "battlefield_count_scope",
+                "battlefield_count_card_types",
+                "battlefield_count_subtypes",
+                "battlefield_count_combat_state",
+                "mana_symbol_count_color",
             ):
                 if effect_data.get(key) is not None:
                     etb_damage_effect[key] = effect_data.get(key)
@@ -44918,6 +44935,62 @@ def _domain_basic_land_type_count(player):
     return len(seen)
 
 
+def _controlled_permanent_color_count(player):
+    colors = set()
+    for permanent in _controlled_permanents(player):
+        colors.update(_spell_color_symbols(permanent))
+    return len(colors)
+
+
+def _permanent_subtype_values(permanent):
+    if not isinstance(permanent, dict):
+        return []
+    values = []
+    explicit_subtypes = permanent.get("subtypes") or permanent.get("subtype") or []
+    if isinstance(explicit_subtypes, str):
+        explicit_subtypes = [explicit_subtypes]
+    for subtype in explicit_subtypes:
+        normalized = str(subtype or "").strip().lower()
+        if normalized and normalized not in values:
+            values.append(normalized)
+    for subtype in creature_subtype_tokens(permanent):
+        normalized = subtype.strip().lower()
+        if normalized and normalized not in values:
+            values.append(normalized)
+    return values
+
+
+def _controlled_party_count(player):
+    party_subtypes = {"cleric", "rogue", "warrior", "wizard"}
+    present = set()
+    for permanent in _controlled_permanents(player):
+        if not is_battlefield_creature(permanent):
+            continue
+        present.update(subtype for subtype in _permanent_subtype_values(permanent) if subtype in party_subtypes)
+    return min(4, len(present))
+
+
+def _greatest_shared_creature_type_count(player):
+    counts = defaultdict(int)
+    for permanent in _controlled_permanents(player):
+        if not is_battlefield_creature(permanent):
+            continue
+        for subtype in set(_permanent_subtype_values(permanent)):
+            counts[subtype] += 1
+    return max(counts.values(), default=0)
+
+
+def _controlled_permanents_mana_symbol_count(player, color):
+    symbol = _color_symbol(color)
+    if symbol not in SYMBOL_TO_COLOR_NAME:
+        return 0
+    total = 0
+    for permanent in _controlled_permanents(player):
+        mana_cost = str(permanent.get("mana_cost") or "")
+        total += len(re.findall(rf"\{{{re.escape(symbol)}\}}", mana_cost.upper()))
+    return total
+
+
 def _stat_modifier_count_from_source(player, opponents, effect_data):
     amount_source = str(effect_data.get("stat_modifier_amount_source") or "").lower()
     if amount_source == "graveyard_card_count":
@@ -45038,6 +45111,32 @@ def _dynamic_damage_count_from_source(player, opponents, effect_data):
         if "hand_stat_modifier_count" in replay_fields:
             replay_fields["hand_damage_count"] = replay_fields["hand_stat_modifier_count"]
         return count, replay_fields
+    if amount_source == "colors_among_permanents_you_control":
+        count = _controlled_permanent_color_count(player)
+        return count, {
+            "damage_amount_source": amount_source,
+            "controlled_permanent_color_count": count,
+        }
+    if amount_source == "party_count":
+        count = _controlled_party_count(player)
+        return count, {
+            "damage_amount_source": amount_source,
+            "party_count": count,
+        }
+    if amount_source == "greatest_shared_creature_type_count":
+        count = _greatest_shared_creature_type_count(player)
+        return count, {
+            "damage_amount_source": amount_source,
+            "greatest_shared_creature_type_count": count,
+        }
+    if amount_source == "controlled_permanents_mana_symbol_count":
+        color = str(effect_data.get("mana_symbol_count_color") or "").strip().upper()
+        count = _controlled_permanents_mana_symbol_count(player, color)
+        return count, {
+            "damage_amount_source": amount_source,
+            "mana_symbol_count_color": color,
+            "controlled_permanents_mana_symbol_count": count,
+        }
     return None, {}
 
 
@@ -45054,6 +45153,10 @@ def dynamic_damage_amount(player, opponents, effect_data):
         "battlefield_permanent_count",
         "controller_hand_count",
         "domain_basic_land_types",
+        "colors_among_permanents_you_control",
+        "party_count",
+        "greatest_shared_creature_type_count",
+        "controlled_permanents_mana_symbol_count",
     }:
         return None, {}
     count, replay_fields = _dynamic_damage_count_from_source(player, opponents, effect_data)

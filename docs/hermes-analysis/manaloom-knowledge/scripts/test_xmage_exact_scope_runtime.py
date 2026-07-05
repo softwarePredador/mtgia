@@ -4313,6 +4313,187 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_dynamic_count_damage_supports_runtime_count_sources(self) -> None:
+        fixtures = [
+            {
+                "card": {
+                    "name": "Fixture Party Mage",
+                    "type_line": "Creature - Ogre",
+                    "oracle_text": (
+                        "When this creature enters, it deals damage to target creature an opponent controls "
+                        "equal to the number of creatures in your party."
+                    ),
+                    "power": 2,
+                    "toughness": 2,
+                },
+                "active_battlefield": [
+                    {"name": "Cleric", "type_line": "Creature - Human Cleric"},
+                    {"name": "Rogue", "type_line": "Creature - Human Rogue"},
+                    {"name": "Warrior", "type_line": "Creature - Human Warrior"},
+                    {"name": "Duplicate Rogue", "type_line": "Creature - Elf Rogue"},
+                ],
+                "opponent_battlefield": [
+                    {"name": "Target Guardian", "type_line": "Creature - Soldier", "power": 2, "toughness": 3},
+                ],
+                "effect": {
+                    "effect": "creature",
+                    "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_dynamic_damage": True,
+                    "etb_damage_target": "creature",
+                    "target": "creature",
+                    "target_controller": "opponent",
+                    "target_constraints": {"card_types": ["creature"], "controller_scope": "opponent"},
+                    "damage_amount_source": "party_count",
+                    "damage_base_amount": 0,
+                    "damage_per_count": 1,
+                },
+                "expected_life": 20,
+                "expected_target_destroyed": True,
+                "event_key": "party_count",
+                "event_count": 3,
+            },
+            {
+                "card": {
+                    "name": "Fixture Ravager",
+                    "type_line": "Creature - Giant",
+                    "oracle_text": (
+                        "When this creature enters, it deals X damage to any target, where X is "
+                        "the greatest number of creatures you control that have a creature type in common."
+                    ),
+                    "power": 4,
+                    "toughness": 4,
+                },
+                "active_battlefield": [
+                    {"name": "Goblin A", "type_line": "Creature - Goblin"},
+                    {"name": "Goblin B", "type_line": "Creature - Goblin Warrior"},
+                    {"name": "Goblin C", "type_line": "Creature - Goblin"},
+                    {"name": "Human", "type_line": "Creature - Human"},
+                ],
+                "opponent_battlefield": [],
+                "effect": {
+                    "effect": "creature",
+                    "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_dynamic_damage": True,
+                    "etb_damage_target": "any_target",
+                    "target": "any_target",
+                    "target_constraints": {"scope": "any_target"},
+                    "damage_amount_source": "greatest_shared_creature_type_count",
+                    "damage_base_amount": 0,
+                    "damage_per_count": 1,
+                },
+                "expected_life": 17,
+                "expected_target_destroyed": False,
+                "event_key": "greatest_shared_creature_type_count",
+                "event_count": 3,
+            },
+            {
+                "card": {
+                    "name": "Fixture Chromatic",
+                    "type_line": "Creature - Golem",
+                    "oracle_text": (
+                        "When this creature enters, it deals damage to target opponent equal to "
+                        "the number of colors among permanents you control."
+                    ),
+                    "power": 3,
+                    "toughness": 3,
+                },
+                "active_battlefield": [
+                    {"name": "Boros Permanent", "type_line": "Artifact", "mana_cost": "{W}{R}"},
+                    {"name": "Green Permanent", "type_line": "Creature - Elf", "mana_cost": "{G}"},
+                    {"name": "Colorless Rock", "type_line": "Artifact", "mana_cost": "{2}"},
+                ],
+                "opponent_battlefield": [],
+                "effect": {
+                    "effect": "creature",
+                    "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_dynamic_damage": True,
+                    "etb_damage_target": "opponent",
+                    "target": "opponent",
+                    "target_constraints": {"scope": "opponent"},
+                    "damage_amount_source": "colors_among_permanents_you_control",
+                    "damage_base_amount": 0,
+                    "damage_per_count": 1,
+                },
+                "expected_life": 17,
+                "expected_target_destroyed": False,
+                "event_key": "controlled_permanent_color_count",
+                "event_count": 3,
+            },
+            {
+                "card": {
+                    "name": "Fixture Chroma",
+                    "type_line": "Creature - Elemental",
+                    "oracle_text": (
+                        "When this creature enters, it deals damage to target opponent equal to the number "
+                        "of red mana symbols in the mana costs of permanents you control."
+                    ),
+                    "power": 3,
+                    "toughness": 3,
+                },
+                "active_battlefield": [
+                    {"name": "Double Red", "type_line": "Creature - Elemental", "mana_cost": "{R}{R}"},
+                    {"name": "Single Red", "type_line": "Artifact", "mana_cost": "{2}{R}"},
+                    {"name": "White Permanent", "type_line": "Creature - Cleric", "mana_cost": "{W}"},
+                ],
+                "opponent_battlefield": [],
+                "effect": {
+                    "effect": "creature",
+                    "battle_model_scope": "xmage_creature_etb_dynamic_count_damage_target_v1",
+                    "ability_kind": "triggered",
+                    "trigger": "enters_battlefield",
+                    "etb_dynamic_damage": True,
+                    "etb_damage_target": "opponent",
+                    "target": "opponent",
+                    "target_constraints": {"scope": "opponent"},
+                    "damage_amount_source": "controlled_permanents_mana_symbol_count",
+                    "mana_symbol_count_color": "R",
+                    "damage_base_amount": 0,
+                    "damage_per_count": 1,
+                },
+                "expected_life": 17,
+                "expected_target_destroyed": False,
+                "event_key": "controlled_permanents_mana_symbol_count",
+                "event_count": 3,
+            },
+        ]
+
+        for fixture in fixtures:
+            with self.subTest(card=fixture["card"]["name"]):
+                self.events.clear()
+                active = self.battle.Player("Active", None, [])
+                opponent = self.battle.Player("Opponent", None, [])
+                opponent.life = 20
+                active.battlefield = list(fixture["active_battlefield"])
+                opponent.battlefield = list(fixture["opponent_battlefield"])
+
+                self.battle.apply_effect_immediate(
+                    active,
+                    [opponent],
+                    fixture["card"],
+                    turn=5,
+                    rng=random.Random(35),
+                    effect_data_override=fixture["effect"],
+                )
+
+                self.assertEqual(opponent.life, fixture["expected_life"])
+                if fixture["expected_target_destroyed"]:
+                    self.assertEqual(opponent.battlefield, [])
+                self.assertTrue(
+                    any(
+                        event == "damage_resolved"
+                        and data.get("card") == fixture["card"]["name"]
+                        and data.get("amount") == fixture["event_count"]
+                        and data.get(fixture["event_key"]) == fixture["event_count"]
+                        for event, data in self.events
+                    )
+                )
+
     def test_x_damage_uses_cast_context_x_value(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

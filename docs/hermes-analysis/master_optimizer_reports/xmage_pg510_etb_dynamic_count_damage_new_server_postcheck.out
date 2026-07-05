@@ -1,0 +1,11 @@
+      card_name       |   normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+----------------------+----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Basalt Ravager       | basalt ravager       | battle_rule_v1:f2ae1e68342721c6d1e6f939f7a083b5 |                  1 |                           1 |                         1 |           0
+ Explosive Prodigy    | explosive prodigy    | battle_rule_v1:1282c6f503ecc1b764fb82ec1ca73ef2 |                  1 |                           1 |                         1 |           0
+ Firefist Adept       | firefist adept       | battle_rule_v1:0d910538c746d80f8fafe09e19cf67d2 |                  1 |                           1 |                         1 |           0
+ Gruesome Scourger    | gruesome scourger    | battle_rule_v1:4caec1a33ceadbea7dfb82ef563888ea |                  1 |                           1 |                         1 |           0
+ Kessig Malcontents   | kessig malcontents   | battle_rule_v1:12df6f8c33b63f99bcc89c6b6444dedc |                  1 |                           1 |                         1 |           0
+ Outrage Shaman       | outrage shaman       | battle_rule_v1:ef46a599a0428bf700b4e8d908835d77 |                  1 |                           1 |                         1 |           0
+ Thundering Sparkmage | thundering sparkmage | battle_rule_v1:dce4d2fc86d58bf503032bc12e78c447 |                  1 |                           1 |                         1 |           0
+ Volley Veteran       | volley veteran       | battle_rule_v1:4bba8c2ade6fc9360d9fecb24654d190 |                  1 |                           1 |                         1 |           0
+(8 rows)
