@@ -2595,3 +2595,51 @@ Runtime contract:
   manifest and safe temporary cut. It must not mutate deck `607`.
 - A forced-access result can prove visibility/use, but cannot promote a deck or
   replace `607` without a later natural gate.
+
+## Topdeck Safe Cut Miner - 2026-07-05
+
+The current topdeck safe-cut mining artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_safe_cut_miner_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_safe_cut_miner_20260705_current.json`
+
+This miner consumes:
+
+- `lorehold_topdeck_forced_access_microbenchmark_plan_20260705_current`;
+- `lorehold_trace_cut_evidence_expander_20260704_role_tag_repair`.
+
+Current result:
+
+- status:
+  `topdeck_safe_cut_miner_no_current_safe_cut_keep_607`;
+- target cards reviewed: `5`;
+- seed-safe cut candidates: `0`;
+- reviewable same-lane gaps: `0`;
+- runnable-now commands: `0`;
+- natural-promotion-allowed rows: `0`;
+- attempted package cuts reviewed: `9`;
+- recommended next action:
+  `do_not_run_forced_access_until_new_nonanchor_cut_evidence`.
+
+Per-card cut state:
+
+- `Penance`: no current safe cut. Prior attempted cuts:
+  `Hexing Squelcher` and `Promise of Loyalty`; both are blocked by prior
+  reject plus cut safety.
+- `Galvanoth`: no current safe cut. Prior attempted cuts:
+  `Bender's Waterskin`, `Hexing Squelcher`, `Victory Chimes`, and
+  `Thor, God of Thunder`; all are blocked by prior reject plus cut safety.
+- `Dragon's Rage Channeler`: no current safe cut. Prior attempted cut:
+  `The Scarlet Witch`; prior evidence is clear, but cut safety blocks it.
+- `Valakut Awakening // Valakut Stoneforge`: no current safe cut. Prior
+  attempted cut: `Big Score`; prior evidence blocks that exact pair.
+- `Wheel of Fortune`: no current safe cut. Prior attempted cut: `Big Score`;
+  prior evidence blocks that exact pair.
+
+Operational lesson:
+
+- The correct next move is not to run forced-access battles yet.
+- First mine or create new non-anchor cut evidence. The cut must be same-lane
+  or explicitly covered by a new package-shell contract.
+- Until that exists, all five topdeck targets remain learning hypotheses only,
+  and deck `607` remains protected.
