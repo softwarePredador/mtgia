@@ -213,7 +213,13 @@ Operational priority after this pivot:
    strategy matrix blocks battle; it must convert profile blockers into repair
    axes, source lanes, same-lane cut policies, and a rerun sequence without
    mutating decks or opening battle/promotion;
-17. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+17. run `global_commander_profile_repair_candidate_model.py` after a repair
+   plan and before any profile-repair candidate copy; it must name legal,
+   color-identity-compatible add candidates, review-only cut pressure, blocked
+   cuts, and materialization blockers for each repair axis. Large
+   commander-payoff shortfalls must route to a broader commander source lane
+   instead of a narrow add/cut materialization;
+18. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -235,6 +241,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260705_kaalia_removal_floor_step5.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_removal_floor_step5.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
 credentials are unavailable. It must report source lanes as unavailable and route
@@ -370,6 +377,19 @@ Current external refresh on 2026-07-05:
   `rerun_global_commander_candidate_package_strategy_matrix`. Above-target mana
   acceleration, card-flow, and tutor roles are review pressure only, not
   automatic cut authorization.
+- Current profile repair candidate modeling is read-only and names candidates
+  without materializing a deck in
+  `global_commander_profile_repair_candidate_model_20260705_kaalia_removal_floor_step5.md`.
+  It found legal WBR-compatible candidate pools for the land floor, spot
+  interaction, and attack-window axes, including cross-axis attack/land options
+  such as `Arena of Glory` and `Hall of the Bandit Lord`, plus spot interaction
+  options such as `Despark` and `Anguished Unmaking`. It still reports
+  `profile_repair_candidate_model_blocks_materialization` because the
+  Angel/Demon/Dragon payoff shortfall is `18` and the ready expected-package
+  candidates are only `5`; therefore `candidate_copy_allowed_now=false`,
+  `battle_gate_allowed_now=false`, and the next gate is
+  `expand_commander_payoff_source_lane_before_candidate_copy`, not another
+  narrow removal swap.
 
 ## Global Commander Rollout - 2026-07-01
 

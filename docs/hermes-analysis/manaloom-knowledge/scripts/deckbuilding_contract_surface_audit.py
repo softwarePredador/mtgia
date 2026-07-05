@@ -51,6 +51,9 @@ GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_MATRIX = (
 GLOBAL_COMMANDER_PROFILE_BLOCKER_REPAIR_PLAN = (
     SCRIPT_DIR / "global_commander_profile_blocker_repair_plan.py"
 )
+GLOBAL_COMMANDER_PROFILE_REPAIR_CANDIDATE_MODEL = (
+    SCRIPT_DIR / "global_commander_profile_repair_candidate_model.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -132,6 +135,10 @@ GLOBAL_COMMANDER_CANDIDATE_PACKAGE_STRATEGY_REPORT = (
 GLOBAL_COMMANDER_PROFILE_BLOCKER_REPAIR_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260705_kaalia_removal_floor_step5.md"
+)
+GLOBAL_COMMANDER_PROFILE_REPAIR_CANDIDATE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_removal_floor_step5.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -252,6 +259,11 @@ def build_audit() -> dict[str, Any]:
                 "repair_mana_base_to_commander_land_floor",
                 "repair_commander_payoff_density_with_legal_source_lanes",
                 "finish_spot_interaction_floor_with_same_lane_cut",
+                "global_commander_profile_repair_candidate_model.py",
+                "global_commander_profile_repair_candidate_model_20260705_kaalia_removal_floor_step5.md",
+                "profile_repair_candidate_model_blocks_materialization",
+                "candidate_copy_allowed_now=false",
+                "expand_commander_payoff_source_lane_before_candidate_copy",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -437,6 +449,11 @@ def build_audit() -> dict[str, Any]:
                 "repair_mana_base_to_commander_land_floor",
                 "repair_commander_payoff_density_with_legal_source_lanes",
                 "finish_spot_interaction_floor_with_same_lane_cut",
+                "global_commander_profile_repair_candidate_model.py",
+                "global_commander_profile_repair_candidate_model_20260705_kaalia_removal_floor_step5.md",
+                "profile_repair_candidate_model_blocks_materialization",
+                "candidate_copy_allowed_now=false",
+                "expand_commander_payoff_source_lane_before_candidate_copy",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -722,6 +739,21 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PROFILE_REPAIR_CANDIDATE_MODEL,
+            [
+                "global_commander_profile_repair_candidate_model",
+                "profile_repair_candidate_model_blocks_materialization",
+                "profile_repair_candidate_model_ready_for_candidate_copy",
+                "candidate_copy_allowed_now",
+                "expand_commander_payoff_source_lane_before_candidate_copy",
+                "needs_broader_commander_payoff_source_lane_before_materialization",
+                "battle_or_optimization_performed",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -895,6 +927,24 @@ def build_audit() -> dict[str, Any]:
                 "repair_mana_base_to_commander_land_floor",
                 "repair_commander_payoff_density_with_legal_source_lanes",
                 "finish_spot_interaction_floor_with_same_lane_cut",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PROFILE_REPAIR_CANDIDATE_REPORT,
+            [
+                "Global Commander Profile Repair Candidate Model",
+                "profile_repair_candidate_model_blocks_materialization",
+                "candidate_copy_allowed_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "expand_commander_payoff_source_lane_before_candidate_copy",
+                "needs_broader_commander_payoff_source_lane_before_materialization",
+                "Arena of Glory",
+                "Hall of the Bandit Lord",
+                "Despark",
+                "Anguished Unmaking",
             ],
         )
     )

@@ -341,6 +341,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `rerun_global_commander_candidate_package_strategy_matrix`; papeis acima do
     alvo como mana acceleration, card draw e tutors sao pressao de revisao, nao
     autorizacao automatica de corte.
+    O modelo de candidatos de reparo fica em
+    `manaloom-knowledge/scripts/global_commander_profile_repair_candidate_model.py`
+    com evidencia local
+    `master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_removal_floor_step5.md`.
+    Resultado: `profile_repair_candidate_model_blocks_materialization`.
+    Land, spot interaction e attack-window ja tem pools legais/review-only,
+    incluindo `Arena of Glory`, `Hall of the Bandit Lord`, `Despark` e
+    `Anguished Unmaking`; porem ADD payoff segue bloqueado porque o shortfall e
+    `18` e ha apenas `5` candidatos prontos no expected package local.
+    Portanto `candidate_copy_allowed_now=false`, `battle_gate_allowed_now=false`
+    e o proximo gate e `expand_commander_payoff_source_lane_before_candidate_copy`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em
