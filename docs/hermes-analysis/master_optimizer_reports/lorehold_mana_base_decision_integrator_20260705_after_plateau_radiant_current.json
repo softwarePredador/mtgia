@@ -1,0 +1,178 @@
+{
+  "annotated_model_ready_pairs": [
+    {
+      "add": "Plateau",
+      "candidate_profile": {
+        "colorless_only": false,
+        "enters_tapped_profile": "reliably_untapped",
+        "typed_mountain_plains": true,
+        "utility_roles": []
+      },
+      "candidate_source_quality_score": 121,
+      "cut": "Radiant Summit",
+      "cut_profile": {
+        "enters_tapped_profile": "conditional_tapped",
+        "protected_utility_reason": null,
+        "typed_mountain_plains": true,
+        "utility_roles": [
+          "typed_fetch_target"
+        ]
+      },
+      "cut_risk_score": 69,
+      "decision_blockers": [
+        "forced_opening_hand_diagnostic_lost_to_607",
+        "natural_smoke_did_not_access_plateau",
+        "natural_smoke_lost_to_607"
+      ],
+      "decision_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_radiant_decision_20260705_current.json",
+      "decision_status": "reject_promotion_keep_607_current_baseline",
+      "learning_status": "blocked_exact_tested_decision",
+      "next_action": "do_not_retest_exact_pair_without_new_mana_trace_evidence",
+      "pair_score": 52,
+      "reasons": [
+        "tempo_upgrade_preserves_color_and_fetch_target_type"
+      ],
+      "status": "model_ready_for_candidate_materialization"
+    },
+    {
+      "add": "Plateau",
+      "candidate_profile": {
+        "colorless_only": false,
+        "enters_tapped_profile": "reliably_untapped",
+        "typed_mountain_plains": true,
+        "utility_roles": []
+      },
+      "candidate_source_quality_score": 121,
+      "cut": "Turbulent Steppe",
+      "cut_oracle_text": "({T}: Add {R} or {W}.)\nThis land enters tapped unless your opponents control eight or more lands.",
+      "cut_profile": {
+        "enters_tapped_profile": "conditional_tapped",
+        "protected_utility_reason": null,
+        "typed_mountain_plains": true,
+        "utility_roles": [
+          "typed_fetch_target"
+        ]
+      },
+      "cut_risk_score": 69,
+      "decision_blockers": [],
+      "decision_report": null,
+      "decision_status": null,
+      "learning_status": "eligible_for_materialization_after_prior_decision_filter",
+      "next_action": "materialize_only_if_cut_condition_is_materially_different_from_rejected_pair",
+      "pair_score": 52,
+      "reasons": [
+        "tempo_upgrade_preserves_color_and_fetch_target_type"
+      ],
+      "same_added_card_prior_rejects": [
+        {
+          "blockers": [
+            "forced_opening_hand_diagnostic_lost_to_607",
+            "natural_smoke_did_not_access_plateau",
+            "natural_smoke_lost_to_607"
+          ],
+          "cut": "Radiant Summit",
+          "report": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_radiant_decision_20260705_current.json",
+          "status": "reject_promotion_keep_607_current_baseline"
+        }
+      ],
+      "status": "model_ready_for_candidate_materialization"
+    }
+  ],
+  "artifact_type": "lorehold_mana_base_decision_integrator",
+  "best_next_pair": {
+    "add": "Plateau",
+    "candidate_profile": {
+      "colorless_only": false,
+      "enters_tapped_profile": "reliably_untapped",
+      "typed_mountain_plains": true,
+      "utility_roles": []
+    },
+    "candidate_source_quality_score": 121,
+    "cut": "Turbulent Steppe",
+    "cut_oracle_text": "({T}: Add {R} or {W}.)\nThis land enters tapped unless your opponents control eight or more lands.",
+    "cut_profile": {
+      "enters_tapped_profile": "conditional_tapped",
+      "protected_utility_reason": null,
+      "typed_mountain_plains": true,
+      "utility_roles": [
+        "typed_fetch_target"
+      ]
+    },
+    "cut_risk_score": 69,
+    "decision_blockers": [],
+    "decision_report": null,
+    "decision_status": null,
+    "learning_status": "eligible_for_materialization_after_prior_decision_filter",
+    "next_action": "materialize_only_if_cut_condition_is_materially_different_from_rejected_pair",
+    "pair_score": 52,
+    "reasons": [
+      "tempo_upgrade_preserves_color_and_fetch_target_type"
+    ],
+    "same_added_card_prior_rejects": [
+      {
+        "blockers": [
+          "forced_opening_hand_diagnostic_lost_to_607",
+          "natural_smoke_did_not_access_plateau",
+          "natural_smoke_lost_to_607"
+        ],
+        "cut": "Radiant Summit",
+        "report": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_radiant_decision_20260705_current.json",
+        "status": "reject_promotion_keep_607_current_baseline"
+      }
+    ],
+    "status": "model_ready_for_candidate_materialization"
+  },
+  "decision": {
+    "current_best_baseline": "deck_607",
+    "next_action": "materialize_best_next_mana_base_pair_as_diagnostic",
+    "promotion_allowed": false,
+    "reason": "Tested mana-base pairs must be fed back into the safe-cut model. An exact rejected pair is blocked, but a different land with a different ETB condition is not inferred as accepted or rejected until it gets its own materialization and gate."
+  },
+  "decisions_loaded": [
+    {
+      "add": "Plateau",
+      "blockers": [
+        "forced_opening_hand_diagnostic_lost_to_607",
+        "natural_smoke_did_not_access_plateau",
+        "natural_smoke_lost_to_607"
+      ],
+      "cut": "Radiant Summit",
+      "full_confirmation_allowed_now": false,
+      "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_radiant_decision_20260705_current.json",
+      "promotion_allowed": false,
+      "status": "reject_promotion_keep_607_current_baseline",
+      "summary": {
+        "blockers": [
+          "forced_opening_hand_diagnostic_lost_to_607",
+          "natural_smoke_did_not_access_plateau",
+          "natural_smoke_lost_to_607"
+        ],
+        "candidate": "+Plateau / -Radiant Summit",
+        "forced_candidate_tied_or_beat_607": false,
+        "full_confirmation_allowed_now": false,
+        "keep_607_as_protected_baseline": true,
+        "natural_candidate_tied_or_beat_607": false,
+        "preflight_ready": true,
+        "promotion_allowed": false
+      }
+    }
+  ],
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T00:41:35Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_safe_cut_model_20260705_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_radiant_decision_20260705_current.json"
+  ],
+  "status": "mana_base_next_diagnostic_pair_available",
+  "summary": {
+    "allow_natural_gate_now": false,
+    "eligible_model_ready_pair_count": 1,
+    "exact_rejected_pair_count": 1,
+    "keep_607_as_protected_baseline": true,
+    "loaded_decision_count": 1,
+    "promotion_allowed": false,
+    "safe_model_ready_pair_count": 2
+  }
+}
