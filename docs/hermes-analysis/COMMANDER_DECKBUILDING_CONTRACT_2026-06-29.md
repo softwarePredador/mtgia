@@ -1463,5 +1463,47 @@ Operational lesson:
   `Plateau` pairs or turning exposed topdeck role cards into cuts merely
   because an added card is attractive.
 
+Topdeck and mana trace gap scout generated on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_mana_trace_gap_scout_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_mana_trace_gap_scout_20260705_current.json`.
+- Status:
+  `topdeck_mana_trace_gap_scout_found_unprobed_floor_sensitive_gaps_keep_607`.
+- Scope: consume the named same-lane cut frontier, deckbuilding value model,
+  deck-607 exposure profile, sidecar probe evidence, mana-base safe-cut model,
+  and mana-base decision integrator.
+- Current counts: `trace_gap_row_count=10`,
+  `unprobed_topdeck_gap_count=6`, `floor_sensitive_gap_count=6`,
+  `already_probed_topdeck_count=4`, `mana_safe_model_ready_pair_count=2`,
+  `mana_remaining_ready_pair_count_after_exact_reject_filter=0`,
+  `mana_eligible_pair_count=0`, and `mana_exact_rejected_pair_count=2`.
+- Unprobed floor-sensitive rows now explicitly tracked:
+  `Call Forth the Tempest`, `Hit the Mother Lode`,
+  `Everything Comes to Dust`, `Rise of the Eldrazi`, `Surge to Victory`, and
+  `Esper Sentinel`.
+- Already-probed blocked rows remain:
+  `Pinnacle Monk // Mystic Peak`, `Reforge the Soul`,
+  `Improvisation Capstone`, and `Artist's Talent`.
+- Mana route: closed by exact decisions. `Plateau` over `Radiant Summit` and
+  `Plateau` over `Turbulent Steppe` remain rejected; there is no remaining
+  model-ready mana pair after exact-reject filtering.
+- Structure-matrix scoring: `false`; candidate deck materialization: `false`;
+  forced access: `false`; natural battle gate: `false`; promotion: `false`.
+- Next allowed work:
+  `collect_targeted_floor_traces_for_unprobed_gap_rows_before_structure_matrix`.
+
+Operational lesson:
+
+- Low exposure is not a cut recommendation when the card is a miracle
+  finisher, draw/filter card, or engine role. It is a trace gap.
+- `Hit the Mother Lode` is the clearest example: it has only `11` unique
+  exposure events, but it is a `miracle_conversion_finisher`; it needs
+  candidate-loss versus protected-`607` floor traces before any cut model can
+  treat it as replaceable.
+- The scout gives the deckbuilder a better learning target without weakening
+  the protected `607` list.
+
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

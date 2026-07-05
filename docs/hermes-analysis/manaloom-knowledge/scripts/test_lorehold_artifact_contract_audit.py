@@ -469,6 +469,39 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.artifact_kind, "promotion_gate_decision_audit")
         self.assertEqual(classification.status, "pass")
 
+    def test_lorehold_topdeck_mana_trace_gap_scout_is_recognized(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_topdeck_mana_trace_gap_scout",
+            "current_baseline": "deck_607",
+            "decision": {
+                "keep_607_as_protected_baseline": True,
+                "candidate_deck_materialization_allowed_now": False,
+            },
+            "deck_607_mutated": False,
+            "external_research_context": [],
+            "generated_at": "2026-07-05T00:00:00Z",
+            "mana_trace_gap": {"eligible_pair_count": 0},
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "source_evidence": {},
+            "source_reports": {},
+            "status": "topdeck_mana_trace_gap_scout_found_unprobed_floor_sensitive_gaps_keep_607",
+            "summary": {
+                "unprobed_topdeck_gap_count": 1,
+                "candidate_deck_materialization_allowed_now": False,
+            },
+            "trace_gap_rows": [{"card_name": "Hit the Mother Lode"}],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lorehold_topdeck_mana_trace_gap_scout.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "lorehold_topdeck_mana_trace_gap_scout")
+        self.assertEqual(classification.schema_version, "lorehold_topdeck_mana_trace_gap_scout_v1")
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+
     def test_cut_methodology_reaudit_payload_is_recognized(self) -> None:
         payload = {
             "candidate_report": "candidate.json",

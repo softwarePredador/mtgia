@@ -3197,3 +3197,65 @@ Next allowed work:
   open forced-access or natural battle gates from the current frontier.
 
 Deck `607` remains untouched and protected.
+
+## Topdeck Mana Trace Gap Scout - 2026-07-05
+
+The trace gap scout is now generated:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_mana_trace_gap_scout_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_mana_trace_gap_scout_20260705_current.json`
+
+Current result:
+
+- status:
+  `topdeck_mana_trace_gap_scout_found_unprobed_floor_sensitive_gaps_keep_607`;
+- trace gap rows: `10`;
+- unprobed topdeck gaps: `6`;
+- floor-sensitive gaps: `6`;
+- already probed topdeck rows: `4`;
+- mana safe-model ready pairs: `2`;
+- mana ready pairs after exact-reject filter: `0`;
+- mana eligible pairs: `0`;
+- exact rejected mana pairs: `2`;
+- structure-matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- forced access allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`.
+
+Unprobed floor-sensitive gaps now tracked:
+
+- `Call Forth the Tempest`: low exposure, miracle-conversion finisher floor
+  unknown;
+- `Hit the Mother Lode`: low exposure, miracle-conversion finisher floor
+  unknown;
+- `Everything Comes to Dust`: low exposure, miracle-conversion finisher floor
+  unknown;
+- `Rise of the Eldrazi`: low exposure, miracle-conversion finisher floor
+  unknown;
+- `Surge to Victory`: floor-sensitive miracle-conversion finisher gap;
+- `Esper Sentinel`: floor-sensitive draw/filter gap.
+
+Already-probed blocked rows:
+
+- `Pinnacle Monk // Mystic Peak`;
+- `Reforge the Soul`;
+- `Improvisation Capstone`;
+- `Artist's Talent`.
+
+Mana lesson:
+
+- `Plateau` over `Radiant Summit` and `Plateau` over `Turbulent Steppe` are
+  still exact tested rejects.
+- No remaining model-ready mana pair survives the exact-reject filter.
+- Do not retest those exact pairs without new mana trace evidence.
+
+Deckbuilding lesson:
+
+- Low exposure is only a reason to investigate, not a reason to cut.
+- A candidate cut that touches miracle finishers, topdeck setup, draw/filter,
+  or engine roles must first show candidate-loss-versus-607 floor traces.
+- The next allowed work is
+  `collect_targeted_floor_traces_for_unprobed_gap_rows_before_structure_matrix`.
+
+Deck `607` remains untouched and protected.

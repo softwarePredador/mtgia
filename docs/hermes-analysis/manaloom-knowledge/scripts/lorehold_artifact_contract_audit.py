@@ -448,6 +448,25 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             },
         )
 
+    if (
+        payload.get("artifact_type") == "lorehold_topdeck_mana_trace_gap_scout"
+        and {"decision", "mana_trace_gap", "source_evidence", "summary", "trace_gap_rows"} <= keys
+    ):
+        return ArtifactClassification(
+            **base,
+            artifact_kind="lorehold_topdeck_mana_trace_gap_scout",
+            schema_version="lorehold_topdeck_mana_trace_gap_scout_v1",
+            status="pass",
+            detail="Lorehold topdeck and mana trace gap scout",
+            canonical_summary={
+                "schema_keys": sorted(keys),
+                "summary": payload.get("summary") if isinstance(payload.get("summary"), Mapping) else {},
+                "source_db_mutated": payload.get("source_db_mutated", False),
+                "postgres_writes": payload.get("postgres_writes", False),
+                "deck_607_mutated": payload.get("deck_607_mutated", False),
+            },
+        )
+
     support_signatures: list[tuple[str, set[str], str]] = [
         ("candidate_matrix", {"rows", "summary"}, "candidate matrix rows"),
         ("variant_staging", {"reports", "valid_count", "invalid_count"}, "variant staging report"),
