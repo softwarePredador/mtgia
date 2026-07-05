@@ -285,6 +285,14 @@ Current external refresh on 2026-07-05:
   lesson is that a situational removal upgrade can be real while its cut is
   still wrong; do not cut `Birgi` from this Kaalia shell for generic removal
   without a better same-lane replacement and a passing larger gate.
+- Current nonland candidate modeling now blocks cross-lane ramp cuts via
+  `cross_lane_ramp_cut_requires_same_lane_source_or_gate`; this removes
+  `Birgi` from generic removal cut pools. The next guarded top pair became
+  `+Feed the Swarm / -Archaeomancer's Map`, but the 9-game equal gate also
+  blocked promotion: base `66.7%`, candidate `33.3%`, blocker
+  `candidate_underperformed_base_probe`, with `Feed the Swarm` exercised in
+  replay. The current lesson is not "add Feed anywhere"; it is "interaction is
+  useful, but Kaalia needs a safer same-lane cut or a different package."
 
 ## Global Commander Rollout - 2026-07-01
 

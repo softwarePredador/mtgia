@@ -282,6 +282,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     blocker `candidate_underperformed_base_probe`. Licao global: a carta
     adicionada pode ser util, mas o corte de `Birgi` esta errado para essa shell
     sem substituto de mesma lane e gate maior aprovado.
+    O modelo nonland agora bloqueia cortes cross-lane de ramp com
+    `cross_lane_ramp_cut_requires_same_lane_source_or_gate`, removendo `Birgi`
+    dos cuts genericos de removal. O novo top pair `+Feed the Swarm /
+    -Archaeomancer's Map` tambem falhou no gate maior: base `66.7%`, candidata
+    `33.3%`, blocker `candidate_underperformed_base_probe`, mesmo com `Feed the
+    Swarm` exercido no replay. Proxima busca: corte mais seguro de mesma lane ou
+    pacote diferente, nao promocao.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

@@ -562,6 +562,7 @@ def build_report(
             "source_lane_boundary": "Wincon candidates require commander-specific win-plan evidence before named additions.",
             "floor_protection": "Cards carrying any missing core role are blocked from cut suggestions.",
             "commander_payoff_protection": "Commander-specific payoffs such as Kaalia Angel/Demon/Dragon creatures are blocked from generic excess-role cuts until source-lane review.",
+            "cross_lane_ramp_protection": "Ramp cards are blocked from non-ramp repairs unless a same-lane source or later battle gate proves the cut.",
             "promotion_block": "No deck change is promoted without candidate copy, structure/legal recheck, strategy matrix, battle gate, and replay trace.",
         },
     }
