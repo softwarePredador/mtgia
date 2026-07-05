@@ -1874,3 +1874,66 @@ Operational lesson:
   name adds and same-lane cuts first.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Miracle Access Candidate Row Queue - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_candidate_row_queue_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_candidate_row_queue_20260705_current_relearn.json`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_access_candidate_row_queue_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_access_candidate_row_queue_current.json`
+
+This queue attempts to convert post-identity external/internal candidates into
+the candidate-row schema required by the miracle-access matrix. It is still
+read-only and does not generate or mutate any deck.
+
+Current result:
+
+- decision status:
+  `miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607`;
+- source candidates considered: `5`;
+- scoreable candidate rows: `0`;
+- blocked candidate rows: `5`;
+- named seed-safe cuts: `0`;
+- matrix contract blocker count: `28`;
+- matrix scoring allowed now: `false`;
+- candidate deck materialization allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- recommended next action:
+  `resolve_runtime_and_named_same_lane_cut_before_matrix_scoring`.
+
+Blocked candidate rows:
+
+- `Brain in a Jar`: lane `topdeck_miracle_access`, matrix cells
+  `topdeck_miracle_access` and `turn_cycle_miracle_mana`, blockers
+  `verified_battle_rule_missing`, `named_safe_cut_missing`, and
+  `matrix_contract_blockers_not_cleared`;
+- `Entreat the Angels`: lane `miracle_finisher`, matrix cells
+  `approach_finisher_conversion` and `topdeck_miracle_access`, blockers
+  `verified_battle_rule_missing`, `named_safe_cut_missing`, and
+  `matrix_contract_blockers_not_cleared`;
+- `Haze of Rage`: lane `storm_combo_pressure`, matrix cell
+  `pressure_survival_floor`, blockers `combo_runtime_required`,
+  `verified_battle_rule_missing`, `named_safe_cut_missing`, and
+  `matrix_contract_blockers_not_cleared`;
+- `Burning Prophet`: lane `spell_scry_pressure`, matrix cells
+  `spell_volume_density` and `pressure_survival_floor`, blockers
+  `verified_battle_rule_missing`, `named_safe_cut_missing`, and
+  `matrix_contract_blockers_not_cleared`;
+- `Inti, Seneschal of the Sun`: lane `rummage_pressure_access`, matrix cells
+  `topdeck_miracle_access` and `pressure_survival_floor`, blockers
+  `verified_battle_rule_missing`, `named_safe_cut_missing`, and
+  `matrix_contract_blockers_not_cleared`.
+
+Operational lesson:
+
+- The strongest current topdeck/miracle additions are visible, but none can
+  score yet because the project lacks both verified runtime and named same-lane
+  cuts for them.
+- The next practical work is not another shell or battle. It is either runtime
+  contract work for the top-priority cards or a named same-lane non-anchor cut
+  discovery path that clears the matrix hard gates.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.

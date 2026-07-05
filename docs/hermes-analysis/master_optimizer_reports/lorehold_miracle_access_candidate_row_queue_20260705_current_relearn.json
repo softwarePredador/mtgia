@@ -1,0 +1,360 @@
+{
+  "artifact_type": "lorehold_miracle_access_candidate_row_queue",
+  "available_named_seed_safe_cuts": [],
+  "blocked_candidate_rows": [
+    {
+      "add_card": "Brain in a Jar",
+      "blocker_reasons": [
+        "matrix_contract_blockers_not_cleared",
+        "no named same-lane cut exists for current 607",
+        "runtime rule is not verified for candidate use"
+      ],
+      "blockers": [
+        "matrix_contract_blockers_not_cleared",
+        "named_safe_cut_missing",
+        "verified_battle_rule_missing"
+      ],
+      "candidate_key": "miracle_access_row_brain_in_a_jar",
+      "cut_card": null,
+      "expected_metric_lift": "alternate_cost_timing_engine",
+      "floor_risk": "unknown_until_matrix_scored",
+      "lane": "topdeck_miracle_access",
+      "matrix_cells": [
+        "topdeck_miracle_access",
+        "turn_cycle_miracle_mana"
+      ],
+      "protected_anchor_impact": "unproven_until_cut_is_named_and_trace_checked",
+      "rule_runtime_status": "runtime_missing_or_manual_review",
+      "same_lane_cut_reason": "",
+      "source_provenance": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "source_required_contract": "single_card_runtime_contract_then_cut_safety"
+    },
+    {
+      "add_card": "Entreat the Angels",
+      "blocker_reasons": [
+        "matrix_contract_blockers_not_cleared",
+        "no named same-lane cut exists for current 607",
+        "runtime rule is not verified for candidate use"
+      ],
+      "blockers": [
+        "matrix_contract_blockers_not_cleared",
+        "named_safe_cut_missing",
+        "verified_battle_rule_missing"
+      ],
+      "candidate_key": "miracle_access_row_entreat_the_angels",
+      "cut_card": null,
+      "expected_metric_lift": "miracle_token_closure",
+      "floor_risk": "unknown_until_matrix_scored",
+      "lane": "miracle_finisher",
+      "matrix_cells": [
+        "approach_finisher_conversion",
+        "topdeck_miracle_access"
+      ],
+      "protected_anchor_impact": "unproven_until_cut_is_named_and_trace_checked",
+      "rule_runtime_status": "runtime_missing_or_manual_review",
+      "same_lane_cut_reason": "",
+      "source_provenance": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "source_required_contract": "miracle_token_runtime_contract_then_cut_safety"
+    },
+    {
+      "add_card": "Haze of Rage",
+      "blocker_reasons": [
+        "combo package must be modeled before matrix scoring",
+        "matrix_contract_blockers_not_cleared",
+        "no named same-lane cut exists for current 607",
+        "runtime rule is not verified for candidate use"
+      ],
+      "blockers": [
+        "combo_runtime_required",
+        "matrix_contract_blockers_not_cleared",
+        "named_safe_cut_missing",
+        "verified_battle_rule_missing"
+      ],
+      "candidate_key": "miracle_access_row_haze_of_rage",
+      "cut_card": null,
+      "expected_metric_lift": "storm_kiln_combo_payoff",
+      "floor_risk": "unknown_until_matrix_scored",
+      "lane": "storm_combo_pressure",
+      "matrix_cells": [
+        "pressure_survival_floor"
+      ],
+      "protected_anchor_impact": "unproven_until_cut_is_named_and_trace_checked",
+      "rule_runtime_status": "runtime_missing_or_manual_review",
+      "same_lane_cut_reason": "",
+      "source_provenance": [
+        "commander_spellbook_storm_kiln_haze"
+      ],
+      "source_required_contract": "combo_runtime_contract_with_storm_kiln_artist"
+    },
+    {
+      "add_card": "Burning Prophet",
+      "blocker_reasons": [
+        "matrix_contract_blockers_not_cleared",
+        "no named same-lane cut exists for current 607",
+        "runtime rule is not verified for candidate use"
+      ],
+      "blockers": [
+        "matrix_contract_blockers_not_cleared",
+        "named_safe_cut_missing",
+        "verified_battle_rule_missing"
+      ],
+      "candidate_key": "miracle_access_row_burning_prophet",
+      "cut_card": null,
+      "expected_metric_lift": "cheap_spell_velocity_creature",
+      "floor_risk": "unknown_until_matrix_scored",
+      "lane": "spell_scry_pressure",
+      "matrix_cells": [
+        "spell_volume_density",
+        "pressure_survival_floor"
+      ],
+      "protected_anchor_impact": "unproven_until_cut_is_named_and_trace_checked",
+      "rule_runtime_status": "runtime_missing_or_manual_review",
+      "same_lane_cut_reason": "",
+      "source_provenance": [
+        "gametyrant_miracle_topdeck_pressure"
+      ],
+      "source_required_contract": "spell_trigger_runtime_review_then_diagnostic_cut_check"
+    },
+    {
+      "add_card": "Inti, Seneschal of the Sun",
+      "blocker_reasons": [
+        "matrix_contract_blockers_not_cleared",
+        "no named same-lane cut exists for current 607",
+        "runtime rule is not verified for candidate use"
+      ],
+      "blockers": [
+        "matrix_contract_blockers_not_cleared",
+        "named_safe_cut_missing",
+        "verified_battle_rule_missing"
+      ],
+      "candidate_key": "miracle_access_row_inti_seneschal_of_the_sun",
+      "cut_card": null,
+      "expected_metric_lift": "attack_discard_exile_access_engine",
+      "floor_risk": "unknown_until_matrix_scored",
+      "lane": "rummage_pressure_access",
+      "matrix_cells": [
+        "topdeck_miracle_access",
+        "pressure_survival_floor"
+      ],
+      "protected_anchor_impact": "unproven_until_cut_is_named_and_trace_checked",
+      "rule_runtime_status": "runtime_missing_or_manual_review",
+      "same_lane_cut_reason": "",
+      "source_provenance": [
+        "edhrec_upgraded_spellslinger_current"
+      ],
+      "source_required_contract": "discard_access_runtime_review_then_shell_or_cut_check"
+    }
+  ],
+  "candidate_rows": [],
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "matrix_scoring_allowed_now": false,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_materialize_candidate_deck_from_blocked_rows",
+      "resolve verified runtime for top-priority rows",
+      "find named same-lane non-anchor cuts before scoring",
+      "keep battle closed until matrix scoring and trace floors pass"
+    ],
+    "promotion_allowed": false,
+    "reason": "Post-identity candidates exist, but each current miracle-access row is blocked by runtime, named cut, or uncleared matrix-contract gates."
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T04:37:27Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "cut_miner_summary": {
+      "classification_counts": {
+        "closed_hard_stop_current_607": 94
+      },
+      "contract_status": "hypothesis_contract_written_blocked_no_named_safe_cuts",
+      "cross_lane_excluded_count": 0,
+      "cut_expansion_status": "pressure_cut_expansion_no_seed_safe_cut_keep_607",
+      "cut_shortage": 2,
+      "decision_status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+      "hard_stop_blocker_counts": {
+        "commander_never_cut": 1,
+        "cut_is_early_mana_floor_support": 14,
+        "cut_is_miracle_core_big_spell": 25,
+        "cut_is_protection_shell": 14,
+        "early_mana_floor_support": 18,
+        "mana_base_never_cut": 28,
+        "measured_high_cut_exposure": 34,
+        "miracle_or_finisher_core": 24,
+        "never_cut_lane": 29,
+        "never_cut_or_mana_base": 29,
+        "prior_rejected_cut": 37,
+        "prior_rejected_cut_slot": 24,
+        "prior_rejected_signature": 4,
+        "protected_cut": 22,
+        "protection_shell": 14,
+        "structural_dependency": 24
+      },
+      "hard_stop_cut_count": 94,
+      "lane_counts": {
+        "big_spell_value": 2,
+        "commander": 1,
+        "contextual": 1,
+        "draw": 6,
+        "early_mana": 18,
+        "graveyard_recursion": 1,
+        "hand_filter": 1,
+        "mana_base": 28,
+        "misc": 2,
+        "protection": 13,
+        "removal": 10,
+        "spell_velocity": 5,
+        "wincon": 6
+      },
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "recommended_next_action": "do_not_battle_mine_new_nonanchor_trace_or_new_shell_contract",
+      "router_route_status": "best_next_learning_route_contract_required_no_deck_action",
+      "target_adds": [
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "target_lane_evidence_gap_count": 0,
+      "target_required_cut_count": 2,
+      "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair",
+      "total_cut_slots_reviewed": 94
+    },
+    "matrix_summary": {
+      "blocking_hard_gate_count": 3,
+      "candidate_deck_materialization_allowed_now": false,
+      "candidate_row_count": 0,
+      "closing_window_comparison_count": 13,
+      "contract_aggregate_blocker_count": 28,
+      "cut_shortage": 2,
+      "decision_status": "miracle_access_structure_matrix_template_ready_no_candidate_no_battle",
+      "deck_action_allowed_now": false,
+      "matrix_cell_count": 6,
+      "matrix_scoring_allowed_now": false,
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "preflight_gate_ready_now_count": 0,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "declare_candidate_rows_with_named_same_lane_cuts_before_scoring",
+      "selected_contract_key": "miracle_access_first_shell_contract",
+      "value_model_land_quantity": 34,
+      "value_model_quantity_total": 100,
+      "value_model_ramp_quantity": 15
+    },
+    "post_identity_summary": {
+      "battle_ready_now_count": 0,
+      "combo_runtime_contract_count": 1,
+      "current_baseline": "deck_607",
+      "full_shell_contract_count": 9,
+      "identity_import_remaining_count": 0,
+      "natural_battle_allowed_now": false,
+      "promotion_allowed": false,
+      "queue_card_count": 14,
+      "recommended_next_action": "draft_runtime_contracts_for_brain_entreat_haze_before_any_deck_gate",
+      "runtime_or_manual_review_count": 4,
+      "source_identity_ready_count": 8,
+      "temporary_identity_ready_count": 6,
+      "verified_auto_rule_ready_count": 1
+    },
+    "value_model_summary": {
+      "card_rows": 94,
+      "commander_count": 1,
+      "deck_id": 607,
+      "gate_ready_now_count": 0,
+      "keep_607_as_protected_baseline": true,
+      "lane_profile": {
+        "artifact": 17,
+        "basic_floor": 8,
+        "board_wipe": 8,
+        "commander_center": 1,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "fast_pressure_guard": 12,
+        "fetch_or_search_fixing": 8,
+        "format_staple_long_tail": 6,
+        "global_top_100": 17,
+        "global_top_500": 11,
+        "instant_sorcery_spell": 36,
+        "land": 34,
+        "mana_base": 34,
+        "miracle_conversion_finisher": 10,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "structural_ramp_floor": 8,
+        "topdeck_miracle_engine": 9,
+        "tutor": 1,
+        "typed_dual_or_fetch_target": 5,
+        "untapped_or_multiplayer_fixing": 5,
+        "utility_engine_land": 8,
+        "wincon": 9
+      },
+      "mana_foundation": {
+        "artifact_ramp_quantity": 11,
+        "enchantment_ramp_quantity": 1,
+        "instant_sorcery_ramp_quantity": 3,
+        "interpretation": "The 607 mana plan is not just more fast mana: it combines 34 lands, fetch/dual fixing, artifact ramp, spell ramp, and opponent-turn mana rocks that feed miracle windows.",
+        "land_groups": {
+          "basic_floor": 8,
+          "fetch_or_search_fixing": 8,
+          "typed_dual_or_fetch_target": 5,
+          "untapped_or_multiplayer_fixing": 5,
+          "utility_engine_land": 8
+        },
+        "land_quantity": 34,
+        "land_rows": 28,
+        "mana_sources_land_plus_ramp": 49,
+        "ramp_quantity": 15
+      },
+      "preflight_status": "no_current_candidate_passes_miracle_access_first_preflight",
+      "promotion_allowed": false,
+      "quantity_total": 100,
+      "role_profile": {
+        "board_wipe": 8,
+        "creature": 2,
+        "draw": 9,
+        "engine": 3,
+        "land": 34,
+        "protection": 12,
+        "ramp": 15,
+        "removal": 7,
+        "tutor": 1,
+        "wincon": 9
+      },
+      "trace_status": "lorehold_miracle_trace_failure_learning_ready"
+    }
+  },
+  "source_reports": {
+    "cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json",
+    "matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn.json",
+    "post_identity": "docs/hermes-analysis/master_optimizer_reports/lorehold_post_identity_queue_split_20260705_current.json",
+    "value_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json"
+  },
+  "status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
+  "summary": {
+    "blocked_candidate_row_count": 5,
+    "candidate_deck_materialization_allowed_now": false,
+    "decision_status": "miracle_access_candidate_row_queue_blocked_no_scoreable_rows_keep_607",
+    "deck_action_allowed_now": false,
+    "matrix_contract_blocker_count": 28,
+    "matrix_scoring_allowed_now": false,
+    "named_seed_safe_cut_count": 0,
+    "natural_battle_gate_allowed_now": false,
+    "promotion_allowed_now": false,
+    "recommended_next_action": "resolve_runtime_and_named_same_lane_cut_before_matrix_scoring",
+    "scoreable_candidate_row_count": 0,
+    "source_candidate_count": 5,
+    "value_model_quantity_total": 100
+  }
+}
