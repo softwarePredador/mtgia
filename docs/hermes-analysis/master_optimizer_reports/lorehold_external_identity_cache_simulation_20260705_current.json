@@ -1,0 +1,226 @@
+{
+  "generated_at": "2026-07-05T01:56:30Z",
+  "artifact_type": "lorehold_external_identity_cache_simulation",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "deck_607_mutated": false,
+  "simulation_db_removed": true,
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_reports": {
+    "external_material_scout": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_material_evidence_scout_20260705_current.json",
+    "identity_cache_package": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current.json",
+    "identity_resolution_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_resolution_queue_20260705_current.json"
+  },
+  "sql_files": {
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_precheck.sql",
+    "apply": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_apply_sqlite.sql",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_postcheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_rollback_sqlite.sql"
+  },
+  "status": "external_identity_cache_simulation_pass_keep_607",
+  "summary": {
+    "current_baseline": "deck_607",
+    "source_marker_rows_before": 0,
+    "source_marker_rows_after": 0,
+    "temp_precheck_existing_cache_rows": 0,
+    "temp_apply_returncode": 0,
+    "temp_postcheck_resolved_cache_rows": 6,
+    "temp_rollback_remaining_package_rows": 0,
+    "temp_rollback_remaining_direct_count": 0,
+    "post_apply_identity_missing_count": 0,
+    "post_apply_runtime_or_manual_review_required_count": 5,
+    "post_apply_shell_contract_required_count": 9,
+    "deck_test_ready_count": 0,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "recommended_next_action": "split_post_identity_runtime_combo_and_shell_contract_queues_without_deck_mutation"
+  },
+  "post_apply_preflight_summary": {
+    "current_baseline": "deck_607",
+    "material_candidate_count": 14,
+    "commander_legal_count": 14,
+    "oracle_identity_ready_count": 14,
+    "oracle_identity_missing_count": 0,
+    "identity_ready_without_verified_rule_count": 13,
+    "runtime_or_manual_review_required_count": 5,
+    "shell_contract_required_count": 9,
+    "format_staple_candidate_count": 1,
+    "gate_ready_now_count": 0,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "recommended_next_action": "resolve_oracle_identity_then_split_runtime_shell_and_cut_safety_queues"
+  },
+  "post_apply_queues": {
+    "identity_import_required": [],
+    "runtime_or_manual_review_required": [
+      "Brain in a Jar",
+      "Burning Prophet",
+      "Entreat the Angels",
+      "Haze of Rage",
+      "Inti, Seneschal of the Sun"
+    ],
+    "combo_runtime_required": [
+      "Haze of Rage"
+    ],
+    "shell_contract_required": [
+      "Anointed Procession",
+      "Blackblade Reforged",
+      "Cathars' Crusade",
+      "Excalibur, Sword of Eden",
+      "Karmic Guide",
+      "Late to Dinner",
+      "Miraculous Recovery",
+      "Storm of Souls",
+      "Strata Scythe"
+    ],
+    "cut_safety_contract_required": []
+  },
+  "postcheck_rows": [
+    {
+      "normalized_name": "brain in a jar",
+      "name": "Brain in a Jar",
+      "card_id": "88ecfcbe-e8db-4f08-aa8b-5b7b3e6c6ce7",
+      "color_identity_json": "[]",
+      "commander_status": "legal"
+    },
+    {
+      "normalized_name": "entreat the angels",
+      "name": "Entreat the Angels",
+      "card_id": "ff4411bc-ed4e-4d54-9e1b-21fc77b0e415",
+      "color_identity_json": "[\"W\"]",
+      "commander_status": "legal"
+    },
+    {
+      "normalized_name": "haze of rage",
+      "name": "Haze of Rage",
+      "card_id": "c344b885-68c6-43d2-b6c1-6c89b3c94983",
+      "color_identity_json": "[\"R\"]",
+      "commander_status": "legal"
+    },
+    {
+      "normalized_name": "late to dinner",
+      "name": "Late to Dinner",
+      "card_id": "6633cab9-23f9-474e-96f1-ca7c0c67691c",
+      "color_identity_json": "[\"W\"]",
+      "commander_status": "legal"
+    },
+    {
+      "normalized_name": "miraculous recovery",
+      "name": "Miraculous Recovery",
+      "card_id": "2b3459d9-a667-4cee-9b39-844013576d0b",
+      "color_identity_json": "[\"W\"]",
+      "commander_status": "legal"
+    },
+    {
+      "normalized_name": "strata scythe",
+      "name": "Strata Scythe",
+      "card_id": "4d623951-3896-494d-bcc5-6caf3cc74bc6",
+      "color_identity_json": "[]",
+      "commander_status": "legal"
+    }
+  ],
+  "sql_execution": {
+    "precheck": {
+      "sql_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_precheck.sql",
+      "returncode": 0,
+      "stdout": "[{\"existing_cache_rows\":0}]\n",
+      "stderr": "",
+      "json_lines": [
+        [
+          {
+            "existing_cache_rows": 0
+          }
+        ]
+      ]
+    },
+    "apply": {
+      "sql_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_apply_sqlite.sql",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "json_lines": []
+    },
+    "postcheck": {
+      "sql_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_postcheck.sql",
+      "returncode": 0,
+      "stdout": "[{\"resolved_cache_rows\":6}]\n[{\"normalized_name\":\"brain in a jar\",\"name\":\"Brain in a Jar\",\"card_id\":\"88ecfcbe-e8db-4f08-aa8b-5b7b3e6c6ce7\",\"color_identity_json\":\"[]\",\"commander_status\":\"legal\"},\n{\"normalized_name\":\"entreat the angels\",\"name\":\"Entreat the Angels\",\"card_id\":\"ff4411bc-ed4e-4d54-9e1b-21fc77b0e415\",\"color_identity_json\":\"[\\\"W\\\"]\",\"commander_status\":\"legal\"},\n{\"normalized_name\":\"haze of rage\",\"name\":\"Haze of Rage\",\"card_id\":\"c344b885-68c6-43d2-b6c1-6c89b3c94983\",\"color_identity_json\":\"[\\\"R\\\"]\",\"commander_status\":\"legal\"},\n{\"normalized_name\":\"late to dinner\",\"name\":\"Late to Dinner\",\"card_id\":\"6633cab9-23f9-474e-96f1-ca7c0c67691c\",\"color_identity_json\":\"[\\\"W\\\"]\",\"commander_status\":\"legal\"},\n{\"normalized_name\":\"miraculous recovery\",\"name\":\"Miraculous Recovery\",\"card_id\":\"2b3459d9-a667-4cee-9b39-844013576d0b\",\"color_identity_json\":\"[\\\"W\\\"]\",\"commander_status\":\"legal\"},\n{\"normalized_name\":\"strata scythe\",\"name\":\"Strata Scythe\",\"card_id\":\"4d623951-3896-494d-bcc5-6caf3cc74bc6\",\"color_identity_json\":\"[]\",\"commander_status\":\"legal\"}]\n",
+      "stderr": "",
+      "json_lines": [
+        [
+          {
+            "resolved_cache_rows": 6
+          }
+        ],
+        [
+          {
+            "normalized_name": "brain in a jar",
+            "name": "Brain in a Jar",
+            "card_id": "88ecfcbe-e8db-4f08-aa8b-5b7b3e6c6ce7",
+            "color_identity_json": "[]",
+            "commander_status": "legal"
+          },
+          {
+            "normalized_name": "entreat the angels",
+            "name": "Entreat the Angels",
+            "card_id": "ff4411bc-ed4e-4d54-9e1b-21fc77b0e415",
+            "color_identity_json": "[\"W\"]",
+            "commander_status": "legal"
+          },
+          {
+            "normalized_name": "haze of rage",
+            "name": "Haze of Rage",
+            "card_id": "c344b885-68c6-43d2-b6c1-6c89b3c94983",
+            "color_identity_json": "[\"R\"]",
+            "commander_status": "legal"
+          },
+          {
+            "normalized_name": "late to dinner",
+            "name": "Late to Dinner",
+            "card_id": "6633cab9-23f9-474e-96f1-ca7c0c67691c",
+            "color_identity_json": "[\"W\"]",
+            "commander_status": "legal"
+          },
+          {
+            "normalized_name": "miraculous recovery",
+            "name": "Miraculous Recovery",
+            "card_id": "2b3459d9-a667-4cee-9b39-844013576d0b",
+            "color_identity_json": "[\"W\"]",
+            "commander_status": "legal"
+          },
+          {
+            "normalized_name": "strata scythe",
+            "name": "Strata Scythe",
+            "card_id": "4d623951-3896-494d-bcc5-6caf3cc74bc6",
+            "color_identity_json": "[]",
+            "commander_status": "legal"
+          }
+        ]
+      ]
+    },
+    "rollback": {
+      "sql_path": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_apply_package_20260705_current_rollback_sqlite.sql",
+      "returncode": 0,
+      "stdout": "[{\"remaining_package_cache_rows\":0}]\n",
+      "stderr": "",
+      "json_lines": [
+        [
+          {
+            "remaining_package_cache_rows": 0
+          }
+        ]
+      ]
+    }
+  },
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "next_actions": [
+      "do_not_mutate_or_replace_deck_607",
+      "do_not_apply_identity_cache_automatically_from_simulation",
+      "route post-identity cards into runtime/manual-review, combo, or shell-contract queues",
+      "keep shell-contract cards out of one-for-one 607 cut gates"
+    ],
+    "reason": "The package applies and rolls back cleanly on a temporary copy, and the post-apply preflight removes identity blockers. It still does not produce a deck-test-ready or promotion-ready package."
+  }
+}

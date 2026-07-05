@@ -477,3 +477,66 @@ Safety notes:
 Current conclusion remains unchanged: protected deck `607` is still the
 Lorehold champion. Applying identity cache rows, if later approved, is a data
 readiness step only; it does not prove any deck change.
+
+## External Identity Cache Simulation - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_simulation_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_external_identity_cache_simulation_20260705_current.json`
+
+It executes the prepared SQLite identity cache package only against a temporary
+copy of `knowledge.db`, reruns the external identity preflight against that
+temporary copy after apply, then rolls the temporary copy back. It is a
+simulation and does not mutate the source database.
+
+Current result:
+
+- status: `external_identity_cache_simulation_pass_keep_607`;
+- source marker rows before/after: `0` / `0`;
+- temporary precheck existing target rows: `0`;
+- temporary apply return code: `0`;
+- temporary postcheck resolved rows: `6`;
+- temporary rollback remaining package rows: `0`;
+- post-apply identity missing count: `0`;
+- post-apply runtime/manual-review queue: `5`;
+- post-apply shell-contract queue: `9`;
+- deck-test ready: `0`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`.
+
+Temporary postcheck resolved all six identity rows as Commander legal:
+
+- `Brain in a Jar`
+- `Entreat the Angels`
+- `Haze of Rage`
+- `Late to Dinner`
+- `Miraculous Recovery`
+- `Strata Scythe`
+
+Post-identity routing:
+
+- `runtime_or_manual_review_required`: `Brain in a Jar`,
+  `Burning Prophet`, `Entreat the Angels`, `Haze of Rage`, and
+  `Inti, Seneschal of the Sun`.
+- `combo_runtime_required`: `Haze of Rage`.
+- `shell_contract_required`: `Anointed Procession`, `Blackblade Reforged`,
+  `Cathars' Crusade`, `Excalibur, Sword of Eden`, `Karmic Guide`,
+  `Late to Dinner`, `Miraculous Recovery`, `Storm of Souls`, and
+  `Strata Scythe`.
+- `cut_safety_contract_required`: none.
+
+Interpretation:
+
+- The identity blocker can be removed cleanly in an isolated SQLite simulation.
+- The source database stayed untouched, and protected deck `607` stayed
+  untouched.
+- Removing identity blockers still does not create a battle-ready candidate:
+  runtime, combo, and shell-contract work remains before any natural battle or
+  cut gate.
+- The next valid learning step is
+  `split_post_identity_runtime_combo_and_shell_contract_queues_without_deck_mutation`.
+
+Current conclusion remains unchanged: protected deck `607` is still the
+Lorehold champion. This checkpoint improves ManaLoom's card-identity readiness
+for external Lorehold learning, but it is not deck-promotion evidence.
