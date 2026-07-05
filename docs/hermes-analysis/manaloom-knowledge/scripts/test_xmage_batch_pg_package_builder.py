@@ -365,6 +365,40 @@ def test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields
     assert expected["required_effect_fields"]["xmage_additional_cost_target"] == "creature"
 
 
+def test_manifest_expected_rule_preserves_dynamic_graveyard_damage_fields() -> None:
+    proposal = {
+        "normalized_name": "kindle",
+        "card_name": "Kindle",
+        "oracle_hash": "hash-kindle",
+        "logical_rule_key": "battle_rule_v1:hash-kindle",
+        "effect_json": {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_graveyard_count_damage_spell_v1",
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "damage": 0,
+            "damage_amount_source": "graveyard_card_count",
+            "damage_base_amount": 2,
+            "damage_per_graveyard_count": 1,
+            "graveyard_count_scope": "all_graveyards",
+            "graveyard_count_card_names": ["Kindle"],
+            "graveyard_count_subtypes": ["arcane"],
+            "graveyard_count_card_types": ["instant"],
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    required = expected["required_effect_fields"]
+    assert required["damage_amount_source"] == "graveyard_card_count"
+    assert required["damage_base_amount"] == 2
+    assert required["damage_per_graveyard_count"] == 1
+    assert required["graveyard_count_scope"] == "all_graveyards"
+    assert required["graveyard_count_card_names"] == ["Kindle"]
+    assert required["graveyard_count_subtypes"] == ["arcane"]
+    assert required["graveyard_count_card_types"] == ["instant"]
+
+
 def test_apply_sql_preserves_existing_backup_table_for_idempotent_rerun() -> None:
     proposal = {
         "normalized_name": "quarry beetle",
