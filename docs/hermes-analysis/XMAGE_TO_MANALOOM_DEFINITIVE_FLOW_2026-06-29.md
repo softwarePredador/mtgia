@@ -10131,6 +10131,65 @@ new server:
   `xmage_fixed_draw_lose_life_spell`, and
   `xmage_static_self_protection_from_subtypes_creature` with `8` cards each.
 
+## 2026-07-05 PG458 Fixed Draw Lose Life Closure
+
+- Closed the exact XMage fixed draw/life-loss instant-or-sorcery family as
+  ManaLoom scopes `xmage_fixed_controller_draw_lose_life_spell_v1` and
+  `xmage_fixed_target_player_draw_lose_life_spell_v1`.
+- The selected package accepted local XMage spell sources whose executable
+  behavior is fixed card draw plus fixed life loss, split by whether the spell
+  always affects its controller or targets a player.
+- The batch covers `8` cards: Ambition's Cost, Ancient Craving, Blood Pact,
+  Harrowing Journey, Night's Whisper, Painful Lesson, Sign in Blood, and
+  Succumb to Temptation.
+- Focused mapper/runtime tests covered controller draw/life-loss resolution
+  and target-player resolution, including lethal opponent targeting;
+  PG458 performed no code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `8` cards. Precheck found `8` target rows,
+  `0` missing targets, `0` existing expected rows, and `4` stale generated
+  shadow rows to deprecate; apply/postcheck verified `8/8` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `4` rows;
+  `failed_cards=[]`.
+- The stale generated shadows were disabled as deprecated rows for Night's
+  Whisper (`2`) and Sign in Blood (`2`), replacing older generated rows with
+  one curated executable rule per card.
+- Direct PostgreSQL verification confirmed all `8` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and expose complete
+  draw/life-loss parameters. The selected counts are:
+  Ambition's Cost `draw=3 life_loss=3 self`, Ancient Craving
+  `draw=3 life_loss=3 self`, Blood Pact
+  `draw=2 life_loss=2 target_player`, Harrowing Journey
+  `draw=3 life_loss=3 target_player`, Night's Whisper
+  `draw=2 life_loss=2 self`, Painful Lesson
+  `draw=2 life_loss=2 target_player`, Sign in Blood
+  `draw=2 life_loss=2 target_player`, and Succumb to Temptation
+  `draw=2 life_loss=2 self`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4429` PostgreSQL runtime rows, wrote `4421` SQLite runtime
+  rows, and exported `4396` canonical fallback rows.
+- PG458 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `8` selected cards. Generic
+  battle scenario count remained `0`; draw/life-loss spell execution remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26457`, `xmage_authoritative_source_count=26143`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26143`. This is an exact
+  reduction of `8` from the post-PG457 queue.
+- The post-PG458 exact split recheck reports `proposal_count=118` and
+  `safe_for_batch_pg_package_count=118`. The largest remaining exact families
+  are `xmage_creature_dies_fixed_damage_target`,
+  `xmage_destroy_target_scry_spell`, `xmage_fixed_damage_scry_spell`, and
+  `xmage_static_self_protection_from_subtypes_creature` with `8` cards each,
+  followed by `xmage_creature_dies_gain_life`,
+  `xmage_fixed_draw_spell_self_cost_reduction`, and
+  `xmage_static_cast_spells_as_flash_permission` with `7` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

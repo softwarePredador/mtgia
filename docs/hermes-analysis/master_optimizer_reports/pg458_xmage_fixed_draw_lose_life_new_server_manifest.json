@@ -1,0 +1,469 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg458_xmage_fixed_draw_lose_life_new_server_20260705_003",
+  "deploy_id": "pg458",
+  "expected_rules": [
+    {
+      "card_name": "Ambition's Cost",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b2afd0214c6776da9b668598d824795",
+      "min_rule_version": 2,
+      "normalized_name": "ambition's cost",
+      "oracle_hash": "2a807c1035d7b1ce49ba9281a02e946e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+        "count": 3,
+        "draw_count": 3,
+        "effect": "draw_cards",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ancient Craving",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b2afd0214c6776da9b668598d824795",
+      "min_rule_version": 2,
+      "normalized_name": "ancient craving",
+      "oracle_hash": "2a807c1035d7b1ce49ba9281a02e946e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+        "count": 3,
+        "draw_count": 3,
+        "effect": "draw_cards",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blood Pact",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e849896e6ab7822b604314a9842236f5",
+      "min_rule_version": 2,
+      "normalized_name": "blood pact",
+      "oracle_hash": "0e1cca8ed574f916efa7634f28cd7de4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards",
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_preference": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Harrowing Journey",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e42886e5607833d64538053de3d5de82",
+      "min_rule_version": 2,
+      "normalized_name": "harrowing journey",
+      "oracle_hash": "1fee8ed9c8875ba33f2972741b6a3e25",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+        "count": 3,
+        "draw_count": 3,
+        "effect": "draw_cards",
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_preference": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Night's Whisper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4149f6570b19de0fc58fef7eb6736e40",
+      "min_rule_version": 2,
+      "normalized_name": "night's whisper",
+      "oracle_hash": "99f77dc3d03da6660ecb413593fe23e7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Painful Lesson",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b5e4090931830427bc375568e4786ed",
+      "min_rule_version": 2,
+      "normalized_name": "painful lesson",
+      "oracle_hash": "0e1cca8ed574f916efa7634f28cd7de4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards",
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_preference": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sign in Blood",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b5e4090931830427bc375568e4786ed",
+      "min_rule_version": 2,
+      "normalized_name": "sign in blood",
+      "oracle_hash": "0e1cca8ed574f916efa7634f28cd7de4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards",
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_preference": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Succumb to Temptation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:96b2d3623c4036f44092a07cd0feebbd",
+      "min_rule_version": 2,
+      "normalized_name": "succumb to temptation",
+      "oracle_hash": "c0b258f641e17da5b9ffc3ea28cd6a10",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_draw_lose_life_spell": 8
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg458_xmage_fixed_draw_lose_life_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg458_xmage_fixed_draw_lose_life_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg458_xmage_fixed_draw_lose_life_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg458_xmage_fixed_draw_lose_life_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg458_xmage_fixed_draw_lose_life_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg458_xmage_fixed_draw_lose_life_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T00:31:36+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Ambition's Cost"
+      },
+      "card_name": "Ambition's Cost",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b2afd0214c6776da9b668598d824795",
+      "normalized_name": "ambition's cost",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+        "count": 3,
+        "draw_count": 3,
+        "effect": "draw_cards",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Ancient Craving"
+      },
+      "card_name": "Ancient Craving",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b2afd0214c6776da9b668598d824795",
+      "normalized_name": "ancient craving",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+        "count": 3,
+        "draw_count": 3,
+        "effect": "draw_cards",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Blood Pact"
+      },
+      "card_name": "Blood Pact",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e849896e6ab7822b604314a9842236f5",
+      "normalized_name": "blood pact",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards",
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_preference": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Harrowing Journey"
+      },
+      "card_name": "Harrowing Journey",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e42886e5607833d64538053de3d5de82",
+      "normalized_name": "harrowing journey",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+        "count": 3,
+        "draw_count": 3,
+        "effect": "draw_cards",
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_preference": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Night's Whisper"
+      },
+      "card_name": "Night's Whisper",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4149f6570b19de0fc58fef7eb6736e40",
+      "normalized_name": "night's whisper",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Painful Lesson"
+      },
+      "card_name": "Painful Lesson",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b5e4090931830427bc375568e4786ed",
+      "normalized_name": "painful lesson",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards",
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_preference": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Sign in Blood"
+      },
+      "card_name": "Sign in Blood",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b5e4090931830427bc375568e4786ed",
+      "normalized_name": "sign in blood",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards",
+        "target": "player",
+        "target_constraints": {
+          "players": [
+            "any"
+          ]
+        },
+        "target_controller": "target_player",
+        "target_preference": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Succumb to Temptation"
+      },
+      "card_name": "Succumb to Temptation",
+      "effect": "draw_cards",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:96b2d3623c4036f44092a07cd0feebbd",
+      "normalized_name": "succumb to temptation",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1",
+        "count": 2,
+        "draw_count": 2,
+        "effect": "draw_cards",
+        "target_controller": "self"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Ambition's Cost",
+    "Ancient Craving",
+    "Blood Pact",
+    "Harrowing Journey",
+    "Night's Whisper",
+    "Painful Lesson",
+    "Sign in Blood",
+    "Succumb to Temptation"
+  ],
+  "selected_count": 8,
+  "slug": "xmage_fixed_draw_lose_life_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Ambition's Cost",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b2afd0214c6776da9b668598d824795",
+      "min_rule_version": 2,
+      "normalized_name": "ambition's cost",
+      "oracle_hash": "2a807c1035d7b1ce49ba9281a02e946e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ancient Craving",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b2afd0214c6776da9b668598d824795",
+      "min_rule_version": 2,
+      "normalized_name": "ancient craving",
+      "oracle_hash": "2a807c1035d7b1ce49ba9281a02e946e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blood Pact",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e849896e6ab7822b604314a9842236f5",
+      "min_rule_version": 2,
+      "normalized_name": "blood pact",
+      "oracle_hash": "0e1cca8ed574f916efa7634f28cd7de4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Harrowing Journey",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e42886e5607833d64538053de3d5de82",
+      "min_rule_version": 2,
+      "normalized_name": "harrowing journey",
+      "oracle_hash": "1fee8ed9c8875ba33f2972741b6a3e25",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Night's Whisper",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4149f6570b19de0fc58fef7eb6736e40",
+      "min_rule_version": 2,
+      "normalized_name": "night's whisper",
+      "oracle_hash": "99f77dc3d03da6660ecb413593fe23e7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Painful Lesson",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b5e4090931830427bc375568e4786ed",
+      "min_rule_version": 2,
+      "normalized_name": "painful lesson",
+      "oracle_hash": "0e1cca8ed574f916efa7634f28cd7de4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sign in Blood",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b5e4090931830427bc375568e4786ed",
+      "min_rule_version": 2,
+      "normalized_name": "sign in blood",
+      "oracle_hash": "0e1cca8ed574f916efa7634f28cd7de4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_target_player_draw_lose_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Succumb to Temptation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:96b2d3623c4036f44092a07cd0feebbd",
+      "min_rule_version": 2,
+      "normalized_name": "succumb to temptation",
+      "oracle_hash": "c0b258f641e17da5b9ffc3ea28cd6a10",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_draw_lose_life_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
