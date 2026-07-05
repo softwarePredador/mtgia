@@ -1,0 +1,161 @@
+{
+  "artifact_type": "lorehold_accessibility_layer_matrix",
+  "cards": [
+    {
+      "bracket_layer": {
+        "allowed_by_bracket": true,
+        "current_deck_game_changers": 5,
+        "game_changer_limit": 999,
+        "official_game_changer": true,
+        "reason": "game_changer_budget_available",
+        "remaining_game_changer_budget": 994,
+        "target_bracket": 4
+      },
+      "card_name": "Mana Vault",
+      "collection_layer": {
+        "owned": false,
+        "owned_quantity": 0,
+        "printings": []
+      },
+      "current_607_accessibility": "legal_not_owned_and_promotion_blocked_current_607",
+      "deck_layer": {
+        "deck_id": 607,
+        "functional_tag": null,
+        "present_in_607": false,
+        "quantity": 0
+      },
+      "discovery_layer": {
+        "battle_rule_active_count": 1,
+        "format_staple_archetype": "ramp",
+        "format_staple_present": true,
+        "format_staple_rank": 144,
+        "format_staples_gap": false,
+        "official_game_changer": true
+      },
+      "promotion_layer": {
+        "current_shell_decision": {
+          "decision": "reject_current_pair",
+          "latest_natural_delta_pp": -66.67,
+          "next_action": "do_not_repeat_mana_vault_cut_arcane_signet_without_new_cut_or_failure_target",
+          "promotion_allowed": false,
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_evidence_synthesis_20260704_learning_refresh.json"
+        },
+        "decision": "blocked_prior_gate_rejected",
+        "decision_reasons": [
+          "mana_vault_current_pair_lost_with_card_exposure"
+        ],
+        "lane": "ramp",
+        "policy_class": "tested_or_policy_blocked_staple"
+      },
+      "rules_layer": {
+        "color_identity": [],
+        "color_identity_allowed": true,
+        "commander_legal": true,
+        "commander_status": "legal",
+        "mana_cost": "{1}",
+        "type_line": "Artifact"
+      }
+    },
+    {
+      "bracket_layer": {
+        "allowed_by_bracket": true,
+        "current_deck_game_changers": 5,
+        "game_changer_limit": 999,
+        "official_game_changer": true,
+        "reason": "game_changer_budget_available",
+        "remaining_game_changer_budget": 994,
+        "target_bracket": 4
+      },
+      "card_name": "The One Ring",
+      "collection_layer": {
+        "owned": true,
+        "owned_quantity": 1,
+        "printings": [
+          {
+            "collector_number": "246",
+            "language_name": "O Um Anel",
+            "quantity": 1,
+            "set": "ltr"
+          }
+        ]
+      },
+      "current_607_accessibility": "legal_owned_but_promotion_blocked_current_607",
+      "deck_layer": {
+        "deck_id": 607,
+        "functional_tag": null,
+        "present_in_607": false,
+        "quantity": 0
+      },
+      "discovery_layer": {
+        "battle_rule_active_count": 1,
+        "format_staple_archetype": null,
+        "format_staple_present": false,
+        "format_staple_rank": null,
+        "format_staples_gap": true,
+        "official_game_changer": true
+      },
+      "promotion_layer": {
+        "current_shell_decision": {
+          "aggregate": {
+            "baseline_games": 72,
+            "baseline_wins": 30,
+            "candidate_games": 72,
+            "candidate_wins": 25
+          },
+          "card_use": {
+            "accessed_games": 24,
+            "cost_paid": 42,
+            "resolved": 17,
+            "spell_cast": 21,
+            "utility_activations": 26
+          },
+          "decision": "reject_current_607_shell",
+          "source": "docs/hermes-analysis/master_optimizer_reports/lorehold_one_ring_cut_decision_20260630.md",
+          "status": "rejected_keep_607_baseline"
+        },
+        "decision": "blocked_existing_package_rejected",
+        "decision_reasons": [
+          "payoff_synthesis_decision"
+        ],
+        "lane": "card_draw_selection",
+        "policy_class": "tested_or_policy_blocked_staple"
+      },
+      "rules_layer": {
+        "color_identity": [],
+        "color_identity_allowed": true,
+        "commander_legal": true,
+        "commander_status": "legal",
+        "mana_cost": "{4}",
+        "type_line": "Legendary Artifact"
+      }
+    }
+  ],
+  "collection_source": "docs/hermes-analysis/manaloom-knowledge/scripts/user_collection.csv",
+  "decision": {
+    "app_contract_note": "Do not label a card as simply accessible unless the UI also says which layer passed: legal, owned, bracket-allowed, discoverable, or promotion-ready.",
+    "keep_607": true,
+    "reason": "Legality, ownership, staple discovery, bracket budget, and 607 promotion are distinct layers. No reviewed card is allowed to enter protected 607 from legality or ownership alone."
+  },
+  "deck_id": 607,
+  "generated_at": "2026-07-05T02:45:12Z",
+  "postgres_writes": false,
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "source_reports": {
+    "bracket_policy": "server/lib/edh_bracket_policy.dart",
+    "mana_foundation": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_foundation_audit_20260704_learning.json",
+    "staple_policy": "docs/hermes-analysis/master_optimizer_reports/lorehold_staple_policy_synthesis_20260704_learning.json"
+  },
+  "summary": {
+    "cards_reviewed": 2,
+    "current_deck_game_changers": 5,
+    "format_staples_gaps": 1,
+    "owned_cards": 1,
+    "promotion_blocked_cards": 2,
+    "result_counts": {
+      "legal_not_owned_and_promotion_blocked_current_607": 1,
+      "legal_owned_but_promotion_blocked_current_607": 1
+    }
+  },
+  "target_bracket": 4
+}

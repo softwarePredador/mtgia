@@ -761,3 +761,41 @@ Current conclusion remains unchanged: protected deck `607` is still the
 Lorehold champion. Entreat is not yet a valid battle-gate challenger because
 the PostgreSQL rule has not been applied and no natural 607 battle gate has
 accepted a named cut.
+
+## Accessibility Layer Matrix - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_accessibility_layer_matrix_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_accessibility_layer_matrix_20260705_current.json`
+
+It separates five meanings that must not be collapsed in the app or deckbuilder:
+Commander legality, collection ownership, format-staple/Game Changer discovery,
+bracket allowance, and protected-607 promotion evidence.
+
+Current result:
+
+- cards reviewed: `2`;
+- target bracket: `4`;
+- current deck-607 Game Changers detected by policy list: `5`;
+- owned cards among reviewed cards: `1`;
+- format-staples gaps: `1`;
+- promotion-blocked cards: `2`;
+- `Mana Vault`: `legal_not_owned_and_promotion_blocked_current_607`;
+- `The One Ring`: `legal_owned_but_promotion_blocked_current_607`.
+
+Operational lesson:
+
+- `Mana Vault` is legal, colorless, a Game Changer, and present in
+  `format_staples`, but is not in the local collection and remains rejected for
+  current 607 promotion after prior equal-gate evidence.
+- `The One Ring` is legal, colorless, a Game Changer, and present in the local
+  collection, but is missing from the local `format_staples` table and remains
+  rejected for current 607 promotion after the value-lane gate.
+- Bracket allowance is separate from promotion: bracket `4` allows these Game
+  Changers, but the 607 deck change is still blocked by cut/gate evidence.
+
+App/deckbuilder contract note: do not label a card as simply `accessible`
+unless the UI or API also states which layer passed: legal, owned,
+bracket-allowed, discoverable, or promotion-ready. No card should enter
+protected `607` from legality, ownership, or staple rank alone.
