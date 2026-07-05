@@ -3021,6 +3021,147 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_spell_cast_add_counters_grows_source_for_matching_noncreature_spell(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        engine = {
+            "name": "Pyroceratops",
+            "type_line": "Creature - Elemental Dinosaur",
+            "power": 2,
+            "toughness": 3,
+            "effect": "creature",
+            "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+            "trigger": "noncreature_spell_cast",
+            "trigger_effect": "add_counters",
+            "spell_cast_add_counters": True,
+            "spell_cast_add_counters_target": "self",
+            "spell_cast_add_counters_count": 1,
+            "spell_cast_add_counters_counter_type": "+1/+1",
+            "counter_count": 1,
+            "counter_type": "+1/+1",
+            "_rule_logical_key": "battle_rule_v1:pyroceratops-test",
+        }
+        active.battlefield.append(engine)
+
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Shock", "type_line": "Instant", "cmc": 1},
+            turn=4,
+            phase="precombat_main",
+        )
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Llanowar Elves", "type_line": "Creature - Elf", "cmc": 1},
+            turn=4,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(engine["plus_one_counters"], 1)
+        self.assertEqual(engine["power"], 3)
+        self.assertEqual(engine["toughness"], 4)
+        events = [
+            data
+            for event, data in self.events
+            if event == "trigger_resolved" and data.get("card") == "Pyroceratops"
+        ]
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["trigger_spell"], "Shock")
+        self.assertEqual(events[0]["effect"], "add_counters")
+        self.assertEqual(events[0]["counters_added"], 1)
+        self.assertEqual(events[0]["rule_logical_key"], "battle_rule_v1:pyroceratops-test")
+
+    def test_spell_cast_add_counters_respects_mana_value_and_color_filters(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.extend(
+            [
+                {
+                    "name": "Stormkeld Prowler",
+                    "type_line": "Creature - Human Rogue",
+                    "power": 2,
+                    "toughness": 1,
+                    "effect": "creature",
+                    "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+                    "trigger": "spell_cast",
+                    "trigger_effect": "add_counters",
+                    "spell_cast_add_counters": True,
+                    "spell_cast_add_counters_target": "self",
+                    "spell_cast_add_counters_count": 2,
+                    "spell_cast_add_counters_counter_type": "+1/+1",
+                    "spell_cast_add_counters_mana_value_min": 5,
+                    "counter_count": 2,
+                    "counter_type": "+1/+1",
+                },
+                {
+                    "name": "Quirion Dryad",
+                    "type_line": "Creature - Dryad",
+                    "power": 1,
+                    "toughness": 1,
+                    "effect": "creature",
+                    "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+                    "trigger": "spell_cast",
+                    "trigger_effect": "add_counters",
+                    "spell_cast_add_counters": True,
+                    "spell_cast_add_counters_target": "self",
+                    "spell_cast_add_counters_count": 1,
+                    "spell_cast_add_counters_counter_type": "+1/+1",
+                    "spell_cast_add_counters_required_colors": ["W", "U", "B", "R"],
+                    "counter_count": 1,
+                    "counter_type": "+1/+1",
+                },
+            ]
+        )
+
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Small Green Spell", "type_line": "Sorcery", "colors": ["G"], "cmc": 4},
+            turn=5,
+            phase="precombat_main",
+        )
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Large Green Spell", "type_line": "Sorcery", "colors": ["G"], "cmc": 5},
+            turn=5,
+            phase="precombat_main",
+        )
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Blue Spell", "type_line": "Instant", "colors": ["U"], "cmc": 2},
+            turn=5,
+            phase="precombat_main",
+        )
+
+        prowler, dryad = active.battlefield
+        self.assertEqual(prowler["plus_one_counters"], 2)
+        self.assertEqual(prowler["power"], 4)
+        self.assertEqual(prowler["toughness"], 3)
+        self.assertEqual(dryad["plus_one_counters"], 1)
+        self.assertEqual(dryad["power"], 2)
+        self.assertEqual(dryad["toughness"], 2)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Stormkeld Prowler"
+                and data.get("trigger_spell") == "Large Green Spell"
+                and data.get("counters_added") == 2
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Quirion Dryad"
+                and data.get("trigger_spell") == "Blue Spell"
+                and data.get("spell_cast_add_counters_required_colors") == ["W", "U", "B", "R"]
+                for event, data in self.events
+            )
+        )
+
     def test_attack_trigger_grants_keyword_to_best_legal_attacking_target_until_eot(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

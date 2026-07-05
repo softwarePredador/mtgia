@@ -11496,6 +11496,58 @@ new server:
   highest-impact remaining family buckets: recursion, draw-engine, protection,
   direct damage, and the residual add-counter subpatterns.
 
+## 2026-07-05 PG483 Spell-Cast Add Counters Closure
+
+- Closed the exact XMage `AddCountersSourceEffect` +
+  `SpellCastControllerTriggeredAbility` permanent family as ManaLoom scope
+  `xmage_spell_cast_add_counters_source_v1`.
+- The selected scope accepts only one spell-cast triggered self-counter ability
+  with optional static self keywords. Supported filters are noncreature,
+  artifact, enchantment, instant-or-sorcery, multicolored, mana-value minimum,
+  creature plus mana-value minimum, and color OR filters such as Quirion Dryad.
+  It deliberately blocks AdventurePredicate, opponent-turn conditions, Ward or
+  other non-static auxiliary ability classes, mixed ETB plus spell-cast counter
+  abilities, non-fixed counters, and unsupported target shapes.
+- The batch covers `14` cards: Blessed Spirits, Boar-q-pine, Deeproot
+  Champion, Electrostatic Infantry, Kurgadon, Lurking Lizards, Mage Tower
+  Referee, Pyre Hound, Pyroceratops, Quirion Dryad, Spellgorger Weird, Sprite
+  Dragon, Stormkeld Prowler, and Tempest Angler.
+- The runtime now resolves matching spell-cast triggers by adding the fixed
+  counters to the source permanent, updates creature stats through the shared
+  source-counter helper, and emits trigger evidence including trigger spell,
+  trigger effect, source zone, card-type/color/multicolor/mana-value filter
+  metadata, and replay rule fields.
+- Focused split/runtime/sync tests passed `780` checks. Existing non-fatal
+  SQLite `ResourceWarning` messages in `battle_analyst_v9.py:5275` remain
+  unchanged.
+- Current PostgreSQL postcheck on the selected cards returns `14/14` promoted
+  rows, `14/14` verified/auto rows, `14/14` Oracle-hash rows, and `0` backup
+  rows.
+- Direct E2E validation passed across PostgreSQL, SQLite `battle_card_rules`,
+  canonical snapshot, and runtime `get_card_effect` for all `14` selected
+  cards. All expose
+  `battle_model_scope=xmage_spell_cast_add_counters_source_v1`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. Metadata sync
+  matched `6723` PostgreSQL cards and `6651` SQLite cache aliases. The battle
+  sync loaded `4603` PostgreSQL rows, wrote `4595` SQLite rows, and exported
+  `4574` canonical fallback rows.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`pass`), legacy contamination
+  (`pass`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26283`, `xmage_authoritative_source_count=25969`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=25969`. This is an exact
+  reduction of `14` from the post-PG482 queue and reduces
+  `add_counters::source_add_counters_variant_v1` from `785` to `771`.
+- The post-PG483 exact split recheck reports `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`. The next work should continue with a
+  new subpattern from the remaining blocked families, led by recursion,
+  draw-engine, protection, direct damage, and residual add-counter scopes.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

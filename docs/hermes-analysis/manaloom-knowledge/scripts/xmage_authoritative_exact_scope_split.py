@@ -227,6 +227,7 @@ STATIC_GRAVEYARD_COUNT_BOOST_SCOPE = "xmage_static_source_boost_equal_graveyard_
 PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
 PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE = "xmage_permanent_simple_activated_draw_discard_v1"
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
+SPELL_CAST_ADD_COUNTERS_SOURCE_SCOPE = "xmage_spell_cast_add_counters_source_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_OPTIONAL_DISCARD_DRAW_CREATURE_SCOPE = "xmage_creature_etb_optional_discard_draw_cards_v1"
@@ -5091,6 +5092,19 @@ def is_spell_cast_draw_engine_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_spell_cast_add_counters_source_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != ADD_COUNTERS_SOURCE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"SpellCastControllerTriggeredAbility"}
+    return (
+        effect_classes(row) == {"AddCountersSourceEffect"}
+        and "SpellCastControllerTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"counter", "triggered_ability"}
+    )
+
+
 def is_creature_dies_recursion_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
         return False
@@ -9401,6 +9415,177 @@ def spell_cast_draw_specs_match(oracle_spec: dict[str, Any], source_spec: dict[s
     return True
 
 
+def _spell_cast_self_alias_pattern(metadata: dict[str, Any]) -> str:
+    normalized_card_name = normalize_name(str(metadata.get("name") or ""))
+    aliases = {
+        alias
+        for alias in {
+            normalized_card_name,
+            normalize_name(normalized_card_name.split(",", 1)[0]),
+        }
+        if alias
+    }
+    return "|".join(re.escape(alias) for alias in sorted(aliases, key=len, reverse=True))
+
+
+def spell_cast_add_counters_filter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(
+        r"\s+",
+        " ",
+        oracle_text_after_leading_static_keywords(metadata),
+    ).strip().lower()
+    self_alias_pattern = _spell_cast_self_alias_pattern(metadata)
+    match = re.search(
+        r"whenever you cast (?P<filter>.+?), put (?P<count>a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(?P<counter>\+1/\+1|-1/-1) counters? on "
+        rf"(?P<target>this (?:creature|artifact|permanent)|it|{self_alias_pattern})\.?",
+        text,
+    )
+    if not match:
+        return "spell_cast_add_counters_oracle_not_simple"
+    count = counter_count_from_text(match.group("count"))
+    if count is None or count <= 0:
+        return "spell_cast_add_counters_oracle_count_not_supported"
+    filter_text = re.sub(r"\s+", " ", match.group("filter").strip())
+    result: dict[str, Any] = {
+        "spell_cast_add_counters_count": count,
+        "spell_cast_add_counters_counter_type": match.group("counter"),
+        "counter_count": count,
+        "counter_type": match.group("counter"),
+        "trigger": "spell_cast",
+    }
+    simple_filter_text = re.sub(r"\s+spell$", "", filter_text)
+    filter_specs: list[tuple[str, dict[str, Any]]] = [
+        ("an enchantment", {"spell_cast_add_counters_card_types": ["enchantment"]}),
+        ("an artifact", {"spell_cast_add_counters_card_types": ["artifact"]}),
+        ("a noncreature", {"trigger": "noncreature_spell_cast"}),
+        ("an instant or sorcery", {"spell_cast_add_counters_card_types": ["instant", "sorcery"]}),
+        ("a multicolored", {"spell_cast_add_counters_requires_multicolored": True}),
+    ]
+    for prefix, spec in filter_specs:
+        if simple_filter_text == prefix:
+            result.update(spec)
+            return result
+    match_mv = re.fullmatch(r"a spell with mana value (?P<mv>\d+) or greater", filter_text)
+    if match_mv:
+        result["spell_cast_add_counters_mana_value_min"] = int(match_mv.group("mv"))
+        return result
+    match_creature_mv = re.fullmatch(
+        r"a creature spell with mana value (?P<mv>\d+) or greater",
+        filter_text,
+    )
+    if match_creature_mv:
+        result["spell_cast_add_counters_card_types"] = ["creature"]
+        result["spell_cast_add_counters_mana_value_min"] = int(match_creature_mv.group("mv"))
+        return result
+    color_filter_text = re.sub(
+        r"^(?:a|an)\s+spell\s+that(?:'s| is)\s+",
+        "",
+        filter_text,
+    )
+    color_filter_text = re.sub(r"^(?:a|an)\s+", "", color_filter_text)
+    color_parts = [
+        part.strip()
+        for part in re.split(r",| or ", color_filter_text)
+        if part.strip()
+    ]
+    color_symbols = [TOKEN_COLOR_WORDS.get(part) for part in color_parts]
+    if color_parts and all(color_symbols):
+        result["spell_cast_add_counters_required_colors"] = color_symbols
+        return result
+    return "spell_cast_add_counters_oracle_filter_not_supported"
+
+
+def spell_cast_add_counters_filter_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if len(re.findall(r"new\s+SpellCastControllerTriggeredAbility\s*\(", text)) != 1:
+        return "spell_cast_add_counters_source_not_single_trigger"
+    if "AdventurePredicate" in text:
+        return "spell_cast_add_counters_source_filter_not_supported"
+    if "withTriggerCondition" in text or "OpponentsTurnCondition" in text:
+        return "spell_cast_add_counters_source_condition_not_supported"
+    counter = fixed_counter_source_from_source(text)
+    if counter is None:
+        return "spell_cast_add_counters_source_counter_not_fixed"
+    counter_type, count = counter
+    result: dict[str, Any] = {
+        "spell_cast_add_counters_count": count,
+        "spell_cast_add_counters_counter_type": counter_type,
+        "counter_count": count,
+        "counter_type": counter_type,
+        "trigger": "spell_cast",
+    }
+    if "FILTER_SPELL_A_NON_CREATURE" in text:
+        result["trigger"] = "noncreature_spell_cast"
+        return result
+    if "FILTER_SPELL_AN_ENCHANTMENT" in text:
+        result["spell_cast_add_counters_card_types"] = ["enchantment"]
+        return result
+    if "FILTER_SPELL_AN_ARTIFACT" in text:
+        result["spell_cast_add_counters_card_types"] = ["artifact"]
+        return result
+    if "FILTER_SPELL_AN_INSTANT_OR_SORCERY" in text or "FilterInstantOrSorcerySpell" in text:
+        result["spell_cast_add_counters_card_types"] = ["instant", "sorcery"]
+        return result
+    if "FILTER_SPELL_A_MULTICOLORED" in text:
+        result["spell_cast_add_counters_requires_multicolored"] = True
+        return result
+    if "FILTER_SPELL_MV_4_OR_GREATER" in text:
+        result["spell_cast_add_counters_mana_value_min"] = 4
+        return result
+    if "CardType.CREATURE.getPredicate()" in text:
+        result["spell_cast_add_counters_card_types"] = ["creature"]
+    color_symbols = [
+        TOKEN_COLOR_WORDS.get(match.lower())
+        for match in re.findall(r"ObjectColor\.(WHITE|BLUE|BLACK|RED|GREEN)\b", text)
+    ]
+    if color_symbols:
+        result["spell_cast_add_counters_required_colors"] = color_symbols
+    mv_match = re.search(
+        r"ManaValuePredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*(\d+)\s*\)",
+        text,
+    )
+    if mv_match:
+        result["spell_cast_add_counters_mana_value_min"] = int(mv_match.group(1)) + 1
+    supported_filter = any(
+        key in result
+        for key in (
+            "spell_cast_add_counters_card_types",
+            "spell_cast_add_counters_required_colors",
+            "spell_cast_add_counters_requires_multicolored",
+            "spell_cast_add_counters_mana_value_min",
+        )
+    )
+    if not supported_filter:
+        return "spell_cast_add_counters_source_filter_not_supported"
+    return result
+
+
+def spell_cast_add_counters_specs_match(
+    oracle_spec: dict[str, Any],
+    source_spec: dict[str, Any],
+) -> bool:
+    comparable_keys = {
+        "trigger",
+        "spell_cast_add_counters_count",
+        "spell_cast_add_counters_counter_type",
+        "spell_cast_add_counters_card_types",
+        "spell_cast_add_counters_required_colors",
+        "spell_cast_add_counters_requires_multicolored",
+        "spell_cast_add_counters_mana_value_min",
+    }
+    for key in comparable_keys:
+        oracle_value = oracle_spec.get(key)
+        source_value = source_spec.get(key)
+        if isinstance(oracle_value, list):
+            oracle_value = sorted(str(value) for value in oracle_value)
+        if isinstance(source_value, list):
+            source_value = sorted(str(value) for value in source_value)
+        if oracle_value != source_value:
+            return False
+    return True
+
+
 def activated_recursion_to_hand_target_from_source(text: str) -> tuple[str, int, bool] | str:
     lowered = str(text or "").lower()
     if "arcane card" in lowered or "SubType.ARCANE.getPredicate()" in text:
@@ -11853,6 +12038,7 @@ def split_row(
     combat_damage_draw_creature_unit = is_creature_combat_damage_draw_unit(row)
     dies_damage_creature_unit = is_creature_dies_damage_unit(row)
     spell_cast_draw_engine_unit = is_spell_cast_draw_engine_unit(row)
+    spell_cast_add_counters_source_unit = is_spell_cast_add_counters_source_unit(row)
     permanent_activated_draw_discard_unit = is_permanent_activated_draw_discard_unit(row)
     dies_recursion_creature_unit = is_creature_dies_recursion_unit(row)
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
@@ -11940,6 +12126,7 @@ def split_row(
         and not combat_damage_draw_creature_unit
         and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
+        and not spell_cast_add_counters_source_unit
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
@@ -12004,6 +12191,7 @@ def split_row(
         and not combat_damage_draw_creature_unit
         and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
+        and not spell_cast_add_counters_source_unit
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
@@ -12556,6 +12744,51 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_spell_cast_draw_engine",
+        ), "selected_exact_scope"
+
+    if spell_cast_add_counters_source_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "spell_cast_add_counters_not_permanent"
+        oracle_spec = spell_cast_add_counters_filter_from_oracle(metadata)
+        if isinstance(oracle_spec, str):
+            return None, oracle_spec
+        source_spec = spell_cast_add_counters_filter_from_source(source_text)
+        if isinstance(source_spec, str):
+            return None, source_spec
+        if not spell_cast_add_counters_specs_match(oracle_spec, source_spec):
+            return None, "spell_cast_add_counters_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": permanent_effect if permanent_effect == "creature" else "permanent",
+            "battle_model_scope": SPELL_CAST_ADD_COUNTERS_SOURCE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger_effect": "add_counters",
+            "spell_cast_add_counters": True,
+            "spell_cast_add_counters_target": "self",
+            "xmage_effect_class": "AddCountersSourceEffect",
+            "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+            **oracle_spec,
+        }
+        if permanent_effect == "creature":
+            effect_json["is_creature_permanent"] = True
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_spell_cast_add_counters_source",
         ), "selected_exact_scope"
 
     if permanent_activated_destroy_unit:
@@ -17915,6 +18148,7 @@ def build_exact_split_report(
             and not is_creature_combat_damage_draw_unit(row)
             and not is_creature_dies_damage_unit(row)
             and not is_spell_cast_draw_engine_unit(row)
+            and not is_spell_cast_add_counters_source_unit(row)
             and not is_permanent_activated_draw_discard_unit(row)
             and not is_creature_etb_damage_unit(row)
             and not is_creature_etb_graveyard_to_library_unit(row)
@@ -17995,6 +18229,7 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DealsCombatDamageToAPlayerTriggeredAbility, exact fixed combat-damage-to-player draw Oracle/source agreement, and only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and SpellCastControllerTriggeredAbility, exact draw count, and supported spell filters",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",
+                "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect and SpellCastControllerTriggeredAbility, exact source self-counter count, supported spell filters, and only static self keywords",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, DiesSourceTriggeredAbility, exact fixed dies-damage Oracle/source agreement, and no auxiliary ability class",
                 "direct_damage::targeted_damage_variant_v1 rows with one-shot DamageTargetEffect whose amount is an exact supported battlefield/hand/domain count, optional fixed base amount, and supported target constraints",

@@ -1,0 +1,1023 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg483_spell_cast_add_counters_new_server_20260705_050912",
+  "deploy_id": "PG483",
+  "expected_rules": [
+    {
+      "card_name": "Blessed Spirits",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:469302a80b5f9cb07d8e7c4685a084b7",
+      "min_rule_version": 2,
+      "normalized_name": "blessed spirits",
+      "oracle_hash": "ebd3b3b2b92b4e98dc35209599aeccae",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_card_types": [
+          "enchantment"
+        ],
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Boar-q-pine",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "min_rule_version": 2,
+      "normalized_name": "boar-q-pine",
+      "oracle_hash": "00710965d61dcb88af09147413c870a9",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deeproot Champion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "min_rule_version": 2,
+      "normalized_name": "deeproot champion",
+      "oracle_hash": "00710965d61dcb88af09147413c870a9",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Electrostatic Infantry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c38a040c3c33c3babb5e2b59547c3b09",
+      "min_rule_version": 2,
+      "normalized_name": "electrostatic infantry",
+      "oracle_hash": "e823ba6dc5925c88a5dc5b0db9a2212a",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_card_types": [
+          "instant",
+          "sorcery"
+        ],
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kurgadon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:273ba37a7e0ec3ab4baf381c811ecbd3",
+      "min_rule_version": 2,
+      "normalized_name": "kurgadon",
+      "oracle_hash": "db70bff8138e6b150eed34530a8e8e66",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 3,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_card_types": [
+          "creature"
+        ],
+        "spell_cast_add_counters_count": 3,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_mana_value_min": 6,
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lurking Lizards",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7aa55787014ba5b5a3cb13b4e735401c",
+      "min_rule_version": 2,
+      "normalized_name": "lurking lizards",
+      "oracle_hash": "76bddd11dfa133e3780d2fbcbb77d23d",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_mana_value_min": 4,
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mage Tower Referee",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0d02fdb8575fdbf54c6272c635d986db",
+      "min_rule_version": 2,
+      "normalized_name": "mage tower referee",
+      "oracle_hash": "3baba1cf8dabe30c1de8d556731bf92e",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_requires_multicolored": true,
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pyre Hound",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c38a040c3c33c3babb5e2b59547c3b09",
+      "min_rule_version": 2,
+      "normalized_name": "pyre hound",
+      "oracle_hash": "e823ba6dc5925c88a5dc5b0db9a2212a",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_card_types": [
+          "instant",
+          "sorcery"
+        ],
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pyroceratops",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dd21c7311af121b25fc6bde40c4af5b0",
+      "min_rule_version": 2,
+      "normalized_name": "pyroceratops",
+      "oracle_hash": "ce93962b6f3e46e6cd910cf3aeb8ff81",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Quirion Dryad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dbf0c6d6391a46d2cfbfa977e26900e5",
+      "min_rule_version": 2,
+      "normalized_name": "quirion dryad",
+      "oracle_hash": "62f7f70992d5d80c365670c5dbb81823",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_required_colors": [
+          "W",
+          "U",
+          "B",
+          "R"
+        ],
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spellgorger Weird",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "min_rule_version": 2,
+      "normalized_name": "spellgorger weird",
+      "oracle_hash": "00710965d61dcb88af09147413c870a9",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sprite Dragon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f7117ada06b523b5625123accd43ed4",
+      "min_rule_version": 2,
+      "normalized_name": "sprite dragon",
+      "oracle_hash": "e570475608537595066a06bdea290f3a",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "haste"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stormkeld Prowler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d00757460f6000145d9726ccd740eeac",
+      "min_rule_version": 2,
+      "normalized_name": "stormkeld prowler",
+      "oracle_hash": "042cf0569eb69b7a38aad5dacccff56c",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 2,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 2,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_mana_value_min": 5,
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tempest Angler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "min_rule_version": 2,
+      "normalized_name": "tempest angler",
+      "oracle_hash": "00710965d61dcb88af09147413c870a9",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_spell_cast_add_counters_source": 14
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg483_spell_cast_add_counters_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg483_spell_cast_add_counters_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg483_spell_cast_add_counters_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg483_spell_cast_add_counters_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg483_spell_cast_add_counters_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg483_spell_cast_add_counters_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T05:09:12+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Blessed Spirits"
+      },
+      "card_name": "Blessed Spirits",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:469302a80b5f9cb07d8e7c4685a084b7",
+      "normalized_name": "blessed spirits",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "flying"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_card_types": [
+          "enchantment"
+        ],
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Boar-q-pine"
+      },
+      "card_name": "Boar-q-pine",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "normalized_name": "boar-q-pine",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Deeproot Champion"
+      },
+      "card_name": "Deeproot Champion",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "normalized_name": "deeproot champion",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Electrostatic Infantry"
+      },
+      "card_name": "Electrostatic Infantry",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c38a040c3c33c3babb5e2b59547c3b09",
+      "normalized_name": "electrostatic infantry",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_card_types": [
+          "instant",
+          "sorcery"
+        ],
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kurgadon"
+      },
+      "card_name": "Kurgadon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:273ba37a7e0ec3ab4baf381c811ecbd3",
+      "normalized_name": "kurgadon",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 3,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_card_types": [
+          "creature"
+        ],
+        "spell_cast_add_counters_count": 3,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_mana_value_min": 6,
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Lurking Lizards"
+      },
+      "card_name": "Lurking Lizards",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7aa55787014ba5b5a3cb13b4e735401c",
+      "normalized_name": "lurking lizards",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_mana_value_min": 4,
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mage Tower Referee"
+      },
+      "card_name": "Mage Tower Referee",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0d02fdb8575fdbf54c6272c635d986db",
+      "normalized_name": "mage tower referee",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_requires_multicolored": true,
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Pyre Hound"
+      },
+      "card_name": "Pyre Hound",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c38a040c3c33c3babb5e2b59547c3b09",
+      "normalized_name": "pyre hound",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_card_types": [
+          "instant",
+          "sorcery"
+        ],
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Pyroceratops"
+      },
+      "card_name": "Pyroceratops",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dd21c7311af121b25fc6bde40c4af5b0",
+      "normalized_name": "pyroceratops",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Quirion Dryad"
+      },
+      "card_name": "Quirion Dryad",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dbf0c6d6391a46d2cfbfa977e26900e5",
+      "normalized_name": "quirion dryad",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_required_colors": [
+          "W",
+          "U",
+          "B",
+          "R"
+        ],
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Spellgorger Weird"
+      },
+      "card_name": "Spellgorger Weird",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "normalized_name": "spellgorger weird",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sprite Dragon"
+      },
+      "card_name": "Sprite Dragon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f7117ada06b523b5625123accd43ed4",
+      "normalized_name": "sprite dragon",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "keywords": [
+          "flying",
+          "haste"
+        ],
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Stormkeld Prowler"
+      },
+      "card_name": "Stormkeld Prowler",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d00757460f6000145d9726ccd740eeac",
+      "normalized_name": "stormkeld prowler",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 2,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 2,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_mana_value_min": 5,
+        "spell_cast_add_counters_target": "self",
+        "trigger": "spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Tempest Angler"
+      },
+      "card_name": "Tempest Angler",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "normalized_name": "tempest angler",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1",
+        "counter_count": 1,
+        "counter_type": "+1/+1",
+        "effect": "creature",
+        "spell_cast_add_counters": true,
+        "spell_cast_add_counters_count": 1,
+        "spell_cast_add_counters_counter_type": "+1/+1",
+        "spell_cast_add_counters_target": "self",
+        "trigger": "noncreature_spell_cast",
+        "trigger_effect": "add_counters",
+        "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+        "xmage_effect_class": "AddCountersSourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Blessed Spirits",
+    "Boar-q-pine",
+    "Deeproot Champion",
+    "Electrostatic Infantry",
+    "Kurgadon",
+    "Lurking Lizards",
+    "Mage Tower Referee",
+    "Pyre Hound",
+    "Pyroceratops",
+    "Quirion Dryad",
+    "Spellgorger Weird",
+    "Sprite Dragon",
+    "Stormkeld Prowler",
+    "Tempest Angler"
+  ],
+  "selected_count": 14,
+  "slug": "spell_cast_add_counters_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Blessed Spirits",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:469302a80b5f9cb07d8e7c4685a084b7",
+      "min_rule_version": 2,
+      "normalized_name": "blessed spirits",
+      "oracle_hash": "ebd3b3b2b92b4e98dc35209599aeccae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Boar-q-pine",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "min_rule_version": 2,
+      "normalized_name": "boar-q-pine",
+      "oracle_hash": "00710965d61dcb88af09147413c870a9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deeproot Champion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "min_rule_version": 2,
+      "normalized_name": "deeproot champion",
+      "oracle_hash": "00710965d61dcb88af09147413c870a9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Electrostatic Infantry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c38a040c3c33c3babb5e2b59547c3b09",
+      "min_rule_version": 2,
+      "normalized_name": "electrostatic infantry",
+      "oracle_hash": "e823ba6dc5925c88a5dc5b0db9a2212a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kurgadon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:273ba37a7e0ec3ab4baf381c811ecbd3",
+      "min_rule_version": 2,
+      "normalized_name": "kurgadon",
+      "oracle_hash": "db70bff8138e6b150eed34530a8e8e66",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lurking Lizards",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7aa55787014ba5b5a3cb13b4e735401c",
+      "min_rule_version": 2,
+      "normalized_name": "lurking lizards",
+      "oracle_hash": "76bddd11dfa133e3780d2fbcbb77d23d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mage Tower Referee",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0d02fdb8575fdbf54c6272c635d986db",
+      "min_rule_version": 2,
+      "normalized_name": "mage tower referee",
+      "oracle_hash": "3baba1cf8dabe30c1de8d556731bf92e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pyre Hound",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c38a040c3c33c3babb5e2b59547c3b09",
+      "min_rule_version": 2,
+      "normalized_name": "pyre hound",
+      "oracle_hash": "e823ba6dc5925c88a5dc5b0db9a2212a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pyroceratops",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dd21c7311af121b25fc6bde40c4af5b0",
+      "min_rule_version": 2,
+      "normalized_name": "pyroceratops",
+      "oracle_hash": "ce93962b6f3e46e6cd910cf3aeb8ff81",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Quirion Dryad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dbf0c6d6391a46d2cfbfa977e26900e5",
+      "min_rule_version": 2,
+      "normalized_name": "quirion dryad",
+      "oracle_hash": "62f7f70992d5d80c365670c5dbb81823",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spellgorger Weird",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "min_rule_version": 2,
+      "normalized_name": "spellgorger weird",
+      "oracle_hash": "00710965d61dcb88af09147413c870a9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sprite Dragon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f7117ada06b523b5625123accd43ed4",
+      "min_rule_version": 2,
+      "normalized_name": "sprite dragon",
+      "oracle_hash": "e570475608537595066a06bdea290f3a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stormkeld Prowler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d00757460f6000145d9726ccd740eeac",
+      "min_rule_version": 2,
+      "normalized_name": "stormkeld prowler",
+      "oracle_hash": "042cf0569eb69b7a38aad5dacccff56c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tempest Angler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:238cedcb64a3ea5843c8e6b1697a55be",
+      "min_rule_version": 2,
+      "normalized_name": "tempest angler",
+      "oracle_hash": "00710965d61dcb88af09147413c870a9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_spell_cast_add_counters_source_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

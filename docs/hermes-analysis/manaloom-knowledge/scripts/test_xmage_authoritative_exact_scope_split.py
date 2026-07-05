@@ -3680,6 +3680,154 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "spell_cast_draw_oracle_filter_not_supported")
 
+    def test_spell_cast_add_counters_maps_noncreature_spell_filter_with_keyword(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_SOURCE_UNIT,
+            effect_classes=["AddCountersSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility", "TrampleAbility"],
+            xmage_signals=["counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Pyroceratops",
+                type_line="Creature - Elemental Dinosaur",
+                oracle_text=(
+                    "Trample\n"
+                    "Whenever you cast a noncreature spell, put a +1/+1 counter on Pyroceratops."
+                ),
+            ),
+            source_text="""
+                this.addAbility(TrampleAbility.getInstance());
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new AddCountersSourceEffect(CounterType.P1P1.createInstance()),
+                    StaticFilters.FILTER_SPELL_A_NON_CREATURE, false
+                ));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.SPELL_CAST_ADD_COUNTERS_SOURCE_SCOPE)
+        self.assertEqual(effect["trigger"], "noncreature_spell_cast")
+        self.assertEqual(effect["trigger_effect"], "add_counters")
+        self.assertTrue(effect["spell_cast_add_counters"])
+        self.assertEqual(effect["spell_cast_add_counters_count"], 1)
+        self.assertEqual(effect["spell_cast_add_counters_counter_type"], "+1/+1")
+        self.assertEqual(effect["spell_cast_add_counters_target"], "self")
+        self.assertEqual(effect["counter_count"], 1)
+        self.assertEqual(effect["keywords"], ["trample"])
+
+    def test_spell_cast_add_counters_maps_creature_mana_value_filter(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_SOURCE_UNIT,
+            effect_classes=["AddCountersSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Kurgadon",
+                type_line="Creature - Beast",
+                oracle_text=(
+                    "Whenever you cast a creature spell with mana value 6 or greater, "
+                    "put three +1/+1 counters on Kurgadon."
+                ),
+            ),
+            source_text="""
+                private static final FilterSpell filterSpell = new FilterSpell(
+                    "a creature spell with mana value 6 or greater");
+                static {
+                    filterSpell.add(CardType.CREATURE.getPredicate());
+                    filterSpell.add(new ManaValuePredicate(ComparisonType.MORE_THAN, 5));
+                }
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new AddCountersSourceEffect(CounterType.P1P1.createInstance(3)),
+                    filterSpell, false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["spell_cast_add_counters_count"], 3)
+        self.assertEqual(effect["spell_cast_add_counters_card_types"], ["creature"])
+        self.assertEqual(effect["spell_cast_add_counters_mana_value_min"], 6)
+
+    def test_spell_cast_add_counters_maps_color_filter(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_SOURCE_UNIT,
+            effect_classes=["AddCountersSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Quirion Dryad",
+                type_line="Creature - Dryad",
+                oracle_text=(
+                    "Whenever you cast a spell that's white, blue, black, or red, "
+                    "put a +1/+1 counter on this creature."
+                ),
+            ),
+            source_text="""
+                private static final FilterSpell filter =
+                    new FilterSpell("a spell that's white, blue, black, or red");
+                static {
+                    filter.add(Predicates.or(
+                        new ColorPredicate(ObjectColor.WHITE),
+                        new ColorPredicate(ObjectColor.BLUE),
+                        new ColorPredicate(ObjectColor.BLACK),
+                        new ColorPredicate(ObjectColor.RED)));
+                }
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new AddCountersSourceEffect(CounterType.P1P1.createInstance(1)),
+                    filter, false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["spell_cast_add_counters_required_colors"], ["W", "U", "B", "R"])
+
+    def test_spell_cast_add_counters_blocks_adventure_filter(self) -> None:
+        row = queue_row(
+            split.ADD_COUNTERS_SOURCE_UNIT,
+            effect_classes=["AddCountersSourceEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["counter", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Wandermare",
+                type_line="Creature - Horse",
+                oracle_text=(
+                    "Whenever you cast a creature spell that has an Adventure, "
+                    "put a +1/+1 counter on Wandermare."
+                ),
+            ),
+            source_text="""
+                private static final FilterSpell filter =
+                    new FilterCreatureSpell("a creature spell that has an Adventure");
+                static {
+                    filter.add(AdventurePredicate.instance);
+                }
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new AddCountersSourceEffect(CounterType.P1P1.createInstance()),
+                    filter, false));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "spell_cast_add_counters_oracle_filter_not_supported")
+
     def test_permanent_activated_life_gain_maps_simple_mana_and_tap_cost(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,

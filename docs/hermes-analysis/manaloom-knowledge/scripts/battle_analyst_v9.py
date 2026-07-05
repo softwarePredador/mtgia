@@ -4386,6 +4386,7 @@ def resolve_add_counters_source_effect(
     *,
     event_name="self_add_counters_resolved",
     phase=None,
+    extra_event_fields=None,
 ):
     counter_type = str(
         effect_data.get("activated_add_counters_counter_type")
@@ -4462,6 +4463,7 @@ def resolve_add_counters_source_effect(
         destination=destination,
         phase=phase,
         turn=turn,
+        **(extra_event_fields or {}),
         **replay_rule_fields(effect_data),
     )
     return permanent
@@ -46730,6 +46732,59 @@ def trigger_spell_cast_engines(
                 all_players=all_players,
             )
             continue
+        add_counters_count = int(permanent.get("spell_cast_add_counters_count") or 0)
+        if add_counters_count > 0 and spell_cast_add_counters_filter_matches(
+            permanent,
+            player,
+            spell,
+            source_zone=source_zone,
+        ):
+
+            def resolve_spell_cast_add_counters_trigger(
+                permanent=permanent,
+                trigger_kind=trigger_kind,
+                spell=spell,
+            ):
+                resolve_add_counters_source_effect(
+                    player,
+                    permanent,
+                    permanent,
+                    turn,
+                    event_name="trigger_resolved",
+                    phase=phase,
+                    extra_event_fields={
+                        "trigger": trigger_kind,
+                        "trigger_spell": spell.get("name", "?"),
+                        "effect": "add_counters",
+                        "trigger_spell_type_line": spell.get("type_line"),
+                        "trigger_spell_source_zone": source_zone,
+                        "spell_cast_add_counters_card_types": permanent.get(
+                            "spell_cast_add_counters_card_types"
+                        )
+                        or [],
+                        "spell_cast_add_counters_required_colors": permanent.get(
+                            "spell_cast_add_counters_required_colors"
+                        )
+                        or [],
+                        "spell_cast_add_counters_requires_multicolored": bool(
+                            permanent.get("spell_cast_add_counters_requires_multicolored")
+                        ),
+                        "spell_cast_add_counters_mana_value_min": int(
+                            permanent.get("spell_cast_add_counters_mana_value_min") or 0
+                        ),
+                    },
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                trigger_kind,
+                resolve_spell_cast_add_counters_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
         draw_threshold = int(permanent.get("spell_cast_draw_if_cmc_at_least") or 0)
         if draw_threshold > 0:
             spell_cmc = int(float(spell.get("cmc") or 0))
@@ -48450,6 +48505,59 @@ def spell_cast_draw_filter_matches(permanent, controller, spell, *, source_zone=
         if not is_historic:
             return False
     mana_value_min = int(permanent.get("spell_cast_draw_mana_value_min") or 0)
+    if mana_value_min > 0 and card_mana_value(spell) < mana_value_min:
+        return False
+    return True
+
+
+def spell_cast_add_counters_filter_matches(permanent, controller, spell, *, source_zone="hand"):
+    if not isinstance(permanent, dict) or not isinstance(spell, dict):
+        return False
+    required_zone = str(permanent.get("spell_cast_add_counters_source_zone") or "").strip().lower()
+    if required_zone and str(source_zone or "hand").strip().lower() != required_zone:
+        return False
+    required_types = [
+        str(value).strip().lower()
+        for value in _as_list(permanent.get("spell_cast_add_counters_card_types"))
+        if str(value).strip()
+    ]
+    if required_types and not _card_type_matches(spell, required_types):
+        return False
+    type_line = str(spell.get("type_line") or "").lower()
+    required_subtypes = [
+        str(value).replace("_", " ").strip().lower()
+        for value in _as_list(permanent.get("spell_cast_add_counters_required_subtypes"))
+        if str(value).strip()
+    ]
+    if required_subtypes and not any(re.search(rf"\b{re.escape(subtype)}\b", type_line) for subtype in required_subtypes):
+        return False
+    required_supertypes = [
+        str(value).strip().lower()
+        for value in _as_list(permanent.get("spell_cast_add_counters_required_supertypes"))
+        if str(value).strip()
+    ]
+    if "legendary" in required_supertypes and "legendary" not in type_line and not spell.get("legendary"):
+        return False
+    if permanent.get("spell_cast_add_counters_requires_multicolored"):
+        if len(_spell_color_symbols(spell)) < 2:
+            return False
+    required_colors = [
+        _color_symbol(value)
+        for value in _as_list(permanent.get("spell_cast_add_counters_required_colors"))
+        if _color_symbol(value)
+    ]
+    if required_colors and not any(_spell_has_color(spell, color) for color in required_colors):
+        return False
+    if permanent.get("spell_cast_add_counters_requires_historic"):
+        is_historic = (
+            is_artifact_spell_for_controller(controller, spell)
+            or "legendary" in type_line
+            or bool(spell.get("legendary"))
+            or re.search(r"\bsaga\b", type_line) is not None
+        )
+        if not is_historic:
+            return False
+    mana_value_min = int(permanent.get("spell_cast_add_counters_mana_value_min") or 0)
     if mana_value_min > 0 and card_mana_value(spell) < mana_value_min:
         return False
     return True
