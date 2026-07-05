@@ -284,6 +284,66 @@ def summarize_exposure_aware_gate_queue(payload: Mapping[str, Any]) -> dict[str,
     }
 
 
+def lorehold_learning_domain(artifact_type: str) -> str:
+    checks = [
+        ("mana", "mana_and_lands"),
+        ("land", "mana_and_lands"),
+        ("staple", "staples"),
+        ("accessibility", "staples"),
+        ("value", "card_value"),
+        ("priority", "card_value"),
+        ("cut", "cuts"),
+        ("safe_cut", "cuts"),
+        ("promotion", "promotion"),
+        ("runtime", "runtime_rules"),
+        ("brain", "runtime_rules"),
+        ("entreat", "runtime_rules"),
+        ("external", "external_learning"),
+        ("identity", "external_learning"),
+        ("topdeck", "topdeck_miracle"),
+        ("miracle", "topdeck_miracle"),
+        ("pressure", "pressure_conversion"),
+        ("spell", "pressure_conversion"),
+        ("restoration", "recursion"),
+        ("soulfire", "interaction_removal"),
+    ]
+    for needle, domain in checks:
+        if needle in artifact_type:
+            return domain
+    return "general_learning"
+
+
+def summarize_governed_lorehold_artifact(payload: Mapping[str, Any]) -> dict[str, Any]:
+    artifact_type = str(payload.get("artifact_type") or "")
+    summary = payload.get("summary") if isinstance(payload.get("summary"), Mapping) else {}
+    decision = payload.get("decision") if isinstance(payload.get("decision"), Mapping) else {}
+    return {
+        "artifact_type": artifact_type,
+        "learning_domain": lorehold_learning_domain(artifact_type),
+        "status": payload.get("status"),
+        "decision_status": summary.get("decision_status") or decision.get("status"),
+        "summary": summary,
+        "source_db_mutated": bool(payload.get("source_db_mutated")),
+        "postgres_writes": bool(payload.get("postgres_writes")),
+        "deck_607_mutated": bool(payload.get("deck_607_mutated")),
+        "candidate_deck_materialization_allowed_now": bool(
+            summary.get("candidate_deck_materialization_allowed_now")
+            or decision.get("candidate_deck_materialization_allowed_now")
+        ),
+        "natural_battle_gate_allowed_now": bool(
+            summary.get("natural_battle_gate_allowed_now")
+            or summary.get("natural_gate_allowed_now")
+            or decision.get("natural_battle_allowed_now")
+            or decision.get("natural_gate_allowed_now")
+        ),
+        "promotion_allowed_now": bool(
+            summary.get("promotion_allowed_now")
+            or decision.get("promotion_allowed")
+            or decision.get("promotion_allowed_now")
+        ),
+    }
+
+
 def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassification:
     keys = set(payload.keys())
     file_name = path.name
@@ -691,6 +751,62 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             status="pass",
             detail="single target pressure replay summary",
             canonical_summary={"summary": payload.get("summary")},
+        )
+
+    if {"package_key", "adds", "cuts", "observations", "decision_rules", "summary"} <= keys:
+        return ArtifactClassification(
+            **base,
+            artifact_kind="lorehold_mana_vault_evidence_synthesis",
+            schema_version="lorehold_mana_vault_evidence_synthesis_v1",
+            status="pass",
+            detail="Lorehold Mana Vault evidence synthesis",
+            canonical_summary={
+                "package_key": payload.get("package_key"),
+                "adds": payload.get("adds") if isinstance(payload.get("adds"), list) else [],
+                "cuts": payload.get("cuts") if isinstance(payload.get("cuts"), list) else [],
+                "observation_count": len(payload.get("observations") or [])
+                if isinstance(payload.get("observations"), list)
+                else 0,
+                "summary": payload.get("summary") if isinstance(payload.get("summary"), Mapping) else {},
+                "source_db_mutated": bool(payload.get("source_db_mutated")),
+                "postgres_writes": bool(payload.get("postgres_writes")),
+            },
+        )
+
+    if file_name.startswith("lorehold_ramp_package_evaluation_") and {"generated_at", "packages", "source_db"} <= keys:
+        return ArtifactClassification(
+            **base,
+            artifact_kind="lorehold_ramp_package_evaluation",
+            schema_version="lorehold_ramp_package_evaluation_v1",
+            status="pass",
+            detail="Lorehold ramp package evaluation",
+            canonical_summary={
+                "package_count": len(payload.get("packages") or [])
+                if isinstance(payload.get("packages"), list)
+                else 0,
+                "source_db": payload.get("source_db"),
+            },
+        )
+
+    artifact_type = str(payload.get("artifact_type") or "")
+    if (
+        artifact_type.startswith("lorehold_")
+        and "generated_at" in keys
+        and ("summary" in keys or "decision" in keys)
+    ):
+        summary = summarize_governed_lorehold_artifact(payload)
+        has_historical_mutation = (
+            summary["source_db_mutated"]
+            or summary["postgres_writes"]
+            or summary["deck_607_mutated"]
+        )
+        return ArtifactClassification(
+            **base,
+            artifact_kind=artifact_type,
+            schema_version=f"{artifact_type}_governed_v1",
+            status="warn" if has_historical_mutation else "pass",
+            detail="governed Lorehold learning artifact with explicit mutation flags",
+            canonical_summary=summary,
         )
 
     return ArtifactClassification(

@@ -1577,5 +1577,34 @@ Operational lesson:
   replacement, preserve the observed floor traces, and then pass structure and
   battle gates.
 
+Governed learning artifact audit generated on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260705_governed_learning_artifacts_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260705_governed_learning_artifacts_current.json`.
+- Status: `pass`.
+- Scope: classify all current local `lorehold*.json` artifacts without deleting
+  historical evidence or flattening schemas into one shape.
+- Current counts: `artifact_count=957`, `unknown_or_invalid_count=0`,
+  `status_counts={"pass": 956, "warn": 1}`.
+- The single warning is the historical
+  `lorehold_role_tag_repair_synthesis_20260704_applied.json`, which declares
+  `source_db_mutated=true`; it is now visible as a governed historical mutation
+  record instead of an unknown schema.
+- Deck universe: `pass`; current matrix: `pass`; artifact contract: `pass`;
+  equal battle gate may run: `true`.
+- Real deck change remains blocked because there is no explicit promotion
+  decision audit with `ready_for_real_deck_change=true`.
+
+Operational lesson:
+
+- An unknown artifact is not neutral evidence. It either needs a specific
+  classifier or a governed Lorehold learning classifier that preserves
+  mutation flags, decision status, and deck-action gates.
+- Passing the artifact contract means the deckbuilder can trust the evidence
+  surface enough to run further gates; it does not authorize a 607 mutation or
+  a promotion.
+
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

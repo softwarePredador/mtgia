@@ -3361,3 +3361,40 @@ Cut-planning lesson:
   become a real deck change.
 
 Deck `607` remains untouched and protected.
+
+## Governed Learning Artifact Audit - 2026-07-05
+
+The artifact contract audit now recognizes the full current Lorehold learning
+surface instead of leaving historical deckbuilding reports as unknown schemas:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260705_governed_learning_artifacts_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260705_governed_learning_artifacts_current.json`
+
+Current result:
+
+- status: `pass`;
+- artifact count: `957`;
+- unknown or invalid artifacts: `0`;
+- status counts: `956` pass and `1` warn;
+- artifact contract: `pass`;
+- deck universe: `pass`;
+- current matrix: `pass`;
+- can run equal battle gate: `true`;
+- ready for real deck change: `false`.
+
+The single warning is the historical
+`lorehold_role_tag_repair_synthesis_20260704_applied.json`, which declares
+`source_db_mutated=true`. It remains visible as a governed historical mutation
+record, not as a silent pass.
+
+Deckbuilding lesson:
+
+- The model can now inspect lands, ramp, card value, staples, runtime contracts,
+  topdeck, pressure, cuts, and promotion-readiness reports through one audited
+  surface.
+- This improves learning confidence, but it does not promote any candidate and
+  does not mutate deck `607`.
+- A real deck change still requires an explicit promotion decision audit with
+  `ready_for_real_deck_change=true`.
+
+Deck `607` remains untouched and protected.

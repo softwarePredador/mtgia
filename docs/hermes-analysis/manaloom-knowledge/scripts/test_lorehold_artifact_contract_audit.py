@@ -575,6 +575,89 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertFalse(classification.canonical_summary["deck_607_mutated"])
 
+    def test_governed_lorehold_learning_artifact_is_recognized(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_deckbuilding_value_model",
+            "all_card_values": [{"card_name": "Esper Sentinel"}],
+            "decision": {"promotion_allowed": False},
+            "deck_607_mutated": False,
+            "generated_at": "2026-07-05T00:00:00Z",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "status": "value_model_ready_keep_607",
+            "summary": {"candidate_deck_materialization_allowed_now": False},
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lorehold_deckbuilding_value_model.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "lorehold_deckbuilding_value_model")
+        self.assertEqual(
+            classification.schema_version,
+            "lorehold_deckbuilding_value_model_governed_v1",
+        )
+        self.assertEqual(classification.status, "pass")
+        self.assertEqual(classification.canonical_summary["learning_domain"], "card_value")
+
+    def test_historical_lorehold_mutation_artifact_is_warn_not_unknown(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_role_tag_repair_synthesis",
+            "after_repair": {},
+            "before_repair": {},
+            "decision": {"status": "role_tag_repair_applied"},
+            "deck_id": 607,
+            "generated_at": "2026-07-04T00:00:00Z",
+            "postgres_writes": False,
+            "source_db_mutated": True,
+            "status": "role_tag_repair_applied",
+            "summary": {"changed_count": 3},
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lorehold_role_tag_repair_synthesis.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "lorehold_role_tag_repair_synthesis")
+        self.assertEqual(classification.status, "warn")
+        self.assertTrue(classification.canonical_summary["source_db_mutated"])
+
+    def test_legacy_mana_vault_evidence_synthesis_is_recognized(self) -> None:
+        payload = {
+            "adds": ["Mana Vault"],
+            "cuts": ["Arcane Signet"],
+            "decision_rules": ["reject if candidate regresses natural gate"],
+            "generated_at": "2026-07-04T00:00:00Z",
+            "observations": [{"status": "negative_gate"}],
+            "package_key": "mana_vault",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "summary": {"decision": "reject_current_pair"},
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lorehold_mana_vault_evidence_synthesis.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "lorehold_mana_vault_evidence_synthesis")
+        self.assertEqual(classification.status, "pass")
+        self.assertEqual(classification.canonical_summary["observation_count"], 1)
+
+    def test_legacy_ramp_package_evaluation_is_recognized(self) -> None:
+        payload = {
+            "generated_at": "2026-07-04T00:00:00Z",
+            "packages": [{"package_key": "basalt_monolith"}],
+            "source_db": "knowledge.db",
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lorehold_ramp_package_evaluation_20260704.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "lorehold_ramp_package_evaluation")
+        self.assertEqual(classification.status, "pass")
+        self.assertEqual(classification.canonical_summary["package_count"], 1)
+
     def test_cut_methodology_reaudit_payload_is_recognized(self) -> None:
         payload = {
             "candidate_report": "candidate.json",
