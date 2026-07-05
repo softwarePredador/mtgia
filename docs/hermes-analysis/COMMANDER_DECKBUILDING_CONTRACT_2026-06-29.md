@@ -1372,6 +1372,15 @@ Learning-frontier closure generated on 2026-07-05:
   but still needs a nonanchor same-lane cut model before any forced-access run.
 - Current next action:
   `mine_new_nonanchor_same_lane_cut_models_before_any_trace_execution`.
+- Non-anchor cut model miner:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.md`.
+- Miner result: `Dragon's Rage Channeler` is the primary clean-prior target, but
+  its `6` same-lane slots are hard-blocked and the current model has
+  `seed_safe_nonanchor_count=0` and `reviewable_nonanchor_gap_count=0`.
+  `Penance`, `Galvanoth`, `Valakut Awakening // Valakut Stoneforge`, and
+  `Wheel of Fortune` remain prior-reject targets with no non-anchor cut model.
+- Current next action:
+  `collect_new_cut_evidence_or_define_new_shell_contract_before_execution`.
 
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

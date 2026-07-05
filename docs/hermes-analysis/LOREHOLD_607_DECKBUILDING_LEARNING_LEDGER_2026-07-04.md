@@ -2958,3 +2958,58 @@ Operational lesson:
   cut models, starting with `Dragon's Rage Channeler` because it lacks a prior
   reject but still needs a legal, nonprotected cut.
 - Deck `607` remains untouched and protected.
+
+## Topdeck Non-Anchor Cut Model Miner - 2026-07-05
+
+The current non-anchor cut-model artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_nonanchor_cut_model_miner_20260705_current.json`
+
+This miner consumes:
+
+- `lorehold_topdeck_floor_trace_evidence_collector_20260705_current`;
+- `lorehold_topdeck_safe_cut_miner_20260705_current`;
+- `lorehold_trace_cut_evidence_expander_20260704_role_tag_repair`.
+
+Current result:
+
+- status:
+  `topdeck_nonanchor_cut_model_none_found_keep_607`;
+- primary target:
+  `Dragon's Rage Channeler`;
+- primary target model status:
+  `clean_prior_target_blocked_no_nonanchor_cut`;
+- primary target same-lane slot count: `6`;
+- seed-safe non-anchor cuts: `0`;
+- reviewable non-anchor gaps: `0`;
+- clean-prior blocked targets: `1`;
+- microbenchmark-runnable rows: `0`;
+- candidate deck materialization allowed now: `false`;
+- forced access allowed now: `false`;
+- structure matrix allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- promotion allowed now: `false`;
+- recommended next action:
+  `collect_new_cut_evidence_or_define_new_shell_contract_before_execution`.
+
+Primary target blocked slots for `Dragon's Rage Channeler`:
+
+- `Call Forth the Tempest`: `spell_velocity`, blocked by miracle-core and
+  structural-dependency evidence;
+- `Everything Comes to Dust`: `spell_velocity`, blocked by miracle-core and
+  structural-dependency evidence;
+- `Hexing Squelcher`: `contextual`, blocked by prior-reject and protected-cut
+  evidence;
+- `Blasphemous Act`, `Farewell`, and `Starfall Invocation`: `spell_velocity`,
+  blocked by miracle-core and/or measured high exposure.
+
+Operational lesson:
+
+- `Dragon's Rage Channeler` remains the cleanest topdeck target by prior-result
+  history, but there is still no legal nonanchor same-lane cut for it in the
+  current `607` evidence.
+- The current one-for-one topdeck path is blocked until new cut evidence exists
+  or a separate shell contract is declared. This is not permission to run
+  forced access or battle.
+- Deck `607` remains untouched and protected.
