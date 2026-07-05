@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-07-05T02:14:36Z",
+  "artifact_type": "lorehold_entreat_x_token_runtime_preflight",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "deck_607_mutated": false,
+  "source_reports": {
+    "brain_entreat_haze_contract": "docs/hermes-analysis/master_optimizer_reports/lorehold_brain_entreat_haze_runtime_contract_20260705_current.json"
+  },
+  "source_files": {
+    "runtime": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+    "focused_test": "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_exact_scope_runtime.py"
+  },
+  "status": "entreat_x_token_runtime_primitive_ready_rule_still_blocked_keep_607",
+  "summary": {
+    "current_baseline": "deck_607",
+    "runtime_primitive_ready": true,
+    "entreat_active_rule_count": 0,
+    "battle_ready_now_count": 0,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "recommended_next_action": "draft_reviewed_entreat_card_rule_package_without_apply_then_gate"
+  },
+  "prior_contract_status": "runtime_contracts_drafted_no_battle_ready_keep_607",
+  "prior_contract_best_first": "Entreat the Angels",
+  "runtime_checks": {
+    "x_value_helper": true,
+    "token_count_uses_x_value": true,
+    "token_count_per_x_guard": true,
+    "tokens_created_replay_source": true,
+    "tokens_created_replay_x_value": true
+  },
+  "test_checks": {
+    "focused_test_exists": true,
+    "entreat_fixture": true,
+    "x_value_fixture": true,
+    "angel_token_model": true,
+    "replay_assertion": true
+  },
+  "entreat_active_rules": [],
+  "decision": {
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "promotion_allowed": false,
+    "reason": "The generic X token runtime primitive is now present and covered by a focused Entreat-style fixture, but Entreat still has no reviewed active card rule and has not passed a natural battle gate against protected deck 607."
+  }
+}

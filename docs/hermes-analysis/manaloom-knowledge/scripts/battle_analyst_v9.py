@@ -36630,7 +36630,22 @@ def resolve_hazels_brewmaster_attack_triggers(player, attackers, opponents, turn
     return resolved
 
 
+def x_value_from_effect_context(effect_data, default=0):
+    if not isinstance(effect_data, dict):
+        return int(default or 0)
+    context = {}
+    context.update(effect_data.get("_cast_context") or {})
+    context.update(effect_data.get("_resolution_context") or {})
+    try:
+        return max(0, int(float(context.get("x_value") or effect_data.get("x_value") or default or 0)))
+    except Exception:
+        return int(default or 0)
+
+
 def token_count_for_effect(player, effect_data, default=5, opponents=None):
+    if isinstance(effect_data, dict) and str(effect_data.get("token_count_source") or "").lower() == "x_value":
+        per_x = int(effect_data.get("token_count_per_x") or 1)
+        return x_value_from_effect_context(effect_data) * max(0, per_x)
     per_opponent = (effect_data or {}).get("token_count_per_opponent")
     if per_opponent not in (None, "", False):
         live_opponents = [
@@ -53424,6 +53439,12 @@ def apply_effect_immediate(
                 token_toughness=effect_data.get("token_toughness", effect_data.get("token_power", 2)),
                 token_subtype=effect_data.get("token_subtype"),
                 token_colors=effect_data.get("token_colors") or [],
+                token_count_source=effect_data.get("token_count_source"),
+                x_value=(
+                    x_value_from_effect_context(effect_data)
+                    if str(effect_data.get("token_count_source") or "").lower() == "x_value"
+                    else None
+                ),
                 token_count_per_opponent=effect_data.get("token_count_per_opponent"),
                 token_flying=bool(effect_data.get("token_flying") or effect_data.get("flying")),
                 token_haste=bool(effect_data.get("token_haste") or effect_data.get("haste")),

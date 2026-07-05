@@ -3242,6 +3242,60 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertIn("trample", token.get("keywords", []))
         self.assertTrue(self.battle.card_has_keyword(token, "trample"))
 
+    def test_x_create_creature_tokens_spell_uses_cast_context_x_value(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_x_create_creature_tokens_spell_v1",
+            "ability_kind": "one_shot",
+            "token_count_source": "x_value",
+            "token_name": "Angel Token",
+            "token_subtype": "Angel",
+            "token_power": 4,
+            "token_toughness": 4,
+            "token_flying": True,
+            "token_colors": ["W"],
+            "_cast_context": {"x_value": 3},
+            "_rule_logical_key": "battle_rule_v1:fixture_entreat_x_tokens",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Entreat the Angels",
+                "type_line": "Sorcery",
+                "oracle_text": "Create X 4/4 white Angel creature tokens with flying.",
+            },
+            turn=4,
+            rng=random.Random(55),
+            effect_data_override=effect,
+        )
+
+        tokens = [card for card in active.battlefield if card.get("name") == "Angel Token"]
+        self.assertEqual(len(tokens), 3)
+        self.assertTrue(all(token.get("power") == 4 and token.get("toughness") == 4 for token in tokens))
+        self.assertTrue(all(token.get("type_line") == "Creature Token — Angel" for token in tokens))
+        self.assertTrue(all(token.get("colors") == ["W"] for token in tokens))
+        self.assertTrue(all(token.get("flying") for token in tokens))
+        self.assertTrue(all("flying" in token.get("keywords", []) for token in tokens))
+        self.assertTrue(
+            any(
+                event == "tokens_created"
+                and data.get("card") == "Entreat the Angels"
+                and data.get("tokens_requested") == 3
+                and data.get("tokens_created") == 3
+                and data.get("token_count_source") == "x_value"
+                and data.get("x_value") == 3
+                and data.get("token_name") == "Angel Token"
+                and data.get("token_flying") is True
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_entreat_x_tokens"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_create_tokens_preserves_token_model(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

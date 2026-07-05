@@ -659,3 +659,41 @@ Current conclusion remains unchanged: protected deck `607` is still the
 Lorehold champion. The next valid learning step is
 `prepare_entreat_the_angels_runtime_contract_before_battle`; this is still not
 a natural battle gate or deck promotion.
+
+## Entreat X-Token Runtime Primitive - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_entreat_x_token_runtime_preflight_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_entreat_x_token_runtime_preflight_20260705_current.json`
+
+It validates the generic runtime foundation needed by `Entreat the Angels`
+before any card-rule apply or natural battle gate. The runtime now supports
+`token_count_source = x_value`, reads X from the cast/resolution context, and
+emits replay evidence for the requested X token count.
+
+Current result:
+
+- status:
+  `entreat_x_token_runtime_primitive_ready_rule_still_blocked_keep_607`;
+- runtime primitive ready: `true`;
+- focused runtime test present: `true`;
+- active ManaLoom rule rows for `Entreat the Angels`: `0`;
+- battle-ready cards now: `0`;
+- natural battle allowed now: `false`;
+- promotion allowed: `false`;
+- source DB mutated: `false`;
+- protected deck `607` mutated: `false`.
+
+Test evidence:
+
+- `python3 -m pytest -q docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_entreat_x_token_runtime_preflight.py`
+  -> `2 passed`;
+- `python3 -m pytest -q docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_exact_scope_runtime.py -k 'x_create_creature_tokens or x_damage_uses_cast_context'`
+  -> `2 passed, 265 deselected`.
+
+Runtime conclusion: ManaLoom can now model an Entreat-style X spell that
+creates X 4/4 white Angel creature tokens with flying, but this is still only a
+generic primitive plus fixture. The next valid learning step is
+`draft_reviewed_entreat_card_rule_package_without_apply_then_gate`; no natural
+battle, cut, shell promotion, or 607 mutation is justified yet.
