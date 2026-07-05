@@ -1471,3 +1471,74 @@ Operational lesson:
   before any natural battle gate.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## Guttersnipe + Storm-Kiln Hypothesis Contract - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_guttersnipe_storm_kiln_hypothesis_contract_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_guttersnipe_storm_kiln_hypothesis_contract_20260705_current_relearn.json`
+
+This contract formalizes the best engine-preserving pressure/conversion route
+from the router: `Guttersnipe + Storm-Kiln Artist`.
+
+Current result:
+
+- decision status:
+  `hypothesis_contract_written_blocked_no_named_safe_cuts`;
+- target route:
+  `guttersnipe_storm_kiln_engine_preserving_pair`;
+- target adds:
+  `Guttersnipe`, `Storm-Kiln Artist`;
+- required cuts: `2`;
+- available named seed-safe cuts: `0`;
+- cut shortage: `2`;
+- hard-blocked cut slots: `92`;
+- same-lane-only cut slots: `2`;
+- closing-window comparisons consumed: `13`;
+- average 607 turn advantage in those comparisons: `10.15`;
+- miracle trace failure flags: `7`;
+- package status:
+  `blocked_no_cut_or_hypothesis_capacity`;
+- ready deck changes: `0`;
+- promotion allowed now: `false`;
+- natural battle gate allowed now: `false`;
+- structure matrix allowed now: `false`;
+- recommended next action:
+  `mine_or_create_cut_evidence_for_two_named_same_lane_nonanchor_slots`.
+
+Direct event requirements for any future test:
+
+- `Guttersnipe` must show direct instant/sorcery-triggered opponent damage in a
+  candidate win or protected equal-gate game.
+- `Storm-Kiln Artist` must show `trigger_resolved` and `treasure_created`
+  events that connect to spell-chain or survival value.
+- A win carried only by existing 607 topdeck/miracle cards is not proof for the
+  new cards.
+
+Engine floor requirements:
+
+- same-seed, same-opponent matrix against protected `607`;
+- no Winota fast-pressure regression;
+- no miracle-cast or topdeck-manipulation regression;
+- no Lorehold spell-cast or upkeep-rummage regression;
+- early mana floor and protection shell preserved;
+- Approach conversion preserved or replaced by an explicitly proven win path.
+
+Cut conclusion:
+
+- There are no named seed-safe cuts for this pair now.
+- `Creative Technique` and `Bender's Waterskin` remain same-lane-only/not
+  seed-safe, not free cuts.
+- Commander, mana base, early mana, protection, topdeck/miracle setup,
+  miracle/finisher core, high-exposure cards, prior rejected cuts, structural
+  dependencies, and protected anchors remain hard-stop cut classes.
+
+Operational lesson:
+
+- The pair is the right next hypothesis to learn from, but the deck is not
+  legally actionable until two named non-anchor cuts exist.
+- No natural battle should be run for this package yet, because a battle without
+  legal cuts would only test a fantasy list.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.

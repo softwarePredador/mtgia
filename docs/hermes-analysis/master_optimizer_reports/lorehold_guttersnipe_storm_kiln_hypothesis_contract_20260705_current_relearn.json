@@ -1,0 +1,479 @@
+{
+  "artifact_type": "lorehold_guttersnipe_storm_kiln_hypothesis_contract",
+  "candidate_package_contract": {
+    "adds": [
+      "Guttersnipe",
+      "Storm-Kiln Artist"
+    ],
+    "available_named_seed_safe_cuts": [],
+    "battle_gate_requirements": [
+      "structure_matrix_passes_before_battle",
+      "copied_db_only_until_promotion_gate_passes",
+      "same_seed_same_opponents_against_current_607",
+      "direct_card_use_evidence_for_each_added_card",
+      "Winota fast-pressure slice must tie or improve"
+    ],
+    "engine_floor_requirements": [
+      "same_seed_same_opponent_matrix_against_protected_deck_607",
+      "no_regression_in_winota_fast_pressure_slice",
+      "no_regression_in_miracle_cast_and_topdeck_manipulation_counts",
+      "no_regression_in_lorehold_spell_cast_and_upkeep_rummage_counts",
+      "preserve_early_mana_floor_and_protection_shell",
+      "preserve_approach_conversion_or_explain_replacement_win_path"
+    ],
+    "event_requirements": [
+      {
+        "event_family": "Guttersnipe trigger/damage",
+        "measurement": "At least one candidate win or protected equal-gate game must show Guttersnipe converting instant/sorcery casts into direct opponent damage.",
+        "required": true,
+        "requirement_key": "guttersnipe_direct_spell_damage"
+      },
+      {
+        "event_family": "trigger_resolved:Storm-Kiln Artist and treasure_created:Storm-Kiln Artist",
+        "measurement": "Storm-Kiln must create Treasures from instant/sorcery casts or copies, and those Treasures must connect to spell-chain or survival value.",
+        "required": true,
+        "requirement_key": "storm_kiln_treasure_conversion"
+      },
+      {
+        "event_family": "card-use causality",
+        "measurement": "A win carried only by existing 607 topdeck/miracle cards is not proof for Guttersnipe or Storm-Kiln.",
+        "required": true,
+        "requirement_key": "no_proxy_win_without_new_cards"
+      }
+    ],
+    "hard_stop_cut_classes": [
+      "commander",
+      "mana_base",
+      "early_mana",
+      "protection",
+      "topdeck_miracle_setup",
+      "miracle_or_finisher_core",
+      "measured_high_cut_exposure",
+      "prior_rejected_cut",
+      "structural_dependency",
+      "protected_cut"
+    ],
+    "lane": "engine_preserving_pressure_conversion_pair",
+    "package_key": "pressure_2_card_guttersnipe_storm_kiln_artist",
+    "required_cut_count": 2,
+    "route_key": "guttersnipe_storm_kiln_engine_preserving_pair",
+    "same_lane_only_slots_not_seed_safe": [
+      {
+        "blockers": [
+          "cut_is_early_mana_floor_support",
+          "cut_not_flex_decision",
+          "cut_safety_not_seed_safe",
+          "early_mana_floor_support",
+          "manual_status_not_seed_safe",
+          "measured_high_cut_exposure",
+          "prior_rejected_cut",
+          "protected_cut",
+          "same_lane_only_requires_concrete_same_lane_add"
+        ],
+        "card_name": "Bender's Waterskin",
+        "direct_event_count": 216,
+        "lane": "early_mana",
+        "manual_status": "same_lane_only",
+        "status": "same_lane_only_not_seed_safe",
+        "unique_exposure_count": 268
+      },
+      {
+        "blockers": [
+          "cut_is_miracle_core_big_spell",
+          "cut_safety_not_seed_safe",
+          "manual_status_not_seed_safe",
+          "miracle_or_finisher_core",
+          "prior_rejected_cut",
+          "protected_cut",
+          "same_lane_only_requires_concrete_same_lane_add"
+        ],
+        "card_name": "Creative Technique",
+        "direct_event_count": 54,
+        "lane": "big_spell_value",
+        "manual_status": "same_lane_only",
+        "status": "same_lane_only_not_seed_safe",
+        "unique_exposure_count": 58
+      }
+    ],
+    "top_near_miss_cut_cards": [
+      "Creative Technique",
+      "Bender's Waterskin",
+      "Generous Gift",
+      "Improvisation Capstone",
+      "Esper Sentinel",
+      "Path to Exile",
+      "Swords to Plowshares",
+      "Stroke of Midnight",
+      "Winds of Abandon",
+      "Monument to Endurance",
+      "Sensei's Divining Top",
+      "Smothering Tithe"
+    ]
+  },
+  "current_baseline": "deck_607",
+  "cut_evidence": {
+    "combined_blocker_counts": {
+      "commander_never_cut": 2,
+      "cut_is_early_mana_floor_support": 28,
+      "cut_is_miracle_core_big_spell": 50,
+      "cut_is_protection_shell": 28,
+      "cut_not_flex_decision": 168,
+      "cut_safety_not_seed_safe": 22,
+      "early_mana_floor_support": 36,
+      "mana_base_never_cut": 56,
+      "manual_review_cut_safety_block": 16,
+      "manual_status_not_seed_safe": 188,
+      "measured_high_cut_exposure": 68,
+      "miracle_or_finisher_core": 48,
+      "missing_cut_safety_row": 154,
+      "never_cut_lane": 58,
+      "never_cut_or_mana_base": 58,
+      "prior_rejected_cut": 74,
+      "prior_rejected_cut_slot": 48,
+      "prior_rejected_signature": 8,
+      "protected_cut": 44,
+      "protection_shell": 28,
+      "same_lane_only_requires_concrete_same_lane_add": 4,
+      "structural_dependency": 48
+    },
+    "named_seed_safe_cuts": [],
+    "same_lane_only_slots_not_seed_safe": [
+      {
+        "blockers": [
+          "cut_is_early_mana_floor_support",
+          "cut_not_flex_decision",
+          "cut_safety_not_seed_safe",
+          "early_mana_floor_support",
+          "manual_status_not_seed_safe",
+          "measured_high_cut_exposure",
+          "prior_rejected_cut",
+          "protected_cut",
+          "same_lane_only_requires_concrete_same_lane_add"
+        ],
+        "card_name": "Bender's Waterskin",
+        "direct_event_count": 216,
+        "lane": "early_mana",
+        "manual_status": "same_lane_only",
+        "status": "same_lane_only_not_seed_safe",
+        "unique_exposure_count": 268
+      },
+      {
+        "blockers": [
+          "cut_is_miracle_core_big_spell",
+          "cut_safety_not_seed_safe",
+          "manual_status_not_seed_safe",
+          "miracle_or_finisher_core",
+          "prior_rejected_cut",
+          "protected_cut",
+          "same_lane_only_requires_concrete_same_lane_add"
+        ],
+        "card_name": "Creative Technique",
+        "direct_event_count": 54,
+        "lane": "big_spell_value",
+        "manual_status": "same_lane_only",
+        "status": "same_lane_only_not_seed_safe",
+        "unique_exposure_count": 58
+      }
+    ],
+    "seed_safe_summary": {
+      "blocked_count": 94,
+      "blocker_counts": {
+        "commander_never_cut": 1,
+        "cut_is_early_mana_floor_support": 14,
+        "cut_is_miracle_core_big_spell": 25,
+        "cut_is_protection_shell": 14,
+        "cut_not_flex_decision": 84,
+        "cut_safety_not_seed_safe": 11,
+        "early_mana_floor_support": 18,
+        "mana_base_never_cut": 28,
+        "manual_review_cut_safety_block": 8,
+        "manual_status_not_seed_safe": 94,
+        "measured_high_cut_exposure": 34,
+        "miracle_or_finisher_core": 24,
+        "missing_cut_safety_row": 77,
+        "never_cut_lane": 29,
+        "never_cut_or_mana_base": 29,
+        "prior_rejected_cut": 37,
+        "prior_rejected_cut_slot": 24,
+        "prior_rejected_signature": 4,
+        "protected_cut": 22,
+        "protection_shell": 14,
+        "same_lane_only_requires_concrete_same_lane_add": 2,
+        "structural_dependency": 24
+      },
+      "deck_card_count": 94,
+      "lane_counts": {
+        "big_spell_value": 2,
+        "commander": 1,
+        "contextual": 1,
+        "draw": 6,
+        "early_mana": 18,
+        "graveyard_recursion": 1,
+        "hand_filter": 1,
+        "mana_base": 28,
+        "misc": 2,
+        "protection": 13,
+        "removal": 10,
+        "spell_velocity": 5,
+        "wincon": 6
+      },
+      "ready_cut_cards": [],
+      "recommended_next_action": "expand_cut_safety_model_or_multi_card_shell_before_gate",
+      "same_lane_only_count": 2,
+      "same_lane_only_cut_cards": [
+        "Creative Technique",
+        "Bender's Waterskin"
+      ],
+      "seed_safe_cut_ready_count": 0,
+      "status_counts": {
+        "blocked": 92,
+        "same_lane_only_not_seed_safe": 2
+      }
+    },
+    "trace_cut_summary": {
+      "actionability_counts": {
+        "hard_blocked": 92,
+        "same_lane_hard_blocked": 2
+      },
+      "blocker_counts": {
+        "commander_never_cut": 1,
+        "cut_is_early_mana_floor_support": 14,
+        "cut_is_miracle_core_big_spell": 25,
+        "cut_is_protection_shell": 14,
+        "cut_not_flex_decision": 84,
+        "cut_safety_not_seed_safe": 11,
+        "early_mana_floor_support": 18,
+        "mana_base_never_cut": 28,
+        "manual_review_cut_safety_block": 8,
+        "manual_status_not_seed_safe": 94,
+        "measured_high_cut_exposure": 34,
+        "miracle_or_finisher_core": 24,
+        "missing_cut_safety_row": 77,
+        "never_cut_lane": 29,
+        "never_cut_or_mana_base": 29,
+        "prior_rejected_cut": 37,
+        "prior_rejected_cut_slot": 24,
+        "prior_rejected_signature": 4,
+        "protected_cut": 22,
+        "protection_shell": 14,
+        "same_lane_only_requires_concrete_same_lane_add": 2,
+        "structural_dependency": 24
+      },
+      "champion_status": "current_champion_snapshot",
+      "cut_slot_count": 94,
+      "hard_blocked_count": 92,
+      "lane_counts": {
+        "big_spell_value": 2,
+        "commander": 1,
+        "contextual": 1,
+        "draw": 6,
+        "early_mana": 18,
+        "graveyard_recursion": 1,
+        "hand_filter": 1,
+        "mana_base": 28,
+        "misc": 2,
+        "protection": 13,
+        "removal": 10,
+        "spell_velocity": 5,
+        "wincon": 6
+      },
+      "micro_package_ready_count": 0,
+      "recommended_next_action": "no_cut_slot_to_expand_under_current_607_contract",
+      "reviewable_evidence_gap_count": 0,
+      "same_lane_hard_blocked_count": 2,
+      "seed_safe_ready_count": 0,
+      "top_near_miss_cut_cards": [
+        "Creative Technique",
+        "Bender's Waterskin",
+        "Generous Gift",
+        "Improvisation Capstone",
+        "Esper Sentinel",
+        "Path to Exile",
+        "Swords to Plowshares",
+        "Stroke of Midnight",
+        "Winds of Abandon",
+        "Monument to Endurance",
+        "Sensei's Divining Top",
+        "Smothering Tithe"
+      ],
+      "top_reviewable_cut_cards": [],
+      "top_same_lane_cut_cards": [
+        "Creative Technique",
+        "Bender's Waterskin"
+      ]
+    }
+  },
+  "decision": {
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_run_natural_battle_until_two_named_safe_cuts_exist",
+      "mine low-exposure non-anchor cut evidence before any package build",
+      "require direct Guttersnipe damage and Storm-Kiln Treasure events in future tests",
+      "preserve topdeck, miracle, mana, protection, and Winota fast-pressure floors"
+    ],
+    "promotion_allowed": false,
+    "reason": "Guttersnipe plus Storm-Kiln is the best next learning route, but it requires two named seed-safe cuts and the current evidence has zero."
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T04:07:42Z",
+  "package_router_row": {
+    "adds": [
+      "Guttersnipe",
+      "Storm-Kiln Artist"
+    ],
+    "available_diagnostic_cut_count": 0,
+    "available_gate_ready_cut_count": 0,
+    "blockers": [
+      "blocked_prior_reject",
+      "insufficient_diagnostic_cut_capacity",
+      "insufficient_hypothesis_natural_gate_capacity",
+      "insufficient_seed_safe_cut_capacity",
+      "missing_current_hypothesis_queue",
+      "no_card_level_natural_gate_ready"
+    ],
+    "card_rows": [
+      {
+        "blockers": [
+          "missing_current_hypothesis_queue",
+          "no_card_level_natural_gate_ready"
+        ],
+        "card_name": "Guttersnipe",
+        "cmc": 3.0,
+        "hypothesis_queue_status": "missing_from_current_hypothesis_queue",
+        "natural_gate_ready": false,
+        "preflight_status": "pass",
+        "readiness_status": "identity_runtime_cut_model_required_before_gate",
+        "role": "noncombat_spell_pressure_payoff",
+        "score": 76
+      },
+      {
+        "blockers": [
+          "blocked_prior_reject",
+          "no_card_level_natural_gate_ready"
+        ],
+        "card_name": "Storm-Kiln Artist",
+        "cmc": 4.0,
+        "hypothesis_queue_status": "present",
+        "natural_gate_ready": false,
+        "preflight_status": "pass",
+        "readiness_status": "blocked_prior_reject",
+        "role": "spell_payoff_mana_extension",
+        "score": 24
+      }
+    ],
+    "contract_natural_gate_ready_count": 0,
+    "diagnostic_only_available": false,
+    "gate_ready": false,
+    "package_key": "pressure_2_card_guttersnipe_storm_kiln_artist",
+    "promotion_allowed": false,
+    "required_cut_count": 2,
+    "score": 90,
+    "status": "blocked_no_cut_or_hypothesis_capacity"
+  },
+  "postgres_writes": false,
+  "route_evidence": {
+    "adds": [
+      "Guttersnipe",
+      "Storm-Kiln Artist"
+    ],
+    "available_diagnostic_cut_count": 0,
+    "available_gate_ready_cut_count": 0,
+    "blockers": [
+      "blocked_prior_reject",
+      "fast_pressure_slice_not_protected",
+      "insufficient_diagnostic_cut_capacity",
+      "insufficient_hypothesis_natural_gate_capacity",
+      "insufficient_seed_safe_cut_capacity",
+      "missing_current_hypothesis_queue",
+      "no_card_level_natural_gate_ready",
+      "no_current_positive_guttersnipe_trace",
+      "pressure_causality_unproven",
+      "pressure_conversion_unproven",
+      "storm_kiln_arcane_signet_swap_rejected"
+    ],
+    "card_evidence": [
+      {
+        "card_blockers": [
+          "missing_current_hypothesis_queue",
+          "no_card_level_natural_gate_ready"
+        ],
+        "card_name": "Guttersnipe",
+        "hypothesis_queue_status": "missing_from_current_hypothesis_queue",
+        "natural_gate_ready": false,
+        "preflight_status": "pass",
+        "readiness_status": "identity_runtime_cut_model_required_before_gate",
+        "role": "noncombat_spell_pressure_payoff",
+        "value_test": "Turns spell chaining into direct table pressure, but must be measured against protection and closing-window timing."
+      },
+      {
+        "card_blockers": [
+          "blocked_prior_reject",
+          "no_card_level_natural_gate_ready"
+        ],
+        "card_name": "Storm-Kiln Artist",
+        "hypothesis_queue_status": "present",
+        "natural_gate_ready": false,
+        "preflight_status": "pass",
+        "readiness_status": "blocked_prior_reject",
+        "role": "spell_payoff_mana_extension",
+        "value_test": "Extends spell-chain turns through treasure production; prior internal evidence forbids treating it as a generic Arcane Signet replacement."
+      }
+    ],
+    "contract_natural_gate_ready_count": 0,
+    "diagnostic_only_available": false,
+    "external_value": "Combines noncombat damage with mana conversion so spell volume can become both pressure and follow-up mana without returning to broad token-pressure shells.",
+    "gate_ready": false,
+    "lane": "engine_preserving_pressure_conversion_pair",
+    "learning_priority": 92,
+    "package_key": "pressure_2_card_guttersnipe_storm_kiln_artist",
+    "package_status": "blocked_no_cut_or_hypothesis_capacity",
+    "promotion_allowed": false,
+    "recommended_next_action": "write_hypothesis_contract_and_find_two_seed_safe_same_lane_cuts_before_any_battle",
+    "required_cut_count": 2,
+    "route_key": "guttersnipe_storm_kiln_engine_preserving_pair",
+    "status": "best_next_learning_route_contract_required_no_deck_action",
+    "storm_runtime_signal": {
+      "arcane_signet_swap_rejected": true,
+      "decision_status": "rejected_for_deck_promotion_pressure_regression",
+      "has_real_positive_signal": true,
+      "treasure_events_documented": true,
+      "winota_regression_documented": true
+    }
+  },
+  "source_db_mutated": false,
+  "source_reports": {
+    "closing_trace": "docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_trace_miner_20260704_role_tag_repair.json",
+    "engine_router": "docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_pressure_conversion_router_20260705_current_relearn.json",
+    "miracle_trace": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_trace_failure_miner_20260704_current.json",
+    "package_router": "docs/hermes-analysis/master_optimizer_reports/lorehold_pressure_package_size_router_20260705_current_relearn.json",
+    "seed_safe_cut_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260704_role_tag_repair.json",
+    "trace_cut_evidence_expander": "docs/hermes-analysis/master_optimizer_reports/lorehold_trace_cut_evidence_expander_20260704_role_tag_repair.json"
+  },
+  "status": "hypothesis_contract_written_blocked_no_named_safe_cuts",
+  "summary": {
+    "available_named_seed_safe_cut_count": 0,
+    "avg_607_turn_advantage": 10.15,
+    "closing_window_comparison_count": 13,
+    "cut_shortage": 2,
+    "decision_status": "hypothesis_contract_written_blocked_no_named_safe_cuts",
+    "hard_blocked_count": 92,
+    "miracle_trace_failure_flag_count": 7,
+    "natural_battle_gate_allowed_now": false,
+    "package_status": "blocked_no_cut_or_hypothesis_capacity",
+    "promotion_allowed_now": false,
+    "ready_deck_change_count": 0,
+    "recommended_next_action": "mine_or_create_cut_evidence_for_two_named_same_lane_nonanchor_slots",
+    "required_cut_count": 2,
+    "router_route_status": "best_next_learning_route_contract_required_no_deck_action",
+    "same_lane_only_cut_count": 2,
+    "structure_matrix_allowed_now": false,
+    "target_adds": [
+      "Guttersnipe",
+      "Storm-Kiln Artist"
+    ],
+    "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair"
+  }
+}
