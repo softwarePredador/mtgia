@@ -1,0 +1,869 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg527_boost_all_filtered_new_server_20260705_200027",
+  "deploy_id": "PG527",
+  "expected_rules": [
+    {
+      "card_name": "Army of Allah",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38a0877b47351dea781b3e292168ba3f",
+      "min_rule_version": 2,
+      "normalized_name": "army of allah",
+      "oracle_hash": "1ef4be52d08f0475feaa7d6d6fe78134",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "attacking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "attacking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eyeblight Massacre",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b230476e11f26739ccb0bc67a312affe",
+      "min_rule_version": 2,
+      "normalized_name": "eyeblight massacre",
+      "oracle_hash": "cbff45a47c8a16ac2aa10e8c93c3195d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -2,
+        "target": "non_elf_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "exclude_subtypes": [
+              "Elf"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": -2,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Festergloom",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:352f141f48f3fcd4ceb24a2b92338d4f",
+      "min_rule_version": 2,
+      "normalized_name": "festergloom",
+      "oracle_hash": "960ea67732e18980852f95373228552e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "non_b_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "exclude_colors": [
+              "B"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hazardous Conditions",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0d1b0e2f966c8962b875ddef80c5a71d",
+      "min_rule_version": 2,
+      "normalized_name": "hazardous conditions",
+      "oracle_hash": "eed2ece1875a19627ed69dfd5181fce2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -2,
+        "target": "creatures_with_no_counters",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "no_counters": true
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": -2,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hold the Line",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65f9a4c354c56642a5c813fab2ecbd7b",
+      "min_rule_version": 2,
+      "normalized_name": "hold the line",
+      "oracle_hash": "770d2d7e18416184090fb01d854f62ec",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 7,
+        "target": "blocking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "blocking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 7,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Holy Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0310fa36bc90e4f8d3a50f3dd18733dc",
+      "min_rule_version": 2,
+      "normalized_name": "holy light",
+      "oracle_hash": "eb426784c3f6417501c84e5b540533f5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "non_w_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "exclude_colors": [
+              "W"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Morale",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b47fdc764d84003fc74f6177d0f0df1e",
+      "min_rule_version": 2,
+      "normalized_name": "morale",
+      "oracle_hash": "1830ec642002de376ed69e4f6766b937",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 1,
+        "target": "attacking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "attacking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 1,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nocturnal Raid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6e22f29986bf8915b94b6e3abe825b71",
+      "min_rule_version": 2,
+      "normalized_name": "nocturnal raid",
+      "oracle_hash": "4136576b251ae9ea8a1a3c90a0c164c4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "b_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "colors": [
+              "B"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rally",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b86e3f6a50e8449a806e54ba6a3e7207",
+      "min_rule_version": 2,
+      "normalized_name": "rally",
+      "oracle_hash": "f83272e913174713d72858ca9f6917ad",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 1,
+        "target": "blocking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "blocking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 1,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stench of Decay",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:383e3cc52fdccddc76a04ea09a0cc79b",
+      "min_rule_version": 2,
+      "normalized_name": "stench of decay",
+      "oracle_hash": "a5e5e5bbe487403fa3c1d872563bd777",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "non_artifact_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "exclude_card_types": [
+              "artifact"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Trumpet Blast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38a0877b47351dea781b3e292168ba3f",
+      "min_rule_version": 2,
+      "normalized_name": "trumpet blast",
+      "oracle_hash": "1ef4be52d08f0475feaa7d6d6fe78134",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "attacking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "attacking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Valorous Charge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6f9f3e1fd5c01d164db507c86d9011fc",
+      "min_rule_version": 2,
+      "normalized_name": "valorous charge",
+      "oracle_hash": "f3a96246a7f3f9092d30f081d7f0fa90",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "w_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "colors": [
+              "W"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_boost_filtered_creatures_until_eot_spell": 12
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg527_boost_all_filtered_new_server_package_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg527_boost_all_filtered_new_server_package_manifest.json",
+    "package": "../../master_optimizer_reports/pg527_boost_all_filtered_new_server_package_package.md",
+    "postcheck": "../../master_optimizer_reports/pg527_boost_all_filtered_new_server_package_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg527_boost_all_filtered_new_server_package_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg527_boost_all_filtered_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-05T20:00:27+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Army of Allah"
+      },
+      "card_name": "Army of Allah",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38a0877b47351dea781b3e292168ba3f",
+      "normalized_name": "army of allah",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "attacking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "attacking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Eyeblight Massacre"
+      },
+      "card_name": "Eyeblight Massacre",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b230476e11f26739ccb0bc67a312affe",
+      "normalized_name": "eyeblight massacre",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -2,
+        "target": "non_elf_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "exclude_subtypes": [
+              "Elf"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": -2,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Festergloom"
+      },
+      "card_name": "Festergloom",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:352f141f48f3fcd4ceb24a2b92338d4f",
+      "normalized_name": "festergloom",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "non_b_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "exclude_colors": [
+              "B"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hazardous Conditions"
+      },
+      "card_name": "Hazardous Conditions",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0d1b0e2f966c8962b875ddef80c5a71d",
+      "normalized_name": "hazardous conditions",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -2,
+        "target": "creatures_with_no_counters",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "no_counters": true
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": -2,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Hold the Line"
+      },
+      "card_name": "Hold the Line",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65f9a4c354c56642a5c813fab2ecbd7b",
+      "normalized_name": "hold the line",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 7,
+        "target": "blocking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "blocking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 7,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Holy Light"
+      },
+      "card_name": "Holy Light",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0310fa36bc90e4f8d3a50f3dd18733dc",
+      "normalized_name": "holy light",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "non_w_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "exclude_colors": [
+              "W"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Morale"
+      },
+      "card_name": "Morale",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b47fdc764d84003fc74f6177d0f0df1e",
+      "normalized_name": "morale",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 1,
+        "target": "attacking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "attacking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 1,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Nocturnal Raid"
+      },
+      "card_name": "Nocturnal Raid",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6e22f29986bf8915b94b6e3abe825b71",
+      "normalized_name": "nocturnal raid",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "b_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "colors": [
+              "B"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Rally"
+      },
+      "card_name": "Rally",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b86e3f6a50e8449a806e54ba6a3e7207",
+      "normalized_name": "rally",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 1,
+        "target": "blocking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "blocking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 1,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Stench of Decay"
+      },
+      "card_name": "Stench of Decay",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:383e3cc52fdccddc76a04ea09a0cc79b",
+      "normalized_name": "stench of decay",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": -1,
+        "target": "non_artifact_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "exclude_card_types": [
+              "artifact"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Trumpet Blast"
+      },
+      "card_name": "Trumpet Blast",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38a0877b47351dea781b3e292168ba3f",
+      "normalized_name": "trumpet blast",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "attacking_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "combat_state": "attacking"
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Valorous Charge"
+      },
+      "card_name": "Valorous Charge",
+      "effect": "global_stat_modifier_until_eot",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6f9f3e1fd5c01d164db507c86d9011fc",
+      "normalized_name": "valorous charge",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+        "effect": "global_stat_modifier_until_eot",
+        "power_delta": 2,
+        "target": "w_creatures",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "creature_filter": {
+            "colors": [
+              "W"
+            ]
+          }
+        },
+        "target_controller": "all",
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostAllEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Army of Allah",
+    "Eyeblight Massacre",
+    "Festergloom",
+    "Hazardous Conditions",
+    "Hold the Line",
+    "Holy Light",
+    "Morale",
+    "Nocturnal Raid",
+    "Rally",
+    "Stench of Decay",
+    "Trumpet Blast",
+    "Valorous Charge"
+  ],
+  "selected_count": 12,
+  "slug": "boost_all_filtered_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Army of Allah",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38a0877b47351dea781b3e292168ba3f",
+      "min_rule_version": 2,
+      "normalized_name": "army of allah",
+      "oracle_hash": "1ef4be52d08f0475feaa7d6d6fe78134",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eyeblight Massacre",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b230476e11f26739ccb0bc67a312affe",
+      "min_rule_version": 2,
+      "normalized_name": "eyeblight massacre",
+      "oracle_hash": "cbff45a47c8a16ac2aa10e8c93c3195d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Festergloom",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:352f141f48f3fcd4ceb24a2b92338d4f",
+      "min_rule_version": 2,
+      "normalized_name": "festergloom",
+      "oracle_hash": "960ea67732e18980852f95373228552e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hazardous Conditions",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0d1b0e2f966c8962b875ddef80c5a71d",
+      "min_rule_version": 2,
+      "normalized_name": "hazardous conditions",
+      "oracle_hash": "eed2ece1875a19627ed69dfd5181fce2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hold the Line",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65f9a4c354c56642a5c813fab2ecbd7b",
+      "min_rule_version": 2,
+      "normalized_name": "hold the line",
+      "oracle_hash": "770d2d7e18416184090fb01d854f62ec",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Holy Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0310fa36bc90e4f8d3a50f3dd18733dc",
+      "min_rule_version": 2,
+      "normalized_name": "holy light",
+      "oracle_hash": "eb426784c3f6417501c84e5b540533f5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Morale",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b47fdc764d84003fc74f6177d0f0df1e",
+      "min_rule_version": 2,
+      "normalized_name": "morale",
+      "oracle_hash": "1830ec642002de376ed69e4f6766b937",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nocturnal Raid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6e22f29986bf8915b94b6e3abe825b71",
+      "min_rule_version": 2,
+      "normalized_name": "nocturnal raid",
+      "oracle_hash": "4136576b251ae9ea8a1a3c90a0c164c4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rally",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b86e3f6a50e8449a806e54ba6a3e7207",
+      "min_rule_version": 2,
+      "normalized_name": "rally",
+      "oracle_hash": "f83272e913174713d72858ca9f6917ad",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stench of Decay",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:383e3cc52fdccddc76a04ea09a0cc79b",
+      "min_rule_version": 2,
+      "normalized_name": "stench of decay",
+      "oracle_hash": "a5e5e5bbe487403fa3c1d872563bd777",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Trumpet Blast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:38a0877b47351dea781b3e292168ba3f",
+      "min_rule_version": 2,
+      "normalized_name": "trumpet blast",
+      "oracle_hash": "1ef4be52d08f0475feaa7d6d6fe78134",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Valorous Charge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6f9f3e1fd5c01d164db507c86d9011fc",
+      "min_rule_version": 2,
+      "normalized_name": "valorous charge",
+      "oracle_hash": "f3a96246a7f3f9092d30f081d7f0fa90",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

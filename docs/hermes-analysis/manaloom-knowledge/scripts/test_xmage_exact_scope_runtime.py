@@ -13140,6 +13140,104 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_filtered_global_stat_modifier_hits_only_attacking_creatures(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        attacking = {"name": "Attacking Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2, "attacking": True}
+        idle = {"name": "Idle Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        enemy_attacking = {
+            "name": "Enemy Attacker",
+            "type_line": "Creature - Goblin",
+            "power": 1,
+            "toughness": 1,
+            "attacking": True,
+        }
+        active.battlefield.extend([attacking, idle])
+        opponent.battlefield.append(enemy_attacking)
+        effect = {
+            "effect": "global_stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+            "target": "attacking_creatures",
+            "target_controller": "all",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "creature_filter": {"combat_state": "attacking"},
+            },
+            "creature_filter": {"combat_state": "attacking"},
+            "power_delta": 2,
+            "toughness_delta": 0,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Trumpet Blast", "type_line": "Instant"},
+            turn=16,
+            rng=random.Random(16),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(attacking["power"], 4)
+        self.assertEqual(idle["power"], 2)
+        self.assertEqual(enemy_attacking["power"], 3)
+        self.assertTrue(
+            any(
+                event == "global_stat_modifier_until_eot_resolved"
+                and data.get("affected_count") == 2
+                and data.get("creature_filter") == {"combat_state": "attacking"}
+                for event, data in self.events
+            )
+        )
+
+    def test_filtered_global_stat_modifier_skips_creatures_with_counters(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        clean = {"name": "Clean Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        modified = {
+            "name": "Counter Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+            "counters": {"+1/+1": 1},
+        }
+        active.battlefield.extend([clean, modified])
+        effect = {
+            "effect": "global_stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1",
+            "target": "creatures_with_no_counters",
+            "target_controller": "all",
+            "target_constraints": {
+                "card_types": ["creature"],
+                "creature_filter": {"no_counters": True},
+            },
+            "creature_filter": {"no_counters": True},
+            "power_delta": -2,
+            "toughness_delta": -2,
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [],
+            {"name": "Fixture Hazardous Conditions", "type_line": "Sorcery"},
+            turn=17,
+            rng=random.Random(17),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.battlefield, [modified])
+        self.assertEqual(active.graveyard[0]["name"], "Clean Bear")
+        self.assertEqual(modified["power"], 2)
+        self.assertEqual(modified["toughness"], 2)
+        self.assertTrue(
+            any(
+                event == "global_stat_modifier_until_eot_resolved"
+                and data.get("affected_count") == 1
+                and data.get("moved_to_graveyard") == [{"target_player": "Active", "target": "Clean Bear"}]
+                for event, data in self.events
+            )
+        )
+
     def test_static_combat_keyword_creature_effect_enriches_permanent_keywords(self) -> None:
         card = {
             "name": "Fixture Keyword Creature",

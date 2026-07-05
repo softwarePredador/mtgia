@@ -14008,6 +14008,79 @@ boosts, dynamic `X` boosts, additional-cost boosts, color/subtype/nonartifact
 filters, attacking/blocking-only filters, static lord effects, or
 `BoostAllEffect` permanents.
 
+## PG527 BoostAll Filtered Creature Modifier Checkpoint
+
+As of 2026-07-05, PG527 is applied and synced against the new server target.
+It extends the PG526 runtime path to exact filtered one-shot `BoostAllEffect`
+spells where Oracle and local XMage agree on a fixed power/toughness delta and
+a supported creature filter.
+
+Promoted cards:
+
+- `Army of Allah`
+- `Eyeblight Massacre`
+- `Festergloom`
+- `Hazardous Conditions`
+- `Hold the Line`
+- `Holy Light`
+- `Morale`
+- `Nocturnal Raid`
+- `Rally`
+- `Stench of Decay`
+- `Trumpet Blast`
+- `Valorous Charge`
+
+Runtime scope:
+
+- `xmage_fixed_boost_filtered_creatures_until_eot_spell_v1`
+
+Supported filters:
+
+- attacking creatures;
+- blocking creatures;
+- creatures with no counters on them;
+- exact included colors for black/white creatures;
+- exact excluded colors for nonblack/nonwhite creatures;
+- exact excluded subtype for non-Elf creatures;
+- exact excluded card type for nonartifact creatures.
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg527_boost_all_filtered_new_server_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg527_boost_all_filtered_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg527_boost_all_filtered_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/battle_card_rules_sqlite_from_pg_pg527_boost_all_filtered_new_server.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/battle_package_end_to_end_validation_20260705_pg527_boost_all_filtered_new_server.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg527_boost_all_filtered_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg527_boost_all_filtered_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg527_boost_all_filtered_new_server.md`
+
+Post-sync queue evidence:
+
+- `battle_and_oracle_ready=5017`
+- `battle_family_mapper_required=28856`
+- `target_identity_count=25933`
+- `xmage_authoritative_source_count=25619`
+- `xmage_missing_source_exception_count=314`
+- `xmage_authoritative_parser_gap_count=0`
+- `xmage_authoritative_adapter_required_count=25619`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+
+Residual boundary: PG527 only authorizes the listed exact fixed
+filtered-creature `BoostAllEffect` one-shot spell filters. It does not
+authorize modal boosts, dynamic `X` boosts, additional-cost boosts, other
+colors/subtypes/card types, modified-creature or counter-type-specific filters,
+static lord effects, or `BoostAllEffect` permanents.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

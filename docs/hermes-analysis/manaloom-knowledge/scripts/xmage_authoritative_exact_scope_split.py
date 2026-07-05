@@ -222,6 +222,7 @@ DYNAMIC_GRAVEYARD_COUNT_BOOST_TARGET_SCOPE = (
 DYNAMIC_COUNT_BOOST_TARGET_SCOPE = "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1"
 BOOST_CONTROLLED_SPELL_SCOPE = "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1"
 BOOST_ALL_SPELL_SCOPE = "xmage_fixed_boost_all_or_opponents_creatures_until_eot_spell_v1"
+BOOST_ALL_FILTERED_SPELL_SCOPE = "xmage_fixed_boost_filtered_creatures_until_eot_spell_v1"
 BOOST_KEYWORD_SCOPE = "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
 ATTACK_TRIGGER_TARGET_KEYWORD_SCOPE = (
     "xmage_creature_attack_grant_keyword_target_creature_until_eot_v1"
@@ -5853,7 +5854,61 @@ def fixed_boost_controlled_from_source(source: str) -> tuple[int, int] | str | N
     return int(power_raw), int(toughness_raw)
 
 
-def fixed_boost_all_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | str | None:
+BOOST_ALL_FILTER_COLOR_WORDS = {
+    "white": "W",
+    "blue": "U",
+    "black": "B",
+    "red": "R",
+    "green": "G",
+}
+
+
+def boost_all_filter_label(creature_filter: dict[str, Any] | None) -> str:
+    if not creature_filter:
+        return "creatures"
+    if creature_filter.get("combat_state"):
+        return f"{creature_filter['combat_state']}_creatures"
+    if creature_filter.get("no_counters"):
+        return "creatures_with_no_counters"
+    if creature_filter.get("colors"):
+        return "_".join(str(color).lower() for color in creature_filter["colors"]) + "_creatures"
+    if creature_filter.get("exclude_colors"):
+        return "non_" + "_".join(str(color).lower() for color in creature_filter["exclude_colors"]) + "_creatures"
+    if creature_filter.get("exclude_subtypes"):
+        return "non_" + "_".join(
+            str(subtype).lower() for subtype in creature_filter["exclude_subtypes"]
+        ) + "_creatures"
+    if creature_filter.get("exclude_card_types"):
+        return "non_" + "_".join(
+            str(card_type).lower() for card_type in creature_filter["exclude_card_types"]
+        ) + "_creatures"
+    return "filtered_creatures"
+
+
+def _boost_all_filter_from_oracle_prefix(prefix: str) -> dict[str, Any] | None:
+    normalized = re.sub(r"\s+", " ", str(prefix or "").strip().lower())
+    if not normalized:
+        return None
+    if normalized == "attacking":
+        return {"combat_state": "attacking"}
+    if normalized == "blocking":
+        return {"combat_state": "blocking"}
+    if normalized == "creatures with no counters on them":
+        return {"no_counters": True}
+    non_match = re.match(r"^non[- ]?([a-z]+)$", normalized)
+    if non_match:
+        value = non_match.group(1)
+        if value in BOOST_ALL_FILTER_COLOR_WORDS:
+            return {"exclude_colors": [BOOST_ALL_FILTER_COLOR_WORDS[value]]}
+        if value == "artifact":
+            return {"exclude_card_types": ["artifact"]}
+        return {"exclude_subtypes": [value.capitalize()]}
+    if normalized in BOOST_ALL_FILTER_COLOR_WORDS:
+        return {"colors": [BOOST_ALL_FILTER_COLOR_WORDS[normalized]]}
+    return None
+
+
+def fixed_boost_all_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str, dict[str, Any] | None] | str | None:
     text = strip_leading_parenthetical_reminders(oracle_text(metadata))
     lowered = text.lower()
     if (
@@ -5865,17 +5920,45 @@ def fixed_boost_all_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str
         or "additional cost" in lowered
     ):
         return "boost_all_oracle_not_simple"
+    no_counters_match = re.match(
+        r"^creatures with no counters on them get (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+) until end of turn\.?$",
+        text,
+        re.I,
+    )
+    if no_counters_match:
+        power = signed_int_from_oracle(no_counters_match.group("power"))
+        toughness = signed_int_from_oracle(no_counters_match.group("toughness"))
+        if power is None or toughness is None:
+            return None
+        return power, toughness, "all", {"no_counters": True}
+    filtered_match = re.match(
+        r"^(?P<prefix>attacking|blocking|non[- ]?[a-z]+|white|blue|black|red|green) "
+        r"creatures get (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+) until end of turn\.?$",
+        text,
+        re.I,
+    )
+    if filtered_match:
+        creature_filter = _boost_all_filter_from_oracle_prefix(filtered_match.group("prefix"))
+        if creature_filter is None:
+            return "boost_all_oracle_filter_not_supported"
+        power = signed_int_from_oracle(filtered_match.group("power"))
+        toughness = signed_int_from_oracle(filtered_match.group("toughness"))
+        if power is None or toughness is None:
+            return None
+        return power, toughness, "all", creature_filter
     patterns = [
         (
             r"^all creatures get ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
             "all",
+            None,
         ),
         (
             r"^creatures your opponents control get ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
             "opponents",
+            None,
         ),
     ]
-    for pattern, controller_scope in patterns:
+    for pattern, controller_scope, creature_filter in patterns:
         match = re.match(pattern, text, re.I)
         if not match:
             continue
@@ -5883,11 +5966,33 @@ def fixed_boost_all_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str
         toughness = signed_int_from_oracle(match.group(2))
         if power is None or toughness is None:
             return None
-        return power, toughness, controller_scope
+        return power, toughness, controller_scope, creature_filter
     return None
 
 
-def fixed_boost_all_from_source(source: str) -> tuple[int, int, str] | str | None:
+def _boost_all_filter_from_source(source: str, rest_text: str) -> dict[str, Any] | str:
+    if "StaticFilters.FILTER_ATTACKING_CREATURES" in rest_text:
+        return {"combat_state": "attacking"}
+    if "StaticFilters.FILTER_BLOCKING_CREATURES" in rest_text:
+        return {"combat_state": "blocking"}
+    if "Predicates.not(SubType.ELF.getPredicate())" in source:
+        return {"exclude_subtypes": ["Elf"]}
+    if "Predicates.not(new ColorPredicate(ObjectColor.BLACK))" in source:
+        return {"exclude_colors": ["B"]}
+    if "Predicates.not(new ColorPredicate(ObjectColor.WHITE))" in source:
+        return {"exclude_colors": ["W"]}
+    if re.search(r"filter\.add\s*\(\s*new\s+ColorPredicate\s*\(\s*ObjectColor\.BLACK\s*\)\s*\)", source):
+        return {"colors": ["B"]}
+    if re.search(r"filter\.add\s*\(\s*new\s+ColorPredicate\s*\(\s*ObjectColor\.WHITE\s*\)\s*\)", source):
+        return {"colors": ["W"]}
+    if "Predicates.not(CardType.ARTIFACT.getPredicate())" in source:
+        return {"exclude_card_types": ["artifact"]}
+    if "Predicates.not(CounterAnyPredicate.instance)" in source:
+        return {"no_counters": True}
+    return "boost_all_source_filter_not_supported"
+
+
+def fixed_boost_all_from_source(source: str) -> tuple[int, int, str, dict[str, Any] | None] | str | None:
     text = source or ""
     matches = re.findall(
         r"new\s+BoostAllEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*"
@@ -5901,13 +6006,19 @@ def fixed_boost_all_from_source(source: str) -> tuple[int, int, str] | str | Non
     rest_text = str(rest or "")
     if not rest_text.strip():
         controller_scope = "all"
+        creature_filter = None
     elif "StaticFilters.FILTER_PERMANENT_ALL_CREATURES" in rest_text:
         controller_scope = "all"
+        creature_filter = None
     elif "StaticFilters.FILTER_OPPONENTS_PERMANENT_CREATURES" in rest_text:
         controller_scope = "opponents"
+        creature_filter = None
     else:
-        return "boost_all_source_filter_not_supported"
-    return int(power_raw), int(toughness_raw), controller_scope
+        controller_scope = "all"
+        creature_filter = _boost_all_filter_from_source(text, rest_text)
+        if isinstance(creature_filter, str):
+            return creature_filter
+    return int(power_raw), int(toughness_raw), controller_scope, creature_filter
 
 
 def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str, str] | None:
@@ -14324,6 +14435,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed controlled-creature boost until end of turn spell"
     elif scope == BOOST_ALL_SPELL_SCOPE:
         scope_kind = "fixed all/opponents-creature boost until end of turn spell"
+    elif scope == BOOST_ALL_FILTERED_SPELL_SCOPE:
+        scope_kind = "fixed filtered-creature boost until end of turn spell"
     elif scope == TARGET_BOOST_ACTIVATED_SCOPE:
         scope_kind = "permanent simple activated target-creature boost until end of turn"
     elif scope == TARGET_KEYWORD_ACTIVATED_SCOPE:
@@ -21032,14 +21145,22 @@ def split_row(
             return None, "boost_all_oracle_not_simple"
         if source_boost != oracle_boost:
             return None, "boost_all_source_oracle_mismatch"
-        power, toughness, controller_scope = oracle_boost
-        target = "opponents_creatures" if controller_scope == "opponents" else "all_creatures"
+        power, toughness, controller_scope, creature_filter = oracle_boost
+        scope = BOOST_ALL_FILTERED_SPELL_SCOPE if creature_filter else BOOST_ALL_SPELL_SCOPE
+        if controller_scope == "opponents":
+            target = "opponents_creatures"
+        elif creature_filter:
+            target = boost_all_filter_label(creature_filter)
+        else:
+            target = "all_creatures"
         target_constraints = {"card_types": ["creature"]}
         if controller_scope == "opponents":
             target_constraints["controller"] = "opponents"
+        if creature_filter:
+            target_constraints["creature_filter"] = creature_filter
         effect_json = {
             "effect": "global_stat_modifier_until_eot",
-            "battle_model_scope": BOOST_ALL_SPELL_SCOPE,
+            "battle_model_scope": scope,
             "target": target,
             "target_controller": controller_scope,
             "target_constraints": target_constraints,
@@ -21048,11 +21169,17 @@ def split_row(
             "xmage_effect_class": "BoostAllEffect",
             **flags,
         }
+        if creature_filter:
+            effect_json["creature_filter"] = creature_filter
         return build_proposal(
             row,
             metadata,
             effect_json,
-            family_id="xmage_boost_all_or_opponents_creatures_until_eot_spell",
+            family_id=(
+                "xmage_boost_filtered_creatures_until_eot_spell"
+                if creature_filter
+                else "xmage_boost_all_or_opponents_creatures_until_eot_spell"
+            ),
         ), "selected_exact_scope"
 
     if unit == BOOST_TARGET_UNIT:

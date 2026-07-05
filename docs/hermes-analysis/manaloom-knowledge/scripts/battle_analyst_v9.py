@@ -3790,6 +3790,35 @@ def permanent_has_subtype(permanent, subtype):
     return normalized_subtype in type_line.replace("-", " ").replace("—", " ").split()
 
 
+def permanent_has_card_type(permanent, card_type):
+    if not isinstance(permanent, dict) or not card_type:
+        return False
+    normalized_card_type = str(card_type).strip().lower()
+    explicit_types = permanent.get("card_types") or permanent.get("card_type") or []
+    if isinstance(explicit_types, str):
+        explicit_types = [explicit_types]
+    if normalized_card_type in {str(value).strip().lower() for value in explicit_types}:
+        return True
+    return normalized_card_type in str(permanent.get("type_line") or "").lower().replace("—", " ").split()
+
+
+def permanent_has_any_counter(permanent):
+    if not isinstance(permanent, dict):
+        return False
+    counters = permanent.get("counters")
+    if isinstance(counters, dict) and any(int(value or 0) > 0 for value in counters.values()):
+        return True
+    for key, value in permanent.items():
+        if not str(key).endswith("_counters"):
+            continue
+        try:
+            if int(value or 0) > 0:
+                return True
+        except (TypeError, ValueError):
+            continue
+    return False
+
+
 def is_mana_source_permanent(source):
     if source == "land":
         return True
@@ -4822,9 +4851,54 @@ def resolve_controlled_stat_modifier_until_eot_spell(player, opponents, card, ef
     return affected
 
 
+def global_stat_modifier_creature_filter_matches(target, creature_filter):
+    if not creature_filter:
+        return True
+    combat_state = str(creature_filter.get("combat_state") or "").lower()
+    if combat_state == "attacking" and not bool(target.get("attacking")):
+        return False
+    if combat_state == "blocking" and not bool(target.get("blocking")):
+        return False
+    if combat_state == "attacking_or_blocking" and not (
+        bool(target.get("attacking")) or bool(target.get("blocking"))
+    ):
+        return False
+    colors = [str(color).strip() for color in _as_list(creature_filter.get("colors")) if str(color).strip()]
+    if colors and not any(card_has_color(target, color) for color in colors):
+        return False
+    excluded_colors = [
+        str(color).strip() for color in _as_list(creature_filter.get("exclude_colors")) if str(color).strip()
+    ]
+    if excluded_colors and any(card_has_color(target, color) for color in excluded_colors):
+        return False
+    subtypes = [
+        str(subtype).strip() for subtype in _as_list(creature_filter.get("subtypes")) if str(subtype).strip()
+    ]
+    if subtypes and not any(permanent_has_subtype(target, subtype) for subtype in subtypes):
+        return False
+    excluded_subtypes = [
+        str(subtype).strip()
+        for subtype in _as_list(creature_filter.get("exclude_subtypes"))
+        if str(subtype).strip()
+    ]
+    if excluded_subtypes and any(permanent_has_subtype(target, subtype) for subtype in excluded_subtypes):
+        return False
+    excluded_card_types = [
+        str(card_type).strip()
+        for card_type in _as_list(creature_filter.get("exclude_card_types"))
+        if str(card_type).strip()
+    ]
+    if excluded_card_types and any(permanent_has_card_type(target, card_type) for card_type in excluded_card_types):
+        return False
+    if creature_filter.get("no_counters") and permanent_has_any_counter(target):
+        return False
+    return True
+
+
 def resolve_global_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn):
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
+    creature_filter = effect_data.get("creature_filter") or {}
     controller_scope = str(effect_data.get("target_controller") or "all").lower()
     if controller_scope in {"opponent", "opponents"}:
         participants = list(opponents or [])
@@ -4838,6 +4912,8 @@ def resolve_global_stat_modifier_until_eot_spell(player, opponents, card, effect
     for owner in participants:
         for target in list(getattr(owner, "battlefield", []) or []):
             if not is_battlefield_creature(target):
+                continue
+            if not global_stat_modifier_creature_filter_matches(target, creature_filter):
                 continue
             power_before = _numeric_card_stat(target, "power")
             toughness_before = _numeric_card_stat(target, "toughness", "power")
@@ -4874,6 +4950,7 @@ def resolve_global_stat_modifier_until_eot_spell(player, opponents, card, effect
         moved_to_graveyard=moved,
         power_delta=power_delta,
         toughness_delta=toughness_delta,
+        creature_filter=creature_filter,
         result=result,
         turn=turn,
         **replay_rule_fields(effect_data),

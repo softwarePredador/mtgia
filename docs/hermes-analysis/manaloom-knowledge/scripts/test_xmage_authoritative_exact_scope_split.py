@@ -12565,11 +12565,63 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target"], "opponents_creatures")
         self.assertEqual(effect["target_controller"], "opponents")
 
-    def test_boost_all_filtered_creatures_stays_blocked(self) -> None:
+    def test_fixed_boost_attacking_creatures_spell_maps_to_filtered_global_modifier(self) -> None:
+        row = queue_row(split.BOOST_ALL_SPELL_UNIT, effect_classes=["BoostAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Attacking creatures get +2/+0 until end of turn."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostAllEffect("
+                "2, 0, Duration.EndOfTurn, StaticFilters.FILTER_ATTACKING_CREATURES, false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_ALL_FILTERED_SPELL_SCOPE)
+        self.assertEqual(effect["target"], "attacking_creatures")
+        self.assertEqual(effect["creature_filter"], {"combat_state": "attacking"})
+
+    def test_fixed_boost_non_elf_creatures_spell_maps_to_filtered_global_modifier(self) -> None:
         row = queue_row(split.BOOST_ALL_SPELL_UNIT, effect_classes=["BoostAllEffect"])
         proposal, reason = split.split_row(
             row,
             metadata(oracle_text="Non-Elf creatures get -2/-2 until end of turn."),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = new FilterCreaturePermanent(\"Non-Elf creatures\");"
+                "static { filter.add(Predicates.not(SubType.ELF.getPredicate())); }"
+                "this.getSpellAbility().addEffect(new BoostAllEffect(-2, -2, Duration.EndOfTurn, filter, false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_ALL_FILTERED_SPELL_SCOPE)
+        self.assertEqual(effect["target"], "non_elf_creatures")
+        self.assertEqual(effect["creature_filter"], {"exclude_subtypes": ["Elf"]})
+
+    def test_fixed_boost_creatures_with_no_counters_spell_maps_to_filtered_global_modifier(self) -> None:
+        row = queue_row(split.BOOST_ALL_SPELL_UNIT, effect_classes=["BoostAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Creatures with no counters on them get -2/-2 until end of turn."),
+            source_text=(
+                "private static final FilterCreaturePermanent filter = new FilterCreaturePermanent(\"creatures with no counters on them\");"
+                "static { filter.add(Predicates.not(CounterAnyPredicate.instance)); }"
+                "this.getSpellAbility().addEffect(new BoostAllEffect(-2, -2, Duration.EndOfTurn, filter, false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creatures_with_no_counters")
+        self.assertEqual(effect["creature_filter"], {"no_counters": True})
+
+    def test_boost_all_unsupported_filter_stays_blocked(self) -> None:
+        row = queue_row(split.BOOST_ALL_SPELL_UNIT, effect_classes=["BoostAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Modified creatures get -2/-2 until end of turn."),
             source_text="this.getSpellAbility().addEffect(new BoostAllEffect(-2, -2, Duration.EndOfTurn, filter, false));",
         )
 
