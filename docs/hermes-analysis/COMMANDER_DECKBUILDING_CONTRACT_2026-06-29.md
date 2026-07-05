@@ -1873,6 +1873,33 @@ Brain seed-safe cut unlock audit added on 2026-07-05:
   cut proof, route-governed runtime proof, structure matrix review, or equal
   battle gates.
 
+Brain post-authorized seed-safe cut discovery refreshed on 2026-07-05:
+
+- Handoff:
+  `docs/hermes-analysis/LOREHOLD_BRAIN_SEED_SAFE_CUT_DISCOVERY_2026-07-05.md`.
+- Current source of truth for Brain route state:
+  use the `post_authorized_full_validation` Brain artifacts rather than the
+  stale `current` Brain preflight when checking whether Brain's rule is active.
+- Current state:
+  `brain_active_rule_count=1`, `postgres_rule_active_confirmed_now=true`,
+  `safe_cut_count=0`, `unlockable_now_count=0`, matrix scoring `false`,
+  candidate deck materialization `false`, natural battle gate `false`, and
+  promotion `false`.
+- Slot queue:
+  `Molecule Man` and `Land Tax` are diagnostic prior-reject rows requiring new
+  trace evidence; `Library of Leng`, `Scroll Rack`, and `Sensei's Divining Top`
+  are protected topdeck anchors requiring role-preservation proof; `The Scarlet
+  Witch` and `The Mind Stone` are protected floor slots requiring floor
+  replacement evidence; `Urza's Saga` and `Lorehold, the Historian` cannot
+  unlock under the current protected-`607` contract.
+- Decision:
+  Brain in a Jar is now a valid runtime/deckbuilding learning target, but it is
+  still not a Lorehold deck edit. Do not score, materialize, battle, or promote
+  a Brain candidate until a named same-lane seed-safe cut exists and the
+  miracle-access candidate queue and structure matrix are rerun.
+- Next allowed work:
+  `mine_named_brain_same_lane_seed_safe_cut_no_deck_action`.
+
 Non-floor sidecar probe evidence closure added on 2026-07-05:
 
 - Report:
