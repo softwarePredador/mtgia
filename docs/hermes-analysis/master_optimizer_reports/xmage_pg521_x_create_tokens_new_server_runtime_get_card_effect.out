@@ -1,0 +1,36 @@
+{
+  "effect_rule_key": "battle_rule_v1:6a713f8351226e8111bad92e7ff7d034",
+  "effect_scope": "xmage_x_create_creature_tokens_spell_v1",
+  "goblin_tokens_created": 3,
+  "token_count_source": "x_value",
+  "tokens": [
+    {
+      "colors": [
+        "R"
+      ],
+      "name": "Goblin Token",
+      "power": 1,
+      "toughness": 1,
+      "type_line": "Creature Token \u2014 Goblin"
+    },
+    {
+      "colors": [
+        "R"
+      ],
+      "name": "Goblin Token",
+      "power": 1,
+      "toughness": 1,
+      "type_line": "Creature Token \u2014 Goblin"
+    },
+    {
+      "colors": [
+        "R"
+      ],
+      "name": "Goblin Token",
+      "power": 1,
+      "toughness": 1,
+      "type_line": "Creature Token \u2014 Goblin"
+    }
+  ],
+  "x_value": 3
+}

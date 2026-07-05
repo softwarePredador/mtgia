@@ -2334,7 +2334,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["token_toughness"], 1)
         self.assertEqual(effect["token_colors"], ["R"])
 
-    def test_fixed_create_creature_tokens_spell_blocks_dynamic_count(self) -> None:
+    def test_x_create_creature_tokens_spell_maps_get_x_value(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Wastes",
+                type_line="Instant",
+                oracle_text="Create X 1/1 white Warrior creature tokens.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new WarriorToken(), GetXValue.instance));
+                class WarriorToken extends TokenImpl {
+                    public WarriorToken() {
+                        super("Warrior Token", "1/1 white Warrior creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.WARRIOR);
+                        color.setWhite(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.X_TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_count_source"], "x_value")
+        self.assertEqual(effect["token_count_per_x"], 1)
+        self.assertEqual(effect["token_name"], "Warrior Token")
+        self.assertEqual(effect["token_power"], 1)
+        self.assertEqual(effect["token_toughness"], 1)
+
+    def test_x_create_creature_tokens_spell_blocks_land_tokens_until_runtime_supported(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(
             row,
@@ -2343,7 +2376,36 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 type_line="Sorcery",
                 oracle_text="Create X 1/1 green Forest Dryad land creature tokens.",
             ),
-            source_text="this.getSpellAbility().addEffect(new CreateTokenEffect(new ForestDryadToken(), GetXValue.instance));",
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new ForestDryadToken(), GetXValue.instance));
+                class ForestDryadToken extends TokenImpl {
+                    public ForestDryadToken() {
+                        super("Forest Dryad Token", "1/1 green Forest Dryad land creature token");
+                        cardType.add(CardType.CREATURE);
+                        cardType.add(CardType.LAND);
+                        subtype.add(SubType.FOREST);
+                        subtype.add(SubType.DRYAD);
+                        color.setGreen(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "token_land_token_runtime_not_supported")
+
+    def test_create_creature_tokens_spell_blocks_contextual_dynamic_count(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Ambush",
+                type_line="Instant",
+                oracle_text="Create a 1/1 green Elf Warrior creature token for each Elf you control.",
+            ),
+            source_text="this.getSpellAbility().addEffect(new CreateTokenEffect(new ElfWarriorToken(), elfCount));",
         )
 
         self.assertIsNone(proposal)

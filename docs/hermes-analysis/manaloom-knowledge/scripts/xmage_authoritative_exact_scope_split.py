@@ -276,6 +276,7 @@ DIES_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_dies_gain_life_v1"
 DIES_DAMAGE_CREATURE_SCOPE = "xmage_creature_dies_fixed_damage_target_v1"
 DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_hand_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
+X_TOKEN_SPELL_SCOPE = "xmage_x_create_creature_tokens_spell_v1"
 ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
 DIES_TOKEN_CREATURE_SCOPE = "xmage_creature_dies_create_tokens_v1"
 PERMANENT_ACTIVATED_TOKEN_SCOPE = "xmage_permanent_simple_activated_create_token_v1"
@@ -684,7 +685,7 @@ def source_xmage_root(row: dict[str, Any]) -> Path | None:
     return None
 
 
-def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | str:
+def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | dict[str, Any] | str:
     text = source or ""
     if len(re.findall(r"new\s+CreateTokenEffect\s*\(", text)) != 1:
         return "token_source_not_single_create_token_effect"
@@ -696,13 +697,19 @@ def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | str:
         return "token_source_custom_text_not_supported"
     match = re.search(
         r"new\s+CreateTokenEffect\s*\(\s*new\s+(\w+)\s*\([^)]*\)\s*"
-        r"(?:,\s*(\d+))?\s*\)",
+        r"(?:,\s*(\d+|GetXValue\.instance))?\s*\)",
         text,
         re.S,
     )
     if not match:
         return "token_source_create_token_not_fixed"
     token_class = match.group(1)
+    if match.group(2) == "GetXValue.instance":
+        return {
+            "token_class": token_class,
+            "token_count_source": "x_value",
+            "token_count_per_x": 1,
+        }
     count = int(match.group(2) or "1")
     if count <= 0:
         return "token_source_count_not_positive"
@@ -964,6 +971,8 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
     toughness_match = re.search(r"toughness\s*=\s*new\s+MageInt\s*\(\s*(\d+)\s*\)", constructor_source)
     if not power_match or not toughness_match:
         return {}, "token_power_toughness_not_fixed"
+    if re.search(r"cardType\.add\s*\(\s*CardType\.LAND\s*\)", constructor_source):
+        return {}, "token_land_token_runtime_not_supported"
     ability_classes = set(re.findall(r"addAbility\s*\(\s*([A-Za-z]+Ability)", constructor_source))
     allowed_ability_classes = set(ALLOWED_TOKEN_ABILITY_KEYWORDS)
     if has_colorless_sacrifice_mana:
@@ -16316,7 +16325,20 @@ def split_row(
         parsed_effect = fixed_create_token_effect_from_source(source_text)
         if isinstance(parsed_effect, str):
             return None, parsed_effect
-        token_class, token_count = parsed_effect
+        if isinstance(parsed_effect, dict):
+            token_class = str(parsed_effect["token_class"])
+            token_count = None
+            token_count_fields = {
+                "token_count_source": parsed_effect["token_count_source"],
+                "token_count_per_x": parsed_effect["token_count_per_x"],
+            }
+            scope = X_TOKEN_SPELL_SCOPE
+            family_id = "xmage_x_create_creature_tokens_spell"
+        else:
+            token_class, token_count = parsed_effect
+            token_count_fields = {"token_count": token_count}
+            scope = TOKEN_SPELL_SCOPE
+            family_id = "xmage_fixed_create_creature_tokens_spell"
         token_data, token_reason = parse_simple_token_class(
             token_class_source(row, source_text, token_class),
             token_class,
@@ -16325,17 +16347,17 @@ def split_row(
             return None, token_reason
         effect_json = {
             "effect": "token_maker",
-            "battle_model_scope": TOKEN_SPELL_SCOPE,
+            "battle_model_scope": scope,
             "ability_kind": "one_shot",
-            "token_count": token_count,
             "xmage_effect_class": "CreateTokenEffect",
+            **token_count_fields,
             **token_data,
         }
         return build_proposal(
             row,
             metadata,
             effect_json,
-            family_id="xmage_fixed_create_creature_tokens_spell",
+            family_id=family_id,
         ), "selected_exact_scope"
 
     if permanent_activated_token_unit:
