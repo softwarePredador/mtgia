@@ -544,6 +544,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `stage_only_cut_count=15`, `scoped_pair_count=0`. A decisao atual e
     `mine_new_value_safe_cut_source_before_package_resynthesis`; o pacote atual
     segue fechado para candidate copy, battle, promocao e mutacao.
+    A mineracao fresca foi executada por
+    `global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `hypothesis_count=8`, com `Biotransference`, `Maskwood Nexus`,
+    `Sigarda's Aid`, `Necromancy`, `Necropotence`, `Trouble in Pairs`,
+    `Puresteel Paladin` e `Sram, Senior Edificer`. Elas ainda nao sao cortes
+    value-safe; o proximo gate e
+    `collect_usage_trace_for_new_cut_source_hypotheses`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

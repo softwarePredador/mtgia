@@ -1,0 +1,1208 @@
+{
+  "artifact_type": "global_commander_value_safe_cut_source_miner",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "blocked_hypothesis_sample": [
+    {
+      "block_reasons": [
+        "already_stage_only_cut_source_requires_proof",
+        "forced_access_used_cut_blocks_reclassification",
+        "attack_window_cut_requires_same_lane_stage_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Alicia Masters, Skilled Sculptor",
+      "cmc": 2.0,
+      "format_staple": {},
+      "profile_roles": [
+        "board_wipes_resets",
+        "mana_acceleration"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:mana_acceleration"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "mana_acceleration_cut"
+      ],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Legendary Creature \u2014 Human Artificer"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_angels_demons_dragons_payoffs"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Ancient Copper Dragon",
+      "cmc": 6.0,
+      "format_staple": {},
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:mana_acceleration",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut"
+      ],
+      "score": 44,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Creature \u2014 Elder Dragon"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Ancient Tomb",
+      "cmc": 0.0,
+      "format_staple": {},
+      "profile_roles": [
+        "lands"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_angels_demons_dragons_payoffs"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Angel of the Ruins",
+      "cmc": 7.0,
+      "format_staple": {},
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:tutors_access",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "tutor_access_cut"
+      ],
+      "score": 44,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Artifact Creature \u2014 Angel"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_spot_interaction",
+        "contextual_staple_requires_stage_review"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Anguished Unmaking",
+      "cmc": 3.0,
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Anguished Unmaking",
+        "category": "",
+        "edhrec_rank": 156
+      },
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "contextual_staple_stage_only",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Instant"
+    },
+    {
+      "block_reasons": [
+        "already_stage_only_cut_source_requires_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Arcane Signet",
+      "cmc": 2.0,
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Arcane Signet",
+        "category": "",
+        "edhrec_rank": 3
+      },
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 38,
+      "staple_tier": "structural_foundation_anchor",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Artifact"
+    },
+    {
+      "block_reasons": [
+        "attack_window_cut_requires_same_lane_stage_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Ardenn, Intrepid Archaeologist",
+      "cmc": 3.0,
+      "format_staple": {},
+      "profile_roles": [],
+      "reasons": [
+        "off_profile_or_unclassified_slot"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut"
+      ],
+      "score": 46,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Legendary Creature \u2014 Kor Scout"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_haste_protection_silence,lands"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Arena of Glory",
+      "cmc": 0.0,
+      "format_staple": {},
+      "profile_roles": [
+        "haste_protection_silence",
+        "lands"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Arid Mesa",
+      "cmc": 0.0,
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Arid Mesa",
+        "category": "",
+        "edhrec_rank": 55
+      },
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 38,
+      "staple_tier": "structural_foundation_anchor",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_angels_demons_dragons_payoffs,haste_protection_silence"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Aurelia, the Law Above",
+      "cmc": 5.0,
+      "format_staple": {},
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "board_wipes_resets",
+        "card_draw_selection",
+        "haste_protection_silence"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "haste_or_protection_cut",
+        "card_flow_cut"
+      ],
+      "score": 44,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Legendary Creature \u2014 Angel"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_angels_demons_dragons_payoffs,haste_protection_silence"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Avacyn, Angel of Hope",
+      "cmc": 8.0,
+      "format_staple": {
+        "archetype": "commanders",
+        "card_name": "Avacyn, Angel of Hope",
+        "category": "",
+        "edhrec_rank": 755
+      },
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:haste_protection_silence",
+        "higher_curve_cut_pressure",
+        "format_staple_reviewable_needs_extra_trace"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 38,
+      "staple_tier": "format_staple_reviewable",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Legendary Creature \u2014 Angel"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_angels_demons_dragons_payoffs"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Balefire Dragon",
+      "cmc": 7.0,
+      "format_staple": {},
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "board_wipes_resets",
+        "dedicated_win_conditions"
+      ],
+      "reasons": [
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut"
+      ],
+      "score": 36,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "already_stage_only_cut_source_requires_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cmc": 3.0,
+      "format_staple": {},
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Legendary Creature \u2014 God"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_haste_protection_silence"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Blightsteel Colossus // Blightsteel Colossus",
+      "cmc": 12.0,
+      "format_staple": {},
+      "profile_roles": [
+        "dedicated_win_conditions",
+        "haste_protection_silence"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 44,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Artifact Creature \u2014 Phyrexian Golem"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Blood Crypt // Blood Crypt",
+      "cmc": 0.0,
+      "format_staple": {},
+      "profile_roles": [
+        "lands"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land \u2014 Swamp Mountain"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Bloodstained Mire",
+      "cmc": 0.0,
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Bloodstained Mire",
+        "category": "",
+        "edhrec_rank": 43
+      },
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 38,
+      "staple_tier": "structural_foundation_anchor",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_angels_demons_dragons_payoffs",
+        "attack_window_cut_requires_same_lane_stage_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Bloodthirster",
+      "cmc": 6.0,
+      "format_staple": {},
+      "profile_roles": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "reasons": [
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "attack_window_or_extra_combat_cut"
+      ],
+      "score": 36,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Creature \u2014 Demon"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_angels_demons_dragons_payoffs,haste_protection_silence"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Cavern-Hoard Dragon",
+      "cmc": 9.0,
+      "format_staple": {},
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:haste_protection_silence,mana_acceleration",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 52,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "City of Traitors",
+      "cmc": 0.0,
+      "format_staple": {},
+      "profile_roles": [
+        "lands"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Clifftop Retreat",
+      "cmc": 0.0,
+      "format_staple": {},
+      "profile_roles": [
+        "lands"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Command Tower",
+      "cmc": 0.0,
+      "format_staple": {},
+      "profile_roles": [
+        "lands"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_spot_interaction"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Damn",
+      "cmc": 2.0,
+      "format_staple": {
+        "archetype": "removal",
+        "card_name": "Damn",
+        "category": "",
+        "edhrec_rank": 324
+      },
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag",
+        "format_staple_reviewable_needs_extra_trace"
+      ],
+      "risk_flags": [],
+      "score": 32,
+      "staple_tier": "format_staple_reviewable",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Sorcery"
+    },
+    {
+      "block_reasons": [
+        "already_stage_only_cut_source_requires_proof",
+        "forced_access_used_cut_blocks_reclassification",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Dark Ritual",
+      "cmc": 1.0,
+      "format_staple": {
+        "archetype": "black",
+        "card_name": "Dark Ritual",
+        "category": "",
+        "edhrec_rank": 36
+      },
+      "profile_roles": [
+        "mana_acceleration"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:mana_acceleration"
+      ],
+      "risk_flags": [
+        "mana_acceleration_cut"
+      ],
+      "score": 38,
+      "staple_tier": "structural_foundation_anchor",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Instant"
+    },
+    {
+      "block_reasons": [
+        "attack_window_cut_requires_same_lane_stage_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Delney, Streetwise Lookout",
+      "cmc": 3.0,
+      "format_staple": {
+        "archetype": "ramp",
+        "card_name": "Delney, Streetwise Lookout",
+        "category": "",
+        "edhrec_rank": 847
+      },
+      "profile_roles": [],
+      "reasons": [
+        "off_profile_or_unclassified_slot",
+        "format_staple_reviewable_needs_extra_trace"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut"
+      ],
+      "score": 40,
+      "staple_tier": "format_staple_reviewable",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Legendary Creature \u2014 Human Scout"
+    },
+    {
+      "block_reasons": [
+        "already_stage_only_cut_source_requires_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Demonic Tutor",
+      "cmc": 2.0,
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Demonic Tutor",
+        "category": "",
+        "edhrec_rank": 58
+      },
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 38,
+      "staple_tier": "structural_foundation_anchor",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Sorcery"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_spot_interaction"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Despark",
+      "cmc": 2.0,
+      "format_staple": {
+        "archetype": "black",
+        "card_name": "Despark",
+        "category": "",
+        "edhrec_rank": 387
+      },
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag",
+        "format_staple_reviewable_needs_extra_trace"
+      ],
+      "risk_flags": [],
+      "score": 32,
+      "staple_tier": "format_staple_reviewable",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Instant"
+    },
+    {
+      "block_reasons": [
+        "already_stage_only_cut_source_requires_proof",
+        "contextual_staple_requires_stage_review"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Diabolic Intent",
+      "cmc": 2.0,
+      "format_staple": {
+        "archetype": "black",
+        "card_name": "Diabolic Intent",
+        "category": "",
+        "edhrec_rank": 265
+      },
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 38,
+      "staple_tier": "contextual_staple_stage_only",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Sorcery"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Dragonskull Summit",
+      "cmc": 0.0,
+      "format_staple": {},
+      "profile_roles": [
+        "lands"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Elegant Parlor",
+      "cmc": 0.0,
+      "format_staple": {},
+      "profile_roles": [
+        "lands"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    {
+      "block_reasons": [
+        "already_stage_only_cut_source_requires_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Enlightened Tutor",
+      "cmc": 1.0,
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Enlightened Tutor",
+        "category": "",
+        "edhrec_rank": 115
+      },
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 38,
+      "staple_tier": "structural_foundation_anchor",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Instant"
+    },
+    {
+      "block_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Esper Sentinel",
+      "cmc": 1.0,
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Esper Sentinel",
+        "category": "",
+        "edhrec_rank": 73
+      },
+      "profile_roles": [
+        "card_draw_selection"
+      ],
+      "reasons": [],
+      "risk_flags": [
+        "card_flow_cut"
+      ],
+      "score": 30,
+      "staple_tier": "structural_foundation_anchor",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Artifact Creature \u2014 Human Soldier"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Fabled Passage",
+      "cmc": 0.0,
+      "format_staple": {
+        "archetype": "combo",
+        "card_name": "Fabled Passage",
+        "category": "",
+        "edhrec_rank": 60
+      },
+      "profile_roles": [
+        "lands",
+        "tutors_access"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:tutors_access"
+      ],
+      "risk_flags": [
+        "tutor_access_cut"
+      ],
+      "score": 38,
+      "staple_tier": "structural_foundation_anchor",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_spot_interaction",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Feed the Swarm",
+      "cmc": 2.0,
+      "format_staple": {
+        "archetype": "black",
+        "card_name": "Feed the Swarm",
+        "category": "",
+        "edhrec_rank": 88
+      },
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "structural_foundation_anchor",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Sorcery"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_spot_interaction"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Forge Anew",
+      "cmc": 3.0,
+      "format_staple": {},
+      "profile_roles": [
+        "reanimation_plan_b",
+        "spot_interaction"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Enchantment"
+    },
+    {
+      "block_reasons": [
+        "attack_window_cut_requires_same_lane_stage_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Genji Glove",
+      "cmc": 5.0,
+      "format_staple": {},
+      "profile_roles": [],
+      "reasons": [
+        "off_profile_or_unclassified_slot",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut"
+      ],
+      "score": 52,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Artifact \u2014 Equipment"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_lands"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Godless Shrine",
+      "cmc": 0.0,
+      "format_staple": {},
+      "profile_roles": [
+        "lands"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Land \u2014 Plains Swamp"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_angels_demons_dragons_payoffs"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Goldlust Triad",
+      "cmc": 5.0,
+      "format_staple": {},
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:mana_acceleration",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut"
+      ],
+      "score": 44,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_angels_demons_dragons_payoffs,haste_protection_silence"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Goldspan Dragon",
+      "cmc": 5.0,
+      "format_staple": {},
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:haste_protection_silence,mana_acceleration",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "angel_demon_dragon_payoff_cut",
+        "mana_acceleration_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 52,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_haste_protection_silence",
+        "contextual_staple_requires_stage_review"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Grand Abolisher",
+      "cmc": 2.0,
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Grand Abolisher",
+        "category": "",
+        "edhrec_rank": 249
+      },
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:haste_protection_silence"
+      ],
+      "risk_flags": [
+        "haste_or_protection_cut"
+      ],
+      "score": 38,
+      "staple_tier": "contextual_staple_stage_only",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Creature \u2014 Human Cleric"
+    },
+    {
+      "block_reasons": [
+        "protected_profile_role_haste_protection_silence",
+        "attack_window_cut_requires_same_lane_stage_proof"
+      ],
+      "candidate_copy_allowed": false,
+      "card_name": "Hammer of Nazahn",
+      "cmc": 4.0,
+      "format_staple": {},
+      "profile_roles": [
+        "haste_protection_silence"
+      ],
+      "reasons": [
+        "matches_post_forced_target_cut_role:haste_protection_silence",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [
+        "attack_window_or_extra_combat_cut",
+        "haste_or_protection_cut"
+      ],
+      "score": 44,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_blocked",
+      "type_line": "Legendary Artifact \u2014 Equipment"
+    }
+  ],
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "hypotheses_require_trace_before_value_safe_reclassification",
+    "candidate_copy_closed_until_value_safe_cut_pair_exists"
+  ],
+  "db_resolution": {
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db",
+    "selected_db_exists": true,
+    "source": "cut_source_report"
+  },
+  "deck_action_allowed": false,
+  "fresh_cut_source_hypotheses": [
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Biotransference",
+      "cmc": 4.0,
+      "format_staple": {},
+      "next_gate": "collect_usage_trace_for_new_cut_source_hypothesis",
+      "profile_roles": [],
+      "reasons": [
+        "off_profile_or_unclassified_slot",
+        "no_runtime_cut_risk_flag",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [],
+      "score": 60,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_needs_trace",
+      "type_line": "Enchantment"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Maskwood Nexus",
+      "cmc": 4.0,
+      "format_staple": {},
+      "next_gate": "collect_usage_trace_for_new_cut_source_hypothesis",
+      "profile_roles": [],
+      "reasons": [
+        "off_profile_or_unclassified_slot",
+        "no_runtime_cut_risk_flag",
+        "higher_curve_cut_pressure"
+      ],
+      "risk_flags": [],
+      "score": 60,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_needs_trace",
+      "type_line": "Artifact"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Sigarda's Aid",
+      "cmc": 1.0,
+      "format_staple": {},
+      "next_gate": "collect_usage_trace_for_new_cut_source_hypothesis",
+      "profile_roles": [],
+      "reasons": [
+        "off_profile_or_unclassified_slot",
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 54,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_needs_trace",
+      "type_line": "Enchantment"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Necromancy",
+      "cmc": 3.0,
+      "format_staple": {},
+      "next_gate": "collect_usage_trace_for_new_cut_source_hypothesis",
+      "profile_roles": [
+        "reanimation_plan_b"
+      ],
+      "reasons": [
+        "no_runtime_cut_risk_flag"
+      ],
+      "risk_flags": [],
+      "score": 38,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_needs_trace",
+      "type_line": "Enchantment"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Necropotence",
+      "cmc": 3.0,
+      "format_staple": {},
+      "next_gate": "collect_usage_trace_for_new_cut_source_hypothesis",
+      "profile_roles": [
+        "card_draw_selection",
+        "reanimation_plan_b"
+      ],
+      "reasons": [],
+      "risk_flags": [
+        "card_flow_cut"
+      ],
+      "score": 30,
+      "staple_tier": "not_format_staple",
+      "status": "fresh_cut_source_hypothesis_needs_trace",
+      "type_line": "Enchantment"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Trouble in Pairs",
+      "cmc": 4.0,
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Trouble in Pairs",
+        "category": "",
+        "edhrec_rank": 631
+      },
+      "next_gate": "collect_usage_trace_for_new_cut_source_hypothesis",
+      "profile_roles": [
+        "card_draw_selection",
+        "dedicated_win_conditions"
+      ],
+      "reasons": [
+        "higher_curve_cut_pressure",
+        "format_staple_reviewable_needs_extra_trace"
+      ],
+      "risk_flags": [
+        "card_flow_cut"
+      ],
+      "score": 30,
+      "staple_tier": "format_staple_reviewable",
+      "status": "fresh_cut_source_hypothesis_needs_trace",
+      "type_line": "Enchantment"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Puresteel Paladin",
+      "cmc": 2.0,
+      "format_staple": {
+        "archetype": "white",
+        "card_name": "Puresteel Paladin",
+        "category": "",
+        "edhrec_rank": 633
+      },
+      "next_gate": "collect_usage_trace_for_new_cut_source_hypothesis",
+      "profile_roles": [
+        "card_draw_selection"
+      ],
+      "reasons": [
+        "format_staple_reviewable_needs_extra_trace"
+      ],
+      "risk_flags": [
+        "card_flow_cut"
+      ],
+      "score": 24,
+      "staple_tier": "format_staple_reviewable",
+      "status": "fresh_cut_source_hypothesis_needs_trace",
+      "type_line": "Creature \u2014 Human Knight"
+    },
+    {
+      "candidate_copy_allowed": false,
+      "card_name": "Sram, Senior Edificer",
+      "cmc": 2.0,
+      "format_staple": {
+        "archetype": "commanders",
+        "card_name": "Sram, Senior Edificer",
+        "category": "",
+        "edhrec_rank": 466
+      },
+      "next_gate": "collect_usage_trace_for_new_cut_source_hypothesis",
+      "profile_roles": [
+        "card_draw_selection"
+      ],
+      "reasons": [
+        "format_staple_reviewable_needs_extra_trace"
+      ],
+      "risk_flags": [
+        "card_flow_cut"
+      ],
+      "score": 24,
+      "staple_tier": "format_staple_reviewable",
+      "status": "fresh_cut_source_hypothesis_needs_trace",
+      "type_line": "Legendary Creature \u2014 Dwarf Advisor"
+    }
+  ],
+  "generated_at": "2026-07-05T22:25:39.686155+00:00",
+  "input_artifacts": {
+    "cut_source_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.json",
+    "recovery_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "selected_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1_candidate/knowledge_candidate.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "This miner does not run battle or open promotion.",
+    "miner_boundary": "Fresh hypotheses are not value-safe cuts until trace or same-lane proof is collected.",
+    "protected_role_boundary": "Protected commander lanes, lands, structural staples, contextual staples, and stage-only cuts remain blocked."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "value_safe_cut_source_hypotheses_ready_for_trace",
+  "summary": {
+    "blocked_hypothesis_count": 80,
+    "commander": "Kaalia of the Vast",
+    "deck_card_count": 89,
+    "deck_id": "619",
+    "forced_focus_count": 3,
+    "hypothesis_count": 8,
+    "next_gate": "collect_usage_trace_for_new_cut_source_hypotheses",
+    "stage_only_cut_count": 15,
+    "target_cut_roles": {
+      "haste_protection_silence": 4,
+      "mana_acceleration": 1,
+      "tutors_access": 8
+    }
+  },
+  "value_safe_reclassification_allowed_now": false
+}

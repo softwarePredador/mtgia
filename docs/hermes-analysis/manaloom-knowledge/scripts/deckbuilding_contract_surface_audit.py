@@ -132,6 +132,12 @@ GLOBAL_COMMANDER_POST_FORCED_RECOVERY_SYNTHESIZER = (
 GLOBAL_COMMANDER_POST_FORCED_RECOVERY_SYNTHESIZER_TEST = (
     SCRIPT_DIR / "test_global_commander_post_forced_recovery_synthesizer.py"
 )
+GLOBAL_COMMANDER_VALUE_SAFE_CUT_SOURCE_MINER = (
+    SCRIPT_DIR / "global_commander_value_safe_cut_source_miner.py"
+)
+GLOBAL_COMMANDER_VALUE_SAFE_CUT_SOURCE_MINER_TEST = (
+    SCRIPT_DIR / "test_global_commander_value_safe_cut_source_miner.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -329,6 +335,10 @@ GLOBAL_COMMANDER_SCOPE1_POST_FORCED_PACKAGE_SCOPE_REDUCER_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_POST_FORCED_RECOVERY_SYNTHESIZER_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_VALUE_SAFE_CUT_SOURCE_MINER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -636,6 +646,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "post_forced_recovery_blocks_candidate_copy_needs_new_cut_source",
                 "mine_new_value_safe_cut_source_before_package_resynthesis",
+                "global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "value_safe_cut_source_hypotheses_ready_for_trace",
+                "collect_usage_trace_for_new_cut_source_hypotheses",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -883,6 +896,8 @@ def build_audit() -> dict[str, Any]:
                 "synthesize_new_value_safe_cut_source_or_smaller_package_after_forced_access_block",
                 "global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "mine_new_value_safe_cut_source_before_package_resynthesis",
+                "global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "collect_usage_trace_for_new_cut_source_hypotheses",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1416,6 +1431,33 @@ def build_audit() -> dict[str, Any]:
                 "post_forced_recovery_blocks_candidate_copy_needs_new_cut_source",
                 "mine_new_value_safe_cut_source_before_package_resynthesis",
                 "materialize_reduced_scope_candidate_copy",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_VALUE_SAFE_CUT_SOURCE_MINER,
+            [
+                "global_commander_value_safe_cut_source_miner",
+                "value_safe_cut_source_hypotheses_ready_for_trace",
+                "value_safe_cut_source_mining_blocks_package_resynthesis",
+                "fresh_cut_source_hypothesis_needs_trace",
+                "collect_usage_trace_for_new_cut_source_hypotheses",
+                "value_safe_reclassification_allowed_now",
+                "candidate_copy_allowed_now",
+                "protected_profile_role_",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_VALUE_SAFE_CUT_SOURCE_MINER_TEST,
+            [
+                "test_mines_fresh_nonprotected_hypothesis_for_trace",
+                "test_blocks_when_only_protected_or_stage_only_sources_exist",
+                "Off Profile Relic",
+                "value_safe_cut_source_hypotheses_ready_for_trace",
+                "collect_usage_trace_for_new_cut_source_hypotheses",
             ],
         )
     )
@@ -2215,6 +2257,25 @@ def build_audit() -> dict[str, Any]:
                 "no_value_safe_cut_source_after_forced_access",
                 "Dragon Mage",
                 "Akroma, Angel of Wrath",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_VALUE_SAFE_CUT_SOURCE_MINER_REPORT,
+            [
+                "Global Commander Value-Safe Cut Source Miner",
+                "value_safe_cut_source_hypotheses_ready_for_trace",
+                "hypothesis_count: `8`",
+                "blocked_hypothesis_count: `80`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "collect_usage_trace_for_new_cut_source_hypotheses",
+                "Biotransference",
+                "Maskwood Nexus",
+                "Sigarda's Aid",
+                "Necromancy",
+                "Sram, Senior Edificer",
             ],
         )
     )

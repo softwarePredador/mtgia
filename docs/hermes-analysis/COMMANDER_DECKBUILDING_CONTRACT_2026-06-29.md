@@ -287,7 +287,11 @@ Operational priority after this pivot:
    cut-lane expansion and scope reduction; it must select the next evidence
    lane without deck action, and if no value-safe cut pair exists it must route
    to mining a fresh value-safe cut source before package resynthesis;
-32. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+32. run `global_commander_value_safe_cut_source_miner.py` after post-forced
+   recovery routes to a fresh cut source; it may mine hypotheses from the
+   current deck, but fresh hypotheses are not value-safe cuts until trace,
+   same-lane, or equal-gate proof is collected;
+33. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -337,6 +341,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_scope1_post_forced.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_post_forced_recovery_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_cut_source_miner_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -740,6 +745,14 @@ Current external refresh on 2026-07-05:
   `mine_new_value_safe_cut_source_before_package_resynthesis`; the current
   package remains closed and no candidate copy, natural battle, promotion, or
   deck mutation is authorized.
+- Current value-safe cut-source mining returns
+  `value_safe_cut_source_hypotheses_ready_for_trace` with `hypothesis_count=8`,
+  `blocked_hypothesis_count=80`, and next gate
+  `collect_usage_trace_for_new_cut_source_hypotheses`. The mined hypotheses are
+  `Biotransference`, `Maskwood Nexus`, `Sigarda's Aid`, `Necromancy`,
+  `Necropotence`, `Trouble in Pairs`, `Puresteel Paladin`, and
+  `Sram, Senior Edificer`. These are trace targets only; candidate copy, battle,
+  promotion, and value-safe reclassification remain closed.
 
 ## Global Commander Rollout - 2026-07-01
 

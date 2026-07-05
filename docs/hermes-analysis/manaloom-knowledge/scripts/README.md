@@ -119,6 +119,12 @@ is `mine_new_value_safe_cut_source_before_package_resynthesis`; do not run a
 candidate copy, natural battle, promotion, or deck mutation from the closed
 package.
 
+Use `global_commander_value_safe_cut_source_miner.py` for that next gate. It may
+surface fresh cut-source hypotheses from the current deck, but those rows are
+trace targets only. Candidate copy and value-safe reclassification stay closed
+until the follow-up trace proves a named hypothesis is unused/safe or has
+same-lane/equal-gate proof.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative
