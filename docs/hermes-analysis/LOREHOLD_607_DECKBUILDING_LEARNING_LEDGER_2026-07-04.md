@@ -799,3 +799,48 @@ App/deckbuilder contract note: do not label a card as simply `accessible`
 unless the UI or API also states which layer passed: legal, owned,
 bracket-allowed, discoverable, or promotion-ready. No card should enter
 protected `607` from legality, ownership, or staple rank alone.
+
+## Game Changer Discovery Gap Audit - 2026-07-05
+
+The next learning artifact is:
+
+- `docs/hermes-analysis/master_optimizer_reports/game_changer_discovery_gap_audit_20260705_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/game_changer_discovery_gap_audit_20260705_current.json`
+
+It compares the backend bracket-policy Game Changer list with local
+`format_staples`, `card_oracle_cache`, Commander legalities, collection, and
+deck `607` presence. It is read-only metadata coverage, not a deck-promotion
+gate.
+
+Current result:
+
+- status: `game_changer_discovery_gap_found_report_only`;
+- Game Changers in policy: `53`;
+- local `game_changers` table present: `false`;
+- Game Changers present in `format_staples`: `21`;
+- Game Changers missing from `format_staples`: `32`;
+- Oracle/cache missing: `5`;
+- Commander legal rows: `53`;
+- Lorehold-legal/color-allowed Game Changers: `21`;
+- Lorehold-legal/color-allowed missing from `format_staples`: `12`;
+- owned Game Changers: `9`;
+- deck-607 Game Changers: `5`.
+
+Lorehold-relevant missing `format_staples` rows include:
+
+- already in protected `607`: `Ancient Tomb` and `Farewell`;
+- owned but not in protected `607`: `Drannith Magistrate` and `The One Ring`;
+- not owned/currently outside `607`: `Field of the Dead`, `Glacial Chasm`,
+  `Grim Monolith`, `Humility`, `Lion's Eye Diamond`, `Mishra's Workshop`,
+  `Serra's Sanctum`, and `The Tabernacle at Pendrell Vale`.
+
+Operational lesson:
+
+- `format_staples` is incomplete as a Game Changer discovery source. The
+  bracket-policy Game Changer list must be a supplemental discovery lane for
+  candidate-source coverage.
+- Missing `format_staples` rows should be repaired as metadata/candidate-source
+  coverage, not treated as evidence that any missing card belongs in the deck.
+- Current `607` remains protected: Game Changer discovery coverage changes
+  what the app can explain and queue, but it does not bypass same-lane cut,
+  natural battle, Winota/fast-pressure, and card-use gates.

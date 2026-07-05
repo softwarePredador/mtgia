@@ -1,0 +1,1489 @@
+{
+  "artifact_type": "game_changer_discovery_gap_audit",
+  "bracket_policy": "server/lib/edh_bracket_policy.dart",
+  "collection_source": "docs/hermes-analysis/manaloom-knowledge/scripts/user_collection.csv",
+  "decision": {
+    "next_action": "Use the bracket Game Changer list as a supplemental discovery lane and repair missing identity/staple rows before relying on format_staples-only candidate generation.",
+    "no_deck_promotion": true,
+    "reason": "Game Changer discovery coverage is metadata only. Missing format_staples rows should be repaired as candidate-source coverage, not interpreted as proof that a card belongs in protected deck 607."
+  },
+  "deck_id": 607,
+  "generated_at": "2026-07-05T02:51:17Z",
+  "lorehold_legal_color_allowed_missing_format_staples": [
+    {
+      "card_name": "ancient tomb",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "ancient tomb",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "",
+        "present": true,
+        "type_line": "Land"
+      },
+      "present_in_deck": true,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "drannith magistrate",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "drannith magistrate",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{1}{W}",
+        "present": true,
+        "type_line": "Creature \u2014 Human Wizard"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "farewell",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "farewell",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{4}{W}{W}",
+        "present": true,
+        "type_line": "Sorcery"
+      },
+      "present_in_deck": true,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "field of the dead",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "field of the dead",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "glacial chasm",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "glacial chasm",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "grim monolith",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "grim monolith",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{2}",
+        "present": true,
+        "type_line": "Artifact"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "humility",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "humility",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{2}{W}{W}",
+        "present": true,
+        "type_line": "Enchantment"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "lion's eye diamond",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "lion's eye diamond",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{0}",
+        "present": true,
+        "type_line": "Artifact"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "mishra's workshop",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "mishra's workshop",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "serra's sanctum",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "serra's sanctum",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Legendary Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "the one ring",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "the one ring",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{4}",
+        "present": true,
+        "type_line": "Legendary Artifact"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "the tabernacle at pendrell vale",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "the tabernacle at pendrell vale",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Legendary Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    }
+  ],
+  "postgres_writes": false,
+  "rows": [
+    {
+      "card_name": "ad nauseam",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "ad nauseam",
+      "oracle": {
+        "color_identity": [
+          "B"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{3}{B}{B}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "ancient tomb",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "ancient tomb",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "",
+        "present": true,
+        "type_line": "Land"
+      },
+      "present_in_deck": true,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "aura shards",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "aura shards",
+      "oracle": {
+        "color_identity": [
+          "G",
+          "W"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{1}{G}{W}",
+        "present": true,
+        "type_line": "Enchantment"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "biorhythm",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "biorhythm",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": false,
+        "type_line": null
+      },
+      "present_in_deck": false,
+      "status": "identity_gap_missing_oracle_cache"
+    },
+    {
+      "card_name": "bolas's citadel",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "bolas's citadel",
+      "oracle": {
+        "color_identity": [
+          "B"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{3}{B}{B}{B}",
+        "present": true,
+        "type_line": "Legendary Artifact"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "braids, cabal minion",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "braids, cabal minion",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": false,
+        "type_line": null
+      },
+      "present_in_deck": false,
+      "status": "identity_gap_missing_oracle_cache"
+    },
+    {
+      "card_name": "chrome mox",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "ramp",
+        "edhrec_rank": 142,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "chrome mox",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{0}",
+        "present": true,
+        "type_line": "Artifact"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "coalition victory",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "coalition victory",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": false,
+        "type_line": null
+      },
+      "present_in_deck": false,
+      "status": "identity_gap_missing_oracle_cache"
+    },
+    {
+      "card_name": "consecrated sphinx",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "consecrated sphinx",
+      "oracle": {
+        "color_identity": [
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{4}{U}{U}",
+        "present": true,
+        "type_line": "Creature \u2014 Sphinx"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "crop rotation",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "green",
+        "edhrec_rank": 213,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "crop rotation",
+      "oracle": {
+        "color_identity": [
+          "G"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{G}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "cyclonic rift",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "blue",
+        "edhrec_rank": 48,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "cyclonic rift",
+      "oracle": {
+        "color_identity": [
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{1}{U}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "demonic tutor",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "combo",
+        "edhrec_rank": 58,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "demonic tutor",
+      "oracle": {
+        "color_identity": [
+          "B"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{1}{B}",
+        "present": true,
+        "type_line": "Sorcery"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "drannith magistrate",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "drannith magistrate",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{1}{W}",
+        "present": true,
+        "type_line": "Creature \u2014 Human Wizard"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "enlightened tutor",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "combo",
+        "edhrec_rank": 115,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "enlightened tutor",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{W}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "farewell",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "farewell",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{4}{W}{W}",
+        "present": true,
+        "type_line": "Sorcery"
+      },
+      "present_in_deck": true,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "field of the dead",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "field of the dead",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "fierce guardianship",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "blue",
+        "edhrec_rank": 77,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "fierce guardianship",
+      "oracle": {
+        "color_identity": [
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{2}{U}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "force of will",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "control",
+        "edhrec_rank": 185,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "force of will",
+      "oracle": {
+        "color_identity": [
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{3}{U}{U}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "gaea's cradle",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "gaea's cradle",
+      "oracle": {
+        "color_identity": [
+          "G"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Legendary Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "gamble",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "combo",
+        "edhrec_rank": 231,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "gamble",
+      "oracle": {
+        "color_identity": [
+          "R"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{R}",
+        "present": true,
+        "type_line": "Sorcery"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "gifts ungiven",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "gifts ungiven",
+      "oracle": {
+        "color_identity": [
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{3}{U}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "glacial chasm",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "glacial chasm",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "grand arbiter augustin iv",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "grand arbiter augustin iv",
+      "oracle": {
+        "color_identity": [
+          "U",
+          "W"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{2}{W}{U}",
+        "present": true,
+        "type_line": "Legendary Creature \u2014 Human Advisor"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "grim monolith",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "grim monolith",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{2}",
+        "present": true,
+        "type_line": "Artifact"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "humility",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "humility",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{2}{W}{W}",
+        "present": true,
+        "type_line": "Enchantment"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "imperial seal",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "combo",
+        "edhrec_rank": 489,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "imperial seal",
+      "oracle": {
+        "color_identity": [
+          "B"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{B}",
+        "present": true,
+        "type_line": "Sorcery"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "intuition",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "intuition",
+      "oracle": {
+        "color_identity": [
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{2}{U}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "jeska's will",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "red",
+        "edhrec_rank": 102,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "jeska's will",
+      "oracle": {
+        "color_identity": [
+          "R"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{2}{R}",
+        "present": true,
+        "type_line": "Sorcery"
+      },
+      "present_in_deck": true,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "lion's eye diamond",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "lion's eye diamond",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{0}",
+        "present": true,
+        "type_line": "Artifact"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "mana vault",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "ramp",
+        "edhrec_rank": 144,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "mana vault",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{1}",
+        "present": true,
+        "type_line": "Artifact"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "mishra's workshop",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "mishra's workshop",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "mox diamond",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "ramp",
+        "edhrec_rank": 246,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "mox diamond",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{0}",
+        "present": true,
+        "type_line": "Artifact"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "mystical tutor",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "blue",
+        "edhrec_rank": 139,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "mystical tutor",
+      "oracle": {
+        "color_identity": [
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{U}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "narset, parter of veils",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "narset, parter of veils",
+      "oracle": {
+        "color_identity": [
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{1}{U}{U}",
+        "present": true,
+        "type_line": "Legendary Planeswalker \u2014 Narset"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "natural order",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "natural order",
+      "oracle": {
+        "color_identity": [
+          "G"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{2}{G}{G}",
+        "present": true,
+        "type_line": "Sorcery"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "necropotence",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "necropotence",
+      "oracle": {
+        "color_identity": [
+          "B"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{B}{B}{B}",
+        "present": true,
+        "type_line": "Enchantment"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "notion thief",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "notion thief",
+      "oracle": {
+        "color_identity": [
+          "B",
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{2}{U}{B}",
+        "present": true,
+        "type_line": "Creature \u2014 Human Rogue"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "opposition agent",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "opposition agent",
+      "oracle": {
+        "color_identity": [
+          "B"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{2}{B}",
+        "present": true,
+        "type_line": "Creature \u2014 Human Rogue"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "orcish bowmasters",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "black",
+        "edhrec_rank": 247,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "orcish bowmasters",
+      "oracle": {
+        "color_identity": [
+          "B"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{1}{B}",
+        "present": true,
+        "type_line": "Creature \u2014 Orc Archer"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "panoptic mirror",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "panoptic mirror",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": false,
+        "type_line": null
+      },
+      "present_in_deck": false,
+      "status": "identity_gap_missing_oracle_cache"
+    },
+    {
+      "card_name": "rhystic study",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "blue",
+        "edhrec_rank": 40,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "rhystic study",
+      "oracle": {
+        "color_identity": [
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{2}{U}",
+        "present": true,
+        "type_line": "Enchantment"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "seedborn muse",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "seedborn muse",
+      "oracle": {
+        "color_identity": [
+          "G"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{3}{G}{G}",
+        "present": true,
+        "type_line": "Creature \u2014 Spirit"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "serra's sanctum",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "serra's sanctum",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Legendary Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "smothering tithe",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "white",
+        "edhrec_rank": 57,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "smothering tithe",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{3}{W}",
+        "present": true,
+        "type_line": "Enchantment"
+      },
+      "present_in_deck": true,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "survival of the fittest",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "survival of the fittest",
+      "oracle": {
+        "color_identity": [
+          "G"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{1}{G}",
+        "present": true,
+        "type_line": "Enchantment"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "teferi's protection",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "white",
+        "edhrec_rank": 99,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "teferi's protection",
+      "oracle": {
+        "color_identity": [
+          "W"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{2}{W}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": true,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "tergrid, god of fright // tergrid's lantern",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "tergrid, god of fright // tergrid's lantern",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": false,
+        "type_line": null
+      },
+      "present_in_deck": false,
+      "status": "identity_gap_missing_oracle_cache"
+    },
+    {
+      "card_name": "thassa's oracle",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "blue",
+        "edhrec_rank": 393,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "thassa's oracle",
+      "oracle": {
+        "color_identity": [
+          "U"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{U}{U}",
+        "present": true,
+        "type_line": "Creature \u2014 Merfolk Wizard"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "the one ring",
+      "collection_quantity": 1,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "the one ring",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{4}",
+        "present": true,
+        "type_line": "Legendary Artifact"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "the tabernacle at pendrell vale",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": null,
+        "edhrec_rank": null,
+        "is_banned": null,
+        "present": false
+      },
+      "normalized_name": "the tabernacle at pendrell vale",
+      "oracle": {
+        "color_identity": [],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": null,
+        "present": true,
+        "type_line": "Legendary Land"
+      },
+      "present_in_deck": false,
+      "status": "discovery_gap_missing_format_staples"
+    },
+    {
+      "card_name": "underworld breach",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "red",
+        "edhrec_rank": 400,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "underworld breach",
+      "oracle": {
+        "color_identity": [
+          "R"
+        ],
+        "color_identity_allowed_lorehold": true,
+        "mana_cost": "{1}{R}",
+        "present": true,
+        "type_line": "Enchantment"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "vampiric tutor",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "combo",
+        "edhrec_rank": 106,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "vampiric tutor",
+      "oracle": {
+        "color_identity": [
+          "B"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{B}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    },
+    {
+      "card_name": "worldly tutor",
+      "collection_quantity": 0,
+      "commander_legality": "legal",
+      "format_staples": {
+        "archetype": "combo",
+        "edhrec_rank": 163,
+        "is_banned": false,
+        "present": true
+      },
+      "normalized_name": "worldly tutor",
+      "oracle": {
+        "color_identity": [
+          "G"
+        ],
+        "color_identity_allowed_lorehold": false,
+        "mana_cost": "{G}",
+        "present": true,
+        "type_line": "Instant"
+      },
+      "present_in_deck": false,
+      "status": "discovery_ready_in_format_staples"
+    }
+  ],
+  "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "status": "game_changer_discovery_gap_found_report_only",
+  "summary": {
+    "commander_legal_count": 53,
+    "deck_game_changer_count": 5,
+    "format_staples_missing_count": 32,
+    "format_staples_present_count": 21,
+    "game_changers_in_policy": 53,
+    "game_changers_table_missing_count": 53,
+    "game_changers_table_present": false,
+    "game_changers_table_row_count": 0,
+    "lorehold_legal_color_allowed_count": 21,
+    "lorehold_legal_color_allowed_missing_format_staples_count": 12,
+    "oracle_missing_count": 5,
+    "owned_game_changer_count": 9,
+    "status_counts": {
+      "discovery_gap_missing_format_staples": 27,
+      "discovery_ready_in_format_staples": 21,
+      "identity_gap_missing_oracle_cache": 5
+    }
+  }
+}
