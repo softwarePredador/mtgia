@@ -282,12 +282,19 @@ def decision_status(
     no_rule = as_int(state.get("active_rule_count")) <= 0
     no_cut = safe_cut_count == 0
     exact_drafted = bool(exact_state.get("contract_drafted"))
-    adapter_missing = exact_drafted and not bool(exact_state.get("adapter_present"))
+    adapter_present = exact_drafted and bool(exact_state.get("adapter_present"))
+    adapter_missing = exact_drafted and not adapter_present
     if no_rule and no_cut:
         if adapter_missing:
             return (
                 "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_missing_no_active_rule_no_safe_cut_keep_607",
                 "implement_brain_in_a_jar_runtime_adapter_before_any_brain_deck_action",
+                False,
+            )
+        if adapter_present:
+            return (
+                "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607",
+                "prepare_brain_in_a_jar_pg_package_precheck_and_mine_seed_safe_cut_no_deck_action",
                 False,
             )
         return (
@@ -296,6 +303,12 @@ def decision_status(
             False,
         )
     if no_rule:
+        if adapter_present:
+            return (
+                "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_keep_607",
+                "prepare_brain_in_a_jar_pg_package_precheck_no_deck_action",
+                False,
+            )
         return (
             "brain_in_a_jar_runtime_cut_preflight_blocked_no_active_rule_keep_607",
             "draft_exact_mana_value_free_cast_runtime_family_before_candidate_queue_refresh",
@@ -352,6 +365,13 @@ def build_report(
         decision_reason = (
             "Brain has runtime and at least one synthetic same-lane cut candidate, but deck "
             "materialization and natural battle remain closed until refreshed matrix scoring."
+        )
+    elif bool(exact_state.get("contract_drafted")) and bool(exact_state.get("adapter_present")):
+        decision_reason = (
+            "Brain in a Jar now has an exact runtime-family contract and a ManaLoom "
+            "adapter, but it still has no active card rule and no seed-safe same-lane "
+            "cut in protected 607. Brain therefore remains a runtime implementation "
+            "route, not a deck card."
         )
     elif bool(exact_state.get("contract_drafted")):
         decision_reason = (
@@ -436,6 +456,7 @@ def build_report(
                 and bool(exact_state.get("contract_drafted"))
                 and not bool(exact_state.get("adapter_present"))
             ),
+            "active_rule_required_before_battle": as_int(state.get("active_rule_count")) <= 0,
             "named_safe_cut_required_before_scoring": len(safe_rows) == 0,
             "reason": decision_reason,
             "next_actions": [
@@ -443,7 +464,11 @@ def build_report(
                 "do_not_materialize_brain_candidate_deck",
                 "do_not_run_natural_battle_for_brain_from_this_preflight",
                 next_action,
-                "after_runtime_adapter_exists_rerun_this_preflight_before_candidate_queue_refresh",
+                (
+                    "after_active_rule_and_safe_cut_exist_rerun_this_preflight_before_candidate_queue_refresh"
+                    if bool(exact_state.get("adapter_present"))
+                    else "after_runtime_adapter_exists_rerun_this_preflight_before_candidate_queue_refresh"
+                ),
             ],
         },
     }
@@ -534,6 +559,7 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
     lines.append(f"- postgres_writes_allowed: `{str(decision['postgres_writes_allowed']).lower()}`")
     lines.append(f"- runtime_family_required_before_battle: `{str(decision['runtime_family_required_before_battle']).lower()}`")
     lines.append(f"- runtime_adapter_required_before_battle: `{str(decision['runtime_adapter_required_before_battle']).lower()}`")
+    lines.append(f"- active_rule_required_before_battle: `{str(decision['active_rule_required_before_battle']).lower()}`")
     lines.append(f"- named_safe_cut_required_before_scoring: `{str(decision['named_safe_cut_required_before_scoring']).lower()}`")
     lines.append(f"- reason: {decision['reason']}")
     lines.append("- next_actions:")

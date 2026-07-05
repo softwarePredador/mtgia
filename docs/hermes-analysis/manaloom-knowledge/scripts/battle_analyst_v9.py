@@ -1220,6 +1220,7 @@ MTG_SHARED_CARD_TYPES = {
     "tribal",
 }
 PLANETARIUM_TOP_FREE_CAST_SCOPE = "scry_or_surveil_once_turn_top_library_free_cast_v1"
+BRAIN_IN_A_JAR_SCOPE = "xmage_brain_in_a_jar_charge_counter_free_cast_scry_v1"
 MEDALLION_COLOR_RESTRICTIONS = {
     "pearl medallion": "W",
     "sapphire medallion": "U",
@@ -31856,6 +31857,42 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             )
             return 1
 
+    brain_in_a_jar_permanents = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and is_brain_in_a_jar_runtime_source(permanent)
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if phase in {"precombat_main", "postcombat_main"}:
+        for permanent in brain_in_a_jar_permanents:
+            counter_count = max(
+                1,
+                int(
+                    permanent.get("activated_add_counters_count")
+                    or permanent.get("counter_count")
+                    or 1
+                ),
+            )
+            next_charge_count = brain_in_a_jar_charge_counter_count(permanent) + counter_count
+            if brain_in_a_jar_exact_mana_value_free_cast_candidates(
+                player,
+                permanent,
+                permanent,
+                charge_counters=next_charge_count,
+            ):
+                result = resolve_brain_in_a_jar_add_counter_free_cast(
+                    player,
+                    opponents,
+                    all_players,
+                    permanent,
+                    turn,
+                    rng,
+                    phase=phase,
+                )
+                if result.get("activated"):
+                    return 1
+
     self_counter_permanents = [
         permanent
         for permanent in player.battlefield
@@ -31863,6 +31900,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         and permanent.get("activated_add_counters")
         and str(permanent.get("activated_add_counters_target") or "self") == "self"
         and not permanent.get("activated_add_counters_used_this_turn")
+        and not is_brain_in_a_jar_runtime_source(permanent)
     ]
     if phase == "postcombat_main":
         for permanent in self_counter_permanents:
@@ -32893,6 +32931,460 @@ def planetarium_top_card_free_castable(card, effect_data):
         "unknown",
         "land",
         "counter",
+    }
+
+
+def is_brain_in_a_jar_runtime_source(permanent):
+    if not isinstance(permanent, dict):
+        return False
+    effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+    return (
+        effect_data.get("battle_model_scope") == BRAIN_IN_A_JAR_SCOPE
+        and bool(effect_data.get("brain_in_a_jar_free_cast"))
+    )
+
+
+def brain_in_a_jar_charge_counter_count(permanent):
+    return get_named_counter_count(permanent, "charge")
+
+
+def brain_in_a_jar_exact_mana_value_free_cast_candidates(
+    player,
+    permanent,
+    effect_data=None,
+    *,
+    charge_counters=None,
+):
+    effect_data = effect_data or permanent
+    required_mana_value = (
+        int(charge_counters)
+        if charge_counters is not None
+        else brain_in_a_jar_charge_counter_count(permanent)
+    )
+    candidates = []
+    for candidate in list(getattr(player, "hand", []) or []):
+        if not isinstance(candidate, dict):
+            continue
+        if not is_instant_or_sorcery_spell(candidate):
+            continue
+        mana_value = card_mana_value(candidate)
+        if mana_value != required_mana_value:
+            continue
+        candidate_effect = get_card_effect(candidate)
+        if candidate_effect.get("effect") in {"unknown", "land", "counter", "free_cast"}:
+            continue
+        candidates.append(
+            {
+                "card": candidate,
+                "source_zone": "hand",
+                "effect_data": candidate_effect,
+                "mana_value": mana_value,
+            }
+        )
+    return candidates
+
+
+def choose_brain_in_a_jar_free_cast_candidate(player, opponents, permanent, effect_data, turn):
+    candidates = brain_in_a_jar_exact_mana_value_free_cast_candidates(player, permanent, effect_data)
+    if not candidates:
+        return None, []
+    all_players = [player] + list(opponents or [])
+    scored = []
+    for candidate in candidates:
+        candidate_effect = copy.deepcopy(candidate["effect_data"])
+        score = threat_score(
+            candidate_effect.get("effect", "unknown"),
+            candidate["card"].get("name", "?"),
+            player,
+            all_players,
+            turn,
+        )
+        if candidate_effect.get("effect") in TARGETED_REMOVAL_EFFECTS:
+            targeted_effect, declared = prepare_declared_removal_targets(
+                player,
+                opponents,
+                candidate["card"],
+                candidate_effect,
+            )
+            if not declared:
+                continue
+            candidate_effect = targeted_effect
+            score += 8
+        elif candidate_effect.get("effect") == "direct_damage":
+            score += int(candidate_effect.get("damage") or 0)
+        elif candidate_effect.get("effect") == "draw_cards":
+            score += 4 * int(candidate_effect.get("count") or 1)
+        scored.append({**candidate, "effect_data": candidate_effect, "score": score})
+    if not scored:
+        return None, candidates
+    return max(
+        scored,
+        key=lambda row: (
+            float(row.get("score") or 0),
+            int(row.get("mana_value") or 0),
+            str(row["card"].get("name", "")),
+        ),
+    ), candidates
+
+
+def cast_brain_in_a_jar_selected_spell(
+    player,
+    opponents,
+    all_players,
+    permanent,
+    selected,
+    turn,
+    rng,
+    *,
+    source_effect_data,
+    stack=None,
+    phase=None,
+):
+    selected_card = selected["card"]
+    if selected_card not in getattr(player, "hand", []):
+        return False, "not_in_hand"
+    selected_effect = copy.deepcopy(selected.get("effect_data") or get_card_effect(selected_card))
+    eligible_spell_names = [
+        row["card"].get("name", "?")
+        for row in brain_in_a_jar_exact_mana_value_free_cast_candidates(
+            player,
+            permanent,
+            source_effect_data,
+        )
+    ]
+    cast_phase = phase or "resolution"
+    cast_ctx = begin_cast_context(
+        player,
+        selected_card,
+        cast_phase,
+        effect_data=selected_effect,
+        role="brain_in_a_jar",
+        modes=["cast_without_paying_mana", "brain_in_a_jar", "hand"],
+        alternative_cost="{0}",
+        source_zone="hand",
+        alternative_cost_kind="cast_without_paying_mana",
+    )
+    cast_ctx.is_legal = True
+    cast_ctx.locked_cost = zero_mana_cost_snapshot("cast_without_paying_mana_cost")
+    store_cast_context_fields(
+        selected_effect,
+        {
+            "phase": cast_phase,
+            **cast_ctx.to_replay_fields(),
+        },
+    )
+    if not commit_cast_payment(cast_ctx):
+        return False, "cast_payment_failed"
+    if not _remove_card_from_zone(player.hand, selected_card):
+        return False, "source_zone_remove_failed"
+
+    emit_replay_event(
+        "brain_in_a_jar_free_cast",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        cast_card=selected_card.get("name", "?"),
+        cast_effect=selected_effect.get("effect", "unknown"),
+        selected_mana_value=card_mana_value(selected_card),
+        charge_counters=brain_in_a_jar_charge_counter_count(permanent),
+        charge_counters_after=brain_in_a_jar_charge_counter_count(permanent),
+        eligible_spell_names=eligible_spell_names,
+        cast_without_paying_mana_cost=True,
+        turn=turn,
+        phase=cast_phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(source_effect_data),
+    )
+    emit_replay_event(
+        "spell_cast",
+        player=player.name,
+        card=selected_card.get("name", "?"),
+        effect=selected_effect.get("effect", "unknown"),
+        type_line=selected_card.get("type_line", ""),
+        cmc=selected_card.get("cmc", 0),
+        turn=turn,
+        phase=cast_phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(selected_effect),
+    )
+    mark_cast_ledger_emitted(selected_effect)
+    players = all_players or [player, *(opponents or [])]
+    trigger_spell_cast_engines(
+        player,
+        players,
+        selected_card,
+        turn,
+        cast_phase,
+        stack=stack,
+        active_player=player,
+    )
+    trigger_opponent_spell_draw_engines(
+        player,
+        opponents,
+        selected_card,
+        turn,
+        cast_phase,
+        rng,
+        stack=stack,
+        active_player=player,
+        all_players=players,
+    )
+    apply_effect_immediate(
+        player,
+        opponents,
+        selected_card,
+        turn,
+        rng,
+        effect_data_override=selected_effect,
+        stack=stack,
+        phase=cast_phase,
+    )
+    return True, "cast_without_paying_mana"
+
+
+def resolve_brain_in_a_jar_add_counter_free_cast(
+    player,
+    opponents,
+    all_players,
+    permanent,
+    turn,
+    rng,
+    *,
+    phase="precombat_main",
+    stack=None,
+):
+    effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+    if not is_brain_in_a_jar_runtime_source(effect_data):
+        return {"activated": False, "result": "not_brain_in_a_jar_runtime_source"}
+    activation_cost = adjusted_activated_ability_generic_cost(
+        player,
+        permanent,
+        int(effect_data.get("activation_cost_generic") or 1),
+    )
+    activation_cost_text = effect_data.get("activation_cost_mana") or (
+        "{%d}" % activation_cost if activation_cost > 0 else "{0}"
+    )
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "brain_in_a_jar_already_tapped",
+            phase=phase,
+        )
+        return {"activated": False, "result": "already_tapped"}
+    if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "failed_to_pay_brain_in_a_jar_add_counter_cost",
+            phase=phase,
+        )
+        return {"activated": False, "result": "failed_to_pay_activation_cost"}
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    permanent["utility_artifact_used_this_turn"] = True
+    permanent["activated_add_counters_used_this_turn"] = True
+    counters_before = brain_in_a_jar_charge_counter_count(permanent)
+    resolve_add_counters_source_effect(
+        player,
+        permanent,
+        effect_data,
+        turn,
+        event_name="brain_in_a_jar_charge_counter_added",
+        phase=phase,
+        extra_event_fields={"activation_kind": "add_charge_counter_then_exact_mana_value_free_cast"},
+    )
+    counters_after = brain_in_a_jar_charge_counter_count(permanent)
+    selected, eligible_candidates = choose_brain_in_a_jar_free_cast_candidate(
+        player,
+        opponents,
+        permanent,
+        effect_data,
+        turn,
+    )
+    eligible_names = [
+        row["card"].get("name", "?")
+        for row in brain_in_a_jar_exact_mana_value_free_cast_candidates(
+            player,
+            permanent,
+            effect_data,
+            charge_counters=counters_after,
+        )
+    ]
+    if selected is None:
+        emit_replay_event(
+            "brain_in_a_jar_free_cast",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            result="no_eligible_exact_mana_value_instant_or_sorcery",
+            charge_counters_before=counters_before,
+            charge_counters_after=counters_after,
+            eligible_spell_names=eligible_names,
+            cast_without_paying_mana_cost=False,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(effect_data),
+        )
+        return {
+            "activated": True,
+            "result": "no_eligible_exact_mana_value_instant_or_sorcery",
+            "charge_counters_before": counters_before,
+            "charge_counters_after": counters_after,
+            "eligible_spell_names": eligible_names,
+            "cast_success": False,
+        }
+
+    cast_success, cast_result = cast_brain_in_a_jar_selected_spell(
+        player,
+        opponents,
+        all_players,
+        permanent,
+        selected,
+        turn,
+        rng,
+        source_effect_data=effect_data,
+        stack=stack,
+        phase=phase,
+    )
+    emit_decision_trace(
+        decision_type="utility_artifact_activation",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                row["card"],
+                action="brain_in_a_jar_exact_mana_value_free_cast",
+                effect=row["effect_data"].get("effect", "unknown"),
+                score=float(row.get("score") or 0),
+            )
+            for row in (eligible_candidates or [])
+        ],
+        chosen_option=decision_card_option(
+            selected["card"],
+            action="brain_in_a_jar_exact_mana_value_free_cast",
+            effect=selected["effect_data"].get("effect", "unknown"),
+            score=float(selected.get("score") or 0),
+        ),
+        score_components={
+            "activation_cost": activation_cost_text,
+            "charge_counters_before": counters_before,
+            "charge_counters_after": counters_after,
+            "required_mana_value": counters_after,
+            "eligible_spell_names": eligible_names,
+            "selected_spell": selected["card"].get("name", "?"),
+            "selected_spell_mana_value": card_mana_value(selected["card"]),
+        },
+        rule_source=BRAIN_IN_A_JAR_SCOPE,
+        rule_status=effect_data.get("_rule_review_status", "active"),
+        confidence="medium",
+        expected_benefit_score=float(selected.get("score") or 0),
+        actual_outcome=cast_result,
+        reason="use_brain_in_a_jar_when_charge_counter_activation_enables_exact_hand_spell",
+        strategic_principle="convert stored charge counters into exact mana-value spell access",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -_mana_cost_text_value(activation_cost_text),
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "charge_counters": counters_after - counters_before,
+            "free_casts": 1 if cast_success else 0,
+        },
+        risk_flags=["activated_add_counters", "cast_without_paying_mana", "exact_mana_value"],
+    )
+    return {
+        "activated": True,
+        "result": cast_result,
+        "charge_counters_before": counters_before,
+        "charge_counters_after": counters_after,
+        "eligible_spell_names": eligible_names,
+        "selected_spell": selected["card"].get("name", "?"),
+        "selected_spell_mana_value": card_mana_value(selected["card"]),
+        "cast_success": bool(cast_success),
+    }
+
+
+def resolve_brain_in_a_jar_remove_variable_charge_counters_scry(
+    player,
+    permanent,
+    turn,
+    *,
+    remove_count=None,
+    phase="precombat_main",
+):
+    effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+    if not is_brain_in_a_jar_runtime_source(effect_data):
+        return {"activated": False, "result": "not_brain_in_a_jar_runtime_source"}
+    activation_cost = adjusted_activated_ability_generic_cost(
+        player,
+        permanent,
+        int(effect_data.get("secondary_activation_cost_generic") or 3),
+    )
+    activation_cost_text = effect_data.get("secondary_activation_cost_mana") or (
+        "{%d}" % activation_cost if activation_cost > 0 else "{0}"
+    )
+    if effect_data.get("secondary_activation_requires_tap", True) and permanent.get("tapped"):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "brain_in_a_jar_scry_already_tapped",
+            phase=phase,
+        )
+        return {"activated": False, "result": "already_tapped"}
+    current = brain_in_a_jar_charge_counter_count(permanent)
+    if current <= 0:
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "brain_in_a_jar_scry_no_charge_counters",
+            phase=phase,
+        )
+        return {"activated": False, "result": "no_charge_counters"}
+    requested = current if remove_count is None else max(0, int(remove_count or 0))
+    requested = min(current, requested)
+    if requested <= 0:
+        return {"activated": False, "result": "zero_counters_requested"}
+    if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "failed_to_pay_brain_in_a_jar_scry_cost",
+            phase=phase,
+        )
+        return {"activated": False, "result": "failed_to_pay_activation_cost"}
+    if effect_data.get("secondary_activation_requires_tap", True):
+        permanent["tapped"] = True
+    permanent["utility_artifact_used_this_turn"] = True
+    removed = remove_named_counters(permanent, "charge", requested)
+    scry_result = scry_library_for_controller(player, removed)
+    emit_replay_event(
+        "brain_in_a_jar_scry",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="remove_variable_charge_counters_scry_x",
+        activation_cost=activation_cost_text,
+        charge_counters_before=current,
+        removed_charge_counters=removed,
+        charge_counters_after=brain_in_a_jar_charge_counter_count(permanent),
+        scry_count=removed,
+        scry_looked_at=scry_result["looked_at"],
+        scry_kept_on_top=scry_result["kept_on_top"],
+        scry_bottomed=scry_result["bottomed"],
+        scry_top_after=scry_result["top_after"],
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(effect_data),
+    )
+    return {
+        "activated": True,
+        "result": "scry_resolved",
+        "charge_counters_before": current,
+        "removed_charge_counters": removed,
+        "charge_counters_after": brain_in_a_jar_charge_counter_count(permanent),
+        "scry_result": scry_result,
     }
 
 

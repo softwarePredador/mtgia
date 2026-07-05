@@ -181,6 +181,21 @@ def test_exact_contract_drafted_changes_blocker_to_adapter_missing() -> None:
     )
 
 
+def test_adapter_present_changes_blocker_to_active_rule_and_safe_cut() -> None:
+    payload = _build(exact_runtime_contract=_exact_runtime_contract(drafted=True, adapter_present=True))
+
+    assert payload["summary"]["decision_status"] == (
+        "brain_in_a_jar_runtime_cut_preflight_blocked_adapter_present_no_active_rule_no_safe_cut_keep_607"
+    )
+    assert payload["summary"]["brain_exact_adapter_present"] is True
+    assert payload["decision"]["runtime_adapter_required_before_battle"] is False
+    assert payload["decision"]["active_rule_required_before_battle"] is True
+    assert payload["decision"]["named_safe_cut_required_before_scoring"] is True
+    assert payload["summary"]["recommended_next_action"] == (
+        "prepare_brain_in_a_jar_pg_package_precheck_and_mine_seed_safe_cut_no_deck_action"
+    )
+
+
 def test_active_rule_and_safe_cut_only_allow_matrix_scoring_no_battle() -> None:
     payload = _build(
         runtime_contract=_runtime_contract(active_rules=1),
