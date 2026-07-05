@@ -2831,7 +2831,8 @@ This miner consumes:
 
 - `lorehold_topdeck_sidecar_cut_model_planner_20260705_current`;
 - `lorehold_card_exposure_profile_20260704_role_tag_repair_deck607`;
-- `lorehold_mana_base_safe_cut_model_20260705_current`.
+- `lorehold_mana_base_safe_cut_model_20260705_current`;
+- `lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current`.
 
 Current result:
 
@@ -2847,8 +2848,12 @@ Current result:
 - exposed topdeck-role probes blocked: `20`;
 - generic mana probes blocked: `28`;
 - dedicated mana-base model-ready pairs found: `2`;
+- dedicated mana-base exact rejected pairs: `2`;
+- dedicated mana-base eligible pairs after decision filter: `0`;
+- mana route status:
+  `mana_route_closed_by_exact_decisions`;
 - recommended next action:
-  `use_dedicated_mana_model_ready_pairs_as_diagnostic_candidates_or_collect_topdeck_floor_traces`.
+  `collect_new_mana_evidence_or_topdeck_floor_traces_before_any_matrix_row`.
 
 Topdeck probe evidence:
 
@@ -2880,14 +2885,20 @@ Corrected mana route:
   model;
 - the dedicated model has exactly two current diagnostic pairs:
   `+Plateau / -Radiant Summit` and `+Plateau / -Turbulent Steppe`;
-- these pairs are `model_ready_for_candidate_materialization`, but still have
-  deck materialization, matrix scoring, trace, battle, and promotion closed.
+- both pairs were already decision-filtered as exact rejected decisions:
+  `lorehold_mana_base_plateau_radiant_decision_20260705_current` rejected
+  `+Plateau / -Radiant Summit`, and
+  `lorehold_mana_base_plateau_turbulent_steppe_decision_20260705_current`
+  rejected `+Plateau / -Turbulent Steppe`;
+- the current mana-base decision integrator has
+  `eligible_model_ready_pair_count=0`, so no Plateau pair remains eligible for
+  materialization without new mana-trace evidence.
 
 Operational lesson:
 
 - The next safe movement is not to cut the named probes.
 - For topdeck, collect floor-equivalence traces before trying any candidate
   row.
-- For mana, route through the dedicated `Plateau` pair model instead of generic
-  basic-land or utility-land probes.
+- For mana, do not retest the exact `Plateau` pairs without new evidence; the
+  current mana route is closed by decisions.
 - Deck `607` remains untouched and protected.

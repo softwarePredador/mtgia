@@ -28,6 +28,9 @@ DEFAULT_EXPOSURE_PROFILE = (
     REPORT_DIR / "lorehold_card_exposure_profile_20260704_role_tag_repair_deck607.json"
 )
 DEFAULT_MANA_BASE_MODEL = REPORT_DIR / "lorehold_mana_base_safe_cut_model_20260705_current.json"
+DEFAULT_MANA_DECISION_INTEGRATOR = (
+    REPORT_DIR / "lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current.json"
+)
 DEFAULT_OUT_PREFIX = REPORT_DIR / "lorehold_topdeck_sidecar_probe_evidence_miner_20260705_current"
 
 LOW_EXPOSURE_UNIQUE_LIMIT = 3
@@ -173,15 +176,45 @@ def mana_ready_pairs(payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+def annotated_mana_pairs(integrator: Mapping[str, Any]) -> list[dict[str, Any]]:
+    rows = [
+        dict(row)
+        for row in as_list(integrator.get("annotated_model_ready_pairs"))
+        if isinstance(row, Mapping)
+    ]
+    rows.sort(key=lambda row: (-as_int(row.get("pair_score")), str(row.get("add") or ""), str(row.get("cut") or "")))
+    return rows
+
+
+def eligible_annotated_pairs(integrator: Mapping[str, Any]) -> list[dict[str, Any]]:
+    return [
+        row
+        for row in annotated_mana_pairs(integrator)
+        if row.get("learning_status") == "eligible_for_materialization_after_prior_decision_filter"
+    ]
+
+
+def rejected_annotated_pairs(integrator: Mapping[str, Any]) -> list[dict[str, Any]]:
+    return [
+        row
+        for row in annotated_mana_pairs(integrator)
+        if row.get("learning_status") == "blocked_exact_tested_decision"
+    ]
+
+
 def build_report(
     *,
     cut_model_planner: Mapping[str, Any],
     exposure_profile: Mapping[str, Any],
     mana_base_model: Mapping[str, Any],
+    mana_decision_integrator: Mapping[str, Any],
     paths: Mapping[str, Path],
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profile)
     ready_pairs = mana_ready_pairs(mana_base_model)
+    annotated_pairs = annotated_mana_pairs(mana_decision_integrator)
+    eligible_pairs = eligible_annotated_pairs(mana_decision_integrator)
+    rejected_pairs = rejected_annotated_pairs(mana_decision_integrator)
     probe_rows = []
     status_counts: Counter[str] = Counter()
     blocker_counts: Counter[str] = Counter()
@@ -205,6 +238,11 @@ def build_report(
         probe_rows.append(row)
         status_counts[status] += 1
         blocker_counts.update(blockers)
+    mana_route_status = "mana_route_not_evaluated_by_decision_integrator"
+    if annotated_pairs and not eligible_pairs and rejected_pairs:
+        mana_route_status = "mana_route_closed_by_exact_decisions"
+    elif eligible_pairs:
+        mana_route_status = "mana_route_has_eligible_pair_after_decision_filter"
     report_status = "topdeck_sidecar_probe_evidence_no_safe_cut_keep_607"
     if not probe_rows:
         report_status = "topdeck_sidecar_probe_evidence_inputs_missing_keep_607"
@@ -234,20 +272,29 @@ def build_report(
                 "blocked_generic_mana_probe_not_pair_safe", 0
             ),
             "mana_model_ready_pair_count": len(ready_pairs),
+            "mana_model_exact_rejected_pair_count": len(rejected_pairs),
+            "mana_model_eligible_pair_count": len(eligible_pairs),
+            "mana_route_status": mana_route_status,
             "status_counts": dict(sorted(status_counts.items())),
             "blocker_counts": dict(sorted(blocker_counts.items())),
             "recommended_next_action": (
-                "use_dedicated_mana_model_ready_pairs_as_diagnostic_candidates_or_collect_topdeck_floor_traces"
-                if ready_pairs
-                else "collect_probe_floor_evidence_before_matrix_rows"
+                "collect_new_mana_evidence_or_topdeck_floor_traces_before_any_matrix_row"
+                if mana_route_status == "mana_route_closed_by_exact_decisions"
+                else (
+                    "use_dedicated_mana_model_ready_pairs_as_diagnostic_candidates_or_collect_topdeck_floor_traces"
+                    if ready_pairs
+                    else "collect_probe_floor_evidence_before_matrix_rows"
+                )
             ),
         },
         "probe_evidence_rows": probe_rows,
         "dedicated_mana_model_ready_pairs": ready_pairs[:10],
+        "dedicated_mana_decision_integrator_pairs": annotated_pairs[:10],
         "source_evidence": {
             "cut_model_planner_summary": summary(cut_model_planner),
             "exposure_profile_card_count": len(as_list(exposure_profile.get("card_profiles"))),
             "mana_base_model_summary": summary(mana_base_model),
+            "mana_decision_integrator_summary": summary(mana_decision_integrator),
         },
         "decision": {
             "keep_607_as_protected_baseline": True,
@@ -260,13 +307,13 @@ def build_report(
             "promotion_allowed": False,
             "reason": (
                 "Current probe cuts have real exposure or structural mana-floor risk. "
-                "The only narrower advancement is the dedicated mana-base model's "
-                "diagnostic Plateau pairs, still with battle and promotion closed."
+                "The dedicated Plateau mana pairs were already decision-filtered and "
+                "are not currently eligible for another materialization route."
             ),
             "next_actions": [
                 "do_not_mutate_deck_607",
                 "do_not_convert exposed topdeck probes into cuts",
-                "route mana learning through dedicated Plateau pairs instead of generic basic-land probes",
+                "do_not_retest exact Plateau pairs without new mana trace evidence",
                 "require matrix, trace, and equal battle gates before any deck change",
             ],
         },
@@ -290,6 +337,9 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- Candidate deck materialization allowed now: `{str(summary_row['candidate_deck_materialization_allowed_now']).lower()}`",
         f"- Natural battle gate allowed now: `{str(summary_row['natural_battle_gate_allowed_now']).lower()}`",
         f"- Mana model ready pairs: `{summary_row['mana_model_ready_pair_count']}`",
+        f"- Mana model exact rejected pairs: `{summary_row['mana_model_exact_rejected_pair_count']}`",
+        f"- Mana model eligible pairs: `{summary_row['mana_model_eligible_pair_count']}`",
+        f"- Mana route status: `{summary_row['mana_route_status']}`",
         f"- Recommended next action: `{summary_row['recommended_next_action']}`",
         "",
         "## Source Reports",
@@ -332,6 +382,23 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
             )
     else:
         lines.append("- None.")
+    lines.extend(["", "## Dedicated Mana Decision Integrator", ""])
+    annotated = as_list(payload.get("dedicated_mana_decision_integrator_pairs"))
+    if annotated:
+        lines.append("| Add | Cut | Learning Status | Decision | Next Action |")
+        lines.append("| --- | --- | --- | --- | --- |")
+        for pair in annotated:
+            lines.append(
+                "| `{add}` | `{cut}` | `{status}` | `{decision}` | `{next}` |".format(
+                    add=pair.get("add") or "",
+                    cut=pair.get("cut") or "",
+                    status=pair.get("learning_status") or "",
+                    decision=pair.get("decision_status") or "",
+                    next=pair.get("next_action") or "",
+                )
+            )
+    else:
+        lines.append("- Not available.")
     lines.extend(["", "## Decision", ""])
     lines.append(f"- keep_607_as_protected_baseline: `{str(decision['keep_607_as_protected_baseline']).lower()}`")
     lines.append(f"- deck_action_allowed: `{str(decision['deck_action_allowed']).lower()}`")
@@ -365,6 +432,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--cut-model-planner", type=Path, default=DEFAULT_CUT_MODEL_PLANNER)
     parser.add_argument("--exposure-profile", type=Path, default=DEFAULT_EXPOSURE_PROFILE)
     parser.add_argument("--mana-base-model", type=Path, default=DEFAULT_MANA_BASE_MODEL)
+    parser.add_argument("--mana-decision-integrator", type=Path, default=DEFAULT_MANA_DECISION_INTEGRATOR)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     return parser.parse_args()
 
@@ -375,11 +443,13 @@ def main() -> int:
         "cut_model_planner": args.cut_model_planner,
         "exposure_profile": args.exposure_profile,
         "mana_base_model": args.mana_base_model,
+        "mana_decision_integrator": args.mana_decision_integrator,
     }
     payload = build_report(
         cut_model_planner=read_json(args.cut_model_planner),
         exposure_profile=read_json(args.exposure_profile),
         mana_base_model=read_json(args.mana_base_model),
+        mana_decision_integrator=read_json(args.mana_decision_integrator),
         paths=paths,
     )
     json_path, md_path = write_outputs(payload, args.out_prefix)

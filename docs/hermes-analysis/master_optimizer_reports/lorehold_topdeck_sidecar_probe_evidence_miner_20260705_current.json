@@ -11,14 +11,82 @@
     "next_actions": [
       "do_not_mutate_deck_607",
       "do_not_convert exposed topdeck probes into cuts",
-      "route mana learning through dedicated Plateau pairs instead of generic basic-land probes",
+      "do_not_retest exact Plateau pairs without new mana trace evidence",
       "require matrix, trace, and equal battle gates before any deck change"
     ],
     "promotion_allowed": false,
-    "reason": "Current probe cuts have real exposure or structural mana-floor risk. The only narrower advancement is the dedicated mana-base model's diagnostic Plateau pairs, still with battle and promotion closed.",
+    "reason": "Current probe cuts have real exposure or structural mana-floor risk. The dedicated Plateau mana pairs were already decision-filtered and are not currently eligible for another materialization route.",
     "safe_cut_ready_now": false
   },
   "deck_607_mutated": false,
+  "dedicated_mana_decision_integrator_pairs": [
+    {
+      "add": "Plateau",
+      "candidate_profile": {
+        "colorless_only": false,
+        "enters_tapped_profile": "reliably_untapped",
+        "typed_mountain_plains": true,
+        "utility_roles": []
+      },
+      "candidate_source_quality_score": 121,
+      "cut": "Radiant Summit",
+      "cut_profile": {
+        "enters_tapped_profile": "conditional_tapped",
+        "protected_utility_reason": null,
+        "typed_mountain_plains": true,
+        "utility_roles": [
+          "typed_fetch_target"
+        ]
+      },
+      "cut_risk_score": 69,
+      "decision_blockers": [
+        "forced_opening_hand_diagnostic_lost_to_607",
+        "natural_smoke_did_not_access_plateau",
+        "natural_smoke_lost_to_607"
+      ],
+      "decision_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_radiant_decision_20260705_current.json",
+      "decision_status": "reject_promotion_keep_607_current_baseline",
+      "learning_status": "blocked_exact_tested_decision",
+      "next_action": "do_not_retest_exact_pair_without_new_mana_trace_evidence",
+      "pair_score": 52,
+      "reasons": [
+        "tempo_upgrade_preserves_color_and_fetch_target_type"
+      ],
+      "status": "model_ready_for_candidate_materialization"
+    },
+    {
+      "add": "Plateau",
+      "candidate_profile": {
+        "colorless_only": false,
+        "enters_tapped_profile": "reliably_untapped",
+        "typed_mountain_plains": true,
+        "utility_roles": []
+      },
+      "candidate_source_quality_score": 121,
+      "cut": "Turbulent Steppe",
+      "cut_profile": {
+        "enters_tapped_profile": "conditional_tapped",
+        "protected_utility_reason": null,
+        "typed_mountain_plains": true,
+        "utility_roles": [
+          "typed_fetch_target"
+        ]
+      },
+      "cut_risk_score": 69,
+      "decision_blockers": [
+        "forced_opening_hand_diagnostic_lost_to_607"
+      ],
+      "decision_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_steppe_decision_20260705_current.json",
+      "decision_status": "reject_promotion_keep_607_current_baseline",
+      "learning_status": "blocked_exact_tested_decision",
+      "next_action": "do_not_retest_exact_pair_without_new_mana_trace_evidence",
+      "pair_score": 52,
+      "reasons": [
+        "tempo_upgrade_preserves_color_and_fetch_target_type"
+      ],
+      "status": "model_ready_for_candidate_materialization"
+    }
+  ],
   "dedicated_mana_model_ready_pairs": [
     {
       "add": "Plateau",
@@ -71,7 +139,7 @@
       "status": "model_ready_for_candidate_materialization"
     }
   ],
-  "generated_at": "2026-07-05T06:47:00Z",
+  "generated_at": "2026-07-05T06:49:48Z",
   "postgres_writes": false,
   "probe_evidence_rows": [
     {
@@ -2300,12 +2368,22 @@
       "promotion_allowed": false,
       "queue_natural_gate_ready_count": 0,
       "value_model_gate_ready_now_count": 0
+    },
+    "mana_decision_integrator_summary": {
+      "allow_natural_gate_now": false,
+      "eligible_model_ready_pair_count": 0,
+      "exact_rejected_pair_count": 2,
+      "keep_607_as_protected_baseline": true,
+      "loaded_decision_count": 2,
+      "promotion_allowed": false,
+      "safe_model_ready_pair_count": 2
     }
   },
   "source_reports": {
     "cut_model_planner": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.json",
     "exposure_profile": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260704_role_tag_repair_deck607.json",
-    "mana_base_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_safe_cut_model_20260705_current.json"
+    "mana_base_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_safe_cut_model_20260705_current.json",
+    "mana_decision_integrator": "docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current.json"
   },
   "status": "topdeck_sidecar_probe_evidence_no_safe_cut_keep_607",
   "summary": {
@@ -2329,12 +2407,15 @@
     "decision_status": "topdeck_sidecar_probe_evidence_no_safe_cut_keep_607",
     "deck_action_allowed_now": false,
     "forced_access_allowed_now": false,
+    "mana_model_eligible_pair_count": 0,
+    "mana_model_exact_rejected_pair_count": 2,
     "mana_model_ready_pair_count": 2,
+    "mana_route_status": "mana_route_closed_by_exact_decisions",
     "matrix_candidate_row_eligible_count": 0,
     "natural_battle_gate_allowed_now": false,
     "probe_row_count": 48,
     "promotion_allowed_now": false,
-    "recommended_next_action": "use_dedicated_mana_model_ready_pairs_as_diagnostic_candidates_or_collect_topdeck_floor_traces",
+    "recommended_next_action": "collect_new_mana_evidence_or_topdeck_floor_traces_before_any_matrix_row",
     "safe_cut_ready_count": 0,
     "status_counts": {
       "blocked_exposed_topdeck_role_probe": 20,

@@ -1,6 +1,6 @@
 # Lorehold Topdeck Sidecar Probe Evidence Miner
 
-- Generated at: `2026-07-05T06:47:00Z`
+- Generated at: `2026-07-05T06:49:48Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
@@ -11,13 +11,17 @@
 - Candidate deck materialization allowed now: `false`
 - Natural battle gate allowed now: `false`
 - Mana model ready pairs: `2`
-- Recommended next action: `use_dedicated_mana_model_ready_pairs_as_diagnostic_candidates_or_collect_topdeck_floor_traces`
+- Mana model exact rejected pairs: `2`
+- Mana model eligible pairs: `0`
+- Mana route status: `mana_route_closed_by_exact_decisions`
+- Recommended next action: `collect_new_mana_evidence_or_topdeck_floor_traces_before_any_matrix_row`
 
 ## Source Reports
 
 - `cut_model_planner`: `docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.json`
 - `exposure_profile`: `docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260704_role_tag_repair_deck607.json`
 - `mana_base_model`: `docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_safe_cut_model_20260705_current.json`
+- `mana_decision_integrator`: `docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_decision_integrator_20260705_after_plateau_turbulent_current.json`
 
 ## Status Summary
 
@@ -84,6 +88,13 @@
 | `Plateau` | `Radiant Summit` | 52 | `model_ready_for_candidate_materialization` | tempo_upgrade_preserves_color_and_fetch_target_type |
 | `Plateau` | `Turbulent Steppe` | 52 | `model_ready_for_candidate_materialization` | tempo_upgrade_preserves_color_and_fetch_target_type |
 
+## Dedicated Mana Decision Integrator
+
+| Add | Cut | Learning Status | Decision | Next Action |
+| --- | --- | --- | --- | --- |
+| `Plateau` | `Radiant Summit` | `blocked_exact_tested_decision` | `reject_promotion_keep_607_current_baseline` | `do_not_retest_exact_pair_without_new_mana_trace_evidence` |
+| `Plateau` | `Turbulent Steppe` | `blocked_exact_tested_decision` | `reject_promotion_keep_607_current_baseline` | `do_not_retest_exact_pair_without_new_mana_trace_evidence` |
+
 ## Decision
 
 - keep_607_as_protected_baseline: `true`
@@ -94,9 +105,9 @@
 - forced_access_allowed_now: `false`
 - natural_battle_allowed_now: `false`
 - promotion_allowed: `false`
-- reason: Current probe cuts have real exposure or structural mana-floor risk. The only narrower advancement is the dedicated mana-base model's diagnostic Plateau pairs, still with battle and promotion closed.
+- reason: Current probe cuts have real exposure or structural mana-floor risk. The dedicated Plateau mana pairs were already decision-filtered and are not currently eligible for another materialization route.
 - next_actions:
   - do_not_mutate_deck_607
   - do_not_convert exposed topdeck probes into cuts
-  - route mana learning through dedicated Plateau pairs instead of generic basic-land probes
+  - do_not_retest exact Plateau pairs without new mana trace evidence
   - require matrix, trace, and equal battle gates before any deck change

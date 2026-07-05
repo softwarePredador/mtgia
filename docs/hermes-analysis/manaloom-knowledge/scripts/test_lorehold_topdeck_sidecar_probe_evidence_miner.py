@@ -77,11 +77,31 @@ def _mana_model():
     }
 
 
+def _integrator():
+    return {
+        "summary": {
+            "exact_rejected_pair_count": 1,
+            "eligible_model_ready_pair_count": 0,
+        },
+        "annotated_model_ready_pairs": [
+            {
+                "add": "Plateau",
+                "cut": "Radiant Summit",
+                "pair_score": 52,
+                "learning_status": "blocked_exact_tested_decision",
+                "decision_status": "reject_promotion_keep_607_current_baseline",
+                "next_action": "do_not_retest_exact_pair_without_new_mana_trace_evidence",
+            }
+        ],
+    }
+
+
 def _paths():
     return {
         "cut_model_planner": Path("/tmp/planner.json"),
         "exposure_profile": Path("/tmp/exposure.json"),
         "mana_base_model": Path("/tmp/mana.json"),
+        "mana_decision_integrator": Path("/tmp/integrator.json"),
     }
 
 
@@ -90,6 +110,7 @@ def _build(**overrides):
         cut_model_planner=overrides.get("cut_model_planner", _planner()),
         exposure_profile=overrides.get("exposure_profile", _exposure()),
         mana_base_model=overrides.get("mana_base_model", _mana_model()),
+        mana_decision_integrator=overrides.get("mana_decision_integrator", _integrator()),
         paths=_paths(),
     )
 
@@ -111,13 +132,22 @@ def test_generic_basic_land_probe_is_blocked_but_mana_model_ready_pair_is_report
     assert mountain["evidence_status"] == "blocked_generic_mana_probe_not_pair_safe"
     assert "basic_land_floor_not_safe_from_probe" in mountain["blockers"]
     assert payload["summary"]["mana_model_ready_pair_count"] == 1
+    assert payload["summary"]["mana_model_exact_rejected_pair_count"] == 1
+    assert payload["summary"]["mana_model_eligible_pair_count"] == 0
     assert payload["dedicated_mana_model_ready_pairs"][0]["cut"] == "Radiant Summit"
+    assert payload["dedicated_mana_decision_integrator_pairs"][0]["learning_status"] == (
+        "blocked_exact_tested_decision"
+    )
     assert payload["decision"]["candidate_deck_materialization_allowed_now"] is False
 
 
 def test_missing_exposure_blocks_probe():
     exposure = {"card_profiles": []}
-    payload = _build(exposure_profile=exposure, mana_base_model={"top_model_ready_pairs": []})
+    payload = _build(
+        exposure_profile=exposure,
+        mana_base_model={"top_model_ready_pairs": []},
+        mana_decision_integrator={"annotated_model_ready_pairs": []},
+    )
     rows = {row["cut_card"]: row for row in payload["probe_evidence_rows"]}
 
     assert rows["Artist's Talent"]["evidence_status"] == "blocked_missing_exposure_evidence"
@@ -131,3 +161,4 @@ def test_markdown_surfaces_no_promotion_and_plateau_pair():
     assert "Safe-cut ready: `0`" in markdown
     assert "Plateau" in markdown
     assert "Radiant Summit" in markdown
+    assert "Mana route status: `mana_route_closed_by_exact_decisions`" in markdown
