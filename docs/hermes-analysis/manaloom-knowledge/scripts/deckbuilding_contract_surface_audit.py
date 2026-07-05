@@ -69,6 +69,8 @@ GLOBAL_COMMANDER_CUT_SOURCE_LANE_EXPANDER = (
 GLOBAL_COMMANDER_VALUE_SAFE_STAGE_SPLITTER = (
     SCRIPT_DIR / "global_commander_value_safe_stage_splitter.py"
 )
+GLOBAL_COMMANDER_PACKAGE_SCOPE_REDUCER = SCRIPT_DIR / "global_commander_package_scope_reducer.py"
+GLOBAL_COMMANDER_PACKAGE_SCOPE_REDUCER_TEST = SCRIPT_DIR / "test_global_commander_package_scope_reducer.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -182,6 +184,22 @@ GLOBAL_COMMANDER_VALUE_SAFE_STAGE1_CHAIN_REPORT = (
 GLOBAL_COMMANDER_VALUE_SAFE_STAGE1_STRATEGY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1.md"
+)
+GLOBAL_COMMANDER_PACKAGE_SCOPE_REDUCER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_stage2.md"
+)
+GLOBAL_COMMANDER_REPAIR_SCOPE1_MATERIALIZER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_REPAIR_SCOPE1_CHAIN_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_REPAIR_SCOPE1_STRATEGY_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -442,6 +460,14 @@ def build_audit() -> dict[str, Any]:
                 "structural staples",
                 "value_safe_cut_shortfall:required_7_ready_1",
                 "backfill_value_safe_cuts_or_reduce_package_scope",
+                "global_commander_package_scope_reducer.py",
+                "global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_stage2.md",
+                "commander_package_scope_reduced_ready_for_candidate_copy",
+                "materialize_reduced_scope_candidate_copy",
+                "global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "angels_demons_dragons_payoffs` is only `16`",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -660,6 +686,14 @@ def build_audit() -> dict[str, Any]:
                 "reanimation_plan_b",
                 "value_safe_cut_shortfall:required_7_ready_1",
                 "backfill_value_safe_cuts_or_reduce_package_scope",
+                "global_commander_package_scope_reducer.py",
+                "global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_stage2.md",
+                "commander_package_scope_reduced_ready_for_candidate_copy",
+                "materialize_reduced_scope_candidate_copy",
+                "global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "angels_demons_dragons_payoffs` segue `16`",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -847,6 +881,8 @@ def build_audit() -> dict[str, Any]:
                 "validate_source_db_for_package",
                 "global_commander_value_safe_stage_splitter",
                 "load_stage_pairs",
+                "global_commander_package_scope_reducer",
+                "load_reduced_scope_pairs",
                 "model_pairs",
                 "--stage",
                 "stage add cards are already present",
@@ -867,10 +903,41 @@ def build_audit() -> dict[str, Any]:
                 "test_blocks_chained_source_db_by_default",
                 "test_blocks_source_missing_protected_cut_candidate",
                 "test_materializes_value_safe_stage_pairs_only_in_candidate_copy",
+                "test_materializes_reduced_scope_pairs_only_in_candidate_copy",
                 "source_matches_pair_report",
                 "Protected Payoff",
                 "Arena of Glory",
+                "Despark",
                 "Smuggler's Share",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PACKAGE_SCOPE_REDUCER,
+            [
+                "global_commander_package_scope_reducer",
+                "commander_package_scope_reduced_ready_for_candidate_copy",
+                "commander_package_scope_reduction_blocks_candidate_copy",
+                "reduced_scope_candidate_copy_allowed_now",
+                "full_package_candidate_copy_allowed_now",
+                "materialize_reduced_scope_candidate_copy",
+                "backfill_value_safe_cuts_or_reduce_package_scope",
+                "selection_policy",
+                "no_value_safe_reduced_scope_pair_ready",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PACKAGE_SCOPE_REDUCER_TEST,
+            [
+                "test_reduces_scope_to_axis_closing_pair_when_cut_is_scarce",
+                "test_blocks_when_no_value_safe_cut_exists",
+                "Necromancy",
+                "Cabal Ritual",
+                "reduced_scope_dropped_adds:1",
+                "no_value_safe_reduced_scope_pair_ready",
             ],
         )
     )
@@ -1289,6 +1356,78 @@ def build_audit() -> dict[str, Any]:
                 "Arena of Glory",
                 "Archaeomancer's Map",
                 "The Balrog of Moria",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PACKAGE_SCOPE_REDUCER_REPORT,
+            [
+                "Global Commander Package Scope Reducer",
+                "commander_package_scope_reduced_ready_for_candidate_copy",
+                "reduced_scope_candidate_copy_allowed_now: `true`",
+                "full_package_candidate_copy_allowed_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "materialize_reduced_scope_candidate_copy",
+                "reduced_scope_dropped_adds:6",
+                "Necromancy",
+                "Cabal Ritual",
+                "reanimation_plan_b",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_REPAIR_SCOPE1_MATERIALIZER_REPORT,
+            [
+                "Global Commander Candidate Copy Materializer",
+                "candidate_materialized_structure_ready_next_gate_closed",
+                "candidate: `1` swap(s)",
+                "source_artifact_type: `global_commander_package_scope_reducer`",
+                "source_unchanged: `true`",
+                "source_matches_pair_report: `true`",
+                "promotion_allowed: `false`",
+                "allow_battle_gate_now: `false`",
+                "Necromancy",
+                "Cabal Ritual",
+                "reanimation_plan_b",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_REPAIR_SCOPE1_CHAIN_REPORT,
+            [
+                "Global Commander Candidate Package Chain Audit",
+                "status: `pass`",
+                "swap_count: `21`",
+                "materializer_chain_pass: `true`",
+                "core_floor_repaired: `true`",
+                "strategy_ready: `true`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "Necromancy",
+                "Cabal Ritual",
+                "run_commander_specific_strategy_matrix_for_package_before_battle",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_REPAIR_SCOPE1_STRATEGY_REPORT,
+            [
+                "Global Commander Candidate Package Strategy Matrix",
+                "package_strategy_blocks_battle",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "blocker_count: `1`",
+                "| `reanimation_plan_b` | 3 | 3 | 0 | `3-6` | `in_range` |",
+                "| `angels_demons_dragons_payoffs` | 4 | 16 | 12 | `22-30` | `below_target` |",
+                "profile_angels_demons_dragons_payoffs_below_target",
+                "repair_commander_profile_blockers_before_battle",
+                "Necromancy",
+                "Cabal Ritual",
             ],
         )
     )

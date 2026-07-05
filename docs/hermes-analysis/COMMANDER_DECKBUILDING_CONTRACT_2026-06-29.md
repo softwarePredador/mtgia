@@ -241,7 +241,12 @@ Operational priority after this pivot:
    full-package materialization closed while any add is unpaired, and it must
    keep battle/promotion closed until candidate-copy, strategy-matrix, and
    replay gates pass;
-22. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+22. run `global_commander_package_scope_reducer.py` when a profile-repair
+   package is blocked because the full package has fewer value-safe cuts than
+   adds; it may open only the strongest smaller paired scope in an isolated DB
+   copy, preferring a scope that closes a whole blocker axis, while keeping the
+   original full package, battle, and promotion closed;
+23. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -268,6 +273,12 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_value_safe_stage_splitter_20260705_kaalia_removal_floor_step5.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_kaalia_value_safe_stage1_repair_scope1_hermes_only.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1_hermes_only.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -532,6 +543,29 @@ Current external refresh on 2026-07-05:
   reports `value_safe_cut_shortfall:required_7_ready_1`. The next gate is
   `backfill_value_safe_cuts_or_reduce_package_scope`; battle and promotion stay
   closed.
+- Current package-scope reduction closed only the repair axis that had enough
+  reviewed cut support. The report
+  `global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_stage2.md`
+  has status `commander_package_scope_reduced_ready_for_candidate_copy`,
+  selects exactly `+Necromancy / -Cabal Ritual`, sets
+  `reduced_scope_candidate_copy_allowed_now=true`, keeps
+  `full_package_candidate_copy_allowed_now=false`, routes the next isolated
+  copy gate to `materialize_reduced_scope_candidate_copy`, and reduces
+  `reanimation_plan_b` remaining requirement from `1` to `0` while leaving the
+  Angel/Demon/Dragon payoff shortfall open. The materializer report
+  `global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  proves the source DB unchanged and keeps `allow_battle_gate_now=false`.
+  The consolidated chain report
+  `global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  passes with `swap_count=21`, `core_floor_repaired=true`,
+  `final_core_status=core_review_ready`, and final role counts including
+  `lands=35`, `ramp=15`, `removal=8`, and `recursion=3`. The commander-specific
+  package matrix
+  `global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+  still blocks battle: `reanimation_plan_b` is now in range, but
+  `angels_demons_dragons_payoffs` is only `16` against the `22-30` target.
+  Therefore the next gate remains `repair_commander_profile_blockers_before_battle`,
+  focused on payoff density, not battle or promotion.
 
 ## Global Commander Rollout - 2026-07-01
 

@@ -440,6 +440,76 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
         self.assertNotIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", candidate_names)
         self.assertNotIn("Smuggler's Share", candidate_names)
 
+    def test_materializes_reduced_scope_pairs_only_in_candidate_copy(self) -> None:
+        tmp, source_db = self._db()
+        self.addCleanup(tmp.cleanup)
+        scope_report = Path(tmp.name) / "scope_report.json"
+        scope_report.write_text(
+            json.dumps(
+                {
+                    "artifact_type": "global_commander_package_scope_reducer",
+                    "status": "commander_package_scope_reduced_ready_for_candidate_copy",
+                    "reduced_scope_candidate_copy_allowed_now": True,
+                    "full_package_candidate_copy_allowed_now": False,
+                    "source_db": str(source_db.resolve()),
+                    "summary": {
+                        "deck_id": "619",
+                        "commander": "Kaalia of the Vast",
+                        "next_gate": "materialize_reduced_scope_candidate_copy",
+                    },
+                    "scoped_pairs": [
+                        {
+                            "pair_index": 1,
+                            "add": "Despark",
+                            "cut": "Smuggler's Share",
+                            "add_axis": "spot_interaction",
+                            "add_covered_axes": ["spot_interaction"],
+                            "add_score": 88,
+                            "cut_primary_role": "card_draw_selection",
+                            "cut_matching_over_target_roles": ["card_draw_selection"],
+                            "cut_score": 41,
+                            "status": "review_only_reduced_scope_pair",
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        payload = audit.build_payload(
+            source_db=source_db,
+            pair_report=scope_report,
+            out_prefix=Path(tmp.name) / "out",
+            deck_id="619",
+        )
+
+        candidate_db = Path(payload["candidate_db"])
+        self.assertEqual(payload["status"], "candidate_materialized_structure_ready_next_gate_closed")
+        self.assertTrue(payload["summary"]["source_unchanged"])
+        self.assertEqual(payload["summary"]["pair_count"], 1)
+        self.assertEqual(payload["summary"]["source_artifact_type"], "global_commander_package_scope_reducer")
+        self.assertEqual(payload["summary"]["stage_next_gate"], "materialize_reduced_scope_candidate_copy")
+        self.assertEqual(payload["model_pairs"][0]["role"], "spot_interaction")
+        self.assertEqual(payload["structure_validation"]["status"], "pass")
+
+        source_conn = sqlite3.connect(source_db)
+        candidate_conn = sqlite3.connect(candidate_db)
+        self.addCleanup(source_conn.close)
+        self.addCleanup(candidate_conn.close)
+
+        source_names = {
+            row[0]
+            for row in source_conn.execute("SELECT card_name FROM deck_cards WHERE deck_id=619").fetchall()
+        }
+        candidate_names = {
+            row[0]
+            for row in candidate_conn.execute("SELECT card_name FROM deck_cards WHERE deck_id=619").fetchall()
+        }
+        self.assertIn("Smuggler's Share", source_names)
+        self.assertNotIn("Despark", source_names)
+        self.assertIn("Despark", candidate_names)
+        self.assertNotIn("Smuggler's Share", candidate_names)
+
 
 if __name__ == "__main__":
     unittest.main()

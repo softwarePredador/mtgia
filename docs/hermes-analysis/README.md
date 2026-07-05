@@ -451,6 +451,29 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `master_optimizer_reports/global_commander_cut_source_lane_expander_20260705_kaalia_value_safe_stage1_repair_stage2.md`
     confirma `value_safe_cut_shortfall:required_7_ready_1`. Proximo gate:
     `backfill_value_safe_cuts_or_reduce_package_scope`.
+    O novo gate de reducao de escopo fica em
+    `manaloom-knowledge/scripts/global_commander_package_scope_reducer.py`
+    com evidencia local
+    `master_optimizer_reports/global_commander_package_scope_reducer_20260705_kaalia_value_safe_stage1_repair_stage2.md`.
+    Resultado: `commander_package_scope_reduced_ready_for_candidate_copy`.
+    Como so havia `1` cut value-safe, o reducer abriu apenas
+    `+Necromancy / -Cabal Ritual`, fechando `reanimation_plan_b` de `1` para
+    `0`, mas manteve o pacote completo bloqueado (`full_package_candidate_copy_allowed_now=false`)
+    e roteou o proximo gate para `materialize_reduced_scope_candidate_copy`.
+    `angels_demons_dragons_payoffs` ainda fica aberto. A materializacao
+    isolada fica em
+    `master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_value_safe_stage1_repair_scope1.md`;
+    ela prova `source_unchanged=true`, `source_matches_pair_report=true`,
+    `allow_battle_gate_now=false` e `promotion_allowed=false`. A chain
+    consolidada fica em
+    `master_optimizer_reports/global_commander_candidate_package_chain_audit_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+    e passa com `swap_count=21`, `core_floor_repaired=true` e
+    `final_core_status=core_review_ready`. A matriz especifica final fica em
+    `master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260705_kaalia_value_safe_stage1_repair_scope1.md`;
+    nela `reanimation_plan_b` esta em faixa, mas
+    `angels_demons_dragons_payoffs` segue `16` contra alvo `22-30`, entao o
+    battle continua fechado e o proximo gate e
+    `repair_commander_profile_blockers_before_battle`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

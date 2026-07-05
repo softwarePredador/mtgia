@@ -228,6 +228,77 @@ def load_stage_pairs(
     }
 
 
+def load_reduced_scope_pairs(
+    scope_report: Path,
+    *,
+    deck_id: str | None = None,
+    add: str | None = None,
+    cut: str | None = None,
+) -> dict[str, Any]:
+    payload = read_json(scope_report)
+    if payload.get("artifact_type") != "global_commander_package_scope_reducer":
+        raise RuntimeError(f"{scope_report} is not a package scope reducer report")
+    if not payload.get("reduced_scope_candidate_copy_allowed_now"):
+        raise RuntimeError(f"reduced scope candidate copy is not allowed by {scope_report}")
+
+    summary = payload.get("summary") or {}
+    if deck_id and str(summary.get("deck_id")) != str(deck_id):
+        raise RuntimeError(f"scope report deck_id mismatch: expected {deck_id}, got {summary.get('deck_id')}")
+
+    pairs: list[dict[str, Any]] = []
+    for pair in payload.get("scoped_pairs") or []:
+        if not isinstance(pair, Mapping):
+            continue
+        pair_add = str(pair.get("add") or "")
+        pair_cut = str(pair.get("cut") or "")
+        if add and normalize_name(pair_add) != normalize_name(add):
+            continue
+        if cut and normalize_name(pair_cut) != normalize_name(cut):
+            continue
+        axes = [str(axis) for axis in pair.get("add_covered_axes") or [] if axis]
+        role = str(pair.get("add_axis") or (axes[0] if axes else "") or pair.get("cut_primary_role") or "")
+        pairs.append(
+            {
+                "deck_id": str(summary.get("deck_id") or ""),
+                "commander": summary.get("commander"),
+                "role": role,
+                "add": pair_add,
+                "cut": pair_cut,
+                "pair": dict(pair),
+                "candidate": {
+                    "card_name": pair_add,
+                    "role": role,
+                    "covered_axes": axes,
+                    "score": pair.get("add_score") or 0,
+                    "source": "package_scope_reducer",
+                },
+                "cut_candidate": {
+                    "card_name": pair_cut,
+                    "role": pair.get("cut_primary_role") or "",
+                    "matching_over_target_roles": pair.get("cut_matching_over_target_roles") or [],
+                    "score": pair.get("cut_score") or 0,
+                },
+                "source_pool_status": payload.get("status"),
+            }
+        )
+    if not pairs:
+        raise RuntimeError(f"no matching reduced scope pairs found in {scope_report}")
+
+    return {
+        "deck_id": str(summary.get("deck_id") or ""),
+        "deck_name": None,
+        "commander": summary.get("commander"),
+        "role": "reduced_scope",
+        "stage": None,
+        "pairs": pairs,
+        "source_pool_status": payload.get("status"),
+        "source_report_db": expected_source_db(payload, scope_report),
+        "blocked_cut_candidates": [],
+        "source_artifact_type": payload.get("artifact_type"),
+        "next_gate": summary.get("next_gate"),
+    }
+
+
 def load_materialization_package(
     pair_report: Path,
     *,
@@ -239,6 +310,8 @@ def load_materialization_package(
     payload = read_json(pair_report)
     if payload.get("artifact_type") == "global_commander_value_safe_stage_splitter":
         return load_stage_pairs(pair_report, deck_id=deck_id, add=add, cut=cut, stage=stage)
+    if payload.get("artifact_type") == "global_commander_package_scope_reducer":
+        return load_reduced_scope_pairs(pair_report, deck_id=deck_id, add=add, cut=cut)
     pair = load_top_pair_from_pool(pair_report, deck_id=deck_id, add=add, cut=cut)
     return {
         "deck_id": pair["deck_id"],
