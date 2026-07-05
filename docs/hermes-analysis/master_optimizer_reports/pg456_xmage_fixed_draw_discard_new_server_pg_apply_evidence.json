@@ -1,0 +1,240 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg456",
+  "generated_at": "2026-07-05T00:16:07.795838+00:00",
+  "manifest": "../../master_optimizer_reports/pg456_xmage_fixed_draw_discard_new_server_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg456_xmage_fixed_draw_discard_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Ancestral Reminiscence",
+      "Careful Study",
+      "Catalog",
+      "Enhanced Awareness",
+      "Prying Eyes",
+      "Rain of Revelation",
+      "Romantic Rendezvous",
+      "Sift",
+      "Thoughtflare"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 9,
+    "promoted_rule_rows": 9,
+    "promoted_verified_auto_rows": 9,
+    "row_count": 9
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Ancestral Reminiscence",
+      "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070",
+      "normalized_name": "ancestral reminiscence",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Careful Study",
+      "logical_rule_key": "battle_rule_v1:0d2aaf58fe699e4cc5b5c7ebc69a05c1",
+      "normalized_name": "careful study",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Catalog",
+      "logical_rule_key": "battle_rule_v1:63b054fc75d44178f8bd4b286a0cbdba",
+      "normalized_name": "catalog",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Enhanced Awareness",
+      "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2",
+      "normalized_name": "enhanced awareness",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Prying Eyes",
+      "logical_rule_key": "battle_rule_v1:7807f21b39fea1cfb17ed8edf4ed891a",
+      "normalized_name": "prying eyes",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Rain of Revelation",
+      "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2",
+      "normalized_name": "rain of revelation",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Romantic Rendezvous",
+      "logical_rule_key": "battle_rule_v1:2baba243f445a0a2e3e5983394657313",
+      "normalized_name": "romantic rendezvous",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Sift",
+      "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070",
+      "normalized_name": "sift",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Thoughtflare",
+      "logical_rule_key": "battle_rule_v1:ebc0a01d26b567480a2f083009f64ec3",
+      "normalized_name": "thoughtflare",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Ancestral Reminiscence",
+      "Careful Study",
+      "Catalog",
+      "Enhanced Awareness",
+      "Prying Eyes",
+      "Rain of Revelation",
+      "Romantic Rendezvous",
+      "Sift",
+      "Thoughtflare"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 9,
+    "total_target_card_rows": 9,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "8d3d70e2-eef1-40c7-8f32-8277894c5b51",
+      "card_name": "Ancestral Reminiscence",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070",
+      "normalized_name": "ancestral reminiscence",
+      "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "07a9fef0-81ee-4940-b7f9-aa36f0f2936e",
+      "card_name": "Careful Study",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:0d2aaf58fe699e4cc5b5c7ebc69a05c1",
+      "normalized_name": "careful study",
+      "oracle_hash": "bbc40777c44eb8cca3e6a811ad954178",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "1a44f701-6a22-40e6-892c-4f6c512c0362",
+      "card_name": "Catalog",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:63b054fc75d44178f8bd4b286a0cbdba",
+      "normalized_name": "catalog",
+      "oracle_hash": "6948b1421f25b941d769532459028061",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "574c8f59-b6a2-4a36-a77e-2a8f60fd9d42",
+      "card_name": "Enhanced Awareness",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2",
+      "normalized_name": "enhanced awareness",
+      "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "e3aeea47-6a86-40c7-9534-a4588c727887",
+      "card_name": "Prying Eyes",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:7807f21b39fea1cfb17ed8edf4ed891a",
+      "normalized_name": "prying eyes",
+      "oracle_hash": "6b2ee39107b1b3039a3324c430e6f271",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "57514803-6f67-4d21-9da8-78f026c2ba42",
+      "card_name": "Rain of Revelation",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2",
+      "normalized_name": "rain of revelation",
+      "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "b5226edc-e387-4d8b-8151-fed07477799e",
+      "card_name": "Romantic Rendezvous",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:2baba243f445a0a2e3e5983394657313",
+      "normalized_name": "romantic rendezvous",
+      "oracle_hash": "aff53f567af23b5e9fcd03939b26340f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "9677d976-1f88-4e08-9125-198d78a71b26",
+      "card_name": "Sift",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070",
+      "normalized_name": "sift",
+      "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "85064766-7726-4c03-a899-17ff74c34acf",
+      "card_name": "Thoughtflare",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:ebc0a01d26b567480a2f083009f64ec3",
+      "normalized_name": "thoughtflare",
+      "oracle_hash": "6b2ee39107b1b3039a3324c430e6f271",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_fixed_draw_discard_new_server"
+}

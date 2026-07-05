@@ -10018,6 +10018,61 @@ new server:
   `xmage_destroy_target_scry_spell`, and `xmage_fixed_damage_scry_spell` with
   `8` cards each.
 
+## 2026-07-05 PG456 Fixed Draw Discard Closure
+
+- Closed the exact XMage fixed draw/discard instant-or-sorcery family as
+  ManaLoom scope `xmage_fixed_draw_discard_spell_v1`.
+- The selected package accepted local XMage spell sources whose executable
+  effect is the fixed `DrawDiscardControllerEffect` lane and whose Oracle text
+  agrees on draw count, discard count, and operation order.
+- The batch covers `9` cards: Ancestral Reminiscence, Careful Study, Catalog,
+  Enhanced Awareness, Prying Eyes, Rain of Revelation, Romantic Rendezvous,
+  Sift, and Thoughtflare.
+- Focused mapper/runtime tests covered draw-then-discard and
+  discard-then-draw resolution, including hand/graveyard movement and event
+  emission for `draw_discard_spell_resolved`; PG456 performed no code mutation.
+  The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `9` cards. Precheck found `9` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `9/9` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `9` rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and expose complete
+  draw/discard parameters. The selected counts are:
+  Ancestral Reminiscence `draw=3 discard=1 draw_then_discard`, Careful Study
+  `draw=2 discard=2 draw_then_discard`, Catalog
+  `draw=2 discard=1 draw_then_discard`, Enhanced Awareness
+  `draw=3 discard=1 draw_then_discard`, Prying Eyes
+  `draw=4 discard=2 draw_then_discard`, Rain of Revelation
+  `draw=3 discard=1 draw_then_discard`, Romantic Rendezvous
+  `draw=2 discard=1 discard_then_draw`, Sift
+  `draw=3 discard=1 draw_then_discard`, and Thoughtflare
+  `draw=4 discard=2 draw_then_discard`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4412` PostgreSQL runtime rows, wrote `4404` SQLite runtime
+  rows, and exported `4379` canonical fallback rows.
+- PG456 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `9` selected cards. Generic
+  battle scenario count remained `0`; draw/discard spell execution remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26474`, `xmage_authoritative_source_count=26160`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26160`. This is an exact
+  reduction of `9` from the post-PG455 queue.
+- The post-PG456 exact split recheck reports `proposal_count=135` and
+  `safe_for_batch_pg_package_count=135`. The largest remaining exact families
+  are `xmage_fixed_scry_draw_card_spell` with `9` cards, followed by
+  `xmage_creature_dies_fixed_damage_target`,
+  `xmage_destroy_target_scry_spell`, `xmage_fixed_damage_scry_spell`, and
+  `xmage_static_self_protection_from_subtypes_creature` with `8` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

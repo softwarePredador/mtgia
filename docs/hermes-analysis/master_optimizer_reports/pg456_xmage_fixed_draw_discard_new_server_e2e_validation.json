@@ -1,0 +1,368 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-05T00:16:48.134978+00:00",
+  "manifest": "../../master_optimizer_reports/pg456_xmage_fixed_draw_discard_new_server_manifest.json",
+  "package_id": "pg456_xmage_fixed_draw_discard_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Ancestral Reminiscence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070",
+          "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Careful Study",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0d2aaf58fe699e4cc5b5c7ebc69a05c1",
+          "oracle_hash": "bbc40777c44eb8cca3e6a811ad954178",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Catalog",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:63b054fc75d44178f8bd4b286a0cbdba",
+          "oracle_hash": "6948b1421f25b941d769532459028061",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Enhanced Awareness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2",
+          "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Prying Eyes",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7807f21b39fea1cfb17ed8edf4ed891a",
+          "oracle_hash": "6b2ee39107b1b3039a3324c430e6f271",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Rain of Revelation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2",
+          "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Romantic Rendezvous",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2baba243f445a0a2e3e5983394657313",
+          "oracle_hash": "aff53f567af23b5e9fcd03939b26340f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Sift",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070",
+          "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Thoughtflare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ebc0a01d26b567480a2f083009f64ec3",
+          "oracle_hash": "6b2ee39107b1b3039a3324c430e6f271",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 9
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Ancestral Reminiscence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070",
+          "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Careful Study",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0d2aaf58fe699e4cc5b5c7ebc69a05c1",
+          "oracle_hash": "bbc40777c44eb8cca3e6a811ad954178",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Catalog",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:63b054fc75d44178f8bd4b286a0cbdba",
+          "oracle_hash": "6948b1421f25b941d769532459028061",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Enhanced Awareness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2",
+          "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Prying Eyes",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7807f21b39fea1cfb17ed8edf4ed891a",
+          "oracle_hash": "6b2ee39107b1b3039a3324c430e6f271",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Rain of Revelation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2",
+          "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Romantic Rendezvous",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2baba243f445a0a2e3e5983394657313",
+          "oracle_hash": "aff53f567af23b5e9fcd03939b26340f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Sift",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070",
+          "oracle_hash": "dc9032001a319c70dbf9acdf0b806db0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "card_name": "Thoughtflare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ebc0a01d26b567480a2f083009f64ec3",
+          "oracle_hash": "6b2ee39107b1b3039a3324c430e6f271",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ancestral Reminiscence",
+          "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Careful Study",
+          "logical_rule_key": "battle_rule_v1:0d2aaf58fe699e4cc5b5c7ebc69a05c1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Catalog",
+          "logical_rule_key": "battle_rule_v1:63b054fc75d44178f8bd4b286a0cbdba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Enhanced Awareness",
+          "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Prying Eyes",
+          "logical_rule_key": "battle_rule_v1:7807f21b39fea1cfb17ed8edf4ed891a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rain of Revelation",
+          "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Romantic Rendezvous",
+          "logical_rule_key": "battle_rule_v1:2baba243f445a0a2e3e5983394657313"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sift",
+          "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thoughtflare",
+          "logical_rule_key": "battle_rule_v1:ebc0a01d26b567480a2f083009f64ec3"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 9
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Ancestral Reminiscence",
+          "component_keys": [],
+          "effect": "draw_cards",
+          "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Careful Study",
+          "component_keys": [],
+          "effect": "draw_cards",
+          "logical_rule_key": "battle_rule_v1:0d2aaf58fe699e4cc5b5c7ebc69a05c1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Catalog",
+          "component_keys": [],
+          "effect": "draw_cards",
+          "logical_rule_key": "battle_rule_v1:63b054fc75d44178f8bd4b286a0cbdba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Enhanced Awareness",
+          "component_keys": [],
+          "effect": "draw_cards",
+          "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Prying Eyes",
+          "component_keys": [],
+          "effect": "draw_cards",
+          "logical_rule_key": "battle_rule_v1:7807f21b39fea1cfb17ed8edf4ed891a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rain of Revelation",
+          "component_keys": [],
+          "effect": "draw_cards",
+          "logical_rule_key": "battle_rule_v1:23c289099aa3f2dabbfeb727d7d654f2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Romantic Rendezvous",
+          "component_keys": [],
+          "effect": "draw_cards",
+          "logical_rule_key": "battle_rule_v1:2baba243f445a0a2e3e5983394657313"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sift",
+          "component_keys": [],
+          "effect": "draw_cards",
+          "logical_rule_key": "battle_rule_v1:73912a4129ba131351a7d72087514070"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thoughtflare",
+          "component_keys": [],
+          "effect": "draw_cards",
+          "logical_rule_key": "battle_rule_v1:ebc0a01d26b567480a2f083009f64ec3"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
