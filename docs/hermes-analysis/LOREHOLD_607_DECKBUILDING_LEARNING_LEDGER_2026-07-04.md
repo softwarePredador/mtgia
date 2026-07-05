@@ -1610,3 +1610,51 @@ Operational lesson:
   structure validation.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
+
+## From-Scratch Shell Failure Synthesis Relearn - 2026-07-05
+
+The next learning artifacts are:
+
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_shell_failure_synthesis_20260705_current_relearn.md`
+- `docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_shell_failure_synthesis_20260705_current_relearn.json`
+
+This synthesis rechecks whether the "no cut inside 607" finding should route
+immediately into another from-scratch shell attempt.
+
+Current result:
+
+- tested shell count: `3`;
+- gate rows reviewed: `4`;
+- natural gate rows: `3`;
+- forced-access diagnostic rows: `1`;
+- promotable shell signals: `0`;
+- best natural delta wins: `-1`;
+- best forced delta wins: `-1`;
+- status counts:
+  `forced_access_rejected=1`, `natural_rejected=3`;
+- recommended next action:
+  `mine_closing_window_trace_before_next_shell`;
+- can run next battle gate: `false`.
+
+Failure modes observed:
+
+- `wins_below_protected_607`: `4`;
+- `losses_above_protected_607`: `4`;
+- `package_lanes_overfilled`: `4`;
+- `upkeep_rummage_floor_regressed`: `4`;
+- `positive_squee_telemetry_not_converting`: `3`;
+- `miracle_floor_regressed`: `2`;
+- `topdeck_floor_regressed`: `2`;
+- `lorehold_spell_floor_regressed`: `2`;
+- `forced_access_no_conversion`: `1`.
+
+Operational lesson:
+
+- A separate shell is allowed only after a predeclared trace target; broad
+  from-scratch attempts have already failed below protected `607`.
+- Forced-access evidence can prove cards were seen or used, but it did not
+  convert into wins in the current evidence and cannot promote a shell.
+- The next valid shell work must start from closing-window trace differences
+  and preserve miracle, topdeck, upkeep-rummage, and spell-floor metrics.
+- Current conclusion remains unchanged: protected deck `607` is still the
+  Lorehold champion, and this persistent learning goal remains open.
