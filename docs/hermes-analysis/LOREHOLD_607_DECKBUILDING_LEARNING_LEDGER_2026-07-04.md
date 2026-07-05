@@ -1809,10 +1809,22 @@ The next learning artifacts are:
 - `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn.json`
 - `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_access_structure_matrix_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_access_structure_matrix_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_structure_routed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_miracle_structure_routed_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_miracle_structure_routed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_miracle_structure_routed_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_structure_routed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_miracle_structure_routed_current.json`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_structure_routed_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_miracle_structure_routed_current.json`
 
 This matrix is the first scoring surface after the miracle-access-first
 contract. It defines how a future candidate row will be scored, but it still
 does not generate a deck, mutate deck `607`, write a database, or run battle.
+It now also consumes
+`lorehold_next_shell_contract_synthesis_20260705_current`, so the matrix is
+auditable as the direct fallback after the Guttersnipe plus Storm-Kiln
+engine-preserving cut path closed.
 
 Current result:
 
@@ -1820,6 +1832,14 @@ Current result:
   `miracle_access_structure_matrix_template_ready_no_candidate_no_battle`;
 - selected contract:
   `miracle_access_first_shell_contract`;
+- next-shell status:
+  `next_shell_cut_path_closed_route_miracle_access_first_keep_607`;
+- engine cut path closed: `true`;
+- engine hard-stop cut slots: `94`;
+- target-lane evidence gaps: `0`;
+- fallback route:
+  `miracle_access_first_shell_contract`;
+- fallback structure-matrix contract allowed: `true`;
 - matrix cells: `6`;
 - candidate rows: `0`;
 - matrix scoring allowed now: `false`;
@@ -1870,8 +1890,14 @@ Operational lesson:
 
 - The project now has a real ranking rubric for miracle-access-first learning,
   but the rubric cannot create truth by itself.
+- The entry route is governed: pressure/conversion cards such as `Guttersnipe`
+  and `Storm-Kiln Artist` stay learning-only until a miracle/topdeck access row
+  preserves protected `607` floors and names same-lane cuts.
 - No deck can be materialized from this template alone; a future candidate must
   name adds and same-lane cuts first.
+- The routed audit set passes after this change: deckbuilding contract surface,
+  operational surface alignment, legacy contamination, and XMage strategy
+  consistency.
 - Current conclusion remains unchanged: protected deck `607` is still the
   Lorehold champion, and this persistent learning goal remains open.
 
@@ -3489,6 +3515,10 @@ Deckbuilding lesson:
 - The next learning route is therefore the miracle/topdeck access-first
   contract, with next action:
   `design_micro_shell_structure_matrix_contract_no_battle`.
+- That action has now produced the miracle-access structure matrix contract as a
+  read-only scoring template. The resulting matrix is still blocked before
+  scoring because candidate rows, named same-lane cuts, and aggregate blocker
+  explanations are missing.
 - External popularity, legality, Game Changer status, or ownership cannot
   replace cut proof. They only decide what the model should learn about next.
 - `Guttersnipe` and `Storm-Kiln Artist` remain learning candidates, but

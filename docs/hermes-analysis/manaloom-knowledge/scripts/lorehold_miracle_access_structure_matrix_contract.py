@@ -27,11 +27,14 @@ DEFAULT_CUT_MINER = (
     REPORT_DIR / "lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json"
 )
 DEFAULT_CLOSING_TRACE = REPORT_DIR / "lorehold_closing_window_trace_miner_20260704_role_tag_repair.json"
+DEFAULT_NEXT_SHELL_SYNTHESIS = REPORT_DIR / "lorehold_next_shell_contract_synthesis_20260705_current.json"
 DEFAULT_OUT_PREFIX = (
     REPORT_DIR / "lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn"
 )
 
 TARGET_CONTRACT = "miracle_access_first_shell_contract"
+TARGET_NEXT_SHELL_STATUS = "next_shell_cut_path_closed_route_miracle_access_first_keep_607"
+TARGET_NEXT_SHELL_ACTION = "design_micro_shell_structure_matrix_contract_no_battle"
 
 MATRIX_CELLS = [
     {
@@ -89,6 +92,11 @@ HARD_GATES = [
         "gate_key": "contract_written",
         "blocks_matrix_scoring_if_false": True,
         "source_field": "contract_written",
+    },
+    {
+        "gate_key": "next_shell_routes_to_miracle_access",
+        "blocks_matrix_scoring_if_false": True,
+        "source_field": "next_shell_route_allowed",
     },
     {
         "gate_key": "no_deck_607_mutation",
@@ -173,15 +181,59 @@ def candidate_rows(payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     return [dict(row) for row in as_list(rows) if isinstance(row, Mapping)]
 
 
+def next_shell_route(next_shell_synthesis: Mapping[str, Any]) -> dict[str, Any]:
+    next_summary = summary(next_shell_synthesis)
+    return {
+        "decision_status": next_summary.get("decision_status") or next_shell_synthesis.get("status") or "",
+        "recommended_next_action": next_summary.get("recommended_next_action") or "",
+        "engine_cut_path_closed": bool(next_summary.get("engine_cut_path_closed")),
+        "engine_cut_path_status": next_summary.get("engine_cut_path_status") or "",
+        "engine_cut_path_hard_stop_cut_count": as_int(
+            next_summary.get("engine_cut_path_hard_stop_cut_count")
+        ),
+        "engine_cut_path_target_lane_evidence_gap_count": as_int(
+            next_summary.get("engine_cut_path_target_lane_evidence_gap_count")
+        ),
+        "fallback_route_key": next_summary.get("fallback_route_key") or "",
+        "fallback_route_status": next_summary.get("fallback_route_status") or "",
+        "fallback_structure_matrix_contract_allowed_now": bool(
+            next_summary.get("fallback_structure_matrix_contract_allowed_now")
+        ),
+        "target_route_key": next_summary.get("target_route_key") or "",
+        "target_adds": as_list(next_summary.get("target_adds")),
+        "natural_battle_gate_allowed_now": bool(next_summary.get("natural_battle_gate_allowed_now")),
+        "promotion_allowed_now": bool(next_summary.get("promotion_allowed_now")),
+        "candidate_deck_materialization_allowed_now": bool(
+            next_summary.get("candidate_deck_materialization_allowed_now")
+        ),
+    }
+
+
+def route_allows_matrix_contract(route: Mapping[str, Any]) -> bool:
+    return bool(
+        route
+        and route.get("decision_status") == TARGET_NEXT_SHELL_STATUS
+        and route.get("recommended_next_action") == TARGET_NEXT_SHELL_ACTION
+        and route.get("engine_cut_path_closed") is True
+        and route.get("fallback_route_key") == TARGET_CONTRACT
+        and route.get("fallback_structure_matrix_contract_allowed_now") is True
+        and route.get("natural_battle_gate_allowed_now") is False
+        and route.get("promotion_allowed_now") is False
+        and route.get("candidate_deck_materialization_allowed_now") is False
+    )
+
+
 def hard_gate_statuses(
     *,
     contract_summary: Mapping[str, Any],
     contract_payload: Mapping[str, Any],
     cut_summary: Mapping[str, Any],
+    next_shell_route_status: Mapping[str, Any],
     candidate_count: int,
 ) -> list[dict[str, Any]]:
     values = {
         "contract_written": bool(contract_summary.get("contract_written")),
+        "next_shell_route_allowed": route_allows_matrix_contract(next_shell_route_status),
         "deck_607_mutated": not bool(contract_payload.get("deck_607_mutated")),
         "postgres_writes": not bool(contract_payload.get("postgres_writes")),
         "candidate_rows": candidate_count > 0,
@@ -235,6 +287,7 @@ def decision_status(
     *,
     contract_summary: Mapping[str, Any],
     contract_payload: Mapping[str, Any],
+    next_shell_route_status: Mapping[str, Any],
     hard_gates: list[Mapping[str, Any]],
     candidate_count: int,
 ) -> tuple[str, str, bool]:
@@ -242,6 +295,12 @@ def decision_status(
         return (
             "miracle_access_structure_matrix_blocked_missing_contract",
             "rerun_miracle_access_first_shell_contract",
+            False,
+        )
+    if not route_allows_matrix_contract(next_shell_route_status):
+        return (
+            "miracle_access_structure_matrix_blocked_missing_next_shell_route",
+            "rerun_next_shell_contract_synthesis",
             False,
         )
     if not bool(contract_summary.get("structure_matrix_contract_allowed_now")):
@@ -282,23 +341,27 @@ def build_report(
     value_model: Mapping[str, Any],
     cut_miner: Mapping[str, Any],
     closing_trace: Mapping[str, Any],
+    next_shell_synthesis: Mapping[str, Any],
     paths: Mapping[str, Path],
 ) -> dict[str, Any]:
     contract_summary = summary(contract_payload)
     value_summary = summary(value_model)
     cut_summary = summary(cut_miner)
     closing_summary = summary(closing_trace)
+    route = next_shell_route(next_shell_synthesis)
     rows = candidate_rows(contract_payload)
     cells = matrix_cell_rows(contract_payload, value_model)
     gates = hard_gate_statuses(
         contract_summary=contract_summary,
         contract_payload=contract_payload,
         cut_summary=cut_summary,
+        next_shell_route_status=route,
         candidate_count=len(rows),
     )
     status, next_action, scoring_allowed = decision_status(
         contract_summary=contract_summary,
         contract_payload=contract_payload,
+        next_shell_route_status=route,
         hard_gates=gates,
         candidate_count=len(rows),
     )
@@ -315,6 +378,20 @@ def build_report(
         "summary": {
             "decision_status": status,
             "selected_contract_key": contract_summary.get("selected_contract_key") or "",
+            "next_shell_status": route.get("decision_status") or "",
+            "next_shell_recommended_next_action": route.get("recommended_next_action") or "",
+            "engine_cut_path_closed": bool(route.get("engine_cut_path_closed")),
+            "engine_cut_path_status": route.get("engine_cut_path_status") or "",
+            "engine_cut_path_hard_stop_cut_count": as_int(
+                route.get("engine_cut_path_hard_stop_cut_count")
+            ),
+            "engine_cut_path_target_lane_evidence_gap_count": as_int(
+                route.get("engine_cut_path_target_lane_evidence_gap_count")
+            ),
+            "fallback_route_key": route.get("fallback_route_key") or "",
+            "fallback_structure_matrix_contract_allowed_now": bool(
+                route.get("fallback_structure_matrix_contract_allowed_now")
+            ),
             "matrix_cell_count": len(cells),
             "candidate_row_count": len(rows),
             "matrix_scoring_allowed_now": scoring_allowed,
@@ -357,12 +434,24 @@ def build_report(
                 "any generated list stays lab-only until equal gate beats 607",
                 "battle remains closed until matrix score and trace floors pass",
             ],
+            "entry_route_contract": {
+                "required_next_shell_status": TARGET_NEXT_SHELL_STATUS,
+                "required_next_action": TARGET_NEXT_SHELL_ACTION,
+                "required_fallback_route": TARGET_CONTRACT,
+                "observed_route": route,
+                "pressure_conversion_shell_policy": (
+                    "Guttersnipe and Storm-Kiln Artist stay learning-only until "
+                    "a miracle/topdeck access row preserves protected 607 floors and "
+                    "names same-lane cuts."
+                ),
+            },
         },
         "source_evidence": {
             "contract_summary": contract_summary,
             "value_model_summary": value_summary,
             "cut_miner_summary": cut_summary,
             "closing_trace_summary": closing_summary,
+            "next_shell_summary": summary(next_shell_synthesis),
         },
         "decision": {
             "keep_607_as_protected_baseline": True,
@@ -403,6 +492,9 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         "- Deck 607 mutated: `false`",
         f"- Decision status: `{summary_row['decision_status']}`",
         f"- Selected contract: `{summary_row['selected_contract_key']}`",
+        f"- Next-shell status: `{summary_row['next_shell_status']}`",
+        f"- Engine cut path closed: `{str(summary_row['engine_cut_path_closed']).lower()}`",
+        f"- Fallback route: `{summary_row['fallback_route_key']}`",
         f"- Matrix cells: `{summary_row['matrix_cell_count']}`",
         f"- Candidate rows: `{summary_row['candidate_row_count']}`",
         f"- Matrix scoring allowed now: `{str(summary_row['matrix_scoring_allowed_now']).lower()}`",
@@ -481,6 +573,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--value-model", type=Path, default=DEFAULT_VALUE_MODEL)
     parser.add_argument("--cut-miner", type=Path, default=DEFAULT_CUT_MINER)
     parser.add_argument("--closing-trace", type=Path, default=DEFAULT_CLOSING_TRACE)
+    parser.add_argument("--next-shell-synthesis", type=Path, default=DEFAULT_NEXT_SHELL_SYNTHESIS)
     parser.add_argument("--out-prefix", type=Path, default=DEFAULT_OUT_PREFIX)
     return parser.parse_args()
 
@@ -492,12 +585,14 @@ def main() -> int:
         "value_model": args.value_model,
         "cut_miner": args.cut_miner,
         "closing_trace": args.closing_trace,
+        "next_shell_synthesis": args.next_shell_synthesis,
     }
     payload = build_report(
         contract_payload=read_json(args.contract),
         value_model=read_json(args.value_model),
         cut_miner=read_json(args.cut_miner),
         closing_trace=read_json(args.closing_trace),
+        next_shell_synthesis=read_json(args.next_shell_synthesis),
         paths=paths,
     )
     json_path, md_path = write_outputs(payload, args.out_prefix)

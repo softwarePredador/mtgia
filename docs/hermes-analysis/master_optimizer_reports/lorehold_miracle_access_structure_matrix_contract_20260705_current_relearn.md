@@ -1,11 +1,14 @@
 # Lorehold Miracle Access Structure Matrix Contract
 
-- Generated at: `2026-07-05T04:33:06Z`
+- Generated at: `2026-07-05T08:57:34Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Deck 607 mutated: `false`
 - Decision status: `miracle_access_structure_matrix_template_ready_no_candidate_no_battle`
 - Selected contract: `miracle_access_first_shell_contract`
+- Next-shell status: `next_shell_cut_path_closed_route_miracle_access_first_keep_607`
+- Engine cut path closed: `true`
+- Fallback route: `miracle_access_first_shell_contract`
 - Matrix cells: `6`
 - Candidate rows: `0`
 - Matrix scoring allowed now: `false`
@@ -20,6 +23,7 @@
 - `closing_trace`: `docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_trace_miner_20260704_role_tag_repair.json`
 - `contract`: `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_shell_contract_20260705_current_relearn.json`
 - `cut_miner`: `docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json`
+- `next_shell_synthesis`: `docs/hermes-analysis/master_optimizer_reports/lorehold_next_shell_contract_synthesis_20260705_current.json`
 - `value_model`: `docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_value_model_20260704_current.json`
 
 ## Matrix Cells
@@ -38,6 +42,7 @@
 | Gate | Passed | Blocks Scoring |
 | --- | ---: | ---: |
 | `contract_written` | `true` | `false` |
+| `next_shell_routes_to_miracle_access` | `true` | `false` |
 | `no_deck_607_mutation` | `true` | `false` |
 | `no_database_writes` | `true` | `false` |
 | `candidate_rows_declared` | `false` | `true` |

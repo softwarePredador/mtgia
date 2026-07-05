@@ -1689,3 +1689,41 @@ Operational lesson:
   deck change.
 - The next allowed work is:
   `design_micro_shell_structure_matrix_contract_no_battle`.
+
+Miracle access structure matrix contract generated on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn.json`.
+- Status:
+  `miracle_access_structure_matrix_template_ready_no_candidate_no_battle`.
+- Entry route:
+  `next_shell_cut_path_closed_route_miracle_access_first_keep_607` from
+  `lorehold_next_shell_contract_synthesis_20260705_current`.
+- Required fallback route:
+  `miracle_access_first_shell_contract`.
+- Current matrix facts:
+  `matrix_cell_count=6`, `candidate_row_count=0`,
+  `matrix_scoring_allowed_now=false`, `named_seed_safe_cut_count=0`,
+  `cut_shortage=2`, and `blocking_hard_gate_count=3`.
+- Current closed pressure/conversion facts:
+  `engine_cut_path_closed=true`,
+  `engine_cut_path_hard_stop_cut_count=94`,
+  `engine_cut_path_target_lane_evidence_gap_count=0`,
+  and fallback structure-matrix contract allowed `true`.
+- Current gates:
+  candidate deck materialization `false`, natural battle gate `false`, deck
+  action `false`, and promotion `false`.
+- Blocking hard gates before scoring:
+  `candidate_rows_declared`, `named_same_lane_cuts_exist`, and
+  `aggregate_blockers_cleared_or_explained`.
+
+Operational lesson:
+
+- A matrix is not deck proof. It only defines how the next miracle/topdeck
+  candidate rows will be judged.
+- Guttersnipe and Storm-Kiln Artist stay learning-only until a candidate row
+  preserves protected `607` miracle/topdeck floors and names same-lane cuts.
+- The next allowed work is:
+  `declare_candidate_rows_with_named_same_lane_cuts_before_scoring`.
