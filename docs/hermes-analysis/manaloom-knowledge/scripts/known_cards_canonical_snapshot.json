@@ -24285,6 +24285,26 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Dusk Legion Zealot": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_lose_life_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "etb_life_loss": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "LoseLifeSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:396bda5c20ca8de95b2f7d087b978fb3",
+    "battle_rule_oracle_hash": "424678d519dbbc2b6e21734c5cd94d02"
+  },
   "Duskdale Wurm": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -60391,6 +60411,26 @@
     "battle_rule_logical_key": "battle_rule_v1:c417c677a4de7ab74cf0773f3f537879",
     "battle_rule_oracle_hash": "f0d2ad0504907c02e3bf994a17c9b727"
   },
+  "Phyrexian Gargantua": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_lose_life_v1",
+    "effect": "creature",
+    "etb_draw_count": 2,
+    "etb_life_loss": 2,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "LoseLifeSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:37eb20bdc9cefa352fcddc7462be9917",
+    "battle_rule_oracle_hash": "3541b0a138e9f3f20acd1c8f9f819aa5"
+  },
   "Phyrexian Metamorph": {
     "ability_kind": "replacement",
     "battle_model_scope": "etb_copy_target_permanent_with_optional_extra_type_v1",
@@ -60410,6 +60450,26 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:1c9b7206e4e878ac743fc9186cdf5beb",
     "battle_rule_oracle_hash": "f33412ad2deef26bceca34c6b467f890"
+  },
+  "Phyrexian Rager": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_lose_life_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "etb_life_loss": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "LoseLifeSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:396bda5c20ca8de95b2f7d087b978fb3",
+    "battle_rule_oracle_hash": "424678d519dbbc2b6e21734c5cd94d02"
   },
   "Phyrexian Reclamation": {
     "_activated_rule_effects": [
@@ -88286,6 +88346,26 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:d6396ebcb807d107b59cd66a6efb80ef",
     "battle_rule_oracle_hash": "c1af8913a641802fe90d30bb8c866365"
+  },
+  "Tithebearer Giant": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_lose_life_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "etb_life_loss": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_classes": [
+      "DrawCardSourceControllerEffect",
+      "LoseLifeSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:396bda5c20ca8de95b2f7d087b978fb3",
+    "battle_rule_oracle_hash": "424678d519dbbc2b6e21734c5cd94d02"
   },
   "Tocasia's Dig Site": {
     "effect": "land",

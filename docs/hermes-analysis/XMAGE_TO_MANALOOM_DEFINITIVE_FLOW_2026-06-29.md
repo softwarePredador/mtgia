@@ -10734,6 +10734,54 @@ new server:
   `xmage_permanent_simple_activated_self_boost_until_eot`, and
   `xmage_simple_mana_source_with_etb_draw`, each with `4` cards.
 
+## 2026-07-05 PG469 Creature ETB Draw Lose Life Closure
+
+- Closed the exact XMage creature enter-the-battlefield draw-and-lose-life
+  family as ManaLoom scope `xmage_creature_etb_draw_lose_life_v1`.
+- The selected package accepted local XMage creature sources whose executable
+  behavior is `EntersBattlefieldTriggeredAbility` with
+  `DrawCardSourceControllerEffect` and `LoseLifeSourceControllerEffect`,
+  preserving the ETB trigger and fixed draw/life-loss amounts.
+- The batch covers `4` cards: Dusk Legion Zealot, Phyrexian Gargantua,
+  Phyrexian Rager, and Tithebearer Giant.
+- Focused mapper/runtime tests covered ETB draw/life-loss extraction, fixed
+  amount preservation, runtime lookup, and package generation; PG469 performed
+  no code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `4` cards. Precheck found `4` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` generated shadow
+  rows to deprecate; apply/postcheck verified `4/4` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `4` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve
+  `trigger=enters_battlefield`, `etb_draw_count`, and `etb_life_loss`.
+  Dusk Legion Zealot, Phyrexian Rager, and Tithebearer Giant each draw `1`
+  and lose `1`; Phyrexian Gargantua draws `2` and loses `2`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4503` PostgreSQL runtime rows, wrote `4495` SQLite runtime
+  rows, and exported `4470` canonical fallback rows.
+- PG469 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `4` selected cards. Generic
+  battle scenario count remained `0`; ETB draw/life-loss behavior remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract with live PostgreSQL connection
+  (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26383`, `xmage_authoritative_source_count=26069`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26069`. This is an exact
+  reduction of `4` from the post-PG468 queue.
+- The post-PG469 exact split recheck reports `proposal_count=44` and
+  `safe_for_batch_pg_package_count=44`. The largest remaining exact families
+  are `xmage_creature_etb_dynamic_graveyard_count_damage`,
+  `xmage_destroy_target_spell`, `xmage_dynamic_graveyard_count_damage_spell`,
+  `xmage_permanent_simple_activated_self_boost_until_eot`, and
+  `xmage_simple_mana_source_with_etb_draw`, each with `4` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

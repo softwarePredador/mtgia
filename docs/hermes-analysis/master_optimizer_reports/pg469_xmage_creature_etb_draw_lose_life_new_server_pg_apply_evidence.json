@@ -1,0 +1,125 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "pg469",
+  "generated_at": "2026-07-05T01:56:17.835024+00:00",
+  "manifest": "../../master_optimizer_reports/pg469_xmage_creature_etb_draw_lose_life_new_server_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg469_xmage_creature_etb_draw_lose_life_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Dusk Legion Zealot",
+      "Phyrexian Gargantua",
+      "Phyrexian Rager",
+      "Tithebearer Giant"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 4,
+    "promoted_rule_rows": 4,
+    "promoted_verified_auto_rows": 4,
+    "row_count": 4
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Dusk Legion Zealot",
+      "logical_rule_key": "battle_rule_v1:396bda5c20ca8de95b2f7d087b978fb3",
+      "normalized_name": "dusk legion zealot",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Phyrexian Gargantua",
+      "logical_rule_key": "battle_rule_v1:37eb20bdc9cefa352fcddc7462be9917",
+      "normalized_name": "phyrexian gargantua",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Phyrexian Rager",
+      "logical_rule_key": "battle_rule_v1:396bda5c20ca8de95b2f7d087b978fb3",
+      "normalized_name": "phyrexian rager",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Tithebearer Giant",
+      "logical_rule_key": "battle_rule_v1:396bda5c20ca8de95b2f7d087b978fb3",
+      "normalized_name": "tithebearer giant",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Dusk Legion Zealot",
+      "Phyrexian Gargantua",
+      "Phyrexian Rager",
+      "Tithebearer Giant"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 4,
+    "total_target_card_rows": 4,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "3044522f-310a-4cda-919e-3eb1031fe877",
+      "card_name": "Dusk Legion Zealot",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:396bda5c20ca8de95b2f7d087b978fb3",
+      "normalized_name": "dusk legion zealot",
+      "oracle_hash": "424678d519dbbc2b6e21734c5cd94d02",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "9001a128-9689-4b32-b906-0ecd8aef1c8a",
+      "card_name": "Phyrexian Gargantua",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:37eb20bdc9cefa352fcddc7462be9917",
+      "normalized_name": "phyrexian gargantua",
+      "oracle_hash": "3541b0a138e9f3f20acd1c8f9f819aa5",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "391d74ff-7ae1-4449-b9e2-c92528c1d4d5",
+      "card_name": "Phyrexian Rager",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:396bda5c20ca8de95b2f7d087b978fb3",
+      "normalized_name": "phyrexian rager",
+      "oracle_hash": "424678d519dbbc2b6e21734c5cd94d02",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "c0e251f7-58c2-4a7f-90b1-7d8f893b8819",
+      "card_name": "Tithebearer Giant",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:396bda5c20ca8de95b2f7d087b978fb3",
+      "normalized_name": "tithebearer giant",
+      "oracle_hash": "424678d519dbbc2b6e21734c5cd94d02",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_creature_etb_draw_lose_life_new_server"
+}
