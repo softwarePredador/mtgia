@@ -1,0 +1,581 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg454_xmage_fixed_damage_new_server_20260705_000101",
+  "deploy_id": "pg454",
+  "expected_rules": [
+    {
+      "card_name": "Acceptable Losses",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2d54e8c21001b6b365fe81b0af6428a1",
+      "min_rule_version": 2,
+      "normalized_name": "acceptable losses",
+      "oracle_hash": "d71a8b345ef6a001cfed89e257f4646b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Artillerize",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b03ad22ee07402503a2f5d9209d44cea",
+      "min_rule_version": 2,
+      "normalized_name": "artillerize",
+      "oracle_hash": "2f71833ab097a370cd7c333082ea00a9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Collateral Damage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda",
+      "min_rule_version": 2,
+      "normalized_name": "collateral damage",
+      "oracle_hash": "d3ba7ac7a86a009d54adcd96a1159265",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fiery Conclusion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b",
+      "min_rule_version": 2,
+      "normalized_name": "fiery conclusion",
+      "oracle_hash": "183697b3f3a8978af7c064140c1f8c4f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Improvised Club",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:493c7acef4e465b2707cebd170fdcaae",
+      "min_rule_version": 2,
+      "normalized_name": "improvised club",
+      "oracle_hash": "0276e05f9d0f18098753d013f7d64bdc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magma Rift",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba",
+      "min_rule_version": 2,
+      "normalized_name": "magma rift",
+      "oracle_hash": "2b84caff4296c6292eee10eca1d7a872",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reckless Abandon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e",
+      "min_rule_version": 2,
+      "normalized_name": "reckless abandon",
+      "oracle_hash": "672ac46295c47c95948e7f9a09f03691",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shard Volley",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6",
+      "min_rule_version": 2,
+      "normalized_name": "shard volley",
+      "oracle_hash": "2205accfe98167bf9b880facea0a6396",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sonic Burst",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a0c1a4a0bc59e29bab995cb6b485cf06",
+      "min_rule_version": 2,
+      "normalized_name": "sonic burst",
+      "oracle_hash": "f1d456de114f89b1ff85f8eebfebcd9e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sonic Seizure",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:59a9093067f1a0eceeaec3adeab4a21b",
+      "min_rule_version": 2,
+      "normalized_name": "sonic seizure",
+      "oracle_hash": "f9bc1cc90ada44379e53fc5d45cf195e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_damage_spell": 10
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg454_xmage_fixed_damage_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg454_xmage_fixed_damage_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg454_xmage_fixed_damage_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg454_xmage_fixed_damage_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg454_xmage_fixed_damage_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg454_xmage_fixed_damage_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T00:01:01+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Acceptable Losses"
+      },
+      "card_name": "Acceptable Losses",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2d54e8c21001b6b365fe81b0af6428a1",
+      "normalized_name": "acceptable losses",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Artillerize"
+      },
+      "card_name": "Artillerize",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b03ad22ee07402503a2f5d9209d44cea",
+      "normalized_name": "artillerize",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Collateral Damage"
+      },
+      "card_name": "Collateral Damage",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda",
+      "normalized_name": "collateral damage",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Fiery Conclusion"
+      },
+      "card_name": "Fiery Conclusion",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b",
+      "normalized_name": "fiery conclusion",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Improvised Club"
+      },
+      "card_name": "Improvised Club",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:493c7acef4e465b2707cebd170fdcaae",
+      "normalized_name": "improvised club",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Magma Rift"
+      },
+      "card_name": "Magma Rift",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba",
+      "normalized_name": "magma rift",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Reckless Abandon"
+      },
+      "card_name": "Reckless Abandon",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e",
+      "normalized_name": "reckless abandon",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Shard Volley"
+      },
+      "card_name": "Shard Volley",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6",
+      "normalized_name": "shard volley",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sonic Burst"
+      },
+      "card_name": "Sonic Burst",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a0c1a4a0bc59e29bab995cb6b485cf06",
+      "normalized_name": "sonic burst",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Sonic Seizure"
+      },
+      "card_name": "Sonic Seizure",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:59a9093067f1a0eceeaec3adeab4a21b",
+      "normalized_name": "sonic seizure",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Acceptable Losses",
+    "Artillerize",
+    "Collateral Damage",
+    "Fiery Conclusion",
+    "Improvised Club",
+    "Magma Rift",
+    "Reckless Abandon",
+    "Shard Volley",
+    "Sonic Burst",
+    "Sonic Seizure"
+  ],
+  "selected_count": 10,
+  "slug": "xmage_fixed_damage_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Acceptable Losses",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2d54e8c21001b6b365fe81b0af6428a1",
+      "min_rule_version": 2,
+      "normalized_name": "acceptable losses",
+      "oracle_hash": "d71a8b345ef6a001cfed89e257f4646b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Artillerize",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b03ad22ee07402503a2f5d9209d44cea",
+      "min_rule_version": 2,
+      "normalized_name": "artillerize",
+      "oracle_hash": "2f71833ab097a370cd7c333082ea00a9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Collateral Damage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda",
+      "min_rule_version": 2,
+      "normalized_name": "collateral damage",
+      "oracle_hash": "d3ba7ac7a86a009d54adcd96a1159265",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fiery Conclusion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b",
+      "min_rule_version": 2,
+      "normalized_name": "fiery conclusion",
+      "oracle_hash": "183697b3f3a8978af7c064140c1f8c4f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Improvised Club",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:493c7acef4e465b2707cebd170fdcaae",
+      "min_rule_version": 2,
+      "normalized_name": "improvised club",
+      "oracle_hash": "0276e05f9d0f18098753d013f7d64bdc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magma Rift",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba",
+      "min_rule_version": 2,
+      "normalized_name": "magma rift",
+      "oracle_hash": "2b84caff4296c6292eee10eca1d7a872",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reckless Abandon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e",
+      "min_rule_version": 2,
+      "normalized_name": "reckless abandon",
+      "oracle_hash": "672ac46295c47c95948e7f9a09f03691",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shard Volley",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6",
+      "min_rule_version": 2,
+      "normalized_name": "shard volley",
+      "oracle_hash": "2205accfe98167bf9b880facea0a6396",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sonic Burst",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a0c1a4a0bc59e29bab995cb6b485cf06",
+      "min_rule_version": 2,
+      "normalized_name": "sonic burst",
+      "oracle_hash": "f1d456de114f89b1ff85f8eebfebcd9e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sonic Seizure",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:59a9093067f1a0eceeaec3adeab4a21b",
+      "min_rule_version": 2,
+      "normalized_name": "sonic seizure",
+      "oracle_hash": "f9bc1cc90ada44379e53fc5d45cf195e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

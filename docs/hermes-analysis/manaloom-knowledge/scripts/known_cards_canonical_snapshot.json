@@ -487,6 +487,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "47c3d8e8cfb4207f0f1862948c108d98"
   },
+  "Acceptable Losses": {
+    "additional_cost": "discard_card",
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "instant": false,
+    "requires_discard_card": true,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_additional_cost_class": "DiscardCardCost",
+    "xmage_additional_cost_target": "card",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2d54e8c21001b6b365fe81b0af6428a1",
+    "battle_rule_oracle_hash": "d71a8b345ef6a001cfed89e257f4646b"
+  },
   "Access Tunnel": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -4619,6 +4645,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "b2cd59447689f7462fa330293018c9df"
+  },
+  "Artillerize": {
+    "additional_cost": "sacrifice_artifact_or_creature",
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "instant": true,
+    "requires_sacrifice_artifact_or_creature": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_additional_cost_class": "SacrificeTargetCost",
+    "xmage_additional_cost_target": "artifact_or_creature",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b03ad22ee07402503a2f5d9209d44cea",
+    "battle_rule_oracle_hash": "2f71833ab097a370cd7c333082ea00a9"
   },
   "Artillery Blast": {
     "amount": 0,
@@ -15881,6 +15931,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "46ad40844d44d9b32843f29a0e83290b"
+  },
+  "Collateral Damage": {
+    "additional_cost": "sacrifice_creature",
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 3,
+    "effect": "direct_damage",
+    "instant": true,
+    "requires_sacrifice_creature": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_additional_cost_class": "SacrificeTargetCost",
+    "xmage_additional_cost_target": "creature",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6a4cad5a65e5eda502f6b72b2be87fda",
+    "battle_rule_oracle_hash": "d3ba7ac7a86a009d54adcd96a1159265"
   },
   "Collective Blessing": {
     "ability_kind": "static",
@@ -28581,6 +28655,32 @@
     "battle_rule_logical_key": "battle_rule_v1:ab59b16c0affe83efd99245a87b0b785",
     "battle_rule_oracle_hash": "bc4b4203a40c025f864fb72b5e028507"
   },
+  "Fiery Conclusion": {
+    "additional_cost": "sacrifice_creature",
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "instant": true,
+    "requires_sacrifice_creature": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_additional_cost_class": "SacrificeTargetCost",
+    "xmage_additional_cost_target": "creature",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8f664511bf5204d8fd1046898525539b",
+    "battle_rule_oracle_hash": "183697b3f3a8978af7c064140c1f8c4f"
+  },
   "Fiery Emancipation": {
     "effect": "passive",
     "battle_rule_source": "curated",
@@ -41001,6 +41101,30 @@
     "battle_rule_logical_key": "battle_rule_v1:4a001137f9a15f1a45b994a4d63f1689",
     "battle_rule_oracle_hash": "211282705b9124c8f737b1eb351e13f0"
   },
+  "Improvised Club": {
+    "additional_cost": "sacrifice_artifact_or_creature",
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "instant": true,
+    "requires_sacrifice_artifact_or_creature": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_additional_cost_class": "SacrificeTargetCost",
+    "xmage_additional_cost_target": "artifact_or_creature",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:493c7acef4e465b2707cebd170fdcaae",
+    "battle_rule_oracle_hash": "0276e05f9d0f18098753d013f7d64bdc"
+  },
   "Impulsive Pilferer": {
     "ability_kind": "triggered",
     "battle_model_scope": "dies_create_treasure_encore_v1",
@@ -48090,6 +48214,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:c3edfce465174a85507af4db418b2afb",
     "battle_rule_oracle_hash": "809522892bd5bb1abae8e9c80e1f7d34"
+  },
+  "Magma Rift": {
+    "additional_cost": "sacrifice_land",
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "instant": false,
+    "requires_sacrifice_land": true,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_additional_cost_class": "SacrificeTargetCost",
+    "xmage_additional_cost_target": "land",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4e960957df9430121cec5e2e1ef736ba",
+    "battle_rule_oracle_hash": "2b84caff4296c6292eee10eca1d7a872"
   },
   "Magma Spray": {
     "amount": 2,
@@ -63495,6 +63645,30 @@
     "battle_rule_logical_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c",
     "battle_rule_oracle_hash": "480908df14808dc5226a241cd01506a6"
   },
+  "Reckless Abandon": {
+    "additional_cost": "sacrifice_creature",
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "instant": false,
+    "requires_sacrifice_creature": true,
+    "sorcery": true,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_additional_cost_class": "SacrificeTargetCost",
+    "xmage_additional_cost_target": "creature",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4f8396dc3fbe31d26fe1f7224d117e2e",
+    "battle_rule_oracle_hash": "672ac46295c47c95948e7f9a09f03691"
+  },
   "Reckless Barbarian": {
     "battle_model_scope": "creature_sacrifice_add_two_red_mana_v1",
     "effect": "creature",
@@ -72261,6 +72435,30 @@
     "battle_rule_logical_key": "battle_rule_v1:985e756dd133e5a0fc85fa37b023c38a",
     "battle_rule_oracle_hash": "19b31ddbf3f07e58bd134bbc285629e7"
   },
+  "Shard Volley": {
+    "additional_cost": "sacrifice_land",
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 3,
+    "effect": "direct_damage",
+    "instant": true,
+    "requires_sacrifice_land": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_additional_cost_class": "SacrificeTargetCost",
+    "xmage_additional_cost_target": "land",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ccd98461ae6ccc49bc3d4e36b11477d6",
+    "battle_rule_oracle_hash": "2205accfe98167bf9b880facea0a6396"
+  },
   "Shared Roots": {
     "battle_model_scope": "xmage_library_search_to_battlefield_spell_v1",
     "count": 1,
@@ -76234,6 +76432,54 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
     "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
+  "Sonic Burst": {
+    "additional_cost": "discard_card",
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "instant": true,
+    "requires_discard_card": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_additional_cost_class": "DiscardCardCost",
+    "xmage_additional_cost_target": "card",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a0c1a4a0bc59e29bab995cb6b485cf06",
+    "battle_rule_oracle_hash": "f1d456de114f89b1ff85f8eebfebcd9e"
+  },
+  "Sonic Seizure": {
+    "additional_cost": "discard_card",
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 3,
+    "effect": "direct_damage",
+    "instant": true,
+    "requires_discard_card": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_additional_cost_class": "DiscardCardCost",
+    "xmage_additional_cost_target": "card",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:59a9093067f1a0eceeaec3adeab4a21b",
+    "battle_rule_oracle_hash": "f9bc1cc90ada44379e53fc5d45cf195e"
   },
   "Soothsayer Adept": {
     "ability_kind": "activated",

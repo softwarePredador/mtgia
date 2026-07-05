@@ -9923,6 +9923,53 @@ new server:
   `9` cards each, and `xmage_creature_dies_fixed_damage_target` with `8`
   cards.
 
+## 2026-07-05 PG454 Fixed Damage Closure
+
+- Closed the exact XMage fixed damage spell family as ManaLoom scope
+  `xmage_fixed_damage_target_spell_v1`.
+- The selected package accepted local XMage one-shot damage spells with exact
+  fixed `DamageTargetEffect`, supported target constraints, and supported
+  additional costs: discard a card, sacrifice a creature, sacrifice a land, or
+  sacrifice an artifact or creature.
+- The batch covers `10` cards: Acceptable Losses, Artillerize, Collateral
+  Damage, Fiery Conclusion, Improvised Club, Magma Rift, Reckless Abandon,
+  Shard Volley, Sonic Burst, and Sonic Seizure.
+- Focused mapper/runtime tests covered fixed damage, supported additional-cost
+  payment, unsupported additional-cost blocking, target constraints, and damage
+  resolution; PG454 performed no code mutation. The focused test lane passed
+  `718` checks.
+- The PostgreSQL package promoted `10` cards. Precheck found `10` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `10/10` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `10` rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve exact damage,
+  supported target constraints, and supported additional costs.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4393` PostgreSQL runtime rows, wrote `4385` SQLite runtime
+  rows, and exported `4360` canonical fallback rows.
+- PG454 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `10` selected cards. Generic
+  battle scenario count remained `0`; fixed-damage behavior remains covered by
+  focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26493`, `xmage_authoritative_source_count=26179`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26179`. This is an exact
+  reduction of `10` from the post-PG453 queue.
+- The post-PG454 exact split recheck reports `proposal_count=154` and
+  `safe_for_batch_pg_package_count=154`. The largest remaining exact family is
+  `xmage_static_self_horsemanship_creature` with `10` cards, followed by
+  `xmage_fixed_draw_discard_spell` and `xmage_fixed_scry_draw_card_spell` with
+  `9` cards each, and `xmage_creature_dies_fixed_damage_target` and
+  `xmage_destroy_target_scry_spell` with `8` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
