@@ -1,0 +1,347 @@
+{
+  "artifact_type": "global_commander_external_reference_corpus_collector",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "external_corpus_is_not_cut_permission",
+    "used_cards_still_require_same_lane_or_equal_gate_proof",
+    "seen_without_usage_cards_still_require_negative_or_force_access_review",
+    "candidate_copy_closed_until_corpus_maps_to_internal_cut_policy_and_trace_evidence"
+  ],
+  "card_corpus_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_decision": "do_not_cut_from_absence_only",
+      "corpus_meaning": "No checked Kaalia public corpus signal; still not cut-safe when target traces use it.",
+      "corpus_status": "external_absence_cannot_override_target_usage",
+      "cut_card": "Biotransference",
+      "cut_roles": [],
+      "external_cut_permission_now": false,
+      "observations": [
+        {
+          "present": false,
+          "source_id": "edhrec_kaalia_current"
+        },
+        {
+          "present": false,
+          "source_id": "edhrec_kaalia_expensive_midrange_2026_06_24"
+        }
+      ],
+      "research_lane": "off_profile_or_unclassified_cut_lane",
+      "source_support_level": "absent_from_checked_kaalia_sources",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_decision": "do_not_cut_from_absence_only",
+      "corpus_meaning": "No checked Kaalia public corpus signal; target usage blocks automatic removal.",
+      "corpus_status": "external_absence_cannot_override_target_usage",
+      "cut_card": "Maskwood Nexus",
+      "cut_roles": [],
+      "external_cut_permission_now": false,
+      "observations": [
+        {
+          "present": false,
+          "source_id": "edhrec_kaalia_current"
+        },
+        {
+          "present": false,
+          "source_id": "edhrec_kaalia_expensive_midrange_2026_06_24"
+        }
+      ],
+      "research_lane": "off_profile_or_unclassified_cut_lane",
+      "source_support_level": "absent_from_checked_kaalia_sources",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_decision": "do_not_cut_without_same_lane_or_equal_gate",
+      "corpus_meaning": "Reanimation support is externally present, especially in the filtered high-budget midrange sample.",
+      "corpus_status": "external_corpus_supports_preserve_or_strict_same_lane_proof",
+      "cut_card": "Necromancy",
+      "cut_roles": [
+        "reanimation_plan_b"
+      ],
+      "external_cut_permission_now": false,
+      "observations": [
+        {
+          "inclusion_percent": 6.1,
+          "present": true,
+          "source_id": "edhrec_kaalia_current",
+          "synergy_percent": 3
+        },
+        {
+          "inclusion_percent": 31,
+          "present": true,
+          "source_id": "edhrec_kaalia_expensive_midrange_2026_06_24",
+          "synergy_percent": 28
+        }
+      ],
+      "research_lane": "reanimation_plan_b",
+      "source_support_level": "commander_corpus_present",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_decision": "do_not_cut_without_same_lane_or_equal_gate",
+      "corpus_meaning": "High-power card-flow engine with bracket/Game Changer context; not generic draw cut fodder.",
+      "corpus_status": "external_corpus_supports_preserve_or_strict_same_lane_proof",
+      "cut_card": "Necropotence",
+      "cut_roles": [
+        "card_draw_selection",
+        "reanimation_plan_b"
+      ],
+      "external_cut_permission_now": false,
+      "observations": [
+        {
+          "inclusion_percent": 10,
+          "present": true,
+          "source_category": "Game Changers",
+          "source_id": "edhrec_kaalia_current",
+          "synergy_percent": 5
+        },
+        {
+          "inclusion_percent": 50,
+          "present": true,
+          "source_category": "Game Changers",
+          "source_id": "edhrec_kaalia_expensive_midrange_2026_06_24",
+          "synergy_percent": 45
+        }
+      ],
+      "research_lane": "card_draw_selection,reanimation_plan_b",
+      "source_support_level": "commander_corpus_present_high_power",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_decision": "negative_or_force_access_required_before_cut_consideration",
+      "corpus_meaning": "No checked Kaalia public corpus signal; seen-without-usage still needs negative or force-access review.",
+      "corpus_status": "external_absence_plus_seen_without_usage_requires_negative_review",
+      "cut_card": "Puresteel Paladin",
+      "cut_roles": [
+        "card_draw_selection"
+      ],
+      "external_cut_permission_now": false,
+      "observations": [
+        {
+          "present": false,
+          "source_id": "edhrec_kaalia_current"
+        },
+        {
+          "present": false,
+          "source_id": "edhrec_kaalia_expensive_midrange_2026_06_24"
+        }
+      ],
+      "research_lane": "card_draw_selection",
+      "source_support_level": "absent_from_checked_kaalia_sources",
+      "trace_group": "seen_without_usage",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_decision": "do_not_cut_from_absence_only",
+      "corpus_meaning": "No checked Kaalia public corpus signal; equipment/support lanes still need negative trace or same-lane proof.",
+      "corpus_status": "external_absence_cannot_override_target_usage",
+      "cut_card": "Sigarda's Aid",
+      "cut_roles": [],
+      "external_cut_permission_now": false,
+      "observations": [
+        {
+          "present": false,
+          "source_id": "edhrec_kaalia_current"
+        },
+        {
+          "present": false,
+          "source_id": "edhrec_kaalia_expensive_midrange_2026_06_24"
+        }
+      ],
+      "research_lane": "off_profile_or_unclassified_cut_lane",
+      "source_support_level": "absent_from_checked_kaalia_sources",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_decision": "do_not_cut_from_absence_only",
+      "corpus_meaning": "No checked Kaalia public corpus signal; target usage still blocks value-safe reclassification.",
+      "corpus_status": "external_absence_cannot_override_target_usage",
+      "cut_card": "Sram, Senior Edificer",
+      "cut_roles": [
+        "card_draw_selection"
+      ],
+      "external_cut_permission_now": false,
+      "observations": [
+        {
+          "present": false,
+          "source_id": "edhrec_kaalia_current"
+        },
+        {
+          "present": false,
+          "source_id": "edhrec_kaalia_expensive_midrange_2026_06_24"
+        }
+      ],
+      "research_lane": "card_draw_selection",
+      "source_support_level": "absent_from_checked_kaalia_sources",
+      "trace_group": "usage_blocked",
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "corpus_decision": "negative_trace_required_before_cut_consideration",
+      "corpus_meaning": "Card-flow/protection-adjacent public signal exists; seen-without-usage still requires negative review.",
+      "corpus_status": "external_presence_requires_negative_trace_before_cut",
+      "cut_card": "Trouble in Pairs",
+      "cut_roles": [
+        "card_draw_selection",
+        "dedicated_win_conditions"
+      ],
+      "external_cut_permission_now": false,
+      "observations": [
+        {
+          "inclusion_percent": 6.2,
+          "present": true,
+          "source_id": "edhrec_kaalia_current",
+          "synergy_percent": 1
+        },
+        {
+          "inclusion_percent": 13,
+          "present": true,
+          "source_id": "edhrec_kaalia_expensive_midrange_2026_06_24",
+          "synergy_percent": 7
+        }
+      ],
+      "research_lane": "card_draw_selection,dedicated_win_conditions",
+      "source_support_level": "commander_corpus_present",
+      "trace_group": "seen_without_usage",
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "deck_action_allowed": false,
+  "external_cut_permission_now": false,
+  "generated_at": "2026-07-05T22:52:17.902477+00:00",
+  "input_artifacts": {
+    "research_plan_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "same_lane_proof_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "bracket_boundary": "Game Changer and bracket context marks high-power staples as context-sensitive, not generic cuts.",
+    "mutation_boundary": "This collector does not copy decks, mutate DBs, run battles, reclassify cuts, or promote a package.",
+    "source_boundary": "External corpus presence protects or routes review; absence is not proof that a used card is safe to cut.",
+    "trace_boundary": "Target-deck usage remains stronger than public-corpus absence."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_corpus_snapshot": [
+    {
+      "commander_decks_observed": 37936,
+      "commander_tags": [
+        "Flying",
+        "Angels",
+        "Aggro",
+        "Demons"
+      ],
+      "evidence_use": "broad public Kaalia corpus for anchor/card presence and role hints",
+      "limitation": "public popularity is not final deck truth or same-lane proof",
+      "observed_on": "2026-07-05",
+      "source_id": "edhrec_kaalia_current",
+      "source_type": "commander_public_usage",
+      "url": "https://edhrec.com/commanders/kaalia-of-the-vast"
+    },
+    {
+      "commander_tags": [
+        "Flying",
+        "Angels",
+        "Aggro",
+        "Midrange"
+      ],
+      "evidence_use": "small high-budget midrange comparison set for high-power anchors",
+      "limitation": "small sample; useful only as corroborating evidence",
+      "observed_on": "2026-07-05",
+      "sample_decks_observed": 16,
+      "source_id": "edhrec_kaalia_expensive_midrange_2026_06_24",
+      "source_type": "filtered_public_usage",
+      "url": "https://edhrec.com/commanders/kaalia-of-the-vast/midrange/expensive"
+    },
+    {
+      "evidence_use": "protect attack-window, payoff-density, recast, and recovery lanes from generic cuts",
+      "limitation": "qualitative strategy evidence, not a cut authorization",
+      "observed_on": "2026-07-05",
+      "source_id": "edhrec_kaalia_hidden_gems_2026_03_26",
+      "source_type": "commander_strategy_article",
+      "strategy_signals": [
+        "attack_to_cheat_angels_demons_dragons",
+        "kill_on_sight_commander_needs_haste_or_protection",
+        "recast_and_hardcast_recovery_matter_after_removal"
+      ],
+      "url": "https://edhrec.com/articles/hidden-gems-for-kaalia-of-the-vast"
+    },
+    {
+      "evidence_use": "bracket and Game Changer context for high-power staple risk",
+      "limitation": "policy context only; not commander-specific fit evidence",
+      "observed_on": "2026-07-05",
+      "source_id": "wizards_commander_brackets_2026_02_09",
+      "source_type": "official_commander_policy",
+      "strategy_signals": [
+        "brackets_active",
+        "game_changers_active",
+        "commander_policy_can_change"
+      ],
+      "url": "https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-february-9-2026"
+    },
+    {
+      "evidence_use": "avoid treating optimized staples as generic over-target cut fodder",
+      "limitation": "bracket intent is not same-lane replacement proof",
+      "observed_on": "2026-07-05",
+      "source_id": "wizards_commander_brackets_2025_10_21",
+      "source_type": "official_commander_policy",
+      "strategy_signals": [
+        "bracket_3_strong_synergy_and_value_engines",
+        "bracket_4_fast_mana_resource_engines_free_disruption_tutors"
+      ],
+      "url": "https://magic.wizards.com/en/news/announcements/commander-brackets-beta-update-october-21-2025"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "external_reference_corpus_collected_no_cut_permission",
+  "summary": {
+    "commander": "Kaalia of the Vast",
+    "commander_public_decks_observed": 37936,
+    "corpus_absent_count": 5,
+    "corpus_present_count": 3,
+    "corpus_status_counts": {
+      "external_absence_cannot_override_target_usage": 4,
+      "external_absence_plus_seen_without_usage_requires_negative_review": 1,
+      "external_corpus_supports_preserve_or_strict_same_lane_proof": 2,
+      "external_presence_requires_negative_trace_before_cut": 1
+    },
+    "deck_id": "619",
+    "filtered_midrange_sample_decks": 16,
+    "hypothesis_count": 8,
+    "next_gate": "map_external_corpus_to_cut_policy_before_rerun_miner",
+    "seen_without_usage_count": 2,
+    "source_count": 5,
+    "support_counts": {
+      "absent_from_checked_kaalia_sources": 5,
+      "commander_corpus_present": 2,
+      "commander_corpus_present_high_power": 1
+    },
+    "usage_blocked_count": 6
+  },
+  "value_safe_reclassification_allowed_now": false
+}

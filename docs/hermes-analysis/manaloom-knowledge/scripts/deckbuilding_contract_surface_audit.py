@@ -156,6 +156,12 @@ GLOBAL_COMMANDER_EXTERNAL_CUT_SOURCE_RESEARCH_PLAN = (
 GLOBAL_COMMANDER_EXTERNAL_CUT_SOURCE_RESEARCH_PLAN_TEST = (
     SCRIPT_DIR / "test_global_commander_external_cut_source_research_plan.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_REFERENCE_CORPUS_COLLECTOR = (
+    SCRIPT_DIR / "global_commander_external_reference_corpus_collector.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_REFERENCE_CORPUS_COLLECTOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_reference_corpus_collector.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -369,6 +375,10 @@ GLOBAL_COMMANDER_SCOPE1_CUT_HYPOTHESIS_SAME_LANE_PROOF_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_CUT_SOURCE_RESEARCH_PLAN_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_REFERENCE_CORPUS_COLLECTOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -690,6 +700,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "external_cut_source_research_plan_ready_no_deck_action",
                 "collect_external_commander_reference_corpus_for_cut_candidates",
+                "global_commander_external_reference_corpus_collector.py",
+                "global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_reference_corpus_collected_no_cut_permission",
+                "map_external_corpus_to_cut_policy_before_rerun_miner",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -950,6 +964,11 @@ def build_audit() -> dict[str, Any]:
                 "external_cut_source_research_plan_ready_no_deck_action",
                 "external_source_count=6",
                 "collect_external_commander_reference_corpus_for_cut_candidates",
+                "global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_reference_corpus_collected_no_cut_permission",
+                "corpus_present_count=3",
+                "corpus_absent_count=5",
+                "map_external_corpus_to_cut_policy_before_rerun_miner",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -1596,6 +1615,35 @@ def build_audit() -> dict[str, Any]:
                 "collect_external_commander_reference_corpus_for_cut_candidates",
                 "external_research_cannot_override_target_usage",
                 "external_research_requires_negative_trace_review_first",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_REFERENCE_CORPUS_COLLECTOR,
+            [
+                "global_commander_external_reference_corpus_collector",
+                "external_reference_corpus_collected_no_cut_permission",
+                "map_external_corpus_to_cut_policy_before_rerun_miner",
+                "external_absence_cannot_override_target_usage",
+                "external_corpus_supports_preserve_or_strict_same_lane_proof",
+                "external_presence_requires_negative_trace_before_cut",
+                "External corpus presence protects or routes review; absence is not proof",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_REFERENCE_CORPUS_COLLECTOR_TEST,
+            [
+                "test_external_corpus_keeps_cut_permissions_closed",
+                "external_reference_corpus_collected_no_cut_permission",
+                "map_external_corpus_to_cut_policy_before_rerun_miner",
+                "external_corpus_supports_preserve_or_strict_same_lane_proof",
+                "external_absence_cannot_override_target_usage",
+                "external_absence_plus_seen_without_usage_requires_negative_review",
             ],
         )
     )
@@ -2477,6 +2525,30 @@ def build_audit() -> dict[str, Any]:
                 "edhrec_kaalia_current",
                 "external_research_cannot_override_target_usage",
                 "external_research_requires_negative_trace_review_first",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_REFERENCE_CORPUS_COLLECTOR_REPORT,
+            [
+                "Global Commander External Reference Corpus Collector",
+                "external_reference_corpus_collected_no_cut_permission",
+                "hypothesis_count: `8`",
+                "source_count: `5`",
+                "commander_public_decks_observed: `37936`",
+                "filtered_midrange_sample_decks: `16`",
+                "corpus_present_count: `3`",
+                "corpus_absent_count: `5`",
+                "usage_blocked_count: `6`",
+                "seen_without_usage_count: `2`",
+                "candidate_copy_allowed_now: `false`",
+                "value_safe_reclassification_allowed_now: `false`",
+                "map_external_corpus_to_cut_policy_before_rerun_miner",
+                "Necropotence",
+                "Biotransference",
+                "external_absence_cannot_override_target_usage",
+                "external_corpus_supports_preserve_or_strict_same_lane_proof",
             ],
         )
     )

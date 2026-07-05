@@ -577,6 +577,16 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     externas atuais sustentam bracket/power context, payoff density,
     attack-window e metodologia de categorias, mas nao substituem trace do deck
     alvo nem abrem permissao de corte.
+    O corpus externo foi coletado em
+    `global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `external_reference_corpus_collected_no_cut_permission`, com
+    `corpus_present_count=3`, `corpus_absent_count=5`, `usage_blocked_count=6`
+    e `seen_without_usage_count=2`. `Necromancy`, `Necropotence` e
+    `Trouble in Pairs` tem presenca no corpus Kaalia checado; as outras cinco
+    hipoteses nao apareceram nessas fontes. A ausencia externa nao vence uso no
+    deck alvo, e a presenca externa exige prova same-lane/equal-gate ou revisao
+    negativa antes de corte. Proximo gate:
+    `map_external_corpus_to_cut_policy_before_rerun_miner`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

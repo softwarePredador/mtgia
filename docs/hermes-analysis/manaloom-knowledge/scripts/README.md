@@ -144,6 +144,12 @@ then routes to external commander reference corpus collection. Popularity,
 articles, and bracket context must not override target-deck usage traces or open
 candidate copy by themselves.
 
+Then run `global_commander_external_reference_corpus_collector.py`. It maps
+external presence, absence, bracket context, and strategy signals back to each
+named cut hypothesis. External absence is not proof that a used card is safe to
+cut; external presence protects or routes review, and the next step is mapping
+the corpus into internal cut policy before rerunning the miner.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

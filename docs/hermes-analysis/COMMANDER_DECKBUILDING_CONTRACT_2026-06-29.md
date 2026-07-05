@@ -307,7 +307,12 @@ Operational priority after this pivot:
     from deck truth, and route to external commander reference corpus collection
     without opening candidate copy, battle, promotion, or value-safe
     reclassification;
-36. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+36. run `global_commander_external_reference_corpus_collector.py` after the
+    external research plan; it must map external corpus presence, absence,
+    bracket context, and strategy-article signals back to named cut candidates,
+    while preserving the rule that external absence cannot override target-deck
+    usage and external presence cannot replace same-lane/equal-gate proof;
+37. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -361,6 +366,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_source_hypothesis_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_cut_hypothesis_same_lane_proof_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_cut_source_research_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_reference_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -799,6 +805,16 @@ Current external refresh on 2026-07-05:
   deckbuilding method. These are evidence lanes only: target usage and
   seen-without-usage blockers still prevent candidate copy, battle, promotion,
   and value-safe reclassification.
+- Current external reference corpus collection returns
+  `external_reference_corpus_collected_no_cut_permission` with
+  `corpus_present_count=3`, `corpus_absent_count=5`, `usage_blocked_count=6`,
+  and `seen_without_usage_count=2`. `Necromancy`, `Necropotence`, and
+  `Trouble in Pairs` have checked Kaalia corpus presence; `Biotransference`,
+  `Maskwood Nexus`, `Sigarda's Aid`, `Puresteel Paladin`, and
+  `Sram, Senior Edificer` are absent from the checked Kaalia public corpus.
+  Presence protects/routes review, and absence is not cut permission when the
+  target deck used the card. The next gate is
+  `map_external_corpus_to_cut_policy_before_rerun_miner`.
 
 ## Global Commander Rollout - 2026-07-01
 
