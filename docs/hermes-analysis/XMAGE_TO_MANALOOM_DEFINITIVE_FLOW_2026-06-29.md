@@ -10242,6 +10242,67 @@ new server:
   `xmage_fixed_draw_spell_self_cost_reduction`, and
   `xmage_static_cast_spells_as_flash_permission` with `7` cards each.
 
+## 2026-07-05 PG460 Destroy Target Scry Closure
+
+- Closed the exact XMage destroy-target-then-scry spell family as ManaLoom
+  scope `xmage_destroy_target_and_scry_spell_v1`.
+- The selected package accepted local XMage instant-or-sorcery sources whose
+  executable behavior is a fixed `DestroyTargetEffect` followed by fixed
+  `ScryEffect`, preserving target type, target constraints, timing, and
+  destroy-then-scry resolution order.
+- The batch covers `8` cards: Artisan's Sorrow, Expose to Daylight, Get the
+  Point, Guiding Bolt, Rubble Reading, Skywhaler's Shot, Tel-Jilad Justice,
+  and Vanquish the Foul.
+- Focused mapper/runtime tests covered destroy+scry mapping and runtime
+  resolution that removes the target before scrying; PG460 performed no code
+  mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `8` cards. Precheck found `8` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `8/8` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `8` promoted rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve target family,
+  target constraints, scry count, timing, and `destroy_then_scry` resolution.
+  The selected parameters are: Artisan's Sorrow
+  `artifact_or_enchantment scry 2 instant`, Expose to Daylight
+  `artifact_or_enchantment scry 1 instant`, Get the Point
+  `creature scry 1 instant`, Guiding Bolt `creature power>=4 scry 2 instant`,
+  Rubble Reading `land scry 2 sorcery`, Skywhaler's Shot
+  `creature power>=3 scry 1 instant`, Tel-Jilad Justice
+  `artifact scry 2 instant`, and Vanquish the Foul
+  `creature power>=4 scry 1 sorcery`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4445` PostgreSQL runtime rows, wrote `4437` SQLite runtime
+  rows, and exported `4412` canonical fallback rows.
+- PG460 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `8` selected cards. Generic
+  battle scenario count remained `0`; destroy+scry behavior remains covered by
+  focused runtime tests.
+- A stale zero-byte sibling SQLite artifact at
+  `docs/hermes-analysis/manaloom-knowledge/knowledge.db` was removed after the
+  first legacy contamination audit correctly failed on it. The rerun legacy
+  audit passed against the active operational DB under
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  after stale SQLite cleanup (`32/32`), and PG/Hermes/SQLite contract with live
+  PostgreSQL connection (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26441`, `xmage_authoritative_source_count=26127`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26127`. This is an exact
+  reduction of `8` from the post-PG459 queue.
+- The post-PG460 exact split recheck reports `proposal_count=102` and
+  `safe_for_batch_pg_package_count=102`. The largest remaining exact families
+  are `xmage_fixed_damage_scry_spell` and
+  `xmage_static_self_protection_from_subtypes_creature` with `8` cards each,
+  followed by `xmage_creature_dies_gain_life`,
+  `xmage_fixed_draw_spell_self_cost_reduction`, and
+  `xmage_static_cast_spells_as_flash_permission` with `7` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

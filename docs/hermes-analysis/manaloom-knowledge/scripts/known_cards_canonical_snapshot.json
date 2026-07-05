@@ -4762,6 +4762,57 @@
     "battle_rule_logical_key": "battle_rule_v1:fea134519697a0e44a05ebc4c1bcf531",
     "battle_rule_oracle_hash": "ac45406941112d77fd8e127672248b83"
   },
+  "Artisan's Sorrow": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "artifact_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "scry",
+        "scry_count": 2,
+        "xmage_effect_class": "ScryEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_destroy_target_and_scry_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": true,
+    "resolution_order": "destroy_then_scry",
+    "scry_count": 2,
+    "sorcery": false,
+    "target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "ScryEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6e9e60bc9fb2ad5c293fdfd311a8c137",
+    "battle_rule_oracle_hash": "da43fa4288fbb6986c6ddda5b21db6dd"
+  },
   "Artist Alley": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -27333,6 +27384,57 @@
     "battle_rule_logical_key": "battle_rule_v1:48f9bc644ca6723800b5f9d6d1b2b4ce",
     "battle_rule_oracle_hash": "11224c7b96db19e25d30806db8e0a3fa"
   },
+  "Expose to Daylight": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "artifact_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "scry",
+        "scry_count": 1,
+        "xmage_effect_class": "ScryEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_destroy_target_and_scry_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": true,
+    "resolution_order": "destroy_then_scry",
+    "scry_count": 1,
+    "sorcery": false,
+    "target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "ScryEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e27b12d525b32a09c3664f43b350acc4",
+    "battle_rule_oracle_hash": "3646dffbed1ee5903335e38f180bdd10"
+  },
   "Extinguish": {
     "battle_model_scope": "xmage_counter_target_spell_v1",
     "effect": "counter",
@@ -33491,6 +33593,55 @@
     "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea",
     "battle_rule_oracle_hash": "6b6517e1b5b60db5cf6bbcd991dbc1ec"
   },
+  "Get the Point": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "scry",
+        "scry_count": 1,
+        "xmage_effect_class": "ScryEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_destroy_target_and_scry_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "resolution_order": "destroy_then_scry",
+    "scry_count": 1,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "ScryEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:60186100f5114fb616355fbbdbb91778",
+    "battle_rule_oracle_hash": "9b713515e0ac5d3787f8022921214828"
+  },
   "Geth's Grimoire": {
     "ability_kind": "triggered",
     "battle_model_scope": "opponent_discards_card_may_draw_v1",
@@ -37554,6 +37705,57 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8358ad4dae1cce40788051c6c95584b9",
     "battle_rule_oracle_hash": "5c9312a9432775bc6a4073c667c0407e"
+  },
+  "Guiding Bolt": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_min": 4
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "scry",
+        "scry_count": 2,
+        "xmage_effect_class": "ScryEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_destroy_target_and_scry_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "resolution_order": "destroy_then_scry",
+    "scry_count": 2,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "power_min": 4
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "ScryEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7339a89b2ca7be6d9b801f0fbf7123dc",
+    "battle_rule_oracle_hash": "379be0891c7170a8b2c7e92b0c961cc8"
   },
   "Guild Artisan": {
     "effect": "passive",
@@ -68360,6 +68562,55 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Rubble Reading": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "scry",
+        "scry_count": 2,
+        "xmage_effect_class": "ScryEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_destroy_target_and_scry_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": false,
+    "resolution_order": "destroy_then_scry",
+    "scry_count": 2,
+    "sorcery": true,
+    "target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "ScryEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3d1fa3cc048c47b80f9e4ebc21b72931",
+    "battle_rule_oracle_hash": "ed6c32c050392475b0ad695de29d1e80"
+  },
   "Rubble Slinger": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -76258,6 +76509,57 @@
     "battle_rule_logical_key": "battle_rule_v1:73c998d8f94edccb0e59cb97eea6267c",
     "battle_rule_oracle_hash": "0ac25ffabfd8c18e6ec16015241d5477"
   },
+  "Skywhaler's Shot": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_min": 3
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "scry",
+        "scry_count": 1,
+        "xmage_effect_class": "ScryEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_destroy_target_and_scry_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "resolution_order": "destroy_then_scry",
+    "scry_count": 1,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "power_min": 3
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "ScryEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cf50ba8ae8f3f26d42593ffd7c919fa7",
+    "battle_rule_oracle_hash": "b72b7bfe543e290d2e6fd90b617727a3"
+  },
   "Skywinder Drake": {
     "_keywords_are_self": true,
     "ability_kind": "static",
@@ -83853,6 +84155,55 @@
     "battle_rule_logical_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
     "battle_rule_oracle_hash": "c326b8227109ed7986576e4fc2fd8738"
   },
+  "Tel-Jilad Justice": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 2,
+        "effect": "scry",
+        "scry_count": 2,
+        "xmage_effect_class": "ScryEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_destroy_target_and_scry_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": true,
+    "resolution_order": "destroy_then_scry",
+    "scry_count": 2,
+    "sorcery": false,
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "ScryEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:549bbd1831243bf6128b853515d740c0",
+    "battle_rule_oracle_hash": "771f081071e5dbd2213233334c6a2874"
+  },
   "Tel-Jilad Outrider": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
@@ -90503,6 +90854,57 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:df7f405115435a17a15ffc3a809aa14c",
     "battle_rule_oracle_hash": "7fa651e04d0a369d0586bfb83bd2fdc7"
+  },
+  "Vanquish the Foul": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "power_min": 4
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_scry_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "scry",
+        "scry_count": 1,
+        "xmage_effect_class": "ScryEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_destroy_target_and_scry_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": false,
+    "resolution_order": "destroy_then_scry",
+    "scry_count": 1,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "power_min": 4
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "ScryEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c7411f0db013697c3ba279504bd4dff2",
+    "battle_rule_oracle_hash": "cde9a7f047448ac2ff5c48179b6cbb80"
   },
   "Vanquish the Horde": {
     "ability_kind": "static",
