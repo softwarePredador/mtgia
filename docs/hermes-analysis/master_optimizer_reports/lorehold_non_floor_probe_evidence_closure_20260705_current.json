@@ -1,0 +1,2472 @@
+{
+  "artifact_type": "lorehold_non_floor_probe_evidence_closure",
+  "closure_rows": [
+    {
+      "add_card": "Boros Garrison",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Ancient Tomb",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 39,
+        "inferred_role": "tutor_access",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine",
+          "tutor_access",
+          "tutor_target"
+        ],
+        "source_file_count": 21,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 39
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "fast_mana_utility_land_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Boros Garrison",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Battlefield Forge",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "ramp_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine"
+        ],
+        "source_file_count": 9,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 15
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "colored_source_floor_requires_pair_model",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Boros Garrison",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Mountain // Mountain",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 402,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 94,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 402
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Boros Garrison",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Plains // Plains",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 244,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 101,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 244
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Boseiju, Who Shelters All",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Ancient Tomb",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 39,
+        "inferred_role": "tutor_access",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine",
+          "tutor_access",
+          "tutor_target"
+        ],
+        "source_file_count": 21,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 39
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "fast_mana_utility_land_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Boseiju, Who Shelters All",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Battlefield Forge",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "ramp_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine"
+        ],
+        "source_file_count": 9,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 15
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "colored_source_floor_requires_pair_model",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Boseiju, Who Shelters All",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Mountain // Mountain",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 402,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 94,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 402
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Boseiju, Who Shelters All",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Plains // Plains",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 244,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 101,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 244
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Cavern of Souls",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Ancient Tomb",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 39,
+        "inferred_role": "tutor_access",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine",
+          "tutor_access",
+          "tutor_target"
+        ],
+        "source_file_count": 21,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 39
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "fast_mana_utility_land_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Cavern of Souls",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Battlefield Forge",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "ramp_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine"
+        ],
+        "source_file_count": 9,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 15
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "colored_source_floor_requires_pair_model",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Cavern of Souls",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Mountain // Mountain",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 402,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 94,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 402
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Cavern of Souls",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Plains // Plains",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 244,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 101,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 244
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Clifftop Retreat",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Ancient Tomb",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 39,
+        "inferred_role": "tutor_access",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine",
+          "tutor_access",
+          "tutor_target"
+        ],
+        "source_file_count": 21,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 39
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "fast_mana_utility_land_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Clifftop Retreat",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Battlefield Forge",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "ramp_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine"
+        ],
+        "source_file_count": 9,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 15
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "colored_source_floor_requires_pair_model",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Clifftop Retreat",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Mountain // Mountain",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 402,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 94,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 402
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Clifftop Retreat",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Plains // Plains",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 244,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 101,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 244
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Plateau",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Ancient Tomb",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 39,
+        "inferred_role": "tutor_access",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine",
+          "tutor_access",
+          "tutor_target"
+        ],
+        "source_file_count": 21,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 39
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "fast_mana_utility_land_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Plateau",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Battlefield Forge",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "ramp_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine"
+        ],
+        "source_file_count": 9,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 15
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "colored_source_floor_requires_pair_model",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Plateau",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Mountain // Mountain",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 402,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 94,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 402
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Plateau",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Plains // Plains",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 244,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 101,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 244
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Rugged Prairie",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Ancient Tomb",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 39,
+        "inferred_role": "tutor_access",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine",
+          "tutor_access",
+          "tutor_target"
+        ],
+        "source_file_count": 21,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 39
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "fast_mana_utility_land_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Rugged Prairie",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Battlefield Forge",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "ramp_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine"
+        ],
+        "source_file_count": 9,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 15
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "colored_source_floor_requires_pair_model",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Rugged Prairie",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Mountain // Mountain",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 402,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 94,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 402
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Rugged Prairie",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Plains // Plains",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 244,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 101,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 244
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Sundown Pass",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Ancient Tomb",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 39,
+        "inferred_role": "tutor_access",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine",
+          "tutor_access",
+          "tutor_target"
+        ],
+        "source_file_count": 21,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 39
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "fast_mana_utility_land_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Sundown Pass",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Battlefield Forge",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "ramp_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "ramp_engine"
+        ],
+        "source_file_count": 9,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 15
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 28,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "colored_source_floor_requires_pair_model",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Sundown Pass",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Mountain // Mountain",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 402,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 94,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 402
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Sundown Pass",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_generic_mana_probe_route",
+      "cut_card": "Plains // Plains",
+      "evidence_status": "blocked_generic_mana_probe_not_pair_safe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 244,
+        "inferred_role": "runtime_ready_unexposed",
+        "role_confidence": "rule_only",
+        "role_signals": [
+          "discard_or_rummage_context"
+        ],
+        "source_file_count": 101,
+        "summary_metric_count": 0,
+        "unique_exposure_count": 244
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required"
+      ],
+      "planner_cut_value_score": 18,
+      "planner_cut_value_tier": "tier_1_structural_floor",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "same_color_source_count_preserved",
+        "untapped_or_fetchable_role_preserved",
+        "land_count_floor_preserved",
+        "same_seed_no_mana_regression_trace"
+      ],
+      "probe_blockers": [
+        "basic_land_floor_not_safe_from_probe",
+        "mana_source_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready",
+        "structural_floor_equivalence_required",
+        "use_dedicated_mana_base_model_before_generic_probe"
+      ],
+      "probe_next_action": "mine mana source equivalence or use dedicated ready pair instead",
+      "safe_cut_ready_now": false,
+      "target_tag": "mana_base_safe_cut_model"
+    },
+    {
+      "add_card": "Dragon's Rage Channeler",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Artist's Talent",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 500,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "discard_payoff",
+          "draw_filter_value",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 92,
+        "summary_metric_count": 35,
+        "unique_exposure_count": 535
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_3_role_filler_with_battle_context",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Dragon's Rage Channeler",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Improvisation Capstone",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 49,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "draw_filter_value",
+          "miracle_hit",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 20,
+        "summary_metric_count": 10,
+        "unique_exposure_count": 59
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_2_commander_contextual_synergy",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Dragon's Rage Channeler",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Pinnacle Monk // Mystic Peak",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 7,
+        "inferred_role": "recursion_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "graveyard_recursion",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 3,
+        "summary_metric_count": 1,
+        "unique_exposure_count": 8
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_3_role_filler_with_battle_context",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:recursion_engine",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Dragon's Rage Channeler",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Reforge the Soul",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "discard_or_rummage_context",
+          "discard_payoff",
+          "draw_filter_value"
+        ],
+        "source_file_count": 16,
+        "summary_metric_count": 8,
+        "unique_exposure_count": 23
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 13,
+      "planner_cut_value_tier": "tier_2_commander_contextual_synergy",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Galvanoth",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Artist's Talent",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 500,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "discard_payoff",
+          "draw_filter_value",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 92,
+        "summary_metric_count": 35,
+        "unique_exposure_count": 535
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_3_role_filler_with_battle_context",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Galvanoth",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Improvisation Capstone",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 49,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "draw_filter_value",
+          "miracle_hit",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 20,
+        "summary_metric_count": 10,
+        "unique_exposure_count": 59
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_2_commander_contextual_synergy",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Galvanoth",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Pinnacle Monk // Mystic Peak",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 7,
+        "inferred_role": "recursion_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "graveyard_recursion",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 3,
+        "summary_metric_count": 1,
+        "unique_exposure_count": 8
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_3_role_filler_with_battle_context",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:recursion_engine",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Galvanoth",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Reforge the Soul",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "discard_or_rummage_context",
+          "discard_payoff",
+          "draw_filter_value"
+        ],
+        "source_file_count": 16,
+        "summary_metric_count": 8,
+        "unique_exposure_count": 23
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 13,
+      "planner_cut_value_tier": "tier_2_commander_contextual_synergy",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Penance",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Artist's Talent",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 500,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "discard_payoff",
+          "draw_filter_value",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 92,
+        "summary_metric_count": 35,
+        "unique_exposure_count": 535
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_3_role_filler_with_battle_context",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Penance",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Improvisation Capstone",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 49,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "draw_filter_value",
+          "miracle_hit",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 20,
+        "summary_metric_count": 10,
+        "unique_exposure_count": 59
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_2_commander_contextual_synergy",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Penance",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Pinnacle Monk // Mystic Peak",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 7,
+        "inferred_role": "recursion_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "graveyard_recursion",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 3,
+        "summary_metric_count": 1,
+        "unique_exposure_count": 8
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_3_role_filler_with_battle_context",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:recursion_engine",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Penance",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Reforge the Soul",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "discard_or_rummage_context",
+          "discard_payoff",
+          "draw_filter_value"
+        ],
+        "source_file_count": 16,
+        "summary_metric_count": 8,
+        "unique_exposure_count": 23
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 13,
+      "planner_cut_value_tier": "tier_2_commander_contextual_synergy",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Artist's Talent",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 500,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "discard_payoff",
+          "draw_filter_value",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 92,
+        "summary_metric_count": 35,
+        "unique_exposure_count": 535
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_3_role_filler_with_battle_context",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Improvisation Capstone",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 49,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "draw_filter_value",
+          "miracle_hit",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 20,
+        "summary_metric_count": 10,
+        "unique_exposure_count": 59
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_2_commander_contextual_synergy",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Pinnacle Monk // Mystic Peak",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 7,
+        "inferred_role": "recursion_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "graveyard_recursion",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 3,
+        "summary_metric_count": 1,
+        "unique_exposure_count": 8
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_3_role_filler_with_battle_context",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:recursion_engine",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Valakut Awakening // Valakut Stoneforge",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Reforge the Soul",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "discard_or_rummage_context",
+          "discard_payoff",
+          "draw_filter_value"
+        ],
+        "source_file_count": 16,
+        "summary_metric_count": 8,
+        "unique_exposure_count": 23
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 13,
+      "planner_cut_value_tier": "tier_2_commander_contextual_synergy",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Artist's Talent",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 500,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "discard_payoff",
+          "draw_filter_value",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 92,
+        "summary_metric_count": 35,
+        "unique_exposure_count": 535
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_3_role_filler_with_battle_context",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Improvisation Capstone",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 49,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "draw_filter_value",
+          "miracle_hit",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 20,
+        "summary_metric_count": 10,
+        "unique_exposure_count": 59
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_2_commander_contextual_synergy",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Pinnacle Monk // Mystic Peak",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 7,
+        "inferred_role": "recursion_engine",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "graveyard_recursion",
+          "paid_cast_exposure"
+        ],
+        "source_file_count": 3,
+        "summary_metric_count": 1,
+        "unique_exposure_count": 8
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 10,
+      "planner_cut_value_tier": "tier_3_role_filler_with_battle_context",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:recursion_engine",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    },
+    {
+      "add_card": "Wheel of Fortune",
+      "candidate_deck_materialization_allowed_now": false,
+      "closure_class": "closed_exposed_topdeck_role",
+      "cut_card": "Reforge the Soul",
+      "evidence_status": "blocked_exposed_topdeck_role_probe",
+      "exposure": {
+        "decision_status": "review_required",
+        "direct_event_count": 15,
+        "inferred_role": "draw_filter_value",
+        "role_confidence": "direct_event_or_rule",
+        "role_signals": [
+          "discard_or_rummage_context",
+          "discard_payoff",
+          "draw_filter_value"
+        ],
+        "source_file_count": 16,
+        "summary_metric_count": 8,
+        "unique_exposure_count": 23
+      },
+      "included_in_non_floor_closure": true,
+      "matrix_candidate_row_eligible_now": false,
+      "missing_probe_evidence_row": false,
+      "planner_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "planner_cut_value_score": 13,
+      "planner_cut_value_tier": "tier_2_commander_contextual_synergy",
+      "planner_floor_trace_blocked": false,
+      "planner_required_evidence": [
+        "candidate_add_drawn_cast_or_activated",
+        "cut_card_low_exposure_or_redundant_trace",
+        "miracle_cast_floor_preserved",
+        "topdeck_manipulation_floor_preserved"
+      ],
+      "probe_blockers": [
+        "miracle_topdeck_floor_equivalence_required",
+        "probe_cut_has_material_exposure",
+        "probe_cut_role_not_low_impact:draw_filter_value",
+        "requires_exposure_trace_before_safe_cut",
+        "safe_cut_miner_zero_current_ready"
+      ],
+      "probe_next_action": "do not turn this probe into a cut without proving redundant low-impact exposure",
+      "safe_cut_ready_now": false,
+      "target_tag": "topdeck_access_sidecar_primary"
+    }
+  ],
+  "current_baseline": "deck_607",
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "forced_access_allowed_now": false,
+    "keep_607_as_protected_baseline": true,
+    "matrix_candidate_rows_ready": false,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_run_battle_without_a_materializable_candidate_contract",
+      "do_not_convert reviewable probes directly into cuts",
+      "define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate"
+    ],
+    "promotion_allowed": false,
+    "reason": "All non-floor sidecar probes have evidence and none produced a safe cut or matrix-eligible row; the dedicated mana route has no currently eligible exact pair.",
+    "safe_cut_ready_now": false
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T10:18:21Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "current_best_summary": {
+      "artifact_contract_equal_battle_gate_allowed": true,
+      "artifact_contract_status": "pass",
+      "artifact_count": 959,
+      "current_positive_signal_count": 0,
+      "decision_status": "current_best_baseline_synthesis_keep_607",
+      "floor_trace_cut_blocker_count": 6,
+      "overridden_historical_positive_signal_count": 1,
+      "protected_baseline_rank": 1,
+      "ready_for_real_deck_change_from_artifact_gate": false,
+      "recommended_next_action": "define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate",
+      "sidecar_candidate_deck_materialization_allowed_now": false,
+      "sidecar_matrix_candidate_row_eligible_count": 0,
+      "sidecar_promotion_allowed_now": false,
+      "sidecar_safe_cut_ready_count": 0,
+      "top_deck_is_607": true,
+      "unknown_or_invalid_count": 0,
+      "validation_error_count": 0
+    },
+    "cut_model_planner_summary": {
+      "attempted_package_cut_name_count": 7,
+      "blocker_counts": {
+        "mana_source_floor_equivalence_required": 28,
+        "miracle_topdeck_floor_equivalence_required": 20,
+        "requires_exposure_trace_before_safe_cut": 48,
+        "safe_cut_miner_zero_current_ready": 48,
+        "structural_floor_equivalence_required": 28
+      },
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_sidecar_cut_model_planner_review_probes_ready_no_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "floor_trace_blocked_probe_count": 0,
+      "floor_trace_cut_blocker_count": 6,
+      "floor_trace_cut_blocker_names": [
+        "Call Forth the Tempest",
+        "Esper Sentinel",
+        "Everything Comes to Dust",
+        "Hit the Mother Lode",
+        "Rise of the Eldrazi",
+        "Surge to Victory"
+      ],
+      "forced_access_allowed_now": false,
+      "matrix_candidate_row_eligible_count": 0,
+      "missing_inputs": [],
+      "named_cut_probe_count": 48,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "protected_near_miss_count": 25,
+      "recommended_next_action": "collect_probe_evidence_for_non_floor_trace_cut_slots_only",
+      "safe_cut_ready_count": 0,
+      "tag_counts": {
+        "mana_base_safe_cut_model": 7,
+        "topdeck_access_sidecar_primary": 5
+      },
+      "target_row_count": 12
+    },
+    "probe_evidence_summary": {
+      "blocked_exposed_topdeck_role_probe_count": 20,
+      "blocked_generic_mana_probe_count": 28,
+      "blocker_counts": {
+        "basic_land_floor_not_safe_from_probe": 14,
+        "colored_source_floor_requires_pair_model": 7,
+        "fast_mana_utility_land_not_safe_from_probe": 7,
+        "mana_source_floor_equivalence_required": 28,
+        "miracle_topdeck_floor_equivalence_required": 20,
+        "probe_cut_has_material_exposure": 20,
+        "probe_cut_role_not_low_impact:draw_filter_value": 15,
+        "probe_cut_role_not_low_impact:recursion_engine": 5,
+        "requires_exposure_trace_before_safe_cut": 48,
+        "safe_cut_miner_zero_current_ready": 48,
+        "structural_floor_equivalence_required": 28,
+        "use_dedicated_mana_base_model_before_generic_probe": 28
+      },
+      "candidate_deck_materialization_allowed_now": false,
+      "decision_status": "topdeck_sidecar_probe_evidence_no_safe_cut_keep_607",
+      "deck_action_allowed_now": false,
+      "forced_access_allowed_now": false,
+      "mana_model_eligible_pair_count": 0,
+      "mana_model_exact_rejected_pair_count": 2,
+      "mana_model_ready_pair_count": 2,
+      "mana_route_status": "mana_route_closed_by_exact_decisions",
+      "matrix_candidate_row_eligible_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "probe_row_count": 48,
+      "promotion_allowed_now": false,
+      "recommended_next_action": "collect_new_mana_evidence_or_topdeck_floor_traces_before_any_matrix_row",
+      "safe_cut_ready_count": 0,
+      "status_counts": {
+        "blocked_exposed_topdeck_role_probe": 20,
+        "blocked_generic_mana_probe_not_pair_safe": 28
+      }
+    }
+  },
+  "source_reports": {
+    "current_best": "docs/hermes-analysis/master_optimizer_reports/lorehold_current_best_baseline_synthesis_20260705_brain_floor_protected_route_current.json",
+    "cut_model_planner": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.json",
+    "probe_evidence": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_probe_evidence_miner_20260705_current.json"
+  },
+  "status": "non_floor_probe_evidence_closure_closed_no_matrix_rows_keep_607",
+  "summary": {
+    "blocked_exposed_topdeck_role_probe_count": 20,
+    "blocked_generic_mana_probe_count": 28,
+    "candidate_deck_materialization_allowed_now": false,
+    "closure_class_counts": {
+      "closed_exposed_topdeck_role": 20,
+      "closed_generic_mana_probe_route": 28
+    },
+    "current_best_decision_status": "current_best_baseline_synthesis_keep_607",
+    "decision_status": "non_floor_probe_evidence_closure_closed_no_matrix_rows_keep_607",
+    "deck_action_allowed_now": false,
+    "forced_access_allowed_now": false,
+    "mana_model_eligible_pair_count": 0,
+    "mana_model_exact_rejected_pair_count": 2,
+    "mana_route_status": "mana_route_closed_by_exact_decisions",
+    "missing_inputs": [],
+    "missing_probe_evidence_row_count": 0,
+    "natural_battle_gate_allowed_now": false,
+    "non_floor_matrix_candidate_row_eligible_count": 0,
+    "non_floor_probe_count": 48,
+    "non_floor_safe_cut_ready_count": 0,
+    "planner_floor_trace_blocked_probe_count": 0,
+    "planner_floor_trace_cut_blocker_count": 6,
+    "planner_named_probe_count": 48,
+    "probe_evidence_row_count": 48,
+    "promotion_allowed_now": false,
+    "recommended_next_action": "define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate",
+    "status_counts": {
+      "blocked_exposed_topdeck_role_probe": 20,
+      "blocked_generic_mana_probe_not_pair_safe": 28
+    }
+  }
+}

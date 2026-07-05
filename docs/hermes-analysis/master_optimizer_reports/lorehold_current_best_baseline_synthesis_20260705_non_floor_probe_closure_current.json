@@ -1,0 +1,100 @@
+{
+  "artifact_type": "lorehold_current_best_baseline_synthesis",
+  "current_baseline": "deck_607",
+  "current_positive_signals": [],
+  "cut_methodology_override": {
+    "blocked_pairs": [
+      "the_one_ring_over_molecule_man"
+    ],
+    "confirmation_pairs": [
+      "birgi_god_of_storytelling_harnfel_horn_of_bounty_over_the_scarlet_witch"
+    ],
+    "current_candidate_status": "battle_cleared_with_cut_methodology_caveat",
+    "overrides_v615_mana_engine_positive": true,
+    "ready_for_real_deck_change": false,
+    "summary": "The Mana Vault ramp swap is methodologically valid. Birgi over Scarlet is same-macro but needs confirmation. The One Ring over Molecule Man is a cross-lane cut and must not be used as proof that Molecule belongs out."
+  },
+  "decision": {
+    "candidate_deck_materialization_allowed_now": false,
+    "deck_action_allowed": false,
+    "keep_607_as_current_best_baseline": true,
+    "natural_battle_gate_ready_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_run_battle_without_a_materializable_candidate_contract",
+      "preserve floor-trace-blocked cards until same-lane replacement preserves floor",
+      "open new work only through new shell contract or new cut evidence"
+    ],
+    "promotion_allowed": false,
+    "reason": "The governed artifact surface is classified, deck_607 ranks first structurally, current sidecar/cut routes have zero eligible rows, and the only positive promotion signal is historical and overridden."
+  },
+  "deck_607_mutated": false,
+  "generated_at": "2026-07-05T10:19:16Z",
+  "matrix_summary": {
+    "live_challenger_ranks": {
+      "deck_614": 3,
+      "deck_615": 2
+    },
+    "protected_baseline_key": "deck_607",
+    "protected_baseline_rank": 1,
+    "protected_baseline_score": 141.151,
+    "ranked_deck_keys": [
+      "deck_607",
+      "deck_615",
+      "deck_614",
+      "deck_613",
+      "deck_609",
+      "deck_616",
+      "deck_611",
+      "deck_610",
+      "deck_612",
+      "deck_608"
+    ],
+    "top_deck_is_607": true,
+    "top_deck_key": "deck_607"
+  },
+  "overridden_historical_positive_signals": [
+    {
+      "artifact_type": "",
+      "override_reason": "cut_methodology_reaudit_20260629 sets ready_for_real_deck_change=false and marks the candidate battle-cleared only with methodology caveat",
+      "path": "docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_decision_audit_20260629_v615_mana_engine_v1.json",
+      "positive_fields": {
+        "decision.ready_for_real_deck_change": true
+      },
+      "status": "pass"
+    }
+  ],
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_reports": {
+    "artifact_audit": "docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260705_non_floor_probe_closure_current.json",
+    "cut_methodology_reaudit": "docs/hermes-analysis/master_optimizer_reports/lorehold_cut_methodology_reaudit_20260629.json",
+    "gap_floor_trace_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_gap_floor_trace_miner_20260705_current.json",
+    "sidecar_cut_planner": "docs/hermes-analysis/master_optimizer_reports/lorehold_topdeck_sidecar_cut_model_planner_20260705_current.json",
+    "strategy_matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json"
+  },
+  "status": "current_best_baseline_synthesis_keep_607",
+  "summary": {
+    "artifact_contract_equal_battle_gate_allowed": true,
+    "artifact_contract_status": "pass",
+    "artifact_count": 972,
+    "current_positive_signal_count": 0,
+    "decision_status": "current_best_baseline_synthesis_keep_607",
+    "floor_trace_cut_blocker_count": 6,
+    "overridden_historical_positive_signal_count": 1,
+    "protected_baseline_rank": 1,
+    "ready_for_real_deck_change_from_artifact_gate": false,
+    "recommended_next_action": "define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate",
+    "sidecar_candidate_deck_materialization_allowed_now": false,
+    "sidecar_matrix_candidate_row_eligible_count": 0,
+    "sidecar_promotion_allowed_now": false,
+    "sidecar_safe_cut_ready_count": 0,
+    "top_deck_is_607": true,
+    "unknown_or_invalid_count": 0,
+    "validation_error_count": 0
+  },
+  "validation": {
+    "errors": [],
+    "status": "pass"
+  }
+}

@@ -575,6 +575,51 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertFalse(classification.canonical_summary["deck_607_mutated"])
 
+    def test_lorehold_non_floor_probe_evidence_closure_is_recognized(self) -> None:
+        payload = {
+            "artifact_type": "lorehold_non_floor_probe_evidence_closure",
+            "current_baseline": "deck_607",
+            "closure_rows": [
+                {
+                    "add_card": "Penance",
+                    "cut_card": "Artist's Talent",
+                    "closure_class": "closed_exposed_topdeck_role",
+                }
+            ],
+            "decision": {
+                "keep_607_as_protected_baseline": True,
+                "candidate_deck_materialization_allowed_now": False,
+            },
+            "deck_607_mutated": False,
+            "generated_at": "2026-07-05T00:00:00Z",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "source_evidence": {"probe_evidence_summary": {}},
+            "source_reports": {},
+            "status": "non_floor_probe_evidence_closure_closed_no_matrix_rows_keep_607",
+            "summary": {
+                "non_floor_probe_count": 1,
+                "non_floor_safe_cut_ready_count": 0,
+                "non_floor_matrix_candidate_row_eligible_count": 0,
+                "candidate_deck_materialization_allowed_now": False,
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lorehold_non_floor_probe_evidence_closure.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(
+            classification.artifact_kind,
+            "lorehold_non_floor_probe_evidence_closure",
+        )
+        self.assertEqual(
+            classification.schema_version,
+            "lorehold_non_floor_probe_evidence_closure_v1",
+        )
+        self.assertEqual(classification.status, "pass")
+        self.assertFalse(classification.canonical_summary["deck_607_mutated"])
+
     def test_governed_lorehold_learning_artifact_is_recognized(self) -> None:
         payload = {
             "artifact_type": "lorehold_deckbuilding_value_model",

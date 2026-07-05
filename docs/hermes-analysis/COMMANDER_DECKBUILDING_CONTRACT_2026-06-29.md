@@ -1872,3 +1872,32 @@ Brain seed-safe cut unlock audit added on 2026-07-05:
   `The One Ring`, is learning context only. It cannot bypass local same-lane
   cut proof, route-governed runtime proof, structure matrix review, or equal
   battle gates.
+
+Non-floor sidecar probe evidence closure added on 2026-07-05:
+
+- Report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_non_floor_probe_evidence_closure_20260705_current.md`.
+- JSON:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_non_floor_probe_evidence_closure_20260705_current.json`.
+- Status:
+  `non_floor_probe_evidence_closure_closed_no_matrix_rows_keep_607`.
+- Scope: consume the current sidecar cut-model planner, probe evidence miner,
+  and current-best baseline synthesis. This is a read-only closure artifact:
+  PostgreSQL writes `false`, source DB mutation `false`, and deck `607`
+  mutation `false`.
+- Current facts:
+  planner named probes `48`, non-floor probes `48`, missing probe evidence
+  rows `0`, safe-cut-ready rows `0`, matrix-eligible rows `0`, natural battle
+  gate `false`, deck action `false`, and promotion `false`.
+- Probe closure split:
+  `20` topdeck probes are closed as `closed_exposed_topdeck_role`, and `28`
+  mana probes are closed as `closed_generic_mana_probe_route`.
+- Dedicated mana route:
+  `mana_route_closed_by_exact_decisions`, with `2` exact rejected pairs and
+  `0` eligible mana pairs.
+- Operational lesson: the old planner next action
+  `collect_probe_evidence_for_non_floor_trace_cut_slots_only` is now complete.
+  No non-floor probe can be converted into a cut, matrix row, sidecar deck,
+  natural battle gate, or promotion under current evidence.
+- Next allowed work:
+  `define_new_shell_contract_or_new_cut_evidence_before_any_battle_gate`.
