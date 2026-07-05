@@ -111,8 +111,28 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
                 ),
                 (
                     619,
+                    "Protected Payoff",
+                    1,
+                    "engine",
+                    '["engine"]',
+                    "test",
+                    0,
+                    0,
+                    6,
+                    "Creature - Demon",
+                    "Flying.",
+                    "protected",
+                    "[]",
+                    "[]",
+                    "seed",
+                    "old",
+                    "old",
+                    "old",
+                ),
+                (
+                    619,
                     "Plains",
-                    98,
+                    97,
                     "land",
                     '["land"]',
                     "test",
@@ -151,11 +171,12 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
         conn.close()
         return tmp, path
 
-    def _pair_report(self, tmp: tempfile.TemporaryDirectory) -> Path:
+    def _pair_report(self, tmp: tempfile.TemporaryDirectory, source_db: Path) -> Path:
         path = Path(tmp.name) / "pair_report.json"
         path.write_text(
             json.dumps(
                 {
+                    "source_db": str(source_db.resolve()),
                     "nonland_pools": [
                         {
                             "deck_id": "619",
@@ -184,6 +205,12 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
                                     "status": "review_only_nonland_add_cut_pair",
                                 }
                             ],
+                            "blocked_cut_candidates": [
+                                {
+                                    "card_name": "Protected Payoff",
+                                    "status": "blocked_commander_specific_payoff_cut",
+                                }
+                            ],
                         }
                     ]
                 }
@@ -195,7 +222,7 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
     def test_materializes_swap_only_in_candidate_copy(self) -> None:
         tmp, source_db = self._db()
         self.addCleanup(tmp.cleanup)
-        pair_report = self._pair_report(tmp)
+        pair_report = self._pair_report(tmp, source_db)
         out_prefix = Path(tmp.name) / "out"
 
         payload = audit.build_payload(
@@ -210,6 +237,7 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
         self.assertTrue(candidate_db.exists())
         self.assertTrue(payload["summary"]["source_unchanged"])
         self.assertTrue(payload["summary"]["source_candidate_hash_differs"])
+        self.assertTrue(payload["summary"]["source_matches_pair_report"])
         self.assertEqual(payload["structure_validation"]["status"], "pass")
         self.assertTrue(payload["structure_validation"]["checks"]["total_cards_100"])
 
@@ -231,6 +259,38 @@ class GlobalCommanderCandidateCopyMaterializerTests(unittest.TestCase):
         self.assertNotIn("Feed the Swarm", source_names)
         self.assertIn("Feed the Swarm", candidate_names)
         self.assertNotIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", candidate_names)
+
+    def test_blocks_chained_source_db_by_default(self) -> None:
+        tmp, source_db = self._db()
+        self.addCleanup(tmp.cleanup)
+        pair_report = self._pair_report(tmp, source_db)
+        chained_source = Path(tmp.name) / "chained.db"
+        chained_source.write_bytes(source_db.read_bytes())
+
+        with self.assertRaisesRegex(RuntimeError, "source DB does not match pair report source_db"):
+            audit.build_payload(
+                source_db=chained_source,
+                pair_report=pair_report,
+                out_prefix=Path(tmp.name) / "out",
+                deck_id="619",
+            )
+
+    def test_blocks_source_missing_protected_cut_candidate(self) -> None:
+        tmp, source_db = self._db()
+        self.addCleanup(tmp.cleanup)
+        pair_report = self._pair_report(tmp, source_db)
+        conn = sqlite3.connect(source_db)
+        conn.execute("DELETE FROM deck_cards WHERE card_name='Protected Payoff'")
+        conn.commit()
+        conn.close()
+
+        with self.assertRaisesRegex(RuntimeError, "protected blocked cut cards are absent"):
+            audit.build_payload(
+                source_db=source_db,
+                pair_report=pair_report,
+                out_prefix=Path(tmp.name) / "out",
+                deck_id="619",
+            )
 
 
 if __name__ == "__main__":

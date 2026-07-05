@@ -69,6 +69,7 @@ def load_top_pair(
     cut: str | None = None,
 ) -> dict[str, Any]:
     payload = read_json(pair_report)
+    source_report_db = str(payload.get("source_db") or "")
     pools = payload.get("nonland_pools") or payload.get("deck_cut_pools") or []
     for pool in pools:
         if not isinstance(pool, Mapping):
@@ -105,8 +106,56 @@ def load_top_pair(
                 "candidate": candidates.get(normalize_name(pair_add), {}),
                 "cut_candidate": cuts.get(normalize_name(pair_cut), {}),
                 "source_pool_status": pool.get("status"),
+                "source_report_db": source_report_db,
+                "blocked_cut_candidates": list(pool.get("blocked_cut_candidates") or []),
             }
     raise RuntimeError(f"no matching pair found in {pair_report}")
+
+
+def source_db_report_path(source_db: Path) -> str:
+    return rel(source_db.resolve())
+
+
+def validate_source_db_for_pair(
+    conn: sqlite3.Connection,
+    *,
+    source_db: Path,
+    pair: Mapping[str, Any],
+    deck_id: int,
+    allow_chained_source: bool,
+) -> dict[str, Any]:
+    expected_source = str(pair.get("source_report_db") or "")
+    actual_source = source_db_report_path(source_db)
+    source_matches = not expected_source or actual_source == expected_source
+    if not source_matches and not allow_chained_source:
+        raise RuntimeError(
+            "source DB does not match pair report source_db; "
+            f"expected {expected_source}, got {actual_source}. "
+            "Rerun the candidate model for this source DB or pass --allow-chained-source explicitly."
+        )
+
+    deck_names = {normalize_name(str(row["card_name"])) for row in deck_rows(conn, deck_id)}
+    protected_cards = [
+        str(row.get("card_name") or "")
+        for row in pair.get("blocked_cut_candidates", [])
+        if isinstance(row, Mapping) and str(row.get("card_name") or "").strip()
+    ]
+    missing_protected = [
+        card for card in protected_cards if normalize_name(card) not in deck_names
+    ]
+    if missing_protected:
+        raise RuntimeError(
+            "source DB is stale or already mutated; protected blocked cut cards are absent: "
+            + ", ".join(missing_protected)
+        )
+    return {
+        "expected_source_db": expected_source,
+        "actual_source_db": actual_source,
+        "source_matches_pair_report": source_matches,
+        "allow_chained_source": allow_chained_source,
+        "protected_blocked_cut_cards": protected_cards,
+        "missing_protected_blocked_cut_cards": missing_protected,
+    }
 
 
 def oracle_row(conn: sqlite3.Connection, card_name: str) -> sqlite3.Row:
@@ -380,6 +429,7 @@ def build_payload(
     deck_id: str | None = "619",
     add: str | None = None,
     cut: str | None = None,
+    allow_chained_source: bool = False,
 ) -> dict[str, Any]:
     pair = load_top_pair(pair_report, deck_id=deck_id, add=add, cut=cut)
     deck_id_int = int(pair["deck_id"])
@@ -391,6 +441,13 @@ def build_payload(
     sync_run_id = out_prefix.name
 
     with connect(source_db) as conn:
+        source_pair_guard = validate_source_db_for_pair(
+            conn,
+            source_db=source_db,
+            pair=pair,
+            deck_id=deck_id_int,
+            allow_chained_source=allow_chained_source,
+        )
         source_summary_before = get_deck_summary(conn, deck_id_int)
         source_hash_before = deck_hash(conn, deck_id_int)
 
@@ -438,7 +495,9 @@ def build_payload(
             "promotion_allowed": False,
             "allow_battle_gate_now": False,
             "allow_next_strategy_matrix": status == "candidate_materialized_structure_ready_next_gate_closed",
+            "source_matches_pair_report": source_pair_guard["source_matches_pair_report"],
         },
+        "source_pair_guard": source_pair_guard,
         "model_pair": pair,
         "materialization": materialized["swap_meta"],
         "structure_validation": materialized["structure_validation"],
@@ -468,10 +527,13 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- role: `{summary['role']}`",
         f"- candidate_db: `{payload['candidate_db']}`",
         f"- source_unchanged: `{str(summary['source_unchanged']).lower()}`",
+        f"- source_matches_pair_report: `{str(summary['source_matches_pair_report']).lower()}`",
         f"- source_candidate_hash_differs: `{str(summary['source_candidate_hash_differs']).lower()}`",
         f"- promotion_allowed: `{str(summary['promotion_allowed']).lower()}`",
         f"- allow_battle_gate_now: `{str(summary['allow_battle_gate_now']).lower()}`",
         f"- allow_next_strategy_matrix: `{str(summary['allow_next_strategy_matrix']).lower()}`",
+        f"- allow_chained_source: `{str(payload['source_pair_guard']['allow_chained_source']).lower()}`",
+        f"- protected_blocked_cut_cards: `{payload['source_pair_guard']['protected_blocked_cut_cards']}`",
         "",
         "## Structure Validation",
         "",
@@ -506,6 +568,11 @@ def main() -> int:
     parser.add_argument("--deck-id", default="619")
     parser.add_argument("--add")
     parser.add_argument("--cut")
+    parser.add_argument(
+        "--allow-chained-source",
+        action="store_true",
+        help="Allow source DB to differ from the pair report source_db; protected blocked cuts still must be present.",
+    )
     args = parser.parse_args()
     payload = build_payload(
         source_db=args.source_db,
@@ -514,6 +581,7 @@ def main() -> int:
         deck_id=args.deck_id,
         add=args.add,
         cut=args.cut,
+        allow_chained_source=args.allow_chained_source,
     )
     json_path, md_path = write_outputs(payload, args.out_prefix)
     print(

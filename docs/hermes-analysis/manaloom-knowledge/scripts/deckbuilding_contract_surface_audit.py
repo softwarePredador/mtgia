@@ -35,6 +35,9 @@ GLOBAL_COMMANDER_LAND_CUT_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_land_
 GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL = SCRIPT_DIR / "global_commander_nonland_core_candidate_model.py"
 GLOBAL_COMMANDER_LEARNING_PRIORITY_AUDIT = SCRIPT_DIR / "global_commander_learning_priority_audit.py"
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER = SCRIPT_DIR / "global_commander_candidate_copy_materializer.py"
+GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
+    SCRIPT_DIR / "test_global_commander_candidate_copy_materializer.py"
+)
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_battle_probe_audit.py"
 )
@@ -184,6 +187,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
+                "must reject stale chained sources",
+                "Bloodthirster",
                 "global_commander_candidate_battle_probe_audit.py",
                 "global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md",
                 "33.3%",
@@ -328,6 +333,8 @@ def build_audit() -> dict[str, Any]:
                 "Angel/Demon/Dragon ficam bloqueadas",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
+                "fonte encadeada/stale",
+                "Bloodthirster",
                 "global_commander_candidate_battle_probe_audit.py",
                 "global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md",
                 "candidato `33.3%` vs",
@@ -505,9 +512,25 @@ def build_audit() -> dict[str, Any]:
                 "candidate_materialized_structure_ready_next_gate_closed",
                 "source_db_mutated",
                 "source_unchanged",
+                "validate_source_db_for_pair",
+                "source_matches_pair_report",
+                "protected_blocked_cut_cards",
+                "protected blocked cut cards are absent",
+                "--allow-chained-source",
                 "promotion_allowed",
                 "allow_battle_gate_now",
                 "allow_next_strategy_matrix",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST,
+            [
+                "test_blocks_chained_source_db_by_default",
+                "test_blocks_source_missing_protected_cut_candidate",
+                "source_matches_pair_report",
+                "Protected Payoff",
             ],
         )
     )

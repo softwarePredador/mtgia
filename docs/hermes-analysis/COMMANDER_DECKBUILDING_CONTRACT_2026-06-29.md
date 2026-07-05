@@ -183,7 +183,9 @@ Operational priority after this pivot:
 11. run `global_commander_candidate_copy_materializer.py` only after a named
    add/cut pool is ready; it may materialize one hypothesis inside an isolated
    copied Hermes SQLite DB, must prove the source DB hash is unchanged, and
-   still keeps promotion/battle gates closed until strategy, battle, and replay
+   must reject stale chained sources unless explicitly overridden. Protected
+   blocked cut cards from the pair report must still be present in the source DB.
+   Promotion/battle gates stay closed until strategy, battle, and replay
    evidence pass;
 12. run `global_commander_candidate_battle_probe_audit.py` after a candidate
    copy has a small equal-seed battle/replay probe; it must compare base versus
@@ -260,7 +262,11 @@ Current external refresh on 2026-07-05:
   Kaalia test case, materialized `+Feed the Swarm / -Birgi, God of Storytelling
   // Harnfel, Horn of Bounty`, passed 100-card/singleton/source-unchanged
   structure checks, and still reports `promotion_allowed=false` plus
-  `allow_battle_gate_now=false`.
+  `allow_battle_gate_now=false`. The materializer now also guards against stale
+  chained sources: the source DB must match the pair report source unless
+  explicitly overridden, and protected blocked cut cards must still be present.
+  This invalidates the old five-swap Kaalia chain because `Bloodthirster` was
+  already absent from that source DB.
 - Current candidate battle probe auditing is diagnostic only. The Kaalia
   nonland-floor candidate copy fixed the removal floor structurally, and the
   replay wrapper now names the target as `Kaalia of the Vast` instead of stale

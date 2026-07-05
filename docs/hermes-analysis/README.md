@@ -260,6 +260,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Storytelling // Harnfel, Horn of Bounty` no deck `619`, com source DB
     intacto e gate de batalha/promocao ainda fechado:
     `master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md`.
+    O materializer agora tambem bloqueia fonte encadeada/stale: o source DB
+    precisa bater com o `source_db` do relatorio de pares, salvo override
+    explicito, e payoffs protegidos em `blocked_cut_candidates` precisam
+    continuar presentes. Isso invalida a cadeia antiga de cinco swaps de Kaalia,
+    onde `Bloodthirster` ja havia sido removido antes do probe.
     Depois da copia candidata, rode
     `manaloom-knowledge/scripts/global_commander_candidate_battle_probe_audit.py`
     sobre um probe pequeno base-vs-candidato com replay estruturado. A primeira
