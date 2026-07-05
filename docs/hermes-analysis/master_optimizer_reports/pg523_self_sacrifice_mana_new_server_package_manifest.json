@@ -1,0 +1,155 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg523_self_sacrifice_mana_new_serv_20260705_184510",
+  "deploy_id": "xmage_pg523_self_sacrifice_mana_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Implements of Sacrifice",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:029eaafc0757e65df75f3aebd1f57ae8",
+      "min_rule_version": 2,
+      "normalized_name": "implements of sacrifice",
+      "oracle_hash": "6c0f382981f934c7a983550809792f33",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 2,
+        "mana_source_contextual_only": true,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wild Cantor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f699583dd1e605324afa7b758a646ca9",
+      "min_rule_version": 2,
+      "normalized_name": "wild cantor",
+      "oracle_hash": "a99fa1476bba0ed023e87949ef4b7652",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "mana_source_contextual_only": true,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_ability_class": "AnyColorManaAbility"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_self_sacrifice_mana_source_permanent": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg523_self_sacrifice_mana_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg523_self_sacrifice_mana_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg523_self_sacrifice_mana_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg523_self_sacrifice_mana_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg523_self_sacrifice_mana_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg523_self_sacrifice_mana_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-05T18:45:10+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Implements of Sacrifice"
+      },
+      "card_name": "Implements of Sacrifice",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:029eaafc0757e65df75f3aebd1f57ae8",
+      "normalized_name": "implements of sacrifice",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 2,
+        "mana_source_contextual_only": true,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Wild Cantor"
+      },
+      "card_name": "Wild Cantor",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f699583dd1e605324afa7b758a646ca9",
+      "normalized_name": "wild cantor",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "mana_source_contextual_only": true,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_ability_class": "AnyColorManaAbility"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Implements of Sacrifice",
+    "Wild Cantor"
+  ],
+  "selected_count": 2,
+  "slug": "pg523_self_sacrifice_mana_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Implements of Sacrifice",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:029eaafc0757e65df75f3aebd1f57ae8",
+      "min_rule_version": 2,
+      "normalized_name": "implements of sacrifice",
+      "oracle_hash": "6c0f382981f934c7a983550809792f33",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wild Cantor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f699583dd1e605324afa7b758a646ca9",
+      "min_rule_version": 2,
+      "normalized_name": "wild cantor",
+      "oracle_hash": "a99fa1476bba0ed023e87949ef4b7652",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

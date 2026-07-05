@@ -13037,10 +13037,16 @@ def sacrifice_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
         if symbol.lower() != "t"
     ]
     activation_mana_cost = "".join(f"{{{symbol}}}" for symbol in activation_symbols)
-    if mana_phrase == "one mana of any color":
+    any_color_amounts = {
+        "one mana of any color": 1,
+        "one mana of any one color": 1,
+        "two mana of any color": 2,
+        "two mana of any one color": 2,
+    }
+    if mana_phrase in any_color_amounts:
         detail = {
             "produces": "WUBRG",
-            "mana_produced": 1,
+            "mana_produced": any_color_amounts[mana_phrase],
             "mana_activation_requires_tap": requires_tap,
             "mana_activation_requires_sacrifice": True,
         }
@@ -13149,9 +13155,21 @@ def java_simple_mana_symbols_from_source(source_text: str) -> list[str] | None:
     return None
 
 
+def java_any_color_mana_amount_from_source(source_text: str) -> int | None:
+    text = source_text or ""
+    amount_match = re.search(r"new\s+AddManaOfAnyColorEffect\s*\(\s*(\d+)\s*\)", text)
+    if amount_match:
+        return int(amount_match.group(1))
+    if re.search(r"new\s+AnyColorManaAbility\s*\(", text):
+        return 1
+    return None
+
+
 def sacrifice_mana_source_source_blocker(source_text: str, detail: dict[str, Any]) -> str | None:
     text = source_text or ""
-    if len(re.findall(r"new\s+SimpleManaAbility\s*\(", text)) != 1:
+    simple_ability_count = len(re.findall(r"new\s+SimpleManaAbility\s*\(", text))
+    any_color_ability_count = len(re.findall(r"new\s+AnyColorManaAbility\s*\(", text))
+    if simple_ability_count + any_color_ability_count != 1:
         return "mana_source_sacrifice_source_not_single_simple_mana"
     if "SacrificeSourceCost" not in text:
         return "mana_source_sacrifice_source_cost_missing"
@@ -13179,6 +13197,10 @@ def sacrifice_mana_source_source_blocker(source_text: str, detail: dict[str, Any
     expected_symbols = list(detail.get("produced_mana_symbols") or [])
     if source_symbols is not None and expected_symbols and Counter(source_symbols) != Counter(expected_symbols):
         return "mana_source_sacrifice_source_mana_output_mismatch"
+    if str(detail.get("produces") or "") == "WUBRG" and not expected_symbols:
+        source_any_color_amount = java_any_color_mana_amount_from_source(text)
+        if source_any_color_amount != int(detail.get("mana_produced") or 0):
+            return "mana_source_sacrifice_source_mana_output_mismatch"
     return None
 
 
@@ -21059,8 +21081,14 @@ def split_row(
                 family_id="xmage_simple_mana_source_with_etb_draw",
             ), "selected_exact_scope"
         self_sacrifice_mana_source = (
-            classes == set()
-            and mana_ability_classes == {"SimpleManaAbility"}
+            classes <= {"AddManaOfAnyColorEffect"}
+            and not simple_mana_source_detail_from_oracle(metadata)
+            and bool(mana_ability_classes & SAFE_MANA_ABILITY_CLASSES)
+            and not (
+                mana_ability_classes
+                - SAFE_MANA_ABILITY_CLASSES
+                - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+            )
             and "SacrificeSourceCost" in source_text
         )
         if self_sacrifice_mana_source:
@@ -21093,9 +21121,13 @@ def split_row(
                 "permanent_type": permanent_type,
                 "ability_kind": "activated_mana",
                 "xmage_mana_ability_classes": sorted(mana_ability_classes),
-                "xmage_ability_class": "SimpleManaAbility",
+                "xmage_ability_class": (
+                    "SimpleManaAbility"
+                    if "SimpleManaAbility" in mana_ability_classes
+                    else sorted(mana_ability_classes)[0]
+                ),
                 "xmage_cost_class": "SacrificeSourceCost",
-                "xmage_effect_classes": [],
+                "xmage_effect_classes": sorted(classes),
             }
             if mana_source_detail.get("produced_mana_symbols"):
                 effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])

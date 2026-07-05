@@ -226,6 +226,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "_keywords_are_self",
     "flash",
     "is_mana_source",
+    "mana_source_contextual_only",
     "mana_produced",
     "produces",
     "produced_mana_symbols",

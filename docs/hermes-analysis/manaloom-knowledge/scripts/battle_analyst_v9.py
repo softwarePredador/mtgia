@@ -25512,6 +25512,48 @@ def _can_pay_card_with_bonus_mana(
         setattr(player.mana_pool, bonus_color, current)
 
 
+def _restore_mana_payment_state(player, pool_snapshot, treasures, restricted_mana, conditional_sources, life):
+    for color, amount in pool_snapshot.items():
+        setattr(player.mana_pool, color, amount)
+    player.treasures = treasures
+    player.restricted_mana = copy.deepcopy(restricted_mana)
+    player.conditional_mana_sources = copy.deepcopy(conditional_sources)
+    player.life = life
+
+
+def _can_pay_card_with_bonus_mana_source(
+    player,
+    card,
+    source,
+    *,
+    bonus_amount,
+    activation_cost=None,
+    additional_generic=0,
+):
+    if bonus_amount <= 0:
+        return player.can_pay_card(card, additional_generic=additional_generic)
+    pool_snapshot = player.mana_pool.snapshot()
+    treasures_snapshot = player.treasures
+    restricted_snapshot = copy.deepcopy(player.restricted_mana)
+    conditional_snapshot = copy.deepcopy(getattr(player, "conditional_mana_sources", []))
+    life_snapshot = player.life
+    try:
+        if activation_cost and not player.spend_mana(activation_cost):
+            return False
+        if not add_player_mana_source_to_pool(player, source):
+            return False
+        return player.can_pay_card(card, additional_generic=additional_generic)
+    finally:
+        _restore_mana_payment_state(
+            player,
+            pool_snapshot,
+            treasures_snapshot,
+            restricted_snapshot,
+            conditional_snapshot,
+            life_snapshot,
+        )
+
+
 def current_state_unlock_candidates(
     player,
     opponents,
@@ -25724,6 +25766,8 @@ def sacrifice_mana_unlock_candidates(
     *,
     bonus_amount,
     bonus_color="colorless",
+    bonus_source=None,
+    activation_cost=None,
 ):
     candidates = []
 
@@ -25738,12 +25782,23 @@ def sacrifice_mana_unlock_candidates(
         if (
             not already_on_board
             and not player.can_pay_card(commander, additional_generic=commander_tax)
-            and _can_pay_card_with_bonus_mana(
-                player,
-                commander,
-                bonus_amount=bonus_amount,
-                bonus_color=bonus_color,
-                additional_generic=commander_tax,
+            and (
+                _can_pay_card_with_bonus_mana_source(
+                    player,
+                    commander,
+                    bonus_source,
+                    bonus_amount=bonus_amount,
+                    activation_cost=activation_cost,
+                    additional_generic=commander_tax,
+                )
+                if bonus_source is not None
+                else _can_pay_card_with_bonus_mana(
+                    player,
+                    commander,
+                    bonus_amount=bonus_amount,
+                    bonus_color=bonus_color,
+                    additional_generic=commander_tax,
+                )
             )
         ):
             effective_cost = int(float(commander.get("cmc") or 0)) + commander_tax
@@ -25768,12 +25823,23 @@ def sacrifice_mana_unlock_candidates(
             continue
         if player.can_pay_card(card):
             continue
-        if not _can_pay_card_with_bonus_mana(
-            player,
-            card,
-            bonus_amount=bonus_amount,
-            bonus_color=bonus_color,
-        ):
+        can_pay_with_bonus = (
+            _can_pay_card_with_bonus_mana_source(
+                player,
+                card,
+                bonus_source,
+                bonus_amount=bonus_amount,
+                activation_cost=activation_cost,
+            )
+            if bonus_source is not None
+            else _can_pay_card_with_bonus_mana(
+                player,
+                card,
+                bonus_amount=bonus_amount,
+                bonus_color=bonus_color,
+            )
+        )
+        if not can_pay_with_bonus:
             continue
         if effect in BOARD_WIPE_LIKE_EFFECTS and not should_cast_board_wipe(player, opponents):
             continue
@@ -28023,6 +28089,8 @@ def activate_self_sacrifice_mana_sources(
             turn,
             bonus_amount=produced,
             bonus_color=bonus_color,
+            bonus_source=permanent,
+            activation_cost=activation_cost,
         )
         if not candidates:
             continue
@@ -28038,8 +28106,8 @@ def activate_self_sacrifice_mana_sources(
             source=permanent,
             all_players=all_players,
         )
-        if not add_fixed_produced_mana_symbols_to_pool(player, permanent, produced):
-            player.mana_pool.add(bonus_color, produced)
+        if not add_player_mana_source_to_pool(player, permanent, turn=turn):
+            continue
         permanent["self_sacrifice_mana_used_this_turn"] = True
 
         emit_decision_trace(
@@ -28113,6 +28181,7 @@ def activate_self_sacrifice_mana_sources(
             produced=produced,
             bonus_color=bonus_color,
             activation_cost=activation_cost,
+            conditional_mana_sources_after=replay_conditional_mana_sources(player),
             destination=destination,
             unlock_target=chosen["card"].get("name", "?"),
             unlock_type=chosen["unlock_type"],

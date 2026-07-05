@@ -8875,6 +8875,161 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_any_color_self_sacrifice_mana_source_unlocks_colored_spell(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        unlock_card = {
+            "name": "Fixture Green One Drop",
+            "type_line": "Creature - Elf",
+            "effect": "creature",
+            "cmc": 1,
+            "mana_cost": "{G}",
+        }
+        active.hand.append(unlock_card)
+        wild_cantor = {
+            "name": "Wild Cantor",
+            "type_line": "Creature - Human Druid",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "mana_activation_requires_sacrifice": True,
+            "activation_requires_sacrifice": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "activation_requires_tap": False,
+            "mana_activation_requires_tap": False,
+            "permanent_type": "creature",
+            "_rule_logical_key": "battle_rule_v1:fixture_wild_cantor",
+        }
+        active.battlefield.append(wild_cantor)
+
+        activated = self.battle.activate_self_sacrifice_mana_sources(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=4,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertIn(wild_cantor, active.graveyard)
+        self.assertEqual(active.available_mana(), 1)
+        self.assertTrue(active.can_pay_card(unlock_card))
+        self.assertEqual(len(active.conditional_mana_sources), 1)
+        self.assertEqual(active.conditional_mana_sources[0]["amount"], 1)
+        self.assertIn(
+            "green",
+            {mode["color"] for mode in active.conditional_mana_sources[0]["modes"]},
+        )
+        self.assertTrue(
+            any(
+                event == "self_sacrifice_mana_source_activated"
+                and data.get("card") == "Wild Cantor"
+                and data.get("unlock_target") == "Fixture Green One Drop"
+                for event, data in self.events
+            )
+        )
+
+    def test_self_sacrifice_mana_source_pays_activation_cost_before_unlock(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        unlock_card = {
+            "name": "Fixture Two Drop",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "cmc": 2,
+            "mana_cost": "{2}",
+        }
+        active.hand.append(unlock_card)
+        implements = {
+            "name": "Implements of Sacrifice",
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "mana_activation_requires_sacrifice": True,
+            "activation_requires_sacrifice": True,
+            "mana_produced": 2,
+            "produces": "WUBRG",
+            "activation_mana_cost": "{1}",
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "artifact",
+            "_rule_logical_key": "battle_rule_v1:fixture_implements",
+        }
+        active.battlefield.append(implements)
+
+        activated = self.battle.activate_self_sacrifice_mana_sources(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=5,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertIn(implements, active.graveyard)
+        self.assertEqual(active.mana_pool.generic, 0)
+        self.assertEqual(active.available_mana(), 2)
+        self.assertTrue(active.can_pay_card(unlock_card))
+        self.assertEqual(active.conditional_mana_sources[0]["amount"], 2)
+        self.assertTrue(
+            any(
+                event == "mana_source_activation_cost_paid"
+                and data.get("card") == "Implements of Sacrifice"
+                and data.get("activation_mana_cost") == "{1}"
+                for event, data in self.events
+            )
+        )
+
+    def test_self_sacrifice_mana_source_does_not_overcount_activation_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        active.hand.append(
+            {
+                "name": "Fixture Three Drop",
+                "type_line": "Creature - Giant",
+                "effect": "creature",
+                "cmc": 3,
+                "mana_cost": "{3}",
+            }
+        )
+        implements = {
+            "name": "Implements of Sacrifice",
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "mana_activation_requires_sacrifice": True,
+            "activation_requires_sacrifice": True,
+            "mana_produced": 2,
+            "produces": "WUBRG",
+            "activation_mana_cost": "{1}",
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "artifact",
+        }
+        active.battlefield.append(implements)
+
+        activated = self.battle.activate_self_sacrifice_mana_sources(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=5,
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertIn(implements, active.battlefield)
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual(active.mana_pool.generic, 1)
+        self.assertEqual(active.conditional_mana_sources, [])
+
     def test_mana_source_with_self_sacrifice_draw_refreshes_then_cashes_in(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -720,6 +720,46 @@ def test_existing_backup_table_from_manifest_ignores_truncated_timestamp(tmp_pat
     assert builder.existing_backup_table_from_manifest(manifest) == "pg485_activated_damage_20260705_055236"
 
 
+def test_manifest_expected_rule_preserves_contextual_mana_source_field() -> None:
+    proposal = {
+        "normalized_name": "wild cantor",
+        "card_name": "Wild Cantor",
+        "oracle_hash": "hash-contextual-mana",
+        "logical_rule_key": "battle_rule_v1:hash-contextual-mana",
+        "effect_json": {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+            "ability_kind": "activated_mana",
+            "is_mana_source": True,
+            "mana_source_contextual_only": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "mana_activation_requires_tap": False,
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": True,
+            "permanent_type": "creature",
+            "xmage_ability_class": "AnyColorManaAbility",
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"] == {
+        "effect": "ramp_permanent",
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "ability_kind": "activated_mana",
+        "is_mana_source": True,
+        "mana_source_contextual_only": True,
+        "mana_produced": 1,
+        "produces": "WUBRG",
+        "mana_activation_requires_tap": False,
+        "activation_requires_tap": False,
+        "activation_requires_sacrifice": True,
+        "permanent_type": "creature",
+        "xmage_ability_class": "AnyColorManaAbility",
+    }
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",

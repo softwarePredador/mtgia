@@ -8500,6 +8500,34 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produced_mana_symbols"], ["B"])
         self.assertEqual(effect["permanent_type"], "creature")
 
+    def test_any_color_creature_sacrifice_mana_source_maps_contextual_only(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Wild Cantor",
+                type_line="Creature - Human Druid",
+                oracle_text="({R/G} can be paid with either {R} or {G}.)\nSacrifice this creature: Add one mana of any color.",
+            ),
+            source_text=(
+                "this.addAbility(new AnyColorManaAbility(new SacrificeSourceCost()));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertTrue(effect["mana_source_contextual_only"])
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertNotIn("produced_mana_symbols", effect)
+        self.assertEqual(effect["xmage_ability_class"], "AnyColorManaAbility")
+
     def test_simple_creature_tap_sacrifice_mana_source_maps(self) -> None:
         row = queue_row(
             split.RAMP_CREATURE_UNIT,
@@ -8555,6 +8583,39 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_mana_cost"], "{3}")
         self.assertEqual(effect["mana_produced"], 3)
         self.assertEqual(effect["produced_mana_symbols"], ["R", "R", "R"])
+
+    def test_simple_artifact_sacrifice_any_one_color_with_activation_cost_maps(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["AddManaOfAnyColorEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Implements of Sacrifice",
+                type_line="Artifact",
+                oracle_text="{1}, {T}, Sacrifice this artifact: Add two mana of any one color.",
+            ),
+            source_text=(
+                "SimpleManaAbility ability = new SimpleManaAbility("
+                "Zone.BATTLEFIELD, new AddManaOfAnyColorEffect(2), new ManaCostsImpl<>(\"{1}\"));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_SACRIFICE_MANA_SOURCE_SCOPE)
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["mana_produced"], 2)
+        self.assertEqual(effect["activation_mana_cost"], "{1}")
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertTrue(effect["mana_activation_requires_sacrifice"])
+        self.assertNotIn("produced_mana_symbols", effect)
+        self.assertEqual(effect["xmage_effect_classes"], ["AddManaOfAnyColorEffect"])
 
     def test_simple_artifact_sacrifice_mana_source_maps_composite_mana_constructor(self) -> None:
         row = queue_row(
