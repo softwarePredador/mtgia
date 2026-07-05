@@ -1,0 +1,3987 @@
+{
+  "all_card_values": [
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Lorehold, the Historian",
+      "cmc": 5.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "engine",
+      "is_commander": true,
+      "lanes": [
+        "commander_center",
+        "engine",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Creature \u2014 Elder Dragon",
+      "value_score": 230,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": 424,
+      "card_name": "Land Tax",
+      "cmc": 1.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "tutor",
+      "is_commander": false,
+      "lanes": [
+        "global_top_500",
+        "topdeck_miracle_engine",
+        "tutor"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Enchantment",
+      "value_score": 156,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Library of Leng",
+      "cmc": 1.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "engine",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "engine",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact",
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Molecule Man",
+      "cmc": 6.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "draw",
+      "is_commander": false,
+      "lanes": [
+        "draw",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Creature \u2014 Human Villain",
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Scroll Rack",
+      "cmc": 2.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "draw",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "draw",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact",
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Sensei's Divining Top",
+      "cmc": 1.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "draw",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "draw",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact",
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "The Mind Stone",
+      "cmc": 2.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "ramp",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Artifact \u2014 Infinity Stone",
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "The Scarlet Witch",
+      "cmc": 3.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "creature",
+      "is_commander": false,
+      "lanes": [
+        "creature",
+        "topdeck_miracle_engine"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Creature \u2014 Mutant Warlock Hero",
+      "value_score": 150,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": 848,
+      "card_name": "Mizzix's Mastery",
+      "cmc": 4.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "lanes": [
+        "format_staple_long_tail",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "format_staple_long_tail",
+      "type_line": "Sorcery",
+      "value_score": 141,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Approach of the Second Sun",
+      "cmc": 7.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Creative Technique",
+      "cmc": 5.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "draw",
+      "is_commander": false,
+      "lanes": [
+        "draw",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Insurrection",
+      "cmc": 8.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Storm Herd",
+      "cmc": 10.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 138,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Bender's Waterskin",
+      "cmc": 3.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "ramp"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact",
+      "value_score": 110,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Monument to Endurance",
+      "cmc": 3.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "ramp"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact",
+      "value_score": 110,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Victory Chimes",
+      "cmc": 3.0,
+      "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "ramp"
+      ],
+      "protected_anchor": true,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact",
+      "value_score": 110,
+      "value_tier": "tier_0_protected_engine_or_anchor"
+    },
+    {
+      "best_edhrec_rank": 119,
+      "card_name": "Urza's Saga",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "global_top_500",
+        "land",
+        "mana_base",
+        "topdeck_miracle_engine",
+        "utility_engine_land"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Enchantment Land \u2014 Urza's Saga",
+      "value_score": 74,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 2173,
+      "card_name": "Rise of the Eldrazi",
+      "cmc": 12.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "lanes": [
+        "format_staple_long_tail",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "format_staple_long_tail",
+      "type_line": "Sorcery",
+      "value_score": 41,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": 3,
+      "card_name": "Arcane Signet",
+      "cmc": 2.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "global_top_100",
+        "ramp",
+        "structural_ramp_floor"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Artifact",
+      "value_score": 39,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 18,
+      "card_name": "Fellwar Stone",
+      "cmc": 2.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "global_top_100",
+        "ramp",
+        "structural_ramp_floor"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Artifact",
+      "value_score": 39,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 57,
+      "card_name": "Smothering Tithe",
+      "cmc": 4.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "global_top_100",
+        "ramp",
+        "structural_ramp_floor"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Enchantment",
+      "value_score": 39,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 1,
+      "card_name": "Sol Ring",
+      "cmc": 1.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "global_top_100",
+        "ramp",
+        "structural_ramp_floor"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Artifact",
+      "value_score": 39,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Call Forth the Tempest",
+      "cmc": 8.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Everything Comes to Dust",
+      "cmc": 10.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Hit the Mother Lode",
+      "cmc": 7.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "draw",
+      "is_commander": false,
+      "lanes": [
+        "draw",
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Surge to Victory",
+      "cmc": 6.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "lanes": [
+        "instant_sorcery_spell",
+        "miracle_conversion_finisher",
+        "wincon"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 38,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": 55,
+      "card_name": "Arid Mesa",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "fetch_or_search_fixing",
+        "global_top_100",
+        "land",
+        "mana_base"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Land",
+      "value_score": 37,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 43,
+      "card_name": "Bloodstained Mire",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "fetch_or_search_fixing",
+        "global_top_100",
+        "land",
+        "mana_base"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Land",
+      "value_score": 37,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 81,
+      "card_name": "Deflecting Swat",
+      "cmc": 3.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "fast_pressure_guard",
+        "global_top_100",
+        "instant_sorcery_spell",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Instant",
+      "value_score": 37,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 42,
+      "card_name": "Flooded Strand",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "fetch_or_search_fixing",
+        "global_top_100",
+        "land",
+        "mana_base"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Land",
+      "value_score": 37,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 51,
+      "card_name": "Marsh Flats",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "fetch_or_search_fixing",
+        "global_top_100",
+        "land",
+        "mana_base"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Land",
+      "value_score": 37,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 50,
+      "card_name": "Scalding Tarn",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "fetch_or_search_fixing",
+        "global_top_100",
+        "land",
+        "mana_base"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Land",
+      "value_score": 37,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 99,
+      "card_name": "Teferi's Protection",
+      "cmc": 3.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "fast_pressure_guard",
+        "global_top_100",
+        "instant_sorcery_spell",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Instant",
+      "value_score": 37,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 46,
+      "card_name": "Windswept Heath",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "fetch_or_search_fixing",
+        "global_top_100",
+        "land",
+        "mana_base"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Land",
+      "value_score": 37,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 49,
+      "card_name": "Wooded Foothills",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "fetch_or_search_fixing",
+        "global_top_100",
+        "land",
+        "mana_base"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Land",
+      "value_score": 37,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 226,
+      "card_name": "Boros Signet",
+      "cmc": 2.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "global_top_500",
+        "ramp",
+        "structural_ramp_floor"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Artifact",
+      "value_score": 36,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 155,
+      "card_name": "Talisman of Conviction",
+      "cmc": 2.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "global_top_500",
+        "ramp",
+        "structural_ramp_floor"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Artifact",
+      "value_score": 36,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 398,
+      "card_name": "Dawn's Truce",
+      "cmc": 2.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "fast_pressure_guard",
+        "global_top_500",
+        "instant_sorcery_spell",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Instant",
+      "value_score": 34,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 181,
+      "card_name": "Flawless Maneuver",
+      "cmc": 3.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "fast_pressure_guard",
+        "global_top_500",
+        "instant_sorcery_spell",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Instant",
+      "value_score": 34,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 190,
+      "card_name": "Prismatic Vista",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "fetch_or_search_fixing",
+        "global_top_500",
+        "land",
+        "mana_base"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Land",
+      "value_score": 34,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 517,
+      "card_name": "Mother of Runes",
+      "cmc": 1.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "fast_pressure_guard",
+        "format_staple_long_tail",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "format_staple_long_tail",
+      "type_line": "Creature \u2014 Human Cleric",
+      "value_score": 31,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 571,
+      "card_name": "Tibalt's Trickery",
+      "cmc": 2.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "fast_pressure_guard",
+        "format_staple_long_tail",
+        "instant_sorcery_spell",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "format_staple_long_tail",
+      "type_line": "Instant",
+      "value_score": 31,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Pearl Medallion",
+      "cmc": 2.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "ramp",
+        "structural_ramp_floor"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact",
+      "value_score": 30,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Ruby Medallion",
+      "cmc": 2.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "ramp",
+        "structural_ramp_floor"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact",
+      "value_score": 30,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Ancient Tomb",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "utility_engine_land"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Avatar's Wrath",
+      "cmc": 4.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "fast_pressure_guard",
+        "instant_sorcery_spell",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Battlefield Forge",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "untapped_or_multiplayer_fixing"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Command Beacon",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "utility_engine_land"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Command Tower",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "untapped_or_multiplayer_fixing"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Eiganjo, Seat of the Empire",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "utility_engine_land"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Elegant Parlor",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "typed_dual_or_fetch_target"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land \u2014 Mountain Plains",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Exotic Orchard",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "untapped_or_multiplayer_fixing"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Farewell",
+      "cmc": 6.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "lanes": [
+        "board_wipe",
+        "fast_pressure_guard",
+        "instant_sorcery_spell"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Giver of Runes",
+      "cmc": 1.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "fast_pressure_guard",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Creature \u2014 Kor Cleric",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Glittering Massif",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "typed_dual_or_fetch_target"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land \u2014 Mountain Plains",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Lightning Greaves",
+      "cmc": 2.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "fast_pressure_guard",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Plaza of Heroes",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "utility_engine_land"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Radiant Summit",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "typed_dual_or_fetch_target"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land \u2014 Mountain Plains",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Redirect Lightning",
+      "cmc": 1.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "fast_pressure_guard",
+        "instant_sorcery_spell",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Instant \u2014 Lesson",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Reliquary Tower",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "utility_engine_land"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Sacred Foundry",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "typed_dual_or_fetch_target"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land \u2014 Mountain Plains",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Spectator Seating",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "untapped_or_multiplayer_fixing"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Sunbaked Canyon",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "utility_engine_land"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Sunbillow Verge",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "untapped_or_multiplayer_fixing"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Swiftfoot Boots",
+      "cmc": 2.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "fast_pressure_guard",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact \u2014 Equipment",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Turbulent Steppe",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "typed_dual_or_fetch_target"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land \u2014 Mountain Plains",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "War Room",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "land",
+        "mana_base",
+        "utility_engine_land"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "value_score": 28,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 73,
+      "card_name": "Esper Sentinel",
+      "cmc": 1.0,
+      "cut_policy": "review_with_exposure_trace_before_cut",
+      "functional_tag": "draw",
+      "is_commander": false,
+      "lanes": [
+        "artifact",
+        "draw",
+        "global_top_100"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Artifact Creature \u2014 Human Soldier",
+      "value_score": 19,
+      "value_tier": "tier_3_role_filler_with_battle_context"
+    },
+    {
+      "best_edhrec_rank": 54,
+      "card_name": "Generous Gift",
+      "cmc": 3.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "removal",
+      "is_commander": false,
+      "lanes": [
+        "global_top_100",
+        "instant_sorcery_spell",
+        "removal"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Instant",
+      "value_score": 19,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": 15,
+      "card_name": "Path to Exile",
+      "cmc": 1.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "removal",
+      "is_commander": false,
+      "lanes": [
+        "global_top_100",
+        "instant_sorcery_spell",
+        "removal"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Instant",
+      "value_score": 19,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": 11,
+      "card_name": "Swords to Plowshares",
+      "cmc": 1.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "removal",
+      "is_commander": false,
+      "lanes": [
+        "global_top_100",
+        "instant_sorcery_spell",
+        "removal"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Instant",
+      "value_score": 19,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Mountain // Mountain",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "basic_floor",
+        "land",
+        "mana_base"
+      ],
+      "protected_anchor": false,
+      "quantity": 4,
+      "runtime_ready": false,
+      "staple_tier": "not_format_staple",
+      "type_line": "Basic Land \u2014 Mountain",
+      "value_score": 18,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Plains // Plains",
+      "cmc": 0.0,
+      "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+      "functional_tag": "land",
+      "is_commander": false,
+      "lanes": [
+        "basic_floor",
+        "land",
+        "mana_base"
+      ],
+      "protected_anchor": false,
+      "quantity": 4,
+      "runtime_ready": false,
+      "staple_tier": "not_format_staple",
+      "type_line": "Basic Land \u2014 Plains",
+      "value_score": 18,
+      "value_tier": "tier_1_structural_floor"
+    },
+    {
+      "best_edhrec_rank": 172,
+      "card_name": "Big Score",
+      "cmc": 4.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "global_top_500",
+        "instant_sorcery_spell",
+        "ramp"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Instant",
+      "value_score": 16,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": 102,
+      "card_name": "Jeska's Will",
+      "cmc": 3.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "global_top_500",
+        "instant_sorcery_spell",
+        "ramp"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Sorcery",
+      "value_score": 16,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": 184,
+      "card_name": "Stroke of Midnight",
+      "cmc": 3.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "removal",
+      "is_commander": false,
+      "lanes": [
+        "global_top_500",
+        "instant_sorcery_spell",
+        "removal"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Instant",
+      "value_score": 16,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": 303,
+      "card_name": "Unexpected Windfall",
+      "cmc": 4.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "lanes": [
+        "global_top_500",
+        "instant_sorcery_spell",
+        "ramp"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Instant",
+      "value_score": 16,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": 1765,
+      "card_name": "Reforge the Soul",
+      "cmc": 5.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "draw",
+      "is_commander": false,
+      "lanes": [
+        "draw",
+        "format_staple_long_tail",
+        "instant_sorcery_spell"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "format_staple_long_tail",
+      "type_line": "Sorcery",
+      "value_score": 13,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": 2111,
+      "card_name": "Winds of Abandon",
+      "cmc": 2.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "removal",
+      "is_commander": false,
+      "lanes": [
+        "format_staple_long_tail",
+        "instant_sorcery_spell",
+        "removal"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "format_staple_long_tail",
+      "type_line": "Sorcery",
+      "value_score": 13,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Artist's Talent",
+      "cmc": 2.0,
+      "cut_policy": "review_with_exposure_trace_before_cut",
+      "functional_tag": "draw",
+      "is_commander": false,
+      "lanes": [
+        "draw"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Enchantment \u2014 Class",
+      "value_score": 10,
+      "value_tier": "tier_3_role_filler_with_battle_context"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Blasphemous Act",
+      "cmc": 9.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 10,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "cmc": 7.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "protection",
+      "is_commander": false,
+      "lanes": [
+        "instant_sorcery_spell",
+        "protection"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 10,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Fated Clash",
+      "cmc": 5.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 10,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Furygale Flocking",
+      "cmc": 0.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "lanes": [
+        "instant_sorcery_spell",
+        "wincon"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 10,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Hexing Squelcher",
+      "cmc": 2.0,
+      "cut_policy": "review_with_exposure_trace_before_cut",
+      "functional_tag": "creature",
+      "is_commander": false,
+      "lanes": [
+        "creature"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Creature \u2014 Goblin Sorcerer",
+      "value_score": 10,
+      "value_tier": "tier_3_role_filler_with_battle_context"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "High Noon",
+      "cmc": 2.0,
+      "cut_policy": "review_with_exposure_trace_before_cut",
+      "functional_tag": "removal",
+      "is_commander": false,
+      "lanes": [
+        "removal"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Enchantment",
+      "value_score": 10,
+      "value_tier": "tier_3_role_filler_with_battle_context"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Improvisation Capstone",
+      "cmc": 0.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "draw",
+      "is_commander": false,
+      "lanes": [
+        "draw",
+        "instant_sorcery_spell"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery \u2014 Lesson",
+      "value_score": 10,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "cmc": 5.0,
+      "cut_policy": "review_with_exposure_trace_before_cut",
+      "functional_tag": "engine",
+      "is_commander": false,
+      "lanes": [
+        "engine"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Creature \u2014 Djinn Monk",
+      "value_score": 10,
+      "value_tier": "tier_3_role_filler_with_battle_context"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Prismari Pianist",
+      "cmc": 0.0,
+      "cut_policy": "review_with_exposure_trace_before_cut",
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "lanes": [
+        "wincon"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Creature \u2014 Djinn Bard",
+      "value_score": 10,
+      "value_tier": "tier_3_role_filler_with_battle_context"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Promise of Loyalty",
+      "cmc": 5.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 10,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Starfall Invocation",
+      "cmc": 5.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 10,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Tempt with Bunnies",
+      "cmc": 3.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "lanes": [
+        "instant_sorcery_spell",
+        "wincon"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 10,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Thor, God of Thunder",
+      "cmc": 5.0,
+      "cut_policy": "review_with_exposure_trace_before_cut",
+      "functional_tag": "removal",
+      "is_commander": false,
+      "lanes": [
+        "removal"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Creature \u2014 God Warrior Hero",
+      "value_score": 10,
+      "value_tier": "tier_3_role_filler_with_battle_context"
+    },
+    {
+      "best_edhrec_rank": null,
+      "card_name": "Tragic Arrogance",
+      "cmc": 5.0,
+      "cut_policy": "same_lane_or_package_proof_required",
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "lanes": [
+        "board_wipe",
+        "instant_sorcery_spell"
+      ],
+      "protected_anchor": false,
+      "quantity": 1,
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "value_score": 10,
+      "value_tier": "tier_2_commander_contextual_synergy"
+    }
+  ],
+  "artifact_type": "lorehold_deckbuilding_value_model",
+  "decision": {
+    "current_best_baseline": "deck_607",
+    "current_best_baseline_reason": "Current evidence has no gate-ready challenger, and the protected 607 list preserves the strongest combination of mana foundation, topdeck/miracle anchors, protection, and proven finishers.",
+    "next_action": "use_value_model_to_design_multi_card_shell_or_forced_access_diagnostic_before_any_natural_gate"
+  },
+  "deck_607_mutated": false,
+  "external_research": [
+    {
+      "learning": "Official format and color identity are entry gates, not proof of card quality.",
+      "source": "Wizards Commander format",
+      "url": "https://magic.wizards.com/en/formats/commander"
+    },
+    {
+      "learning": "Lorehold grants miracle to instants and sorceries and rummages on each opponent upkeep.",
+      "source": "Scryfall Lorehold Oracle",
+      "url": "https://scryfall.com/card/sos/201/lorehold-the-historian"
+    },
+    {
+      "learning": "Current commander-context signal is Topdeck plus Spellslinger; Scroll Rack and Sensei's Top are high-synergy cards.",
+      "source": "EDHREC Optimized Topdeck Lorehold",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian/optimized/topdeck"
+    },
+    {
+      "learning": "Library of Leng plus upkeep rummage is a core miracle setup pattern.",
+      "source": "EDHREC Miracles Every Turn",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander"
+    },
+    {
+      "learning": "Ramp is about outpacing the curve; in Lorehold it must also preserve commander timing and miracle cadence.",
+      "source": "EDHREC Ramp in Commander",
+      "url": "https://edhrec.com/guides/the-edhrec-guide-to-ramp-in-commander"
+    },
+    {
+      "learning": "Ramp and draw are structural pillars, but pillar counts do not replace commander-specific package proof.",
+      "source": "Card Kingdom ramp/draw article",
+      "url": "https://blog.cardkingdom.com/whats-better-in-commander-card-draw-or-ramp/"
+    }
+  ],
+  "generated_at": "2026-07-05T00:02:03Z",
+  "policy": {
+    "artifacts": "Artifact value is high only when it serves topdeck, miracle, ramp timing, or protection lanes.",
+    "cuts": "Any cut must be same-lane or package-declared and must satisfy miracle_access_first_shell_v1 before natural gate.",
+    "lands": "Protect the 34-land mana foundation unless a same-function mana-source model and battle gate prove improvement.",
+    "ramp": "Prefer ramp that preserves commander timing and opponent-turn miracle windows; fast mana alone is not sufficient.",
+    "staples": "Global staples are candidates or floors, not automatic cuts over protected commander engines."
+  },
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_preflight_20260704_current.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_trace_failure_miner_20260704_current.json"
+  ],
+  "status": "lorehold_value_model_ready_607_remains_protected",
+  "summary": {
+    "card_rows": 94,
+    "commander_count": 1,
+    "deck_id": 607,
+    "gate_ready_now_count": 0,
+    "keep_607_as_protected_baseline": true,
+    "lane_profile": {
+      "artifact": 17,
+      "basic_floor": 8,
+      "board_wipe": 8,
+      "commander_center": 1,
+      "creature": 2,
+      "draw": 9,
+      "engine": 3,
+      "fast_pressure_guard": 12,
+      "fetch_or_search_fixing": 8,
+      "format_staple_long_tail": 6,
+      "global_top_100": 17,
+      "global_top_500": 11,
+      "instant_sorcery_spell": 36,
+      "land": 34,
+      "mana_base": 34,
+      "miracle_conversion_finisher": 10,
+      "protection": 12,
+      "ramp": 15,
+      "removal": 7,
+      "structural_ramp_floor": 8,
+      "topdeck_miracle_engine": 9,
+      "tutor": 1,
+      "typed_dual_or_fetch_target": 5,
+      "untapped_or_multiplayer_fixing": 5,
+      "utility_engine_land": 8,
+      "wincon": 9
+    },
+    "mana_foundation": {
+      "artifact_ramp_quantity": 11,
+      "enchantment_ramp_quantity": 1,
+      "instant_sorcery_ramp_quantity": 3,
+      "interpretation": "The 607 mana plan is not just more fast mana: it combines 34 lands, fetch/dual fixing, artifact ramp, spell ramp, and opponent-turn mana rocks that feed miracle windows.",
+      "land_groups": {
+        "basic_floor": 8,
+        "fetch_or_search_fixing": 8,
+        "typed_dual_or_fetch_target": 5,
+        "untapped_or_multiplayer_fixing": 5,
+        "utility_engine_land": 8
+      },
+      "land_quantity": 34,
+      "land_rows": 28,
+      "mana_sources_land_plus_ramp": 49,
+      "ramp_quantity": 15
+    },
+    "preflight_status": "no_current_candidate_passes_miracle_access_first_preflight",
+    "promotion_allowed": false,
+    "quantity_total": 100,
+    "role_profile": {
+      "board_wipe": 8,
+      "creature": 2,
+      "draw": 9,
+      "engine": 3,
+      "land": 34,
+      "protection": 12,
+      "ramp": 15,
+      "removal": 7,
+      "tutor": 1,
+      "wincon": 9
+    },
+    "trace_status": "lorehold_miracle_trace_failure_learning_ready"
+  },
+  "value_tiers": {
+    "tier_0_protected_engine_or_anchor": [
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Lorehold, the Historian",
+        "cmc": 5.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "engine",
+        "is_commander": true,
+        "lanes": [
+          "commander_center",
+          "engine",
+          "topdeck_miracle_engine"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Legendary Creature \u2014 Elder Dragon",
+        "value_score": 230,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": 424,
+        "card_name": "Land Tax",
+        "cmc": 1.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "tutor",
+        "is_commander": false,
+        "lanes": [
+          "global_top_500",
+          "topdeck_miracle_engine",
+          "tutor"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Enchantment",
+        "value_score": 156,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Library of Leng",
+        "cmc": 1.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "engine",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "engine",
+          "topdeck_miracle_engine"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Artifact",
+        "value_score": 150,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Molecule Man",
+        "cmc": 6.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "draw",
+        "is_commander": false,
+        "lanes": [
+          "draw",
+          "topdeck_miracle_engine"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Legendary Creature \u2014 Human Villain",
+        "value_score": 150,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Scroll Rack",
+        "cmc": 2.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "draw",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "draw",
+          "topdeck_miracle_engine"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Artifact",
+        "value_score": 150,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Sensei's Divining Top",
+        "cmc": 1.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "draw",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "draw",
+          "topdeck_miracle_engine"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Artifact",
+        "value_score": 150,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "The Mind Stone",
+        "cmc": 2.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "ramp",
+          "topdeck_miracle_engine"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Legendary Artifact \u2014 Infinity Stone",
+        "value_score": 150,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "The Scarlet Witch",
+        "cmc": 3.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "creature",
+        "is_commander": false,
+        "lanes": [
+          "creature",
+          "topdeck_miracle_engine"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Legendary Creature \u2014 Mutant Warlock Hero",
+        "value_score": 150,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": 848,
+        "card_name": "Mizzix's Mastery",
+        "cmc": 4.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "wincon",
+        "is_commander": false,
+        "lanes": [
+          "format_staple_long_tail",
+          "instant_sorcery_spell",
+          "miracle_conversion_finisher",
+          "wincon"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "format_staple_long_tail",
+        "type_line": "Sorcery",
+        "value_score": 141,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Approach of the Second Sun",
+        "cmc": 7.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "wincon",
+        "is_commander": false,
+        "lanes": [
+          "instant_sorcery_spell",
+          "miracle_conversion_finisher",
+          "wincon"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 138,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Creative Technique",
+        "cmc": 5.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "draw",
+        "is_commander": false,
+        "lanes": [
+          "draw",
+          "instant_sorcery_spell",
+          "miracle_conversion_finisher"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 138,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Insurrection",
+        "cmc": 8.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "wincon",
+        "is_commander": false,
+        "lanes": [
+          "instant_sorcery_spell",
+          "miracle_conversion_finisher",
+          "wincon"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 138,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Storm Herd",
+        "cmc": 10.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "wincon",
+        "is_commander": false,
+        "lanes": [
+          "instant_sorcery_spell",
+          "miracle_conversion_finisher",
+          "wincon"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 138,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Bender's Waterskin",
+        "cmc": 3.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "ramp"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Artifact",
+        "value_score": 110,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Monument to Endurance",
+        "cmc": 3.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "ramp"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Artifact",
+        "value_score": 110,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Victory Chimes",
+        "cmc": 3.0,
+        "cut_policy": "no_generic_cut_same_lane_battle_proof_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "ramp"
+        ],
+        "protected_anchor": true,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Artifact",
+        "value_score": 110,
+        "value_tier": "tier_0_protected_engine_or_anchor"
+      }
+    ],
+    "tier_1_structural_floor": [
+      {
+        "best_edhrec_rank": 119,
+        "card_name": "Urza's Saga",
+        "cmc": 0.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "land",
+        "is_commander": false,
+        "lanes": [
+          "global_top_500",
+          "land",
+          "mana_base",
+          "topdeck_miracle_engine",
+          "utility_engine_land"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Enchantment Land \u2014 Urza's Saga",
+        "value_score": 74,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 3,
+        "card_name": "Arcane Signet",
+        "cmc": 2.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "global_top_100",
+          "ramp",
+          "structural_ramp_floor"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Artifact",
+        "value_score": 39,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 18,
+        "card_name": "Fellwar Stone",
+        "cmc": 2.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "global_top_100",
+          "ramp",
+          "structural_ramp_floor"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Artifact",
+        "value_score": 39,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 57,
+        "card_name": "Smothering Tithe",
+        "cmc": 4.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "global_top_100",
+          "ramp",
+          "structural_ramp_floor"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Enchantment",
+        "value_score": 39,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 1,
+        "card_name": "Sol Ring",
+        "cmc": 1.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "global_top_100",
+          "ramp",
+          "structural_ramp_floor"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Artifact",
+        "value_score": 39,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 55,
+        "card_name": "Arid Mesa",
+        "cmc": 0.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "land",
+        "is_commander": false,
+        "lanes": [
+          "fetch_or_search_fixing",
+          "global_top_100",
+          "land",
+          "mana_base"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Land",
+        "value_score": 37,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 43,
+        "card_name": "Bloodstained Mire",
+        "cmc": 0.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "land",
+        "is_commander": false,
+        "lanes": [
+          "fetch_or_search_fixing",
+          "global_top_100",
+          "land",
+          "mana_base"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Land",
+        "value_score": 37,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 81,
+        "card_name": "Deflecting Swat",
+        "cmc": 3.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "protection",
+        "is_commander": false,
+        "lanes": [
+          "fast_pressure_guard",
+          "global_top_100",
+          "instant_sorcery_spell",
+          "protection"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Instant",
+        "value_score": 37,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 42,
+        "card_name": "Flooded Strand",
+        "cmc": 0.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "land",
+        "is_commander": false,
+        "lanes": [
+          "fetch_or_search_fixing",
+          "global_top_100",
+          "land",
+          "mana_base"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Land",
+        "value_score": 37,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 51,
+        "card_name": "Marsh Flats",
+        "cmc": 0.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "land",
+        "is_commander": false,
+        "lanes": [
+          "fetch_or_search_fixing",
+          "global_top_100",
+          "land",
+          "mana_base"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Land",
+        "value_score": 37,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 50,
+        "card_name": "Scalding Tarn",
+        "cmc": 0.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "land",
+        "is_commander": false,
+        "lanes": [
+          "fetch_or_search_fixing",
+          "global_top_100",
+          "land",
+          "mana_base"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Land",
+        "value_score": 37,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 99,
+        "card_name": "Teferi's Protection",
+        "cmc": 3.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "protection",
+        "is_commander": false,
+        "lanes": [
+          "fast_pressure_guard",
+          "global_top_100",
+          "instant_sorcery_spell",
+          "protection"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Instant",
+        "value_score": 37,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 46,
+        "card_name": "Windswept Heath",
+        "cmc": 0.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "land",
+        "is_commander": false,
+        "lanes": [
+          "fetch_or_search_fixing",
+          "global_top_100",
+          "land",
+          "mana_base"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Land",
+        "value_score": 37,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 49,
+        "card_name": "Wooded Foothills",
+        "cmc": 0.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "land",
+        "is_commander": false,
+        "lanes": [
+          "fetch_or_search_fixing",
+          "global_top_100",
+          "land",
+          "mana_base"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Land",
+        "value_score": 37,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 226,
+        "card_name": "Boros Signet",
+        "cmc": 2.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "global_top_500",
+          "ramp",
+          "structural_ramp_floor"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Artifact",
+        "value_score": 36,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 155,
+        "card_name": "Talisman of Conviction",
+        "cmc": 2.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "global_top_500",
+          "ramp",
+          "structural_ramp_floor"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Artifact",
+        "value_score": 36,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 398,
+        "card_name": "Dawn's Truce",
+        "cmc": 2.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "protection",
+        "is_commander": false,
+        "lanes": [
+          "fast_pressure_guard",
+          "global_top_500",
+          "instant_sorcery_spell",
+          "protection"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Instant",
+        "value_score": 34,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 181,
+        "card_name": "Flawless Maneuver",
+        "cmc": 3.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "protection",
+        "is_commander": false,
+        "lanes": [
+          "fast_pressure_guard",
+          "global_top_500",
+          "instant_sorcery_spell",
+          "protection"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Instant",
+        "value_score": 34,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 190,
+        "card_name": "Prismatic Vista",
+        "cmc": 0.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "land",
+        "is_commander": false,
+        "lanes": [
+          "fetch_or_search_fixing",
+          "global_top_500",
+          "land",
+          "mana_base"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Land",
+        "value_score": 34,
+        "value_tier": "tier_1_structural_floor"
+      },
+      {
+        "best_edhrec_rank": 517,
+        "card_name": "Mother of Runes",
+        "cmc": 1.0,
+        "cut_policy": "protect_floor_same_role_upgrade_and_gate_required",
+        "functional_tag": "protection",
+        "is_commander": false,
+        "lanes": [
+          "fast_pressure_guard",
+          "format_staple_long_tail",
+          "protection"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "format_staple_long_tail",
+        "type_line": "Creature \u2014 Human Cleric",
+        "value_score": 31,
+        "value_tier": "tier_1_structural_floor"
+      }
+    ],
+    "tier_2_commander_contextual_synergy": [
+      {
+        "best_edhrec_rank": 2173,
+        "card_name": "Rise of the Eldrazi",
+        "cmc": 12.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "wincon",
+        "is_commander": false,
+        "lanes": [
+          "format_staple_long_tail",
+          "instant_sorcery_spell",
+          "miracle_conversion_finisher",
+          "wincon"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "format_staple_long_tail",
+        "type_line": "Sorcery",
+        "value_score": 41,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Call Forth the Tempest",
+        "cmc": 8.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "board_wipe",
+        "is_commander": false,
+        "lanes": [
+          "board_wipe",
+          "instant_sorcery_spell",
+          "miracle_conversion_finisher"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 38,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Everything Comes to Dust",
+        "cmc": 10.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "board_wipe",
+        "is_commander": false,
+        "lanes": [
+          "board_wipe",
+          "instant_sorcery_spell",
+          "miracle_conversion_finisher"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 38,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Hit the Mother Lode",
+        "cmc": 7.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "draw",
+        "is_commander": false,
+        "lanes": [
+          "draw",
+          "instant_sorcery_spell",
+          "miracle_conversion_finisher"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 38,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Surge to Victory",
+        "cmc": 6.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "wincon",
+        "is_commander": false,
+        "lanes": [
+          "instant_sorcery_spell",
+          "miracle_conversion_finisher",
+          "wincon"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 38,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": 54,
+        "card_name": "Generous Gift",
+        "cmc": 3.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "removal",
+        "is_commander": false,
+        "lanes": [
+          "global_top_100",
+          "instant_sorcery_spell",
+          "removal"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Instant",
+        "value_score": 19,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": 15,
+        "card_name": "Path to Exile",
+        "cmc": 1.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "removal",
+        "is_commander": false,
+        "lanes": [
+          "global_top_100",
+          "instant_sorcery_spell",
+          "removal"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Instant",
+        "value_score": 19,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": 11,
+        "card_name": "Swords to Plowshares",
+        "cmc": 1.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "removal",
+        "is_commander": false,
+        "lanes": [
+          "global_top_100",
+          "instant_sorcery_spell",
+          "removal"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Instant",
+        "value_score": 19,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": 172,
+        "card_name": "Big Score",
+        "cmc": 4.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "global_top_500",
+          "instant_sorcery_spell",
+          "ramp"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Instant",
+        "value_score": 16,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": 102,
+        "card_name": "Jeska's Will",
+        "cmc": 3.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "global_top_500",
+          "instant_sorcery_spell",
+          "ramp"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Sorcery",
+        "value_score": 16,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": 184,
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "removal",
+        "is_commander": false,
+        "lanes": [
+          "global_top_500",
+          "instant_sorcery_spell",
+          "removal"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Instant",
+        "value_score": 16,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": 303,
+        "card_name": "Unexpected Windfall",
+        "cmc": 4.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "ramp",
+        "is_commander": false,
+        "lanes": [
+          "global_top_500",
+          "instant_sorcery_spell",
+          "ramp"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_500",
+        "type_line": "Instant",
+        "value_score": 16,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": 1765,
+        "card_name": "Reforge the Soul",
+        "cmc": 5.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "draw",
+        "is_commander": false,
+        "lanes": [
+          "draw",
+          "format_staple_long_tail",
+          "instant_sorcery_spell"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "format_staple_long_tail",
+        "type_line": "Sorcery",
+        "value_score": 13,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": 2111,
+        "card_name": "Winds of Abandon",
+        "cmc": 2.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "removal",
+        "is_commander": false,
+        "lanes": [
+          "format_staple_long_tail",
+          "instant_sorcery_spell",
+          "removal"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "format_staple_long_tail",
+        "type_line": "Sorcery",
+        "value_score": 13,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Blasphemous Act",
+        "cmc": 9.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "board_wipe",
+        "is_commander": false,
+        "lanes": [
+          "board_wipe",
+          "instant_sorcery_spell"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 10,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+        "cmc": 7.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "protection",
+        "is_commander": false,
+        "lanes": [
+          "instant_sorcery_spell",
+          "protection"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 10,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Fated Clash",
+        "cmc": 5.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "board_wipe",
+        "is_commander": false,
+        "lanes": [
+          "board_wipe",
+          "instant_sorcery_spell"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 10,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Furygale Flocking",
+        "cmc": 0.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "wincon",
+        "is_commander": false,
+        "lanes": [
+          "instant_sorcery_spell",
+          "wincon"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 10,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Improvisation Capstone",
+        "cmc": 0.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "draw",
+        "is_commander": false,
+        "lanes": [
+          "draw",
+          "instant_sorcery_spell"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery \u2014 Lesson",
+        "value_score": 10,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Promise of Loyalty",
+        "cmc": 5.0,
+        "cut_policy": "same_lane_or_package_proof_required",
+        "functional_tag": "board_wipe",
+        "is_commander": false,
+        "lanes": [
+          "board_wipe",
+          "instant_sorcery_spell"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Sorcery",
+        "value_score": 10,
+        "value_tier": "tier_2_commander_contextual_synergy"
+      }
+    ],
+    "tier_3_role_filler_with_battle_context": [
+      {
+        "best_edhrec_rank": 73,
+        "card_name": "Esper Sentinel",
+        "cmc": 1.0,
+        "cut_policy": "review_with_exposure_trace_before_cut",
+        "functional_tag": "draw",
+        "is_commander": false,
+        "lanes": [
+          "artifact",
+          "draw",
+          "global_top_100"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "global_top_100",
+        "type_line": "Artifact Creature \u2014 Human Soldier",
+        "value_score": 19,
+        "value_tier": "tier_3_role_filler_with_battle_context"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Artist's Talent",
+        "cmc": 2.0,
+        "cut_policy": "review_with_exposure_trace_before_cut",
+        "functional_tag": "draw",
+        "is_commander": false,
+        "lanes": [
+          "draw"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Enchantment \u2014 Class",
+        "value_score": 10,
+        "value_tier": "tier_3_role_filler_with_battle_context"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Hexing Squelcher",
+        "cmc": 2.0,
+        "cut_policy": "review_with_exposure_trace_before_cut",
+        "functional_tag": "creature",
+        "is_commander": false,
+        "lanes": [
+          "creature"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Creature \u2014 Goblin Sorcerer",
+        "value_score": 10,
+        "value_tier": "tier_3_role_filler_with_battle_context"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "High Noon",
+        "cmc": 2.0,
+        "cut_policy": "review_with_exposure_trace_before_cut",
+        "functional_tag": "removal",
+        "is_commander": false,
+        "lanes": [
+          "removal"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Enchantment",
+        "value_score": 10,
+        "value_tier": "tier_3_role_filler_with_battle_context"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Pinnacle Monk // Mystic Peak",
+        "cmc": 5.0,
+        "cut_policy": "review_with_exposure_trace_before_cut",
+        "functional_tag": "engine",
+        "is_commander": false,
+        "lanes": [
+          "engine"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Creature \u2014 Djinn Monk",
+        "value_score": 10,
+        "value_tier": "tier_3_role_filler_with_battle_context"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Prismari Pianist",
+        "cmc": 0.0,
+        "cut_policy": "review_with_exposure_trace_before_cut",
+        "functional_tag": "wincon",
+        "is_commander": false,
+        "lanes": [
+          "wincon"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Creature \u2014 Djinn Bard",
+        "value_score": 10,
+        "value_tier": "tier_3_role_filler_with_battle_context"
+      },
+      {
+        "best_edhrec_rank": null,
+        "card_name": "Thor, God of Thunder",
+        "cmc": 5.0,
+        "cut_policy": "review_with_exposure_trace_before_cut",
+        "functional_tag": "removal",
+        "is_commander": false,
+        "lanes": [
+          "removal"
+        ],
+        "protected_anchor": false,
+        "quantity": 1,
+        "runtime_ready": true,
+        "staple_tier": "not_format_staple",
+        "type_line": "Legendary Creature \u2014 God Warrior Hero",
+        "value_score": 10,
+        "value_tier": "tier_3_role_filler_with_battle_context"
+      }
+    ]
+  },
+  "variant_watchlist": [
+    {
+      "best_edhrec_rank": 115,
+      "candidate_status": "prior_tested_reject_or_caveat_do_not_auto_include",
+      "card_name": "Enlightened Tutor",
+      "cmc": 1.0,
+      "example_functional_tag": "tutor",
+      "reason": "coherent tutor, but tested 607 cuts lost natural confirmation",
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Instant",
+      "variant_deck_count": 6,
+      "variant_deck_ids": [
+        608,
+        611,
+        612,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": 231,
+      "candidate_status": "prior_tested_reject_or_caveat_do_not_auto_include",
+      "card_name": "Gamble",
+      "cmc": 1.0,
+      "example_functional_tag": "tutor",
+      "reason": "coherent tutor, but tested 607 cuts lost natural confirmation",
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Sorcery",
+      "variant_deck_count": 5,
+      "variant_deck_ids": [
+        609,
+        612,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": 233,
+      "candidate_status": "prior_tested_reject_or_caveat_do_not_auto_include",
+      "card_name": "Storm-Kiln Artist",
+      "cmc": 4.0,
+      "example_functional_tag": "ramp",
+      "reason": "real runtime signal, but Arcane Signet replacement regressed fast pressure",
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Creature \u2014 Dwarf Shaman",
+      "variant_deck_count": 5,
+      "variant_deck_ids": [
+        608,
+        611,
+        612,
+        613,
+        614
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "prior_tested_reject_or_caveat_do_not_auto_include",
+      "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "cmc": 3.0,
+      "example_functional_tag": "engine",
+      "reason": "same-macro signal but not confirmed as final 607 change",
+      "runtime_ready": false,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Creature \u2014 God",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        608,
+        612,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": 144,
+      "candidate_status": "prior_tested_reject_or_caveat_do_not_auto_include",
+      "card_name": "Mana Vault",
+      "cmc": 1.0,
+      "example_functional_tag": "ramp",
+      "reason": "internally available and runtime-modeled, but one-card Bender's Waterskin replacement lost",
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Artifact",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        612,
+        613,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "prior_tested_reject_or_caveat_do_not_auto_include",
+      "card_name": "The One Ring",
+      "cmc": 4.0,
+      "example_functional_tag": "draw",
+      "reason": "internally available and runtime-modeled, but tested value/draw cuts lost to 607",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Artifact",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        608,
+        613,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "prior_tested_reject_or_caveat_do_not_auto_include",
+      "card_name": "Cloud Key",
+      "cmc": 3.0,
+      "example_functional_tag": "ramp",
+      "reason": "lost same-lane Bender's Waterskin benchmark and regressed miracle cadence",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Artifact",
+      "variant_deck_count": 1,
+      "variant_deck_ids": [
+        612
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "prior_tested_reject_or_caveat_do_not_auto_include",
+      "card_name": "Electro, Assaulting Battery",
+      "cmc": 3.0,
+      "example_functional_tag": "removal",
+      "reason": "lost same-lane Bender's Waterskin benchmark and regressed Winota",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Creature \u2014 Human Villain",
+      "variant_deck_count": 1,
+      "variant_deck_ids": [
+        611
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "prior_tested_reject_or_caveat_do_not_auto_include",
+      "card_name": "Possibility Storm",
+      "cmc": 5.0,
+      "example_functional_tag": "unknown",
+      "reason": "same-lane Creative Technique benchmark lost and had weak used-game outcome sample",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Enchantment",
+      "variant_deck_count": 1,
+      "variant_deck_ids": [
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Plateau",
+      "cmc": 0.0,
+      "example_functional_tag": "land",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land \u2014 Mountain Plains",
+      "variant_deck_count": 7,
+      "variant_deck_ids": [
+        610,
+        611,
+        612,
+        613,
+        614,
+        615,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Apex of Power",
+      "cmc": 10.0,
+      "example_functional_tag": "draw",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "variant_deck_count": 6,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        613,
+        615,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Brass's Bounty",
+      "cmc": 7.0,
+      "example_functional_tag": "wincon",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "variant_deck_count": 6,
+      "variant_deck_ids": [
+        609,
+        611,
+        612,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Clifftop Retreat",
+      "cmc": 0.0,
+      "example_functional_tag": "land",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "variant_deck_count": 6,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        614,
+        615,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Perch Protection",
+      "cmc": 6.0,
+      "example_functional_tag": "wincon",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Instant",
+      "variant_deck_count": 6,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": 173,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Boros Charm",
+      "cmc": 2.0,
+      "example_functional_tag": "protection",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Instant",
+      "variant_deck_count": 5,
+      "variant_deck_ids": [
+        609,
+        612,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": 423,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Silence",
+      "cmc": 1.0,
+      "example_functional_tag": "protection",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Instant",
+      "variant_deck_count": 5,
+      "variant_deck_ids": [
+        612,
+        613,
+        614,
+        615,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Austere Command",
+      "cmc": 6.0,
+      "example_functional_tag": "board_wipe",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        612
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Boseiju, Who Shelters All",
+      "cmc": 0.0,
+      "example_functional_tag": "land",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Land",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        612,
+        613,
+        615,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Dance with Calamity",
+      "cmc": 8.0,
+      "example_functional_tag": "draw",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        611,
+        613,
+        614
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Galvanoth",
+      "cmc": 5.0,
+      "example_functional_tag": "draw",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Creature \u2014 Beast",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        611,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Goldspan Dragon",
+      "cmc": 5.0,
+      "example_functional_tag": "ramp",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Creature \u2014 Dragon",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        608,
+        611,
+        614,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Invoke Calamity",
+      "cmc": 5.0,
+      "example_functional_tag": "engine",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Instant",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        614,
+        615,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Longshot, Rebel Bowman",
+      "cmc": 4.0,
+      "example_functional_tag": "wincon",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Legendary Creature \u2014 Human Rebel Ally",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        611,
+        612,
+        613,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Ol\u00f3rin's Searing Light",
+      "cmc": 4.0,
+      "example_functional_tag": "draw",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Instant",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Penance",
+      "cmc": 3.0,
+      "example_functional_tag": "draw",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Enchantment",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        611,
+        613,
+        614
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Restoration Seminar",
+      "cmc": 0.0,
+      "example_functional_tag": "engine",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery \u2014 Lesson",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        612
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Rugged Prairie",
+      "cmc": 0.0,
+      "example_functional_tag": "land",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        610,
+        611,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Sundown Pass",
+      "cmc": 0.0,
+      "example_functional_tag": "land",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        611,
+        613,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Valakut Awakening // Valakut Stoneforge",
+      "cmc": 3.0,
+      "example_functional_tag": "draw",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Instant",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        608,
+        609,
+        610,
+        611
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Volcanic Vision",
+      "cmc": 7.0,
+      "example_functional_tag": "engine",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Sorcery",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        609,
+        611,
+        613,
+        614
+      ]
+    },
+    {
+      "best_edhrec_rank": 554,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Wheel of Fortune",
+      "cmc": 3.0,
+      "example_functional_tag": "draw",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "format_staple_long_tail",
+      "type_line": "Sorcery",
+      "variant_deck_count": 4,
+      "variant_deck_ids": [
+        608,
+        609,
+        612,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Boros Garrison",
+      "cmc": 0.0,
+      "example_functional_tag": "land",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        609,
+        610,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Cavern of Souls",
+      "cmc": 0.0,
+      "example_functional_tag": "land",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Land",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        612,
+        614,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": 29,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Chaos Warp",
+      "cmc": 3.0,
+      "example_functional_tag": "draw",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "global_top_100",
+      "type_line": "Instant",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        611,
+        615,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Deflecting Palm",
+      "cmc": 2.0,
+      "example_functional_tag": "protection",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Instant",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        614,
+        615,
+        616
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Dragon's Rage Channeler",
+      "cmc": 1.0,
+      "example_functional_tag": "draw",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Creature \u2014 Human Shaman",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        609,
+        613,
+        614
+      ]
+    },
+    {
+      "best_edhrec_rank": 630,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Dualcaster Mage",
+      "cmc": 3.0,
+      "example_functional_tag": "engine",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "format_staple_long_tail",
+      "type_line": "Creature \u2014 Human Wizard",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        611,
+        612,
+        613
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Goblin Engineer",
+      "cmc": 2.0,
+      "example_functional_tag": "tutor",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Creature \u2014 Goblin Artificer",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        608,
+        610,
+        611
+      ]
+    },
+    {
+      "best_edhrec_rank": null,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Goliath Daydreamer",
+      "cmc": 4.0,
+      "example_functional_tag": "creature",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "not_format_staple",
+      "type_line": "Creature \u2014 Giant Wizard",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        613,
+        614,
+        615
+      ]
+    },
+    {
+      "best_edhrec_rank": 249,
+      "candidate_status": "watchlist_unproven_do_not_auto_include",
+      "card_name": "Grand Abolisher",
+      "cmc": 2.0,
+      "example_functional_tag": "protection",
+      "reason": "appears in variants but lacks current 607 safe-cut and equal-gate proof",
+      "runtime_ready": true,
+      "staple_tier": "global_top_500",
+      "type_line": "Creature \u2014 Human Cleric",
+      "variant_deck_count": 3,
+      "variant_deck_ids": [
+        613,
+        615,
+        616
+      ]
+    }
+  ]
+}
