@@ -146,6 +146,7 @@ class GlobalCommanderNonlandCoreCandidateModelTests(unittest.TestCase):
                 ("619", "Kaalia of the Vast", 1, "engine", "[]", 1, 4, "Legendary Creature", "Flying", "kaalia"),
                 ("619", "Path to Exile", 1, "removal", '["removal"]', 0, 1, "Instant", "Exile target creature.", "path"),
                 ("619", "Excess Engine", 1, "engine", '["engine"]', 0, 5, "Artifact", "Whenever you cast a spell, draw a card.", "engine"),
+                ("619", "Rune-Scarred Demon", 1, "tutor", '["engine","tutor"]', 0, 7, "Creature - Demon", "When this creature enters, search your library for a card.", "runescarred"),
                 ("620", "Sauron, the Dark Lord", 1, "engine", "[]", 1, 6, "Legendary Creature", "Whenever the Ring tempts you, draw cards.", "sauron"),
             ],
         )
@@ -156,6 +157,7 @@ class GlobalCommanderNonlandCoreCandidateModelTests(unittest.TestCase):
                 ("Sauron, the Dark Lord", "sauron the dark lord", "{3}{U}{B}{R}", '["B","R","U"]', '["B","R","U"]', "Legendary Creature", "", 6, "", "sauron"),
                 ("Swords to Plowshares", "swords to plowshares", "{W}", '["W"]', '["W"]', "Instant", "Exile target creature. Its controller gains life.", 1, "", "swords"),
                 ("Path to Exile", "path to exile", "{W}", '["W"]', '["W"]', "Instant", "Exile target creature.", 1, "", "path"),
+                ("Rune-Scarred Demon", "rune-scarred demon", "{5}{B}{B}", '["B"]', '["B"]', "Creature - Demon", "Flying. When this creature enters, search your library for a card.", 7, "", "runescarred"),
                 ("Bojuka Bog", "bojuka bog", "", "[]", '["B"]', "Land", "When this land enters, exile target player's graveyard.", 0, "", "bog"),
                 ("Pongify", "pongify", "{U}", '["U"]', '["U"]', "Instant", "Destroy target creature.", 1, "", "pongify"),
                 ("Anguished Unmaking", "anguished unmaking", "{1}{W}{B}", '["B","W"]', '["B","W"]', "Instant", "Exile target nonland permanent. You lose 3 life.", 3, "", "anguished"),
@@ -213,6 +215,12 @@ class GlobalCommanderNonlandCoreCandidateModelTests(unittest.TestCase):
         self.assertNotIn("Pongify", candidate_names)
         self.assertNotIn("Cloudshift", candidate_names)
         self.assertEqual(pool["top_cut_candidates"][0]["card_name"], "Excess Engine")
+        self.assertNotIn("Rune-Scarred Demon", [row["card_name"] for row in pool["top_cut_candidates"]])
+        self.assertEqual(pool["blocked_cut_candidates"][0]["card_name"], "Rune-Scarred Demon")
+        self.assertIn(
+            "kaalia_angel_demon_dragon_payoff_requires_source_lane",
+            pool["blocked_cut_candidates"][0]["block_reasons"],
+        )
         self.assertTrue(pool["pair_hypotheses"])
 
     def test_wincon_remains_source_lane_only_with_related_source(self) -> None:

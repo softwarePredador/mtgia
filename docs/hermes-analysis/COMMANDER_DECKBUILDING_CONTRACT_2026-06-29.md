@@ -238,7 +238,10 @@ Current external refresh on 2026-07-05:
   `format_staples` pools for supported roles, filters by commander color
   identity, Commander legality, current deck membership, nonland type, and
   role-confirming Oracle text, then emits add/cut hypotheses only. Wincon gaps
-  stay blocked on commander-specific win-plan/source evidence.
+  stay blocked on commander-specific win-plan/source evidence. Generic
+  excess-role cuts must also respect commander-specific package payoffs; for
+  example Kaalia Angel/Demon/Dragon creatures are blocked from generic cut pools
+  until source-lane review proves they are expendable.
 - Current runtime profile fallback now includes `Kaalia of the Vast` in
   `server/lib/ai/commander_reference_profile_support.dart`. This is a local
   aggregate source lane for generation prompts only: it requires Mardu color

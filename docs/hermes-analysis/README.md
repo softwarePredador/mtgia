@@ -235,7 +235,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     para roles suportados, filtra por identidade de cor, legalidade Commander,
     cartas ja no deck, tipo nonland e texto Oracle que confirme a funcao. Gaps
     de wincon continuam bloqueados ate existir source-lane/plano de vitoria do
-    comandante. Evidencia local atual:
+    comandante, e cortes por excesso generico precisam respeitar payoffs do
+    comandante; em Kaalia, criaturas Angel/Demon/Dragon ficam bloqueadas ate
+    source-lane provar que sao cortaveis. Evidencia local atual:
     `master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`.
     O suporte runtime de profiles agora tambem tem fallback agregado para
     `Kaalia of the Vast` em

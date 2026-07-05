@@ -41,6 +41,7 @@ ROLE_TO_FORMAT_STAPLE_ARCHETYPES = {
     "protection": [],
     "recursion": [],
 }
+KAALIA_PAYOFF_TYPES = {"angel", "demon", "dragon"}
 
 
 def utc_now() -> str:
@@ -320,23 +321,52 @@ def build_candidates_for_hypothesis(
     return candidates[:limit]
 
 
+def commander_specific_cut_blockers(commander: str, row: dict[str, Any]) -> list[str]:
+    blockers: list[str] = []
+    commander_key = normalize_name(commander)
+    card_name = normalize_name(row.get("card_name"))
+    type_line = str(row.get("type_line") or "").lower()
+    if commander_key == "kaalia of the vast":
+        if "creature" in type_line and any(payoff_type in type_line for payoff_type in KAALIA_PAYOFF_TYPES):
+            blockers.append("kaalia_angel_demon_dragon_payoff_requires_source_lane")
+        if card_name == "master of cruelties":
+            blockers.append("kaalia_master_of_cruelties_combo_anchor_requires_source_lane")
+    return blockers
+
+
 def cut_candidates_for_hypothesis(
     *,
     conn: sqlite3.Connection,
     hypothesis: dict[str, Any],
     core_row: dict[str, Any],
     limit: int,
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     deck_id = str(hypothesis.get("deck_id"))
+    commander = str(hypothesis.get("commander") or "")
     missing = land_cuts.missing_roles(core_row)
     excess = land_cuts.excess_roles(core_row)
     staple_ranks = land_cuts.staple_rank_by_name(conn)
     out: list[dict[str, Any]] = []
+    blocked: list[dict[str, Any]] = []
     for row in land_cuts.deck_rows(conn, deck_id):
         if as_int(row.get("is_commander")) or "land" in str(row.get("type_line") or "").lower():
             continue
         roles, source = core_roles.card_roles(row)
         if roles & missing:
+            continue
+        commander_blockers = commander_specific_cut_blockers(commander, row)
+        if commander_blockers:
+            blocked.append(
+                {
+                    "card_name": row.get("card_name"),
+                    "status": "blocked_commander_specific_payoff_cut",
+                    "roles": sorted(roles),
+                    "classification_source": source,
+                    "cmc": row.get("cmc"),
+                    "block_reasons": commander_blockers,
+                    "mutation_allowed": False,
+                }
+            )
             continue
         matching_excess = roles & set(excess)
         if not matching_excess:
@@ -365,7 +395,8 @@ def cut_candidates_for_hypothesis(
             }
         )
     out.sort(key=lambda row: (-as_int(row["score"]), str(row["card_name"])))
-    return out[:limit]
+    blocked.sort(key=lambda row: str(row["card_name"]))
+    return out[:limit], blocked[:limit]
 
 
 def related_learned_sources(conn: sqlite3.Connection, commander: str, limit: int) -> list[dict[str, Any]]:
@@ -405,6 +436,7 @@ def build_pool_for_hypothesis(
     existing_names = land_pool.current_deck_names(conn, deck_id)
     candidates: list[dict[str, Any]] = []
     cuts: list[dict[str, Any]] = []
+    blocked_cuts: list[dict[str, Any]] = []
     related_sources: list[dict[str, Any]] = []
     if role in SUPPORTED_CANDIDATE_ROLES:
         candidates = build_candidates_for_hypothesis(
@@ -414,7 +446,7 @@ def build_pool_for_hypothesis(
             existing_names=existing_names,
             limit=limit,
         )
-        cuts = cut_candidates_for_hypothesis(
+        cuts, blocked_cuts = cut_candidates_for_hypothesis(
             conn=conn,
             hypothesis=hypothesis,
             core_row=core_row,
@@ -460,8 +492,10 @@ def build_pool_for_hypothesis(
         "commander_color_identity": commander_colors,
         "candidate_count": len(candidates),
         "cut_candidate_count": len(cuts),
+        "blocked_cut_candidate_count": len(blocked_cuts),
         "top_candidates": candidates,
         "top_cut_candidates": cuts,
+        "blocked_cut_candidates": blocked_cuts,
         "pair_hypotheses": pairs[:limit],
         "related_source_lanes": related_sources,
         "status": status,
@@ -508,6 +542,7 @@ def build_report(
             "status_counts": dict(sorted(status_counts.items())),
             "total_candidate_count": sum(as_int(row.get("candidate_count")) for row in pools),
             "total_cut_candidate_count": sum(as_int(row.get("cut_candidate_count")) for row in pools),
+            "total_blocked_cut_candidate_count": sum(as_int(row.get("blocked_cut_candidate_count")) for row in pools),
             "total_pair_hypothesis_count": sum(len(row.get("pair_hypotheses") or []) for row in pools),
             "top_next_action": "review_nonland_add_cut_pairs_or_build_commander_source_lane",
         },
@@ -516,6 +551,7 @@ def build_report(
             "review_only": "Nonland candidates and cuts are hypotheses only.",
             "source_lane_boundary": "Wincon candidates require commander-specific win-plan evidence before named additions.",
             "floor_protection": "Cards carrying any missing core role are blocked from cut suggestions.",
+            "commander_payoff_protection": "Commander-specific payoffs such as Kaalia Angel/Demon/Dragon creatures are blocked from generic excess-role cuts until source-lane review.",
             "promotion_block": "No deck change is promoted without candidate copy, structure/legal recheck, strategy matrix, battle gate, and replay trace.",
         },
     }
@@ -546,6 +582,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
                 f"- missing: `{pool['missing']}`",
                 f"- candidates: `{pool['candidate_count']}`",
                 f"- cut_candidates: `{pool['cut_candidate_count']}`",
+                f"- blocked_cut_candidates: `{pool.get('blocked_cut_candidate_count', 0)}`",
                 "",
                 "| Score | Candidate | Status | Reasons |",
                 "| --- | --- | --- | --- |",
@@ -564,6 +601,12 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             )
         if not pool["top_cut_candidates"]:
             lines.append("|  | none |  |  |")
+        if pool.get("blocked_cut_candidates"):
+            lines.extend(["", "| Blocked Cut | Status | Reasons |", "| --- | --- | --- |"])
+            for row in pool["blocked_cut_candidates"]:
+                lines.append(
+                    f"| `{row['card_name']}` | `{row['status']}` | {', '.join(row.get('block_reasons') or [])} |"
+                )
         if pool["related_source_lanes"]:
             lines.extend(["", "Related source lanes:"])
             for row in pool["related_source_lanes"]:
