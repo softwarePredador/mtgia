@@ -12582,6 +12582,80 @@ destroy costs, kicker/evoke-like auxiliaries, conditional/reflexive ETB destroy
 effects, unsupported target filters, and composite destroy rows require
 separate exact runtime families.
 
+## 2026-07-05 PG501 Token Basic Landwalk Checkpoint
+
+PG501 closed the exact XMage token subpattern for fixed creature tokens whose
+only token keyword addition is a basic landwalk keyword already supported by
+the ManaLoom combat runtime. The splitter now preserves `token_landwalk`,
+`token_landwalk_land_type`, and `token_landwalk_land_types`, and
+`battle_analyst_v9.py` carries that metadata through generic spell, ETB, and
+dies token creation paths.
+
+Promoted card:
+
+- `Goblin Scouts`
+
+Runtime and parser changes:
+
+- `ForestwalkAbility`, `IslandwalkAbility`, `MountainwalkAbility`,
+  `PlainswalkAbility`, and `SwampwalkAbility` are allowed only as fixed token
+  basic landwalk metadata.
+- `GoblinScoutsToken` now maps to 3 `1/1` red `Goblin Scout` tokens with
+  `mountainwalk`.
+- The runtime uses the existing `landwalk_land_types` blocker-legality path, so
+  a matching defending basic land prevents blocks and a nonmatching basic land
+  does not.
+
+Validation and deploy evidence:
+
+- Split candidate:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg501_token_basic_landwalk_candidate.json`
+  with `proposal_count=1` and `safe_for_batch_pg_package_count=1`.
+- PostgreSQL package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_package.md`.
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_apply_evidence.md`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_precheck.out`
+  validated 1 canonical `Goblin Scouts` row and found 2 old rows to deprecate.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_apply.out`
+  reported `deprecated_shadow_rows=2`, `upserted_rows=1`, and `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_postcheck.out`
+  confirmed the promoted row as verified/auto with an Oracle hash.
+- PG -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_pg_to_sqlite_sync.json`
+  reported `pg_rows_loaded=8425`, `sqlite_inserted_or_updated=8189`, and
+  `canonical_snapshot_rows_exported=5952`.
+- SQLite validation:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_sqlite_validation.json`
+  reported `status=pass`, `validated_card_count=1`, and `issue_count=0`.
+- Battle tests:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_full_battle_suite_post_sync.out`
+  reported `628` `PASS` lines, including
+  `test_pg501_token_landwalk_is_unblockable_against_matching_basic_land`.
+- PG/Hermes/SQLite contract:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg501_token_basic_landwalk_new_server.md`
+  passed `51/51`.
+- Post-sync Commander-legal queue:
+  `target_identity_count=26066`, `xmage_authoritative_source_count=25752`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=25752`.
+- Post-sync global readiness:
+  `battle_and_oracle_ready=4884`, `battle_family_mapper_required=28989`,
+  `generic_runtime_or_no_card_rule=360`, `oracle_data_sync=4`,
+  `commander_legality_sync=3`, and `oracle_identity_rule_link_or_copy=2`.
+- Post-sync exact splitter recheck against the rebuilt queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg501_token_basic_landwalk_new_server_final_recheck.json`
+  reported `proposal_count=0` and `safe_for_batch_pg_package_count=0`.
+
+Residual boundary: PG501 does not close all token keyword rows. Changeling,
+defender, shroud, conditional token text, dynamic token counts, copied text,
+custom ability text, and token classes with unsupported ability semantics
+remain blocked for separate exact runtime families.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

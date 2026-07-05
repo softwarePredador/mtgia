@@ -347,13 +347,18 @@ ALLOWED_TOKEN_ABILITY_KEYWORDS = {
     "DeathtouchAbility": "deathtouch",
     "DoubleStrikeAbility": "double_strike",
     "FirstStrikeAbility": "first_strike",
+    "ForestwalkAbility": "forestwalk",
     "FlyingAbility": "flying",
     "HasteAbility": "haste",
     "HexproofAbility": "hexproof",
     "IndestructibleAbility": "indestructible",
+    "IslandwalkAbility": "islandwalk",
     "LifelinkAbility": "lifelink",
     "MenaceAbility": "menace",
+    "MountainwalkAbility": "mountainwalk",
+    "PlainswalkAbility": "plainswalk",
     "ReachAbility": "reach",
+    "SwampwalkAbility": "swampwalk",
     "TrampleAbility": "trample",
     "VigilanceAbility": "vigilance",
 }
@@ -362,15 +367,28 @@ TOKEN_DESCRIPTION_KEYWORDS = {
     "deathtouch": "deathtouch",
     "double strike": "double_strike",
     "first strike": "first_strike",
+    "forestwalk": "forestwalk",
     "flying": "flying",
     "haste": "haste",
     "hexproof": "hexproof",
     "indestructible": "indestructible",
+    "islandwalk": "islandwalk",
     "lifelink": "lifelink",
     "menace": "menace",
+    "mountainwalk": "mountainwalk",
+    "plainswalk": "plainswalk",
     "reach": "reach",
+    "swampwalk": "swampwalk",
     "trample": "trample",
     "vigilance": "vigilance",
+}
+
+TOKEN_BASIC_LANDWALK_KEYWORDS = {
+    "plainswalk": "plains",
+    "islandwalk": "island",
+    "swampwalk": "swamp",
+    "mountainwalk": "mountain",
+    "forestwalk": "forest",
 }
 
 TOKEN_COLOR_SETTERS = {
@@ -400,7 +418,6 @@ UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS = {
     "prowess",
     "toxic",
     "sacrifice",
-    "mountainwalk",
     "banding",
 }
 
@@ -966,6 +983,16 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
         token_data["token_flying"] = True
     if "haste" in token_keywords:
         token_data["token_haste"] = True
+    landwalk_types = [
+        land_type
+        for keyword, land_type in TOKEN_BASIC_LANDWALK_KEYWORDS.items()
+        if keyword in token_keywords
+    ]
+    if landwalk_types:
+        token_data["token_landwalk"] = True
+        token_data["token_landwalk_land_types"] = landwalk_types
+        if len(landwalk_types) == 1:
+            token_data["token_landwalk_land_type"] = landwalk_types[0]
     if artifact:
         token_data["artifact_tokens"] = True
     return token_data, None
@@ -15605,6 +15632,9 @@ def split_row(
             "token_keywords": "etb_token_keywords",
             "token_flying": "etb_token_flying",
             "token_haste": "etb_token_haste",
+            "token_landwalk": "etb_token_landwalk",
+            "token_landwalk_land_type": "etb_token_landwalk_land_type",
+            "token_landwalk_land_types": "etb_token_landwalk_land_types",
             "artifact_tokens": "etb_artifact_tokens",
         }
         for source_key, target_key in optional_token_fields.items():
@@ -15655,6 +15685,9 @@ def split_row(
             "token_keywords": "dies_token_keywords",
             "token_flying": "dies_token_flying",
             "token_haste": "dies_token_haste",
+            "token_landwalk": "dies_token_landwalk",
+            "token_landwalk_land_type": "dies_token_landwalk_land_type",
+            "token_landwalk_land_types": "dies_token_landwalk_land_types",
             "artifact_tokens": "dies_artifact_tokens",
         }
         for source_key, target_key in optional_token_fields.items():

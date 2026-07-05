@@ -1,0 +1,38 @@
+{
+  "effect": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "R"
+    ],
+    "token_count": 3,
+    "token_description": "1/1 red Goblin Scout creature tokens with mountainwalk",
+    "token_keywords": [
+      "mountainwalk"
+    ],
+    "token_landwalk": true,
+    "token_landwalk_land_type": "mountain",
+    "token_landwalk_land_types": [
+      "mountain"
+    ],
+    "token_name": "Goblin Scout Token",
+    "token_power": 1,
+    "token_subtype": "Goblin Scout",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "GoblinScoutsToken"
+  },
+  "issue_count": 0,
+  "issues": [],
+  "row": {
+    "card_name": "Goblin Scouts",
+    "execution_status": "auto",
+    "logical_rule_key": "battle_rule_v1:3ac463b68b0acd2aba49dae3bbb0eca9",
+    "normalized_name": "goblin scouts",
+    "oracle_hash": "d1109ddc748e9acb0439d5fabdc058c1",
+    "review_status": "verified"
+  },
+  "status": "pass",
+  "validated_card_count": 1
+}

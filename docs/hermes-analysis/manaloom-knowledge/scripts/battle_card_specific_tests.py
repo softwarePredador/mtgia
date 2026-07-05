@@ -10435,6 +10435,59 @@ def register_tests(battle, player):
         assert dies_event["rule_logical_key"] == "battle_rule_v1:pg499_dies_token_test"
         assert dies_event["rule_oracle_hash"] == "pg499-dies-token-hash"
 
+    def test_pg501_token_landwalk_is_unblockable_against_matching_basic_land():
+        active = player("Active")
+        opponent = player("Opponent")
+        opponent.life = 1
+        opponent.battlefield = [
+            {"name": "Basic Mountain", "effect": "land", "type_line": "Basic Land - Mountain"},
+            {"name": "Ground Blocker", "effect": "creature", "type_line": "Creature - Bear", "power": 2, "toughness": 2},
+        ]
+        effect_data = {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+            "ability_kind": "one_shot",
+            "token_count": 1,
+            "token_name": "Goblin Scout Token",
+            "token_subtype": "Goblin Scout",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_colors": ["R"],
+            "token_keywords": ["mountainwalk"],
+            "token_landwalk": True,
+            "token_landwalk_land_type": "mountain",
+            "token_landwalk_land_types": ["mountain"],
+            "_rule_logical_key": "battle_rule_v1:pg501-token-landwalk",
+            "_rule_oracle_hash": "pg501-token-landwalk-hash",
+        }
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Goblin Scouts", "type_line": "Sorcery"},
+            501,
+            random.Random(501),
+            effect_data_override=effect_data,
+        )
+
+        token = next(card for card in active.battlefield if card.get("name") == "Goblin Scout Token")
+        assert token.get("landwalk") is True
+        assert token.get("landwalk_land_type") == "mountain"
+        assert token.get("landwalk_land_types") == ["mountain"]
+        assert "mountainwalk" in token.get("keywords", [])
+        assignments = battle.declare_blockers_step(opponent, [token], 501, random.Random(501))
+        assert assignments == [(token, [])]
+
+        opponent_without_mountain = player("Opponent Without Mountain")
+        opponent_without_mountain.life = 1
+        blocker = {"name": "Ground Blocker", "effect": "creature", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        opponent_without_mountain.battlefield = [
+            {"name": "Basic Island", "effect": "land", "type_line": "Basic Land - Island"},
+            blocker,
+        ]
+        assignments = battle.declare_blockers_step(opponent_without_mountain, [token], 502, random.Random(502))
+        assert assignments == [(token, [blocker])]
+
     def test_reckless_endeavor_damage_wipe_creates_treasures():
         active = player("Active")
         opponent = player("Opponent")
@@ -23137,6 +23190,7 @@ def register_tests(battle, player):
         test_prized_statue_enters_and_dies_create_treasures,
         test_impulsive_pilferer_dies_create_treasure,
         test_pg499_dies_token_maker_creates_keyworded_tokens,
+        test_pg501_token_landwalk_is_unblockable_against_matching_basic_land,
         test_electroduplicate_creates_hasty_copy_and_sacrifices_at_end_step,
         test_heat_shimmer_copies_any_creature_and_exiles_token_at_end_step,
         test_twinflame_copies_own_creature_only_and_exiles_token_at_end_step,

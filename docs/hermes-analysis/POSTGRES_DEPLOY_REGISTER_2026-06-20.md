@@ -14575,3 +14575,76 @@ Register decision:
   through `xmage_creature_etb_destroy_target_v1`.
 - The remaining targeted-destroy backlog must continue as exact subpatterns,
   not as a generic all-destroy promotion.
+
+## 2026-07-05 - PG501 Token Basic Landwalk New Server
+
+Status: applied on the new PostgreSQL target and synced to Hermes SQLite.
+
+Scope:
+
+- Deploy id: `xmage_pg501_token_basic_landwalk_new_server`.
+- Runtime family: `xmage_fixed_create_creature_tokens_spell_v1`.
+- XMage source signature:
+  `CreateTokenEffect` with `GoblinScoutsToken`.
+- Promoted cards: `1`.
+- Promoted card name: `Goblin Scouts`.
+- Only fixed basic landwalk token metadata is allowed in this batch.
+  Changeling, defender, shroud, conditional token text, dynamic token counts,
+  copied text, custom ability text, and unsupported token ability semantics
+  remain blocked for separate runtime families.
+
+Package files:
+
+- Package:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_package.md`.
+- Precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_precheck.sql`.
+- Apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_apply.sql`.
+- Postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_postcheck.sql`.
+- Rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_rollback.sql`.
+- Manifest:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_manifest.json`.
+
+Execution evidence:
+
+- Apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_apply_evidence.md`.
+- Precheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_precheck.out`;
+  1 canonical `Goblin Scouts` row matched, with 2 old rows identified for
+  deprecation.
+- Apply:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_apply.out`;
+  `deprecated_shadow_rows=2`, `upserted_rows=1`, `COMMIT`.
+- Postcheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_postcheck.out`;
+  `promoted_rule_rows=1`, `promoted_verified_auto_rows=1`,
+  `promoted_oracle_hash_rows=1`, and `backup_rows=2`.
+- PG -> Hermes sync:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_pg_to_sqlite_sync.json`;
+  `pg_rows_loaded=8425`, `sqlite_inserted_or_updated=8189`,
+  `canonical_snapshot_rows_exported=5952`.
+- SQLite validation:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_sqlite_validation.json`;
+  `status=pass`, `validated_card_count=1`, `issue_count=0`.
+- Contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg501_token_basic_landwalk_new_server.md`;
+  `51/51` checks passed.
+- Post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg501_token_basic_landwalk_new_server_commander_legal.json`;
+  `xmage_authoritative_adapter_required_count=25752`.
+- Post-sync exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg501_token_basic_landwalk_new_server_final_recheck.json`;
+  `proposal_count=0`, `safe_for_batch_pg_package_count=0`.
+
+Register decision:
+
+- PG501 is applied and should not be rebuilt.
+- Fixed token creation with basic landwalk metadata is executable through
+  `xmage_fixed_create_creature_tokens_spell_v1` and the existing combat
+  `landwalk_land_types` blocker legality path.
+- The remaining token keyword backlog must continue as exact subpatterns, not
+  as a generic token-keyword promotion.

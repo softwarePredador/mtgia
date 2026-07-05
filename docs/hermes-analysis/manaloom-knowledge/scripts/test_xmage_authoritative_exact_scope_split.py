@@ -2281,6 +2281,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["token_toughness"], 5)
         self.assertEqual(effect["token_keywords"], ["trample"])
 
+    def test_fixed_create_creature_tokens_spell_maps_basic_landwalk_token_keyword(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Goblin Scouts",
+                type_line="Sorcery",
+                oracle_text="Create three 1/1 red Goblin Scout creature tokens with mountainwalk.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new GoblinScoutsToken(), 3));
+                class GoblinScoutsToken extends TokenImpl {
+                    public GoblinScoutsToken() {
+                        super("Goblin Scout Token", "1/1 red Goblin Scout creature tokens with mountainwalk");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.GOBLIN);
+                        subtype.add(SubType.SCOUT);
+                        color.setRed(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        this.addAbility(new MountainwalkAbility());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_count"], 3)
+        self.assertEqual(effect["token_keywords"], ["mountainwalk"])
+        self.assertTrue(effect["token_landwalk"])
+        self.assertEqual(effect["token_landwalk_land_type"], "mountain")
+        self.assertEqual(effect["token_landwalk_land_types"], ["mountain"])
+
     def test_fixed_create_creature_tokens_spell_still_blocks_unsupported_token_keyword(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(

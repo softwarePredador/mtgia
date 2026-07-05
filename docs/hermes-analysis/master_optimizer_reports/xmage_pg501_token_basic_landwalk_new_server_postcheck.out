@@ -1,0 +1,4 @@
+   card_name   | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+---------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Goblin Scouts | goblin scouts   | battle_rule_v1:3ac463b68b0acd2aba49dae3bbb0eca9 |                  1 |                           1 |                         1 |           2
+(1 row)

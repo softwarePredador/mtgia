@@ -1,0 +1,4 @@
+manifest=docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_manifest.json
+package=docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_package.md
+selected_count=1
+mutations_performed=[]

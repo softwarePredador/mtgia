@@ -17948,6 +17948,11 @@ def resolve_generic_permanent_etb(
                 haste=bool(effect_data.get("etb_token_haste")),
                 flying=bool(effect_data.get("etb_token_flying")),
                 keywords=list(effect_data.get("etb_token_keywords") or []),
+                landwalk_land_types=(
+                    effect_data.get("etb_token_landwalk_land_types")
+                    or effect_data.get("etb_token_landwalk_land_type")
+                    or []
+                ),
                 artifact=bool(effect_data.get("etb_artifact_tokens")),
                 subtype=effect_data.get("etb_token_subtype"),
                 colors=list(effect_data.get("etb_token_colors") or []),
@@ -18764,6 +18769,9 @@ def resolve_permanent_dies_token_maker(
         "dies_token_keywords": "token_keywords",
         "dies_token_flying": "token_flying",
         "dies_token_haste": "token_haste",
+        "dies_token_landwalk": "token_landwalk",
+        "dies_token_landwalk_land_type": "token_landwalk_land_type",
+        "dies_token_landwalk_land_types": "token_landwalk_land_types",
         "dies_artifact_tokens": "artifact_tokens",
     }
     for dies_key, token_key in dies_field_map.items():
@@ -37700,6 +37708,7 @@ def create_creature_token(
     haste=False,
     flying=False,
     keywords=None,
+    landwalk_land_types=None,
     artifact=False,
     subtype=None,
     colors=None,
@@ -37740,6 +37749,19 @@ def create_creature_token(
                 token[normalized_keyword] = True
     if "prowess" in token_keywords:
         token["prowess"] = True
+    normalized_landwalk_types = []
+    raw_landwalk_types = landwalk_land_types or []
+    if isinstance(raw_landwalk_types, str):
+        raw_landwalk_types = [raw_landwalk_types]
+    for value in raw_landwalk_types:
+        land_type = str(value or "").strip().lower()
+        if land_type in {"plains", "island", "swamp", "mountain", "forest"}:
+            normalized_landwalk_types.append(land_type)
+    if normalized_landwalk_types:
+        token["landwalk"] = True
+        token["landwalk_land_types"] = list(dict.fromkeys(normalized_landwalk_types))
+        if len(token["landwalk_land_types"]) == 1:
+            token["landwalk_land_type"] = token["landwalk_land_types"][0]
     token = prepare_entering_permanent(
         token,
         controller=player,
@@ -38045,6 +38067,11 @@ def create_creature_tokens_from_effect(
     token_haste = bool((effect_data or {}).get("token_haste") or (effect_data or {}).get("haste"))
     token_flying = bool((effect_data or {}).get("token_flying") or (effect_data or {}).get("flying"))
     token_keywords = list((effect_data or {}).get("token_keywords") or [])
+    token_landwalk_land_types = (
+        (effect_data or {}).get("token_landwalk_land_types")
+        or (effect_data or {}).get("token_landwalk_land_type")
+        or []
+    )
     if (effect_data or {}).get("token_prowess") and "prowess" not in token_keywords:
         token_keywords.append("prowess")
     artifact_tokens = bool((effect_data or {}).get("artifact_tokens"))
@@ -38074,6 +38101,7 @@ def create_creature_tokens_from_effect(
                     haste=token_haste,
                     flying=token_flying,
                     keywords=token_keywords,
+                    landwalk_land_types=token_landwalk_land_types,
                     artifact=artifact_tokens,
                     subtype=token_subtype,
                     colors=token_colors,
@@ -38110,6 +38138,7 @@ def create_creature_tokens_from_effect(
             haste=token_haste,
             flying=token_flying,
             keywords=token_keywords,
+            landwalk_land_types=token_landwalk_land_types,
             artifact=artifact_tokens,
             subtype=token_subtype,
             colors=token_colors,

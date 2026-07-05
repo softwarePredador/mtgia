@@ -1,0 +1,75 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.xmage_pg501_token_basic_landwalk_new_ser_20260705_105116",
+  "deploy_id": "xmage_pg501_token_basic_landwalk_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Goblin Scouts",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3ac463b68b0acd2aba49dae3bbb0eca9",
+      "min_rule_version": 2,
+      "normalized_name": "goblin scouts",
+      "oracle_hash": "d1109ddc748e9acb0439d5fabdc058c1",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "xmage_effect_class": "CreateTokenEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_create_creature_tokens_spell": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/xmage_pg501_token_basic_landwalk_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-05T10:51:16+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Goblin Scouts"
+      },
+      "card_name": "Goblin Scouts",
+      "effect": "token_maker",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3ac463b68b0acd2aba49dae3bbb0eca9",
+      "normalized_name": "goblin scouts",
+      "required_effect_fields": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+        "effect": "token_maker",
+        "xmage_effect_class": "CreateTokenEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Goblin Scouts"
+  ],
+  "selected_count": 1,
+  "slug": "xmage_pg501_token_basic_landwalk_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Goblin Scouts",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3ac463b68b0acd2aba49dae3bbb0eca9",
+      "min_rule_version": 2,
+      "normalized_name": "goblin scouts",
+      "oracle_hash": "d1109ddc748e9acb0439d5fabdc058c1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

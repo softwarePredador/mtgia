@@ -1,0 +1,4 @@
+   card_name   | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+---------------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Goblin Scouts | goblin scouts   | d1109ddc748e9acb0439d5fabdc058c1 | battle_rule_v1:3ac463b68b0acd2aba49dae3bbb0eca9 | deprecate_nonmatching_rows |                1 | d65142d0-66eb-48e1-898a-64efeae69be7 |                  2 |                         0 |                           2
+(1 row)
