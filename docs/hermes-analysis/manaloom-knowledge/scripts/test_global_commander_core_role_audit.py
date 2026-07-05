@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+"""Tests for global Commander core role audit."""
+
+from __future__ import annotations
+
+import sqlite3
+import unittest
+from pathlib import Path
+
+import global_commander_core_role_audit as audit
+
+
+class GlobalCommanderCoreRoleAuditTests(unittest.TestCase):
+    def test_card_roles_use_tags_and_text_without_losing_multi_role(self) -> None:
+        row = {
+            "functional_tag": "ramp",
+            "functional_tags_json": '["ramp", "engine"]',
+            "type_line": "Artifact",
+            "oracle_text": "Whenever you cast an instant or sorcery spell, draw a card.",
+        }
+
+        roles, source = audit.card_roles(row)
+
+        self.assertEqual(source, "tag_plus_text")
+        self.assertIn("ramp", roles)
+        self.assertIn("engine", roles)
+        self.assertIn("draw", roles)
+
+    def test_oracle_text_infers_roles_for_untagged_lab_cards(self) -> None:
+        row = {
+            "functional_tag": "",
+            "functional_tags_json": "[]",
+            "type_line": "Instant",
+            "oracle_text": "Counter target spell. Draw a card.",
+        }
+
+        roles, source = audit.card_roles(row)
+
+        self.assertEqual(source, "text_inferred")
+        self.assertEqual(roles, {"draw", "removal"})
+
+    def test_lands_that_tap_for_mana_do_not_count_as_ramp(self) -> None:
+        row = {
+            "functional_tag": "",
+            "functional_tags_json": "[]",
+            "type_line": "Land",
+            "oracle_text": "{T}: Add one mana of any color in your commander's color identity.",
+        }
+
+        roles, source = audit.card_roles(row)
+
+        self.assertEqual(source, "text_inferred")
+        self.assertEqual(roles, {"land"})
+
+    def test_numeric_damage_to_each_infers_board_wipe(self) -> None:
+        row = {
+            "functional_tag": "",
+            "functional_tags_json": "[]",
+            "type_line": "Sorcery",
+            "oracle_text": "This spell deals 3 damage to each creature.",
+        }
+
+        roles, source = audit.card_roles(row)
+
+        self.assertEqual(source, "text_inferred")
+        self.assertIn("board_wipe", roles)
+
+    def test_build_report_marks_role_data_incomplete_before_strategy_matrix(self) -> None:
+        card_rows = []
+        for index in range(35):
+            card_rows.append(
+                {
+                    "deck_id": "607",
+                    "card_name": f"Land {index}",
+                    "quantity": 1,
+                    "functional_tag": "land",
+                    "functional_tags_json": '["land"]',
+                    "type_line": "Land",
+                    "oracle_text": "{T}: Add {R}.",
+                }
+            )
+        for index in range(50):
+            card_rows.append(
+                {
+                    "deck_id": "607",
+                    "card_name": f"Unknown {index}",
+                    "quantity": 1,
+                    "functional_tag": "",
+                    "functional_tags_json": "[]",
+                    "type_line": "Artifact",
+                    "oracle_text": "",
+                }
+            )
+        for index in range(15):
+            card_rows.append(
+                {
+                    "deck_id": "607",
+                    "card_name": f"Draw {index}",
+                    "quantity": 1,
+                    "functional_tag": "draw",
+                    "functional_tags_json": '["draw"]',
+                    "type_line": "Sorcery",
+                    "oracle_text": "Draw a card.",
+                }
+            )
+
+        role_by_deck = audit.role_counts_by_deck(card_rows)
+        counts = role_by_deck["607"]["role_counts"]
+        role_rows = [audit.band_status(role, int(counts.get(role) or 0)) for role in audit.ROLE_ORDER]
+        status = audit.deck_core_status(
+            shape_status="structure_ready",
+            total_cards=100,
+            role_rows=role_rows,
+            unknown_count=int(counts["unknown"]),
+        )
+
+        self.assertEqual(status, "role_data_incomplete")
+        self.assertEqual(counts["unknown"], 50)
+
+    def test_sqlite_report_routes_core_gap(self) -> None:
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        conn.execute("CREATE TABLE decks (id INTEGER PRIMARY KEY, deck_name TEXT, archetype TEXT)")
+        conn.execute(
+            """
+            CREATE TABLE deck_cards (
+              deck_id INTEGER,
+              card_name TEXT,
+              quantity INTEGER,
+              functional_tag TEXT,
+              functional_tags_json TEXT,
+              type_line TEXT,
+              oracle_text TEXT,
+              is_commander INTEGER DEFAULT 0
+            )
+            """
+        )
+        conn.execute("INSERT INTO decks (id, deck_name, archetype) VALUES (607, 'VARIANT Lorehold', 'spells')")
+        rows = []
+        rows.append((607, "Lorehold, the Historian", 1, "engine", '["engine"]', "Legendary Creature", "Whenever you cast.", 1))
+        for index in range(34):
+            rows.append((607, f"Land {index}", 1, "land", '["land"]', "Land", "{T}: Add {R}.", 0))
+        for index in range(65):
+            rows.append((607, f"Ramp {index}", 1, "ramp", '["ramp"]', "Artifact", "{T}: Add one mana.", 0))
+        conn.executemany(
+            """
+            INSERT INTO deck_cards (
+              deck_id, card_name, quantity, functional_tag, functional_tags_json,
+              type_line, oracle_text, is_commander
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            rows,
+        )
+
+        role_by_deck = audit.role_counts_by_deck(audit.load_role_rows(conn))
+        counts = role_by_deck["607"]["role_counts"]
+        role_rows = [audit.band_status(role, int(counts.get(role) or 0)) for role in audit.ROLE_ORDER]
+        status = audit.deck_core_status(
+            shape_status="structure_ready",
+            total_cards=100,
+            role_rows=role_rows,
+            unknown_count=int(counts["unknown"]),
+        )
+
+        self.assertEqual(status, "core_role_gap")
+        self.assertIn("repair_core_role_floor", audit.next_gate(status))
+        conn.close()
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -26,6 +26,7 @@ ARTIFACT_CONTRACT_AUDIT = SCRIPT_DIR / "lorehold_artifact_contract_audit.py"
 PROMOTION_DECISION_AUDIT = SCRIPT_DIR / "lorehold_promotion_gate_decision_audit.py"
 GLOBAL_COMMANDER_AUDIT = SCRIPT_DIR / "global_commander_deck_contract_audit.py"
 GLOBAL_COMMANDER_MATRIX = SCRIPT_DIR / "global_commander_strategy_matrix.py"
+GLOBAL_COMMANDER_CORE_ROLE_AUDIT = SCRIPT_DIR / "global_commander_core_role_audit.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -55,6 +56,10 @@ GLOBAL_COMMANDER_REPORT = (
 GLOBAL_COMMANDER_MATRIX_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260701_current.md"
+)
+GLOBAL_COMMANDER_CORE_ROLE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -119,6 +124,8 @@ def build_audit() -> dict[str, Any]:
                 "benchmark/regression deck",
                 "global_commander_deck_contract_audit.py",
                 "global_commander_strategy_matrix.py",
+                "global_commander_core_role_audit.py",
+                "global_commander_core_role_audit_20260705_global_goal_hermes_only.md",
             ],
         )
     )
@@ -302,6 +309,18 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CORE_ROLE_AUDIT,
+            [
+                "global_commander_core_role_audit",
+                "CORE_ROLE_BANDS",
+                "structured_tags_first_then_oracle_text_diagnostic_fallback",
+                "benchmark_regression_only_not_global_template",
+                "battle_or_optimization_performed",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -315,6 +334,14 @@ def build_audit() -> dict[str, Any]:
             "exists": GLOBAL_COMMANDER_MATRIX_REPORT.exists(),
             "status": "pass" if GLOBAL_COMMANDER_MATRIX_REPORT.exists() else "fail",
             "missing": [] if GLOBAL_COMMANDER_MATRIX_REPORT.exists() else ["global_commander_matrix_report"],
+        }
+    )
+    checks.append(
+        {
+            "path": rel(GLOBAL_COMMANDER_CORE_ROLE_REPORT),
+            "exists": GLOBAL_COMMANDER_CORE_ROLE_REPORT.exists(),
+            "status": "pass" if GLOBAL_COMMANDER_CORE_ROLE_REPORT.exists() else "fail",
+            "missing": [] if GLOBAL_COMMANDER_CORE_ROLE_REPORT.exists() else ["global_commander_core_role_report"],
         }
     )
 

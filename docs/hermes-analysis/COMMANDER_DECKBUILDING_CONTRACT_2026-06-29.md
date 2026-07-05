@@ -155,9 +155,10 @@ Operational priority after this pivot:
 2. classify each deck by product truth, registered variant, Hermes lab, or
    fixture before using it in any promotion decision;
 3. require commander-specific profile/source lanes before strategy matrices;
-4. use role/core diagnostics for mana, curve, ramp, draw, removal, wipes,
-   protection, recursion, win plans, staples, and same-lane cuts across all
-   commanders;
+4. run `global_commander_core_role_audit.py` for role/core diagnostics over
+   mana, curve, ramp, draw, removal, wipes, protection, recursion, win plans,
+   staples, and same-lane cuts across all commanders before commander-specific
+   matrices or battle gates;
 5. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
@@ -167,6 +168,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260705_global_core_pivot.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260705_global_core_pivot_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260705_global_core_pivot_hermes_only.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.md`
 
 The Hermes-only matrix is allowed as a local degraded diagnostic when PostgreSQL
 credentials are unavailable. It must report source lanes as unavailable and route

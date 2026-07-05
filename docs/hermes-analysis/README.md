@@ -204,6 +204,10 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     e `master_optimizer_reports/global_commander_strategy_matrix_20260705_global_core_pivot_hermes_only.md`.
     Esses relatorios validam Hermes/lab, mas source lanes ficam indisponiveis;
     portanto nao substituem a matriz com PostgreSQL para readiness de produto.
+    Para diagnostico global de papeis/core antes da matriz estrategica, rode
+    `manaloom-knowledge/scripts/global_commander_core_role_audit.py`; evidencia
+    local atual:
+    `master_optimizer_reports/global_commander_core_role_audit_20260705_global_goal_hermes_only.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em
