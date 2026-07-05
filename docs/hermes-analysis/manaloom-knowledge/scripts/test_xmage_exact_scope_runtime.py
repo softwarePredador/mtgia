@@ -5381,6 +5381,55 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_destroy_target_create_treasure_gives_treasures_to_spell_controller(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Target Knight",
+            "type_line": "Creature - Knight",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+        }
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_create_treasure_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "graveyard",
+            "treasure_count": 2,
+            "controller_treasure_tokens": 2,
+            "treasure_recipient": "controller",
+            "treasure_trigger": "on_resolution_after_destroy",
+            "declared_targets": [{"target": target, "controller": opponent}],
+        }
+
+        resolved = self.battle.resolve_declared_single_removal(
+            active,
+            [opponent],
+            {"name": "Contract Killing", "type_line": "Sorcery"},
+            effect,
+            turn=4,
+            rng=random.Random(45),
+        )
+
+        self.assertTrue(resolved)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertEqual(active.treasures, 2)
+        self.assertEqual(opponent.treasures, 0)
+        self.assertTrue(
+            any(
+                event == "treasure_created"
+                and data.get("card") == "Contract Killing"
+                and data.get("trigger") == "post_removal"
+                and data.get("treasures_created") == 2
+                and data.get("treasure_recipient") == "controller"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_spell_without_required_sacrifice_land_does_not_damage(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

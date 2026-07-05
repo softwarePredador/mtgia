@@ -118,6 +118,10 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "token_mana_activation_requires_sacrifice",
     "token_mana_activation_requires_tap",
     "token_mana_produced",
+    "treasure_count",
+    "controller_treasure_tokens",
+    "treasure_recipient",
+    "treasure_trigger",
     "token_produces",
     "token_produced_mana_symbols",
     "artifact_tokens",
@@ -911,10 +915,64 @@ def aura_static_pt_execution_scenario_from_expected_rule(rule: dict[str, Any]) -
     }
 
 
+def destroy_target_create_treasure_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_destroy_target_create_treasure_spell_v1":
+        return None
+    target_type = str(required.get("target") or "permanent").lower()
+    if target_type == "artifact_or_enchantment":
+        target = {
+            "name": f"E2E Artifact Target for {rule['card_name']}",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "cmc": 2,
+        }
+    elif target_type == "creature_or_planeswalker":
+        target = {
+            "name": f"E2E Creature Target for {rule['card_name']}",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+            "cmc": 3,
+        }
+    elif target_type == "creature":
+        target = {
+            "name": f"E2E Creature Target for {rule['card_name']}",
+            "type_line": "Creature - Soldier",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "cmc": 2,
+        }
+    else:
+        target = {
+            "name": f"E2E Permanent Target for {rule['card_name']}",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "cmc": 2,
+        }
+    return {
+        "name": f"{rule['card_name']} destroys target and creates Treasure",
+        "type": "destroy_target_create_treasure",
+        "card": {"name": rule["card_name"]},
+        "target": target,
+        "expected_treasure_count": int(
+            required.get("controller_treasure_tokens")
+            or required.get("treasure_count")
+            or 1
+        ),
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any] | None:
     return (
         static_global_pt_execution_scenario_from_expected_rule(rule)
         or aura_static_pt_execution_scenario_from_expected_rule(rule)
+        or destroy_target_create_treasure_execution_scenario_from_expected_rule(rule)
     )
 
 

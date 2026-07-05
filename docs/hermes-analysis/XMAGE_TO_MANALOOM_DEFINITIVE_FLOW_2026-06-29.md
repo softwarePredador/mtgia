@@ -14325,6 +14325,74 @@ modifiers, Aura rows with auxiliary non-static abilities, Umbra/Cycling/Escape
 style packages, unsupported target restrictions, or source/Oracle mismatches
 still blocked by `aura_static_pt_*` reasons.
 
+## 2026-07-05 PG533 Destroy Target Create Treasure Checkpoint
+
+Applied package: `PG533 destroy_treasure_new_server`.
+
+Closed family:
+
+- `3` exact one-shot destroy-target plus controller Treasure creation rows from
+  XMage `DestroyTargetEffect + CreateTokenEffect(new TreasureToken(), N?)`.
+
+Promoted cards:
+
+- `Contract Killing`
+- `Crack Open`
+- `Grim Bounty`
+
+Runtime scope:
+
+- `xmage_destroy_target_create_treasure_spell_v1`
+
+Supported exact forms:
+
+- destroy target creature and create a fixed number of Treasure tokens for the
+  spell controller;
+- destroy target artifact or enchantment and create a fixed number of Treasure
+  tokens for the spell controller;
+- destroy target creature or planeswalker and create a fixed number of Treasure
+  tokens for the spell controller.
+
+Evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_pg533_destroy_treasure_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg533_destroy_treasure_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg533_destroy_treasure_new_server_apply_evidence.md`
+- PostgreSQL -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg533_destroy_treasure_new_server_pg_to_sqlite_sync.json`
+- battle package E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg533_destroy_treasure_new_server_e2e_validation.md`
+- authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260705_post_pg533_destroy_treasure_new_server_commander_legal.md`
+- global readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260705_post_pg533_destroy_treasure_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260705_post_pg533_destroy_treasure_new_server_recheck.md`
+- final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260705_post_pg533_destroy_treasure_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260705_post_pg533_destroy_treasure_new_server_final_with_pg.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260705_post_pg533_destroy_treasure_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260705_post_pg533_destroy_treasure_new_server_final.md`
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25829`
+- post-cycle `target_identity_count=25826`
+- post-cycle `xmage_authoritative_source_count=25512`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_adapter_required_count=25512`
+- `treasure_maker::single_treasure_creation_v1` reduced from `35` to `32`
+- final exact-scope recheck `proposal_count=0`
+- final exact-scope recheck `safe_for_batch_pg_package_count=0`
+
+Residual boundary: PG533 does not authorize triggered Treasure makers,
+activated Treasure makers, Treasure plus damage, Treasure plus
+initiative/venture, Treasure plus exile/play, Aura/Equipment Treasure patterns,
+or target-controller compensation tokens.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -12353,6 +12353,38 @@ def create_removal_compensation_tokens(effect_data, target_controller, source_ca
     return created
 
 
+def create_controller_treasures_after_removal(effect_data, controller, source_card, turn):
+    if not isinstance(effect_data, dict) or controller is None:
+        return 0
+    try:
+        treasure_count = int(
+            effect_data.get("controller_treasure_tokens")
+            or effect_data.get("controller_treasure_count")
+            or 0
+        )
+    except Exception:
+        treasure_count = 0
+    if treasure_count <= 0:
+        return 0
+    before = int(getattr(controller, "treasures", 0) or 0)
+    controller.treasures = before + treasure_count
+    emit_replay_event(
+        "treasure_created",
+        player=getattr(controller, "name", None),
+        card=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+        source=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+        trigger="post_removal",
+        treasures_created=treasure_count,
+        treasures_before=before,
+        treasures=controller.treasures,
+        treasures_after=controller.treasures,
+        treasure_recipient="controller",
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return treasure_count
+
+
 def cant_block_runtime_enabled(effect_data):
     if not isinstance(effect_data, dict):
         return False
@@ -13050,6 +13082,7 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
             all_players=players,
         )
         create_removal_compensation_tokens(effect_data, target_controller, card, turn)
+        create_controller_treasures_after_removal(effect_data, player, card, turn)
         resolved.append(decision["target_name"])
 
     emit_replay_event(
@@ -13242,6 +13275,7 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         all_players=players,
     )
     create_removal_compensation_tokens(effect_data, target_controller, card, turn)
+    create_controller_treasures_after_removal(effect_data, player, card, turn)
     return True
 
 
@@ -54089,6 +54123,7 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                         all_players=participants,
                     )
                     create_removal_compensation_tokens(component, opp, card, turn)
+                    create_controller_treasures_after_removal(component, player, card, turn)
                     emit_replay_event(
                         "removal_resolved",
                         player=player.name,
@@ -55776,6 +55811,7 @@ def apply_effect_immediate(
                     all_players=all_players_for_entry,
                 )
                 create_removal_compensation_tokens(effect_data, opp, card, turn)
+                create_controller_treasures_after_removal(effect_data, player, card, turn)
                 break
         finish_resolved_spell(player, card, turn=turn)
     elif effect in ("deal_damage", "direct_damage"):

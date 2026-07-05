@@ -2987,6 +2987,94 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "token_description_keyword_not_supported")
 
+    def test_destroy_target_create_treasure_spell_maps_contract_killing_count(self) -> None:
+        row = queue_row(
+            split.TREASURE_UNIT,
+            effect_classes=["CreateTokenEffect", "DestroyTargetEffect"],
+            xmage_signals=["targeting", "token"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Contract Killing",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Destroy target creature. Create two Treasure tokens. "
+                    "(They're artifacts with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                this.getSpellAbility().addEffect(new DestroyTargetEffect());
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new TreasureToken(), 2));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_CREATE_TREASURE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["treasure_count"], 2)
+        self.assertEqual(effect["controller_treasure_tokens"], 2)
+        self.assertEqual(effect["treasure_recipient"], "controller")
+
+    def test_destroy_target_create_treasure_spell_maps_artifact_or_enchantment(self) -> None:
+        row = queue_row(
+            split.TREASURE_UNIT,
+            effect_classes=["CreateTokenEffect", "DestroyTargetEffect"],
+            xmage_signals=["targeting", "token"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Crack Open",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Destroy target artifact or enchantment. Create a Treasure token. "
+                    "(It's an artifact with \"{T}, Sacrifice this token: Add one mana of any color.\")"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DestroyTargetEffect());
+                this.getSpellAbility().addTarget(
+                    new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new TreasureToken()));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "artifact_or_enchantment")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["artifact", "enchantment"]})
+        self.assertEqual(effect["controller_treasure_tokens"], 1)
+
+    def test_destroy_target_create_treasure_blocks_extra_venture_effect(self) -> None:
+        row = queue_row(
+            split.TREASURE_UNIT,
+            effect_classes=["CreateTokenEffect", "DestroyTargetEffect", "VentureIntoTheDungeonEffect"],
+            xmage_signals=["targeting", "token"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="You Find a Cursed Idol",
+                type_line="Sorcery",
+                oracle_text="Destroy target artifact or enchantment. Create a Treasure token. Venture into the dungeon.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new DestroyTargetEffect());
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new TreasureToken()));
+                this.getSpellAbility().addEffect(new VentureIntoTheDungeonEffect());
+                this.getSpellAbility().addTarget(
+                    new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "destroy_treasure_effect_classes_not_exact")
+
     def test_destroy_with_controller_creature_token_compensation_maps_beast_within(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,

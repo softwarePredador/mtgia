@@ -39,6 +39,7 @@ DRAW_UNIT = "draw_cards::xmage_draw_card_variant_review_v1"
 DRAW_ENGINE_UNIT = "draw_engine::xmage_draw_card_variant_review_v1"
 DAMAGE_UNIT = "direct_damage::targeted_damage_variant_v1"
 DESTROY_UNIT = "removal_destroy::targeted_destroy_variant_v1"
+TREASURE_UNIT = "treasure_maker::single_treasure_creation_v1"
 LIFE_UNIT = "life_gain::xmage_life_gain_variant_review_v1"
 EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
 RAMP_ARTIFACT_UNIT = "ramp_permanent::xmage_artifact_mana_source_variant_review_v1"
@@ -113,6 +114,7 @@ SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
     DESTROY_UNIT,
+    TREASURE_UNIT,
     LIFE_UNIT,
     EXILE_UNIT,
     RAMP_ARTIFACT_UNIT,
@@ -161,6 +163,7 @@ GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
     "xmage_graveyard_simple_activated_self_return_to_battlefield_v1"
 )
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
+DESTROY_CREATE_TREASURE_SCOPE = "xmage_destroy_target_create_treasure_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
 LIFE_GAIN_DRAW_SCOPE = "xmage_fixed_controller_gain_life_draw_card_spell_v1"
 SCRY_SCOPE = "xmage_fixed_scry_spell_v1"
@@ -302,6 +305,7 @@ SPELL_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
     DESTROY_UNIT,
+    TREASURE_UNIT,
     LIFE_UNIT,
     EXILE_UNIT,
     COUNTER_UNIT,
@@ -1622,6 +1626,68 @@ def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | No
     if re.search(r"destroy target permanent\b", text):
         return "remove_permanent", "permanent"
     return None
+
+
+def fixed_treasure_count_word(value: str) -> int | None:
+    word = str(value or "").strip().lower()
+    if word in {"a", "an"}:
+        return 1
+    if word in NUMBER_WORDS:
+        return int(NUMBER_WORDS[word])
+    if word.isdigit():
+        return int(word)
+    return None
+
+
+def destroy_target_create_treasure_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, str, int] | str | None:
+    text = normalized_token_oracle_phrase(oracle_text(metadata))
+    match = re.fullmatch(
+        r"destroy target (?P<target>.+?)\. create (?P<count>a|an|one|two|three|four|five|\d+) "
+        r"treasure tokens?",
+        text,
+    )
+    if not match:
+        return "destroy_treasure_oracle_not_exact"
+    count = fixed_treasure_count_word(match.group("count"))
+    if count is None or count <= 0:
+        return "destroy_treasure_oracle_count_not_fixed_positive"
+    target_phrase = match.group("target").strip()
+    target_map = {
+        "creature": ("remove_creature", "creature"),
+        "artifact or enchantment": ("remove_permanent", "artifact_or_enchantment"),
+        "creature or planeswalker": ("remove_permanent", "creature_or_planeswalker"),
+        "nonland permanent": ("remove_permanent", "nonland_permanent"),
+        "permanent": ("remove_permanent", "permanent"),
+        "artifact": ("remove_permanent", "artifact"),
+        "enchantment": ("remove_permanent", "enchantment"),
+        "land": ("remove_permanent", "land"),
+    }
+    mapped = target_map.get(target_phrase)
+    if mapped is None:
+        return "destroy_treasure_oracle_target_not_supported"
+    effect, target_type = mapped
+    return effect, target_type, count
+
+
+def destroy_target_create_treasure_from_source(source: str) -> int | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "destroy_treasure_additional_cost_not_supported"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return "destroy_treasure_target_pointer_not_supported"
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return "destroy_treasure_source_destroy_not_single"
+    parsed_token = fixed_create_token_effect_from_source(text)
+    if isinstance(parsed_token, dict):
+        return "destroy_treasure_source_token_count_dynamic"
+    if isinstance(parsed_token, str):
+        return parsed_token
+    token_class, token_count = parsed_token
+    if token_class != "TreasureToken":
+        return "destroy_treasure_source_token_not_treasure"
+    return int(token_count)
 
 
 def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
@@ -14911,6 +14977,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature ETB return target permanent to hand trigger"
     elif scope == DESTROY_GAIN_LIFE_SCOPE:
         scope_kind = "fixed destroy-target plus controller life-gain spell"
+    elif scope == DESTROY_CREATE_TREASURE_SCOPE:
+        scope_kind = "fixed destroy-target plus controller Treasure creation spell"
     elif scope == LIFE_GAIN_DRAW_SCOPE:
         scope_kind = "fixed controller life-gain plus draw-card spell"
     elif scope == BOOST_DRAW_SCOPE:
@@ -19170,6 +19238,45 @@ def split_row(
             family_id="xmage_permanent_simple_activated_damage",
         ), "selected_exact_scope"
 
+    if unit == TREASURE_UNIT:
+        if classes != {"CreateTokenEffect", "DestroyTargetEffect"}:
+            return None, "destroy_treasure_effect_classes_not_exact"
+        if ability_classes(row):
+            return None, "destroy_treasure_ability_class_not_simple"
+        oracle_match = destroy_target_create_treasure_from_oracle(metadata)
+        if oracle_match is None:
+            return None, "destroy_treasure_oracle_not_exact"
+        if isinstance(oracle_match, str):
+            return None, oracle_match
+        effect, target_type, oracle_treasure_count = oracle_match
+        source_treasure_count = destroy_target_create_treasure_from_source(source_text)
+        if isinstance(source_treasure_count, str):
+            return None, source_treasure_count
+        if int(source_treasure_count) != int(oracle_treasure_count):
+            return None, "destroy_treasure_source_oracle_count_mismatch"
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "destroy_treasure_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
+        effect_json = {
+            "effect": effect,
+            "battle_model_scope": DESTROY_CREATE_TREASURE_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "graveyard",
+            "treasure_count": int(oracle_treasure_count),
+            "controller_treasure_tokens": int(oracle_treasure_count),
+            "treasure_recipient": "controller",
+            "treasure_trigger": "on_resolution_after_destroy",
+            "xmage_effect_classes": ["DestroyTargetEffect", "CreateTokenEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_destroy_target_create_treasure_spell",
+        ), "selected_exact_scope"
+
     if unit == DESTROY_UNIT and classes == {"CreateTokenControllerTargetEffect", "DestroyTargetEffect"}:
         unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
         if unsupported_abilities:
@@ -22467,6 +22574,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, DiesSourceTriggeredAbility, exact fixed dies-damage Oracle/source agreement, and no auxiliary ability class",
                 "direct_damage::targeted_damage_variant_v1 rows with one-shot DamageTargetEffect whose amount is an exact supported battlefield/hand/domain count, optional fixed base amount, and supported target constraints",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact ETB destroy Oracle/source target constraints",
+                "treasure_maker::single_treasure_creation_v1 rows with one-shot DestroyTargetEffect + CreateTokenEffect(new TreasureToken(), N), exact Oracle target/count agreement, and no auxiliary abilities",
                 "bounce::targeted_return_to_hand_variant_v1 rows with ReturnToHandTargetEffect, EntersBattlefieldTriggeredAbility, exact ETB return-target-to-hand Oracle text, no condition, and no multi-target adjuster",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "add_counters::source_add_counters_variant_v1 rows with AddCountersSourceEffect, SimpleActivatedAbility, exact self-counter Oracle text, and mana/tap source costs only",

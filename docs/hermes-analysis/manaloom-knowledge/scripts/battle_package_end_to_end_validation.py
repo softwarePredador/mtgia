@@ -582,6 +582,67 @@ def run_remove_permanent_basic_land_compensation(
     }
 
 
+def run_destroy_target_create_treasure(
+    battle,
+    scenario: dict[str, Any],
+    events: list[tuple[str, dict[str, Any]]],
+) -> dict[str, Any]:
+    card = scenario["card"]
+    active = battle.Player(str(scenario.get("player") or "Lorehold"), None, [])
+    opponent = battle.Player(str(scenario.get("opponent") or "Opponent"), None, [])
+    target = dict(scenario["target"])
+    opponent.battlefield = [target]
+    before_treasures = int(getattr(active, "treasures", 0) or 0)
+    opponent_before_treasures = int(getattr(opponent, "treasures", 0) or 0)
+    expected_treasure_count = int(scenario.get("expected_treasure_count") or 1)
+
+    battle.apply_effect_immediate(
+        active,
+        [opponent],
+        card,
+        turn=int(scenario.get("turn") or 6),
+        rng=random.Random(int(scenario.get("seed") or 6063)),
+    )
+
+    if target in opponent.battlefield:
+        fail("battle_execution", f"{card['name']} did not remove target {target.get('name')}")
+    if target not in opponent.graveyard:
+        fail("battle_execution", f"{card['name']} did not move target to graveyard")
+    treasure_delta = int(active.treasures or 0) - before_treasures
+    if treasure_delta != expected_treasure_count:
+        fail(
+            "battle_execution",
+            f"{card['name']} treasure delta={treasure_delta}, expected {expected_treasure_count}",
+        )
+    if int(opponent.treasures or 0) != opponent_before_treasures:
+        fail("battle_execution", f"{card['name']} incorrectly gave Treasure to target controller")
+    treasure_event = next(
+        (
+            data
+            for event, data in events
+            if event == "treasure_created"
+            and data.get("card") == card.get("name")
+            and data.get("trigger") == "post_removal"
+        ),
+        None,
+    )
+    if treasure_event is None:
+        fail("battle_events", f"missing {card['name']} post-removal treasure_created event")
+    if int(treasure_event.get("treasures_created") or 0) != expected_treasure_count:
+        fail(
+            "battle_events",
+            f"{card['name']} event treasures_created={treasure_event.get('treasures_created')}",
+        )
+    return {
+        "scenario": scenario.get("name"),
+        "card_name": card["name"],
+        "target": target.get("name"),
+        "treasures_created": treasure_delta,
+        "controller_treasures_after": active.treasures,
+        "target_moved_to_graveyard": target in opponent.graveyard,
+    }
+
+
 def run_conditional_land_play(
     battle,
     scenario: dict[str, Any],
@@ -1607,6 +1668,7 @@ SCENARIO_RUNNERS = {
     "copy_stack_ability_response": run_copy_stack_ability_response,
     "copy_spell_choose_new_targets": run_copy_spell_choose_new_targets,
     "change_single_target_response": run_change_single_target_response,
+    "destroy_target_create_treasure": run_destroy_target_create_treasure,
     "mana_source_life_cost_spend": run_mana_source_life_cost_spend,
     "nonfliers_cant_block_rider": run_nonfliers_cant_block_rider,
     "remove_permanent_basic_land_compensation": run_remove_permanent_basic_land_compensation,
