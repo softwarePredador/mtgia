@@ -363,6 +363,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Mesmo assim `candidate_copy_allowed_now=false`, `battle_gate_allowed_now=false`
     e o proximo gate passa a ser
     `synthesize_commander_payoff_package_before_candidate_copy`.
+    A sintese do pacote de payoffs fica em
+    `manaloom-knowledge/scripts/global_commander_payoff_package_synthesizer.py`
+    com evidencia local
+    `master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md`.
+    Resultado: `commander_payoff_package_synthesis_blocks_candidate_copy`.
+    O modelo usa `Arena of Glory` para cobrir ataque/land, inclui `Despark`,
+    `Anguished Unmaking` e `18` payoffs Angel/Demon/Dragon, mas isso vira `21`
+    adds contra apenas `10` cuts review-only. Como ficam `11` adds sem par e o
+    pacote passa do limite de `8` swaps, `candidate_copy_allowed_now=false`,
+    `battle_gate_allowed_now=false` e o proximo gate e
+    `expand_commander_cut_source_lane_for_full_profile_package`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

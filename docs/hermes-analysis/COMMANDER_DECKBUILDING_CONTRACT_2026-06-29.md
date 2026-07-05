@@ -224,7 +224,12 @@ Operational priority after this pivot:
    rows by commander color identity, Commander legality, creature payoff type,
    current deck membership, and role-confirming text, then keep candidate copy
    and battle closed while routing broad shortfalls to package synthesis;
-19. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+19. run `global_commander_payoff_package_synthesizer.py` after a payoff source
+   lane is expanded; it must synthesize a full-profile package, exploit
+   cross-axis cards such as attack-window lands, pair every add with a reviewed
+   cut, enforce package-size limits, and keep materialization closed when cuts
+   or stage sizing are insufficient;
+20. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
    probes, as regression evidence only unless they produce a named safe cut and
    equal-gate proof under the Lorehold promotion gate.
 
@@ -248,6 +253,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_profile_blocker_repair_plan_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_removal_floor_step5.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -415,6 +421,18 @@ Current external refresh on 2026-07-05:
   `candidate_copy_allowed_now=false`, `battle_gate_allowed_now=false`, and
   `promotion_allowed=false`; the next gate is
   `synthesize_commander_payoff_package_before_candidate_copy`.
+- Current payoff package synthesis is read-only and consumes the expanded ADD
+  lane in
+  `global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md`.
+  The synthesis uses `Arena of Glory` as a cross-axis attack-window/land repair,
+  then adds `Despark`, `Anguished Unmaking`, and `18` Angel/Demon/Dragon
+  payoffs to cover all current profile requirements. That creates `21` required
+  adds but only `10` review-only cuts, leaving `11` unpaired adds and exceeding
+  the materializer review limit of `8` swaps. Therefore the status is
+  `commander_payoff_package_synthesis_blocks_candidate_copy`,
+  blocker `insufficient_reviewable_cuts_for_full_profile_package:required_21_ready_10`,
+  `candidate_copy_allowed_now=false`, `battle_gate_allowed_now=false`, and the
+  next gate is `expand_commander_cut_source_lane_for_full_profile_package`.
 
 ## Global Commander Rollout - 2026-07-01
 

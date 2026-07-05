@@ -57,6 +57,9 @@ GLOBAL_COMMANDER_PROFILE_REPAIR_CANDIDATE_MODEL = (
 GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_EXPANDER = (
     SCRIPT_DIR / "global_commander_payoff_source_lane_expander.py"
 )
+GLOBAL_COMMANDER_PAYOFF_PACKAGE_SYNTHESIZER = (
+    SCRIPT_DIR / "global_commander_payoff_package_synthesizer.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -146,6 +149,10 @@ GLOBAL_COMMANDER_PROFILE_REPAIR_CANDIDATE_REPORT = (
 GLOBAL_COMMANDER_PAYOFF_SOURCE_LANE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5.md"
+)
+GLOBAL_COMMANDER_PAYOFF_PACKAGE_SYNTHESIS_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -341,6 +348,11 @@ def build_audit() -> dict[str, Any]:
                 "commander_payoff_source_lane_expanded",
                 "ready_candidates_cover_shortfall=true",
                 "synthesize_commander_payoff_package_before_candidate_copy",
+                "global_commander_payoff_package_synthesizer.py",
+                "global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md",
+                "commander_payoff_package_synthesis_blocks_candidate_copy",
+                "insufficient_reviewable_cuts_for_full_profile_package",
+                "expand_commander_cut_source_lane_for_full_profile_package",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -535,6 +547,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5.md",
                 "commander_payoff_source_lane_expanded",
                 "synthesize_commander_payoff_package_before_candidate_copy",
+                "global_commander_payoff_package_synthesizer.py",
+                "global_commander_payoff_package_synthesizer_20260705_kaalia_removal_floor_step5.md",
+                "commander_payoff_package_synthesis_blocks_candidate_copy",
+                "expand_commander_cut_source_lane_for_full_profile_package",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -849,6 +865,24 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PAYOFF_PACKAGE_SYNTHESIZER,
+            [
+                "global_commander_payoff_package_synthesizer",
+                "commander_payoff_package_synthesis_blocks_candidate_copy",
+                "commander_payoff_package_synthesis_ready_for_candidate_copy",
+                "review_only_synthesized_package_add",
+                "review_only_synthesized_package_cut",
+                "insufficient_reviewable_cuts_for_full_profile_package",
+                "package_size_exceeds_materializer_review_limit",
+                "materialize_synthesized_commander_package_chain_copy",
+                "expand_commander_cut_source_lane_for_full_profile_package",
+                "battle_or_optimization_performed",
+                "mutation_allowed",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
@@ -1005,6 +1039,27 @@ def build_audit() -> dict[str, Any]:
                 "Ancient Copper Dragon",
                 "Hellkite Charger",
                 "Avacyn, Angel of Hope",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_PAYOFF_PACKAGE_SYNTHESIS_REPORT,
+            [
+                "Global Commander Payoff Package Synthesizer",
+                "commander_payoff_package_synthesis_blocks_candidate_copy",
+                "selected_add_count: `21`",
+                "selected_cut_count: `10`",
+                "unpaired_add_count: `11`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "insufficient_reviewable_cuts_for_full_profile_package:required_21_ready_10",
+                "package_size_exceeds_materializer_review_limit:required_21_limit_8",
+                "expand_commander_cut_source_lane_for_full_profile_package",
+                "Arena of Glory",
+                "Despark",
+                "Balefire Dragon",
             ],
         )
     )

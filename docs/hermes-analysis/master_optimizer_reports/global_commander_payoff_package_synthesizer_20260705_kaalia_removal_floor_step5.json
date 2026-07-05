@@ -1,0 +1,1597 @@
+{
+  "artifact_type": "global_commander_payoff_package_synthesizer",
+  "battle_gate_allowed_now": false,
+  "battle_or_optimization_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "insufficient_reviewable_cuts_for_full_profile_package:required_21_ready_10",
+    "package_size_exceeds_materializer_review_limit:required_21_limit_8"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-05T20:08:44.523155+00:00",
+  "input_artifacts": {
+    "payoff_source_lane_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_payoff_source_lane_expander_20260705_kaalia_removal_floor_step5.json",
+    "repair_candidate_model_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_profile_repair_candidate_model_20260705_kaalia_removal_floor_step5.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "battle_boundary": "Battle and promotion remain closed until candidate copy, strategy matrix, and replay gates pass.",
+    "cut_boundary": "Every add needs a reviewed cut before candidate-copy materialization.",
+    "package_boundary": "A synthesized package is planning evidence, not a deck mutation.",
+    "size_boundary": "Packages over 8 swaps must be split or re-sourced before materialization."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "remaining_cut_review_pool": [],
+  "selected_add_package": [
+    {
+      "axis": "commander_attack_window",
+      "card_name": "Arena of Glory",
+      "cmc": 0.0,
+      "color_identity": [
+        "R"
+      ],
+      "color_identity_allowed": true,
+      "commander_legality": "legal",
+      "covered_axes": [
+        "commander_attack_window",
+        "lands"
+      ],
+      "fit_reasons": [
+        "commander_reference_profile_expected_package",
+        "profile_expected_package",
+        "role_confirms_attack_window_support",
+        "also_land_slot_candidate",
+        "haste_text"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "haste_protection_silence",
+        "lands"
+      ],
+      "score": 135,
+      "selected_for_axis": "commander_attack_window",
+      "source": "commander_reference_profile_expected_package",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Land"
+    },
+    {
+      "axis": "spot_interaction",
+      "card_name": "Despark",
+      "cmc": 2.0,
+      "color_identity": [
+        "W",
+        "B"
+      ],
+      "color_identity_allowed": true,
+      "commander_legality": "legal",
+      "covered_axes": [
+        "spot_interaction"
+      ],
+      "fit_reasons": [
+        "commander_reference_profile_expected_package",
+        "profile_expected_package",
+        "role_confirms_spot_interaction",
+        "cheap_interaction",
+        "exile_target_answer",
+        "flexible_answer_text"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "score": 142,
+      "selected_for_axis": "spot_interaction",
+      "source": "commander_reference_profile_expected_package",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Instant"
+    },
+    {
+      "axis": "spot_interaction",
+      "card_name": "Anguished Unmaking",
+      "cmc": 3.0,
+      "color_identity": [
+        "W",
+        "B"
+      ],
+      "color_identity_allowed": true,
+      "commander_legality": "legal",
+      "covered_axes": [
+        "spot_interaction"
+      ],
+      "fit_reasons": [
+        "commander_reference_profile_expected_package",
+        "profile_expected_package",
+        "role_confirms_spot_interaction",
+        "exile_target_answer",
+        "flexible_answer_text"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "spot_interaction"
+      ],
+      "score": 130,
+      "selected_for_axis": "spot_interaction",
+      "source": "commander_reference_profile_expected_package",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Instant"
+    },
+    {
+      "card_name": "Balefire Dragon",
+      "cmc": 7.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "profile_expected_package",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_damage_trigger",
+        "life_total_or_damage_multiplier"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "board_wipes_resets",
+        "dedicated_win_conditions"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 127,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "profile_expected_package",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Ancient Copper Dragon",
+      "cmc": 6.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "profile_expected_package",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_damage_trigger",
+        "mana_or_treasure_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 124,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "profile_expected_package",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Elder Dragon"
+    },
+    {
+      "card_name": "Angel of the Ruins",
+      "cmc": 7.0,
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "profile_expected_package",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "etb_value",
+        "tutor_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 124,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "profile_expected_package",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Artifact Creature \u2014 Angel"
+    },
+    {
+      "card_name": "Hoarding Broodlord",
+      "cmc": 8.0,
+      "color_identity": [
+        "B"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "profile_expected_package",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "etb_value",
+        "tutor_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 124,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "profile_expected_package",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Goldlust Triad",
+      "cmc": 5.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_damage_trigger",
+        "attack_trigger",
+        "mana_or_treasure_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 111,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Hellkite Charger",
+      "cmc": 6.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "haste",
+        "attack_trigger",
+        "extra_combat_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 110,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Avacyn, Angel of Hope",
+      "cmc": 8.0,
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "profile_expected_package",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "protection_or_lock_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 108,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "profile_expected_package",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Angel"
+    },
+    {
+      "card_name": "Cavern-Hoard Dragon",
+      "cmc": 9.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "expensive_cheat_target",
+        "evasive_body",
+        "haste",
+        "combat_keywords",
+        "combat_damage_trigger",
+        "mana_or_treasure_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 105,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Goldspan Dragon",
+      "cmc": 5.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "haste",
+        "attack_trigger",
+        "mana_or_treasure_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 103,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Scourge of the Throne",
+      "cmc": 6.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "attack_trigger",
+        "extra_combat_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 103,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Aurelia, the Law Above",
+      "cmc": 5.0,
+      "color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "haste",
+        "attack_trigger",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "board_wipes_resets",
+        "card_draw_selection",
+        "haste_protection_silence"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 102,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Angel"
+    },
+    {
+      "card_name": "Starfield Shepherd",
+      "cmc": 5.0,
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "etb_value",
+        "tutor_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 99,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Angel"
+    },
+    {
+      "card_name": "Dragon Mage",
+      "cmc": 7.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_damage_trigger",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "card_draw_selection"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 98,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon Wizard"
+    },
+    {
+      "card_name": "Bonehoard Dracosaur",
+      "cmc": 5.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_keywords",
+        "mana_or_treasure_payload",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 97,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dinosaur Dragon"
+    },
+    {
+      "card_name": "Drakuseth, Maw of Flames",
+      "cmc": 7.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "attack_trigger",
+        "removal_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "The Balrog of Moria",
+      "cmc": 7.0,
+      "color_identity": [
+        "B",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "haste",
+        "combat_keywords",
+        "mana_or_treasure_payload",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "card_draw_selection",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Avatar Demon"
+    },
+    {
+      "card_name": "Wrathful Red Dragon",
+      "cmc": 5.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "removal_payload",
+        "life_total_or_damage_multiplier"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "dedicated_win_conditions"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Akroma, Angel of Wrath",
+      "cmc": 8.0,
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "haste",
+        "combat_keywords",
+        "protection_or_lock_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 95,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Angel"
+    }
+  ],
+  "selected_cut_package": [
+    {
+      "card_name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+      "classification_source": "text_inferred",
+      "cmc": 3.0,
+      "core_roles": [
+        "draw",
+        "engine",
+        "ramp",
+        "recursion"
+      ],
+      "cut_reasons": [
+        "over_target_card_draw_selection",
+        "over_target_mana_acceleration",
+        "card_flow_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "score": 57,
+      "status": "review_only_synthesized_package_cut"
+    },
+    {
+      "card_name": "Professional Face-Breaker",
+      "classification_source": "text_inferred",
+      "cmc": 3.0,
+      "core_roles": [
+        "draw",
+        "engine",
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_card_draw_selection",
+        "over_target_mana_acceleration",
+        "card_flow_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "score": 57,
+      "status": "review_only_synthesized_package_cut"
+    },
+    {
+      "card_name": "Smuggler's Share",
+      "classification_source": "text_inferred",
+      "cmc": 3.0,
+      "core_roles": [
+        "draw",
+        "engine",
+        "ramp"
+      ],
+      "cut_reasons": [
+        "over_target_card_draw_selection",
+        "over_target_mana_acceleration",
+        "card_flow_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "score": 57,
+      "status": "review_only_synthesized_package_cut"
+    },
+    {
+      "card_name": "Demonic Tutor",
+      "classification_source": "text_inferred",
+      "cmc": 2.0,
+      "core_roles": [
+        "tutor"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "score": 50,
+      "status": "review_only_synthesized_package_cut"
+    },
+    {
+      "card_name": "Diabolic Intent",
+      "classification_source": "text_inferred",
+      "cmc": 2.0,
+      "core_roles": [
+        "tutor"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "score": 50,
+      "status": "review_only_synthesized_package_cut"
+    },
+    {
+      "card_name": "Oswald Fiddlebender",
+      "classification_source": "text_inferred",
+      "cmc": 2.0,
+      "core_roles": [
+        "tutor"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "score": 50,
+      "status": "review_only_synthesized_package_cut"
+    },
+    {
+      "card_name": "Stoneforge Mystic",
+      "classification_source": "text_inferred",
+      "cmc": 2.0,
+      "core_roles": [
+        "tutor"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "score": 50,
+      "status": "review_only_synthesized_package_cut"
+    },
+    {
+      "card_name": "Wishclaw Talisman",
+      "classification_source": "text_inferred",
+      "cmc": 2.0,
+      "core_roles": [
+        "tutor"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "score": 50,
+      "status": "review_only_synthesized_package_cut"
+    },
+    {
+      "card_name": "Enlightened Tutor",
+      "classification_source": "text_inferred",
+      "cmc": 1.0,
+      "core_roles": [
+        "tutor"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "score": 49,
+      "status": "review_only_synthesized_package_cut"
+    },
+    {
+      "card_name": "Imperial Seal",
+      "classification_source": "text_inferred",
+      "cmc": 1.0,
+      "core_roles": [
+        "tutor"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "tutors_access"
+      ],
+      "score": 49,
+      "status": "review_only_synthesized_package_cut"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "commander_payoff_package_synthesis_blocks_candidate_copy",
+  "summary": {
+    "candidate_copy_blocker_count": 2,
+    "commander": "Kaalia of the Vast",
+    "commander_color_identity": [
+      "W",
+      "B",
+      "R"
+    ],
+    "deck_id": "619",
+    "initial_axis_requirements": {
+      "angels_demons_dragons_payoffs": 18,
+      "commander_attack_window": 1,
+      "lands": 1,
+      "spot_interaction": 2
+    },
+    "next_gate": "expand_commander_cut_source_lane_for_full_profile_package",
+    "package_size_limit": 8,
+    "remaining_axis_requirements": {
+      "angels_demons_dragons_payoffs": 0,
+      "commander_attack_window": 0,
+      "lands": 0,
+      "spot_interaction": 0
+    },
+    "remaining_cut_candidate_count": 0,
+    "selected_add_count": 21,
+    "selected_cut_count": 10,
+    "unpaired_add_count": 11
+  },
+  "tentative_add_cut_pairs": [
+    {
+      "add": "Arena of Glory",
+      "add_axes": [
+        "commander_attack_window",
+        "lands"
+      ],
+      "cut": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+      "cut_matching_over_target_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "cut_reasons": [
+        "over_target_card_draw_selection",
+        "over_target_mana_acceleration",
+        "card_flow_above_target_review"
+      ],
+      "status": "review_only_synthesized_add_cut_pair",
+      "step": 1
+    },
+    {
+      "add": "Despark",
+      "add_axes": [
+        "spot_interaction"
+      ],
+      "cut": "Professional Face-Breaker",
+      "cut_matching_over_target_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "cut_reasons": [
+        "over_target_card_draw_selection",
+        "over_target_mana_acceleration",
+        "card_flow_above_target_review"
+      ],
+      "status": "review_only_synthesized_add_cut_pair",
+      "step": 2
+    },
+    {
+      "add": "Anguished Unmaking",
+      "add_axes": [
+        "spot_interaction"
+      ],
+      "cut": "Smuggler's Share",
+      "cut_matching_over_target_roles": [
+        "card_draw_selection",
+        "mana_acceleration"
+      ],
+      "cut_reasons": [
+        "over_target_card_draw_selection",
+        "over_target_mana_acceleration",
+        "card_flow_above_target_review"
+      ],
+      "status": "review_only_synthesized_add_cut_pair",
+      "step": 3
+    },
+    {
+      "add": "Balefire Dragon",
+      "add_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "cut": "Demonic Tutor",
+      "cut_matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "status": "review_only_synthesized_add_cut_pair",
+      "step": 4
+    },
+    {
+      "add": "Ancient Copper Dragon",
+      "add_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "cut": "Diabolic Intent",
+      "cut_matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "status": "review_only_synthesized_add_cut_pair",
+      "step": 5
+    },
+    {
+      "add": "Angel of the Ruins",
+      "add_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "cut": "Oswald Fiddlebender",
+      "cut_matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "status": "review_only_synthesized_add_cut_pair",
+      "step": 6
+    },
+    {
+      "add": "Hoarding Broodlord",
+      "add_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "cut": "Stoneforge Mystic",
+      "cut_matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "status": "review_only_synthesized_add_cut_pair",
+      "step": 7
+    },
+    {
+      "add": "Goldlust Triad",
+      "add_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "cut": "Wishclaw Talisman",
+      "cut_matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "status": "review_only_synthesized_add_cut_pair",
+      "step": 8
+    },
+    {
+      "add": "Hellkite Charger",
+      "add_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "cut": "Enlightened Tutor",
+      "cut_matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "status": "review_only_synthesized_add_cut_pair",
+      "step": 9
+    },
+    {
+      "add": "Avacyn, Angel of Hope",
+      "add_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "cut": "Imperial Seal",
+      "cut_matching_over_target_roles": [
+        "tutors_access"
+      ],
+      "cut_reasons": [
+        "over_target_tutors_access",
+        "tutor_role_above_target_review"
+      ],
+      "status": "review_only_synthesized_add_cut_pair",
+      "step": 10
+    }
+  ],
+  "unpaired_adds": [
+    {
+      "card_name": "Cavern-Hoard Dragon",
+      "cmc": 9.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "expensive_cheat_target",
+        "evasive_body",
+        "haste",
+        "combat_keywords",
+        "combat_damage_trigger",
+        "mana_or_treasure_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 105,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Goldspan Dragon",
+      "cmc": 5.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "haste",
+        "attack_trigger",
+        "mana_or_treasure_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 103,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Scourge of the Throne",
+      "cmc": 6.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "attack_trigger",
+        "extra_combat_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 103,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Aurelia, the Law Above",
+      "cmc": 5.0,
+      "color_identity": [
+        "W",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "haste",
+        "attack_trigger",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "board_wipes_resets",
+        "card_draw_selection",
+        "haste_protection_silence"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 102,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Angel"
+    },
+    {
+      "card_name": "Starfield Shepherd",
+      "cmc": 5.0,
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "etb_value",
+        "tutor_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "tutors_access"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 99,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Angel"
+    },
+    {
+      "card_name": "Dragon Mage",
+      "cmc": 7.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_damage_trigger",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "card_draw_selection"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 98,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon Wizard"
+    },
+    {
+      "card_name": "Bonehoard Dracosaur",
+      "cmc": 5.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "combat_keywords",
+        "mana_or_treasure_payload",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 97,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dinosaur Dragon"
+    },
+    {
+      "card_name": "Drakuseth, Maw of Flames",
+      "cmc": 7.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "attack_trigger",
+        "removal_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "The Balrog of Moria",
+      "cmc": 7.0,
+      "color_identity": [
+        "B",
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "haste",
+        "combat_keywords",
+        "mana_or_treasure_payload",
+        "card_flow_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "card_draw_selection",
+        "haste_protection_silence",
+        "mana_acceleration"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Avatar Demon"
+    },
+    {
+      "card_name": "Wrathful Red Dragon",
+      "cmc": 5.0,
+      "color_identity": [
+        "R"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "removal_payload",
+        "life_total_or_damage_multiplier"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "dedicated_win_conditions"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 96,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Creature \u2014 Dragon"
+    },
+    {
+      "card_name": "Akroma, Angel of Wrath",
+      "cmc": 8.0,
+      "color_identity": [
+        "W"
+      ],
+      "commander_legality": "legal",
+      "covered_axes": [
+        "angels_demons_dragons_payoffs"
+      ],
+      "fit_reasons": [
+        "commander_legal",
+        "kaalia_cheat_curve",
+        "evasive_body",
+        "haste",
+        "combat_keywords",
+        "protection_or_lock_payload"
+      ],
+      "mutation_allowed": false,
+      "profile_roles": [
+        "angels_demons_dragons_payoffs",
+        "haste_protection_silence"
+      ],
+      "required_gates": [
+        "source_lane_package_synthesis",
+        "profile_repair_candidate_model_recheck",
+        "candidate_copy_only",
+        "strategy_matrix_before_battle",
+        "battle_gate_with_drawn_cast_used_trace_before_promotion"
+      ],
+      "score": 95,
+      "selected_for_axis": "angels_demons_dragons_payoffs",
+      "source": "local_oracle_add_type_scan",
+      "status": "review_only_synthesized_package_add",
+      "type_line": "Legendary Creature \u2014 Angel"
+    }
+  ]
+}
