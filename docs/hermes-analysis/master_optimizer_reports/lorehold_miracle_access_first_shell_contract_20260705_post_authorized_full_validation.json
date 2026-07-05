@@ -1,0 +1,586 @@
+{
+  "artifact_type": "lorehold_miracle_access_first_shell_contract",
+  "contract": {
+    "anchor_access_floors_from_607": {
+      "Land Tax": 1,
+      "Library of Leng": 0,
+      "Lorehold, the Historian": 3,
+      "Scroll Rack": 1,
+      "Sensei's Divining Top": 2,
+      "The Mind Stone": 2,
+      "Urza's Saga": 1
+    },
+    "battle_gate_requirements": [
+      "structure_matrix_passes_before_any_battle",
+      "copied_deck_or_lab_candidate_only_until_promotion_gate_passes",
+      "same_seed_same_opponent_matrix_against_current_deck_607",
+      "direct_drawn_cast_used_trace_for_added_cards_and_anchors",
+      "candidate_ties_or_beats_607_aggregate",
+      "Winota_fast_pressure_slice_ties_or_improves",
+      "closing_window_trace_shows_miracle_topdeck_plan_executed"
+    ],
+    "blocked_shortcuts": [
+      {
+        "reason": "Pressure packages such as Guttersnipe or Storm-Kiln cannot be tested as the next shell until miracle/topdeck floors are preserved.",
+        "shortcut_key": "pressure_conversion_blocked_until_miracle_floor"
+      },
+      {
+        "reason": "Forced access can prove visibility or use, but prior forced-access diagnostics still failed to convert into wins.",
+        "shortcut_key": "forced_access_not_promotion_evidence"
+      },
+      {
+        "reason": "Mana Vault, The One Ring, and similar staples stay hypotheses unless same-lane cut proof and equal battle evidence beat protected 607.",
+        "shortcut_key": "global_staple_not_cross_lane_cut_proof"
+      },
+      {
+        "reason": "The current from-scratch shell synthesis shows broad shells below 607 and requires a predeclared trace target before another shell.",
+        "shortcut_key": "broad_from_scratch_shell_blocked"
+      }
+    ],
+    "closing_window_gap_counts": {
+      "607_mana_timing_anchor_deficit": 9,
+      "approach_conversion_missing": 7,
+      "candidate_died_before_closing_window": 13,
+      "candidate_lost_multiple_turns_before_607_finish": 13,
+      "lorehold_spell_volume_deficit": 13,
+      "miracle_cast_deficit": 13,
+      "static_cost_reduction_deficit": 9,
+      "topdeck_activation_deficit": 9,
+      "topdeck_engine_card_deficit": 11,
+      "upkeep_rummage_deficit": 9
+    },
+    "contract_key": "miracle_access_first_shell_contract",
+    "event_floor_requirements": [
+      {
+        "measurement": "meet_or_exceed_current_607_same_seed_floor",
+        "metric": "miracle_cast",
+        "requirement_key": "miracle_cast_floor"
+      },
+      {
+        "measurement": "meet_or_exceed_current_607_same_seed_floor",
+        "metric": "topdeck_manipulation_activated",
+        "requirement_key": "topdeck_manipulation_floor"
+      },
+      {
+        "measurement": "meet_or_exceed_current_607_same_seed_floor",
+        "metric": "lorehold_spell_cast",
+        "requirement_key": "lorehold_spell_volume_floor"
+      },
+      {
+        "measurement": "meet_or_exceed_current_607_same_seed_floor",
+        "metric": "lorehold_upkeep_rummage",
+        "requirement_key": "upkeep_rummage_floor"
+      },
+      {
+        "measurement": "no_regression_against_607_closing_window_trace",
+        "metric": "static_cost_reduction_total",
+        "requirement_key": "static_cost_reduction_floor"
+      },
+      {
+        "measurement": "no_missing_approach_conversion_in_candidate_closing_windows",
+        "metric": "approach_conversion",
+        "requirement_key": "approach_conversion_floor"
+      }
+    ],
+    "forbidden_shortcut_from_router": "Do not add tutors/recursion/hand-filter density unless the shell first preserves the topdeck and miracle cadence.",
+    "protected_anchors": [
+      "Approach of the Second Sun",
+      "Bender's Waterskin",
+      "Creative Technique",
+      "Land Tax",
+      "Library of Leng",
+      "Lorehold, the Historian",
+      "Mizzix's Mastery",
+      "Molecule Man",
+      "Scroll Rack",
+      "Sensei's Divining Top",
+      "Storm Herd",
+      "The Mind Stone",
+      "The Scarlet Witch",
+      "Victory Chimes"
+    ],
+    "shell_type": "micro_shell_before_full_generation",
+    "strategic_floors_from_607": {
+      "lorehold_cost_paid": 27,
+      "lorehold_spell_cast": 22,
+      "lorehold_upkeep_rummage": 5,
+      "miracle_cast": 4,
+      "topdeck_manipulation_activated": 5
+    },
+    "strategic_goal": "Build only a miracle/topdeck access micro-shell that preserves the current 607 engine floors before any pressure, tutor, recursion, or generic value route can be tested.",
+    "structure_matrix_entry_requirements": [
+      "start from a micro-shell structure matrix, not a broad full-deck rewrite",
+      "state adds, same-lane cuts, and protected anchors before materializing any list",
+      "keep legal Commander shape, color identity, singleton, and unresolved count gates separate",
+      "preserve topdeck, miracle, upkeep-rummage, spell-volume, and cost-reduction floors",
+      "preserve natural access to Sensei's Divining Top and Scroll Rack",
+      "preserve Bender's Waterskin and Victory Chimes unless same-lane evidence beats 607",
+      "carry Approach of the Second Sun conversion as a protected finisher floor",
+      "reject pressure, tutor, recursion, or generic value density if the miracle floor regresses"
+    ],
+    "target_metrics_from_router": [
+      "miracle_cast",
+      "topdeck_manipulation_activated",
+      "lorehold_spell_cast",
+      "lorehold_upkeep_rummage",
+      "static_cost_reduction_total"
+    ],
+    "top_anchor_card_deficits": [
+      {
+        "delta_total": 29,
+        "event": "topdeck_manipulation_activated:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 17,
+        "event": "cost_paid:Lorehold, the Historian"
+      },
+      {
+        "delta_total": 15,
+        "event": "cost_paid:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 15,
+        "event": "spell_cast:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 15,
+        "event": "spell_resolved:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 14,
+        "event": "topdeck_manipulation_activated:Scroll Rack"
+      },
+      {
+        "delta_total": 13,
+        "event": "spell_resolved:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 8,
+        "event": "cost_paid:Victory Chimes"
+      },
+      {
+        "delta_total": 7,
+        "event": "spell_cast:Victory Chimes"
+      },
+      {
+        "delta_total": 7,
+        "event": "cost_paid:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 7,
+        "event": "spell_cast:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 6,
+        "event": "spell_resolved:Mizzix's Mastery"
+      },
+      {
+        "delta_total": 5,
+        "event": "miracle_cast:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 4,
+        "event": "cost_paid:Bender's Waterskin"
+      },
+      {
+        "delta_total": 4,
+        "event": "cost_paid:Scroll Rack"
+      },
+      {
+        "delta_total": 4,
+        "event": "miracle_cast:Jeska's Will"
+      }
+    ],
+    "top_strategic_deficits": [
+      {
+        "delta_total": 153,
+        "event": "lorehold_cost_paid"
+      },
+      {
+        "delta_total": 134,
+        "event": "lorehold_spell_cast"
+      },
+      {
+        "delta_total": 71,
+        "event": "miracle_cast"
+      },
+      {
+        "delta_total": 63,
+        "event": "lorehold_upkeep_rummage"
+      },
+      {
+        "delta_total": 41,
+        "event": "topdeck_manipulation_activated"
+      },
+      {
+        "delta_total": 37,
+        "event": "static_cost_reduction_total"
+      }
+    ]
+  },
+  "current_baseline": "deck_607",
+  "decision": {
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "do_not_mutate_deck_607",
+      "do_not_write_postgresql_or_sqlite",
+      "write_or_run_structure_matrix_only_after this contract",
+      "preserve protected anchors unless same-lane proof beats 607",
+      "run equal battle gate only after structure matrix and trace floors pass"
+    ],
+    "promotion_allowed": false,
+    "reason": "The next learning target is the miracle/topdeck access floor, but current evidence still has blocker signals and no ready deck change.",
+    "structure_matrix_allowed_now": false,
+    "structure_matrix_contract_allowed_now": true
+  },
+  "deck_607_mutated": false,
+  "external_research_refresh": [
+    {
+      "contract_use": "Use official Commander shape, singleton, color identity, and bracket framing as legality and power-context gates only.",
+      "source": "Wizards Commander format",
+      "url": "https://magic.wizards.com/en/formats/commander"
+    },
+    {
+      "contract_use": "Treat public Lorehold adoption and staple rates as evidence lanes. They can suggest cards, but cannot override 607 trace floors or cuts.",
+      "source": "EDHREC Lorehold commander page",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian"
+    },
+    {
+      "contract_use": "Lorehold's opponent-upkeep rummage creates first-draw miracle windows; top-library control is therefore the engine floor.",
+      "source": "EDHREC Miracles Every Turn with Lorehold",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander"
+    },
+    {
+      "contract_use": "Instant/sorcery density, topdeck manipulation, protection, mana for opponents' turns, and big spell conversion are the relevant lanes.",
+      "source": "EDHREC Boros Miracles on a Budget",
+      "url": "https://edhrec.com/articles/lorehold-the-historian-boros-miracles-on-a-budget"
+    },
+    {
+      "contract_use": "Use combo discovery as package evidence only; it is not full-deck balance, cut safety, or ManaLoom runtime proof.",
+      "source": "Commander Spellbook",
+      "url": "https://commanderspellbook.com/"
+    }
+  ],
+  "generated_at": "2026-07-05T11:26:01Z",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_evidence": {
+    "aggregate_blockers": [
+      "aggregate_topdeck_anchor_access_regressed",
+      "all current from-scratch shells are below protected 607",
+      "another battle gate without a predeclared trace target would repeat prior work",
+      "broad shell changes overfill package lanes or regress miracle/topdeck cadence",
+      "fast_pressure_slice_not_protected",
+      "fast_pressure_slice_regressed",
+      "forced tutor/access evidence still failed to convert into wins",
+      "from_scratch_shell_gate_not_allowed",
+      "head_to_head_not_won",
+      "head_to_head_vs_607_not_won_or_tied",
+      "land_tax_access_below_607_floor",
+      "lorehold_cost_paid_below_607_floor",
+      "lorehold_spell_cast_below_607_floor",
+      "lorehold_upkeep_rummage_below_607_floor",
+      "miracle_cast_below_607_floor",
+      "miracle_trace_missing",
+      "no_named_seed_safe_cuts_in_current_607",
+      "pressure_card_use_not_observed",
+      "pressure_causality_unproven",
+      "pressure_conversion_not_proven",
+      "pressure_conversion_unproven",
+      "scroll_rack_access_below_607_floor",
+      "senseis_divining_top_access_below_607_floor",
+      "the_mind_stone_access_below_607_floor",
+      "topdeck_activation_missing",
+      "topdeck_anchor_access_regressed",
+      "topdeck_manipulation_activated_below_607_floor",
+      "urzas_saga_access_below_607_floor"
+    ],
+    "cut_miner_summary": {
+      "classification_counts": {
+        "closed_hard_stop_current_607": 94
+      },
+      "contract_status": "hypothesis_contract_written_blocked_no_named_safe_cuts",
+      "cross_lane_excluded_count": 0,
+      "cut_expansion_status": "pressure_cut_expansion_no_seed_safe_cut_keep_607",
+      "cut_shortage": 2,
+      "decision_status": "no_current_cut_evidence_for_guttersnipe_storm_kiln_keep_607",
+      "hard_stop_blocker_counts": {
+        "commander_never_cut": 1,
+        "cut_is_early_mana_floor_support": 14,
+        "cut_is_miracle_core_big_spell": 25,
+        "cut_is_protection_shell": 14,
+        "early_mana_floor_support": 18,
+        "mana_base_never_cut": 28,
+        "measured_high_cut_exposure": 34,
+        "miracle_or_finisher_core": 24,
+        "never_cut_lane": 29,
+        "never_cut_or_mana_base": 29,
+        "prior_rejected_cut": 37,
+        "prior_rejected_cut_slot": 24,
+        "prior_rejected_signature": 4,
+        "protected_cut": 22,
+        "protection_shell": 14,
+        "structural_dependency": 24
+      },
+      "hard_stop_cut_count": 94,
+      "lane_counts": {
+        "big_spell_value": 2,
+        "commander": 1,
+        "contextual": 1,
+        "draw": 6,
+        "early_mana": 18,
+        "graveyard_recursion": 1,
+        "hand_filter": 1,
+        "mana_base": 28,
+        "misc": 2,
+        "protection": 13,
+        "removal": 10,
+        "spell_velocity": 5,
+        "wincon": 6
+      },
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "recommended_next_action": "do_not_battle_mine_new_nonanchor_trace_or_new_shell_contract",
+      "router_route_status": "best_next_learning_route_contract_required_no_deck_action",
+      "target_adds": [
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "target_lane_evidence_gap_count": 0,
+      "target_required_cut_count": 2,
+      "target_route_key": "guttersnipe_storm_kiln_engine_preserving_pair",
+      "total_cut_slots_reviewed": 94
+    },
+    "miracle_failure_summary": {
+      "blocking_failure_flags": [
+        "head_to_head_not_won",
+        "miracle_trace_missing",
+        "topdeck_activation_missing",
+        "topdeck_anchor_access_regressed",
+        "pressure_causality_unproven",
+        "pressure_conversion_unproven",
+        "fast_pressure_slice_not_protected"
+      ],
+      "candidate_count": 2,
+      "failure_flag_counts": {
+        "fast_pressure_slice_not_protected": 1,
+        "head_to_head_not_won": 2,
+        "mana_event_without_conversion_to_wins": 1,
+        "miracle_trace_missing": 1,
+        "miracle_volume_regressed": 1,
+        "pressure_causality_unproven": 2,
+        "pressure_conversion_unproven": 1,
+        "topdeck_activation_missing": 1,
+        "topdeck_activation_regressed": 2,
+        "topdeck_anchor_access_regressed": 2
+      },
+      "keep_607_as_protected_baseline": true,
+      "learned_priority_order": [
+        "legal_identity_and_card_availability",
+        "commander_intent_and_topdeck_miracle_density",
+        "natural_access_to_topdeck_anchors",
+        "trace_proof_that_miracle_window_executes",
+        "pressure_or_mana_conversion_after_engine_floor_is_preserved",
+        "same_seed_battle_gate_ties_or_beats_607"
+      ],
+      "next_shell_contract": "miracle_access_first_shell",
+      "promotion_allowed": false
+    },
+    "preflight_summary": {
+      "anchor_access_floors_from_607": {
+        "Land Tax": 1,
+        "Library of Leng": 0,
+        "Lorehold, the Historian": 3,
+        "Scroll Rack": 1,
+        "Sensei's Divining Top": 2,
+        "The Mind Stone": 2,
+        "Urza's Saga": 1
+      },
+      "blocking_reasons": [
+        "aggregate_topdeck_anchor_access_regressed",
+        "fast_pressure_slice_regressed",
+        "head_to_head_vs_607_not_won_or_tied",
+        "land_tax_access_below_607_floor",
+        "lorehold_cost_paid_below_607_floor",
+        "lorehold_spell_cast_below_607_floor",
+        "lorehold_upkeep_rummage_below_607_floor",
+        "miracle_cast_below_607_floor",
+        "miracle_trace_missing",
+        "pressure_card_use_not_observed",
+        "pressure_causality_unproven",
+        "pressure_conversion_not_proven",
+        "scroll_rack_access_below_607_floor",
+        "senseis_divining_top_access_below_607_floor",
+        "the_mind_stone_access_below_607_floor",
+        "topdeck_activation_missing",
+        "topdeck_manipulation_activated_below_607_floor",
+        "urzas_saga_access_below_607_floor"
+      ],
+      "candidate_count": 2,
+      "gate_ready_now_count": 0,
+      "keep_607_as_protected_baseline": true,
+      "preflight_contract": "miracle_access_first_shell_v1",
+      "promotion_allowed": false,
+      "strategic_floors_from_607": {
+        "lorehold_cost_paid": 27,
+        "lorehold_spell_cast": 22,
+        "lorehold_upkeep_rummage": 5,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": 5
+      }
+    },
+    "router_summary": {
+      "avg_607_turn_advantage": 10.15,
+      "candidate_hypothesis_count": 3,
+      "closing_window_comparison_count": 13,
+      "cut_shortage": 2,
+      "decision_status": "closing_window_shell_target_selected_no_battle",
+      "from_scratch_can_run_next_battle_gate": false,
+      "from_scratch_promotable_shell_signal_count": 0,
+      "miracle_failure_flag_count": 7,
+      "named_seed_safe_cut_count": 0,
+      "natural_battle_gate_allowed_now": false,
+      "promotion_allowed_now": false,
+      "ready_deck_change_count": 0,
+      "ready_micro_package_hypothesis_count": 3,
+      "recommended_next_action": "write_miracle_access_first_shell_contract_no_battle",
+      "selected_hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+      "selected_status": "primary_shell_contract_target_blocked_but_actionable_as_design"
+    },
+    "selected_shell_target": {
+      "battle_allowed_now": false,
+      "blockers": [
+        "from_scratch_shell_gate_not_allowed",
+        "miracle_trace_missing",
+        "no_named_seed_safe_cuts_in_current_607",
+        "topdeck_activation_missing",
+        "topdeck_anchor_access_regressed"
+      ],
+      "deck_mutation_allowed_now": false,
+      "evidence_cards": [
+        "topdeck_manipulation_activated:Sensei's Divining Top",
+        "cost_paid:Lorehold, the Historian",
+        "cost_paid:Sensei's Divining Top",
+        "spell_cast:Sensei's Divining Top",
+        "spell_resolved:Sensei's Divining Top",
+        "topdeck_manipulation_activated:Scroll Rack",
+        "spell_resolved:Approach of the Second Sun",
+        "cost_paid:Victory Chimes"
+      ],
+      "evidence_events": [
+        "lorehold_cost_paid",
+        "lorehold_spell_cast",
+        "miracle_cast",
+        "lorehold_upkeep_rummage",
+        "topdeck_manipulation_activated",
+        "static_cost_reduction_total"
+      ],
+      "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+      "priority_score": 259,
+      "recommended_next_action": "write_miracle_access_first_shell_contract_no_battle",
+      "requirements": [
+        "do not cut Sensei's Divining Top, Scroll Rack, Bender's Waterskin, or Victory Chimes",
+        "predeclare miracle_cast and topdeck_manipulation_activated targets before gate",
+        "candidate must not overfill hand_filter plus graveyard_recursion plus conversion lanes together"
+      ],
+      "shell_contract": {
+        "contract_key": "miracle_access_first_shell_contract",
+        "forbidden_shortcut": "Do not add tutors/recursion/hand-filter density unless the shell first preserves the topdeck and miracle cadence.",
+        "must_preserve": [
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "Bender's Waterskin",
+          "Victory Chimes",
+          "Approach of the Second Sun"
+        ],
+        "shell_type": "micro_shell_before_full_generation",
+        "target_metrics": [
+          "miracle_cast",
+          "topdeck_manipulation_activated",
+          "lorehold_spell_cast",
+          "lorehold_upkeep_rummage",
+          "static_cost_reduction_total"
+        ]
+      },
+      "status": "primary_shell_contract_target_blocked_but_actionable_as_design",
+      "target_gap_tags": [
+        "miracle_cast_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit"
+      ],
+      "target_gap_total": 33
+    },
+    "shell_failure_summary": {
+      "best_forced_delta_wins": null,
+      "best_natural_delta_wins": -5,
+      "blockers": [
+        "all current from-scratch shells are below protected 607",
+        "forced tutor/access evidence still failed to convert into wins",
+        "broad shell changes overfill package lanes or regress miracle/topdeck cadence",
+        "another battle gate without a predeclared trace target would repeat prior work"
+      ],
+      "can_run_next_battle_gate": false,
+      "failure_mode_counts": {
+        "lorehold_spell_floor_regressed": 1,
+        "losses_above_protected_607": 3,
+        "miracle_floor_regressed": 3,
+        "package_lanes_overfilled": 1,
+        "positive_squee_telemetry_not_converting": 1,
+        "topdeck_floor_regressed": 1,
+        "upkeep_rummage_floor_regressed": 1,
+        "wins_below_protected_607": 3
+      },
+      "forced_gate_row_count": 0,
+      "gate_report_count": 3,
+      "natural_gate_row_count": 3,
+      "promotable_shell_signal_count": 0,
+      "recommended_next_action": "mine_closing_window_trace_before_next_shell",
+      "shell_gate_row_count": 3,
+      "status_counts": {
+        "natural_rejected": 3
+      },
+      "tested_shell_count": 3,
+      "tested_shell_keys": [
+        "challenger_lorehold_access_density_control_v1",
+        "challenger_lorehold_spell_pressure_mana_conversion_deoverfill_v1",
+        "challenger_lorehold_spell_volume_access_depressure_v1"
+      ]
+    }
+  },
+  "source_reports": {
+    "closing_trace": "docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_trace_miner_20260704_role_tag_repair.json",
+    "cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json",
+    "miracle_failure": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_trace_failure_miner_20260704_current.json",
+    "preflight": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_access_first_preflight_20260704_current.json",
+    "router": "docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_next_shell_target_router_20260705_post_authorized_full_validation.json",
+    "shell_failure": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_shell_failure_synthesis_20260705_authorized_full_validation.json"
+  },
+  "status": "miracle_access_first_contract_written_no_battle_blocked_before_structure_matrix",
+  "summary": {
+    "aggregate_blocker_count": 28,
+    "avg_607_turn_advantage": 10.15,
+    "closing_window_comparison_count": 13,
+    "contract_written": true,
+    "cut_shortage": 2,
+    "decision_status": "miracle_access_first_contract_written_no_battle_blocked_before_structure_matrix",
+    "deck_action_allowed_now": false,
+    "from_scratch_can_run_next_battle_gate": false,
+    "from_scratch_promotable_shell_signal_count": 0,
+    "miracle_failure_flag_count": 7,
+    "named_seed_safe_cut_count": 0,
+    "natural_battle_gate_allowed_now": false,
+    "preflight_candidate_count": 2,
+    "preflight_gate_ready_now_count": 0,
+    "promotion_allowed_now": false,
+    "ready_deck_change_count": 0,
+    "recommended_next_action": "design_micro_shell_structure_matrix_contract_no_battle",
+    "selected_contract_key": "miracle_access_first_shell_contract",
+    "selected_hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+    "structure_matrix_allowed_now": false,
+    "structure_matrix_contract_allowed_now": true
+  }
+}

@@ -20,7 +20,8 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_CONTRACT = (
-    REPORT_DIR / "lorehold_miracle_access_first_shell_contract_20260705_current_relearn.json"
+    REPORT_DIR
+    / "lorehold_miracle_access_first_shell_contract_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_VALUE_MODEL = REPORT_DIR / "lorehold_deckbuilding_value_model_20260704_current.json"
 DEFAULT_CUT_MINER = (
@@ -29,7 +30,8 @@ DEFAULT_CUT_MINER = (
 DEFAULT_CLOSING_TRACE = REPORT_DIR / "lorehold_closing_window_trace_miner_20260704_role_tag_repair.json"
 DEFAULT_NEXT_SHELL_SYNTHESIS = REPORT_DIR / "lorehold_next_shell_contract_synthesis_20260705_current.json"
 DEFAULT_OUT_PREFIX = (
-    REPORT_DIR / "lorehold_miracle_access_structure_matrix_contract_20260705_current_relearn"
+    REPORT_DIR
+    / "lorehold_miracle_access_structure_matrix_contract_20260705_post_authorized_full_validation"
 )
 
 TARGET_CONTRACT = "miracle_access_first_shell_contract"

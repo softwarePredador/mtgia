@@ -21,19 +21,22 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_ROUTER = (
-    REPORT_DIR / "lorehold_closing_window_next_shell_target_router_20260705_current_relearn.json"
+    REPORT_DIR
+    / "lorehold_closing_window_next_shell_target_router_20260705_post_authorized_full_validation.json"
 )
 DEFAULT_PREFLIGHT = REPORT_DIR / "lorehold_miracle_access_first_preflight_20260704_current.json"
 DEFAULT_CLOSING_TRACE = REPORT_DIR / "lorehold_closing_window_trace_miner_20260704_role_tag_repair.json"
 DEFAULT_SHELL_FAILURE = (
-    REPORT_DIR / "lorehold_from_scratch_shell_failure_synthesis_20260705_current_relearn.json"
+    REPORT_DIR
+    / "lorehold_from_scratch_shell_failure_synthesis_20260705_authorized_full_validation.json"
 )
 DEFAULT_CUT_MINER = (
     REPORT_DIR / "lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json"
 )
 DEFAULT_MIRACLE_FAILURE = REPORT_DIR / "lorehold_miracle_trace_failure_miner_20260704_current.json"
 DEFAULT_OUT_PREFIX = (
-    REPORT_DIR / "lorehold_miracle_access_first_shell_contract_20260705_current_relearn"
+    REPORT_DIR
+    / "lorehold_miracle_access_first_shell_contract_20260705_post_authorized_full_validation"
 )
 
 TARGET_HYPOTHESIS = "preserve_topdeck_miracle_floor_micro_package"

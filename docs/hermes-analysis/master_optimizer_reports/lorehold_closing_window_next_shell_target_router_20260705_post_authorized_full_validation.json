@@ -1,0 +1,397 @@
+{
+  "artifact_type": "lorehold_closing_window_next_shell_target_router",
+  "current_baseline": "deck_607",
+  "decision": {
+    "deck_action_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "natural_battle_allowed_now": false,
+    "next_actions": [
+      "write_miracle_access_first_shell_contract_no_battle",
+      "do_not_start_from_broad_from_scratch_shell",
+      "do_not_test_pressure_conversion_until miracle/topdeck floor contract exists",
+      "predeclare target metrics before any structure matrix",
+      "keep deck_607 protected until same-seed equal battle gate proves replacement"
+    ],
+    "promotion_allowed": false,
+    "reason": "Closing-window evidence identifies a miracle/topdeck floor repair target, but failed shells and zero seed-safe cuts block battle or mutation now."
+  },
+  "deck_607_mutated": false,
+  "gap_counts": {
+    "607_mana_timing_anchor_deficit": 9,
+    "approach_conversion_missing": 7,
+    "candidate_died_before_closing_window": 13,
+    "candidate_lost_multiple_turns_before_607_finish": 13,
+    "lorehold_spell_volume_deficit": 13,
+    "miracle_cast_deficit": 13,
+    "static_cost_reduction_deficit": 9,
+    "topdeck_activation_deficit": 9,
+    "topdeck_engine_card_deficit": 11,
+    "upkeep_rummage_deficit": 9
+  },
+  "generated_at": "2026-07-05T11:26:01Z",
+  "hypothesis_routes": [
+    {
+      "battle_allowed_now": false,
+      "blockers": [
+        "from_scratch_shell_gate_not_allowed",
+        "miracle_trace_missing",
+        "no_named_seed_safe_cuts_in_current_607",
+        "topdeck_activation_missing",
+        "topdeck_anchor_access_regressed"
+      ],
+      "deck_mutation_allowed_now": false,
+      "evidence_cards": [
+        "topdeck_manipulation_activated:Sensei's Divining Top",
+        "cost_paid:Lorehold, the Historian",
+        "cost_paid:Sensei's Divining Top",
+        "spell_cast:Sensei's Divining Top",
+        "spell_resolved:Sensei's Divining Top",
+        "topdeck_manipulation_activated:Scroll Rack",
+        "spell_resolved:Approach of the Second Sun",
+        "cost_paid:Victory Chimes"
+      ],
+      "evidence_events": [
+        "lorehold_cost_paid",
+        "lorehold_spell_cast",
+        "miracle_cast",
+        "lorehold_upkeep_rummage",
+        "topdeck_manipulation_activated",
+        "static_cost_reduction_total"
+      ],
+      "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+      "priority_score": 259,
+      "recommended_next_action": "write_miracle_access_first_shell_contract_no_battle",
+      "requirements": [
+        "do not cut Sensei's Divining Top, Scroll Rack, Bender's Waterskin, or Victory Chimes",
+        "predeclare miracle_cast and topdeck_manipulation_activated targets before gate",
+        "candidate must not overfill hand_filter plus graveyard_recursion plus conversion lanes together"
+      ],
+      "shell_contract": {
+        "contract_key": "miracle_access_first_shell_contract",
+        "forbidden_shortcut": "Do not add tutors/recursion/hand-filter density unless the shell first preserves the topdeck and miracle cadence.",
+        "must_preserve": [
+          "Sensei's Divining Top",
+          "Scroll Rack",
+          "Bender's Waterskin",
+          "Victory Chimes",
+          "Approach of the Second Sun"
+        ],
+        "shell_type": "micro_shell_before_full_generation",
+        "target_metrics": [
+          "miracle_cast",
+          "topdeck_manipulation_activated",
+          "lorehold_spell_cast",
+          "lorehold_upkeep_rummage",
+          "static_cost_reduction_total"
+        ]
+      },
+      "status": "primary_shell_contract_target_blocked_but_actionable_as_design",
+      "target_gap_tags": [
+        "miracle_cast_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit"
+      ],
+      "target_gap_total": 33
+    },
+    {
+      "battle_allowed_now": false,
+      "blockers": [
+        "from_scratch_shell_gate_not_allowed",
+        "miracle_trace_missing",
+        "no_named_seed_safe_cuts_in_current_607",
+        "pressure_conversion_unproven",
+        "topdeck_anchor_access_regressed"
+      ],
+      "deck_mutation_allowed_now": false,
+      "evidence_cards": [
+        "topdeck_manipulation_activated:Sensei's Divining Top",
+        "cost_paid:Lorehold, the Historian",
+        "cost_paid:Sensei's Divining Top",
+        "spell_cast:Sensei's Divining Top",
+        "spell_resolved:Sensei's Divining Top",
+        "topdeck_manipulation_activated:Scroll Rack",
+        "spell_resolved:Approach of the Second Sun",
+        "cost_paid:Victory Chimes"
+      ],
+      "evidence_events": [
+        "lorehold_cost_paid",
+        "lorehold_spell_cast",
+        "miracle_cast",
+        "lorehold_upkeep_rummage",
+        "topdeck_manipulation_activated",
+        "static_cost_reduction_total"
+      ],
+      "hypothesis_key": "approach_big_spell_conversion_preservation",
+      "priority_score": 189,
+      "recommended_next_action": "defer_until_miracle_access_contract_exists",
+      "requirements": [
+        "protect Approach of the Second Sun, Mizzix's Mastery, and high-impact spell volume",
+        "do not treat tutor access as sufficient unless it restores spell volume and finish conversion"
+      ],
+      "shell_contract": {
+        "contract_key": "approach_spell_volume_conversion_shell_contract",
+        "forbidden_shortcut": "Do not treat forced tutor access as proof unless the final spell volume and Approach conversion window also recover.",
+        "must_preserve": [
+          "Approach of the Second Sun",
+          "Mizzix's Mastery",
+          "Creative Technique",
+          "high-impact spell volume"
+        ],
+        "shell_type": "micro_shell_before_full_generation",
+        "target_metrics": [
+          "lorehold_spell_cast",
+          "miracle_cast",
+          "approach_conversion",
+          "topdeck_manipulation_activated"
+        ]
+      },
+      "status": "secondary_shell_contract_target_after_miracle_floor",
+      "target_gap_tags": [
+        "approach_conversion_missing",
+        "lorehold_spell_volume_deficit"
+      ],
+      "target_gap_total": 20
+    },
+    {
+      "battle_allowed_now": false,
+      "blockers": [
+        "fast_pressure_slice_not_protected",
+        "from_scratch_shell_gate_not_allowed",
+        "no_named_seed_safe_cuts_in_current_607",
+        "pressure_causality_unproven",
+        "pressure_route_must_follow_engine_floor_repair"
+      ],
+      "deck_mutation_allowed_now": false,
+      "evidence_cards": [
+        "topdeck_manipulation_activated:Sensei's Divining Top",
+        "cost_paid:Lorehold, the Historian",
+        "cost_paid:Sensei's Divining Top",
+        "spell_cast:Sensei's Divining Top",
+        "spell_resolved:Sensei's Divining Top",
+        "topdeck_manipulation_activated:Scroll Rack",
+        "spell_resolved:Approach of the Second Sun",
+        "cost_paid:Victory Chimes"
+      ],
+      "evidence_events": [
+        "lorehold_cost_paid",
+        "lorehold_spell_cast",
+        "miracle_cast",
+        "lorehold_upkeep_rummage",
+        "topdeck_manipulation_activated",
+        "static_cost_reduction_total"
+      ],
+      "hypothesis_key": "pressure_survival_without_engine_cuts",
+      "priority_score": 191,
+      "recommended_next_action": "do_not_run_pressure_shell_until_miracle_access_floor_is_preserved",
+      "requirements": [
+        "repair early pressure only with cards that preserve the 607 topdeck/miracle floor",
+        "Winota/Sisay/Vivi losses must be evaluated by same opponent slot before confirmation"
+      ],
+      "shell_contract": {
+        "contract_key": "pressure_survival_without_engine_cuts_contract",
+        "forbidden_shortcut": "Do not add broad token or pressure payoffs after Young Pyromancer was observed only in losses without first restoring the engine floor.",
+        "must_preserve": [
+          "topdeck_miracle_setup",
+          "early_mana_floor",
+          "protection_window",
+          "Winota fast-pressure slice"
+        ],
+        "shell_type": "diagnostic_only_until_engine_floor_passes",
+        "target_metrics": [
+          "candidate_died_before_closing_window",
+          "Winota record",
+          "miracle_cast",
+          "topdeck_manipulation_activated"
+        ]
+      },
+      "status": "diagnostic_only_after_engine_floor",
+      "target_gap_tags": [
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish"
+      ],
+      "target_gap_total": 26
+    }
+  ],
+  "postgres_writes": false,
+  "selected_shell_target": {
+    "battle_allowed_now": false,
+    "blockers": [
+      "from_scratch_shell_gate_not_allowed",
+      "miracle_trace_missing",
+      "no_named_seed_safe_cuts_in_current_607",
+      "topdeck_activation_missing",
+      "topdeck_anchor_access_regressed"
+    ],
+    "deck_mutation_allowed_now": false,
+    "evidence_cards": [
+      "topdeck_manipulation_activated:Sensei's Divining Top",
+      "cost_paid:Lorehold, the Historian",
+      "cost_paid:Sensei's Divining Top",
+      "spell_cast:Sensei's Divining Top",
+      "spell_resolved:Sensei's Divining Top",
+      "topdeck_manipulation_activated:Scroll Rack",
+      "spell_resolved:Approach of the Second Sun",
+      "cost_paid:Victory Chimes"
+    ],
+    "evidence_events": [
+      "lorehold_cost_paid",
+      "lorehold_spell_cast",
+      "miracle_cast",
+      "lorehold_upkeep_rummage",
+      "topdeck_manipulation_activated",
+      "static_cost_reduction_total"
+    ],
+    "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+    "priority_score": 259,
+    "recommended_next_action": "write_miracle_access_first_shell_contract_no_battle",
+    "requirements": [
+      "do not cut Sensei's Divining Top, Scroll Rack, Bender's Waterskin, or Victory Chimes",
+      "predeclare miracle_cast and topdeck_manipulation_activated targets before gate",
+      "candidate must not overfill hand_filter plus graveyard_recursion plus conversion lanes together"
+    ],
+    "shell_contract": {
+      "contract_key": "miracle_access_first_shell_contract",
+      "forbidden_shortcut": "Do not add tutors/recursion/hand-filter density unless the shell first preserves the topdeck and miracle cadence.",
+      "must_preserve": [
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Bender's Waterskin",
+        "Victory Chimes",
+        "Approach of the Second Sun"
+      ],
+      "shell_type": "micro_shell_before_full_generation",
+      "target_metrics": [
+        "miracle_cast",
+        "topdeck_manipulation_activated",
+        "lorehold_spell_cast",
+        "lorehold_upkeep_rummage",
+        "static_cost_reduction_total"
+      ]
+    },
+    "status": "primary_shell_contract_target_blocked_but_actionable_as_design",
+    "target_gap_tags": [
+      "miracle_cast_deficit",
+      "topdeck_activation_deficit",
+      "topdeck_engine_card_deficit"
+    ],
+    "target_gap_total": 33
+  },
+  "source_db_mutated": false,
+  "source_reports": {
+    "closing_trace": "docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_trace_miner_20260704_role_tag_repair.json",
+    "cut_miner": "docs/hermes-analysis/master_optimizer_reports/lorehold_engine_preserving_cut_evidence_miner_20260705_current_relearn.json",
+    "miracle_failure": "docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_trace_failure_miner_20260704_current.json",
+    "shell_failure": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_shell_failure_synthesis_20260705_authorized_full_validation.json"
+  },
+  "status": "closing_window_shell_target_selected_no_battle",
+  "summary": {
+    "avg_607_turn_advantage": 10.15,
+    "candidate_hypothesis_count": 3,
+    "closing_window_comparison_count": 13,
+    "cut_shortage": 2,
+    "decision_status": "closing_window_shell_target_selected_no_battle",
+    "from_scratch_can_run_next_battle_gate": false,
+    "from_scratch_promotable_shell_signal_count": 0,
+    "miracle_failure_flag_count": 7,
+    "named_seed_safe_cut_count": 0,
+    "natural_battle_gate_allowed_now": false,
+    "promotion_allowed_now": false,
+    "ready_deck_change_count": 0,
+    "ready_micro_package_hypothesis_count": 3,
+    "recommended_next_action": "write_miracle_access_first_shell_contract_no_battle",
+    "selected_hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+    "selected_status": "primary_shell_contract_target_blocked_but_actionable_as_design"
+  },
+  "top_anchor_card_deficits": [
+    {
+      "delta_total": 29,
+      "event": "topdeck_manipulation_activated:Sensei's Divining Top"
+    },
+    {
+      "delta_total": 17,
+      "event": "cost_paid:Lorehold, the Historian"
+    },
+    {
+      "delta_total": 15,
+      "event": "cost_paid:Sensei's Divining Top"
+    },
+    {
+      "delta_total": 15,
+      "event": "spell_cast:Sensei's Divining Top"
+    },
+    {
+      "delta_total": 15,
+      "event": "spell_resolved:Sensei's Divining Top"
+    },
+    {
+      "delta_total": 14,
+      "event": "topdeck_manipulation_activated:Scroll Rack"
+    },
+    {
+      "delta_total": 13,
+      "event": "spell_resolved:Approach of the Second Sun"
+    },
+    {
+      "delta_total": 8,
+      "event": "cost_paid:Victory Chimes"
+    },
+    {
+      "delta_total": 7,
+      "event": "spell_cast:Victory Chimes"
+    },
+    {
+      "delta_total": 7,
+      "event": "cost_paid:Approach of the Second Sun"
+    },
+    {
+      "delta_total": 7,
+      "event": "spell_cast:Approach of the Second Sun"
+    },
+    {
+      "delta_total": 6,
+      "event": "spell_resolved:Mizzix's Mastery"
+    },
+    {
+      "delta_total": 5,
+      "event": "miracle_cast:Approach of the Second Sun"
+    },
+    {
+      "delta_total": 4,
+      "event": "cost_paid:Bender's Waterskin"
+    },
+    {
+      "delta_total": 4,
+      "event": "cost_paid:Scroll Rack"
+    },
+    {
+      "delta_total": 4,
+      "event": "miracle_cast:Jeska's Will"
+    }
+  ],
+  "top_strategic_deficits": [
+    {
+      "delta_total": 153,
+      "event": "lorehold_cost_paid"
+    },
+    {
+      "delta_total": 134,
+      "event": "lorehold_spell_cast"
+    },
+    {
+      "delta_total": 71,
+      "event": "miracle_cast"
+    },
+    {
+      "delta_total": 63,
+      "event": "lorehold_upkeep_rummage"
+    },
+    {
+      "delta_total": 41,
+      "event": "topdeck_manipulation_activated"
+    },
+    {
+      "delta_total": 37,
+      "event": "static_cost_reduction_total"
+    }
+  ]
+}
