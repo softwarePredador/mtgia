@@ -1,0 +1,291 @@
+{
+  "artifact_type": "global_commander_ramp_cut_forced_access_trace_generator",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": true,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "forced_access_usage_observed_blocks_ramp_cut:Culling the Weak,Desperate Ritual",
+    "candidate_copy_closed_after_ramp_forced_access_trace"
+  ],
+  "commander": "Kaalia of the Vast",
+  "deck_action_allowed": false,
+  "deck_id": "619",
+  "forced_access_replay_performed": true,
+  "generated_at": "2026-07-06T05:55:11.639467+00:00",
+  "input_artifacts": {
+    "battle_replay": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_replay_v10_3.py",
+    "ramp_trace_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replacement_gate_20260706_current.json",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current",
+    "source_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "forced_access_boundary": "Forced access is diagnostic evidence only; it is not a natural battle gate.",
+    "promotion_boundary": "No candidate copy, deck mutation, battle gate, or promotion is opened by this report.",
+    "ramp_cut_boundary": "A ramp cut used under forced access is blocked until a different cut or exact same-lane replacement is proven.",
+    "target_boundary": "Forced access applies only to the current evaluation target player."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "review_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Culling the Weak",
+      "decision": "not_cut_safe_after_forced_access_usage",
+      "decision_trace_count": 3,
+      "event_types": {
+        "additional_cost_failed": 3,
+        "cast_announced": 3,
+        "cost_paid": 3,
+        "focus_card_access_snapshot": 120,
+        "forced_focus_access_applied": 3,
+        "spell_cast": 3,
+        "turn_start": 3
+      },
+      "exposure_event_count": 3,
+      "first_decision_trace": {
+        "event": "cast_spell",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_forced_access_event": {
+        "card": "Culling the Weak",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": "Grim Monolith",
+        "status": "moved",
+        "turn": 0
+      },
+      "first_usage_event": {
+        "card": "Culling the Weak",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "forced_access_moved_or_present_count": 3,
+      "forced_access_not_found_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut_or_exact_same_lane_replacement_after_forced_access",
+      "status": "ramp_cut_forced_access_usage_observed_blocks_cut",
+      "usage_event_count": 9
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "card_name": "Desperate Ritual",
+      "decision": "not_cut_safe_after_forced_access_usage",
+      "decision_trace_count": 29,
+      "event_types": {
+        "cast_announced": 2,
+        "cost_paid": 2,
+        "focus_card_access_snapshot": 120,
+        "forced_focus_access_applied": 3,
+        "spell_cast": 2,
+        "turn_end": 14,
+        "turn_start": 16
+      },
+      "exposure_event_count": 30,
+      "first_decision_trace": {
+        "event": "pass_no_action",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_exposure_event": {
+        "event": "turn_start",
+        "player": "Kaalia of the Vast",
+        "turn": 1
+      },
+      "first_forced_access_event": {
+        "card": "Desperate Ritual",
+        "event": "forced_focus_access_applied",
+        "mode": "opening_hand",
+        "player": "Kaalia of the Vast",
+        "replaced_card": "Bloodstained Mire",
+        "status": "moved",
+        "turn": 0
+      },
+      "first_usage_event": {
+        "card": "Desperate Ritual",
+        "event": "cast_announced",
+        "player": "Kaalia of the Vast",
+        "turn": 6
+      },
+      "forced_access_moved_or_present_count": 3,
+      "forced_access_not_found_count": 0,
+      "mutation_allowed": false,
+      "next_gate": "find_different_ramp_cut_or_exact_same_lane_replacement_after_forced_access",
+      "status": "ramp_cut_forced_access_usage_observed_blocks_cut",
+      "usage_event_count": 6
+    }
+  ],
+  "seed_rows": [
+    {
+      "decision_count": 120,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_replay_seed_100.decision_trace.jsonl",
+      "event_count": 984,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_replay_seed_100.events.jsonl",
+      "forced_access": {
+        "Culling the Weak": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Culling the Weak",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Grim Monolith",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Desperate Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Desperate Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Bloodstained Mire",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_deck_provenance_seed_100.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_replay_seed_100.txt",
+      "returncode": 0,
+      "seed": 100,
+      "status": "ramp_cut_forced_replay_generated"
+    },
+    {
+      "decision_count": 105,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_replay_seed_101.decision_trace.jsonl",
+      "event_count": 675,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_replay_seed_101.events.jsonl",
+      "forced_access": {
+        "Culling the Weak": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Culling the Weak",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Blood Crypt // Blood Crypt",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Desperate Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Desperate Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Mountain // Mountain",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_deck_provenance_seed_101.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_replay_seed_101.txt",
+      "returncode": 0,
+      "seed": 101,
+      "status": "ramp_cut_forced_replay_generated"
+    },
+    {
+      "decision_count": 139,
+      "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_replay_seed_102.decision_trace.jsonl",
+      "event_count": 972,
+      "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_replay_seed_102.events.jsonl",
+      "forced_access": {
+        "Culling the Weak": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Culling the Weak",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Mana Vault",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        },
+        "Desperate Ritual": {
+          "already_in_hand_count": 0,
+          "first_event": {
+            "card": "Desperate Ritual",
+            "event": "forced_focus_access_applied",
+            "mode": "opening_hand",
+            "player": "Kaalia of the Vast",
+            "replaced_card": "Haunted Ridge",
+            "status": "moved",
+            "turn": 0
+          },
+          "moved_count": 1,
+          "not_found_count": 0,
+          "statuses": {
+            "moved": 1
+          }
+        }
+      },
+      "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_deck_provenance_seed_102.json",
+      "replay_txt": "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_replays_20260706_current/forced_replay_seed_102.txt",
+      "returncode": 0,
+      "seed": 102,
+      "status": "ramp_cut_forced_replay_generated"
+    }
+  ],
+  "source_db_mutated": false,
+  "status": "ramp_cut_forced_access_trace_blocks_used_unexposed_cuts",
+  "summary": {
+    "candidate_copy_blocker_count": 2,
+    "focus_card_count": 2,
+    "focus_cards": [
+      "Culling the Weak",
+      "Desperate Ritual"
+    ],
+    "force_failure_count": 0,
+    "forced_access_mode": "opening_hand",
+    "generated_replay_count": 3,
+    "manual_review_count": 0,
+    "next_gate": "find_different_ramp_cut_or_exact_same_lane_replacement_after_forced_access",
+    "seed_count": 3,
+    "seed_start": 100,
+    "usage_blocked_count": 2
+  }
+}

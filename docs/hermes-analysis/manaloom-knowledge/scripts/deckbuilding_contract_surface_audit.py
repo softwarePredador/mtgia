@@ -78,6 +78,12 @@ GLOBAL_COMMANDER_RAMP_CUT_TRACE_REPLACEMENT_GATE = (
 GLOBAL_COMMANDER_RAMP_CUT_TRACE_REPLACEMENT_GATE_TEST = (
     SCRIPT_DIR / "test_global_commander_ramp_cut_trace_replacement_gate.py"
 )
+GLOBAL_COMMANDER_RAMP_CUT_FORCED_ACCESS_TRACE_GENERATOR = (
+    SCRIPT_DIR / "global_commander_ramp_cut_forced_access_trace_generator.py"
+)
+GLOBAL_COMMANDER_RAMP_CUT_FORCED_ACCESS_TRACE_GENERATOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_ramp_cut_forced_access_trace_generator.py"
+)
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT = (
     SCRIPT_DIR / "global_commander_engine_cut_usage_same_lane_proof_scout.py"
 )
@@ -521,6 +527,10 @@ GLOBAL_COMMANDER_RAMP_CUT_FOLLOWUP_ROUTER_REPORT = (
 GLOBAL_COMMANDER_RAMP_CUT_TRACE_REPLACEMENT_GATE_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_trace_replacement_gate_20260706_current.md"
+)
+GLOBAL_COMMANDER_RAMP_CUT_FORCED_ACCESS_TRACE_GENERATOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_ramp_cut_forced_access_trace_generator_20260706_current.md"
 )
 GLOBAL_COMMANDER_ENGINE_CUT_USAGE_SAME_LANE_PROOF_SCOUT_REPORT = (
     REPO_ROOT
@@ -4097,6 +4107,48 @@ def build_audit() -> dict[str, Any]:
                 "run_forced_access_trace_for_unexposed_ramp_cut",
                 "Fellwar Stone",
                 "Commander's Sphere",
+            ],
+        )
+    )
+    checks.extend(
+        [
+            check_contains(
+                GLOBAL_COMMANDER_RAMP_CUT_FORCED_ACCESS_TRACE_GENERATOR,
+                [
+                    "Generate forced-access traces for unexposed global Commander ramp cuts.",
+                    "UNEXPOSED_RAMP_STATUS",
+                    "ramp_cut_forced_access_usage_observed_blocks_cut",
+                    "candidate_copy_allowed_now",
+                ],
+            ),
+            check_contains(
+                GLOBAL_COMMANDER_RAMP_CUT_FORCED_ACCESS_TRACE_GENERATOR_TEST,
+                [
+                    "Tests for ramp cut forced-access trace generation.",
+                    "test_forced_access_usage_blocks_ramp_cut",
+                    "test_forced_access_without_usage_needs_manual_review",
+                ],
+            ),
+        ]
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_RAMP_CUT_FORCED_ACCESS_TRACE_GENERATOR_REPORT,
+            [
+                "Global Commander Ramp Cut Forced Access Trace Generator",
+                "ramp_cut_forced_access_trace_blocks_used_unexposed_cuts",
+                "focus_card_count: `2`",
+                "focus_cards: `Culling the Weak, Desperate Ritual`",
+                "seed_count: `3`",
+                "generated_replay_count: `3`",
+                "forced_access_mode: `opening_hand`",
+                "usage_blocked_count: `2`",
+                "candidate_copy_allowed_now: `false`",
+                "battle_replay_performed: `true`",
+                "battle_gate_performed: `false`",
+                "find_different_ramp_cut_or_exact_same_lane_replacement_after_forced_access",
+                "forced_access_usage_observed_blocks_ramp_cut:Culling the Weak,Desperate Ritual",
+                "candidate_copy_closed_after_ramp_forced_access_trace",
             ],
         )
     )

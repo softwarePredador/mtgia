@@ -206,6 +206,12 @@ Operational priority after this pivot:
    `global_commander_ramp_cut_trace_replacement_gate.py` to execute natural
    trace collection, review text-trace candidates, and mine local same-lane
    ramp replacement seeds without opening candidate copy; if the
+   ramp trace gate leaves unexposed ramp cuts, then run
+   `global_commander_ramp_cut_forced_access_trace_generator.py` with forced
+   access against the current evaluation target only as diagnostic evidence;
+   forced ramp usage blocks that cut until a different ramp cut or exact
+   same-lane replacement is proven, and no candidate copy, mutation, battle
+   gate, or promotion can open from forced access alone; if the
    chosen axis is `engine`,
    then run
    `global_commander_engine_axis_nonland_cut_policy_model.py` to apply that
@@ -1648,6 +1654,14 @@ Current external refresh on 2026-07-05:
   same-lane artifact ramp seeds (`Fellwar Stone` and `Commander's Sphere`).
   Candidate copy, battle gate, mutation, and promotion remain closed; the next
   gate is `run_forced_access_trace_for_unexposed_ramp_cut`.
+- The ramp cut forced-access trace generator then forces opening-hand access
+  only for the two naturally unexposed ramp cuts, `Culling the Weak` and
+  `Desperate Ritual`. Across `3` forced-access replays, both cards are used by
+  the target deck: `Culling the Weak` records `9` usage events and
+  `Desperate Ritual` records `6`, so both are blocked as cuts. The next route
+  must find a different ramp cut or exact same-lane replacement. Forced access
+  remains diagnostic evidence only: candidate copy, battle gate, mutation, and
+  promotion remain closed.
 
 ## Global Commander Rollout - 2026-07-01
 
