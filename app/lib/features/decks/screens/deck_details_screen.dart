@@ -33,6 +33,10 @@ import '../../cards/widgets/card_edition_metadata.dart';
 import '../../commercial/models/manaloom_plan.dart';
 import '../../commercial/widgets/ai_usage_gate.dart';
 
+class _GuidedRebuildPaywallBlocked implements Exception {
+  const _GuidedRebuildPaywallBlocked();
+}
+
 class DeckDetailsScreen extends StatefulWidget {
   final String deckId;
   final String? initialOptimizationIntent;
@@ -1608,7 +1612,30 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       error: error,
       fallbackArchetype: archetype,
       selectedBracket: _selectedBracket,
-      rebuildDeck: deckProvider.rebuildDeck,
+      rebuildDeck: (
+        deckId, {
+        required archetype,
+        required theme,
+        required bracket,
+        required rebuildScope,
+        required saveMode,
+      }) async {
+        final hasAiQuota = await reserveAiActionOrShowPaywall(
+          context,
+          kind: AiUsageKind.guidedRebuild,
+        );
+        if (!hasAiQuota) {
+          throw const _GuidedRebuildPaywallBlocked();
+        }
+        return deckProvider.rebuildDeck(
+          deckId,
+          archetype: archetype,
+          theme: theme,
+          bracket: bracket,
+          rebuildScope: rebuildScope,
+          saveMode: saveMode,
+        );
+      },
       refreshDeckDetails: deckProvider.fetchDeckDetails,
       onLoadingStart: () {
         showGuidedRebuildLoading(context);
@@ -1638,6 +1665,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
         );
       },
       onRebuildGenericError: (rebuildError) {
+        if (rebuildError is _GuidedRebuildPaywallBlocked) return;
         if (!mounted) return;
         showGuidedRebuildErrorSnackBar(context, rebuildError);
       },

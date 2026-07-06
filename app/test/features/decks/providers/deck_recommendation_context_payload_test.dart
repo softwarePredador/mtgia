@@ -13,6 +13,9 @@ void main() {
         'prefer_collection': true,
         'budget_limit_brl': 100,
         'rebuild_intent': 'upgraded',
+        'report': 'before_after_shareable',
+        'explain_swaps': true,
+        'include_price_risk_curve_bracket': true,
       },
     );
 
@@ -21,6 +24,9 @@ void main() {
       'prefer_collection': true,
       'budget_limit_brl': 100,
       'rebuild_intent': 'upgraded',
+      'report': 'before_after_shareable',
+      'explain_swaps': true,
+      'include_price_risk_curve_bracket': true,
     });
   });
 }

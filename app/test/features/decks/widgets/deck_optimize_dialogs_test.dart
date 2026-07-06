@@ -38,6 +38,36 @@ void main() {
     expect(find.text('Etapa 2 de 5'), findsOneWidget);
   });
 
+  testWidgets(
+    'recommendation context shows collection and budget constraints',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: RecommendationContextSection(
+              preferCollection: true,
+              budgetLimit: 100,
+              rebuildIntent: 'optimized',
+              onPreferCollectionChanged: (_) {},
+              onBudgetLimitChanged: (_) {},
+              onRebuildIntentChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        find.byKey(const Key('optimize-recommendation-context-summary')),
+        findsOneWidget,
+      );
+      expect(find.text('A IA vai respeitar'), findsOneWidget);
+      expect(find.text('Coleção primeiro'), findsOneWidget);
+      expect(find.text('Até R\$ 100'), findsOneWidget);
+      expect(find.text('Optimized'), findsWidgets);
+      expect(find.text('Antes/depois'), findsOneWidget);
+    },
+  );
+
   testWidgets('apply optimization loading helper opens dialog', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

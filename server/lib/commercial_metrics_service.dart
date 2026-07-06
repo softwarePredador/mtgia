@@ -30,6 +30,9 @@ class CommercialMetricsService {
       'generated_at': DateTime.now().toUtc().toIso8601String(),
       'activation_funnel': activation,
       'ai_performance': ai,
+      'ai_performance_history': hasAiLogs
+          ? await aiPerformanceHistory(days: safeDays, bucket: 'day')
+          : _missing('ai_logs'),
       'plan_mix': plans,
       'shareable_reports': reports,
       'retention': retention,
@@ -37,6 +40,122 @@ class CommercialMetricsService {
   }
 
   static int normalizeWindowDays(int days) => days.clamp(1, 90);
+  static String normalizeHistoryBucket(String? bucket) {
+    final normalized = bucket?.trim().toLowerCase();
+    return normalized == 'hour' ? 'hour' : 'day';
+  }
+
+  static int normalizeHistoryWindowDays(int days, {String bucket = 'day'}) {
+    final normalizedBucket = normalizeHistoryBucket(bucket);
+    final maxDays = normalizedBucket == 'hour' ? 7 : 90;
+    return days.clamp(1, maxDays);
+  }
+
+  Future<Map<String, dynamic>> aiPerformanceHistory({
+    int days = 30,
+    String bucket = 'day',
+  }) async {
+    final normalizedBucket = normalizeHistoryBucket(bucket);
+    final safeDays = normalizeHistoryWindowDays(
+      days,
+      bucket: normalizedBucket,
+    );
+    final hasAiLogs = await _tableExists('ai_logs');
+    if (!hasAiLogs) return _missing('ai_logs');
+
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT
+          date_trunc('$normalizedBucket', created_at) AS period_start,
+          endpoint,
+          COUNT(*)::int AS request_count,
+          SUM(CASE WHEN success THEN 0 ELSE 1 END)::int AS error_count,
+          ROUND(AVG(latency_ms))::int AS avg_latency_ms,
+          COALESCE(
+            percentile_disc(0.95) WITHIN GROUP (ORDER BY latency_ms),
+            0
+          )::int AS p95_latency_ms,
+          COALESCE(SUM(COALESCE(input_tokens, 0)), 0)::int AS input_tokens,
+          COALESCE(SUM(COALESCE(output_tokens, 0)), 0)::int AS output_tokens
+        FROM ai_logs
+        WHERE created_at >= NOW() - (@days * INTERVAL '1 day')
+        GROUP BY period_start, endpoint
+        ORDER BY period_start ASC, endpoint ASC
+      '''),
+      parameters: {'days': safeDays},
+    );
+
+    final periodsByStart = <String, Map<String, dynamic>>{};
+    var totalRequests = 0;
+    var totalErrors = 0;
+    var totalInputTokens = 0;
+    var totalOutputTokens = 0;
+
+    for (final row in result) {
+      final periodStart = _dateIso(row[0]);
+      final endpoint = row[1]?.toString() ?? 'unknown';
+      final requestCount = (row[2] as int?) ?? 0;
+      final errorCount = (row[3] as int?) ?? 0;
+      final inputTokens = (row[6] as int?) ?? 0;
+      final outputTokens = (row[7] as int?) ?? 0;
+
+      totalRequests += requestCount;
+      totalErrors += errorCount;
+      totalInputTokens += inputTokens;
+      totalOutputTokens += outputTokens;
+
+      final period = periodsByStart.putIfAbsent(
+        periodStart,
+        () => {
+          'period_start': periodStart,
+          'request_count': 0,
+          'error_count': 0,
+          'total_tokens': 0,
+          'endpoints': <Map<String, dynamic>>[],
+        },
+      );
+      period['request_count'] = (period['request_count'] as int) + requestCount;
+      period['error_count'] = (period['error_count'] as int) + errorCount;
+      period['total_tokens'] =
+          (period['total_tokens'] as int) + inputTokens + outputTokens;
+      (period['endpoints'] as List<Map<String, dynamic>>).add({
+        'endpoint': endpoint,
+        'request_count': requestCount,
+        'error_count': errorCount,
+        'error_rate': requestCount > 0 ? _ratio(errorCount, requestCount) : 0.0,
+        'avg_latency_ms': (row[4] as int?) ?? 0,
+        'p95_latency_ms': (row[5] as int?) ?? 0,
+        'input_tokens': inputTokens,
+        'output_tokens': outputTokens,
+      });
+    }
+
+    final periods = periodsByStart.values.map((period) {
+      final requestCount = period['request_count'] as int;
+      final errorCount = period['error_count'] as int;
+      return {
+        ...period,
+        'error_rate': requestCount > 0 ? _ratio(errorCount, requestCount) : 0.0,
+      };
+    }).toList();
+
+    return {
+      'status': 'ok',
+      'bucket': normalizedBucket,
+      'window_days': safeDays,
+      'period_count': periods.length,
+      'totals': {
+        'request_count': totalRequests,
+        'error_count': totalErrors,
+        'error_rate':
+            totalRequests > 0 ? _ratio(totalErrors, totalRequests) : 0.0,
+        'input_tokens': totalInputTokens,
+        'output_tokens': totalOutputTokens,
+        'total_tokens': totalInputTokens + totalOutputTokens,
+      },
+      'periods': periods,
+    };
+  }
 
   Map<String, dynamic> _missing(String table) => {
         'status': 'not_initialized',
@@ -248,6 +367,14 @@ class CommercialMetricsService {
     );
     return result.isNotEmpty && (((result.first[0] as int?) ?? 0) > 0);
   }
+}
+
+String _dateIso(Object? value) {
+  if (value is DateTime) return value.toUtc().toIso8601String();
+  return DateTime.tryParse(value?.toString() ?? '')
+          ?.toUtc()
+          .toIso8601String() ??
+      value.toString();
 }
 
 double _ratio(int numerator, int denominator) =>

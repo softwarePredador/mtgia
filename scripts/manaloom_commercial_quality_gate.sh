@@ -52,6 +52,7 @@ fetch_json() {
 health_file="$RUN_DIR/health.json"
 ready_file="$RUN_DIR/ready.json"
 commercial_file="$RUN_DIR/commercial.json"
+ai_history_file="$RUN_DIR/ai_history.json"
 service_file="$RUN_DIR/service.txt"
 cron_file="$RUN_DIR/remote_cron.txt"
 backup_file="$RUN_DIR/remote_backup_latest.json"
@@ -62,6 +63,7 @@ summary_file="$RUN_DIR/summary.json"
 fetch_json "$API/health" "$health_file"
 fetch_json "$API/ready" "$ready_file"
 fetch_json "$API/health/commercial" "$commercial_file"
+fetch_json "$API/health/ai-history?days=30&bucket=day" "$ai_history_file"
 
 ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i "$SSH_KEY" "$SSH_HOST" \
   'docker service ls --format "{{.Name}} {{.Image}} {{.Replicas}}" | grep evolution_cartinhas' \
@@ -88,6 +90,8 @@ ready_status="$(jq -r '.status' "$ready_file")"
 git_sha="$(jq -r '.git_sha // ""' "$health_file")"
 smoke_status="$(jq -r '.status' "$smoke_file")"
 benchmark_status="$(jq -r '.status' "$benchmark_file")"
+ai_history_status="$(jq -r '.status' "$ai_history_file")"
+ai_history_periods="$(jq -r '.period_count // 0' "$ai_history_file")"
 mock_count="$(jq -r '.mock_response_count // 0' "$benchmark_file")"
 successful_ai_runs="$(jq -r '.successful_runs // 0' "$benchmark_file")"
 backup_bytes="$(jq -r '.bytes // 0' "$backup_file")"
@@ -126,6 +130,10 @@ if [ "$benchmark_status" != "pass" ]; then
     issues+=("ai_generation_degraded")
   fi
 fi
+if [ "$ai_history_status" != "ok" ]; then
+  status="fail"
+  issues+=("ai_history_dashboard_unavailable")
+fi
 if [ "$backup_bytes" -lt 1024 ]; then
   status="fail"
   issues+=("backup_missing_or_too_small")
@@ -145,8 +153,10 @@ jq -n \
   --arg run_dir "$RUN_DIR" \
   --arg service_replicas "$service_replicas" \
   --arg benchmark_status "$benchmark_status" \
+  --arg ai_history_status "$ai_history_status" \
   --argjson successful_ai_runs "$successful_ai_runs" \
   --argjson mock_count "$mock_count" \
+  --argjson ai_history_periods "$ai_history_periods" \
   --argjson backup_bytes "$backup_bytes" \
   --argjson cron_lines "$cron_lines" \
   --argjson issues "$issues_json" \
@@ -160,6 +170,10 @@ jq -n \
       status: $benchmark_status,
       successful_runs: $successful_ai_runs,
       mock_response_count: $mock_count
+    },
+    ai_history: {
+      status: $ai_history_status,
+      period_count: $ai_history_periods
     },
     backup: {
       latest_bytes: $backup_bytes,

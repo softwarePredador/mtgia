@@ -15,10 +15,13 @@ Future<Response> onRequest(RequestContext context) async {
   try {
     final pool = context.read<Pool>();
     final requestMetrics = RequestMetricsService.instance.snapshot();
+    final commercialMetrics = CommercialMetricsService(pool);
 
     final aiCost = await _loadAiCostProxy(pool);
     final aiOptimize = await _loadAiOptimizeOverview(pool);
-    final commercial = await CommercialMetricsService(pool).snapshot(days: 30);
+    final aiHistory =
+        await commercialMetrics.aiPerformanceHistory(days: 30, bucket: 'day');
+    final commercial = await commercialMetrics.snapshot(days: 30);
 
     return Response.json(
       statusCode: HttpStatus.ok,
@@ -29,6 +32,7 @@ Future<Response> onRequest(RequestContext context) async {
           'requests': requestMetrics,
           'ai_cost_proxy': aiCost,
           'ai_optimize': aiOptimize,
+          'ai_history': aiHistory,
           'commercial': commercial,
         },
       },

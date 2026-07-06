@@ -170,7 +170,131 @@ class RecommendationContextSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
+          _RecommendationContextSummary(
+            preferCollection: preferCollection,
+            budgetLimit: budgetLimit,
+            rebuildIntent: rebuildIntent,
+          ),
+          const SizedBox(height: 12),
           const _RecommendationTrustNote(),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecommendationContextSummary extends StatelessWidget {
+  const _RecommendationContextSummary({
+    required this.preferCollection,
+    required this.budgetLimit,
+    required this.rebuildIntent,
+  });
+
+  final bool preferCollection;
+  final double budgetLimit;
+  final String rebuildIntent;
+
+  String get _budgetLabel {
+    final rounded = budgetLimit.round();
+    if (rounded <= 0) return 'Sem compras novas';
+    return 'Até R\$ $rounded';
+  }
+
+  String get _collectionLabel =>
+      preferCollection ? 'Coleção primeiro' : 'Coleção + mercado';
+
+  String get _intentLabel {
+    return switch (rebuildIntent) {
+      'casual' => 'Casual',
+      'upgraded' => 'Upgraded',
+      'optimized' => 'Optimized',
+      'cedh' => 'cEDH',
+      _ => rebuildIntent,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('optimize-recommendation-context-summary'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.6)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'A IA vai respeitar',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _RecommendationConstraintChip(
+                icon: Icons.inventory_2_outlined,
+                label: _collectionLabel,
+              ),
+              _RecommendationConstraintChip(
+                icon: Icons.payments_outlined,
+                label: _budgetLabel,
+              ),
+              _RecommendationConstraintChip(
+                icon: Icons.speed_outlined,
+                label: _intentLabel,
+              ),
+              const _RecommendationConstraintChip(
+                icon: Icons.compare_arrows_outlined,
+                label: 'Antes/depois',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecommendationConstraintChip extends StatelessWidget {
+  const _RecommendationConstraintChip({
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.45),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: AppTheme.frost400),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
