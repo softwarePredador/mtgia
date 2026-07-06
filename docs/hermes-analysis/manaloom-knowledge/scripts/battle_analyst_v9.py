@@ -8636,6 +8636,9 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "life_gain_on_counter",
     "life_loss_on_counter",
     "target_controller_life_loss_on_counter",
+    "life_loss_on_destroy",
+    "target_controller_life_loss_on_destroy",
+    "life_loss_amount",
     "scry_on_counter",
     "scry_count",
     "counter_unless_pays_generic",
@@ -12279,6 +12282,55 @@ def apply_removal_life_gain(effect_data, target_controller, target, source_contr
     return requested, max(0, after - before)
 
 
+def removal_target_controller_life_loss_requested(effect_data):
+    if not isinstance(effect_data, dict):
+        return 0
+    try:
+        return max(
+            0,
+            int(
+                effect_data.get("target_controller_life_loss_on_destroy")
+                or effect_data.get("life_loss_on_destroy")
+                or 0
+            ),
+        )
+    except Exception:
+        return 0
+
+
+def apply_removal_target_controller_life_loss(
+    effect_data,
+    target_controller,
+    source_card,
+    target,
+    destination,
+    turn,
+):
+    requested = removal_target_controller_life_loss_requested(effect_data)
+    if requested <= 0 or target_controller is None or str(destination or "").lower() != "graveyard":
+        return requested, 0
+    before = int(getattr(target_controller, "life", 0) or 0)
+    change_life(target_controller, -requested)
+    after = int(getattr(target_controller, "life", 0) or 0)
+    lost = max(0, before - after)
+    emit_replay_event(
+        "life_loss_on_destroy_resolved",
+        player=getattr(target_controller, "name", None),
+        card=source_card.get("name", "?") if isinstance(source_card, dict) else "?",
+        target=target.get("name", "?") if isinstance(target, dict) else "?",
+        target_controller=getattr(target_controller, "name", None),
+        destination=destination,
+        life_loss_on_destroy=requested,
+        target_controller_life_loss_on_destroy=requested,
+        target_controller_life_before=before,
+        target_controller_life_after=after,
+        target_controller_life_lost=lost,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return requested, lost
+
+
 def removal_life_gain_replay_fields(effect_data, requested, gained):
     fields = {}
     if not isinstance(effect_data, dict):
@@ -12913,10 +12965,10 @@ def move_removed_permanent_to_destination(
                 **replay_rule_fields(effect_data),
             )
             return "none"
-        move_permanent_from_battlefield(
+        destination = move_permanent_from_battlefield(
             target_controller,
             target,
-            reason="removal",
+            reason="destroy",
             source=source_card,
         )
     resolve_basic_land_compensation(
@@ -13137,7 +13189,7 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
         if check_ward(target, card, player, rng):
             ward_countered.append(decision["target_name"])
             continue
-        move_removed_permanent_to_destination(
+        destination = move_removed_permanent_to_destination(
             target_controller,
             target,
             card,
@@ -13145,6 +13197,14 @@ def resolve_multi_target_removal(player, opponents, card, effect_data, turn, rng
             turn,
             rng,
             all_players=players,
+        )
+        apply_removal_target_controller_life_loss(
+            effect_data,
+            target_controller,
+            card,
+            target,
+            destination,
+            turn,
         )
         create_removal_compensation_tokens(effect_data, target_controller, card, turn)
         create_controller_treasures_after_removal(effect_data, player, card, turn)
@@ -13320,7 +13380,7 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         ),
         **replay_rule_fields(effect_data),
     )
-    move_removed_permanent_to_destination(
+    destination = move_removed_permanent_to_destination(
         target_controller,
         target,
         card,
@@ -13328,6 +13388,14 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         turn,
         rng,
         all_players=players,
+    )
+    apply_removal_target_controller_life_loss(
+        effect_data,
+        target_controller,
+        card,
+        target,
+        destination,
+        turn,
     )
     apply_cant_block_until_eot_runtime(
         player,
@@ -57315,7 +57383,7 @@ def apply_effect_immediate(
                         ),
                         **replay_rule_fields(effect_data),
                     )
-                move_removed_permanent_to_destination(
+                destination = move_removed_permanent_to_destination(
                     opp,
                     t,
                     card,
@@ -57323,6 +57391,14 @@ def apply_effect_immediate(
                     turn,
                     rng,
                     all_players=all_players_for_entry,
+                )
+                apply_removal_target_controller_life_loss(
+                    effect_data,
+                    opp,
+                    card,
+                    t,
+                    destination,
+                    turn,
                 )
                 create_removal_compensation_tokens(effect_data, opp, card, turn)
                 create_controller_treasures_after_removal(effect_data, player, card, turn)

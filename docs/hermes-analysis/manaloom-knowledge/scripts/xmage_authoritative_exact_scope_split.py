@@ -168,6 +168,9 @@ DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spe
 GRAVEYARD_COUNT_DAMAGE_SCOPE = "xmage_dynamic_graveyard_count_damage_spell_v1"
 DYNAMIC_COUNT_DAMAGE_SCOPE = "xmage_dynamic_count_damage_spell_v1"
 DESTROY_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_controller_gain_life_spell_v1"
+DESTROY_TARGET_CONTROLLER_LOSE_LIFE_SCOPE = (
+    "xmage_destroy_target_and_target_controller_loses_life_spell_v1"
+)
 CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1"
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
@@ -2306,6 +2309,43 @@ def simple_destroy_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[str,
         if match:
             return target, int(match.group(1))
     return None
+
+
+def simple_destroy_target_controller_life_loss_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    destroy_matches = list(re.finditer(r"new\s+DestroyTargetEffect\s*\(\s*(?:true\s*)?\)", text, re.S))
+    if len(destroy_matches) != 1:
+        return None
+    life_matches = list(re.finditer(r"new\s+LoseLifeTargetControllerEffect\s*\(\s*(\d+)\s*\)", text, re.S))
+    if len(life_matches) != 1:
+        return None
+    if destroy_matches[0].start() > life_matches[0].start():
+        return None
+    return int(life_matches[0].group(1))
+
+
+def simple_destroy_target_controller_life_loss_from_oracle(
+    metadata: dict[str, Any],
+) -> tuple[str, str, int] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^(destroy target .+?)(\. it can't be regenerated)?\. "
+        r"its controller loses (?P<life>\d+) life\.?$",
+        text,
+    )
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group(1)}{match.group(2) or ''}."
+    parsed = destroy_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target = parsed
+    return effect, target, int(match.group("life"))
 
 
 def fixed_destroy_draw_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
@@ -16839,6 +16879,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature ETB return target permanent to hand trigger"
     elif scope == DESTROY_GAIN_LIFE_SCOPE:
         scope_kind = "fixed destroy-target plus controller life-gain spell"
+    elif scope == DESTROY_TARGET_CONTROLLER_LOSE_LIFE_SCOPE:
+        scope_kind = "fixed destroy-target spell with target-controller life loss"
     elif scope == DESTROY_CREATE_TREASURE_SCOPE:
         scope_kind = "fixed destroy-target plus controller Treasure creation spell"
     elif scope == LIFE_GAIN_DRAW_SCOPE:
@@ -23137,6 +23179,43 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_damage_spell"), "selected_exact_scope"
 
     if unit == DESTROY_UNIT:
+        if classes == {"DestroyTargetEffect", "LoseLifeTargetControllerEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "destroy_target_controller_life_loss_ability_class_not_simple"
+            if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
+                return None, "destroy_target_controller_life_loss_additional_cost_not_supported"
+            source_life_loss = simple_destroy_target_controller_life_loss_from_source(source_text)
+            if source_life_loss is None:
+                return None, "destroy_target_controller_life_loss_source_not_fixed"
+            oracle_destroy = simple_destroy_target_controller_life_loss_from_oracle(metadata)
+            if oracle_destroy is None:
+                return None, "destroy_target_controller_life_loss_oracle_not_exact_fixed"
+            effect, target_type, oracle_life_loss = oracle_destroy
+            if source_life_loss != oracle_life_loss:
+                return None, "destroy_target_controller_life_loss_source_oracle_mismatch"
+            if not source_matches_target_constraint(source_text, target_type):
+                return None, "destroy_target_controller_life_loss_target_source_mismatch"
+            target_base = restricted_target_base(target_type)
+            effect_json = {
+                "effect": effect,
+                "battle_model_scope": DESTROY_TARGET_CONTROLLER_LOSE_LIFE_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "graveyard",
+                "target_controller_life_loss_on_destroy": int(oracle_life_loss),
+                "life_loss_on_destroy": int(oracle_life_loss),
+                "life_loss_amount": int(oracle_life_loss),
+                "resolution_order": "destroy_then_target_controller_life_loss",
+                "xmage_effect_classes": ["DestroyTargetEffect", "LoseLifeTargetControllerEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_destroy_target_controller_life_loss_spell",
+            ), "selected_exact_scope"
         if classes != {"DestroyTargetEffect"}:
             return None, "destroy_effect_class_not_pure"
         additional_cost_fields, additional_cost_reason = fixed_destroy_spell_additional_cost_fields_from_source(

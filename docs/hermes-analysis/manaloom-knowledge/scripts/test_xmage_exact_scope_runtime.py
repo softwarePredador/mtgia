@@ -227,6 +227,82 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_destroy_target_controller_life_loss_applies_after_destroy(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 20
+        land = {
+            "name": "Fixture Mine",
+            "type_line": "Land",
+        }
+        opponent.battlefield = [land]
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+            "target": "land",
+            "target_constraints": {"card_types": ["land"]},
+            "destination": "graveyard",
+            "target_controller_life_loss_on_destroy": 2,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Despoil", "type_line": "Sorcery"},
+            turn=10,
+            rng=random.Random(10),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 18)
+        self.assertEqual(opponent.battlefield, [])
+        self.assertIn(land, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "life_loss_on_destroy_resolved"
+                and data.get("card") == "Fixture Despoil"
+                and data.get("target") == "Fixture Mine"
+                and data.get("target_controller_life_lost") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_destroy_target_controller_life_loss_does_not_apply_when_regenerated(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 20
+        troll = {
+            "name": "Shielded Fixture",
+            "type_line": "Creature - Troll",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "regeneration_shields": 1,
+        }
+        opponent.battlefield = [troll]
+        effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "graveyard",
+            "target_controller_life_loss_on_destroy": 2,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Hideous End", "type_line": "Instant"},
+            turn=11,
+            rng=random.Random(11),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 20)
+        self.assertIn(troll, opponent.battlefield)
+        self.assertNotIn(troll, opponent.graveyard)
+        self.assertFalse(any(event == "life_loss_on_destroy_resolved" for event, _data in self.events))
+
     def test_static_flash_permission_artifact_filter_only_allows_artifacts(self) -> None:
         active = self.battle.Player("Active", None, [])
         artifact = {"name": "Mind Stone", "type_line": "Artifact", "mana_cost": "{2}"}

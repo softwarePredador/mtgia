@@ -6840,6 +6840,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "destroy_life_gain_source_not_fixed")
 
+    def test_destroy_target_controller_life_loss_spell_maps_fixed_loss(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect", "LoseLifeTargetControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target land. Its controller loses 2 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addEffect(new LoseLifeTargetControllerEffect(2));"
+                "this.getSpellAbility().addTarget(new TargetLandPermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_TARGET_CONTROLLER_LOSE_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "land")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["land"]})
+        self.assertEqual(effect["target_controller_life_loss_on_destroy"], 2)
+        self.assertEqual(effect["life_loss_on_destroy"], 2)
+        self.assertEqual(effect["resolution_order"], "destroy_then_target_controller_life_loss")
+
+    def test_destroy_target_controller_life_loss_spell_blocks_additional_cost(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect", "LoseLifeTargetControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, sacrifice a creature. Destroy target creature. Its controller loses 2 life."),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addEffect(new LoseLifeTargetControllerEffect(2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "additional_cost_detected")
+
     def test_destroy_gain_life_spell_blocks_restricted_target_filter(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
         proposal, reason = split.split_row(

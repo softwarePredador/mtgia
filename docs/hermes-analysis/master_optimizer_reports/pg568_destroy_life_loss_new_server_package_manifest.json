@@ -1,0 +1,432 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg568_destroy_life_loss_new_server_20260706_130040",
+  "deploy_id": "pg568",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Despoil",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb008ee853e0c16a82d310f3b1bcd83c",
+      "min_rule_version": 2,
+      "normalized_name": "despoil",
+      "oracle_hash": "e6aabef5c8b19127d673861a72992af7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Glissa's Scorn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45f19be7da622c48c1663fe0000f6df7",
+      "min_rule_version": 2,
+      "normalized_name": "glissa's scorn",
+      "oracle_hash": "87af1241e46e757e1da03e0597820331",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hideous End",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24333b3df3cde8c82347931bcb69ad60",
+      "min_rule_version": 2,
+      "normalized_name": "hideous end",
+      "oracle_hash": "283ba3dd92a7fec5b5df73f9c2c202ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sip of Hemlock",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f686c3e82b40ec6e14f999c8e673e88",
+      "min_rule_version": 2,
+      "normalized_name": "sip of hemlock",
+      "oracle_hash": "3125a6f0add80e2884d95059c587e5d0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spreading Rot",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb008ee853e0c16a82d310f3b1bcd83c",
+      "min_rule_version": 2,
+      "normalized_name": "spreading rot",
+      "oracle_hash": "e6aabef5c8b19127d673861a72992af7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Victorious Destruction",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b83a1a4eafbf7337d350ae97c171e642",
+      "min_rule_version": 2,
+      "normalized_name": "victorious destruction",
+      "oracle_hash": "4f70b37a0a9accdda0fec8d01827dec8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_destroy_target_controller_life_loss_spell": 6
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg568_destroy_life_loss_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg568_destroy_life_loss_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg568_destroy_life_loss_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg568_destroy_life_loss_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg568_destroy_life_loss_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg568_destroy_life_loss_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T13:00:40+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Despoil"
+      },
+      "card_name": "Despoil",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb008ee853e0c16a82d310f3b1bcd83c",
+      "normalized_name": "despoil",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Glissa's Scorn"
+      },
+      "card_name": "Glissa's Scorn",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45f19be7da622c48c1663fe0000f6df7",
+      "normalized_name": "glissa's scorn",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Hideous End"
+      },
+      "card_name": "Hideous End",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24333b3df3cde8c82347931bcb69ad60",
+      "normalized_name": "hideous end",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Sip of Hemlock"
+      },
+      "card_name": "Sip of Hemlock",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f686c3e82b40ec6e14f999c8e673e88",
+      "normalized_name": "sip of hemlock",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Spreading Rot"
+      },
+      "card_name": "Spreading Rot",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb008ee853e0c16a82d310f3b1bcd83c",
+      "normalized_name": "spreading rot",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Victorious Destruction"
+      },
+      "card_name": "Victorious Destruction",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b83a1a4eafbf7337d350ae97c171e642",
+      "normalized_name": "victorious destruction",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "resolution_order": "destroy_then_target_controller_life_loss",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_effect_classes": [
+          "DestroyTargetEffect",
+          "LoseLifeTargetControllerEffect"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Despoil",
+    "Glissa's Scorn",
+    "Hideous End",
+    "Sip of Hemlock",
+    "Spreading Rot",
+    "Victorious Destruction"
+  ],
+  "selected_count": 6,
+  "slug": "destroy_life_loss_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Despoil",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb008ee853e0c16a82d310f3b1bcd83c",
+      "min_rule_version": 2,
+      "normalized_name": "despoil",
+      "oracle_hash": "e6aabef5c8b19127d673861a72992af7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Glissa's Scorn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45f19be7da622c48c1663fe0000f6df7",
+      "min_rule_version": 2,
+      "normalized_name": "glissa's scorn",
+      "oracle_hash": "87af1241e46e757e1da03e0597820331",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hideous End",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24333b3df3cde8c82347931bcb69ad60",
+      "min_rule_version": 2,
+      "normalized_name": "hideous end",
+      "oracle_hash": "283ba3dd92a7fec5b5df73f9c2c202ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sip of Hemlock",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f686c3e82b40ec6e14f999c8e673e88",
+      "min_rule_version": 2,
+      "normalized_name": "sip of hemlock",
+      "oracle_hash": "3125a6f0add80e2884d95059c587e5d0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spreading Rot",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb008ee853e0c16a82d310f3b1bcd83c",
+      "min_rule_version": 2,
+      "normalized_name": "spreading rot",
+      "oracle_hash": "e6aabef5c8b19127d673861a72992af7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Victorious Destruction",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b83a1a4eafbf7337d350ae97c171e642",
+      "min_rule_version": 2,
+      "normalized_name": "victorious destruction",
+      "oracle_hash": "4f70b37a0a9accdda0fec8d01827dec8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_and_target_controller_loses_life_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
