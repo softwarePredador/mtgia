@@ -432,6 +432,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     blocker `candidate_underperformed_base_probe`. Licao global: a carta
     adicionada pode ser util, mas o corte de `Birgi` esta errado para essa shell
     sem substituto de mesma lane e gate maior aprovado.
+    Para o pacote Lorehold profile-repair, o novo runner
+    `manaloom-knowledge/scripts/global_commander_candidate_battle_probe_runner.py`
+    gerou os inputs padronizados em
+    `master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package.md`.
+    O audit estrito
+    `master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260706_lorehold_profile_repair_package.md`
+    bloqueou promocao: `battle_probe_blocks_promotion`,
+    `added_cards_not_exercised_in_replay_events`, com `Call Forth the Tempest`
+    exercitada e `Bant Panorama`, `Brokers Hideout`, `Pyromancer's Goggles` e
+    `Birgi, God of Storytelling // Harnfel, Horn of Bounty` apenas em
+    `added_cards_seen_without_exercise`.
     O modelo nonland agora bloqueia cortes cross-lane de ramp com
     `cross_lane_ramp_cut_requires_same_lane_source_or_gate`, removendo `Birgi`
     dos cuts genericos de removal. O novo top pair `+Feed the Swarm /

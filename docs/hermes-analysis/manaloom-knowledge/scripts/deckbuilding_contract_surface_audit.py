@@ -189,6 +189,12 @@ GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_TEST = (
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_battle_probe_audit.py"
 )
+GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_RUNNER = (
+    SCRIPT_DIR / "global_commander_candidate_battle_probe_runner.py"
+)
+GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_RUNNER_TEST = (
+    SCRIPT_DIR / "test_global_commander_candidate_battle_probe_runner.py"
+)
 GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL = SCRIPT_DIR / "global_commander_battle_feedback_model.py"
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_package_chain_audit.py"
@@ -731,6 +737,14 @@ GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_CHAIN_REPORT = (
 GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_PACKAGE_STRATEGY_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package.md"
+)
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_BATTLE_PROBE_RUNNER_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package.md"
+)
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_BATTLE_PROBE_AUDIT_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260706_lorehold_profile_repair_package.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
     REPO_ROOT
@@ -1277,6 +1291,13 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_candidate_copy_materializer_20260706_lorehold_profile_repair_package.md",
                 "global_commander_candidate_package_chain_audit_20260706_lorehold_profile_repair_package.md",
                 "global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package.md",
+                "global_commander_candidate_battle_probe_runner.py",
+                "global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package.md",
+                "global_commander_candidate_battle_probe_audit_20260706_lorehold_profile_repair_package.md",
+                "battle_probe_blocks_promotion",
+                "added_cards_not_exercised_in_replay_events",
+                "added_cards_seen_without_exercise",
+                "added_cards_unexercised_in_events",
                 "commander_profile_not_available",
                 "profile_lands_below_target",
                 "protected anchor cuts",
@@ -1738,6 +1759,12 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md",
                 "candidato `33.3%` vs",
                 "nenhuma das cinco remocoes adicionadas foi exercida",
+                "global_commander_candidate_battle_probe_runner.py",
+                "global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package.md",
+                "global_commander_candidate_battle_probe_audit_20260706_lorehold_profile_repair_package.md",
+                "battle_probe_blocks_promotion",
+                "added_cards_not_exercised_in_replay_events",
+                "added_cards_seen_without_exercise",
                 "global_commander_battle_feedback_model.py",
                 "global_commander_battle_feedback_model_20260705_current.md",
                 "pair_blocked_by_failed_gate",
@@ -3950,12 +3977,39 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_RUNNER,
+            [
+                "global_commander_candidate_battle_probe_runner",
+                "candidate_battle_probe_inputs_ready",
+                "battle_probe_audit_ready",
+                "MANALOOM_FOCUS_ACCESS_CARDS",
+                "source_db_mutated",
+                "promotion_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_RUNNER_TEST,
+            [
+                "test_build_payload_writes_metric_files_and_replay_inputs",
+                "candidate_battle_probe_inputs_ready",
+                "test_missing_candidate_result_blocks_audit_ready",
+                "candidate_result_missing_from_battle_gate",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_AUDIT,
             [
                 "global_commander_candidate_battle_probe_audit",
+                "EXERCISE_EVENT_NAMES",
                 "battle_probe_blocks_promotion",
                 "candidate_underperformed_base_probe",
                 "added_cards_not_exercised_in_replay_events",
+                "added_cards_seen_without_exercise",
+                "added_cards_unexercised_in_events",
                 "stale_lorehold_mentions",
                 "promotion_allowed",
                 "larger_battle_gate_required",
@@ -5229,6 +5283,35 @@ def build_audit() -> dict[str, Any]:
                 "Bant Panorama",
                 "Storm-Kiln Artist",
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_BATTLE_PROBE_RUNNER_REPORT,
+            [
+                "Global Commander Candidate Battle Probe Runner",
+                "candidate_battle_probe_inputs_ready",
+                "battle_probe_audit_ready: `true`",
+                "source_db_mutated: `false`",
+                "base_wr: `0.0`",
+                "candidate_wr: `100.0`",
+                "run_global_commander_candidate_battle_probe_audit",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_BATTLE_PROBE_AUDIT_REPORT,
+            [
+                "Global Commander Candidate Battle Probe Audit",
+                "battle_probe_blocks_promotion",
+                "promotion_allowed: `false`",
+                "larger_battle_gate_required: `true`",
+                "added_cards_exercised_in_events: `['Call Forth the Tempest']`",
+                "added_cards_seen_without_exercise",
+                "added_cards_unexercised_in_events",
+                "added_cards_not_exercised_in_replay_events",
             ],
         )
     )

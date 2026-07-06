@@ -101,6 +101,51 @@ class GlobalCommanderCandidateBattleProbeAuditTests(unittest.TestCase):
         self.assertEqual(payload["replay"]["added_cards_decision_only"], ["Terminate"])
         self.assertIn("3-game equal-sample", payload["policy"]["battle_sample"])
 
+    def test_focus_snapshot_mentions_do_not_count_as_exercised_added_cards(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        base_db = root / "base.db"
+        candidate_db = root / "candidate.db"
+        self._db(base_db, [("Kaalia of the Vast", 1), ("Old Card", 0)])
+        self._db(candidate_db, [("Kaalia of the Vast", 1), ("Terminate", 0)])
+        base_metrics = root / "base_metrics.json"
+        candidate_metrics = root / "candidate_metrics.json"
+        self._metrics(base_metrics, wins=1, losses=1, win_rate=50.0)
+        self._metrics(candidate_metrics, wins=2, losses=0, win_rate=100.0)
+        replay_dir = root / "replay"
+        replay_dir.mkdir()
+        (replay_dir / "deck_provenance.json").write_text(
+            json.dumps({"decks": [{"name": "Kaalia of the Vast"}]}),
+            encoding="utf-8",
+        )
+        (replay_dir / "replay.events.jsonl").write_text(
+            json.dumps(
+                {
+                    "event": "focus_card_access_snapshot",
+                    "focus_card_zones": {"Terminate": {"zone": "library"}},
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        (replay_dir / "replay.decision_trace.jsonl").write_text("", encoding="utf-8")
+
+        payload = audit.build_payload(
+            base_db=base_db,
+            candidate_db=candidate_db,
+            deck_id=619,
+            base_metrics=base_metrics,
+            candidate_metrics=candidate_metrics,
+            replay_dir=replay_dir,
+        )
+
+        self.assertEqual(payload["status"], "battle_probe_blocks_promotion")
+        self.assertEqual(payload["replay"]["added_cards_exercised_in_events"], [])
+        self.assertEqual(payload["replay"]["added_cards_seen_without_exercise"], ["Terminate"])
+        self.assertEqual(payload["replay"]["added_cards_unexercised_in_events"], ["Terminate"])
+        self.assertIn("added_cards_not_exercised_in_replay_events", payload["blocker_reasons"])
+
 
 if __name__ == "__main__":
     unittest.main()

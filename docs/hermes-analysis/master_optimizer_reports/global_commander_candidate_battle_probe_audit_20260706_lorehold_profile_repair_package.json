@@ -1,0 +1,1273 @@
+{
+  "artifact_type": "global_commander_candidate_battle_probe_audit",
+  "battle_metrics": {
+    "base": {
+      "evaluation_mode": "equal_seed_battle_probe",
+      "evaluation_target_player": "Lorehold, the Historian",
+      "event_counts": {
+        "activated_ability_skipped": 5,
+        "cast_announced": 5,
+        "combat": 6,
+        "combat_result": 6,
+        "combat_step": 36,
+        "commander_cast": 1,
+        "copy_creature_token_failed": 1,
+        "cost_paid": 5,
+        "creature_cast": 1,
+        "focus_card_access_snapshot": 36,
+        "land_played": 10,
+        "lorehold_upkeep_rummage": 1,
+        "lorehold_upkeep_rummage_skipped": 3,
+        "mana_refreshed": 36,
+        "player_eliminated": 1,
+        "priority_pass": 56,
+        "spell_cast": 3,
+        "spell_resolved": 1,
+        "turn_end": 13,
+        "turn_start": 14,
+        "utility_land_activated": 1
+      },
+      "games_per_opponent": 1,
+      "losses": 1,
+      "opponent_kind": "generic+fixed_deck",
+      "opponents": 1,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package_base_metrics.json",
+      "stalls": 0,
+      "total_games": 1,
+      "warnings": [],
+      "win_rate": 0.0,
+      "wins": 0
+    },
+    "candidate": {
+      "evaluation_mode": "equal_seed_battle_probe",
+      "evaluation_target_player": "Lorehold, the Historian",
+      "event_counts": {
+        "additional_cost_paid": 1,
+        "approach_cast_tracked": 1,
+        "approach_first_resolution": 1,
+        "cast_announced": 16,
+        "class_level_gained": 2,
+        "combat": 7,
+        "combat_result": 7,
+        "combat_step": 45,
+        "commander_cast": 3,
+        "compensation_tokens_created": 1,
+        "conditional_mana_life_cost_paid": 1,
+        "copy_creature_token_created": 1,
+        "cost_paid": 16,
+        "creature_cast": 2,
+        "end_step_instant": 1,
+        "end_step_token_exiled": 1,
+        "focus_card_access_snapshot": 50,
+        "instant_removal": 1,
+        "land_played": 15,
+        "lorehold_upkeep_rummage": 3,
+        "lorehold_upkeep_rummage_skipped": 2,
+        "mana_refreshed": 29,
+        "miracle_cast": 1,
+        "permanent_moved_from_battlefield": 4,
+        "player_eliminated": 1,
+        "priority_pass": 90,
+        "removal_resolved": 1,
+        "replacement_applied": 3,
+        "spell_cast": 11,
+        "spell_resolved": 10,
+        "treasure_created": 1,
+        "trigger_resolved": 1,
+        "trigger_skipped": 1,
+        "turn_end": 18,
+        "turn_start": 19
+      },
+      "games_per_opponent": 1,
+      "losses": 0,
+      "opponent_kind": "generic+fixed_deck",
+      "opponents": 1,
+      "path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package_candidate_metrics.json",
+      "stalls": 0,
+      "total_games": 1,
+      "warnings": [],
+      "win_rate": 100.0,
+      "wins": 1
+    },
+    "same_sample_shape": true,
+    "win_rate_delta": 100.0
+  },
+  "battle_probe_performed": true,
+  "blocker_reasons": [
+    "added_cards_not_exercised_in_replay_events"
+  ],
+  "commander": "Lorehold, the Historian",
+  "deck_diff": {
+    "added_cards": [
+      "Bant Panorama",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "Brokers Hideout",
+      "Call Forth the Tempest",
+      "Pyromancer's Goggles"
+    ],
+    "base_count": 100,
+    "candidate_count": 100,
+    "cut_cards": [
+      "Artist's Talent",
+      "Brass's Bounty",
+      "Jeska's Will",
+      "Starfall Invocation",
+      "Storm-Kiln Artist"
+    ],
+    "deck_id": 612
+  },
+  "deck_id": 612,
+  "generated_at": "2026-07-06T07:34:16.334445+00:00",
+  "input_artifacts": {
+    "base_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package_candidate/knowledge_candidate.db",
+    "base_metrics": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package_base_metrics.json",
+    "candidate_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_lorehold_profile_repair_package_candidate/knowledge_candidate.db",
+    "candidate_metrics": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package_candidate_metrics.json",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package_replay"
+  },
+  "larger_battle_gate_required": true,
+  "policy": {
+    "battle_sample": "The 1-game equal-sample probe/gate is diagnostic only and cannot promote a deck by itself.",
+    "card_exposure": "Added cards must be drawn/cast/used in replay events before card-level swap evidence is trusted.",
+    "promotion": "Promotion remains closed until larger equal battle gate and replay trace pass."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "replay": {
+    "added_card_decision_evidence": {
+      "Bant Panorama": {
+        "events": {},
+        "example": null,
+        "exercise_count": 0,
+        "exercise_events": {},
+        "exercise_example": null,
+        "mention_count": 0
+      },
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+        "events": {},
+        "example": null,
+        "exercise_count": 0,
+        "exercise_events": {},
+        "exercise_example": null,
+        "mention_count": 0
+      },
+      "Brokers Hideout": {
+        "events": {},
+        "example": null,
+        "exercise_count": 0,
+        "exercise_events": {},
+        "exercise_example": null,
+        "mention_count": 0
+      },
+      "Call Forth the Tempest": {
+        "events": {
+          "discard_then_draw": 4,
+          "priority_pass": 10
+        },
+        "example": {
+          "actual_outcome": "priority_pass",
+          "alternatives_considered": [
+            {
+              "action": "consider",
+              "card": "Increasing Vengeance",
+              "cmc": 2.0,
+              "effect": "copy_spell",
+              "payable": false,
+              "phase_legal": true,
+              "reactive": true,
+              "score": 4.0,
+              "type_line": "Instant"
+            },
+            {
+              "action": "consider",
+              "card": "Repercussion",
+              "cmc": 3.0,
+              "effect": "passive",
+              "payable": false,
+              "phase_legal": true,
+              "reactive": false,
+              "score": 1.0,
+              "type_line": "Enchantment"
+            },
+            {
+              "action": "consider",
+              "card": "Toralf, God of Fury // Toralf's Hammer",
+              "cmc": 4.0,
+              "effect": "creature",
+              "payable": false,
+              "phase_legal": true,
+              "reactive": false,
+              "score": 0.0,
+              "type_line": "Legendary Creature \u2014 God"
+            },
+            {
+              "action": "consider",
+              "card": "Call Forth the Tempest",
+              "cmc": 8.0,
+              "effect": "damage_wipe",
+              "payable": false,
+              "phase_legal": true,
+              "reactive": false,
+              "score": -3.0,
+              "type_line": "Sorcery"
+            }
+          ],
+          "available_option_scores": [],
+          "available_options": [
+            {
+              "action": "pass"
+            }
+          ],
+          "best_available_option_score": 0.0,
+          "best_rejected_option_score": null,
+          "chosen_option": {
+            "action": "pass",
+            "reason": "no_affordable_nonland_action",
+            "score": 0
+          },
+          "chosen_option_score": 0.0,
+          "confidence": "medium",
+          "decision_id": "decision-000040",
+          "decision_type": "pass_no_action",
+          "expected_benefit_score": 0,
+          "expected_payoff_reason": "no_affordable_nonland_action",
+          "heuristic_version": "battle_decision_strategy_v1_2026_06_15",
+          "phase": "precombat_main",
+          "player": "Lorehold",
+          "reason": "no_affordable_nonland_action",
+          "rejected_option_scores": [],
+          "rejected_options": [],
+          "rejected_reason": "preserve_resources_or_no_profitable_line",
+          "replay_id": "seed_42",
+          "resource_delta": {},
+          "risk_flags": [
+            "mana_constrained_hand"
+          ],
+          "rule_source": "battle_heuristic",
+          "rule_status": "heuristic",
+          "schema_version": "decision_trace_v1",
+          "score_components": {
+            "affordable_card_count": 0,
+            "available_mana": 5,
+            "castable_now_count": 0,
+            "hand_nonland_count": 4,
+            "main_phase_action_taken": 0,
+            "minimum_hand_cmc": 2,
+            "phase_is_main": 1,
+            "reactive_option_count": 0,
+            "stack_empty": 1
+          },
+          "score_gap_vs_best_rejected": null,
+          "strategic_principle": "pass_when_no_profitable_or_legal_action_is_available",
+          "turn": 4
+        },
+        "exercise_count": 0,
+        "exercise_events": {},
+        "exercise_example": null,
+        "mention_count": 14
+      },
+      "Pyromancer's Goggles": {
+        "events": {},
+        "example": null,
+        "exercise_count": 0,
+        "exercise_events": {},
+        "exercise_example": null,
+        "mention_count": 0
+      }
+    },
+    "added_card_event_evidence": {
+      "Bant Panorama": {
+        "events": {
+          "focus_card_access_snapshot": 56
+        },
+        "example": {
+          "available_mana": 0,
+          "battlefield_focus": [],
+          "battlefield_size": 0,
+          "command_zone_focus": [
+            "Lorehold, the Historian"
+          ],
+          "event": "focus_card_access_snapshot",
+          "exile_focus": [],
+          "exile_size": 0,
+          "focus_card_zones": {
+            "Bant Panorama": {
+              "library_index": 84,
+              "library_position": 85,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+              "library_index": 55,
+              "library_position": 56,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Brokers Hideout": {
+              "library_index": 38,
+              "library_position": 39,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Call Forth the Tempest": {
+              "library_index": 3,
+              "library_position": 4,
+              "library_top_7": true,
+              "zone": "library"
+            },
+            "Land Tax": {
+              "zone": "absent"
+            },
+            "Library of Leng": {
+              "zone": "hand"
+            },
+            "Lorehold, the Historian": {
+              "zone": "command_zone"
+            },
+            "Pyromancer's Goggles": {
+              "library_index": 58,
+              "library_position": 59,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Scroll Rack": {
+              "library_index": 35,
+              "library_position": 36,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Sensei's Divining Top": {
+              "library_index": 11,
+              "library_position": 12,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Squee, Goblin Nabob": {
+              "zone": "absent"
+            },
+            "The Mind Stone": {
+              "zone": "absent"
+            },
+            "Urza's Saga": {
+              "library_index": 60,
+              "library_position": 61,
+              "library_top_7": false,
+              "zone": "library"
+            }
+          },
+          "focus_cards_seen": [
+            "Urza's Saga",
+            "Library of Leng",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Lorehold, the Historian",
+            "Bant Panorama",
+            "Brokers Hideout",
+            "Pyromancer's Goggles",
+            "Call Forth the Tempest",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          ],
+          "forced_access_applied": [],
+          "forced_access_mode": "none",
+          "graveyard_focus": [],
+          "graveyard_size": 0,
+          "hand_focus": [
+            "Library of Leng"
+          ],
+          "hand_size": 7,
+          "lands_played_this_turn": 0,
+          "library_focus": [
+            "Urza's Saga",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Bant Panorama",
+            "Brokers Hideout",
+            "Pyromancer's Goggles",
+            "Call Forth the Tempest",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          ],
+          "library_size": 92,
+          "library_top_focus": [
+            "Call Forth the Tempest"
+          ],
+          "mulligan_count": 1,
+          "opening_keep": true,
+          "opening_reason": "early_engine:Library of Leng:1",
+          "opening_risk_flags": [],
+          "phase": "opening_keep",
+          "player": "Lorehold",
+          "replay_id": "seed_42",
+          "top_library": [
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Bloodstained Mire",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Escape Tunnel",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Wooded Foothills",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 8.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Call Forth the Tempest",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Sorcery"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Sunbaked Canyon",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            }
+          ],
+          "turn": 0
+        },
+        "exercise_count": 0,
+        "exercise_events": {},
+        "exercise_example": null,
+        "mention_count": 56
+      },
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+        "events": {
+          "focus_card_access_snapshot": 56
+        },
+        "example": {
+          "available_mana": 0,
+          "battlefield_focus": [],
+          "battlefield_size": 0,
+          "command_zone_focus": [
+            "Lorehold, the Historian"
+          ],
+          "event": "focus_card_access_snapshot",
+          "exile_focus": [],
+          "exile_size": 0,
+          "focus_card_zones": {
+            "Bant Panorama": {
+              "library_index": 84,
+              "library_position": 85,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+              "library_index": 55,
+              "library_position": 56,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Brokers Hideout": {
+              "library_index": 38,
+              "library_position": 39,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Call Forth the Tempest": {
+              "library_index": 3,
+              "library_position": 4,
+              "library_top_7": true,
+              "zone": "library"
+            },
+            "Land Tax": {
+              "zone": "absent"
+            },
+            "Library of Leng": {
+              "zone": "hand"
+            },
+            "Lorehold, the Historian": {
+              "zone": "command_zone"
+            },
+            "Pyromancer's Goggles": {
+              "library_index": 58,
+              "library_position": 59,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Scroll Rack": {
+              "library_index": 35,
+              "library_position": 36,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Sensei's Divining Top": {
+              "library_index": 11,
+              "library_position": 12,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Squee, Goblin Nabob": {
+              "zone": "absent"
+            },
+            "The Mind Stone": {
+              "zone": "absent"
+            },
+            "Urza's Saga": {
+              "library_index": 60,
+              "library_position": 61,
+              "library_top_7": false,
+              "zone": "library"
+            }
+          },
+          "focus_cards_seen": [
+            "Urza's Saga",
+            "Library of Leng",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Lorehold, the Historian",
+            "Bant Panorama",
+            "Brokers Hideout",
+            "Pyromancer's Goggles",
+            "Call Forth the Tempest",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          ],
+          "forced_access_applied": [],
+          "forced_access_mode": "none",
+          "graveyard_focus": [],
+          "graveyard_size": 0,
+          "hand_focus": [
+            "Library of Leng"
+          ],
+          "hand_size": 7,
+          "lands_played_this_turn": 0,
+          "library_focus": [
+            "Urza's Saga",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Bant Panorama",
+            "Brokers Hideout",
+            "Pyromancer's Goggles",
+            "Call Forth the Tempest",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          ],
+          "library_size": 92,
+          "library_top_focus": [
+            "Call Forth the Tempest"
+          ],
+          "mulligan_count": 1,
+          "opening_keep": true,
+          "opening_reason": "early_engine:Library of Leng:1",
+          "opening_risk_flags": [],
+          "phase": "opening_keep",
+          "player": "Lorehold",
+          "replay_id": "seed_42",
+          "top_library": [
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Bloodstained Mire",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Escape Tunnel",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Wooded Foothills",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 8.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Call Forth the Tempest",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Sorcery"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Sunbaked Canyon",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            }
+          ],
+          "turn": 0
+        },
+        "exercise_count": 0,
+        "exercise_events": {},
+        "exercise_example": null,
+        "mention_count": 56
+      },
+      "Brokers Hideout": {
+        "events": {
+          "focus_card_access_snapshot": 56
+        },
+        "example": {
+          "available_mana": 0,
+          "battlefield_focus": [],
+          "battlefield_size": 0,
+          "command_zone_focus": [
+            "Lorehold, the Historian"
+          ],
+          "event": "focus_card_access_snapshot",
+          "exile_focus": [],
+          "exile_size": 0,
+          "focus_card_zones": {
+            "Bant Panorama": {
+              "library_index": 84,
+              "library_position": 85,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+              "library_index": 55,
+              "library_position": 56,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Brokers Hideout": {
+              "library_index": 38,
+              "library_position": 39,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Call Forth the Tempest": {
+              "library_index": 3,
+              "library_position": 4,
+              "library_top_7": true,
+              "zone": "library"
+            },
+            "Land Tax": {
+              "zone": "absent"
+            },
+            "Library of Leng": {
+              "zone": "hand"
+            },
+            "Lorehold, the Historian": {
+              "zone": "command_zone"
+            },
+            "Pyromancer's Goggles": {
+              "library_index": 58,
+              "library_position": 59,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Scroll Rack": {
+              "library_index": 35,
+              "library_position": 36,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Sensei's Divining Top": {
+              "library_index": 11,
+              "library_position": 12,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Squee, Goblin Nabob": {
+              "zone": "absent"
+            },
+            "The Mind Stone": {
+              "zone": "absent"
+            },
+            "Urza's Saga": {
+              "library_index": 60,
+              "library_position": 61,
+              "library_top_7": false,
+              "zone": "library"
+            }
+          },
+          "focus_cards_seen": [
+            "Urza's Saga",
+            "Library of Leng",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Lorehold, the Historian",
+            "Bant Panorama",
+            "Brokers Hideout",
+            "Pyromancer's Goggles",
+            "Call Forth the Tempest",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          ],
+          "forced_access_applied": [],
+          "forced_access_mode": "none",
+          "graveyard_focus": [],
+          "graveyard_size": 0,
+          "hand_focus": [
+            "Library of Leng"
+          ],
+          "hand_size": 7,
+          "lands_played_this_turn": 0,
+          "library_focus": [
+            "Urza's Saga",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Bant Panorama",
+            "Brokers Hideout",
+            "Pyromancer's Goggles",
+            "Call Forth the Tempest",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          ],
+          "library_size": 92,
+          "library_top_focus": [
+            "Call Forth the Tempest"
+          ],
+          "mulligan_count": 1,
+          "opening_keep": true,
+          "opening_reason": "early_engine:Library of Leng:1",
+          "opening_risk_flags": [],
+          "phase": "opening_keep",
+          "player": "Lorehold",
+          "replay_id": "seed_42",
+          "top_library": [
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Bloodstained Mire",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Escape Tunnel",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Wooded Foothills",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 8.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Call Forth the Tempest",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Sorcery"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Sunbaked Canyon",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            }
+          ],
+          "turn": 0
+        },
+        "exercise_count": 0,
+        "exercise_events": {},
+        "exercise_example": null,
+        "mention_count": 56
+      },
+      "Call Forth the Tempest": {
+        "events": {
+          "damage_wipe_resolved": 3,
+          "focus_card_access_snapshot": 56,
+          "lorehold_upkeep_rummage": 4,
+          "miracle_cast": 1,
+          "mizzix_mastery_copy_cast": 1,
+          "mizzix_mastery_resolved": 1,
+          "priority_pass": 8,
+          "spell_cast": 1,
+          "spell_copied": 1,
+          "spell_copy_ceased_to_exist": 2,
+          "spell_resolved": 4,
+          "turn_end": 5,
+          "turn_start": 4
+        },
+        "example": {
+          "available_mana": 0,
+          "battlefield_focus": [],
+          "battlefield_size": 0,
+          "command_zone_focus": [
+            "Lorehold, the Historian"
+          ],
+          "event": "focus_card_access_snapshot",
+          "exile_focus": [],
+          "exile_size": 0,
+          "focus_card_zones": {
+            "Bant Panorama": {
+              "library_index": 84,
+              "library_position": 85,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+              "library_index": 55,
+              "library_position": 56,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Brokers Hideout": {
+              "library_index": 38,
+              "library_position": 39,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Call Forth the Tempest": {
+              "library_index": 3,
+              "library_position": 4,
+              "library_top_7": true,
+              "zone": "library"
+            },
+            "Land Tax": {
+              "zone": "absent"
+            },
+            "Library of Leng": {
+              "zone": "hand"
+            },
+            "Lorehold, the Historian": {
+              "zone": "command_zone"
+            },
+            "Pyromancer's Goggles": {
+              "library_index": 58,
+              "library_position": 59,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Scroll Rack": {
+              "library_index": 35,
+              "library_position": 36,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Sensei's Divining Top": {
+              "library_index": 11,
+              "library_position": 12,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Squee, Goblin Nabob": {
+              "zone": "absent"
+            },
+            "The Mind Stone": {
+              "zone": "absent"
+            },
+            "Urza's Saga": {
+              "library_index": 60,
+              "library_position": 61,
+              "library_top_7": false,
+              "zone": "library"
+            }
+          },
+          "focus_cards_seen": [
+            "Urza's Saga",
+            "Library of Leng",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Lorehold, the Historian",
+            "Bant Panorama",
+            "Brokers Hideout",
+            "Pyromancer's Goggles",
+            "Call Forth the Tempest",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          ],
+          "forced_access_applied": [],
+          "forced_access_mode": "none",
+          "graveyard_focus": [],
+          "graveyard_size": 0,
+          "hand_focus": [
+            "Library of Leng"
+          ],
+          "hand_size": 7,
+          "lands_played_this_turn": 0,
+          "library_focus": [
+            "Urza's Saga",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Bant Panorama",
+            "Brokers Hideout",
+            "Pyromancer's Goggles",
+            "Call Forth the Tempest",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          ],
+          "library_size": 92,
+          "library_top_focus": [
+            "Call Forth the Tempest"
+          ],
+          "mulligan_count": 1,
+          "opening_keep": true,
+          "opening_reason": "early_engine:Library of Leng:1",
+          "opening_risk_flags": [],
+          "phase": "opening_keep",
+          "player": "Lorehold",
+          "replay_id": "seed_42",
+          "top_library": [
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Bloodstained Mire",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Escape Tunnel",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Wooded Foothills",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 8.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Call Forth the Tempest",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Sorcery"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Sunbaked Canyon",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            }
+          ],
+          "turn": 0
+        },
+        "exercise_count": 10,
+        "exercise_events": {
+          "lorehold_upkeep_rummage": 4,
+          "miracle_cast": 1,
+          "spell_cast": 1,
+          "spell_resolved": 4
+        },
+        "exercise_example": {
+          "active_player": "Dihada, Binder of Wills #29 (real)",
+          "card_id": "b37ebf11-2939-481c-aeb5-dbd795850196",
+          "discard_destination": "top_of_library",
+          "discarded": "Call Forth the Tempest",
+          "drawn": "Call Forth the Tempest",
+          "event": "lorehold_upkeep_rummage",
+          "player": "Lorehold",
+          "reason": "redraw_spell_as_first_draw_for_miracle",
+          "replacement_used": true,
+          "replay_id": "seed_42",
+          "rule_confidence": 0.0,
+          "rule_execution_status": "auto",
+          "rule_review_status": "unknown",
+          "rule_source": "unknown",
+          "rule_version": null,
+          "semantic_hash": "3ea141db816abab69c59e0c4f209aabc89fb23d719c99d497709fadc84bd5260",
+          "turn": 7
+        },
+        "mention_count": 91
+      },
+      "Pyromancer's Goggles": {
+        "events": {
+          "focus_card_access_snapshot": 56
+        },
+        "example": {
+          "available_mana": 0,
+          "battlefield_focus": [],
+          "battlefield_size": 0,
+          "command_zone_focus": [
+            "Lorehold, the Historian"
+          ],
+          "event": "focus_card_access_snapshot",
+          "exile_focus": [],
+          "exile_size": 0,
+          "focus_card_zones": {
+            "Bant Panorama": {
+              "library_index": 84,
+              "library_position": 85,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+              "library_index": 55,
+              "library_position": 56,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Brokers Hideout": {
+              "library_index": 38,
+              "library_position": 39,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Call Forth the Tempest": {
+              "library_index": 3,
+              "library_position": 4,
+              "library_top_7": true,
+              "zone": "library"
+            },
+            "Land Tax": {
+              "zone": "absent"
+            },
+            "Library of Leng": {
+              "zone": "hand"
+            },
+            "Lorehold, the Historian": {
+              "zone": "command_zone"
+            },
+            "Pyromancer's Goggles": {
+              "library_index": 58,
+              "library_position": 59,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Scroll Rack": {
+              "library_index": 35,
+              "library_position": 36,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Sensei's Divining Top": {
+              "library_index": 11,
+              "library_position": 12,
+              "library_top_7": false,
+              "zone": "library"
+            },
+            "Squee, Goblin Nabob": {
+              "zone": "absent"
+            },
+            "The Mind Stone": {
+              "zone": "absent"
+            },
+            "Urza's Saga": {
+              "library_index": 60,
+              "library_position": 61,
+              "library_top_7": false,
+              "zone": "library"
+            }
+          },
+          "focus_cards_seen": [
+            "Urza's Saga",
+            "Library of Leng",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Lorehold, the Historian",
+            "Bant Panorama",
+            "Brokers Hideout",
+            "Pyromancer's Goggles",
+            "Call Forth the Tempest",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          ],
+          "forced_access_applied": [],
+          "forced_access_mode": "none",
+          "graveyard_focus": [],
+          "graveyard_size": 0,
+          "hand_focus": [
+            "Library of Leng"
+          ],
+          "hand_size": 7,
+          "lands_played_this_turn": 0,
+          "library_focus": [
+            "Urza's Saga",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Bant Panorama",
+            "Brokers Hideout",
+            "Pyromancer's Goggles",
+            "Call Forth the Tempest",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+          ],
+          "library_size": 92,
+          "library_top_focus": [
+            "Call Forth the Tempest"
+          ],
+          "mulligan_count": 1,
+          "opening_keep": true,
+          "opening_reason": "early_engine:Library of Leng:1",
+          "opening_risk_flags": [],
+          "phase": "opening_keep",
+          "player": "Lorehold",
+          "replay_id": "seed_42",
+          "top_library": [
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Bloodstained Mire",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Escape Tunnel",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Wooded Foothills",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            },
+            {
+              "cmc": 8.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Call Forth the Tempest",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Sorcery"
+            },
+            {
+              "cmc": 0.0,
+              "is_commander": false,
+              "keywords": [],
+              "name": "Sunbaked Canyon",
+              "power": null,
+              "summoning_sick": false,
+              "tapped": false,
+              "toughness": null,
+              "type_line": "Land"
+            }
+          ],
+          "turn": 0
+        },
+        "exercise_count": 0,
+        "exercise_events": {},
+        "exercise_example": null,
+        "mention_count": 56
+      }
+    },
+    "added_cards_decision_only": [],
+    "added_cards_exercised_in_events": [
+      "Call Forth the Tempest"
+    ],
+    "added_cards_seen_without_exercise": [
+      "Bant Panorama",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "Brokers Hideout",
+      "Pyromancer's Goggles"
+    ],
+    "added_cards_unexercised_in_events": [
+      "Bant Panorama",
+      "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "Brokers Hideout",
+      "Pyromancer's Goggles"
+    ],
+    "added_cards_unobserved": [],
+    "decision_count": 143,
+    "decisions_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package_replay/replay.decision_trace.jsonl",
+    "event_count": 905,
+    "events_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package_replay/replay.events.jsonl",
+    "provenance_names": [
+      "Lorehold",
+      "Dihada, Binder of Wills #29 (real)",
+      "Kraum, Ludevic's Opus #51 (real)",
+      "Kinnan, Bonder Prodigy #72 (real)"
+    ],
+    "provenance_path": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package_replay/deck_provenance.json",
+    "replay_dir": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package_replay",
+    "stale_lorehold_mentions": 0
+  },
+  "source_db_mutated": false,
+  "status": "battle_probe_blocks_promotion"
+}

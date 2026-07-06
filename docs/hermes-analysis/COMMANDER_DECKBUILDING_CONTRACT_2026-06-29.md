@@ -1820,6 +1820,23 @@ Current external refresh on 2026-07-05:
   `global_commander_candidate_package_chain_audit_20260706_lorehold_profile_repair_package.md`,
   and
   `global_commander_candidate_package_strategy_matrix_20260706_lorehold_profile_repair_package.md`.
+  The battle-probe bridge is now explicit:
+  `global_commander_candidate_battle_probe_runner.py` generated
+  `global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package.md`,
+  which normalized the equal-seed probe metrics and replay inputs for the
+  audit. The strict replay audit
+  `global_commander_candidate_battle_probe_audit_20260706_lorehold_profile_repair_package.md`
+  keeps promotion blocked even though the 1-game probe had candidate `100.0%`
+  versus base `0.0%`: only `Call Forth the Tempest` was exercised in replay
+  events, while `Bant Panorama`,
+  `Birgi, God of Storytelling // Harnfel, Horn of Bounty`, `Brokers Hideout`,
+  and `Pyromancer's Goggles` were only seen without exercise. The next gate is
+  exposure/usage replay or another evidence path that proves the unexercised
+  adds before any larger equal gate or promotion can be trusted. Literal audit
+  signals: `battle_probe_blocks_promotion`,
+  `added_cards_not_exercised_in_replay_events`,
+  `added_cards_seen_without_exercise`, and
+  `added_cards_unexercised_in_events`.
 
 ## Global Commander Rollout - 2026-07-01
 

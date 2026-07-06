@@ -24,6 +24,35 @@ from global_commander_deck_contract_audit import REPO_ROOT
 
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_OUT_PREFIX = REPORT_DIR / "global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor"
+EXERCISE_EVENT_NAMES = {
+    "activated_ability",
+    "additional_cost_paid",
+    "board_wipe_resolved",
+    "cast_announced",
+    "class_level_gained",
+    "commander_cast",
+    "conditional_mana_life_cost_paid",
+    "cost_paid",
+    "creature_cast",
+    "discard_then_draw",
+    "draw_cards_resolved",
+    "end_step_instant",
+    "instant_removal",
+    "land_played",
+    "land_tax_trigger_resolved",
+    "lorehold_upkeep_rummage",
+    "miracle_cast",
+    "permanent_moved_from_battlefield",
+    "recursion_resolved",
+    "removal_resolved",
+    "spell_cast",
+    "spell_resolved",
+    "topdeck_manipulation_activated",
+    "treasure_created",
+    "trigger_resolved",
+    "utility_artifact_activated",
+    "utility_land_activated",
+}
 
 
 def utc_now() -> str:
@@ -126,12 +155,20 @@ def metrics_summary(path: Path) -> dict[str, Any]:
     }
 
 
-def card_mentions(rows: list[dict[str, Any]], cards: list[str]) -> dict[str, dict[str, Any]]:
+def card_mentions(
+    rows: list[dict[str, Any]],
+    cards: list[str],
+    *,
+    exercise_event_names: set[str] | None = None,
+) -> dict[str, dict[str, Any]]:
     evidence = {
         card: {
             "mention_count": 0,
+            "exercise_count": 0,
             "events": {},
+            "exercise_events": {},
             "example": None,
+            "exercise_example": None,
         }
         for card in cards
     }
@@ -145,6 +182,13 @@ def card_mentions(rows: list[dict[str, Any]], cards: list[str]) -> dict[str, dic
             evidence[card]["events"][event] = int(evidence[card]["events"].get(event, 0)) + 1
             if evidence[card]["example"] is None:
                 evidence[card]["example"] = row
+            if exercise_event_names is not None and event in exercise_event_names:
+                evidence[card]["exercise_count"] += 1
+                evidence[card]["exercise_events"][event] = int(
+                    evidence[card]["exercise_events"].get(event, 0)
+                ) + 1
+                if evidence[card]["exercise_example"] is None:
+                    evidence[card]["exercise_example"] = row
     return evidence
 
 
@@ -168,12 +212,22 @@ def replay_summary(replay_dir: Path, *, commander: str, added_cards: list[str]) 
         for name in provenance_names:
             if "Lorehold" in name:
                 stale_lorehold_mentions += 1
-    event_evidence = card_mentions(events, added_cards)
+    event_evidence = card_mentions(
+        events,
+        added_cards,
+        exercise_event_names=EXERCISE_EVENT_NAMES,
+    )
     decision_evidence = card_mentions(decisions, added_cards)
     exercised = [
         card
         for card in added_cards
+        if event_evidence.get(card, {}).get("exercise_count", 0) > 0
+    ]
+    event_observed_only = [
+        card
+        for card in added_cards
         if event_evidence.get(card, {}).get("mention_count", 0) > 0
+        and event_evidence.get(card, {}).get("exercise_count", 0) == 0
     ]
     decision_only = [
         card
@@ -199,8 +253,12 @@ def replay_summary(replay_dir: Path, *, commander: str, added_cards: list[str]) 
         "added_card_event_evidence": event_evidence,
         "added_card_decision_evidence": decision_evidence,
         "added_cards_exercised_in_events": exercised,
+        "added_cards_seen_without_exercise": event_observed_only,
         "added_cards_decision_only": decision_only,
         "added_cards_unobserved": unobserved,
+        "added_cards_unexercised_in_events": [
+            card for card in added_cards if card not in set(exercised)
+        ],
     }
 
 
@@ -231,7 +289,7 @@ def build_payload(
         blocker_reasons.append("candidate_underperformed_base_probe")
     if replay["stale_lorehold_mentions"]:
         blocker_reasons.append("replay_contains_stale_lorehold_target_mentions")
-    if replay["added_cards_unobserved"] or replay["added_cards_decision_only"]:
+    if replay["added_cards_unexercised_in_events"]:
         blocker_reasons.append("added_cards_not_exercised_in_replay_events")
     status = "battle_probe_blocks_promotion" if blocker_reasons else "battle_probe_ready_for_larger_gate"
     sample_games = candidate["total_games"] if candidate["total_games"] else base["total_games"]
@@ -300,8 +358,10 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
         f"- replay_dir: `{replay['replay_dir']}`",
         f"- stale_lorehold_mentions: `{replay['stale_lorehold_mentions']}`",
         f"- added_cards_exercised_in_events: `{replay['added_cards_exercised_in_events']}`",
+        f"- added_cards_seen_without_exercise: `{replay['added_cards_seen_without_exercise']}`",
         f"- added_cards_decision_only: `{replay['added_cards_decision_only']}`",
         f"- added_cards_unobserved: `{replay['added_cards_unobserved']}`",
+        f"- added_cards_unexercised_in_events: `{replay['added_cards_unexercised_in_events']}`",
         "",
         "## Blockers",
         "",
