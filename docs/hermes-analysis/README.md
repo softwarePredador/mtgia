@@ -683,6 +683,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     (`haste_protection_silence`, `mana_acceleration`, `tutors_access`)
     exauridos no deck atual. O proximo gate e
     `collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles`.
+    O coletor de corpus externo/nonpayoff fica em
+    `global_commander_external_nonpayoff_same_lane_cut_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `external_nonpayoff_same_lane_corpus_collected_no_cut_permission`,
+    com `external_source_count=6`, `role_corpus_count=3`,
+    `exhausted_role_count=3`, `ready_pair_count=0` e
+    `external_cut_permission_now=false`. O proximo gate e
+    `map_external_nonpayoff_same_lane_corpus_to_cut_policy_before_source_discovery`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

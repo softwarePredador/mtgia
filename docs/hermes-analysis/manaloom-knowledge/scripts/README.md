@@ -230,6 +230,13 @@ package, and forbids recycling used, seen, stage-only, blocked, or traced cuts.
 Candidate copy, battle, promotion, and value-safe reclassification remain
 closed.
 
+Then run `global_commander_external_nonpayoff_same_lane_cut_corpus_collector.py`
+after cut-axis broadening routes to external nonpayoff corpus. It records
+role-level public Commander, combo, bracket/Game Changer, and strategy-source
+signals plus their limitations. External corpus is source-policy evidence only;
+it does not create cut permission, candidate copy, battle, promotion, or
+value-safe reclassification.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

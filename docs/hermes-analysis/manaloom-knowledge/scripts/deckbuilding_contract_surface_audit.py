@@ -228,6 +228,12 @@ GLOBAL_COMMANDER_SAME_LANE_CUT_AXIS_BROADENING_PLAN = (
 GLOBAL_COMMANDER_SAME_LANE_CUT_AXIS_BROADENING_PLAN_TEST = (
     SCRIPT_DIR / "test_global_commander_same_lane_cut_axis_broadening_plan.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_CORPUS_COLLECTOR = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_same_lane_cut_corpus_collector.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_CORPUS_COLLECTOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_same_lane_cut_corpus_collector.py"
+)
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -493,6 +499,10 @@ GLOBAL_COMMANDER_SCOPE1_SAME_LANE_NEW_CUT_SOURCE_MINER_REPORT = (
 GLOBAL_COMMANDER_SCOPE1_SAME_LANE_CUT_AXIS_BROADENING_PLAN_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_CORPUS_COLLECTOR_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_same_lane_cut_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -866,6 +876,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_cut_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "same_lane_cut_axis_broadening_plan_ready_no_deck_action",
                 "collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles",
+                "global_commander_external_nonpayoff_same_lane_cut_corpus_collector.py",
+                "global_commander_external_nonpayoff_same_lane_cut_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_nonpayoff_same_lane_corpus_collected_no_cut_permission",
+                "map_external_nonpayoff_same_lane_corpus_to_cut_policy_before_source_discovery",
                 "battle_gate_allowed_now",
                 "Path to Exile",
                 "Terminate",
@@ -1180,6 +1194,9 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_same_lane_cut_axis_broadening_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md",
                 "same_lane_cut_axis_broadening_plan_ready_no_deck_action",
                 "collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles",
+                "global_commander_external_nonpayoff_same_lane_cut_corpus_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md",
+                "external_nonpayoff_same_lane_corpus_collected_no_cut_permission",
+                "map_external_nonpayoff_same_lane_corpus_to_cut_policy_before_source_discovery",
                 "battle_gate_allowed_now=false",
                 "Path to Exile",
                 "Terminate",
@@ -2035,6 +2052,32 @@ def build_audit() -> dict[str, Any]:
                 "test_missing_role_source_routes_to_discovery_before_resynthesis",
                 "same_lane_cut_axis_broadening_plan_ready_no_deck_action",
                 "collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_CORPUS_COLLECTOR,
+            [
+                "global_commander_external_nonpayoff_same_lane_cut_corpus_collector",
+                "external_nonpayoff_same_lane_corpus_collected_no_cut_permission",
+                "external_nonpayoff_same_lane_corpus_blocked_fresh_sources_need_trace",
+                "map_external_nonpayoff_same_lane_corpus_to_cut_policy_before_source_discovery",
+                "external_corpus_is_not_cut_permission",
+                "candidate_copy_allowed_now",
+                "value_safe_reclassification_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_CORPUS_COLLECTOR_TEST,
+            [
+                "test_exhausted_roles_collect_corpus_without_cut_permission",
+                "test_fresh_sources_block_external_corpus_until_trace",
+                "test_role_without_scanned_sources_routes_to_source_discovery",
+                "external_nonpayoff_same_lane_corpus_collected_no_cut_permission",
+                "map_external_nonpayoff_same_lane_corpus_to_cut_policy_before_source_discovery",
             ],
         )
     )
@@ -3228,6 +3271,30 @@ def build_audit() -> dict[str, Any]:
                 "candidate_copy_allowed_now: `false`",
                 "value_safe_reclassification_allowed_now: `false`",
                 "collect_external_nonpayoff_same_lane_cut_corpus_for_exhausted_roles",
+                "haste_protection_silence",
+                "mana_acceleration",
+                "tutors_access",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SAME_LANE_CUT_CORPUS_COLLECTOR_REPORT,
+            [
+                "Global Commander External Nonpayoff Same-Lane Cut Corpus Collector",
+                "external_nonpayoff_same_lane_corpus_collected_no_cut_permission",
+                "target_role_count: `3`",
+                "external_source_count: `6`",
+                "role_corpus_count: `3`",
+                "exhausted_role_count: `3`",
+                "fresh_same_lane_cut_source_count: `0`",
+                "blocked_recycled_cut_source_count: `47`",
+                "ready_pair_count: `0`",
+                "unpaired_add_count: `8`",
+                "external_cut_permission_now: `false`",
+                "candidate_copy_allowed_now: `false`",
+                "map_external_nonpayoff_same_lane_corpus_to_cut_policy_before_source_discovery",
+                "edhrec_kaalia_current_2026_07_05",
                 "haste_protection_silence",
                 "mana_acceleration",
                 "tutors_access",
