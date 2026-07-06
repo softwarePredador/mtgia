@@ -1,6 +1,6 @@
 # Global Commander Candidate Battle Probe Audit
 
-- generated_at: `2026-07-06T07:34:16.334445+00:00`
+- generated_at: `2026-07-06T07:46:08.494123+00:00`
 - status: `battle_probe_blocks_promotion`
 - deck_id: `612`
 - commander: `Lorehold, the Historian`

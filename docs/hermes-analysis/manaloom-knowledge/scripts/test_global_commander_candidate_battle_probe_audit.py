@@ -146,6 +146,22 @@ class GlobalCommanderCandidateBattleProbeAuditTests(unittest.TestCase):
         self.assertEqual(payload["replay"]["added_cards_unexercised_in_events"], ["Terminate"])
         self.assertIn("added_cards_not_exercised_in_replay_events", payload["blocker_reasons"])
 
+    def test_action_event_snapshot_mentions_do_not_count_as_exercised(self) -> None:
+        evidence = audit.card_mentions(
+            [
+                {
+                    "event": "land_played",
+                    "card": "Other Land",
+                    "board_snapshot": [{"name": "Bant Panorama"}],
+                }
+            ],
+            ["Bant Panorama"],
+            exercise_event_names=audit.EXERCISE_EVENT_NAMES,
+        )
+
+        self.assertEqual(evidence["Bant Panorama"]["mention_count"], 1)
+        self.assertEqual(evidence["Bant Panorama"]["exercise_count"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

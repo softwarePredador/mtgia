@@ -1837,6 +1837,18 @@ Current external refresh on 2026-07-05:
   `added_cards_not_exercised_in_replay_events`,
   `added_cards_seen_without_exercise`, and
   `added_cards_unexercised_in_events`.
+  Follow-up diagnostic:
+  `global_commander_candidate_added_card_exposure_trace_generator.py` generated
+  `global_commander_candidate_added_card_exposure_trace_generator_20260706_lorehold_profile_repair_package.md`.
+  Its status is
+  `candidate_added_card_forced_exposure_all_exercised_diagnostic_only`: with
+  opening-hand forced access, `Bant Panorama`, `Birgi, God of Storytelling //
+  Harnfel, Horn of Bounty`, `Brokers Hideout`, and `Pyromancer's Goggles` all
+  produced target-deck exercise events. This proves runtime/execution
+  availability under diagnostic access only. The report still carries
+  `forced_access_is_diagnostic_not_natural_gate`, keeps
+  `battle_gate_allowed_now=false` and `promotion_allowed=false`, and routes to
+  `seek_natural_replay_confirmation_before_larger_equal_gate`.
 
 ## Global Commander Rollout - 2026-07-01
 

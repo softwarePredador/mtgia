@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from global_commander_deck_contract_audit import REPO_ROOT
+from master_optimizer_common import normalize_name
 
 
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
@@ -53,6 +54,18 @@ EXERCISE_EVENT_NAMES = {
     "utility_artifact_activated",
     "utility_land_activated",
 }
+ACTIVE_CARD_KEYS = (
+    "card",
+    "source",
+    "source_name",
+    "stack_object",
+    "spell",
+    "permanent",
+    "land",
+    "object",
+    "ability_source",
+    "trigger_source",
+)
 
 
 def utc_now() -> str:
@@ -155,6 +168,25 @@ def metrics_summary(path: Path) -> dict[str, Any]:
     }
 
 
+def card_value_matches(value: Any, card: str) -> bool:
+    target = normalize_name(card)
+    if not target:
+        return False
+    if isinstance(value, str):
+        return normalize_name(value) == target
+    if isinstance(value, Mapping):
+        for key in ("name", "card", "source", "stack_object"):
+            if card_value_matches(value.get(key), card):
+                return True
+    if isinstance(value, list):
+        return any(card_value_matches(item, card) for item in value)
+    return False
+
+
+def active_card_matches(row: Mapping[str, Any], card: str) -> bool:
+    return any(card_value_matches(row.get(key), card) for key in ACTIVE_CARD_KEYS)
+
+
 def card_mentions(
     rows: list[dict[str, Any]],
     cards: list[str],
@@ -182,7 +214,11 @@ def card_mentions(
             evidence[card]["events"][event] = int(evidence[card]["events"].get(event, 0)) + 1
             if evidence[card]["example"] is None:
                 evidence[card]["example"] = row
-            if exercise_event_names is not None and event in exercise_event_names:
+            if (
+                exercise_event_names is not None
+                and event in exercise_event_names
+                and active_card_matches(row, card)
+            ):
                 evidence[card]["exercise_count"] += 1
                 evidence[card]["exercise_events"][event] = int(
                     evidence[card]["exercise_events"].get(event, 0)

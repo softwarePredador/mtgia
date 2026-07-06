@@ -195,6 +195,12 @@ GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_RUNNER = (
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_RUNNER_TEST = (
     SCRIPT_DIR / "test_global_commander_candidate_battle_probe_runner.py"
 )
+GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_EXPOSURE_TRACE_GENERATOR = (
+    SCRIPT_DIR / "global_commander_candidate_added_card_exposure_trace_generator.py"
+)
+GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_EXPOSURE_TRACE_GENERATOR_TEST = (
+    SCRIPT_DIR / "test_global_commander_candidate_added_card_exposure_trace_generator.py"
+)
 GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL = SCRIPT_DIR / "global_commander_battle_feedback_model.py"
 GLOBAL_COMMANDER_CANDIDATE_PACKAGE_CHAIN_AUDIT = (
     SCRIPT_DIR / "global_commander_candidate_package_chain_audit.py"
@@ -745,6 +751,10 @@ GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_BATTLE_PROBE_RUNNER_REPORT = (
 GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_BATTLE_PROBE_AUDIT_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260706_lorehold_profile_repair_package.md"
+)
+GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_ADDED_CARD_EXPOSURE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_added_card_exposure_trace_generator_20260706_lorehold_profile_repair_package.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_BATTLE_PROBE_REPORT = (
     REPO_ROOT
@@ -1298,6 +1308,11 @@ def build_audit() -> dict[str, Any]:
                 "added_cards_not_exercised_in_replay_events",
                 "added_cards_seen_without_exercise",
                 "added_cards_unexercised_in_events",
+                "global_commander_candidate_added_card_exposure_trace_generator.py",
+                "global_commander_candidate_added_card_exposure_trace_generator_20260706_lorehold_profile_repair_package.md",
+                "candidate_added_card_forced_exposure_all_exercised_diagnostic_only",
+                "forced_access_is_diagnostic_not_natural_gate",
+                "seek_natural_replay_confirmation_before_larger_equal_gate",
                 "commander_profile_not_available",
                 "profile_lands_below_target",
                 "protected anchor cuts",
@@ -1765,6 +1780,11 @@ def build_audit() -> dict[str, Any]:
                 "battle_probe_blocks_promotion",
                 "added_cards_not_exercised_in_replay_events",
                 "added_cards_seen_without_exercise",
+                "global_commander_candidate_added_card_exposure_trace_generator.py",
+                "global_commander_candidate_added_card_exposure_trace_generator_20260706_lorehold_profile_repair_package.md",
+                "candidate_added_card_forced_exposure_all_exercised_diagnostic_only",
+                "forced_access_is_diagnostic_not_natural_gate",
+                "seek_natural_replay_confirmation_before_larger_equal_gate",
                 "global_commander_battle_feedback_model.py",
                 "global_commander_battle_feedback_model_20260705_current.md",
                 "pair_blocked_by_failed_gate",
@@ -4018,6 +4038,32 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_EXPOSURE_TRACE_GENERATOR,
+            [
+                "global_commander_candidate_added_card_exposure_trace_generator",
+                "candidate_added_card_forced_exposure_all_exercised_diagnostic_only",
+                "forced_access_is_diagnostic_not_natural_gate",
+                "natural_gate_satisfied_now",
+                "target_aliases",
+                "active_card_matches",
+                "promotion_allowed",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_CANDIDATE_ADDED_CARD_EXPOSURE_TRACE_GENERATOR_TEST,
+            [
+                "test_forced_access_exercise_is_diagnostic_not_natural_gate",
+                "test_action_event_snapshot_mentions_are_not_exercise",
+                "Lorehold, the Historian",
+                "Lorehold",
+                "forced_access_unexercised_added_cards",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_BATTLE_FEEDBACK_MODEL,
             [
                 "global_commander_battle_feedback_model",
@@ -5312,6 +5358,22 @@ def build_audit() -> dict[str, Any]:
                 "added_cards_seen_without_exercise",
                 "added_cards_unexercised_in_events",
                 "added_cards_not_exercised_in_replay_events",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_LOREHOLD_PROFILE_REPAIR_ADDED_CARD_EXPOSURE_REPORT,
+            [
+                "Global Commander Candidate Added Card Exposure Trace Generator",
+                "candidate_added_card_forced_exposure_all_exercised_diagnostic_only",
+                "forced_access_mode: `opening_hand`",
+                "exercised_added_cards: `['Bant Panorama', 'Birgi, God of Storytelling // Harnfel, Horn of Bounty', 'Brokers Hideout', \"Pyromancer's Goggles\"]`",
+                "natural_gate_satisfied_now: `false`",
+                "battle_gate_allowed_now: `false`",
+                "promotion_allowed: `false`",
+                "forced_access_is_diagnostic_not_natural_gate",
+                "seek_natural_replay_confirmation_before_larger_equal_gate",
             ],
         )
     )

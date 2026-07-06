@@ -117,7 +117,7 @@
     "deck_id": 612
   },
   "deck_id": 612,
-  "generated_at": "2026-07-06T07:34:16.334445+00:00",
+  "generated_at": "2026-07-06T07:46:08.494123+00:00",
   "input_artifacts": {
     "base_db": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260706_land_floor_deck612_package_candidate/knowledge_candidate.db",
     "base_metrics": "docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_runner_20260706_lorehold_profile_repair_package_base_metrics.json",
@@ -1023,31 +1023,53 @@
           ],
           "turn": 0
         },
-        "exercise_count": 10,
+        "exercise_count": 4,
         "exercise_events": {
-          "lorehold_upkeep_rummage": 4,
           "miracle_cast": 1,
-          "spell_cast": 1,
-          "spell_resolved": 4
+          "spell_resolved": 3
         },
         "exercise_example": {
-          "active_player": "Dihada, Binder of Wills #29 (real)",
-          "card_id": "b37ebf11-2939-481c-aeb5-dbd795850196",
-          "discard_destination": "top_of_library",
-          "discarded": "Call Forth the Tempest",
-          "drawn": "Call Forth the Tempest",
-          "event": "lorehold_upkeep_rummage",
+          "alternative_cost": "{2}",
+          "alternative_cost_kind": "miracle",
+          "card": "Call Forth the Tempest",
+          "card_id": "820290f5-3faf-4492-a794-5e8d6cfb772a",
+          "cards_drawn_this_turn": 1,
+          "cmc": 8.0,
+          "effect": "damage_wipe",
+          "event": "miracle_cast",
+          "first_draw_miracle_candidate": false,
+          "locked_cost": {
+            "colored": {},
+            "generic": 2,
+            "hybrid": [],
+            "monocolored_hybrid": [],
+            "phyrexian": [],
+            "phyrexian_hybrid": [],
+            "spend_tags": [
+              "instant_or_sorcery_spell",
+              "noncreature_spell"
+            ]
+          },
+          "lorehold_on_board": true,
+          "miracle_cost": 2,
+          "miracle_engine": "Lorehold, the Historian",
+          "native_miracle": false,
+          "phase": "opponent_upkeep",
           "player": "Lorehold",
-          "reason": "redraw_spell_as_first_draw_for_miracle",
-          "replacement_used": true,
           "replay_id": "seed_42",
-          "rule_confidence": 0.0,
+          "rule_alternative_count": 1,
+          "rule_confidence": 1.0,
           "rule_execution_status": "auto",
-          "rule_review_status": "unknown",
-          "rule_source": "unknown",
-          "rule_version": null,
-          "semantic_hash": "3ea141db816abab69c59e0c4f209aabc89fb23d719c99d497709fadc84bd5260",
-          "turn": 7
+          "rule_logical_key": "battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739",
+          "rule_oracle_hash": "5e76c466448cabbfd764e746566b41c1",
+          "rule_review_status": "verified",
+          "rule_runtime_selection_mode": "single_selected",
+          "rule_source": "curated",
+          "rule_version": 3,
+          "source": "lorehold_opponent_upkeep_rummage",
+          "turn": 8,
+          "type_line": "Sorcery",
+          "x_value": 0
         },
         "mention_count": 91
       },
