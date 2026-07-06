@@ -375,7 +375,11 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
                   path: ':id',
                   builder: (context, state) {
                     final id = state.pathParameters['id']!;
-                    return DeckDetailsScreen(deckId: id);
+                    return DeckDetailsScreen(
+                      deckId: id,
+                      initialOptimizationIntent:
+                          state.uri.queryParameters['optimize'],
+                    );
                   },
                   routes: [
                     GoRoute(

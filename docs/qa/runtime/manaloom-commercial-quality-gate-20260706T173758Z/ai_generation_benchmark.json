@@ -1,0 +1,41 @@
+{
+  "status": "pass",
+  "api": "https://evolution-cartinhas.2ta7qx.easypanel.host",
+  "runs": 2,
+  "successful_runs": 2,
+  "mock_response_count": 0,
+  "avg_total_ms": 5530,
+  "p50_total_ms": 4754,
+  "p95_total_ms": 4754,
+  "max_total_ms": 6306,
+  "results": [
+    {
+      "run": 1,
+      "prompt": "mono red aggro with low curve burn creatures and haste threats",
+      "http_code": 200,
+      "time_namelookup_ms": 2,
+      "time_connect_ms": 201,
+      "time_starttransfer_ms": 4753,
+      "time_total_ms": 4754,
+      "is_mock": null,
+      "generation_mode": null,
+      "deckbuilding_contract_present": false,
+      "generated_card_count": 60,
+      "error": null
+    },
+    {
+      "run": 2,
+      "prompt": "azorius control with board wipes card draw and planeswalkers",
+      "http_code": 200,
+      "time_namelookup_ms": 3,
+      "time_connect_ms": 202,
+      "time_starttransfer_ms": 6306,
+      "time_total_ms": 6306,
+      "is_mock": null,
+      "generation_mode": null,
+      "deckbuilding_contract_present": false,
+      "generated_card_count": 60,
+      "error": null
+    }
+  ]
+}

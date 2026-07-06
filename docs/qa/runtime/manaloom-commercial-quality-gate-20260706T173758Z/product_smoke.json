@@ -1,0 +1,34 @@
+{
+  "status": "ok",
+  "api": "https://evolution-cartinhas.2ta7qx.easypanel.host",
+  "web": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host",
+  "plan_before": {
+    "plan_name": "free",
+    "status": "active",
+    "ai_monthly_limit": 120,
+    "ai_requests_used": 0,
+    "ai_requests_remaining": 120,
+    "estimated_cost_usd": 0.0
+  },
+  "checkout": {
+    "code": 501,
+    "status": "payment_provider_not_configured"
+  },
+  "note_code": 201,
+  "timeline_code": 200,
+  "report": {
+    "id": "rpt_1783359495089023_kbco6hwh90oriw",
+    "public_url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/reports/rpt_1783359495089023_kbco6hwh90oriw",
+    "api_code": 200,
+    "web_code": 200
+  },
+  "community": {
+    "public_deck_code": 200,
+    "comment_code": 201,
+    "comment_list_code": 200,
+    "moderation_report_code": 201,
+    "trade_match_code": 200
+  },
+  "delete_deck_code": 204,
+  "cleanup": "DELETE 1"
+}

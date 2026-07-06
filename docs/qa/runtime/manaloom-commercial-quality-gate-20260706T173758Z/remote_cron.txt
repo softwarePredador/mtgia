@@ -1,0 +1,2 @@
+17 2 * * * MANALOOM_POSTGRES_SERVICE=evolution_manaloom-postgres MANALOOM_POSTGRES_USER=postgres MANALOOM_POSTGRES_DB=halder MANALOOM_BACKUP_DIR=/opt/manaloom/backups/postgres MANALOOM_BACKUP_RETENTION_DAYS=14 /opt/manaloom/scripts/postgres_backup.sh >> /opt/manaloom/logs/postgres_backup.log 2>&1 # manaloom-postgres-backup
+47 3 * * 0 MANALOOM_BACKUP_DIR=/opt/manaloom/backups/postgres MANALOOM_RESTORE_VALIDATE_MODE=schema /opt/manaloom/scripts/postgres_restore_validate_latest.sh >> /opt/manaloom/logs/postgres_restore_check.log 2>&1 # manaloom-postgres-restore-check

@@ -537,6 +537,7 @@ class OptimizationSheetBody extends StatelessWidget {
   final bool preferCollection;
   final double budgetLimit;
   final String rebuildIntent;
+  final bool startsFromPostGame;
   final bool showAllStrategies;
   final Future<List<Map<String, dynamic>>> optionsFuture;
   final ScrollController scrollController;
@@ -560,6 +561,7 @@ class OptimizationSheetBody extends StatelessWidget {
     required this.preferCollection,
     required this.budgetLimit,
     required this.rebuildIntent,
+    this.startsFromPostGame = false,
     required this.showAllStrategies,
     required this.optionsFuture,
     required this.scrollController,
@@ -600,6 +602,10 @@ class OptimizationSheetBody extends StatelessWidget {
           accent: accent,
         ),
         const SizedBox(height: 16),
+        if (startsFromPostGame) ...[
+          const _PostGameOptimizationNotice(),
+          const SizedBox(height: 16),
+        ],
         if (savedArchetype != null && savedArchetype!.trim().isNotEmpty) ...[
           CurrentStrategySection(
             savedArchetype: savedArchetype!,
@@ -640,6 +646,36 @@ class OptimizationSheetBody extends StatelessWidget {
           onRebuildIntentChanged: onRebuildIntentChanged,
         ),
       ],
+    );
+  }
+}
+
+class _PostGameOptimizationNotice extends StatelessWidget {
+  const _PostGameOptimizationNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('optimize-post-game-notice'),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.35)),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.sports_score_outlined, color: AppTheme.brass400),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Fluxo iniciado pelo pós-jogo. Use coleção, orçamento e intensidade para transformar os problemas recorrentes da mesa em um ajuste revisável.',
+              style: TextStyle(color: AppTheme.textSecondary, height: 1.35),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

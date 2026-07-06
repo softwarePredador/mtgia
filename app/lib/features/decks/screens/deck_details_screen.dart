@@ -35,8 +35,13 @@ import '../../commercial/widgets/ai_usage_gate.dart';
 
 class DeckDetailsScreen extends StatefulWidget {
   final String deckId;
+  final String? initialOptimizationIntent;
 
-  const DeckDetailsScreen({super.key, required this.deckId});
+  const DeckDetailsScreen({
+    super.key,
+    required this.deckId,
+    this.initialOptimizationIntent,
+  });
 
   @override
   State<DeckDetailsScreen> createState() => _DeckDetailsScreenState();
@@ -52,6 +57,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   bool _pricingAutoLoaded = false;
   bool _validationAutoLoaded = false;
   bool _isValidating = false;
+  bool _autoOpenedOptimization = false;
   Map<String, dynamic>? _validationResult;
   Set<String> _invalidCardNames = {};
   String? _lastValidationDeckSignature;
@@ -85,7 +91,16 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DeckProvider>().fetchDeckDetails(widget.deckId);
+      _openInitialOptimizationIntent();
     });
+  }
+
+  void _openInitialOptimizationIntent() {
+    if (_autoOpenedOptimization || !mounted) return;
+    final intent = widget.initialOptimizationIntent?.trim();
+    if (intent != 'post_game' && intent != 'rebuild') return;
+    _autoOpenedOptimization = true;
+    _showOptimizationOptions(context, initialIntent: intent);
   }
 
   Map<String, dynamic>? _pricingFromDeck(DeckDetails deck) {
@@ -1215,7 +1230,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     );
   }
 
-  void _showOptimizationOptions(BuildContext context) {
+  void _showOptimizationOptions(BuildContext context, {String? initialIntent}) {
+    final startsFromPostGame = initialIntent == 'post_game';
+    final startsFromRebuild = initialIntent == 'rebuild';
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1234,6 +1251,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 (context, scrollController) => _OptimizationSheet(
                   deckId: widget.deckId,
                   scrollController: scrollController,
+                  initialIntensity:
+                      startsFromRebuild
+                          ? OptimizeIntensity.rebuild
+                          : OptimizeIntensity.focused,
+                  initialRebuildIntent:
+                      startsFromRebuild ? 'optimized' : 'upgraded',
+                  startsFromPostGame: startsFromPostGame || startsFromRebuild,
                 ),
           ),
     );
@@ -1473,10 +1497,16 @@ String _bracketLabel(int bracket) {
 class _OptimizationSheet extends StatefulWidget {
   final String deckId;
   final ScrollController scrollController;
+  final OptimizeIntensity initialIntensity;
+  final String initialRebuildIntent;
+  final bool startsFromPostGame;
 
   const _OptimizationSheet({
     required this.deckId,
     required this.scrollController,
+    this.initialIntensity = OptimizeIntensity.focused,
+    this.initialRebuildIntent = 'upgraded',
+    this.startsFromPostGame = false,
   });
 
   @override
@@ -1488,10 +1518,10 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   int _selectedBracket = 2;
   bool _showAllStrategies = true;
   bool _keepTheme = true;
-  OptimizeIntensity _selectedIntensity = OptimizeIntensity.focused;
+  late OptimizeIntensity _selectedIntensity;
   bool _preferCollection = true;
   double _budgetLimit = 100;
-  String _rebuildIntent = 'upgraded';
+  late String _rebuildIntent;
 
   String? get _currentArchetype {
     final deck = context.read<DeckProvider>().selectedDeck;
@@ -1775,6 +1805,8 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   @override
   void initState() {
     super.initState();
+    _selectedIntensity = widget.initialIntensity;
+    _rebuildIntent = widget.initialRebuildIntent;
     final deck = context.read<DeckProvider>().selectedDeck;
     final savedBracket = deck?.bracket;
     if (savedBracket != null) _selectedBracket = savedBracket;
@@ -1796,6 +1828,7 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       preferCollection: _preferCollection,
       budgetLimit: _budgetLimit,
       rebuildIntent: _rebuildIntent,
+      startsFromPostGame: widget.startsFromPostGame,
       showAllStrategies: _showAllStrategies,
       optionsFuture: _optionsFuture,
       scrollController: widget.scrollController,

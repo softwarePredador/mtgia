@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../models/post_game_note.dart';
@@ -114,7 +115,17 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
                   16 + MediaQuery.of(context).padding.bottom,
                 ),
                 children: [
-                  _EvolutionSummaryPanel(summary: _summary),
+                  _EvolutionSummaryPanel(
+                    summary: _summary,
+                    onOptimize:
+                        () => context.go(
+                          '/decks/${widget.deckId}?optimize=post_game',
+                        ),
+                    onRebuild:
+                        () => context.go(
+                          '/decks/${widget.deckId}?optimize=rebuild',
+                        ),
+                  ),
                   const SizedBox(height: 14),
                   _PostGameForm(
                     resultController: _resultController,
@@ -158,9 +169,15 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
 }
 
 class _EvolutionSummaryPanel extends StatelessWidget {
-  const _EvolutionSummaryPanel({required this.summary});
+  const _EvolutionSummaryPanel({
+    required this.summary,
+    required this.onOptimize,
+    required this.onRebuild,
+  });
 
   final DeckEvolutionSummary summary;
+  final VoidCallback onOptimize;
+  final VoidCallback onRebuild;
 
   @override
   Widget build(BuildContext context) {
@@ -244,6 +261,98 @@ class _EvolutionSummaryPanel extends StatelessWidget {
                   ),
                 ),
           ],
+          if (summary.topPerformers.isNotEmpty ||
+              summary.reviewCandidates.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _CardSignalRows(summary: summary),
+          ],
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  key: const Key('post-game-optimize-from-summary-button'),
+                  onPressed: onOptimize,
+                  icon: const Icon(Icons.auto_fix_high),
+                  label: const Text('Otimizar'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  key: const Key('post-game-rebuild-from-summary-button'),
+                  onPressed: onRebuild,
+                  icon: const Icon(Icons.construction_outlined),
+                  label: const Text('Rebuild'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CardSignalRows extends StatelessWidget {
+  const _CardSignalRows({required this.summary});
+
+  final DeckEvolutionSummary summary;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        if (summary.topPerformers.isNotEmpty)
+          _SignalRow(
+            icon: Icons.check_circle_outline,
+            label: 'Preservar',
+            values: summary.topPerformers,
+            color: AppTheme.success,
+          ),
+        if (summary.reviewCandidates.isNotEmpty)
+          _SignalRow(
+            icon: Icons.manage_search,
+            label: 'Revisar',
+            values: summary.reviewCandidates,
+            color: AppTheme.warning,
+          ),
+      ],
+    );
+  }
+}
+
+class _SignalRow extends StatelessWidget {
+  const _SignalRow({
+    required this.icon,
+    required this.label,
+    required this.values,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final List<String> values;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 17, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              '$label: ${values.take(3).join(', ')}',
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
+                height: 1.35,
+              ),
+            ),
+          ),
         ],
       ),
     );

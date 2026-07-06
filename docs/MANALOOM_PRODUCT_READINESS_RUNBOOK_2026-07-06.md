@@ -40,6 +40,11 @@
     `/ai/generate`, com contagem de mocks e status `pass/degraded`.
   - `scripts/manaloom_easypanel_backup.sh`: backup `pg_dump -Fc`.
   - `scripts/manaloom_validate_restore.sh`: restore em Postgres temporario.
+  - `scripts/manaloom_install_remote_backup_cron.sh`: instala backup diario e
+    validacao semanal de restore no EasyPanel novo.
+  - `scripts/manaloom_commercial_quality_gate.sh`: health, ready, commercial,
+    replica do servico, cron de backup, ultimo dump, smoke produto e benchmark
+    de IA em uma unica saida `pass/fail`.
 - Hosts publicos default alinhados para:
   - API: `https://evolution-cartinhas.2ta7qx.easypanel.host`
   - web publico: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`
@@ -83,6 +88,8 @@ scripts/manaloom_product_smoke.sh
 MANALOOM_AI_BENCHMARK_RUNS=3 scripts/manaloom_ai_generation_benchmark.sh
 scripts/manaloom_easypanel_backup.sh
 scripts/manaloom_validate_restore.sh backups/manaloom-postgres/<arquivo>.dump
+scripts/manaloom_install_remote_backup_cron.sh
+MANALOOM_AI_BENCHMARK_RUNS=3 scripts/manaloom_commercial_quality_gate.sh
 ```
 
 Para restore completo em ambiente temporario:
@@ -96,12 +103,22 @@ O restore padrao usa `schema` para ser rapido em validacao recorrente. O modo
 
 Evidencia de 2026-07-06:
 
-- Backup real do Postgres novo gerado em `backups/manaloom-postgres/`.
-- Restore schema validado em Postgres 17 temporario remoto.
-- Resultado do restore: `80` tabelas publicas restauradas.
+- Backup remoto automatico instalado no EasyPanel novo:
+  `17 2 * * * ... # manaloom-postgres-backup`.
+- Validacao remota de restore instalada:
+  `47 3 * * 0 ... # manaloom-postgres-restore-check`.
+- Backup real do Postgres novo:
+  `/opt/manaloom/backups/postgres/manaloom-postgres-20260706T173318Z.dump`.
+- Tamanho validado: `279087037` bytes.
+- Restore `schema` validado em Postgres 17 temporario remoto.
+- Restore `full` validado em Postgres 17 temporario remoto.
+- Resultado dos restores: `82` tabelas publicas restauradas.
 - Deploy backend final validado no SHA
   `7cd6fbf5eb99192bd7346933f4e3220734e1ec2e`.
 - Smoke de produto final: `status=ok`.
-- Benchmark de IA final: sem mock em producao; status pode ficar `degraded`
-  quando a IA retorna deck invalido e a API responde 422, que e o
-  comportamento esperado sem fallback mock.
+- Quality gate comercial:
+  `docs/qa/runtime/manaloom-commercial-quality-gate-20260706T173758Z/summary.json`
+  com `status=pass`, `service_replicas=1/1`, `successful_runs=2`,
+  `mock_response_count=0`, `cron_lines=2` e `issues=[]`.
+- Login Flutter Web local validado em
+  `http://127.0.0.1:8088/app/#/login`, sem `RangeError` e sem erros de console.

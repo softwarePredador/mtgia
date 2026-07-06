@@ -1,0 +1,58 @@
+{
+  "status": "ok",
+  "window_days": 30,
+  "generated_at": "2026-07-06T17:38:00.351356Z",
+  "activation_funnel": {
+    "status": "ok",
+    "signups": 74,
+    "events": {
+      "core_flow_started": 3,
+      "deck_created": 13
+    },
+    "deck_created_count": 13,
+    "ai_used_count": 0,
+    "deck_created_per_signup": 0.1757,
+    "ai_used_per_signup": 0.0
+  },
+  "ai_performance": {
+    "status": "ok",
+    "request_count": 6,
+    "error_count": 0,
+    "error_rate": 0.0,
+    "total_tokens": 22844,
+    "endpoints": [
+      {
+        "endpoint": "optimize",
+        "request_count": 6,
+        "error_count": 0,
+        "error_rate": 0.0,
+        "avg_latency_ms": 3975,
+        "p95_latency_ms": 5371,
+        "input_tokens": 22014,
+        "output_tokens": 830
+      }
+    ]
+  },
+  "plan_mix": {
+    "status": "ok",
+    "total_users_with_plan": 1134,
+    "plans": [
+      {
+        "plan_name": "free",
+        "status": "active",
+        "count": 1134
+      }
+    ]
+  },
+  "shareable_reports": {
+    "status": "ok",
+    "created_count": 0,
+    "public_count": 0
+  },
+  "retention": {
+    "status": "ok",
+    "post_game_note_count": 0,
+    "active_users": 0,
+    "active_decks": 0
+  }
+}
