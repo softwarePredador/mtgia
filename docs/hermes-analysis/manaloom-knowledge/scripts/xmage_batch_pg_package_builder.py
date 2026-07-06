@@ -306,9 +306,13 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "trigger_effect",
     "trigger_controller_scope",
     "trigger_gain_life",
+    "trigger_draw_count",
     "trigger_another_creature_enters",
     "trigger_entering_card_types",
+    "trigger_entering_power_min",
+    "trigger_entering_subtypes",
     "trigger_optional",
+    "trigger_limit_each_turn",
     "ability_kind",
     "activated_effect",
     "activated_battle_model_scope",
@@ -1562,6 +1566,50 @@ def creature_enters_life_gain_execution_scenario_from_expected_rule(
     }
 
 
+def creature_enters_draw_execution_scenario_from_expected_rule(
+    rule: dict[str, Any],
+) -> dict[str, Any] | None:
+    required = dict(rule.get("required_effect_fields") or {})
+    if required.get("battle_model_scope") != "xmage_creature_enters_draw_trigger_v1":
+        return None
+    count = int(required.get("trigger_draw_count") or 0)
+    if count <= 0:
+        return None
+    controller_scope = str(required.get("trigger_controller_scope") or "self")
+    entering_controller = "opponent" if controller_scope == "any" else "controller"
+    subtypes = [str(value) for value in (required.get("trigger_entering_subtypes") or []) if value]
+    subtype = subtypes[0].title() if subtypes else "Soldier"
+    power = max(2, int(required.get("trigger_entering_power_min") or 0))
+    library = [
+        {"name": f"E2E Drawn Card {index + 1}", "type_line": "Sorcery", "effect": "draw_cards"}
+        for index in range(count)
+    ]
+    return {
+        "name": f"{rule['card_name']} draws when creature enters",
+        "type": "creature_enters_draw",
+        "card": {
+            "name": rule["card_name"],
+            "type_line": "Enchantment",
+            "effect": required.get("effect") or "enchantment",
+        },
+        "source_starts_on_battlefield": True,
+        "entering_controller": entering_controller,
+        "entering_creature": {
+            "name": f"E2E Entering Creature for {rule['card_name']}",
+            "type_line": f"Creature - {subtype}",
+            "subtypes": [subtype],
+            "effect": "creature",
+            "power": power,
+            "toughness": max(1, power),
+        },
+        "controller_library": library,
+        "expected_trigger": required.get("trigger"),
+        "expected_draw_count": count,
+        "expected_hand_after": count,
+        "logical_rule_key": rule["logical_rule_key"],
+    }
+
+
 def spell_cast_gain_life_execution_scenario_from_expected_rule(
     rule: dict[str, Any],
 ) -> dict[str, Any] | None:
@@ -2024,6 +2072,7 @@ def execution_scenario_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any
         or dynamic_life_gain_execution_scenario_from_expected_rule(rule)
         or creature_etb_dynamic_life_gain_execution_scenario_from_expected_rule(rule)
         or creature_enters_life_gain_execution_scenario_from_expected_rule(rule)
+        or creature_enters_draw_execution_scenario_from_expected_rule(rule)
         or spell_cast_gain_life_execution_scenario_from_expected_rule(rule)
     )
 

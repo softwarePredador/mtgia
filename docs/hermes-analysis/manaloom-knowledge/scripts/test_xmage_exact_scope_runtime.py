@@ -17540,6 +17540,139 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_enters_draw_respects_power_filter(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Elemental Bond",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+            "trigger": "creature_you_control_enters",
+            "trigger_effect": "draw_cards",
+            "trigger_controller_scope": "self",
+            "trigger_draw_count": 1,
+            "trigger_entering_card_types": ["creature"],
+            "trigger_entering_power_min": 3,
+            "_rule_logical_key": "battle_rule_v1:fixture_elemental_bond",
+        }
+        active.battlefield = [source]
+        small = {"name": "Small Creature", "type_line": "Creature - Soldier", "effect": "creature", "power": 2}
+        large = {"name": "Large Creature", "type_line": "Creature - Beast", "effect": "creature", "power": 3}
+
+        self.battle.process_controlled_creature_enters_triggers(
+            active,
+            [opponent],
+            small,
+            turn=5,
+            all_players=[active, opponent],
+        )
+        self.assertEqual(active.hand, [])
+
+        self.battle.process_controlled_creature_enters_triggers(
+            active,
+            [opponent],
+            large,
+            turn=5,
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn Card"])
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Elemental Bond"
+                and data.get("trigger") == "creature_you_control_enters"
+                and data.get("effect") == "draw_cards"
+                and data.get("cards_drawn") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_enters_draw_triggers_on_opponent_subtype_for_global_scope(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Beast Draw"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Wirewood Savage",
+            "type_line": "Creature - Elf",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+            "trigger": "creature_enters",
+            "trigger_effect": "draw_cards",
+            "trigger_controller_scope": "any",
+            "trigger_draw_count": 1,
+            "trigger_entering_card_types": ["creature"],
+            "trigger_entering_subtypes": ["beast"],
+            "trigger_optional": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_wirewood_savage",
+        }
+        active.battlefield = [source]
+        entering = {
+            "name": "Opponent Beast",
+            "type_line": "Creature - Beast",
+            "subtypes": ["Beast"],
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+
+        self.battle.process_opponent_controlled_creature_enters_triggers(
+            opponent,
+            entering,
+            turn=6,
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Beast Draw"])
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Wirewood Savage"
+                and data.get("trigger") == "creature_enters"
+                and data.get("effect") == "draw_cards"
+                and data.get("entering_controller") == "Opponent"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_enters_draw_limit_once_each_turn(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "First"}, {"name": "Second"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Mary Jane Watson",
+            "type_line": "Legendary Creature - Human Performer",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+            "trigger": "creature_you_control_enters",
+            "trigger_effect": "draw_cards",
+            "trigger_controller_scope": "self",
+            "trigger_draw_count": 1,
+            "trigger_entering_card_types": ["creature"],
+            "trigger_entering_subtypes": ["spider"],
+            "trigger_limit_each_turn": 1,
+            "_rule_logical_key": "battle_rule_v1:fixture_mary_jane",
+        }
+        active.battlefield = [source]
+        spider = {
+            "name": "Spider Token",
+            "type_line": "Creature - Spider",
+            "subtypes": ["Spider"],
+            "effect": "creature",
+            "power": 1,
+        }
+
+        for _ in range(2):
+            self.battle.process_controlled_creature_enters_triggers(
+                active,
+                [opponent],
+                dict(spider),
+                turn=7,
+                all_players=[active, opponent],
+            )
+
+        self.assertEqual([card["name"] for card in active.hand], ["First"])
+        self.assertEqual([card["name"] for card in active.library], ["Second"])
+
 
 if __name__ == "__main__":
     unittest.main()

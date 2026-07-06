@@ -21192,6 +21192,132 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "creature_enters_life_gain_oracle_not_exact_creature")
 
+    def test_creature_enters_draw_maps_controlled_power_filter(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldAllTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Elemental Bond",
+                type_line="Enchantment",
+                oracle_text="Whenever a creature you control with power 3 or greater enters, draw a card.",
+            ),
+            source_text="""
+                private static final FilterPermanent filter = new FilterControlledCreaturePermanent(
+                    "a creature you control with power 3 or greater");
+                static {
+                    filter.add(new PowerPredicate(ComparisonType.MORE_THAN, 2));
+                }
+                this.addAbility(new EntersBattlefieldAllTriggeredAbility(
+                    new DrawCardSourceControllerEffect(1), filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.CREATURE_ENTERS_DRAW_TRIGGER_SCOPE)
+        self.assertEqual(effect["trigger"], "creature_you_control_enters")
+        self.assertEqual(effect["trigger_effect"], "draw_cards")
+        self.assertEqual(effect["trigger_draw_count"], 1)
+        self.assertEqual(effect["trigger_entering_power_min"], 3)
+        self.assertFalse(effect["trigger_optional"])
+
+    def test_creature_enters_draw_maps_global_optional_subtype_filter(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldAllTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Wirewood Savage",
+                type_line="Creature - Elf",
+                oracle_text="Whenever a Beast enters, you may draw a card.",
+            ),
+            source_text="""
+                private static final FilterPermanent filter = new FilterPermanent("a Beast");
+                static {
+                    filter.add(SubType.BEAST.getPredicate());
+                }
+                this.addAbility(new EntersBattlefieldAllTriggeredAbility(
+                    Zone.BATTLEFIELD, new DrawCardSourceControllerEffect(1), filter, true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["trigger"], "creature_enters")
+        self.assertEqual(effect["trigger_controller_scope"], "any")
+        self.assertEqual(effect["trigger_entering_subtypes"], ["beast"])
+        self.assertTrue(effect["trigger_optional"])
+
+    def test_creature_enters_draw_maps_trigger_limit_each_turn(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldAllTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mary Jane Watson",
+                type_line="Legendary Creature - Human Performer",
+                oracle_text=(
+                    "Whenever a Spider you control enters, draw a card. "
+                    "This ability triggers only once each turn."
+                ),
+            ),
+            source_text="""
+                private static final FilterPermanent filter = new FilterControlledPermanent(SubType.SPIDER);
+                this.addAbility(new EntersBattlefieldAllTriggeredAbility(
+                    new DrawCardSourceControllerEffect(1), filter
+                ).setTriggersLimitEachTurn(1));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["trigger_entering_subtypes"], ["spider"])
+        self.assertEqual(effect["trigger_limit_each_turn"], 1)
+
+    def test_creature_enters_draw_blocks_optional_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldAllTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Mentor of the Meek",
+                type_line="Creature - Human Soldier",
+                oracle_text=(
+                    "Whenever another creature you control with power 2 or less enters, "
+                    "you may pay {1}. If you do, draw a card."
+                ),
+            ),
+            source_text="""
+                Effect effect = new DoIfCostPaid(new DrawCardSourceControllerEffect(1), new ManaCostsImpl<>("{1}"));
+                this.addAbility(new EntersBattlefieldAllTriggeredAbility(
+                    Zone.BATTLEFIELD, effect, filter, false));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "creature_enters_draw_oracle_not_simple")
+
     def test_report_summarizes_selected_and_blocked_rows(self) -> None:
         rows = [
             queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"], card_id="draw"),

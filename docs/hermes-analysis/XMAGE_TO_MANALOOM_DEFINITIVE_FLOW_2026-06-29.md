@@ -16285,6 +16285,138 @@ activated library-pick permanents, X look-count variants, or conditional
 trigger variants. Those remain blocked under `look_library_pick_*`,
 `etb_library_pick_*`, or their source/Oracle mismatch reasons.
 
+## PG579 Creature Enters Draw New Server Evidence
+
+PG579 evidence:
+
+- exact-scope split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg579_creature_enters_draw_new_server.md`
+- exact-scope split JSON:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg579_creature_enters_draw_new_server.json`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_package.md`
+- package manifest:
+  `docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_manifest.json`
+- package precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_precheck.sql`
+- package apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_apply.sql`
+- package postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_postcheck.sql`
+- package rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_rollback.sql`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_apply_evidence.md`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_e2e.md`
+- E2E validation JSON:
+  `docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_e2e.json`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_sync_report.json`
+- post-PG579 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg579_creature_enters_draw_new_server.md`
+- post-PG579 readiness JSON:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg579_creature_enters_draw_new_server.json`
+- post-PG579 queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg579_creature_enters_draw_new_server_commander_legal.md`
+- post-PG579 queue JSON:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg579_creature_enters_draw_new_server_commander_legal.json`
+- post-PG579 exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg579_creature_enters_draw_new_server_recheck.md`
+- post-PG579 exact split JSON:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg579_creature_enters_draw_new_server_recheck.json`
+
+PG579 promoted `5` XMage-authoritative creature-enters draw trigger rules:
+
+- `Elemental Bond`
+- `Garruk's Packleader`
+- `Mary Jane Watson`
+- `Wirewood Savage`
+- `Woodland Liege`
+
+Runtime/modeling change:
+
+- `xmage_authoritative_exact_scope_split.py` now supports
+  `xmage_creature_enters_draw_trigger_v1` for simple permanent triggers that
+  draw cards when matching creatures enter the battlefield;
+- supported filters include creature you control with fixed minimum power,
+  another creature you control once each turn, and matching creature subtypes
+  entering under any player's control;
+- `battle_analyst_v9.py` now executes those trigger filters for controller and
+  opponent creature-enter paths;
+- package builder and E2E validation now generate focused
+  `creature_enters_draw` scenarios.
+
+Validation:
+
+- precheck found `5/5` target cards and no existing expected executable rows;
+- apply upserted `5` rules and deprecated `4` generated review-only shadow
+  rows for `Elemental Bond` and `Garruk's Packleader`;
+- postcheck found one promoted verified/auto/Oracle-hash row for each card;
+- PG -> Hermes/SQLite sync loaded `5` PostgreSQL rows, updated `9` SQLite
+  rows, and exported `6654` canonical snapshot rows;
+- E2E validation passed for PostgreSQL, SQLite, snapshot, runtime
+  `get_card_effect`, and focused battle execution;
+- splitter suite passed `681` tests;
+- exact runtime suite passed `351` tests;
+- package builder focused suite passed;
+- wrapped battle analyst suite passed against the new server environment;
+- post-PG579 queue moved from PG578 `target_identity_count=25339` and
+  `xmage_authoritative_source_count=25025` to `25334` and `25020`;
+- top draw-engine work unit moved from `1593` to `1588`;
+- final exact-scope recheck returned `proposal_count=0`.
+
+Residual boundary: PG579 does not authorize optional-cost or more complex
+creature-enter draw variants. Those remain blocked under
+`creature_enters_draw_oracle_not_simple` and require separate modeling.
+
+## PG580 Oracle Hash Integrity Backfill New Server Evidence
+
+PG580 evidence:
+
+- backfill:
+  `docs/hermes-analysis/master_optimizer_reports/pg580_oracle_hash_integrity_backfill_new_server.md`
+- precheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg580_oracle_hash_integrity_backfill_new_server_precheck.sql`
+- apply SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg580_oracle_hash_integrity_backfill_new_server_apply.sql`
+- postcheck SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg580_oracle_hash_integrity_backfill_new_server_postcheck.sql`
+- rollback SQL:
+  `docs/hermes-analysis/master_optimizer_reports/pg580_oracle_hash_integrity_backfill_new_server_rollback.sql`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg580_oracle_hash_integrity_backfill_sync_report.json`
+- final PG/Hermes/SQLite audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.md`
+- final PG/Hermes/SQLite audit JSON:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.json`
+- final governance audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.md`
+- final governance audit JSONs:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.json`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg579_pg580_creature_enters_draw_new_server_final.json`
+
+PG580 is a metadata-only integrity backfill triggered by the post-PG579
+PG/Hermes/SQLite audit. It does not change card behavior.
+
+Validation:
+
+- precheck found `44` trusted executable PostgreSQL rows missing
+  `oracle_hash`;
+- all `44` rows were resolvable from current `public.cards.oracle_text`;
+- backup table:
+  `manaloom_deploy_audit.pg580_oracle_hash_integrity_backfill_new_server_20260706`;
+- updated rows: `44`;
+- postcheck missing rows: `0`;
+- PG -> SQLite sync loaded `64` PostgreSQL rows, updated `64` SQLite rows, and
+  exported `6654` canonical snapshot rows;
+- final PG/Hermes/SQLite contract passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational and legacy contamination audits passed.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

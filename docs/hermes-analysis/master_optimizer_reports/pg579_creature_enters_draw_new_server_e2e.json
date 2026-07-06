@@ -1,0 +1,273 @@
+{
+  "battle_execution": {
+    "event_count": 5,
+    "results": [
+      {
+        "card_name": "Elemental Bond",
+        "cards_drawn": 1,
+        "entering_controller": "Draw Trigger Controller",
+        "hand_after": 1,
+        "scenario": "Elemental Bond draws when creature enters",
+        "trigger": "creature_you_control_enters"
+      },
+      {
+        "card_name": "Garruk's Packleader",
+        "cards_drawn": 1,
+        "entering_controller": "Draw Trigger Controller",
+        "hand_after": 1,
+        "scenario": "Garruk's Packleader draws when creature enters",
+        "trigger": "creature_you_control_enters"
+      },
+      {
+        "card_name": "Mary Jane Watson",
+        "cards_drawn": 1,
+        "entering_controller": "Draw Trigger Controller",
+        "hand_after": 1,
+        "scenario": "Mary Jane Watson draws when creature enters",
+        "trigger": "creature_you_control_enters"
+      },
+      {
+        "card_name": "Wirewood Savage",
+        "cards_drawn": 1,
+        "entering_controller": "Opponent",
+        "hand_after": 1,
+        "scenario": "Wirewood Savage draws when creature enters",
+        "trigger": "creature_enters"
+      },
+      {
+        "card_name": "Woodland Liege",
+        "cards_drawn": 1,
+        "entering_controller": "Draw Trigger Controller",
+        "hand_after": 1,
+        "scenario": "Woodland Liege draws when creature enters",
+        "trigger": "creature_you_control_enters"
+      }
+    ],
+    "scenario_count": 5
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-06T23:19:33.276864+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_manifest.json",
+  "package_id": "pg579_creature_enters_draw_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "card_name": "Elemental Bond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bd1c61d07d0cfba06bd4b9cd2c8e3563",
+          "oracle_hash": "5a691f455e7c6bc07be2216acc17dd12",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "card_name": "Garruk's Packleader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0f60b037ce53a92cb805467893c4b09b",
+          "oracle_hash": "75e46cdf177b60f8222c11dd2a23fe4a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "card_name": "Mary Jane Watson",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cc844d8be9823c1e24a8a527104759b7",
+          "oracle_hash": "cf34165c6f4e6d223d5a808d08d31820",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "card_name": "Wirewood Savage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:082b3870153de03b308b0b1845fac9a3",
+          "oracle_hash": "d9bea46f134c92b206b9825d99fd4536",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "card_name": "Woodland Liege",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0b327e4ff0cfb5815d7d2b7cf7adea6d",
+          "oracle_hash": "b88741308258706f6b2a4bcc27621de9",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "card_name": "Elemental Bond",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bd1c61d07d0cfba06bd4b9cd2c8e3563",
+          "oracle_hash": "5a691f455e7c6bc07be2216acc17dd12",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "card_name": "Garruk's Packleader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0f60b037ce53a92cb805467893c4b09b",
+          "oracle_hash": "75e46cdf177b60f8222c11dd2a23fe4a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "card_name": "Mary Jane Watson",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cc844d8be9823c1e24a8a527104759b7",
+          "oracle_hash": "cf34165c6f4e6d223d5a808d08d31820",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "card_name": "Wirewood Savage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:082b3870153de03b308b0b1845fac9a3",
+          "oracle_hash": "d9bea46f134c92b206b9825d99fd4536",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "card_name": "Woodland Liege",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0b327e4ff0cfb5815d7d2b7cf7adea6d",
+          "oracle_hash": "b88741308258706f6b2a4bcc27621de9",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elemental Bond",
+          "logical_rule_key": "battle_rule_v1:bd1c61d07d0cfba06bd4b9cd2c8e3563"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Garruk's Packleader",
+          "logical_rule_key": "battle_rule_v1:0f60b037ce53a92cb805467893c4b09b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mary Jane Watson",
+          "logical_rule_key": "battle_rule_v1:cc844d8be9823c1e24a8a527104759b7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wirewood Savage",
+          "logical_rule_key": "battle_rule_v1:082b3870153de03b308b0b1845fac9a3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+          "battle_rule_version": 2,
+          "card_name": "Woodland Liege",
+          "logical_rule_key": "battle_rule_v1:0b327e4ff0cfb5815d7d2b7cf7adea6d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Elemental Bond",
+          "component_keys": [],
+          "effect": "enchantment",
+          "logical_rule_key": "battle_rule_v1:bd1c61d07d0cfba06bd4b9cd2c8e3563"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Garruk's Packleader",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0f60b037ce53a92cb805467893c4b09b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mary Jane Watson",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cc844d8be9823c1e24a8a527104759b7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wirewood Savage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:082b3870153de03b308b0b1845fac9a3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Woodland Liege",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0b327e4ff0cfb5815d7d2b7cf7adea6d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 5,
+        "scenarios": 5
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

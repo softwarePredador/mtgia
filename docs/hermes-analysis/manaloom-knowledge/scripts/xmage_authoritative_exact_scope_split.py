@@ -313,6 +313,7 @@ SPELL_CAST_GAIN_LIFE_SCOPE = "xmage_spell_cast_gain_life_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DYNAMIC_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_dynamic_gain_life_v1"
 CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE = "xmage_creature_enters_life_gain_trigger_v1"
+CREATURE_ENTERS_DRAW_TRIGGER_SCOPE = "xmage_creature_enters_draw_trigger_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_SCRY_CREATURE_SCOPE = "xmage_creature_etb_scry_v1"
 ETB_OPTIONAL_DISCARD_DRAW_CREATURE_SCOPE = "xmage_creature_etb_optional_discard_draw_cards_v1"
@@ -7578,6 +7579,19 @@ def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_enters_draw_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldAllTriggeredAbility"}
+    return (
+        effect_classes(row) == {"DrawCardSourceControllerEffect"}
+        and "EntersBattlefieldAllTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"draw", "triggered_ability"})
+    )
+
+
 def is_creature_etb_scry_unit(row: dict[str, Any]) -> bool:
     unit = str(row.get("adapter_work_unit") or "")
     abilities = ability_classes(row)
@@ -14708,6 +14722,152 @@ def creature_enters_life_gain_from_source(source_text: str, ability_names: set[s
     }
 
 
+def _creature_enters_draw_filter_from_text(
+    filter_text: str,
+    *,
+    controller_scope: str,
+) -> dict[str, Any] | str:
+    normalized = re.sub(r"\s+", " ", str(filter_text or "").strip().lower())
+    result: dict[str, Any] = {
+        "trigger_entering_card_types": ["creature"],
+        "trigger_controller_scope": controller_scope,
+    }
+    if normalized.endswith(" you control"):
+        normalized = normalized[: -len(" you control")].strip()
+    normalized = normalized.replace("creature you control with power", "creature with power")
+    power_match = re.fullmatch(
+        r"creature with power (?P<power>\d+) or greater",
+        normalized,
+    )
+    if power_match:
+        result["trigger_entering_power_min"] = int(power_match.group("power"))
+        return result
+    subtype_match = re.fullmatch(r"(?P<subtype>[a-z][a-z -]*)(?: you control)?", normalized)
+    if subtype_match:
+        subtype = subtype_match.group("subtype").strip().replace("-", " ")
+        if subtype == "creature":
+            return result
+        result["trigger_entering_subtypes"] = [subtype]
+        return result
+    return "creature_enters_draw_oracle_filter_not_supported"
+
+
+def creature_enters_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
+    limit_each_turn = False
+    limit_suffix = " this ability triggers only once each turn."
+    if text.endswith(limit_suffix):
+        limit_each_turn = True
+        text = text[: -len(limit_suffix)].strip()
+    number_pattern = r"(a|one|two|three|four|five|\d+)"
+    match = re.fullmatch(
+        rf"whenever (?P<another>another )?(?P<filter>.+?) enters(?: the battlefield)?[, ]+(?:you )?(?P<may>may )?draw (?P<count>{number_pattern}) cards?\.?",
+        text,
+    )
+    if not match:
+        return "creature_enters_draw_oracle_not_simple"
+    count = number_word_to_int(match.group("count"))
+    if count <= 0:
+        return "creature_enters_draw_oracle_count_not_fixed"
+    filter_text = re.sub(r"^(?:a|an)\s+", "", match.group("filter").strip())
+    controller_scope = "self" if "you control" in filter_text else "any"
+    filter_spec = _creature_enters_draw_filter_from_text(
+        filter_text,
+        controller_scope=controller_scope,
+    )
+    if isinstance(filter_spec, str):
+        return filter_spec
+    trigger = "creature_you_control_enters" if controller_scope == "self" else "creature_enters"
+    result: dict[str, Any] = {
+        "trigger": trigger,
+        "trigger_effect": "draw_cards",
+        "trigger_draw_count": count,
+        "trigger_another_creature_enters": bool(match.group("another")),
+        "trigger_optional": bool(match.group("may")),
+        **filter_spec,
+    }
+    if limit_each_turn:
+        result["trigger_limit_each_turn"] = 1
+    return result
+
+
+def _creature_enters_draw_filter_from_source(source_text: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    if "TokenPredicate" in text or "SymmetryMatrixPredicate" in text:
+        return "creature_enters_draw_source_filter_not_supported"
+    if "FilterControlledCreaturePermanent" in text or "FilterControlledPermanent" in text:
+        controller_scope = "self"
+    elif "FilterCreaturePermanent" in text or "new FilterPermanent" in text:
+        controller_scope = "any"
+    else:
+        return "creature_enters_draw_source_creature_filter_not_supported"
+    result: dict[str, Any] = {
+        "trigger_entering_card_types": ["creature"],
+        "trigger_controller_scope": controller_scope,
+    }
+    power_match = re.search(
+        r"new\s+PowerPredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*(\d+)\s*\)",
+        text,
+    )
+    if power_match:
+        result["trigger_entering_power_min"] = int(power_match.group(1)) + 1
+    subtype_matches = [
+        value.lower().replace("_", " ")
+        for value in re.findall(r"SubType\.([A-Z_]+)(?:\.getPredicate\s*\(\s*\)|\))", text)
+    ]
+    if subtype_matches:
+        # Ignore source card subtype declarations before `this.addAbility`; only
+        # filter subtypes matter for the entering permanent.
+        ability_index = text.find("addAbility")
+        filtered: list[str] = []
+        for match in re.finditer(r"SubType\.([A-Z_]+)(?:\.getPredicate\s*\(\s*\)|\))", text):
+            prefix = text[max(0, match.start() - 80): match.start()]
+            if ability_index >= 0 and match.start() < ability_index and "filter" not in prefix.lower():
+                continue
+            filtered.append(match.group(1).lower().replace("_", " "))
+        if filtered:
+            result["trigger_entering_subtypes"] = sorted(set(filtered))
+    if not result.get("trigger_entering_power_min") and not result.get("trigger_entering_subtypes"):
+        if "FilterControlledCreaturePermanent" not in text and "FilterCreaturePermanent" not in text:
+            return "creature_enters_draw_source_filter_not_supported"
+    return result
+
+
+def creature_enters_draw_from_source(source_text: str, ability_names: set[str]) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    if ability_names != {"EntersBattlefieldAllTriggeredAbility"}:
+        return "creature_enters_draw_source_ability_not_supported"
+    if "DoIfCostPaid" in text or "ManaCostsImpl" in text or "GenericManaCost" in text:
+        return "creature_enters_draw_source_optional_cost_not_supported"
+    draw_count = java_constructor_int(text, "DrawCardSourceControllerEffect", default=1)
+    if draw_count is None or draw_count <= 0:
+        return "creature_enters_draw_source_count_not_fixed"
+    optional = bool(
+        re.search(
+            r"EntersBattlefieldAllTriggeredAbility\s*\([^;]*,\s*true\s*\)",
+            text,
+            flags=re.DOTALL,
+        )
+    )
+    another_only = bool("AnotherPredicate.instance" in text)
+    filter_spec = _creature_enters_draw_filter_from_source(text)
+    if isinstance(filter_spec, str):
+        return filter_spec
+    controller_scope = str(filter_spec.get("trigger_controller_scope") or "self")
+    trigger = "creature_you_control_enters" if controller_scope == "self" else "creature_enters"
+    result: dict[str, Any] = {
+        "trigger": trigger,
+        "trigger_effect": "draw_cards",
+        "trigger_draw_count": draw_count,
+        "trigger_another_creature_enters": another_only,
+        "trigger_optional": optional,
+        **filter_spec,
+    }
+    if ".setTriggersLimitEachTurn(1)" in text:
+        result["trigger_limit_each_turn"] = 1
+    return result
+
+
 def dies_life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
     match = re.fullmatch(
@@ -17394,6 +17554,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature ETB dynamic life-gain trigger"
     elif scope == CREATURE_ENTERS_LIFE_GAIN_TRIGGER_SCOPE:
         scope_kind = "permanent trigger when a creature enters and controller gains life"
+    elif scope == CREATURE_ENTERS_DRAW_TRIGGER_SCOPE:
+        scope_kind = "permanent trigger when a creature enters and controller draws cards"
     elif scope == ETB_BOUNCE_CREATURE_SCOPE:
         scope_kind = "creature ETB return target permanent to hand trigger"
     elif scope == DESTROY_GAIN_LIFE_SCOPE:
@@ -17611,6 +17773,7 @@ def split_row(
     static_horsemanship_creature_unit = is_static_horsemanship_creature_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     creature_enters_life_gain_unit = is_creature_enters_life_gain_unit(row)
+    creature_enters_draw_unit = is_creature_enters_draw_unit(row)
     dies_life_gain_creature_unit = is_creature_dies_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
     etb_scry_creature_unit = is_creature_etb_scry_unit(row)
@@ -17742,6 +17905,7 @@ def split_row(
         and not static_horsemanship_creature_unit
         and not etb_life_gain_creature_unit
         and not creature_enters_life_gain_unit
+        and not creature_enters_draw_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not etb_scry_creature_unit
@@ -17817,6 +17981,7 @@ def split_row(
         (unit in SPELL_UNITS or boost_keyword_spell_unit or target_keyword_spell_unit)
         and not etb_life_gain_creature_unit
         and not creature_enters_life_gain_unit
+        and not creature_enters_draw_unit
         and not static_protection_from_colors_creature_unit
         and not static_cast_as_flash_permission_unit
         and not static_cant_be_blocked_creature_unit
@@ -21388,6 +21553,54 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_enters_life_gain_trigger",
+        ), "selected_exact_scope"
+
+    if creature_enters_draw_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "creature_enters_draw_not_permanent"
+        oracle_trigger = creature_enters_draw_from_oracle(metadata)
+        if isinstance(oracle_trigger, str):
+            return None, oracle_trigger
+        source_trigger = creature_enters_draw_from_source(source_text, ability_classes(row))
+        if isinstance(source_trigger, str):
+            return None, source_trigger
+        for key in (
+            "trigger",
+            "trigger_effect",
+            "trigger_controller_scope",
+            "trigger_draw_count",
+            "trigger_another_creature_enters",
+            "trigger_optional",
+            "trigger_entering_card_types",
+            "trigger_entering_power_min",
+            "trigger_entering_subtypes",
+            "trigger_limit_each_turn",
+        ):
+            if source_trigger.get(key) != oracle_trigger.get(key):
+                return None, "creature_enters_draw_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": CREATURE_ENTERS_DRAW_TRIGGER_SCOPE,
+            "ability_kind": "triggered",
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "xmage_ability_class": next(iter(ability_classes(row))),
+            **oracle_trigger,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_enters_draw_trigger",
         ), "selected_exact_scope"
 
     if dies_life_gain_creature_unit:
@@ -26340,6 +26553,7 @@ def build_exact_split_report(
             and not is_static_horsemanship_creature_unit(row)
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_dies_life_gain_unit(row)
+            and not is_creature_enters_draw_unit(row)
             and not is_creature_etb_draw_unit(row)
             and not is_creature_etb_scry_unit(row)
             and not is_creature_etb_draw_lose_life_unit(row)
@@ -26434,6 +26648,7 @@ def build_exact_split_report(
                 "no-effect/no-signal HorsemanshipAbility creature rows with exact Oracle/XMage self horsemanship evasion",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and DiesSourceTriggeredAbility plus only static self keywords",
+                "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldAllTriggeredAbility, exact creature-enter draw Oracle/source agreement, supported power/subtype/controller filters, no optional trigger cost, and only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "xmage_signature ScryEffect rows with EntersBattlefieldTriggeredAbility, exact fixed ETB scry Oracle/source agreement, and no target or condition",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect, EntersBattlefieldTriggeredAbility, exact fixed draw/life-loss Oracle/source agreement, and only static self keywords",

@@ -38622,6 +38622,34 @@ def resolve_damage_any_target(
     return result
 
 
+def creature_enter_trigger_matches(permanent, entering_permanent, *, entering_controller_is_source_controller=True):
+    if not isinstance(permanent, dict) or not isinstance(entering_permanent, dict):
+        return False
+    trigger = str(permanent.get("trigger") or "")
+    controller_scope = str(permanent.get("trigger_controller_scope") or "")
+    if trigger == "creature_you_control_enters" or controller_scope == "self":
+        if not entering_controller_is_source_controller:
+            return False
+    card_types = [
+        str(value).strip().lower()
+        for value in permanent.get("trigger_entering_card_types") or []
+        if value
+    ]
+    if card_types and "creature" in card_types and not is_battlefield_creature(entering_permanent):
+        return False
+    power_min = int(permanent.get("trigger_entering_power_min") or 0)
+    if power_min > 0 and card_power_value(entering_permanent, default=0) < power_min:
+        return False
+    subtypes = [
+        str(value).strip().lower()
+        for value in permanent.get("trigger_entering_subtypes") or []
+        if value
+    ]
+    if subtypes and not any(permanent_has_subtype(entering_permanent, subtype) for subtype in subtypes):
+        return False
+    return True
+
+
 def process_controlled_creature_enters_triggers(
     player,
     opponents,
@@ -38640,16 +38668,81 @@ def process_controlled_creature_enters_triggers(
         for permanent in list(getattr(player, "battlefield", []) or [])
         if isinstance(permanent, dict)
         and permanent.get("trigger") in {"creature_you_control_enters", "creature_enters"}
-        and permanent.get("trigger_effect") in {"damage_each_opponent", "damage_any_target", "gain_life"}
+        and permanent.get("trigger_effect") in {"damage_each_opponent", "damage_any_target", "gain_life", "draw_cards"}
     ]
     resolved = 0
     for permanent in trigger_sources:
+        if not creature_enter_trigger_matches(
+            permanent,
+            entering_permanent,
+            entering_controller_is_source_controller=True,
+        ):
+            continue
         if (
             permanent is entering_permanent
             and permanent.get("trigger_another_creature_you_control_enters")
             or permanent is entering_permanent
             and permanent.get("trigger_another_creature_enters")
         ):
+            continue
+        if permanent.get("trigger_effect") == "draw_cards":
+            limit = int(permanent.get("trigger_limit_each_turn") or 0)
+            if limit > 0 and permanent.get("creature_enters_draw_last_trigger_turn") == turn:
+                continue
+            requested = int(permanent.get("trigger_draw_count") or permanent.get("draw_count") or 0)
+            if requested <= 0:
+                continue
+            if limit > 0:
+                permanent["creature_enters_draw_last_trigger_turn"] = turn
+
+            def resolve_creature_enters_draw_trigger(permanent=permanent, requested=requested):
+                hand_before = len(player.hand)
+                library_before = len(player.library)
+                drawn = player.draw(requested)
+                if all_players is not None and drawn:
+                    process_player_draw_triggers(
+                        player,
+                        len(drawn),
+                        turn,
+                        "trigger_resolution",
+                        all_players,
+                        stack=stack,
+                        turn_player=player,
+                    )
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=permanent.get("trigger") or "creature_you_control_enters",
+                    entering_creature=entering_permanent.get("name", "?"),
+                    entering_controller=getattr(player, "name", "?"),
+                    source_event=source_event,
+                    effect="draw_cards",
+                    cards_requested=requested,
+                    cards_drawn=len(drawn),
+                    hand_before=hand_before,
+                    hand_after=len(player.hand),
+                    library_before=library_before,
+                    library_after=len(player.library),
+                    trigger_optional=bool(permanent.get("trigger_optional")),
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                permanent.get("trigger") or "creature_you_control_enters",
+                resolve_creature_enters_draw_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+                data={
+                    "entering_creature": entering_permanent.get("name", "?"),
+                    "source_event": source_event,
+                },
+            )
+            resolved += 1
             continue
         if permanent.get("trigger_effect") == "gain_life":
             amount = int(
@@ -38854,9 +38947,79 @@ def process_opponent_controlled_creature_enters_triggers(
             for permanent in list(getattr(source_controller, "battlefield", []) or [])
             if isinstance(permanent, dict)
             and permanent.get("trigger") in {"creature_enters_under_opponent_control", "creature_enters"}
-            and permanent.get("trigger_effect") == "gain_life"
+            and permanent.get("trigger_effect") in {"gain_life", "draw_cards"}
         ]
         for permanent in trigger_sources:
+            if not creature_enter_trigger_matches(
+                permanent,
+                entering_permanent,
+                entering_controller_is_source_controller=False,
+            ):
+                continue
+            if permanent.get("trigger_effect") == "draw_cards":
+                limit = int(permanent.get("trigger_limit_each_turn") or 0)
+                if limit > 0 and permanent.get("creature_enters_draw_last_trigger_turn") == turn:
+                    continue
+                requested = int(permanent.get("trigger_draw_count") or permanent.get("draw_count") or 0)
+                if requested <= 0:
+                    continue
+                if limit > 0:
+                    permanent["creature_enters_draw_last_trigger_turn"] = turn
+
+                def resolve_opponent_creature_enters_draw_trigger(
+                    source_controller=source_controller,
+                    permanent=permanent,
+                    requested=requested,
+                ):
+                    hand_before = len(source_controller.hand)
+                    library_before = len(source_controller.library)
+                    drawn = source_controller.draw(requested)
+                    if all_players is not None and drawn:
+                        process_player_draw_triggers(
+                            source_controller,
+                            len(drawn),
+                            turn,
+                            "trigger_resolution",
+                            all_players,
+                            stack=stack,
+                            turn_player=entering_controller,
+                        )
+                    emit_replay_event(
+                        "trigger_resolved",
+                        player=source_controller.name,
+                        card=permanent.get("name", "?"),
+                        trigger=permanent.get("trigger") or "creature_enters",
+                        entering_creature=entering_permanent.get("name", "?"),
+                        entering_controller=getattr(entering_controller, "name", "?"),
+                        source_event=source_event,
+                        effect="draw_cards",
+                        cards_requested=requested,
+                        cards_drawn=len(drawn),
+                        hand_before=hand_before,
+                        hand_after=len(source_controller.hand),
+                        library_before=library_before,
+                        library_after=len(source_controller.library),
+                        trigger_optional=bool(permanent.get("trigger_optional")),
+                        turn=turn,
+                        **replay_rule_fields(permanent),
+                    )
+
+                resolve_or_enqueue_trigger(
+                    source_controller,
+                    permanent,
+                    permanent.get("trigger") or "creature_enters",
+                    resolve_opponent_creature_enters_draw_trigger,
+                    stack=stack,
+                    active_player=active_player,
+                    all_players=all_players,
+                    data={
+                        "entering_creature": entering_permanent.get("name", "?"),
+                        "entering_controller": getattr(entering_controller, "name", "?"),
+                        "source_event": source_event,
+                    },
+                )
+                resolved += 1
+                continue
             amount = int(
                 permanent.get("trigger_gain_life")
                 or permanent.get("gain_life")

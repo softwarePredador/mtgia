@@ -1754,6 +1754,32 @@ def test_spell_cast_gain_life_execution_scenario_uses_matching_and_nonmatching_s
     assert "Creature" in scenario["nonmatching_spell"]["type_line"]
 
 
+def test_creature_enters_draw_execution_scenario_uses_matching_entering_creature() -> None:
+    rule = {
+        "normalized_name": "elemental bond",
+        "card_name": "Elemental Bond",
+        "logical_rule_key": "battle_rule_v1:elemental-bond",
+        "required_effect_fields": {
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+            "trigger": "creature_you_control_enters",
+            "trigger_effect": "draw_cards",
+            "trigger_controller_scope": "self",
+            "trigger_draw_count": 1,
+            "trigger_entering_card_types": ["creature"],
+            "trigger_entering_power_min": 3,
+        },
+    }
+
+    scenario = builder.execution_scenario_from_expected_rule(rule)
+
+    assert scenario["type"] == "creature_enters_draw"
+    assert scenario["expected_draw_count"] == 1
+    assert scenario["expected_trigger"] == "creature_you_control_enters"
+    assert scenario["entering_controller"] == "controller"
+    assert scenario["entering_creature"]["power"] == 3
+
+
 def test_simple_activated_regenerate_source_execution_scenario_uses_activation_mana() -> None:
     rule = {
         "normalized_name": "cudgel troll",

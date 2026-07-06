@@ -1,0 +1,545 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg579_creature_enters_draw_new_server_20260706_231755",
+  "deploy_id": "PG579",
+  "execution_scenarios": [
+    {
+      "card": {
+        "effect": "enchantment",
+        "name": "Elemental Bond",
+        "type_line": "Enchantment"
+      },
+      "controller_library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Drawn Card 1",
+          "type_line": "Sorcery"
+        }
+      ],
+      "entering_controller": "controller",
+      "entering_creature": {
+        "effect": "creature",
+        "name": "E2E Entering Creature for Elemental Bond",
+        "power": 3,
+        "subtypes": [
+          "Soldier"
+        ],
+        "toughness": 3,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_draw_count": 1,
+      "expected_hand_after": 1,
+      "expected_trigger": "creature_you_control_enters",
+      "logical_rule_key": "battle_rule_v1:bd1c61d07d0cfba06bd4b9cd2c8e3563",
+      "name": "Elemental Bond draws when creature enters",
+      "source_starts_on_battlefield": true,
+      "type": "creature_enters_draw"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Garruk's Packleader",
+        "type_line": "Enchantment"
+      },
+      "controller_library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Drawn Card 1",
+          "type_line": "Sorcery"
+        }
+      ],
+      "entering_controller": "controller",
+      "entering_creature": {
+        "effect": "creature",
+        "name": "E2E Entering Creature for Garruk's Packleader",
+        "power": 3,
+        "subtypes": [
+          "Soldier"
+        ],
+        "toughness": 3,
+        "type_line": "Creature - Soldier"
+      },
+      "expected_draw_count": 1,
+      "expected_hand_after": 1,
+      "expected_trigger": "creature_you_control_enters",
+      "logical_rule_key": "battle_rule_v1:0f60b037ce53a92cb805467893c4b09b",
+      "name": "Garruk's Packleader draws when creature enters",
+      "source_starts_on_battlefield": true,
+      "type": "creature_enters_draw"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Mary Jane Watson",
+        "type_line": "Enchantment"
+      },
+      "controller_library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Drawn Card 1",
+          "type_line": "Sorcery"
+        }
+      ],
+      "entering_controller": "controller",
+      "entering_creature": {
+        "effect": "creature",
+        "name": "E2E Entering Creature for Mary Jane Watson",
+        "power": 2,
+        "subtypes": [
+          "Spider"
+        ],
+        "toughness": 2,
+        "type_line": "Creature - Spider"
+      },
+      "expected_draw_count": 1,
+      "expected_hand_after": 1,
+      "expected_trigger": "creature_you_control_enters",
+      "logical_rule_key": "battle_rule_v1:cc844d8be9823c1e24a8a527104759b7",
+      "name": "Mary Jane Watson draws when creature enters",
+      "source_starts_on_battlefield": true,
+      "type": "creature_enters_draw"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Wirewood Savage",
+        "type_line": "Enchantment"
+      },
+      "controller_library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Drawn Card 1",
+          "type_line": "Sorcery"
+        }
+      ],
+      "entering_controller": "opponent",
+      "entering_creature": {
+        "effect": "creature",
+        "name": "E2E Entering Creature for Wirewood Savage",
+        "power": 2,
+        "subtypes": [
+          "Beast"
+        ],
+        "toughness": 2,
+        "type_line": "Creature - Beast"
+      },
+      "expected_draw_count": 1,
+      "expected_hand_after": 1,
+      "expected_trigger": "creature_enters",
+      "logical_rule_key": "battle_rule_v1:082b3870153de03b308b0b1845fac9a3",
+      "name": "Wirewood Savage draws when creature enters",
+      "source_starts_on_battlefield": true,
+      "type": "creature_enters_draw"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Woodland Liege",
+        "type_line": "Enchantment"
+      },
+      "controller_library": [
+        {
+          "effect": "draw_cards",
+          "name": "E2E Drawn Card 1",
+          "type_line": "Sorcery"
+        }
+      ],
+      "entering_controller": "controller",
+      "entering_creature": {
+        "effect": "creature",
+        "name": "E2E Entering Creature for Woodland Liege",
+        "power": 2,
+        "subtypes": [
+          "Beast"
+        ],
+        "toughness": 2,
+        "type_line": "Creature - Beast"
+      },
+      "expected_draw_count": 1,
+      "expected_hand_after": 1,
+      "expected_trigger": "creature_you_control_enters",
+      "logical_rule_key": "battle_rule_v1:0b327e4ff0cfb5815d7d2b7cf7adea6d",
+      "name": "Woodland Liege draws when creature enters",
+      "source_starts_on_battlefield": true,
+      "type": "creature_enters_draw"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Elemental Bond",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bd1c61d07d0cfba06bd4b9cd2c8e3563",
+      "min_rule_version": 2,
+      "normalized_name": "elemental bond",
+      "oracle_hash": "5a691f455e7c6bc07be2216acc17dd12",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+        "effect": "enchantment",
+        "trigger": "creature_you_control_enters",
+        "trigger_another_creature_enters": false,
+        "trigger_controller_scope": "self",
+        "trigger_draw_count": 1,
+        "trigger_effect": "draw_cards",
+        "trigger_entering_card_types": [
+          "creature"
+        ],
+        "trigger_entering_power_min": 3,
+        "trigger_optional": false,
+        "xmage_ability_class": "EntersBattlefieldAllTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Garruk's Packleader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0f60b037ce53a92cb805467893c4b09b",
+      "min_rule_version": 2,
+      "normalized_name": "garruk's packleader",
+      "oracle_hash": "75e46cdf177b60f8222c11dd2a23fe4a",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+        "effect": "creature",
+        "trigger": "creature_you_control_enters",
+        "trigger_another_creature_enters": true,
+        "trigger_controller_scope": "self",
+        "trigger_draw_count": 1,
+        "trigger_effect": "draw_cards",
+        "trigger_entering_card_types": [
+          "creature"
+        ],
+        "trigger_entering_power_min": 3,
+        "trigger_optional": true,
+        "xmage_ability_class": "EntersBattlefieldAllTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mary Jane Watson",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cc844d8be9823c1e24a8a527104759b7",
+      "min_rule_version": 2,
+      "normalized_name": "mary jane watson",
+      "oracle_hash": "cf34165c6f4e6d223d5a808d08d31820",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+        "effect": "creature",
+        "trigger": "creature_you_control_enters",
+        "trigger_another_creature_enters": false,
+        "trigger_controller_scope": "self",
+        "trigger_draw_count": 1,
+        "trigger_effect": "draw_cards",
+        "trigger_entering_card_types": [
+          "creature"
+        ],
+        "trigger_entering_subtypes": [
+          "spider"
+        ],
+        "trigger_limit_each_turn": 1,
+        "trigger_optional": false,
+        "xmage_ability_class": "EntersBattlefieldAllTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wirewood Savage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:082b3870153de03b308b0b1845fac9a3",
+      "min_rule_version": 2,
+      "normalized_name": "wirewood savage",
+      "oracle_hash": "d9bea46f134c92b206b9825d99fd4536",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+        "effect": "creature",
+        "trigger": "creature_enters",
+        "trigger_another_creature_enters": false,
+        "trigger_controller_scope": "any",
+        "trigger_draw_count": 1,
+        "trigger_effect": "draw_cards",
+        "trigger_entering_card_types": [
+          "creature"
+        ],
+        "trigger_entering_subtypes": [
+          "beast"
+        ],
+        "trigger_optional": true,
+        "xmage_ability_class": "EntersBattlefieldAllTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Woodland Liege",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0b327e4ff0cfb5815d7d2b7cf7adea6d",
+      "min_rule_version": 2,
+      "normalized_name": "woodland liege",
+      "oracle_hash": "b88741308258706f6b2a4bcc27621de9",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+        "effect": "creature",
+        "trigger": "creature_you_control_enters",
+        "trigger_another_creature_enters": false,
+        "trigger_controller_scope": "self",
+        "trigger_draw_count": 1,
+        "trigger_effect": "draw_cards",
+        "trigger_entering_card_types": [
+          "creature"
+        ],
+        "trigger_entering_subtypes": [
+          "beast"
+        ],
+        "trigger_optional": false,
+        "xmage_ability_class": "EntersBattlefieldAllTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_enters_draw_trigger": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg579_creature_enters_draw_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T23:17:55+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Elemental Bond"
+      },
+      "card_name": "Elemental Bond",
+      "effect": "enchantment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bd1c61d07d0cfba06bd4b9cd2c8e3563",
+      "normalized_name": "elemental bond",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+        "effect": "enchantment",
+        "trigger": "creature_you_control_enters",
+        "trigger_another_creature_enters": false,
+        "trigger_controller_scope": "self",
+        "trigger_draw_count": 1,
+        "trigger_effect": "draw_cards",
+        "trigger_entering_card_types": [
+          "creature"
+        ],
+        "trigger_entering_power_min": 3,
+        "trigger_optional": false,
+        "xmage_ability_class": "EntersBattlefieldAllTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Garruk's Packleader"
+      },
+      "card_name": "Garruk's Packleader",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0f60b037ce53a92cb805467893c4b09b",
+      "normalized_name": "garruk's packleader",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+        "effect": "creature",
+        "trigger": "creature_you_control_enters",
+        "trigger_another_creature_enters": true,
+        "trigger_controller_scope": "self",
+        "trigger_draw_count": 1,
+        "trigger_effect": "draw_cards",
+        "trigger_entering_card_types": [
+          "creature"
+        ],
+        "trigger_entering_power_min": 3,
+        "trigger_optional": true,
+        "xmage_ability_class": "EntersBattlefieldAllTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Mary Jane Watson"
+      },
+      "card_name": "Mary Jane Watson",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cc844d8be9823c1e24a8a527104759b7",
+      "normalized_name": "mary jane watson",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+        "effect": "creature",
+        "trigger": "creature_you_control_enters",
+        "trigger_another_creature_enters": false,
+        "trigger_controller_scope": "self",
+        "trigger_draw_count": 1,
+        "trigger_effect": "draw_cards",
+        "trigger_entering_card_types": [
+          "creature"
+        ],
+        "trigger_entering_subtypes": [
+          "spider"
+        ],
+        "trigger_limit_each_turn": 1,
+        "trigger_optional": false,
+        "xmage_ability_class": "EntersBattlefieldAllTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Wirewood Savage"
+      },
+      "card_name": "Wirewood Savage",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:082b3870153de03b308b0b1845fac9a3",
+      "normalized_name": "wirewood savage",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+        "effect": "creature",
+        "trigger": "creature_enters",
+        "trigger_another_creature_enters": false,
+        "trigger_controller_scope": "any",
+        "trigger_draw_count": 1,
+        "trigger_effect": "draw_cards",
+        "trigger_entering_card_types": [
+          "creature"
+        ],
+        "trigger_entering_subtypes": [
+          "beast"
+        ],
+        "trigger_optional": true,
+        "xmage_ability_class": "EntersBattlefieldAllTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Woodland Liege"
+      },
+      "card_name": "Woodland Liege",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0b327e4ff0cfb5815d7d2b7cf7adea6d",
+      "normalized_name": "woodland liege",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1",
+        "effect": "creature",
+        "trigger": "creature_you_control_enters",
+        "trigger_another_creature_enters": false,
+        "trigger_controller_scope": "self",
+        "trigger_draw_count": 1,
+        "trigger_effect": "draw_cards",
+        "trigger_entering_card_types": [
+          "creature"
+        ],
+        "trigger_entering_subtypes": [
+          "beast"
+        ],
+        "trigger_optional": false,
+        "xmage_ability_class": "EntersBattlefieldAllTriggeredAbility",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Elemental Bond",
+    "Garruk's Packleader",
+    "Mary Jane Watson",
+    "Wirewood Savage",
+    "Woodland Liege"
+  ],
+  "selected_count": 5,
+  "slug": "creature_enters_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Elemental Bond",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bd1c61d07d0cfba06bd4b9cd2c8e3563",
+      "min_rule_version": 2,
+      "normalized_name": "elemental bond",
+      "oracle_hash": "5a691f455e7c6bc07be2216acc17dd12",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Garruk's Packleader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0f60b037ce53a92cb805467893c4b09b",
+      "min_rule_version": 2,
+      "normalized_name": "garruk's packleader",
+      "oracle_hash": "75e46cdf177b60f8222c11dd2a23fe4a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mary Jane Watson",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cc844d8be9823c1e24a8a527104759b7",
+      "min_rule_version": 2,
+      "normalized_name": "mary jane watson",
+      "oracle_hash": "cf34165c6f4e6d223d5a808d08d31820",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wirewood Savage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:082b3870153de03b308b0b1845fac9a3",
+      "min_rule_version": 2,
+      "normalized_name": "wirewood savage",
+      "oracle_hash": "d9bea46f134c92b206b9825d99fd4536",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Woodland Liege",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0b327e4ff0cfb5815d7d2b7cf7adea6d",
+      "min_rule_version": 2,
+      "normalized_name": "woodland liege",
+      "oracle_hash": "b88741308258706f6b2a4bcc27621de9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_enters_draw_trigger_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
