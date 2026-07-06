@@ -18,10 +18,14 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 COMMANDER_CONTRACT = REPO_ROOT / "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
 DEFAULT_CORE_REPORT = REPORT_DIR / "global_commander_core_role_audit_20260705_global_goal_hermes_only.json"
-DEFAULT_STRATEGY_REPORT = REPORT_DIR / "global_commander_strategy_matrix_20260705_global_core_pivot_hermes_only.json"
+DEFAULT_STRATEGY_REPORT = REPORT_DIR / "global_commander_strategy_matrix_20260701_current.json"
 DEFAULT_LAND_CUT_REPORT = REPORT_DIR / "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.json"
 DEFAULT_NONLAND_REPORT = REPORT_DIR / "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.json"
 DEFAULT_BATTLE_FEEDBACK_REPORT = REPORT_DIR / "global_commander_battle_feedback_model_20260705_current.json"
+DEFAULT_SOURCE_EXHAUSTION_REPORT = (
+    REPORT_DIR
+    / "global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_repair_scope1_followup_after_mana_vault.json"
+)
 BRACKET_POLICY_FILE = REPO_ROOT / "server/lib/edh_bracket_policy.dart"
 
 EXTERNAL_RESEARCH_SNAPSHOT = [
@@ -187,6 +191,62 @@ def nonland_pools_by_deck(nonland_payload: dict[str, Any]) -> dict[str, list[dic
     return pools
 
 
+def source_exhaustion_summary_by_deck(source_exhaustion_payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    if not source_exhaustion_payload:
+        return {}
+    summary = source_exhaustion_payload.get("summary") or {}
+    deck_id = str(summary.get("deck_id") or source_exhaustion_payload.get("deck_id") or "")
+    if not deck_id:
+        return {}
+    candidate_copy_value = source_exhaustion_payload.get("candidate_copy_allowed_now")
+    candidate_copy_allowed = bool(candidate_copy_value) if isinstance(candidate_copy_value, bool) else None
+    next_gate = str(summary.get("next_gate") or "")
+    prior_fresh = int(summary.get("prior_fresh_seeded_same_lane_cut_source_count") or 0)
+    seeded_exhausted = int(summary.get("seeded_exhausted_role_count") or 0)
+    current_deck_review = int(summary.get("current_deck_negative_review_candidate_count") or 0)
+    state = "not_applicable"
+    if candidate_copy_allowed is False:
+        if current_deck_review > 0:
+            state = "current_deck_negative_review_required_before_candidate_copy"
+        elif "source_candidate_pool" in next_gate or (prior_fresh == 0 and seeded_exhausted > 0):
+            state = "source_expansion_required_before_candidate_copy"
+        else:
+            state = "source_exhaustion_unresolved_before_candidate_copy"
+    elif candidate_copy_allowed is True:
+        state = "source_exhaustion_cleared_for_candidate_copy"
+    return {
+        deck_id: {
+            "artifact_type": source_exhaustion_payload.get("artifact_type"),
+            "status": source_exhaustion_payload.get("status") or "unknown",
+            "state": state,
+            "commander": summary.get("commander") or source_exhaustion_payload.get("commander"),
+            "candidate_copy_allowed_now": candidate_copy_allowed,
+            "battle_gate_allowed_now": bool(source_exhaustion_payload.get("battle_gate_allowed_now")),
+            "next_gate": next_gate or "none",
+            "target_role_count": int(summary.get("target_role_count") or 0),
+            "seeded_exhausted_role_count": seeded_exhausted,
+            "unseeded_role_count": int(summary.get("unseeded_role_count") or 0),
+            "current_deck_negative_review_candidate_count": current_deck_review,
+            "prior_fresh_seeded_same_lane_cut_source_count": prior_fresh,
+            "prior_blocked_recycled_seeded_cut_source_count": int(
+                summary.get("prior_blocked_recycled_seeded_cut_source_count") or 0
+            ),
+            "candidate_copy_blockers": list(source_exhaustion_payload.get("candidate_copy_blockers") or []),
+        }
+    }
+
+
+def source_exhaustion_blocks_candidate_copy(source_exhaustion_summary: dict[str, Any] | None) -> bool:
+    if not source_exhaustion_summary:
+        return False
+    state = source_exhaustion_summary.get("state") or source_exhaustion_summary.get("source_exhaustion_state")
+    return str(state or "") in {
+        "current_deck_negative_review_required_before_candidate_copy",
+        "source_expansion_required_before_candidate_copy",
+        "source_exhaustion_unresolved_before_candidate_copy",
+    }
+
+
 def preferred_nonland_pool(core_row: dict[str, Any], pools: list[dict[str, Any]]) -> dict[str, Any] | None:
     missing = {row.get("role") for row in role_rows_by_status(core_row, "below_floor")} - {"land"}
     if not missing:
@@ -241,8 +301,13 @@ def next_action_for_deck(
     land_cut_pool: dict[str, Any] | None,
     nonland_pool: dict[str, Any] | None = None,
     has_commander_source_lane: bool = False,
+    source_exhaustion_summary: dict[str, Any] | None = None,
 ) -> str:
     gate_state = repair_gate_state(core_row, land_cut_pool, nonland_pool)
+    if stage == "core_floor_repair" and source_exhaustion_blocks_candidate_copy(source_exhaustion_summary):
+        if str((source_exhaustion_summary or {}).get("state")) == "current_deck_negative_review_required_before_candidate_copy":
+            return "collect_current_deck_negative_review_before_candidate_copy"
+        return "expand_external_nonpayoff_source_candidate_pool_before_candidate_copy"
     if stage == "core_floor_repair" and gate_state == "land_add_cut_pool_ready_review_only":
         if has_commander_source_lane:
             return "review_top_land_add_cut_pair_then_candidate_copy"
@@ -274,6 +339,7 @@ def build_deck_priorities(
     strategy_payload: dict[str, Any],
     land_cut_payload: dict[str, Any] | None = None,
     nonland_payload: dict[str, Any] | None = None,
+    source_exhaustion_payload: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     commander_rows = {
         row["commander_key"]: row
@@ -282,6 +348,7 @@ def build_deck_priorities(
     }
     cut_pools = land_cut_pools_by_deck(land_cut_payload or {})
     nonland_pools = nonland_pools_by_deck(nonland_payload or {})
+    source_exhaustion_by_deck = source_exhaustion_summary_by_deck(source_exhaustion_payload or {})
     priorities = []
     for core_row in core_payload.get("decks", []):
         commander_key = normalize_commander(str(core_row.get("commander") or ""))
@@ -293,6 +360,7 @@ def build_deck_priorities(
             core_row,
             nonland_pools.get(str(core_row.get("deck_id") or ""), []),
         )
+        source_exhaustion_summary = source_exhaustion_by_deck.get(str(core_row.get("deck_id") or ""))
         gate_state = repair_gate_state(core_row, land_cut_pool, nonland_pool)
         below = role_rows_by_status(core_row, "below_floor")
         above = role_rows_by_status(core_row, "above_range_review")
@@ -318,12 +386,32 @@ def build_deck_priorities(
                 "nonland_candidate_count": int((nonland_pool or {}).get("candidate_count") or 0),
                 "nonland_cut_candidate_count": int((nonland_pool or {}).get("cut_candidate_count") or 0),
                 "nonland_pair_hypothesis_count": len((nonland_pool or {}).get("pair_hypotheses") or []),
+                "source_exhaustion_state": (source_exhaustion_summary or {}).get("state", "not_applicable"),
+                "source_exhaustion_status": (source_exhaustion_summary or {}).get("status"),
+                "source_exhaustion_next_gate": (source_exhaustion_summary or {}).get("next_gate"),
+                "source_exhaustion_target_role_count": int(
+                    (source_exhaustion_summary or {}).get("target_role_count") or 0
+                ),
+                "source_exhaustion_seeded_exhausted_role_count": int(
+                    (source_exhaustion_summary or {}).get("seeded_exhausted_role_count") or 0
+                ),
+                "source_exhaustion_prior_fresh_cut_source_count": int(
+                    (source_exhaustion_summary or {}).get("prior_fresh_seeded_same_lane_cut_source_count") or 0
+                ),
+                "source_exhaustion_prior_blocked_recycled_cut_source_count": int(
+                    (source_exhaustion_summary or {}).get("prior_blocked_recycled_seeded_cut_source_count") or 0
+                ),
+                "candidate_copy_allowed_by_source_exhaustion": (
+                    (source_exhaustion_summary or {}).get("candidate_copy_allowed_now")
+                ),
+                "source_exhaustion_blockers": (source_exhaustion_summary or {}).get("candidate_copy_blockers", []),
                 "next_action": next_action_for_deck(
                     stage,
                     core_row,
                     land_cut_pool,
                     nonland_pool,
                     has_commander_source_lane=has_commander_source_lane,
+                    source_exhaustion_summary=source_exhaustion_summary,
                 ),
             }
         )
@@ -410,19 +498,29 @@ def build_report(
     land_cut_payload: dict[str, Any] | None = None,
     nonland_payload: dict[str, Any] | None = None,
     battle_feedback_payload: dict[str, Any] | None = None,
+    source_exhaustion_payload: dict[str, Any] | None = None,
     bracket_status: dict[str, Any],
     core_report_path: Path,
     strategy_report_path: Path,
     land_cut_report_path: Path | None = None,
     nonland_report_path: Path | None = None,
     battle_feedback_report_path: Path | None = None,
+    source_exhaustion_report_path: Path | None = None,
 ) -> dict[str, Any]:
     land_cut_payload = land_cut_payload or {}
     nonland_payload = nonland_payload or {}
-    deck_priorities = build_deck_priorities(core_payload, strategy_payload, land_cut_payload, nonland_payload)
+    source_exhaustion_payload = source_exhaustion_payload or {}
+    deck_priorities = build_deck_priorities(
+        core_payload,
+        strategy_payload,
+        land_cut_payload,
+        nonland_payload,
+        source_exhaustion_payload,
+    )
     commander_queue = build_commander_queue(deck_priorities)
     stage_counts = Counter(row["stage"] for row in deck_priorities)
     repair_gate_counts = Counter(row["repair_gate_state"] for row in deck_priorities)
+    source_exhaustion_gate_counts = Counter(row["source_exhaustion_state"] for row in deck_priorities)
     input_artifacts = {
         "core_role_report": artifact_rel(core_report_path),
         "strategy_matrix_report": artifact_rel(strategy_report_path),
@@ -433,6 +531,8 @@ def build_report(
         input_artifacts["nonland_core_candidate_model"] = artifact_rel(nonland_report_path)
     if battle_feedback_report_path is not None and battle_feedback_report_path.exists():
         input_artifacts["battle_feedback_model"] = artifact_rel(battle_feedback_report_path)
+    if source_exhaustion_report_path is not None and source_exhaustion_report_path.exists():
+        input_artifacts["source_exhaustion_router"] = artifact_rel(source_exhaustion_report_path)
     feedback_summary = battle_feedback_summary(battle_feedback_payload)
     return {
         "generated_at": utc_now(),
@@ -453,6 +553,7 @@ def build_report(
                 "role_data_and_core_floor",
                 "land_candidate_pool_and_cut_model",
                 "nonland_candidate_pool_and_cut_model",
+                "source_exhaustion_router_before_candidate_copy",
                 "role_extreme_review",
                 "commander_profile_and_source_lanes",
                 "commander_specific_strategy_matrix",
@@ -467,10 +568,14 @@ def build_report(
             "commander_count": len(commander_queue),
             "stage_counts": dict(sorted(stage_counts.items())),
             "repair_gate_counts": dict(sorted(repair_gate_counts.items())),
+            "source_exhaustion_gate_counts": dict(sorted(source_exhaustion_gate_counts.items())),
             "top_next_action": commander_queue[0]["next_action"] if commander_queue else "none",
             "bracket_policy_status": bracket_status["status"],
             "battle_feedback_status": feedback_summary["status"],
             "blocked_exact_add_cut_pair_count": feedback_summary["blocked_pair_count"],
+            "source_exhaustion_blocked_deck_count": sum(
+                1 for row in deck_priorities if source_exhaustion_blocks_candidate_copy(row)
+            ),
             "battle_feedback_pair_status_counts": feedback_summary["pair_status_counts"],
         },
         "battle_feedback_summary": feedback_summary,
@@ -502,6 +607,10 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
     for state, count in payload["summary"]["repair_gate_counts"].items():
         lines.append(f"| `{state}` | {count} |")
 
+    lines.extend(["", "## Source Exhaustion Gate Counts", "", "| Gate State | Decks |", "| --- | ---: |"])
+    for state, count in payload["summary"]["source_exhaustion_gate_counts"].items():
+        lines.append(f"| `{state}` | {count} |")
+
     lines.extend(["", "## Commander Queue", "", "| Commander | Top Stage | Decks | Next Action |", "| --- | --- | ---: | --- |"])
     for row in payload["commander_queue"]:
         lines.append(
@@ -513,8 +622,8 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "",
             "## Top Deck Priorities",
             "",
-            "| Score | Deck | Commander | Stage | Repair Gate | Below Floor | Above Range | Next Action |",
-            "| ---: | --- | --- | --- | --- | --- | --- | --- |",
+            "| Score | Deck | Commander | Stage | Repair Gate | Source Exhaustion | Below Floor | Above Range | Next Action |",
+            "| ---: | --- | --- | --- | --- | --- | --- | --- | --- |",
         ]
     )
     for row in payload["deck_priorities"][:20]:
@@ -523,7 +632,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
         below = ", ".join(f"`{item}`" for item in row["below_floor_roles"]) or "-"
         above = ", ".join(f"`{item}`" for item in row["above_range_roles"]) or "-"
         lines.append(
-            f"| {row['priority_score']} | `{deck}` | `{commander}` | `{row['stage']}` | `{row['repair_gate_state']}` | {below} | {above} | `{row['next_action']}` |"
+            f"| {row['priority_score']} | `{deck}` | `{commander}` | `{row['stage']}` | `{row['repair_gate_state']}` | `{row['source_exhaustion_state']}` | {below} | {above} | `{row['next_action']}` |"
         )
 
     bracket_policy = payload["backend_contract_gaps"]["bracket_policy"]
@@ -546,6 +655,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "",
             "- This is a learning queue, not a deck mutation permit.",
             "- Exact add/cut pairs blocked by battle feedback must not be requeued as fresh hypotheses.",
+            "- Source-exhaustion routers override candidate-copy routing until a fresh same-lane cut source or required negative review exists.",
             "- External sources calibrate priorities; PostgreSQL/backend remains product truth.",
             "- Deck 607 is ranked only as a regression benchmark and must not become the global objective function.",
             "",
@@ -561,10 +671,11 @@ def main() -> int:
     parser.add_argument("--land-cut-report", type=Path, default=DEFAULT_LAND_CUT_REPORT)
     parser.add_argument("--nonland-report", type=Path, default=DEFAULT_NONLAND_REPORT)
     parser.add_argument("--battle-feedback-report", type=Path, default=DEFAULT_BATTLE_FEEDBACK_REPORT)
+    parser.add_argument("--source-exhaustion-report", type=Path, default=DEFAULT_SOURCE_EXHAUSTION_REPORT)
     parser.add_argument(
         "--out-prefix",
         type=Path,
-        default=REPORT_DIR / "global_commander_learning_priority_audit_20260705_current",
+        default=REPORT_DIR / "global_commander_learning_priority_audit_20260706_source_exhaustion_current",
     )
     args = parser.parse_args()
     payload = build_report(
@@ -573,12 +684,14 @@ def main() -> int:
         land_cut_payload=load_optional_json(args.land_cut_report),
         nonland_payload=load_optional_json(args.nonland_report),
         battle_feedback_payload=load_optional_json(args.battle_feedback_report),
+        source_exhaustion_payload=load_optional_json(args.source_exhaustion_report),
         bracket_status=bracket_policy_status(),
         core_report_path=args.core_report,
         strategy_report_path=args.strategy_report,
         land_cut_report_path=args.land_cut_report,
         nonland_report_path=args.nonland_report,
         battle_feedback_report_path=args.battle_feedback_report,
+        source_exhaustion_report_path=args.source_exhaustion_report,
     )
     args.out_prefix.parent.mkdir(parents=True, exist_ok=True)
     json_path = args.out_prefix.with_suffix(".json")

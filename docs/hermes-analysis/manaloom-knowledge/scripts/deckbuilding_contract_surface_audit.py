@@ -368,7 +368,7 @@ GLOBAL_COMMANDER_NONLAND_CORE_CANDIDATE_MODEL_REPORT = (
 )
 GLOBAL_COMMANDER_LEARNING_PRIORITY_REPORT = (
     REPO_ROOT
-    / "docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md"
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_exhaustion_current.md"
 )
 GLOBAL_COMMANDER_CANDIDATE_COPY_MATERIALIZER_REPORT = (
     REPO_ROOT
@@ -849,7 +849,8 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md",
                 "Kaalia Angel/Demon/Dragon creatures are blocked",
                 "global_commander_learning_priority_audit.py",
-                "global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md",
+                "global_commander_learning_priority_audit_20260706_source_exhaustion_current.md",
+                "expand_external_nonpayoff_source_candidate_pool_before_candidate_copy",
                 "global_commander_candidate_copy_materializer.py",
                 "global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md",
                 "must reject stale chained sources",
@@ -1661,6 +1662,10 @@ def build_audit() -> dict[str, Any]:
                 "global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only",
                 "global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only",
                 "global_commander_battle_feedback_model_20260705_current",
+                "DEFAULT_SOURCE_EXHAUSTION_REPORT",
+                "source_exhaustion_router_before_candidate_copy",
+                "source_exhaustion_gate_counts",
+                "expand_external_nonpayoff_source_candidate_pool_before_candidate_copy",
                 "battle_feedback_model_before_requeue",
                 "blocked_exact_add_cut_pair_count",
                 "current_official_bracket_model_has_five_brackets_and_game_changers",

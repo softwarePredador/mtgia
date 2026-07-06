@@ -307,7 +307,99 @@ class GlobalCommanderLearningPriorityAuditTests(unittest.TestCase):
 
         [row] = report["deck_priorities"]
         self.assertEqual(row["repair_gate_state"], "nonland_add_cut_pool_ready_review_only")
+        self.assertEqual(row["source_exhaustion_state"], "not_applicable")
         self.assertEqual(row["next_action"], "review_top_nonland_add_cut_pair_then_candidate_copy")
+
+    def test_source_exhaustion_blocks_nonland_candidate_copy_even_with_source_lane(self) -> None:
+        core_payload = {
+            "decks": [
+                {
+                    "deck_id": "619",
+                    "deck_name": "Kaalia Variant",
+                    "commander": "Kaalia of the Vast",
+                    "scope": "hermes_registered_variant",
+                    "shape_status": "structure_ready",
+                    "core_status": "core_role_gap",
+                    "role_bands": [
+                        {
+                            "role": "removal",
+                            "count": 1,
+                            "min": 6,
+                            "max": 14,
+                            "severity": "critical",
+                            "status": "below_floor",
+                        }
+                    ],
+                }
+            ]
+        }
+        strategy_payload = {
+            "commanders": [
+                {
+                    "commander_key": "kaalia of the vast",
+                    "status": "ready_for_strategy_matrix",
+                    "source_lane_count": 1,
+                }
+            ]
+        }
+        nonland_payload = {
+            "nonland_pools": [
+                {
+                    "deck_id": "619",
+                    "role": "removal",
+                    "status": "review_nonland_add_cut_pool_ready",
+                    "candidate_count": 12,
+                    "cut_candidate_count": 12,
+                    "pair_hypotheses": [{"add": "Feed the Swarm", "cut": "Birgi"}],
+                }
+            ]
+        }
+        source_exhaustion_payload = {
+            "artifact_type": "global_commander_external_nonpayoff_seed_exhaustion_recovery_router",
+            "status": "external_nonpayoff_seed_exhaustion_recovery_routes_to_source_expansion",
+            "candidate_copy_allowed_now": False,
+            "battle_gate_allowed_now": False,
+            "candidate_copy_blockers": [
+                "reviewed_external_seed_exhaustion_is_not_cut_permission",
+                "candidate_copy_closed_until_current_deck_negative_review_or_fresh_cut_source_exists",
+            ],
+            "summary": {
+                "commander": "Kaalia of the Vast",
+                "deck_id": "619",
+                "next_gate": "expand_external_nonpayoff_source_candidate_pool",
+                "target_role_count": 3,
+                "seeded_exhausted_role_count": 3,
+                "current_deck_negative_review_candidate_count": 0,
+                "prior_fresh_seeded_same_lane_cut_source_count": 0,
+                "prior_blocked_recycled_seeded_cut_source_count": 47,
+            },
+        }
+
+        report = audit.build_report(
+            core_payload=core_payload,
+            strategy_payload=strategy_payload,
+            nonland_payload=nonland_payload,
+            source_exhaustion_payload=source_exhaustion_payload,
+            bracket_status=audit.bracket_policy_status_from_text(""),
+            core_report_path=Path("docs/hermes-analysis/master_optimizer_reports/core.json"),
+            strategy_report_path=Path("docs/hermes-analysis/master_optimizer_reports/strategy.json"),
+            nonland_report_path=Path("docs/hermes-analysis/master_optimizer_reports/nonland.json"),
+            source_exhaustion_report_path=Path("docs/hermes-analysis/master_optimizer_reports/source_exhaustion.json"),
+        )
+
+        [row] = report["deck_priorities"]
+        self.assertEqual(row["repair_gate_state"], "nonland_add_cut_pool_ready_review_only")
+        self.assertEqual(row["source_exhaustion_state"], "source_expansion_required_before_candidate_copy")
+        self.assertEqual(row["source_exhaustion_prior_fresh_cut_source_count"], 0)
+        self.assertEqual(row["source_exhaustion_prior_blocked_recycled_cut_source_count"], 47)
+        self.assertEqual(row["candidate_copy_allowed_by_source_exhaustion"], False)
+        self.assertEqual(row["next_action"], "expand_external_nonpayoff_source_candidate_pool_before_candidate_copy")
+        self.assertEqual(report["commander_queue"][0]["next_action"], row["next_action"])
+        self.assertEqual(report["summary"]["source_exhaustion_blocked_deck_count"], 1)
+        self.assertEqual(
+            report["summary"]["source_exhaustion_gate_counts"]["source_expansion_required_before_candidate_copy"],
+            1,
+        )
 
     def test_battle_feedback_summary_blocks_exact_pair_requeue(self) -> None:
         core_payload = {

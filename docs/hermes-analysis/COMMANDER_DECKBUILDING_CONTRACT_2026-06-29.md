@@ -494,7 +494,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_named_land_candidate_pool_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_land_cut_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`
-- `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260705_global_goal_hermes_only.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_exhaustion_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md`
@@ -1322,6 +1322,13 @@ Current external refresh on 2026-07-05:
   with `current_deck_negative_review_candidate_count=0`; no candidate copy,
   battle, promotion, or value-safe reclassification opens, and the next gate is
   `expand_external_nonpayoff_source_candidate_pool`.
+- The current global learning-priority audit consumes that follow-up
+  seed-exhaustion router. Even when the nonland add/cut pool and commander
+  source lane look ready, deck `619` is now routed to
+  `expand_external_nonpayoff_source_candidate_pool_before_candidate_copy`
+  because `prior_fresh_seeded_same_lane_cut_source_count=0` and
+  `prior_blocked_recycled_seeded_cut_source_count=47`. This is a global
+  candidate-copy guardrail, not a Kaalia-only exception.
 
 ## Global Commander Rollout - 2026-07-01
 
