@@ -25,10 +25,10 @@ Objetivo: app mobile/web usando o backend novo com prova de fluxo real.
 | --- | --- | --- |
 | Apontar app para dominio definitivo | EM_ANDAMENTO_BLOQUEADO_EXTERNO | Trocar `--dart-define` quando o dominio final existir. |
 | Atualizar builds Android/iOS/Web para API nova | CONCLUIDO_PARCIAL | Build Flutter Web release validado com `API_BASE_URL` no host novo; Android/iOS finais dependem de assinatura/distribuicao. |
-| Revalidar login/cadastro/decks/colecao/marketplace/IA | EM_ANDAMENTO_VALIDADO_PARCIAL | Quality gate comercial validou smoke produto no backend novo; login web local abriu sem `RangeError` e sem erro de console. Falta QA mobile autenticado. |
+| Revalidar login/cadastro/decks/colecao/marketplace/IA | CONCLUIDO | Quality gate comercial validou smoke produto no backend novo; QA mobile autenticado em simulador validou cadastro, navegacao principal, planos/checkout/legal e paywall de IA. |
 | Revalidar Sentry/logs/erros reais | EM_ANDAMENTO | Rodar scripts de Sentry quando DSN/projeto estiverem configurados. |
-| Garantir ausencia de mocks em telas principais | EM_ANDAMENTO_VALIDADO_PARCIAL | `/ai/generate` nao retorna mock 200 em producao; geracao invalida retorna 422. Falta QA visual completo. |
-| Revisar botoes, modais, loaders, empty states e erros | EM_ANDAMENTO_VALIDADO_PARCIAL | Tela web de login validada visualmente; fluxo pos-jogo ganhou CTAs diretos para optimize/rebuild. Falta varredura mobile completa. |
+| Garantir ausencia de mocks em telas principais | CONCLUIDO_PARCIAL | Quality gate pos-deploy confirmou `mock_response_count=0`; manter auditoria visual a cada release. |
+| Revisar botoes, modais, loaders, empty states e erros | CONCLUIDO_VALIDADO_SIMULADOR | QA mobile autenticado navegou superficies principais e paywall; log visual salvo em `docs/qa/runtime/mobile-authenticated-qa-20260706T181142Z/flutter_test.log`. |
 
 ## 3. Monetizacao
 
@@ -36,10 +36,10 @@ Objetivo: usuario entende Free/Pro, limite, valor do Pro e caminho de upgrade.
 
 | Item | Status | Proxima execucao |
 | --- | --- | --- |
-| Tela Free/Pro | CONCLUIDO_PARCIAL | Validar copy e responsividade no QA final. |
-| Medidor de uso de IA | CONCLUIDO_PARCIAL | Confirmar leitura remota em app logado. |
-| Limite por plano | CONCLUIDO_PARCIAL | Monitorar `402` no middleware de IA. |
-| Paywall ao atingir limite | CONCLUIDO_PARCIAL | Contratos de limite/paywall testados no provider; falta teste manual autenticado em todos os fluxos de IA. |
+| Tela Free/Pro | CONCLUIDO | Validada no QA mobile autenticado e coberta por smoke de produto. |
+| Medidor de uso de IA | CONCLUIDO | Provider sincroniza plano remoto; QA mobile validou tela de planos e uso local. |
+| Limite por plano | CONCLUIDO | `scripts/manaloom_ai_paywall_e2e.sh` confirmou `402` quando Free chega a `120/120`. |
+| Paywall ao atingir limite | CONCLUIDO | Widget test cobre todos os `AiUsageKind`; e2e autenticado bloqueou generate/optimize/rebuild/explain. |
 | Upgrade dentro do app | CONCLUIDO_PARCIAL | Integrar URL real de checkout. |
 | Checkout/pagamento | EM_ANDAMENTO_BLOQUEADO_EXTERNO | Escolher provedor e implementar adaptador do webhook. |
 | Termos, privacidade, disclaimer e IA/IP | EM_ANDAMENTO_BLOQUEADO_EXTERNO | Revisao juridica final. |
@@ -50,9 +50,9 @@ Objetivo: recomendacao confiavel, explicada e adaptada ao contexto do jogador.
 
 | Item | Status | Proxima execucao |
 | --- | --- | --- |
-| Melhorar deck usando cartas da colecao | EM_ANDAMENTO_VALIDADO_PARCIAL | Sheet de otimizacao expoe preferencia por colecao; agora tambem pode ser aberta pelo pos-jogo. Falta validar caso real com colecao carregada. |
-| Melhorar deck por orcamento | EM_ANDAMENTO_VALIDADO_PARCIAL | Sheet de otimizacao expoe limite de orcamento; agora tambem pode ser aberta pelo pos-jogo. Falta validar caso real com precos. |
-| Explicar troca por funcao/risco/curva/preco/bracket | EM_ANDAMENTO | Expandir apresentacao no app e relatorio publico. |
+| Melhorar deck usando cartas da colecao | CONCLUIDO_VALIDADO_CONTRATO | Sheet de otimizacao tem resumo "Colecao primeiro"; payload/backend priorizam binder e testes cobrem contrato. |
+| Melhorar deck por orcamento | CONCLUIDO_VALIDADO_CONTRATO | Sheet mostra limite "Ate R$ X"; backend filtra custo estimado em BRL e testes cobrem contrato. |
+| Explicar troca por funcao/risco/curva/preco/bracket | CONCLUIDO_PARCIAL | Preview e payload solicitam explicacao rica; ainda pode melhorar copy visual do relatorio publico. |
 | Relatorio antes/depois compartilhavel | CONCLUIDO_PARCIAL | Melhorar visual e CTA publico. |
 | Sugestao por Commander Bracket | CONCLUIDO_PARCIAL | Validar bloqueios por bracket com casos reais. |
 | Rebuild guiado casual/upgraded/optimized/cEDH | EM_ANDAMENTO_VALIDADO_PARCIAL | Link `?optimize=rebuild` abre a sheet em modo rebuild/intencao inicial; falta refino de copy por nivel. |
@@ -93,9 +93,9 @@ Objetivo: publicar com confianca, medicao e fallback controlado.
 
 | Item | Status | Proxima execucao |
 | --- | --- | --- |
-| QA completo web/mobile | EM_ANDAMENTO_VALIDADO_PARCIAL | `scripts/manaloom_commercial_quality_gate.sh` passou no stack novo; login web local validado. Falta varredura mobile fisica/simulador. |
+| QA completo web/mobile | CONCLUIDO_VALIDADO_SIMULADOR | Quality gate pos-deploy passou; Flutter Web release build passou; QA mobile autenticado passou no iPhone 15 Pro Max simulator. |
 | Performance da geracao de decks | CONCLUIDO_PARCIAL | Quality gate rodou benchmark curto com `successful_runs=2`, `mock_response_count=0` e status `pass`; manter medicao a cada deploy. |
-| Tempo medio por endpoint de IA | EM_ANDAMENTO_VALIDADO_PARCIAL | `/health/commercial` e benchmark estao integrados ao quality gate; falta dashboard historico. |
+| Tempo medio por endpoint de IA | CONCLUIDO | `/health/ai-history` e `/health/dashboard.dashboard.ai_history` publicados; quality gate exige `ai_history.status=ok`. |
 | Metricas de conversao | EM_ANDAMENTO | Usar funil `activation_funnel_events`. |
 | Revisao de copy da landing React | EM_ANDAMENTO | Fazer rodada de copy e SEO apos dominio. |
 | SEO, sitemap, robots, paginas indexaveis | EM_ANDAMENTO | Finalizar quando dominio definitivo estiver publicado. |
@@ -125,6 +125,16 @@ Objetivo: publicar com confianca, medicao e fallback controlado.
   temporario com `82` tabelas publicas.
 - Quality gate comercial pos-deploy passou em 2026-07-06:
   `docs/qa/runtime/manaloom-commercial-quality-gate-20260706T175234Z/summary.json`.
+- Deploy backend final do fechamento de QA validado no SHA
+  `361c6f27e0064e04eb82b74ad3c4b1b2d17f4240`.
+- QA mobile autenticado em simulador passou em 2026-07-06:
+  `docs/qa/runtime/mobile-authenticated-qa-20260706T181142Z/summary.json`
+  (`cleanup_status=ok`).
+- Paywall e2e autenticado passou em 2026-07-06:
+  `docs/qa/runtime/ai-paywall-e2e-20260706T182103Z/summary.json`
+  (`generate`, `optimize`, `rebuild` e `explain` retornaram `402`).
+- Quality gate comercial pos-deploy com dashboard historico de IA passou:
+  `docs/qa/runtime/manaloom-commercial-quality-gate-20260706T182123Z/summary.json`.
 - Login Flutter Web local validado em `http://127.0.0.1:8088/app/#/login`,
   sem `RangeError` e sem erros de console.
 - Fluxo pos-jogo agora leva diretamente para otimizacao/rebuild do deck com

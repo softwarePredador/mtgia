@@ -34,6 +34,8 @@
   - `GET /health/metrics`: latencia e erro por endpoint em memoria.
   - `GET /health/dashboard`: request metrics, IA e resumo comercial.
   - `GET /health/commercial`: funil, IA, planos, relatorios e retencao.
+  - `GET /health/ai-history`: serie historica de requisicoes de IA por bucket
+    `day` ou `hour`.
 - Scripts operacionais:
   - `scripts/manaloom_product_smoke.sh`: smoke ponta a ponta no stack novo.
   - `scripts/manaloom_ai_generation_benchmark.sh`: benchmark real de
@@ -45,6 +47,14 @@
   - `scripts/manaloom_commercial_quality_gate.sh`: health, ready, commercial,
     replica do servico, cron de backup, ultimo dump, smoke produto e benchmark
     de IA em uma unica saida `pass/fail`.
+  - `scripts/manaloom_ai_paywall_e2e.sh`: cria usuario temporario, esgota o
+    limite Free via `ai_logs`, valida `402` em generate/optimize/rebuild/explain
+    e limpa o usuario.
+  - `scripts/manaloom_mobile_authenticated_qa.sh`: roda QA autenticada no
+    simulador iOS, cobre cadastro, superficies principais, planos/checkout/legal
+    e paywall visual.
+  - `scripts/manaloom_deploy_backend_image.sh`: publica o backend via imagem no
+    registry local do EasyPanel novo e atualiza `evolution_cartinhas`.
 - Hosts publicos default alinhados para:
   - API: `https://evolution-cartinhas.2ta7qx.easypanel.host`
   - web publico: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`
@@ -70,6 +80,7 @@
 curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/health
 curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/ready
 curl -fsS https://evolution-cartinhas.2ta7qx.easypanel.host/health/commercial
+curl -fsS 'https://evolution-cartinhas.2ta7qx.easypanel.host/health/ai-history?days=30&bucket=day'
 curl -I https://evolution-manaloom-web-public.2ta7qx.easypanel.host/pricing
 curl -I https://evolution-manaloom-web-public.2ta7qx.easypanel.host/reports/nao-existe
 ```
@@ -86,6 +97,7 @@ Esperado:
 ```bash
 scripts/manaloom_product_smoke.sh
 MANALOOM_AI_BENCHMARK_RUNS=3 scripts/manaloom_ai_generation_benchmark.sh
+scripts/manaloom_ai_paywall_e2e.sh
 scripts/manaloom_easypanel_backup.sh
 scripts/manaloom_validate_restore.sh backups/manaloom-postgres/<arquivo>.dump
 scripts/manaloom_install_remote_backup_cron.sh
@@ -118,6 +130,14 @@ Evidencia de 2026-07-06:
 - Smoke de produto final: `status=ok`.
 - Quality gate comercial:
   `docs/qa/runtime/manaloom-commercial-quality-gate-20260706T175234Z/summary.json`
+- Deploy backend QA final validado no SHA
+  `361c6f27e0064e04eb82b74ad3c4b1b2d17f4240`.
+- QA mobile autenticado:
+  `docs/qa/runtime/mobile-authenticated-qa-20260706T181142Z/summary.json`.
+- Paywall autenticado de IA:
+  `docs/qa/runtime/ai-paywall-e2e-20260706T182103Z/summary.json`.
+- Quality gate comercial com historico de IA:
+  `docs/qa/runtime/manaloom-commercial-quality-gate-20260706T182123Z/summary.json`.
   com `status=pass`, `service_replicas=1/1`, `successful_runs=2`,
   `mock_response_count=0`, `cron_lines=2` e `issues=[]`.
 - Login Flutter Web local validado em

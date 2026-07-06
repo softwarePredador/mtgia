@@ -18,6 +18,17 @@ ManaLoom, web publica React/Next.js e deploy no novo EasyPanel ManaLoom.
 | 6 | Retencao e uso continuo | Implementado e revalidado | Deck passa a ter historico pos-jogo e evolucao local |
 | 7 | Comunidade, trade e crescimento | Implementado e revalidado | Usuario pode publicar, explorar, seguir, usar binder, marketplace e trade |
 
+Atualizacao de fechamento QA em 2026-07-06:
+
+- Backend final em producao: `361c6f27e0064e04eb82b74ad3c4b1b2d17f4240`.
+- QA mobile autenticado em simulador: `pass`.
+- Paywall autenticado dos endpoints caros de IA: `pass` com `402` em
+  generate/optimize/rebuild/explain.
+- Dashboard historico de IA: publicado em `/health/ai-history` e integrado ao
+  `/health/dashboard`.
+- Quality gate comercial final: `pass`, `mock_response_count=0`,
+  `ai_history.status=ok`, `service_replicas=1/1`.
+
 ## Etapa 1 - Diagnostico Produto
 
 Entregue em:

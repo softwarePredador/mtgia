@@ -1,0 +1,51 @@
+{
+  "status": "pass",
+  "api": "https://evolution-cartinhas.2ta7qx.easypanel.host",
+  "plan_after_seed": {
+    "ai_requests_used": 120,
+    "ai_requests_remaining": 0
+  },
+  "endpoints": [
+    {
+      "endpoint": "generate",
+      "path": "/ai/generate",
+      "http_code": 402,
+      "blocked": true,
+      "error": "Limite do plano atingido",
+      "message": "Você atingiu o limite de requisições de IA do seu plano atual. Faça upgrade para continuar.",
+      "plan_name": "free",
+      "ai_requests_remaining": 0
+    },
+    {
+      "endpoint": "optimize",
+      "path": "/ai/optimize",
+      "http_code": 402,
+      "blocked": true,
+      "error": "Limite do plano atingido",
+      "message": "Você atingiu o limite de requisições de IA do seu plano atual. Faça upgrade para continuar.",
+      "plan_name": "free",
+      "ai_requests_remaining": 0
+    },
+    {
+      "endpoint": "rebuild",
+      "path": "/ai/rebuild",
+      "http_code": 402,
+      "blocked": true,
+      "error": "Limite do plano atingido",
+      "message": "Você atingiu o limite de requisições de IA do seu plano atual. Faça upgrade para continuar.",
+      "plan_name": "free",
+      "ai_requests_remaining": 0
+    },
+    {
+      "endpoint": "explain",
+      "path": "/ai/explain",
+      "http_code": 402,
+      "blocked": true,
+      "error": "Limite do plano atingido",
+      "message": "Você atingiu o limite de requisições de IA do seu plano atual. Faça upgrade para continuar.",
+      "plan_name": "free",
+      "ai_requests_remaining": 0
+    }
+  ],
+  "all_blocked": true
+}

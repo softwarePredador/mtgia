@@ -1,0 +1,9 @@
+{
+  "status": "pass",
+  "api": "https://evolution-cartinhas.2ta7qx.easypanel.host",
+  "device_id": "DABB9D79-2FDB-4585-94DB-E31F1288EE74",
+  "test_exit_code": 0,
+  "cleanup_status": "ok",
+  "artifacts_dir": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/qa/runtime/mobile-authenticated-qa-20260706T181142Z",
+  "log_file": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/qa/runtime/mobile-authenticated-qa-20260706T181142Z/flutter_test.log"
+}

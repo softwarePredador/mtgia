@@ -1,0 +1,54 @@
+{
+  "status": "ok",
+  "bucket": "day",
+  "window_days": 30,
+  "period_count": 2,
+  "totals": {
+    "request_count": 6,
+    "error_count": 0,
+    "error_rate": 0.0,
+    "input_tokens": 22014,
+    "output_tokens": 830,
+    "total_tokens": 22844
+  },
+  "periods": [
+    {
+      "period_start": "2026-06-11T00:00:00.000Z",
+      "request_count": 4,
+      "error_count": 0,
+      "total_tokens": 15441,
+      "endpoints": [
+        {
+          "endpoint": "optimize",
+          "request_count": 4,
+          "error_count": 0,
+          "error_rate": 0.0,
+          "avg_latency_ms": 4520,
+          "p95_latency_ms": 5371,
+          "input_tokens": 14676,
+          "output_tokens": 765
+        }
+      ],
+      "error_rate": 0.0
+    },
+    {
+      "period_start": "2026-07-01T00:00:00.000Z",
+      "request_count": 2,
+      "error_count": 0,
+      "total_tokens": 7403,
+      "endpoints": [
+        {
+          "endpoint": "optimize",
+          "request_count": 2,
+          "error_count": 0,
+          "error_rate": 0.0,
+          "avg_latency_ms": 2887,
+          "p95_latency_ms": 3185,
+          "input_tokens": 7338,
+          "output_tokens": 65
+        }
+      ],
+      "error_rate": 0.0
+    }
+  ]
+}

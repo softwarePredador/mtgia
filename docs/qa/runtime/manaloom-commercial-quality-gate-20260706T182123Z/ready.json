@@ -1,0 +1,16 @@
+{
+  "status": "ready",
+  "service": "mtgia-server",
+  "timestamp": "2026-07-06T18:21:24.552751",
+  "environment": "production",
+  "checks": {
+    "database": {
+      "status": "healthy",
+      "latency_ms": null
+    },
+    "cards_data": {
+      "status": "healthy",
+      "card_count": 34331
+    }
+  }
+}
