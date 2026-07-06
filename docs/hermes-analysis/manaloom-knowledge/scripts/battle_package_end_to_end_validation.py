@@ -1969,6 +1969,7 @@ def run_simple_activated_self_keyword(
     )
     active = battle.Player(str(scenario.get("player") or "Activated Controller"), None, [])
     active.battlefield = [source]
+    active.hand = [battle.enrich_card(dict(card)) for card in (scenario.get("controller_hand") or [])]
     add_manifest_mana(active, scenario.get("controller_mana") or {})
     expected_keywords = [
         str(keyword or "").strip().lower().replace(" ", "_")
@@ -1997,6 +1998,8 @@ def run_simple_activated_self_keyword(
             "battle_execution",
             f"{card['name']} source tapped={bool(source.get('tapped'))}, expected {expected_tapped_source}",
         )
+    expected_discard_count = int(scenario.get("expected_discard_count") or 0)
+    expected_life_paid = int(scenario.get("expected_life_paid") or 0)
     activation_event = next(
         (
             data
@@ -2009,6 +2012,16 @@ def run_simple_activated_self_keyword(
     )
     if activation_event is None:
         fail("battle_events", f"missing {card['name']} simple activated self keyword event")
+    if int(activation_event.get("activation_discard_count") or 0) != expected_discard_count:
+        fail(
+            "battle_events",
+            f"{card['name']} activation_discard_count={activation_event.get('activation_discard_count')!r}",
+        )
+    if int(activation_event.get("activation_life_cost") or 0) != expected_life_paid:
+        fail(
+            "battle_events",
+            f"{card['name']} activation_life_cost={activation_event.get('activation_life_cost')!r}",
+        )
     resolved_event = next(
         (
             data
@@ -2032,6 +2045,8 @@ def run_simple_activated_self_keyword(
         "source_keywords": list(source.get("keywords") or []),
         "granted_keywords": expected_keywords,
         "source_tapped": bool(source.get("tapped")),
+        "discarded_count": int(activation_event.get("activation_discard_count") or 0),
+        "life_paid": int(activation_event.get("activation_life_cost") or 0),
     }
 
 

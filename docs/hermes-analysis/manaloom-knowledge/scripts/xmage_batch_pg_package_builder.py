@@ -1576,13 +1576,29 @@ def simple_activated_self_keyword_execution_scenario_from_expected_rule(
     required = dict(rule.get("required_effect_fields") or {})
     if required.get("battle_model_scope") != "xmage_permanent_simple_activated_self_keyword_until_eot_v1":
         return None
+    discard_target = str(required.get("activation_discard_target") or "any_card")
+    discard_hand = []
+    if int(required.get("activation_discard_count") or 0):
+        if discard_target == "land_card":
+            discard_hand = [
+                {"name": "E2E Spare Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
+                {"name": "E2E Nonland Spell", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+            ]
+        else:
+            discard_hand = [
+                {"name": "E2E Spare Card A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+                {"name": "E2E Spare Card B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+            ]
     return {
         "name": f"{rule['card_name']} activates self keyword ability",
         "type": "simple_activated_self_keyword",
         "card": {"name": rule["card_name"]},
         "controller_mana": _manifest_mana_for_required_activation(required),
+        "controller_hand": discard_hand,
         "expected_tapped_source": bool(required.get("activation_requires_tap")),
         "expected_keywords": list(required.get("granted_keywords_until_eot") or []),
+        "expected_discard_count": int(required.get("activation_discard_count") or 0),
+        "expected_life_paid": int(required.get("activation_life_cost") or 0),
         "logical_rule_key": rule["logical_rule_key"],
     }
 

@@ -10545,6 +10545,8 @@ def parse_mana_cost_text(cost_text: str) -> tuple[int, list[str]] | None:
             colors.append(normalized)
         elif re.fullmatch(r"[WUBRG](?:/[WUBRG])+", normalized):
             colors.append(normalized)
+        elif re.fullmatch(r"(?:[WUBRG]/P|P/[WUBRG])", normalized):
+            colors.append(normalized)
         else:
             return None
     return generic, colors
@@ -10856,7 +10858,7 @@ def activation_cost_from_oracle_prefix(
     mana_text = re.sub(r"\s*,?\s*\{t\}\s*,?\s*", "", text).strip()
     if mana_text in {"", ","}:
         mana_text = "{0}"
-    if not re.fullmatch(r"(?:\{[0-9wubrg/]+\})+", mana_text):
+    if not re.fullmatch(r"(?:\{[0-9wubrgp/]+\})+", mana_text):
         return "activated_self_boost_oracle_cost_not_supported"
     canonical = re.sub(
         r"\{([^}]+)\}",
@@ -11506,13 +11508,89 @@ def activated_self_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, An
     )
     if not match:
         return "activated_self_keyword_oracle_not_simple"
-    activation = activation_cost_from_oracle_prefix(cost_text)
+    normalized_cost = cost_text
+    discard_cost = activation_discard_cost_from_oracle(text)
+    if discard_cost:
+        discard_pattern = r"(?:^|,\s*)discard a card(?: at random)?(?:\s*,?|$)"
+        normalized_cost = re.sub(discard_pattern, ",", normalized_cost).strip(" ,")
+    life_cost = 0
+    life_pattern = r"(?:^|,\s*)pay (?P<life>\d+) life(?:\s*,?|$)"
+    life_matches = list(re.finditer(life_pattern, normalized_cost))
+    if len(life_matches) > 1:
+        return "activated_self_keyword_oracle_cost_not_supported"
+    if life_matches:
+        life_cost = int(life_matches[0].group("life"))
+        normalized_cost = re.sub(life_pattern, ",", normalized_cost).strip(" ,")
+    activation = activation_cost_from_oracle_prefix(normalized_cost)
     if isinstance(activation, str):
         return str(activation).replace("activated_self_boost", "activated_self_keyword")
-    return {
+    result = {
         "keyword": TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group("keyword")],
         **activation,
     }
+    if discard_cost:
+        result.update(discard_cost)
+    if life_cost:
+        result["activation_life_cost"] = life_cost
+    return result
+
+
+def activated_self_keyword_cost_from_source(window: str) -> dict[str, Any] | str:
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "OrCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "SacrificeSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+        "UntapSourceCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_self_keyword_source_cost_not_supported"
+    discard_cost = activation_discard_cost_from_source(window)
+    if isinstance(discard_cost, str):
+        return discard_cost.replace("activated_damage", "activated_self_keyword")
+    life_matches = re.findall(r"PayLifeCost\s*\(\s*(\d+)\s*\)", window or "", re.S)
+    if len(life_matches) > 1:
+        return "activated_self_keyword_source_cost_not_supported"
+    mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window, re.S)
+    generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window, re.S)
+    colored_matches = re.findall(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window, re.S)
+    cost_kinds = sum(1 for matches in (mana_matches, generic_matches, colored_matches) if matches)
+    if cost_kinds > 1:
+        return "activated_self_keyword_source_cost_not_supported"
+    if len(mana_matches) > 1 or len(generic_matches) > 1 or len(colored_matches) > 1:
+        return "activated_self_keyword_source_cost_not_supported"
+    if mana_matches:
+        cost_text = mana_matches[0]
+    elif generic_matches:
+        cost_text = "{" + generic_matches[0] + "}"
+    elif colored_matches:
+        cost_text = "{" + colored_matches[0] + "}"
+    else:
+        cost_text = "{0}"
+    parsed = parse_mana_cost_text(cost_text)
+    if parsed is None:
+        return "activated_self_keyword_source_mana_cost_not_supported"
+    generic, colors = parsed
+    result = {
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": generic,
+        "activation_cost_colors": colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": False,
+    }
+    if discard_cost:
+        result.update(discard_cost)
+    if life_matches:
+        result["activation_life_cost"] = int(life_matches[0])
+    return result
 
 
 def activated_self_keyword_from_source(source: str, keyword_ability_class: str) -> dict[str, Any] | str:
@@ -11537,7 +11615,7 @@ def activated_self_keyword_from_source(source: str, keyword_ability_class: str) 
     window = text[max(0, gain_index - 500) : gain_index + 2000]
     if "SimpleActivatedAbility" not in window:
         return "activated_self_keyword_source_not_simple_activated"
-    activation = activated_target_keyword_cost_from_source(window)
+    activation = activated_self_keyword_cost_from_source(window)
     if isinstance(activation, str):
         return (
             activation.replace("activated_target_keyword", "activated_self_keyword")
@@ -17463,15 +17541,34 @@ def split_row(
             int(parsed_activation["activation_cost_generic"]),
             list(parsed_activation["activation_cost_colors"]),
             bool(parsed_activation["activation_requires_tap"]),
+            int(parsed_activation.get("activation_discard_count") or 0),
+            parsed_activation.get("activation_discard_target"),
+            bool(parsed_activation.get("activation_discard_random")),
+            int(parsed_activation.get("activation_life_cost") or 0),
         )
         oracle_cost = (
             int(oracle_keyword["activation_cost_generic"]),
             list(oracle_keyword["activation_cost_colors"]),
             bool(oracle_keyword["activation_requires_tap"]),
+            int(oracle_keyword.get("activation_discard_count") or 0),
+            oracle_keyword.get("activation_discard_target"),
+            bool(oracle_keyword.get("activation_discard_random")),
+            int(oracle_keyword.get("activation_life_cost") or 0),
         )
         if source_cost != oracle_cost:
             return None, "activated_self_keyword_source_oracle_cost_mismatch"
         keyword = oracle_keyword["keyword"]
+        activation_extra_fields = {
+            key: parsed_activation[key]
+            for key in (
+                "activation_discard_count",
+                "activation_discard_target",
+                "activation_requires_discard_card",
+                "activation_discard_random",
+                "activation_life_cost",
+            )
+            if parsed_activation.get(key) not in (None, False, 0, "")
+        }
         activated_effect = {
             "effect": "stat_modifier_until_eot",
             "battle_model_scope": SELF_KEYWORD_ACTIVATED_SCOPE,
@@ -17492,6 +17589,7 @@ def split_row(
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": False,
+            **activation_extra_fields,
         }
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
@@ -17525,6 +17623,7 @@ def split_row(
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": False,
+            **activation_extra_fields,
         }
         return build_proposal(
             row,

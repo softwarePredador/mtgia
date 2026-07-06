@@ -43969,6 +43969,11 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
+            "activation_life_cost": permanent.get("activation_life_cost"),
             "target": "self",
             "target_controller": "self",
             "target_constraints": permanent.get("target_constraints") or {"source": "self", "card_types": ["creature"]},
@@ -44036,6 +44041,11 @@ def _activated_rule_effects_for_permanent(permanent):
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "activation_discard_count": permanent.get("activation_discard_count"),
+            "activation_discard_target": permanent.get("activation_discard_target"),
+            "activation_requires_discard_card": permanent.get("activation_requires_discard_card"),
+            "activation_discard_random": permanent.get("activation_discard_random"),
+            "activation_life_cost": permanent.get("activation_life_cost"),
             "target": "self",
             "target_controller": "self",
             "target_constraints": permanent.get("target_constraints")
@@ -46345,6 +46355,49 @@ def _self_keyword_activation_cost(effect_data):
     return _self_boost_activation_cost(effect_data)
 
 
+def _self_keyword_discard_options(player, effect_data):
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    if discard_count <= 0:
+        return []
+    discard_target = str(effect_data.get("activation_discard_target") or "any_card").strip().lower()
+    hand = [card for card in list(getattr(player, "hand", []) or []) if isinstance(card, dict)]
+    if discard_target == "land_card":
+        return [card for card in hand if is_effective_land(card)]
+    if discard_target in {"", "any_card"}:
+        return hand
+    return []
+
+
+def _select_self_keyword_discard_cards(player, effect_data, rng):
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    if discard_count <= 0:
+        return []
+    options = list(_self_keyword_discard_options(player, effect_data))
+    if len(options) < discard_count:
+        return None
+    selected = []
+    for _ in range(discard_count):
+        if effect_data.get("activation_discard_random"):
+            card = rng.choice(options)
+        else:
+            card = _choose_currency_converter_discard(player)
+            if card not in options:
+                card = sorted(options, key=lambda candidate: str(candidate.get("name") or ""))[0]
+        selected.append(card)
+        options.remove(card)
+    return selected
+
+
+def _can_pay_self_keyword_extra_costs(player, effect_data):
+    life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
+    if life_cost and (getattr(player, "life_cant_change", False) or player.life <= life_cost + 1):
+        return False
+    discard_count = max(0, int(effect_data.get("activation_discard_count") or 0))
+    if discard_count and len(_self_keyword_discard_options(player, effect_data)) < discard_count:
+        return False
+    return True
+
+
 def can_activate_generic_self_keyword_permanent(player, permanent, *, effect_data=None, auto_only=False):
     effect_data = effect_data or activated_self_keyword_effect_for_permanent(permanent)
     if effect_data is None:
@@ -46363,6 +46416,8 @@ def can_activate_generic_self_keyword_permanent(player, permanent, *, effect_dat
         return False
     activation_cost = _self_keyword_activation_cost(effect_data)
     if not player.can_pay(activation_cost):
+        return False
+    if not _can_pay_self_keyword_extra_costs(player, effect_data):
         return False
     keywords = list(effect_data.get("granted_keywords_until_eot") or [])
     if len(keywords) != 1:
@@ -46398,8 +46453,38 @@ def activate_generic_self_keyword_permanent(
         return False
     phase = phase or "precombat_main"
     activation_cost = _self_keyword_activation_cost(effect_data)
+    discard_cards = _select_self_keyword_discard_cards(player, effect_data, rng)
+    if discard_cards is None:
+        return False
     if not player.spend_mana(activation_cost):
         return False
+    life_before = player.life
+    life_cost = max(0, int(effect_data.get("activation_life_cost") or 0))
+    if life_cost:
+        change_life(player, -life_cost)
+    discarded = []
+    if discard_cards:
+        removed_cards = []
+        for discard_card in discard_cards:
+            if discard_card in player.hand:
+                player.hand.remove(discard_card)
+                removed_cards.append(discard_card)
+        if len(removed_cards) != len(discard_cards):
+            return False
+        discard_resolution = resolve_effect_discard_cards(
+            player,
+            removed_cards,
+            top_limit=0,
+            opponents=[opponent for opponent in all_players if opponent is not player],
+            turn=turn,
+            phase=phase,
+            rng=rng,
+        )
+        discarded = [
+            card.get("name", "?")
+            for card in discard_resolution.get("to_graveyard", removed_cards)
+            if isinstance(card, dict)
+        ]
     if effect_data.get("activation_requires_tap"):
         permanent["tapped"] = True
     keywords = [
@@ -46449,6 +46534,8 @@ def activate_generic_self_keyword_permanent(
         heuristic_version=DECISION_STRATEGY_VERSION,
         resource_delta={
             "mana": -mana_paid,
+            "life": -life_cost,
+            "cards_discarded": len(discarded),
             "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
             "temporary_keywords": len(keywords),
         },
@@ -46456,6 +46543,8 @@ def activate_generic_self_keyword_permanent(
             flag
             for flag, active in {
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "discard_cost": bool(discarded),
+                "life_payment": bool(life_cost),
                 "temporary_keyword": bool(keywords),
             }.items()
             if active
@@ -46468,6 +46557,11 @@ def activate_generic_self_keyword_permanent(
         effect="stat_modifier_until_eot",
         activation_kind="simple_activated_self_keyword",
         activation_cost=activation_cost,
+        activation_life_cost=life_cost,
+        life_before=life_before,
+        life_after=player.life,
+        activation_discard_count=len(discarded),
+        discarded=discarded,
         tapped=bool(permanent.get("tapped")),
         mana_paid=mana_paid,
         target=permanent.get("name", "?"),

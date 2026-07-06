@@ -15091,6 +15091,79 @@ multi-mode abilities, non-keyword stat changes, unsupported discard/life/
 sacrifice/exile activation costs, or any generic self-ability review scope
 without an exact runtime adapter and focused package evidence.
 
+## PG554 Self Keyword Extra Costs New Server Evidence
+
+PG554 evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg554_self_keyword_extra_costs_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_package_package.md`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_apply_evidence.md`
+- PG -> SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_sync_report.json`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_e2e.md`
+- post-sync queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg554_self_keyword_extra_costs_new_server.md`
+- final exact-scope recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg554_self_keyword_extra_costs_new_server_final.md`
+- readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg554_self_keyword_extra_costs_new_server.md`
+- final audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg554_self_keyword_extra_costs_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg554_self_keyword_extra_costs_new_server_final_env.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg554_self_keyword_extra_costs_new_server_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg554_self_keyword_extra_costs_new_server_final.md`
+
+Validation:
+
+- focused code checks passed: `py_compile`, `54` package/E2E pytest tests, and
+  `620` exact-scope splitter unittest tests;
+- exact split selected `5` additional cards for
+  `xmage_permanent_simple_activated_self_keyword_until_eot_v1`;
+- package precheck found `5/5` target card rows and no existing matching rows;
+- package apply upserted `5` rows and deprecated `0` shadow rows;
+- PostgreSQL postcheck confirmed `5/5` promoted rows, `5/5`
+  verified/auto, and `5/5` oracle hash rows;
+- PG -> SQLite sync loaded `8,948` PostgreSQL rows, updated `8,712` SQLite
+  rows, and exported `6,450` canonical snapshot rows;
+- package E2E: `status=pass`, `scenario_count=5`, `event_count=10`, and
+  every promoted card paid its extra activation cost where applicable before
+  gaining the expected self keyword until end of turn;
+- final exact-scope recheck has `proposal_count=0` and
+  `safe_for_batch_pg_package_count=0`;
+- final audits passed: XMage strategy `26/26`, PG-Hermes-SQLite `51/51`,
+  operational surface `pass`, legacy contamination `pass`.
+
+Post-sync queue evidence:
+
+- pre-cycle `target_identity_count=25548`
+- post-cycle `target_identity_count=25543`
+- post-cycle `xmage_authoritative_source_count=25229`
+- post-cycle `xmage_missing_source_exception_count=314`
+- post-cycle `xmage_authoritative_parser_gap_count=0`
+- post-cycle `xmage_authoritative_adapter_required_count=25229`
+- post-cycle `adapter_work_unit_count=11354`
+
+Runtime semantics:
+
+- the splitter now accepts exact self-keyword activation costs from XMage
+  `DiscardCardCost`, `PayLifeCost(N)`, and simple mana including phyrexian
+  `{W/P}`, `{U/P}`, `{B/P}`, `{R/P}`, and `{G/P}`;
+- the runtime refuses activation if the controller lacks discard fodder or
+  life to pay, spends mana first, pays life, discards the selected card cost,
+  emits cost evidence in the `activated_ability` event, and then resolves the
+  self keyword until end of turn;
+- package E2E validates the observable discard/life-payment counts, not only
+  the final keyword state.
+
+Residual boundary: PG554 still does not authorize activation costs that require
+untapping the source, tapping another target creature/permanent, sacrifice,
+exile, target discard, composite/or costs, or broader target-keyword/stat-change
+families without a matching exact runtime adapter and focused package evidence.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

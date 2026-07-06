@@ -1,0 +1,298 @@
+{
+  "battle_execution": {
+    "event_count": 10,
+    "results": [
+      {
+        "card_name": "Fledgling Imp",
+        "discarded_count": 1,
+        "granted_keywords": [
+          "flying"
+        ],
+        "life_paid": 0,
+        "scenario": "Fledgling Imp activates self keyword ability",
+        "source_keywords": [
+          "flying"
+        ],
+        "source_tapped": false
+      },
+      {
+        "card_name": "Insatiable Souleater",
+        "discarded_count": 0,
+        "granted_keywords": [
+          "trample"
+        ],
+        "life_paid": 0,
+        "scenario": "Insatiable Souleater activates self keyword ability",
+        "source_keywords": [
+          "trample"
+        ],
+        "source_tapped": false
+      },
+      {
+        "card_name": "Olivia's Dragoon",
+        "discarded_count": 1,
+        "granted_keywords": [
+          "flying"
+        ],
+        "life_paid": 0,
+        "scenario": "Olivia's Dragoon activates self keyword ability",
+        "source_keywords": [
+          "flying"
+        ],
+        "source_tapped": false
+      },
+      {
+        "card_name": "Patrol Hound",
+        "discarded_count": 1,
+        "granted_keywords": [
+          "first_strike"
+        ],
+        "life_paid": 0,
+        "scenario": "Patrol Hound activates self keyword ability",
+        "source_keywords": [
+          "first_strike"
+        ],
+        "source_tapped": false
+      },
+      {
+        "card_name": "Shadowcloak Vampire",
+        "discarded_count": 0,
+        "granted_keywords": [
+          "flying"
+        ],
+        "life_paid": 2,
+        "scenario": "Shadowcloak Vampire activates self keyword ability",
+        "source_keywords": [
+          "flying"
+        ],
+        "source_tapped": false
+      }
+    ],
+    "scenario_count": 5
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-06T06:15:12.450194+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_package_manifest.json",
+  "package_id": "pg554_self_keyword_extra_costs_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Fledgling Imp",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:daa15499def4831e63caae638eaf067a",
+          "oracle_hash": "52923bdf36f4fb6eabffbecf6ddf4b66",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Insatiable Souleater",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b4a7c68f795f60e117ee654782b79d57",
+          "oracle_hash": "b4305043e3a76f4cb960c54a6d8eef33",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Olivia's Dragoon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:164923f1580f3b634945a67e46500b02",
+          "oracle_hash": "5da6a0ad3acfad925957bfe679f2ecd9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Patrol Hound",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:892ac00e937d0158f852010008300506",
+          "oracle_hash": "a467b144152ba539299c6d7dd3223a98",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Shadowcloak Vampire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5146b23b2bc449f8552c513145fd83a8",
+          "oracle_hash": "8856f3575f27df6ef4122fae6d4fe680",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 5
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Fledgling Imp",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:daa15499def4831e63caae638eaf067a",
+          "oracle_hash": "52923bdf36f4fb6eabffbecf6ddf4b66",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Insatiable Souleater",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b4a7c68f795f60e117ee654782b79d57",
+          "oracle_hash": "b4305043e3a76f4cb960c54a6d8eef33",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Olivia's Dragoon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:164923f1580f3b634945a67e46500b02",
+          "oracle_hash": "5da6a0ad3acfad925957bfe679f2ecd9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Patrol Hound",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:892ac00e937d0158f852010008300506",
+          "oracle_hash": "a467b144152ba539299c6d7dd3223a98",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "card_name": "Shadowcloak Vampire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5146b23b2bc449f8552c513145fd83a8",
+          "oracle_hash": "8856f3575f27df6ef4122fae6d4fe680",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fledgling Imp",
+          "logical_rule_key": "battle_rule_v1:daa15499def4831e63caae638eaf067a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Insatiable Souleater",
+          "logical_rule_key": "battle_rule_v1:b4a7c68f795f60e117ee654782b79d57"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Olivia's Dragoon",
+          "logical_rule_key": "battle_rule_v1:164923f1580f3b634945a67e46500b02"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Patrol Hound",
+          "logical_rule_key": "battle_rule_v1:892ac00e937d0158f852010008300506"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shadowcloak Vampire",
+          "logical_rule_key": "battle_rule_v1:5146b23b2bc449f8552c513145fd83a8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 5
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Fledgling Imp",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:daa15499def4831e63caae638eaf067a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Insatiable Souleater",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b4a7c68f795f60e117ee654782b79d57"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Olivia's Dragoon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:164923f1580f3b634945a67e46500b02"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Patrol Hound",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:892ac00e937d0158f852010008300506"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shadowcloak Vampire",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5146b23b2bc449f8552c513145fd83a8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 10,
+        "scenarios": 5
+      },
+      "name": "battle_execution",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

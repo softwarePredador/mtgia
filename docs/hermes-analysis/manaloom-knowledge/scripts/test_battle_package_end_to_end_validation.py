@@ -207,6 +207,10 @@ def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
         "activation_cost_generic": 2,
         "activation_cost_colors": ["R/W"],
         "activation_requires_tap": False,
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": True,
+        "activation_life_cost": 2,
         "activation_requires_sacrifice": False,
         "_rule_logical_key": "battle_rule_v1:cobalt-golem",
     }
@@ -218,8 +222,14 @@ def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
                 "type": "simple_activated_self_keyword",
                 "card": {"name": "Cobalt Golem"},
                 "controller_mana": {"generic": 2, "red": 1},
+                "controller_hand": [
+                    {"name": "E2E Spare Card A", "type_line": "Sorcery", "effect": "draw_cards", "cmc": 2},
+                    {"name": "E2E Spare Card B", "type_line": "Instant", "effect": "direct_damage", "cmc": 1},
+                ],
                 "expected_keywords": ["flying"],
                 "expected_tapped_source": False,
+                "expected_discard_count": 1,
+                "expected_life_paid": 2,
                 "logical_rule_key": "battle_rule_v1:cobalt-golem",
             },
             events,
@@ -232,6 +242,8 @@ def test_simple_activated_self_keyword_runner_executes_keyword_effect() -> None:
     assert result["granted_keywords"] == ["flying"]
     assert "flying" in result["source_keywords"]
     assert result["source_tapped"] is False
+    assert result["discarded_count"] == 1
+    assert result["life_paid"] == 2
 
 
 def test_simple_mana_source_refresh_runner_executes_partial_mana_rule() -> None:

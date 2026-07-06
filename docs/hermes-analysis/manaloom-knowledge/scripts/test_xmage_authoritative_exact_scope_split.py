@@ -14699,7 +14699,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertFalse(effect["activation_requires_tap"])
         self.assertEqual(effect["_activated_rule_effects"][0]["target"], "self")
 
-    def test_activated_self_keyword_blocks_discard_cost_until_supported(self) -> None:
+    def test_activated_self_keyword_maps_discard_cost(self) -> None:
         row = queue_row(
             "xmage_signature::GainAbilitySourceEffect::FlyingAbility,SimpleActivatedAbility::"
             "no_target_class::no_condition_class::activated_ability",
@@ -14722,8 +14722,72 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_self_keyword_oracle_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.SELF_KEYWORD_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{0}")
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertTrue(effect["activation_requires_discard_card"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_count"], 1)
+
+    def test_activated_self_keyword_maps_pay_life_cost(self) -> None:
+        row = queue_row(
+            "xmage_signature::GainAbilitySourceEffect::FlyingAbility,SimpleActivatedAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["GainAbilitySourceEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Shadowcloak Vampire",
+                type_line="Creature - Vampire",
+                oracle_text="Pay 2 life: Shadowcloak Vampire gains flying until end of turn.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new GainAbilitySourceEffect(FlyingAbility.getInstance(), Duration.EndOfTurn), "
+                "new PayLifeCost(2)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{0}")
+        self.assertEqual(effect["activation_life_cost"], 2)
+        self.assertFalse(effect["activation_requires_tap"])
+
+    def test_activated_self_keyword_maps_phyrexian_mana_cost(self) -> None:
+        row = queue_row(
+            "xmage_signature::GainAbilitySourceEffect::SimpleActivatedAbility,TrampleAbility::"
+            "no_target_class::no_condition_class::activated_ability",
+            effect_classes=["GainAbilitySourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility", "TrampleAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Insatiable Souleater",
+                type_line="Artifact Creature - Phyrexian Beast",
+                oracle_text="{G/P}: This creature gains trample until end of turn.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new GainAbilitySourceEffect(TrampleAbility.getInstance(), Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{G/P}")));'
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["granted_keywords_until_eot"], ["trample"])
+        self.assertEqual(effect["activation_cost_mana"], "{G/P}")
+        self.assertEqual(effect["activation_cost_colors"], ["G/P"])
 
     def test_activated_self_boost_accepts_colored_mana_cost_source(self) -> None:
         row = queue_row(

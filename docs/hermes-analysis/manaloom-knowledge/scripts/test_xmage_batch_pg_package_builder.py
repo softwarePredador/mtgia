@@ -694,6 +694,9 @@ def test_manifest_builds_simple_activated_self_keyword_execution_scenario() -> N
             "activation_cost_generic": 2,
             "activation_cost_colors": ["R/W"],
             "activation_requires_tap": False,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
         },
     }
 
@@ -706,6 +709,8 @@ def test_manifest_builds_simple_activated_self_keyword_execution_scenario() -> N
     assert scenario["controller_mana"]["generic"] == 2
     assert scenario["controller_mana"]["red"] == 1
     assert scenario["controller_mana"]["white"] == 0
+    assert scenario["expected_discard_count"] == 1
+    assert len(scenario["controller_hand"]) == 2
 
 
 def test_manifest_expected_rule_preserves_spell_additional_sacrifice_cost_fields() -> None:

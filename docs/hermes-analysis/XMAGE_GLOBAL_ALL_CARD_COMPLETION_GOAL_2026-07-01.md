@@ -1789,6 +1789,17 @@ Immediate checkpoint after PG361:
     must implement another mapper/runtime subpattern before generating a new
     PostgreSQL package. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/pg553_self_keyword_until_eot_new_server_apply_evidence.md`.
+80. PG554 promoted `5` additional simple activated self-keyword-until-EOT
+    permanent rows on the new server after extending the exact mapper/runtime
+    lane to XMage `DiscardCardCost`, `PayLifeCost(N)`, and simple phyrexian
+    mana activation costs. The cycle reduced Commander-legal battle-gap
+    identities from `25548` to `25543`, reduced XMage-authoritative
+    adapter-required identities from `25234` to `25229`, and reduced adapter
+    work units from `11356` to `11354`. The final split returned
+    `proposal_count=0`, so the next cycle must implement another
+    mapper/runtime subpattern before generating a new PostgreSQL package.
+    Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_apply_evidence.md`.
 
 ## Non-Goals
 

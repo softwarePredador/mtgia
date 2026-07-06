@@ -1,0 +1,991 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg554_self_keyword_extra_costs_new_serve_20260706_061152",
+  "deploy_id": "pg554_self_keyword_extra_costs_new_server",
+  "execution_scenarios": [
+    {
+      "card": {
+        "name": "Fledgling Imp"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Spare Card B",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 1,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 1,
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_life_paid": 0,
+      "expected_tapped_source": false,
+      "logical_rule_key": "battle_rule_v1:daa15499def4831e63caae638eaf067a",
+      "name": "Fledgling Imp activates self keyword ability",
+      "type": "simple_activated_self_keyword"
+    },
+    {
+      "card": {
+        "name": "Insatiable Souleater"
+      },
+      "controller_hand": [],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 1,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 0,
+      "expected_keywords": [
+        "trample"
+      ],
+      "expected_life_paid": 0,
+      "expected_tapped_source": false,
+      "logical_rule_key": "battle_rule_v1:b4a7c68f795f60e117ee654782b79d57",
+      "name": "Insatiable Souleater activates self keyword ability",
+      "type": "simple_activated_self_keyword"
+    },
+    {
+      "card": {
+        "name": "Olivia's Dragoon"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Spare Card B",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 1,
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_life_paid": 0,
+      "expected_tapped_source": false,
+      "logical_rule_key": "battle_rule_v1:164923f1580f3b634945a67e46500b02",
+      "name": "Olivia's Dragoon activates self keyword ability",
+      "type": "simple_activated_self_keyword"
+    },
+    {
+      "card": {
+        "name": "Patrol Hound"
+      },
+      "controller_hand": [
+        {
+          "cmc": 2,
+          "effect": "draw_cards",
+          "name": "E2E Spare Card A",
+          "type_line": "Sorcery"
+        },
+        {
+          "cmc": 1,
+          "effect": "direct_damage",
+          "name": "E2E Spare Card B",
+          "type_line": "Instant"
+        }
+      ],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 1,
+      "expected_keywords": [
+        "first_strike"
+      ],
+      "expected_life_paid": 0,
+      "expected_tapped_source": false,
+      "logical_rule_key": "battle_rule_v1:892ac00e937d0158f852010008300506",
+      "name": "Patrol Hound activates self keyword ability",
+      "type": "simple_activated_self_keyword"
+    },
+    {
+      "card": {
+        "name": "Shadowcloak Vampire"
+      },
+      "controller_hand": [],
+      "controller_mana": {
+        "black": 0,
+        "blue": 0,
+        "generic": 0,
+        "green": 0,
+        "red": 0,
+        "white": 0
+      },
+      "expected_discard_count": 0,
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_life_paid": 2,
+      "expected_tapped_source": false,
+      "logical_rule_key": "battle_rule_v1:5146b23b2bc449f8552c513145fd83a8",
+      "name": "Shadowcloak Vampire activates self keyword ability",
+      "type": "simple_activated_self_keyword"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Fledgling Imp",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:daa15499def4831e63caae638eaf067a",
+      "min_rule_version": 2,
+      "normalized_name": "fledgling imp",
+      "oracle_hash": "52923bdf36f4fb6eabffbecf6ddf4b66",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [
+              "B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "flying"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "FlyingAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Insatiable Souleater",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b4a7c68f795f60e117ee654782b79d57",
+      "min_rule_version": 2,
+      "normalized_name": "insatiable souleater",
+      "oracle_hash": "b4305043e3a76f4cb960c54a6d8eef33",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [
+              "G/P"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{G/P}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "trample"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "TrampleAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [
+          "G/P"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{G/P}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "trample"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Olivia's Dragoon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:164923f1580f3b634945a67e46500b02",
+      "min_rule_version": 2,
+      "normalized_name": "olivia's dragoon",
+      "oracle_hash": "5da6a0ad3acfad925957bfe679f2ecd9",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "flying"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "FlyingAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Patrol Hound",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:892ac00e937d0158f852010008300506",
+      "min_rule_version": 2,
+      "normalized_name": "patrol hound",
+      "oracle_hash": "a467b144152ba539299c6d7dd3223a98",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "first_strike"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "FirstStrikeAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "first_strike"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shadowcloak Vampire",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5146b23b2bc449f8552c513145fd83a8",
+      "min_rule_version": 2,
+      "normalized_name": "shadowcloak vampire",
+      "oracle_hash": "8856f3575f27df6ef4122fae6d4fe680",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_life_cost": 2,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "flying"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "FlyingAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_life_cost": 2,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_self_keyword_until_eot": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg554_self_keyword_extra_costs_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T06:11:52+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Fledgling Imp"
+      },
+      "card_name": "Fledgling Imp",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:daa15499def4831e63caae638eaf067a",
+      "normalized_name": "fledgling imp",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [
+              "B"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{B}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "flying"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "FlyingAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Insatiable Souleater"
+      },
+      "card_name": "Insatiable Souleater",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b4a7c68f795f60e117ee654782b79d57",
+      "normalized_name": "insatiable souleater",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [
+              "G/P"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{G/P}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "trample"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "TrampleAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [
+          "G/P"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{G/P}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "trample"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Olivia's Dragoon"
+      },
+      "card_name": "Olivia's Dragoon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:164923f1580f3b634945a67e46500b02",
+      "normalized_name": "olivia's dragoon",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "flying"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "FlyingAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Patrol Hound"
+      },
+      "card_name": "Patrol Hound",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:892ac00e937d0158f852010008300506",
+      "normalized_name": "patrol hound",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": true,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "first_strike"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "FirstStrikeAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_discard_count": 1,
+        "activation_discard_target": "any_card",
+        "activation_requires_discard_card": true,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "first_strike"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Shadowcloak Vampire"
+      },
+      "card_name": "Shadowcloak Vampire",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5146b23b2bc449f8552c513145fd83a8",
+      "normalized_name": "shadowcloak vampire",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "self_keyword_until_eot",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_life_cost": 2,
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+            "duration": "until_end_of_turn",
+            "effect": "stat_modifier_until_eot",
+            "granted_keywords_until_eot": [
+              "flying"
+            ],
+            "power_delta": 0,
+            "target": "self",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "source": "self"
+            },
+            "target_controller": "self",
+            "toughness_delta": 0,
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "GainAbilitySourceEffect",
+            "xmage_keyword_ability_class": "FlyingAbility"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "activated_effect": "self_keyword_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_life_cost": 2,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "creature",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_delta": 0,
+        "target": "self",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "source": "self"
+        },
+        "target_controller": "self",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilitySourceEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Fledgling Imp",
+    "Insatiable Souleater",
+    "Olivia's Dragoon",
+    "Patrol Hound",
+    "Shadowcloak Vampire"
+  ],
+  "selected_count": 5,
+  "slug": "self_keyword_extra_costs",
+  "snapshot_checks": [
+    {
+      "card_name": "Fledgling Imp",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:daa15499def4831e63caae638eaf067a",
+      "min_rule_version": 2,
+      "normalized_name": "fledgling imp",
+      "oracle_hash": "52923bdf36f4fb6eabffbecf6ddf4b66",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Insatiable Souleater",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b4a7c68f795f60e117ee654782b79d57",
+      "min_rule_version": 2,
+      "normalized_name": "insatiable souleater",
+      "oracle_hash": "b4305043e3a76f4cb960c54a6d8eef33",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Olivia's Dragoon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:164923f1580f3b634945a67e46500b02",
+      "min_rule_version": 2,
+      "normalized_name": "olivia's dragoon",
+      "oracle_hash": "5da6a0ad3acfad925957bfe679f2ecd9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Patrol Hound",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:892ac00e937d0158f852010008300506",
+      "min_rule_version": 2,
+      "normalized_name": "patrol hound",
+      "oracle_hash": "a467b144152ba539299c6d7dd3223a98",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shadowcloak Vampire",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5146b23b2bc449f8552c513145fd83a8",
+      "min_rule_version": 2,
+      "normalized_name": "shadowcloak vampire",
+      "oracle_hash": "8856f3575f27df6ef4122fae6d4fe680",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_self_keyword_until_eot_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
