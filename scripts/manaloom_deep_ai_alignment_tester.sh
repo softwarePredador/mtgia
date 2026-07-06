@@ -2,7 +2,7 @@
 set -u -o pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-REPORT_DIR="$ROOT_DIR/docs/hermes-analysis/master_optimizer_reports"
+REPORT_DIR="${MANALOOM_DEEP_AI_REPORT_DIR:-/tmp/manaloom_deep_ai_alignment_reports}"
 TS="$(date -u +%Y%m%d_%H%M%S)"
 RUN_ID="deep_ai_alignment_${TS}"
 SUMMARY_FILE="$REPORT_DIR/${RUN_ID}_summary.md"

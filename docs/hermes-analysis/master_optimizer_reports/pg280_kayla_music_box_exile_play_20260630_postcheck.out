@@ -1,5 +1,0 @@
-     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows 
--------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Kayla's Music Box | kayla's music box | battle_rule_v1:68e589311ca78d53076e317ab21a4151 |                  1 |                           1 |                         1 |           0
-(1 row)
-

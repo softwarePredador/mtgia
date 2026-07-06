@@ -1,2 +1,0 @@
-PASS test_pg490_creature_etb_bounce_returns_opponent_creature_to_hand
-PASS test_pg491_self_etb_bounce_respects_controller_and_exclude_source

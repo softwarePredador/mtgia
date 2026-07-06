@@ -1,5 +1,0 @@
-   card_name   | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
----------------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Devout Decree | devout decree   | 2ffef40b32de279e5d069ebdd05a631d | battle_rule_v1:77c2ca923d2c6b62ff46fc58b27e27fb | deprecate_nonmatching_rows |                1 | 35bb8338-443c-499b-99b4-439ef2d5b278 |                  0 |                         0 |                           0
- Ray of Ruin   | ray of ruin     | 2c30c4034ace17cd7c4d01f9cb32d74c | battle_rule_v1:3ba725d656340693d4c616116bb305ef | deprecate_nonmatching_rows |                1 | 17c6b05f-bcee-412f-8ae6-e442f4924886 |                  0 |                         0 |                           0
-(2 rows)

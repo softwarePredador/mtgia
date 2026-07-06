@@ -1,4 +1,0 @@
-PASS test_pg058_simple_red_ritual_family_rule_provenance
-PASS test_pg058_simple_red_ritual_family_runtime_adds_one_shot_mana
-PASS test_pg086_angels_grace_rule_resolves_from_sqlite_cache
-PASS focused PG112/PG113 metadata tests 3

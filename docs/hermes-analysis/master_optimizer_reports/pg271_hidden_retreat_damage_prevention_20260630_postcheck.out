@@ -1,4 +1,0 @@
-   card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
-----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Hidden Retreat | hidden retreat  | battle_rule_v1:7148a419f22524cca81db7d14deeb043 |                  1 |                           1 |                         1 |           2
-(1 row)

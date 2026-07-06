@@ -1,8 +1,0 @@
--- statement 1
-normalized_name	logical_rule_key	postgres_card_name	oracle_text	current_rule_oracle_hash	expected_oracle_hash	review_status	execution_status	effect	battle_model_scope	deck_role_json	reviewed_by	reviewed_at	updated_at
-seething song	battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7	Seething Song	Add {R}{R}{R}{R}{R}.		ccd492289c6f1c14c8fb7a248d7bbf32	verified	auto	ramp_ritual	single_shot_red_ritual_v1	{'effect': 'ramp_ritual', 'timing': 'instant', 'category': 'ramp'}	codex-pg112	2026-06-23 19:46:40.235497+00:00	2026-06-27 07:15:03.488166+00:00
-(1 rows)
--- statement 2
-target_rows	safe_target_rows	missing_hash_rows
-1	1	1
-(1 rows)

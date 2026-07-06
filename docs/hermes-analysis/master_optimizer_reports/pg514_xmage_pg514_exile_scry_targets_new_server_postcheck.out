@@ -1,5 +1,0 @@
-   card_name   | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Devout Decree | devout decree   | battle_rule_v1:77c2ca923d2c6b62ff46fc58b27e27fb |                  1 |                           1 |                         1 |           0
- Ray of Ruin   | ray of ruin     | battle_rule_v1:3ba725d656340693d4c616116bb305ef |                  1 |                           1 |                         1 |           0
-(2 rows)

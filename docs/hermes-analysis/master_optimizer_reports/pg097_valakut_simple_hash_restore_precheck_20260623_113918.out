@@ -1,4 +1,0 @@
- target_rule_rows | card_oracle_hash_match_rows | rows_needing_hash_restore | rows_needing_status_restore | rows_needing_execution_restore | expected_scope_rows | split_mdfc_rule_rows | backup_table_already_exists
-------------------+-----------------------------+---------------------------+-----------------------------+--------------------------------+---------------------+----------------------+-----------------------------
-                1 |                           1 |                         1 |                           1 |                              0 |                   1 |                    1 | f
-(1 row)

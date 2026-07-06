@@ -1,8 +1,0 @@
-BEGIN
-psql:docs/hermes-analysis/master_optimizer_reports/deck608_dragons_approach_thrumming_pg056_apply_20260623_015223.sql:13: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
-CREATE SCHEMA
-SELECT 4
-DO
-UPDATE 2
-UPDATE 2
-COMMIT

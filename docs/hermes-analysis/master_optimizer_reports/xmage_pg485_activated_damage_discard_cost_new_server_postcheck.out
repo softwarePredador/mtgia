@@ -1,5 +1,0 @@
-   card_name   | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Fodder Tosser | fodder tosser   | battle_rule_v1:d35ce8a381cc3d6a0cc576fb6108b3cc |                  1 |                           1 |                         1 |           0
- Kris Mage     | kris mage       | battle_rule_v1:155303f01b41347d870d32c90f594ff8 |                  1 |                           1 |                         1 |           0
-(2 rows)

@@ -1,4 +1,0 @@
-       card_name       |    normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
------------------------+-----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Alhammarret's Archive | alhammarret's archive | battle_rule_v1:b865a68cb5efcaf543f5ceda5d9ed599 |                  1 |                           1 |                         1 |           2
-(1 row)

@@ -59,6 +59,21 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Gate recomendado antes de deploy, handoff ou ajuste de env:
     `./scripts/quality_gate.sh server-target`.
 
+- `manaloom-knowledge/scripts/report_retention_audit.py`
+  - Status: `active_cleanup_guardrail`.
+  - Define a regra de retencao de artefatos: `master_optimizer_reports` e
+    evidencia temporaria de auditoria, nao data lake, cache de produto ou fonte
+    operacional.
+  - Dados brutos de report (`.json`, `.jsonl`, `.sql`, `.db`, `.log`, `.out`,
+    `.err`, `.tsv`, `.txt`) so podem ficar versionados quando ainda forem
+    referenciados por scripts/testes/contratos atuais. Sobras locais ignoradas
+    devem ser apagadas ao fechar a rodada.
+  - Wrappers recorrentes devem escrever em `/tmp` por padrao; use
+    `MANALOOM_*_OUT_PREFIX` apenas quando uma evidencia realmente precisa ser
+    retida.
+  - Gate de limpeza:
+    `./scripts/quality_gate.sh report-retention`.
+
 ## Contrato de dados / aliases
 
 - `DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md`

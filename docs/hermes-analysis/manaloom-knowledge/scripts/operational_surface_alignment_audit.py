@@ -33,6 +33,7 @@ XMAGE_AUDIT = SCRIPT_DIR / "xmage_strategy_consistency_audit.py"
 DECKBUILDING_AUDIT = SCRIPT_DIR / "deckbuilding_contract_surface_audit.py"
 APP_AI_BRIDGE_AUDIT = SCRIPT_DIR / "app_ai_knowledge_bridge_audit.py"
 OLD_SERVER_REFERENCE_AUDIT = SCRIPT_DIR / "old_server_reference_audit.py"
+REPORT_RETENTION_AUDIT = SCRIPT_DIR / "report_retention_audit.py"
 LOREHOLD_ARTIFACT_AUDIT = SCRIPT_DIR / "lorehold_artifact_contract_audit.py"
 LOREHOLD_PROMOTION_DECISION_AUDIT = SCRIPT_DIR / "lorehold_promotion_gate_decision_audit.py"
 VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
@@ -58,6 +59,7 @@ ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.da
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
 QUALITY_GATE = REPO_ROOT / "scripts" / "quality_gate.sh"
 OLD_SERVER_REFERENCE_WRAPPER = REPO_ROOT / "scripts" / "manaloom_old_server_reference_audit.sh"
+REPORT_RETENTION_WRAPPER = REPO_ROOT / "scripts" / "manaloom_report_retention_audit.sh"
 LEGACY_CONTAMINATION_BASELINE = DOCS_DIR / "LEGACY_CONTAMINATION_BASELINE_2026-06-30.json"
 
 CURRENT_XMAGE_MANIFEST = (
@@ -154,6 +156,7 @@ def build_checks() -> list[Check]:
                 "NEW_SERVER_POSTGRES_WORKFLOW_2026-07-06.md",
                 "app_ai_knowledge_bridge_audit.py",
                 "old_server_reference_audit.py",
+                "report_retention_audit.py",
                 "legacy_contamination_audit.py",
                 CURRENT_XMAGE_MANIFEST,
                 "global_commander_deck_contract_audit.py",
@@ -303,6 +306,25 @@ def build_checks() -> list[Check]:
             "scripts.old_server_reference_audit_wrapper_exists",
         ),
         check_contains(
+            REPORT_RETENTION_AUDIT,
+            [
+                "RAW_REPORT_SUFFIXES",
+                "ACTIVE_REFERENCE_ROOTS",
+                "tracked_raw_report_files_are_referenced_by_current_surfaces",
+                "ignored_local_report_artifacts_absent",
+            ],
+            "scripts.report_retention_audit_blocks_unused_report_data",
+        ),
+        check_contains(
+            REPORT_RETENTION_WRAPPER,
+            [
+                "report_retention_audit.py",
+                "MANALOOM_REPORT_RETENTION_AUDIT_OUT_PREFIX",
+                "--fail-on-ignored-local",
+            ],
+            "scripts.report_retention_audit_wrapper_exists",
+        ),
+        check_contains(
             QUALITY_GATE,
             [
                 "run_app_ai_bridge",
@@ -312,6 +334,8 @@ def build_checks() -> list[Check]:
                 "run_old_server_reference_audit",
                 "server-target",
                 "manaloom_old_server_reference_audit.sh",
+                "report-retention",
+                "manaloom_report_retention_audit.sh",
             ],
             "scripts.quality_gate_exposes_app_ai_bridge",
         ),

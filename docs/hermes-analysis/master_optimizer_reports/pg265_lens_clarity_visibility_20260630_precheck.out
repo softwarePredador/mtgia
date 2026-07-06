@@ -1,4 +1,0 @@
-    card_name    | normalized_name |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
------------------+-----------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Lens of Clarity | lens of clarity | 2ecfad3e651e40d4bc94925c3acc62ae | battle_rule_v1:45a79bbae76496a55723659b63dc4001 | deprecate_nonmatching_rows |                1 | fcabad6a-f8ef-4c6f-b63c-5b9be1d059fd |                  2 |                         0 |                           2
-(1 row)

@@ -1,6 +1,0 @@
-               card_name                |            normalized_name             |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows 
-----------------------------------------+----------------------------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
- Erode                                  | erode                                  | fade62a3cbc3e6987d7988b711a5a834 | battle_rule_v1:dd175af9c77feea940de97138a916fe3 | deprecate_nonmatching_rows |                1 | 52a9a2dd-6b7b-439c-b5e7-5594322299d3 |                  2 |                         0 |                           2
- Sundering Eruption // Volcanic Fissure | sundering eruption // volcanic fissure | 09148a5a6f4d14c04a30bf19819e20b8 | battle_rule_v1:98d0006543fc622cfc1d82991bd5a66a | deprecate_nonmatching_rows |                1 | 5c135c89-def7-4748-a3f6-f162f403aa5d |                  2 |                         0 |                           2
-(2 rows)
-

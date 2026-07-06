@@ -1,5 +1,0 @@
-   card_name   | normalized_name |                logical_rule_key                 |               card_id                | review_status | execution_status | rule_version | current_oracle_hash | pg_card_name  |       computed_oracle_hash       | oracle_text_length
----------------+-----------------+-------------------------------------------------+--------------------------------------+---------------+------------------+--------------+---------------------+---------------+----------------------------------+--------------------
- Angel's Grace | angel's grace   | battle_rule_v1:2833836fd4d943d3e02d1cfa2d284227 | 5bada3bb-7fd0-4102-b5b4-235616a28597 | verified      | auto             |            2 |                     | Angel's Grace | 627c4ce7adf5be44b93e2b850159e5d9 |                312
- Seething Song | seething song   | battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7 | b8b37250-ca47-4dcc-a6d9-1675febf2587 | verified      | auto             |            2 |                     | Seething Song | ccd492289c6f1c14c8fb7a248d7bbf32 |                 20
-(2 rows)

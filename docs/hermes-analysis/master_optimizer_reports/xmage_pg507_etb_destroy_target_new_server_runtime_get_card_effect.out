@@ -1,2 +1,0 @@
-{"battle_model_scope": "xmage_creature_etb_destroy_target_v1", "card": "Angel of Despair", "etb_remove_effect": "remove_permanent", "etb_remove_target": "permanent", "keywords": ["flying"], "target_constraints": {"card_types": ["permanent"]}, "target_controller": "any"}
-{"battle_model_scope": "xmage_creature_etb_destroy_target_v1", "card": "Dark Hatchling", "etb_remove_effect": "remove_creature", "etb_remove_target": "creature", "keywords": ["flying"], "target_constraints": {"card_types": ["creature"], "exclude_colors": ["B"]}, "target_controller": null}

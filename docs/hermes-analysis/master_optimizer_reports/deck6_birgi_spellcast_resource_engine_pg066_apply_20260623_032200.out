@@ -1,9 +1,0 @@
-BEGIN
-psql:../docs/hermes-analysis/master_optimizer_reports/deck6_birgi_spellcast_resource_engine_pg066_apply_20260623_032200.sql:6: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
-CREATE SCHEMA
-DO
-SELECT 2
-DO
-INSERT 0 1
-UPDATE 2
-COMMIT

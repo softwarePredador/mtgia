@@ -1,4 +1,0 @@
-{"etb_mana_produced": 1, "etb_produces": "R", "etb_symbols": ["R"], "logical_key": "battle_rule_v1:03d10668e241154656a14f9ac5949550", "name": "Akki Rockspeaker", "scope": "xmage_creature_etb_add_fixed_mana_v1", "source": null}
-{"etb_mana_produced": 2, "etb_produces": "RG", "etb_symbols": ["R", "G"], "logical_key": "battle_rule_v1:26c40d0b0bdd51355b5247591324af4c", "name": "Burning-Tree Emissary", "scope": "xmage_creature_etb_add_fixed_mana_v1", "source": null}
-{"etb_mana_produced": 3, "etb_produces": "B", "etb_symbols": ["B", "B", "B"], "logical_key": "battle_rule_v1:2d3e4b8f02be6791b9d9707558b0ccd6", "name": "Priest of Gix", "scope": "xmage_creature_etb_add_fixed_mana_v1", "source": null}
-{"etb_mana_produced": 3, "etb_produces": "R", "etb_symbols": ["R", "R", "R"], "logical_key": "battle_rule_v1:e98b5dbd90254c3b996852a344bcfc08", "name": "Priest of Urabrask", "scope": "xmage_creature_etb_add_fixed_mana_v1", "source": null}

@@ -1,9 +1,0 @@
-BEGIN
-psql:../docs/hermes-analysis/master_optimizer_reports/pg090_rule_hash_scope_restore_20260623_062000_apply.sql:3: NOTICE:  schema "manaloom_deploy_audit" already exists, skipping
-CREATE SCHEMA
-DO
-SELECT 12
-DO
-SELECT 12
-UPDATE 12
-COMMIT

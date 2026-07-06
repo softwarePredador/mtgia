@@ -1,4 +1,0 @@
-     card_name      |  normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
---------------------+--------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Neheb, the Eternal | neheb, the eternal | battle_rule_v1:aeb836c3a1a534548dbce188e2982441 |                  1 |                           1 |                         1 |           2
-(1 row)

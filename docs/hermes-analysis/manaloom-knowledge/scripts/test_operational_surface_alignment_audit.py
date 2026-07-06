@@ -34,6 +34,10 @@ class OperationalSurfaceAlignmentAuditTests(unittest.TestCase):
             "scripts.old_server_reference_audit_blocks_old_operational_targets",
             check_names,
         )
+        self.assertIn(
+            "scripts.report_retention_audit_blocks_unused_report_data",
+            check_names,
+        )
 
     def test_forbidden_stale_snippet_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

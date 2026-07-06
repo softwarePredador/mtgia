@@ -1,8 +1,0 @@
-Armaggon, Future Shark	curated	verified	auto	xmage_creature_etb_destroy_target_v1	remove_creature	creature		3	{'card_types': ['creature']}
-Final-Sting Faerie	curated	verified	auto	xmage_creature_etb_destroy_target_v1	remove_creature	creature			{'card_types': ['creature'], 'damaged_this_turn': True}
-Gilt-Leaf Winnower	curated	verified	auto	xmage_creature_etb_destroy_target_v1	remove_creature	creature			{'card_types': ['creature'], 'exclude_subtypes': ['elf'], 'power_toughness_not_equal': True}
-Kraul Whipcracker	curated	verified	auto	xmage_creature_etb_destroy_target_v1	remove_permanent	permanent	opponent		{'token': True, 'card_types': ['permanent'], 'controller_scope': 'opponent'}
-Lurking Deadeye	curated	verified	auto	xmage_creature_etb_destroy_target_v1	remove_creature	creature			{'card_types': ['creature'], 'damaged_this_turn': True}
-Nekrataal	curated	verified	auto	xmage_creature_etb_destroy_target_v1	remove_creature	creature			{'card_types': ['creature'], 'exclude_colors': ['B'], 'exclude_card_types': ['artifact']}
-Ogre Gatecrasher	curated	verified	auto	xmage_creature_etb_destroy_target_v1	remove_creature	creature			{'card_types': ['creature'], 'required_keywords': ['defender']}
-Stingerfling Spider	curated	verified	auto	xmage_creature_etb_destroy_target_v1	remove_creature	creature			{'card_types': ['creature'], 'required_keywords': ['flying']}

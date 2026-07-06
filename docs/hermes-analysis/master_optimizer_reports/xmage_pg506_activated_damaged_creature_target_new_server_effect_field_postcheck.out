@@ -1,3 +1,0 @@
-Ogre Siegebreaker|xmage_permanent_simple_activated_destroy_target_v1|creature_damaged_this_turn|{"card_types": ["creature"], "damaged_this_turn": true}|{2}{B}{R}|false
-Opportunist|xmage_permanent_simple_activated_damage_v1|creature_damaged_this_turn|{"card_types": ["creature"], "damaged_this_turn": true}|{0}|true
-Witch's Mist|xmage_permanent_simple_activated_destroy_target_v1|creature_damaged_this_turn|{"card_types": ["creature"], "damaged_this_turn": true}|{2}{B}|true

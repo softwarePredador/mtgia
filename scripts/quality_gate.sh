@@ -107,6 +107,11 @@ run_old_server_reference_audit() {
   "$ROOT_DIR/scripts/manaloom_old_server_reference_audit.sh"
 }
 
+run_report_retention_audit() {
+  print_header "ManaLoom report retention audit"
+  "$ROOT_DIR/scripts/manaloom_report_retention_audit.sh"
+}
+
 run_deep_ai_alignment() {
   print_header "ManaLoom deep AI alignment tester"
   "$ROOT_DIR/scripts/manaloom_deep_ai_alignment_tester.sh"
@@ -133,6 +138,7 @@ Uso:
   ./scripts/quality_gate.sh ai-eval # eval fixa de prompt/saída da IA Commander
   ./scripts/quality_gate.sh ai-bridge # ponte app/IA: auditoria + eval Commander
   ./scripts/quality_gate.sh server-target # bloqueia referencias ativas ao servidor antigo
+  ./scripts/quality_gate.sh report-retention # bloqueia dados brutos/locais sem uso em reports
   ./scripts/quality_gate.sh deep-ai # tester profundo IA + dados + battle/deckbuilder
 
 Dica:
@@ -149,6 +155,7 @@ Exemplos:
   ./scripts/quality_gate.sh ai-eval
   ./scripts/quality_gate.sh ai-bridge
   ./scripts/quality_gate.sh server-target
+  ./scripts/quality_gate.sh report-retention
   ./scripts/quality_gate.sh deep-ai
 EOF
 }
@@ -176,6 +183,9 @@ main() {
       ;;
     server-target)
       run_old_server_reference_audit
+      ;;
+    report-retention)
+      run_report_retention_audit
       ;;
     deep-ai)
       run_deep_ai_alignment

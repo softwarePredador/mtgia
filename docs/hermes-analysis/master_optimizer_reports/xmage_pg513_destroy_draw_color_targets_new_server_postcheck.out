@@ -1,7 +1,0 @@
-    card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
------------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Annihilate      | annihilate      | battle_rule_v1:c8e5c579f97351f53716b06514fe211e |                  1 |                           1 |                         1 |           0
- Eastern Paladin | eastern paladin | battle_rule_v1:afea40681a2aa92731b0434232adf3a3 |                  1 |                           1 |                         1 |           0
- Execute         | execute         | battle_rule_v1:1f93b52c9ed6de8e93a4fa5dc105e255 |                  1 |                           1 |                         1 |           0
- Slay            | slay            | battle_rule_v1:1d35c73183c4187e06a9e033352a52ab |                  1 |                           1 |                         1 |           0
-(4 rows)

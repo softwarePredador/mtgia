@@ -1,4 +1,0 @@
-   card_name   | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
- Cursed Mirror | cursed mirror   | battle_rule_v1:e4964406f7479873bbab9b6266928a48 |                  1 |                           1 |                         1 |           2
-(1 row)

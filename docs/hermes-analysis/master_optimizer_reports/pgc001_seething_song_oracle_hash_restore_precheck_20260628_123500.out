@@ -1,9 +1,0 @@
--- file docs/hermes-analysis/master_optimizer_reports/pgc001_seething_song_oracle_hash_restore_precheck.sql
--- statement 1
-normalized_name	logical_rule_key	postgres_card_name	oracle_text	current_rule_oracle_hash	expected_oracle_hash	review_status	execution_status	effect	battle_model_scope	updated_at
-seething song	battle_rule_v1:3eb15dc581c6b913158f9b63c023f3d7	Seething Song	Add {R}{R}{R}{R}{R}.		ccd492289c6f1c14c8fb7a248d7bbf32	verified	auto	ramp_ritual	single_shot_red_ritual_v1	2026-06-28 12:15:06.870117+00:00
-(1 rows)
--- statement 2
-target_rows	safe_target_rows	missing_hash_rows
-1	1	1
-(1 rows)
