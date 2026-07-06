@@ -662,6 +662,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `seen_without_usage_count=4`, `external_reference_only_count=1` e
     `needs_trace_or_external_research_count=4`. O proximo gate e
     `build_same_lane_replacement_or_find_new_cut_source_for_used_stage_cuts`.
+    O roteador desses cortes usados fica em
+    `global_commander_same_lane_used_cut_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md`.
+    Resultado: `same_lane_used_cut_recovery_routes_to_new_cut_source`, com
+    `used_cut_count=19`, `strict_recovery_count=10`,
+    `same_lane_replacement_proof_count=9` e `no_same_lane_route_count=0`. O
+    proximo gate e
+    `mine_or_research_new_same_lane_cut_source_before_candidate_copy`.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

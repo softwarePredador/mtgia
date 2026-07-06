@@ -1,0 +1,967 @@
+{
+  "artifact_type": "global_commander_same_lane_used_cut_recovery_router",
+  "battle_gate_allowed_now": false,
+  "battle_gate_performed": false,
+  "battle_or_optimization_performed": false,
+  "battle_replay_performed": false,
+  "candidate_copy_allowed_now": false,
+  "candidate_copy_blockers": [
+    "used_stage_cuts_are_not_value_safe_from_current_trace",
+    "candidate_copy_closed_until_new_cut_source_or_explicit_replacement_proof",
+    "used_structural_or_anchor_cuts_need_strict_recovery:10"
+  ],
+  "deck_action_allowed": false,
+  "generated_at": "2026-07-06T00:04:33.190569+00:00",
+  "input_artifacts": {
+    "package_source_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_package_source_synthesizer_20260705_kaalia_value_safe_stage1_repair_scope1.json",
+    "trace_collector_report": "docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.json"
+  },
+  "mutation_allowed": false,
+  "policy": {
+    "candidate_copy_boundary": "This router never opens candidate copy or battle.",
+    "structural_boundary": "Structural staples, expected anchors, and prior failed-gate cuts should prefer new cut-source lanes unless replacement proof is explicit.",
+    "usage_boundary": "A used cut is not value-safe unless later proof replaces its function or finds a different cut."
+  },
+  "postgres_writes": false,
+  "promotion_allowed": false,
+  "source_db_mutated": false,
+  "status": "same_lane_used_cut_recovery_routes_to_new_cut_source",
+  "summary": {
+    "candidate_copy_blocker_count": 3,
+    "commander": "Kaalia of the Vast",
+    "decision_counts": {
+      "used_cut_has_same_lane_add_route_but_not_value_safe": 9,
+      "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source": 10
+    },
+    "deck_id": "619",
+    "next_gate": "mine_or_research_new_same_lane_cut_source_before_candidate_copy",
+    "no_same_lane_route_count": 0,
+    "same_lane_replacement_proof_count": 9,
+    "selected_add_count": 8,
+    "strict_recovery_count": 10,
+    "target_role_counts": {
+      "haste_protection_silence": 6,
+      "mana_acceleration": 9,
+      "tutors_access": 4
+    },
+    "used_cut_count": 19
+  },
+  "used_cut_recovery_rows": [
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Smothering Tithe",
+      "decision": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+      "decision_trace_count": 25,
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 46,
+      "next_evidence": "prefer_new_cut_source_unless_replacement_proof_is_explicit",
+      "route_count": 1,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "mana_acceleration_replacement",
+          "add_card": "Fellwar Stone",
+          "add_score": 136,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "mana_acceleration",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 163,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "decision": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+      "decision_trace_count": 7,
+      "evidence_lanes": [
+        "prior_failed_gate_reopen_proof"
+      ],
+      "exposure_event_count": 13,
+      "next_evidence": "prefer_new_cut_source_unless_replacement_proof_is_explicit",
+      "route_count": 1,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "mana_acceleration_replacement",
+          "add_card": "Fellwar Stone",
+          "add_score": 136,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "mana_acceleration",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "global_battle_feedback_requires_new_same_lane_or_gate"
+      ],
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 21,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Ornithopter of Paradise",
+      "decision": "used_cut_has_same_lane_add_route_but_not_value_safe",
+      "decision_trace_count": 15,
+      "evidence_lanes": [
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 26,
+      "next_evidence": "collect_explicit_replacement_proof_or_equal_gate",
+      "route_count": 1,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "mana_acceleration_replacement",
+          "add_card": "Fellwar Stone",
+          "add_score": 136,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "mana_acceleration",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 12,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Silence",
+      "decision": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+      "decision_trace_count": 18,
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "expected_package_anchor_replacement_proof"
+      ],
+      "exposure_event_count": 1,
+      "next_evidence": "prefer_new_cut_source_unless_replacement_proof_is_explicit",
+      "route_count": 2,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Boros Charm",
+          "add_score": 132,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Swiftfoot Boots",
+          "add_score": 123,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 12,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Voice of Victory",
+      "decision": "used_cut_has_same_lane_add_route_but_not_value_safe",
+      "decision_trace_count": 13,
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate"
+      ],
+      "exposure_event_count": 21,
+      "next_evidence": "collect_explicit_replacement_proof_or_equal_gate",
+      "route_count": 2,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Boros Charm",
+          "add_score": 132,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Swiftfoot Boots",
+          "add_score": 123,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+      ],
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 12,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Demonic Tutor",
+      "decision": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+      "decision_trace_count": 18,
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 14,
+      "next_evidence": "prefer_new_cut_source_unless_replacement_proof_is_explicit",
+      "route_count": 5,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Gamble",
+          "add_score": 124,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Wishclaw Talisman",
+          "add_score": 121,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Entomb",
+          "add_score": 120,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Imperial Seal",
+          "add_score": 119,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Diabolic Tutor",
+          "add_score": 114,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Jeska's Will",
+      "decision": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+      "decision_trace_count": 11,
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 6,
+      "next_evidence": "prefer_new_cut_source_unless_replacement_proof_is_explicit",
+      "route_count": 1,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "mana_acceleration_replacement",
+          "add_card": "Fellwar Stone",
+          "add_score": 136,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "mana_acceleration",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Mana Vault",
+      "decision": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+      "decision_trace_count": 4,
+      "evidence_lanes": [
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 17,
+      "next_evidence": "prefer_new_cut_source_unless_replacement_proof_is_explicit",
+      "route_count": 1,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "mana_acceleration_replacement",
+          "add_card": "Fellwar Stone",
+          "add_score": 136,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "mana_acceleration",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "The One Ring",
+      "decision": "used_cut_has_same_lane_add_route_but_not_value_safe",
+      "decision_trace_count": 19,
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "exposure_event_count": 18,
+      "next_evidence": "collect_explicit_replacement_proof_or_equal_gate",
+      "route_count": 2,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Boros Charm",
+          "add_score": 132,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Swiftfoot Boots",
+          "add_score": 123,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:card_flow_cut"
+      ],
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 9,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Lightning Greaves",
+      "decision": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+      "decision_trace_count": 11,
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "expected_package_anchor_replacement_proof"
+      ],
+      "exposure_event_count": 16,
+      "next_evidence": "prefer_new_cut_source_unless_replacement_proof_is_explicit",
+      "route_count": 2,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Boros Charm",
+          "add_score": 132,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Swiftfoot Boots",
+          "add_score": 123,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "commander_expected_package_anchor_requires_stage_proof"
+      ],
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 8,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Sunforger",
+      "decision": "used_cut_has_same_lane_add_route_but_not_value_safe",
+      "decision_trace_count": 19,
+      "evidence_lanes": [
+        "cross_role_risk_trace_or_new_cut_source"
+      ],
+      "exposure_event_count": 24,
+      "next_evidence": "collect_explicit_replacement_proof_or_equal_gate",
+      "route_count": 5,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Gamble",
+          "add_score": 124,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Wishclaw Talisman",
+          "add_score": 121,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Entomb",
+          "add_score": 120,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Imperial Seal",
+          "add_score": 119,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Diabolic Tutor",
+          "add_score": 114,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "non_target_cut_risk:attack_window_or_extra_combat_cut,card_flow_cut"
+      ],
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 8,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Sol Ring",
+      "decision": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+      "decision_trace_count": 5,
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 14,
+      "next_evidence": "prefer_new_cut_source_unless_replacement_proof_is_explicit",
+      "route_count": 1,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "mana_acceleration_replacement",
+          "add_card": "Fellwar Stone",
+          "add_score": 136,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "mana_acceleration",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 7,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Professional Face-Breaker",
+      "decision": "used_cut_has_same_lane_add_route_but_not_value_safe",
+      "decision_trace_count": 14,
+      "evidence_lanes": [
+        "cross_role_risk_trace_or_new_cut_source",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 12,
+      "next_evidence": "collect_explicit_replacement_proof_or_equal_gate",
+      "route_count": 1,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "mana_acceleration_replacement",
+          "add_card": "Fellwar Stone",
+          "add_score": 136,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "mana_acceleration",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "non_target_cut_risk:card_flow_cut",
+        "contextual_staple_requires_stage_review"
+      ],
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 6,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Diabolic Intent",
+      "decision": "used_cut_has_same_lane_add_route_but_not_value_safe",
+      "decision_trace_count": 1,
+      "evidence_lanes": [
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 0,
+      "next_evidence": "collect_explicit_replacement_proof_or_equal_gate",
+      "route_count": 5,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Gamble",
+          "add_score": 124,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Wishclaw Talisman",
+          "add_score": 121,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Entomb",
+          "add_score": 120,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Imperial Seal",
+          "add_score": 119,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Diabolic Tutor",
+          "add_score": 114,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "contextual_staple_requires_stage_review"
+      ],
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 5,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Arcane Signet",
+      "decision": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+      "decision_trace_count": 5,
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 11,
+      "next_evidence": "prefer_new_cut_source_unless_replacement_proof_is_explicit",
+      "route_count": 1,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "mana_acceleration_replacement",
+          "add_card": "Fellwar Stone",
+          "add_score": 136,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "mana_acceleration",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 3,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Ragavan, Nimble Pilferer",
+      "decision": "used_cut_has_same_lane_add_route_but_not_value_safe",
+      "decision_trace_count": 1,
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate",
+        "cross_role_risk_trace_or_new_cut_source",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 3,
+      "next_evidence": "collect_explicit_replacement_proof_or_equal_gate",
+      "route_count": 2,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Boros Charm",
+          "add_score": 132,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Swiftfoot Boots",
+          "add_score": 123,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate",
+        "non_target_cut_risk:card_flow_cut,mana_acceleration_cut",
+        "contextual_staple_requires_stage_review"
+      ],
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 3,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Ragavan, Nimble Pilferer",
+      "decision": "used_cut_has_same_lane_add_route_but_not_value_safe",
+      "decision_trace_count": 1,
+      "evidence_lanes": [
+        "multi_role_protected_lane_replacement_proof",
+        "cross_role_risk_trace_or_new_cut_source",
+        "contextual_staple_usage_and_replacement_review"
+      ],
+      "exposure_event_count": 3,
+      "next_evidence": "collect_explicit_replacement_proof_or_equal_gate",
+      "route_count": 1,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "mana_acceleration_replacement",
+          "add_card": "Fellwar Stone",
+          "add_score": 136,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "mana_acceleration",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "other_protected_profile_role_haste_protection_silence",
+        "non_target_cut_risk:card_flow_cut,haste_or_protection_cut",
+        "contextual_staple_requires_stage_review"
+      ],
+      "target_cut_role": "mana_acceleration",
+      "usage_event_count": 3,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Enlightened Tutor",
+      "decision": "used_structural_or_anchor_cut_needs_strict_replacement_or_new_cut_source",
+      "decision_trace_count": 14,
+      "evidence_lanes": [
+        "expected_package_anchor_replacement_proof",
+        "structural_staple_same_lane_or_equal_gate_proof"
+      ],
+      "exposure_event_count": 10,
+      "next_evidence": "prefer_new_cut_source_unless_replacement_proof_is_explicit",
+      "route_count": 5,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Gamble",
+          "add_score": 124,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Wishclaw Talisman",
+          "add_score": 121,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Entomb",
+          "add_score": 120,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Imperial Seal",
+          "add_score": 119,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "tutors_access_replacement",
+          "add_card": "Diabolic Tutor",
+          "add_score": 114,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "tutors_access",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "commander_expected_package_anchor_requires_stage_proof",
+        "structural_foundation_staple_requires_same_lane_or_battle_proof"
+      ],
+      "target_cut_role": "tutors_access",
+      "usage_event_count": 2,
+      "value_safe_reclassification_allowed": false
+    },
+    {
+      "battle_gate_allowed": false,
+      "candidate_copy_allowed": false,
+      "cut_card": "Hammer of Nazahn",
+      "decision": "used_cut_has_same_lane_add_route_but_not_value_safe",
+      "decision_trace_count": 37,
+      "evidence_lanes": [
+        "protected_same_lane_usage_trace_or_equal_gate"
+      ],
+      "exposure_event_count": 30,
+      "next_evidence": "collect_explicit_replacement_proof_or_equal_gate",
+      "route_count": 2,
+      "same_lane_add_routes": [
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Boros Charm",
+          "add_score": 132,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        },
+        {
+          "add_axis": "commander_attack_window",
+          "add_card": "Swiftfoot Boots",
+          "add_score": 123,
+          "required_proof": [
+            "prove_added_card_replaces_used_cut_function",
+            "rerun_strategy_matrix_after_any_candidate_copy",
+            "equal_gate_with_relevant_card_usage_before_promotion"
+          ],
+          "same_lane_role": "haste_protection_silence",
+          "status": "explicit_same_lane_add_route_requires_replacement_proof"
+        }
+      ],
+      "stage_reasons": [
+        "target_role_is_protected_profile_lane_requires_trace_or_equal_gate"
+      ],
+      "target_cut_role": "haste_protection_silence",
+      "usage_event_count": 1,
+      "value_safe_reclassification_allowed": false
+    }
+  ],
+  "value_safe_reclassification_allowed_now": false
+}

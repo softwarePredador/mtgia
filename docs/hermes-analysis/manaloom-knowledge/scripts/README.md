@@ -209,6 +209,12 @@ blocks value-safe reclassification; seen-without-usage needs negative review;
 external references still need internal trace proof. Candidate copy, battle,
 promotion, and value-safe reclassification remain closed.
 
+Then run `global_commander_same_lane_used_cut_recovery_router.py` for used
+stage-only cuts. It separates structural/anchor/prior-failed cuts that should
+prefer a fresh cut-source lane from non-structural used cuts that could proceed
+only after explicit same-lane replacement proof. This router still does not open
+candidate copy, battle, promotion, or value-safe reclassification.
+
 ## XMage Authoritative Adaptation
 
 For all-card battle-rule acceleration, use local XMage as the authoritative

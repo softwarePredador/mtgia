@@ -363,7 +363,11 @@ Operational priority after this pivot:
     seen-needs-negative-review, external-reference-only, or trace-missing while
     keeping candidate copy, battle, promotion, and value-safe reclassification
     closed;
-46. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+46. run `global_commander_same_lane_used_cut_recovery_router.py` when stage-cut
+    trace collection shows used cuts; it must route used cuts to explicit
+    same-lane replacement proof or fresh cut-source mining/research, and it
+    must keep every used cut non-value-safe until that later evidence exists;
+47. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -427,6 +431,7 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_pair_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_cut_evidence_plan_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_stage_cut_trace_collector_20260705_kaalia_value_safe_stage1_repair_scope1.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_same_lane_used_cut_recovery_router_20260705_kaalia_value_safe_stage1_repair_scope1.md`
 
 Historical candidate-copy, battle-probe, battle-feedback, and package-chain
 snapshots are local ignored evidence artifacts. The surface auditor must show
@@ -950,6 +955,15 @@ Current external refresh on 2026-07-05:
   battle, promotion, and value-safe reclassification remain closed. The next
   gate is
   `build_same_lane_replacement_or_find_new_cut_source_for_used_stage_cuts`.
+- Current same-lane used-cut recovery routing returns
+  `same_lane_used_cut_recovery_routes_to_new_cut_source` with `used_cut_count=19`,
+  `strict_recovery_count=10`, `same_lane_replacement_proof_count=9`, and
+  `no_same_lane_route_count=0`. The current package has possible same-lane add
+  routes for every used cut, but structural staples, expected anchors, and prior
+  failed-gate cuts should prefer a fresh cut-source lane unless explicit
+  replacement proof exists. Candidate copy, battle, promotion, and value-safe
+  reclassification remain closed. The next gate is
+  `mine_or_research_new_same_lane_cut_source_before_candidate_copy`.
 
 ## Global Commander Rollout - 2026-07-01
 
