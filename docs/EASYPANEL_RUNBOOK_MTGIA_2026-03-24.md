@@ -39,11 +39,39 @@ No EasyPanel:
 - serviço público atual:
   - projeto: `evolution`
   - app: `cartinhas`
-  - source: `git`
-  - repo: `https://github.com/softwarePredador/mtgia.git`
-  - branch/ref: `master`
-  - build path: `/server`
-  - build: `Dockerfile`
+  - source no novo servidor: `image`
+  - imagem: `localhost:5000/manaloom/cartinhas:latest`
+  - Dockerfile de origem: `server/Dockerfile`
+
+### Nota operacional 2026-07-06
+
+No novo servidor EasyPanel (`evolution-cartinhas.2ta7qx.easypanel.host`), o
+serviço `evolution/cartinhas` está configurado como source `image`, não como
+source Git. Portanto, chamar apenas `services.app.deployService` pelo EasyPanel
+reinicia a imagem já pinada no Docker Swarm; isso não reconstrói o código do
+`master`.
+
+Fluxo correto para publicar backend nesse servidor:
+
+1. Confirmar que `HEAD == origin/master` no checkout local.
+2. Enviar apenas a árvore commitada de `server/` para o servidor:
+   `git archive HEAD:server`.
+3. No servidor, construir e publicar no registry local:
+   `docker build -t localhost:5000/manaloom/cartinhas:<sha-curto> -t localhost:5000/manaloom/cartinhas:latest .`
+   e `docker push` das duas tags.
+4. Atualizar o service Swarm com update `stop-first`, porque a porta host
+   `18080` impede start-first/zero-downtime em nó único:
+   `docker service update --update-order stop-first --image localhost:5000/manaloom/cartinhas:latest ... evolution_cartinhas`.
+5. Definir `GIT_SHA=<sha-completo>` e `SENTRY_RELEASE=<sha-completo>` no service.
+6. Validar `/health`, `/ready`, `/health/ready`, request-id e banco.
+
+Deploy validado em 2026-07-06:
+
+- commit: `02270f1c38adb8540cd4745418862d6374a96d34`
+- imagem publicada: `localhost:5000/manaloom/cartinhas:02270f1c38ad`
+- `/health.git_sha`: `02270f1c38adb8540cd4745418862d6374a96d34`
+- `/ready`: `ready`, banco healthy, `card_count=34331`
+- `scripts/validate_request_id_ready.sh`: `READY_VALIDATION_OK=1`
 
 ### Nota operacional 2026-06-15
 
