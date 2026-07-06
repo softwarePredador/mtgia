@@ -1,0 +1,741 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg577_etb_library_tutor_creatures_20260706_222420",
+  "deploy_id": "pg577",
+  "execution_scenarios": [],
+  "expected_rules": [
+    {
+      "card_name": "Boggart Harbinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ac6a6877f0b44d0ae26c029bb8d1117",
+      "min_rule_version": 2,
+      "normalized_name": "boggart harbinger",
+      "oracle_hash": "e5f0576f0172323b7e8798a69069199d",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_top",
+        "target": "any_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Campus Guide",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24ee2f2441cb28108d4b7aa8f39a71a1",
+      "min_rule_version": 2,
+      "normalized_name": "campus guide",
+      "oracle_hash": "26846e5bc0ddcbe7957a74e496d92122",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_top",
+        "target": "basic_land_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Compass Gnome",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2b5adb3004f8226b1aa0087791143ecc",
+      "min_rule_version": 2,
+      "normalized_name": "compass gnome",
+      "oracle_hash": "58fba482e97f4685625e59f26bd9f81b",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_or_cave_to_top",
+        "target": "basic_land_or_cave_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Faerie Harbinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:81f3b3a7231902b0adcec03d32c1820c",
+      "min_rule_version": 2,
+      "normalized_name": "faerie harbinger",
+      "oracle_hash": "87cee14f7ca7688e6ac4672bc3c647f5",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_top",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "target": "any_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flamekin Harbinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c1678afe69fd7114cfa482cc934c3d4f",
+      "min_rule_version": 2,
+      "normalized_name": "flamekin harbinger",
+      "oracle_hash": "84183e5321971ca284ee29c5b8a26ef1",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_top",
+        "target": "any_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Giant Harbinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:222a10f082bfc14fbeba7ccf10884f71",
+      "min_rule_version": 2,
+      "normalized_name": "giant harbinger",
+      "oracle_hash": "af5745b1d22887f3db63255a170b92d5",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_top",
+        "target": "any_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Giant Ladybug",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:126ee4675a65076a75dd82647a715d20",
+      "min_rule_version": 2,
+      "normalized_name": "giant ladybug",
+      "oracle_hash": "d343af3b0c3541b8852d86033512b64d",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_top",
+        "keywords": [
+          "reach"
+        ],
+        "target": "basic_land_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kithkin Harbinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6ecac707233523e08b819dc3628b6ac",
+      "min_rule_version": 2,
+      "normalized_name": "kithkin harbinger",
+      "oracle_hash": "9c4bf40f15566d622be1fb3b21a06592",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_top",
+        "target": "any_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Loam Larva",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24ee2f2441cb28108d4b7aa8f39a71a1",
+      "min_rule_version": 2,
+      "normalized_name": "loam larva",
+      "oracle_hash": "26846e5bc0ddcbe7957a74e496d92122",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_top",
+        "target": "basic_land_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scampering Surveyor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca664664ddad191cdf11a5036f2e92b7",
+      "min_rule_version": 2,
+      "normalized_name": "scampering surveyor",
+      "oracle_hash": "c6ca72b3b7a3634ea5caa3d9b2c4c9a4",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_or_cave_to_battlefield",
+        "target": "basic_land_or_cave_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spider-Bot",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:126ee4675a65076a75dd82647a715d20",
+      "min_rule_version": 2,
+      "normalized_name": "spider-bot",
+      "oracle_hash": "d343af3b0c3541b8852d86033512b64d",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_top",
+        "keywords": [
+          "reach"
+        ],
+        "target": "basic_land_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_library_search_to_battlefield": 1,
+    "xmage_creature_etb_library_search_to_top": 10
+  },
+  "files": {
+    "apply": "/tmp/pg577_etb_library_tutor_creatures_package_apply.sql",
+    "manifest": "/tmp/pg577_etb_library_tutor_creatures_package_manifest.json",
+    "package": "/tmp/pg577_etb_library_tutor_creatures_package_package.md",
+    "postcheck": "/tmp/pg577_etb_library_tutor_creatures_package_postcheck.sql",
+    "precheck": "/tmp/pg577_etb_library_tutor_creatures_package_precheck.sql",
+    "rollback": "/tmp/pg577_etb_library_tutor_creatures_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T22:24:20+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Boggart Harbinger"
+      },
+      "card_name": "Boggart Harbinger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ac6a6877f0b44d0ae26c029bb8d1117",
+      "normalized_name": "boggart harbinger",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_top",
+        "target": "any_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Campus Guide"
+      },
+      "card_name": "Campus Guide",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24ee2f2441cb28108d4b7aa8f39a71a1",
+      "normalized_name": "campus guide",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_top",
+        "target": "basic_land_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Compass Gnome"
+      },
+      "card_name": "Compass Gnome",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2b5adb3004f8226b1aa0087791143ecc",
+      "normalized_name": "compass gnome",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_or_cave_to_top",
+        "target": "basic_land_or_cave_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Faerie Harbinger"
+      },
+      "card_name": "Faerie Harbinger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:81f3b3a7231902b0adcec03d32c1820c",
+      "normalized_name": "faerie harbinger",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_top",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "target": "any_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Flamekin Harbinger"
+      },
+      "card_name": "Flamekin Harbinger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c1678afe69fd7114cfa482cc934c3d4f",
+      "normalized_name": "flamekin harbinger",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_top",
+        "target": "any_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Giant Harbinger"
+      },
+      "card_name": "Giant Harbinger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:222a10f082bfc14fbeba7ccf10884f71",
+      "normalized_name": "giant harbinger",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_top",
+        "target": "any_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Giant Ladybug"
+      },
+      "card_name": "Giant Ladybug",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:126ee4675a65076a75dd82647a715d20",
+      "normalized_name": "giant ladybug",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_top",
+        "keywords": [
+          "reach"
+        ],
+        "target": "basic_land_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Kithkin Harbinger"
+      },
+      "card_name": "Kithkin Harbinger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6ecac707233523e08b819dc3628b6ac",
+      "normalized_name": "kithkin harbinger",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "any_to_top",
+        "target": "any_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Loam Larva"
+      },
+      "card_name": "Loam Larva",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24ee2f2441cb28108d4b7aa8f39a71a1",
+      "normalized_name": "loam larva",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_top",
+        "target": "basic_land_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Scampering Surveyor"
+      },
+      "card_name": "Scampering Surveyor",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca664664ddad191cdf11a5036f2e92b7",
+      "normalized_name": "scampering surveyor",
+      "required_effect_fields": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_or_cave_to_battlefield",
+        "target": "basic_land_or_cave_to_battlefield",
+        "trigger": "enters_battlefield",
+        "tutor_enters_tapped": true,
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Spider-Bot"
+      },
+      "card_name": "Spider-Bot",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:126ee4675a65076a75dd82647a715d20",
+      "normalized_name": "spider-bot",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "creature",
+        "etb_tutor_count": 1,
+        "etb_tutor_target": "basic_land_to_top",
+        "keywords": [
+          "reach"
+        ],
+        "target": "basic_land_to_top",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "library_tutor_to_top",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "SearchLibraryPutOnLibraryEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Boggart Harbinger",
+    "Campus Guide",
+    "Compass Gnome",
+    "Faerie Harbinger",
+    "Flamekin Harbinger",
+    "Giant Harbinger",
+    "Giant Ladybug",
+    "Kithkin Harbinger",
+    "Loam Larva",
+    "Scampering Surveyor",
+    "Spider-Bot"
+  ],
+  "selected_count": 11,
+  "slug": "etb_library_tutor_creatures",
+  "snapshot_checks": [
+    {
+      "card_name": "Boggart Harbinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ac6a6877f0b44d0ae26c029bb8d1117",
+      "min_rule_version": 2,
+      "normalized_name": "boggart harbinger",
+      "oracle_hash": "e5f0576f0172323b7e8798a69069199d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Campus Guide",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24ee2f2441cb28108d4b7aa8f39a71a1",
+      "min_rule_version": 2,
+      "normalized_name": "campus guide",
+      "oracle_hash": "26846e5bc0ddcbe7957a74e496d92122",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Compass Gnome",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2b5adb3004f8226b1aa0087791143ecc",
+      "min_rule_version": 2,
+      "normalized_name": "compass gnome",
+      "oracle_hash": "58fba482e97f4685625e59f26bd9f81b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Faerie Harbinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:81f3b3a7231902b0adcec03d32c1820c",
+      "min_rule_version": 2,
+      "normalized_name": "faerie harbinger",
+      "oracle_hash": "87cee14f7ca7688e6ac4672bc3c647f5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flamekin Harbinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c1678afe69fd7114cfa482cc934c3d4f",
+      "min_rule_version": 2,
+      "normalized_name": "flamekin harbinger",
+      "oracle_hash": "84183e5321971ca284ee29c5b8a26ef1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Giant Harbinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:222a10f082bfc14fbeba7ccf10884f71",
+      "min_rule_version": 2,
+      "normalized_name": "giant harbinger",
+      "oracle_hash": "af5745b1d22887f3db63255a170b92d5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Giant Ladybug",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:126ee4675a65076a75dd82647a715d20",
+      "min_rule_version": 2,
+      "normalized_name": "giant ladybug",
+      "oracle_hash": "d343af3b0c3541b8852d86033512b64d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Kithkin Harbinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d6ecac707233523e08b819dc3628b6ac",
+      "min_rule_version": 2,
+      "normalized_name": "kithkin harbinger",
+      "oracle_hash": "9c4bf40f15566d622be1fb3b21a06592",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Loam Larva",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:24ee2f2441cb28108d4b7aa8f39a71a1",
+      "min_rule_version": 2,
+      "normalized_name": "loam larva",
+      "oracle_hash": "26846e5bc0ddcbe7957a74e496d92122",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scampering Surveyor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca664664ddad191cdf11a5036f2e92b7",
+      "min_rule_version": 2,
+      "normalized_name": "scampering surveyor",
+      "oracle_hash": "c6ca72b3b7a3634ea5caa3d9b2c4c9a4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spider-Bot",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:126ee4675a65076a75dd82647a715d20",
+      "min_rule_version": 2,
+      "normalized_name": "spider-bot",
+      "oracle_hash": "d343af3b0c3541b8852d86033512b64d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

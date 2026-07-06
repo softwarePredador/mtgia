@@ -253,6 +253,7 @@ PERMANENT_ACTIVATED_TUTOR_HAND_SCOPE = (
 )
 ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_battlefield_v1"
 ETB_TUTOR_HAND_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_hand_v1"
+ETB_TUTOR_TOP_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_top_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
@@ -8072,6 +8073,19 @@ def is_creature_etb_tutor_to_battlefield_unit(row: dict[str, Any]) -> bool:
     remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
     return (
         effect_classes(row) == {"SearchLibraryPutInPlayEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
+def is_creature_etb_tutor_to_top_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != TUTOR_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"SearchLibraryPutOnLibraryEffect"}
         and "EntersBattlefieldTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
@@ -16399,6 +16413,8 @@ def library_tutor_target_from_phrase(phrase: str) -> str | None:
         "basic land card or a gate card": "basic_land_or_gate",
         "basic land cards and/or gate cards": "basic_land_or_gate",
         "basic lands and/or gates": "basic_land_or_gate",
+        "basic land card or cave card": "basic_land_or_cave",
+        "basic land card or a cave card": "basic_land_or_cave",
         "basic land cards and/or town cards with different names": "basic_land_or_town",
         "forest card": "forest",
         "forest cards": "forest",
@@ -16522,6 +16538,8 @@ def parse_library_tutor_query(query: str) -> dict[str, Any] | None:
         "sorcery card": {"target": "sorcery", "target_card_types": ["sorcery"]},
         "basic forest card": {"target": "forest", "required_supertypes": ["basic"]},
         "basic forest cards": {"target": "forest", "required_supertypes": ["basic"]},
+        "basic land card or cave": {"target": "basic_land_or_cave"},
+        "basic land card or cave card": {"target": "basic_land_or_cave"},
         "aura card": {"target": "any", "target_subtypes": ["aura"]},
         "aura cards": {"target": "any", "target_subtypes": ["aura"]},
         "aura or equipment card": {"target": "any", "target_subtypes": ["aura", "equipment"]},
@@ -16560,10 +16578,20 @@ def parse_library_tutor_query(query: str) -> dict[str, Any] | None:
         return parsed if count > 0 else None
 
     target = library_tutor_target_from_phrase(phrase)
-    if target is None or count <= 0:
-        return None
-    parsed["target"] = target
-    return parsed
+    if target is not None and count > 0:
+        parsed["target"] = target
+        return parsed
+
+    subtype_card_match = re.fullmatch(
+        r"(?P<subtype>[a-z][a-z' -]+?) cards?",
+        phrase,
+    )
+    if subtype_card_match:
+        parsed["target"] = "any"
+        parsed["target_subtypes"] = [subtype_card_match.group("subtype").strip()]
+        return parsed if count > 0 else None
+
+    return None
 
 
 def library_tutor_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -16634,6 +16662,29 @@ def etb_library_tutor_to_battlefield_from_oracle(metadata: dict[str, Any]) -> di
         return "etb_library_tutor_oracle_count_not_supported"
     parsed["destination"] = "battlefield"
     parsed["enters_tapped"] = bool(match.group("tapped"))
+    return parsed
+
+
+def etb_library_tutor_to_top_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    if " if " in f" {text} " or " additional cost " in f" {text} ":
+        return "etb_library_tutor_to_top_oracle_not_simple"
+    match = re.fullmatch(
+        r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+"
+        r"(?P<body>(?:you may )?search your library for .+)",
+        text,
+    )
+    if not match:
+        return "etb_library_tutor_to_top_oracle_not_simple"
+    body = re.sub(r"^you may\s+", "", match.group("body").strip(), flags=re.I)
+    parsed = library_tutor_from_oracle({"oracle_text": body})
+    if isinstance(parsed, str):
+        return parsed.replace("library_tutor", "etb_library_tutor_to_top")
+    if parsed.get("destination") != "library_top":
+        return "etb_library_tutor_to_top_oracle_not_simple"
+    if int(parsed["count"]) != 1 or bool(parsed.get("up_to_count")):
+        return "etb_library_tutor_to_top_oracle_count_not_supported"
     return parsed
 
 
@@ -17395,6 +17446,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE,
         ETB_LIBRARY_PICK_CREATURE_SCOPE,
         ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE,
+        ETB_TUTOR_TOP_CREATURE_SCOPE,
         ETB_TOKEN_CREATURE_SCOPE,
         ETB_ADD_COUNTERS_CREATURE_SCOPE,
     }:
@@ -17546,6 +17598,7 @@ def split_row(
     etb_graveyard_to_library_creature_unit = is_creature_etb_graveyard_to_library_unit(row)
     etb_library_pick_creature_unit = is_creature_etb_library_pick_unit(row)
     etb_tutor_battlefield_creature_unit = is_creature_etb_tutor_to_battlefield_unit(row)
+    etb_tutor_top_creature_unit = is_creature_etb_tutor_to_top_unit(row)
     etb_tutor_hand_creature_unit = is_creature_etb_tutor_to_hand_unit(row)
     etb_fixed_mana_creature_unit = is_creature_etb_fixed_mana_unit(row)
     dies_fixed_mana_permanent_unit = (
@@ -17676,6 +17729,7 @@ def split_row(
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
         and not etb_tutor_battlefield_creature_unit
+        and not etb_tutor_top_creature_unit
         and not etb_tutor_hand_creature_unit
         and not etb_fixed_mana_creature_unit
         and not dies_fixed_mana_permanent_unit
@@ -17758,6 +17812,7 @@ def split_row(
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
         and not etb_tutor_battlefield_creature_unit
+        and not etb_tutor_top_creature_unit
         and not etb_tutor_hand_creature_unit
         and not etb_fixed_mana_creature_unit
         and not dies_fixed_mana_permanent_unit
@@ -22243,6 +22298,47 @@ def split_row(
             family_id="xmage_creature_etb_library_search_to_battlefield",
         ), "selected_exact_scope"
 
+    if etb_tutor_top_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_library_tutor_to_top_not_creature"
+        oracle_tutor = etb_library_tutor_to_top_from_oracle(metadata)
+        if isinstance(oracle_tutor, str):
+            return None, oracle_tutor
+        source_tutor = library_tutor_from_source(source_text, "SearchLibraryPutOnLibraryEffect")
+        if isinstance(source_tutor, str):
+            return None, source_tutor.replace("library_tutor", "etb_library_tutor_to_top")
+        mismatch = library_tutor_specs_match(source_tutor, oracle_tutor)
+        if mismatch:
+            return None, f"etb_library_tutor_to_top_source_oracle_{mismatch}_mismatch"
+        target = f"{oracle_tutor['target']}_to_top"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_TUTOR_TOP_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "library_tutor_to_top",
+            "etb_tutor_target": target,
+            "etb_tutor_count": int(oracle_tutor["count"]),
+            "target": target,
+            "count": int(oracle_tutor["count"]),
+            "destination": "library_top",
+            "xmage_effect_class": "SearchLibraryPutOnLibraryEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+            **library_tutor_effect_constraints(oracle_tutor),
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_library_search_to_top",
+        ), "selected_exact_scope"
+
     if etb_tutor_hand_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "etb_library_tutor_to_hand_not_creature"
@@ -26306,6 +26402,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with LookLibraryAndPickControllerEffect, EntersBattlefieldTriggeredAbility, exact ETB look-library pick-one-to-hand Oracle/source agreement, and only static self keywords",
                 "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInPlayEffect, EntersBattlefieldTriggeredAbility, exact ETB land tutor-to-battlefield Oracle/source agreement, and only static self keywords",
+                "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutOnLibraryEffect, EntersBattlefieldTriggeredAbility, exact ETB tutor-to-library-top Oracle/source agreement, and only static self keywords",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility plus only static self keywords, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",

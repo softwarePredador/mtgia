@@ -37243,6 +37243,9 @@ def library_tutor_candidates(player, target_type):
         elif target_type == "basic_land_or_gate":
             if is_effective_land(candidate) and ("basic" in type_line or "gate" in type_line):
                 candidates.append(candidate)
+        elif target_type == "basic_land_or_cave":
+            if is_effective_land(candidate) and ("basic" in type_line or "cave" in type_line):
+                candidates.append(candidate)
         elif target_type == "basic_land_or_town":
             if is_effective_land(candidate) and ("basic" in type_line or "town" in type_line):
                 candidates.append(candidate)

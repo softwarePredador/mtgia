@@ -16089,6 +16089,110 @@ Validation:
 Residual boundary: PG576 does not authorize execution of All-Fates Scroll's
 draw-X sacrifice ability. That remains a separate activated draw runtime family.
 
+## PG577 ETB Library Tutor Creatures New Server Evidence
+
+PG577 evidence:
+
+- candidate split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg577_etb_library_tutor_creatures_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg577_etb_library_tutor_creatures_package.md`
+- package raw files:
+  `docs/hermes-analysis/master_optimizer_reports/pg577_etb_library_tutor_creatures_package_manifest.json`,
+  `docs/hermes-analysis/master_optimizer_reports/pg577_etb_library_tutor_creatures_package_precheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg577_etb_library_tutor_creatures_package_apply.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg577_etb_library_tutor_creatures_package_postcheck.sql`,
+  `docs/hermes-analysis/master_optimizer_reports/pg577_etb_library_tutor_creatures_package_rollback.sql`
+- apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg577_etb_library_tutor_creatures_apply_evidence.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg577_etb_library_tutor_creatures_sync_report.json`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg577_etb_library_tutor_creatures_e2e.md`
+
+PG577 promoted `11` creature ETB library tutor rows on the new server:
+
+- `10` `xmage_creature_etb_library_search_to_top_v1` rows;
+- `1` `xmage_creature_etb_library_search_to_battlefield_v1` row.
+
+Runtime semantics:
+
+- Harbinger-style cards use `any_to_top` plus exact subtype filters;
+- Campus Guide, Giant Ladybug, Loam Larva, and Spider-Bot use
+  `basic_land_to_top`;
+- Compass Gnome uses `basic_land_or_cave_to_top`;
+- Scampering Surveyor uses `basic_land_or_cave_to_battlefield` with
+  `tutor_enters_tapped=true`.
+
+Parser/runtime contract fixed:
+
+- do not encode "basic land card or Cave card" as a single `target_subtypes`
+  value;
+- use the canonical target `basic_land_or_cave`, which the battle runtime
+  resolves as effective lands with either `basic` or `cave` in the type line.
+
+Validation:
+
+- package precheck found `11/11` target card rows, no missing targets, and `0`
+  existing expected executable rows before apply;
+- package apply verified `11/11` promoted rows with `review_status=verified`,
+  `execution_status=auto`, and matching Oracle hashes;
+- PG -> Hermes/SQLite sync loaded `11` PostgreSQL rows, updated `11` SQLite
+  rows, and exported `6647` canonical snapshot rows;
+- splitter suite passed `675` tests;
+- battle runtime suite passed with focused Compass Gnome and Scampering
+  Surveyor coverage;
+- post-PG577 queue moved from PG576 `target_identity_count=25354` and
+  `xmage_authoritative_source_count=25040` to `25343` and `25029`;
+- tutor work unit moved from `578` to `567`;
+- final exact-scope recheck returned `proposal_count=0`.
+
+Residual boundary: PG577 does not authorize conditional, distinct-name, or
+costed tutor variants. Those remain in blocked reasons such as
+`activated_library_tutor_*`, `etb_library_tutor_*_mismatch`, and
+`library_tutor_source_distinct_names_not_supported`.
+
+## PG577b Oracle Hash Integrity Backfill New Server Evidence
+
+PG577b evidence:
+
+- backfill:
+  `docs/hermes-analysis/master_optimizer_reports/pg577b_oracle_hash_integrity_backfill_new_server.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg577b_oracle_hash_integrity_backfill_sync_report.json`
+- post-backfill readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260706_post_pg577b_oracle_hash_backfill.md`
+- post-backfill queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg577b_oracle_hash_backfill_commander_legal.md`
+- post-backfill exact split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg577b_oracle_hash_backfill_recheck.md`
+- final PG/Hermes/SQLite audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260706_post_pg577b_final_after_docs.md`
+- final governance audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260706_post_pg577b_final_after_docs.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260706_post_pg577b_final_after_docs.md`,
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260706_post_pg577b_final_after_docs.md`
+
+PG577b is a metadata-only integrity backfill triggered by the PG/Hermes/SQLite
+gate after PG577. It does not change card behavior.
+
+Validation:
+
+- precheck found `44` trusted executable PostgreSQL rows missing
+  `oracle_hash`;
+- all `44` rows were resolvable from current `public.cards.oracle_text`;
+- backup table:
+  `manaloom_deploy_audit.pg577b_oracle_hash_integrity_backfill_new_server_20260706_22320`;
+- updated rows: `44`;
+- postcheck missing rows: `0`;
+- PG -> SQLite sync loaded `65` PostgreSQL rows, updated `66` SQLite rows, and
+  exported `6647` canonical snapshot rows;
+- final PG/Hermes/SQLite contract passed `51/51`;
+- final XMage strategy audit passed `26/26`;
+- final operational and legacy contamination audits passed;
+- post-backfill queue remained `target_identity_count=25343`, confirming the
+  backfill fixed integrity without changing the adapter backlog.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

@@ -19336,6 +19336,142 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["destination"], "hand")
         self.assertEqual(effect["trigger"], "enters_battlefield")
 
+    def test_creature_etb_library_tutor_to_top_maps_basic_land_scope(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutOnLibraryEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Guide",
+                type_line="Artifact Creature - Golem",
+                oracle_text=(
+                    "When Fixture Guide enters the battlefield, you may search your library for a basic land card, "
+                    "reveal it, then shuffle and put that card on top."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutOnLibraryEffect(new TargetCardInLibrary(StaticFilters.FILTER_CARD_BASIC_LAND), true), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TUTOR_TOP_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_tutor_target"], "basic_land_to_top")
+        self.assertEqual(effect["destination"], "library_top")
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+
+    def test_creature_etb_library_tutor_to_top_preserves_keyword_and_subtype_filter(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutOnLibraryEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlashAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Harbinger",
+                type_line="Creature - Faerie Wizard",
+                oracle_text=(
+                    "Flash\n"
+                    "Flying\n"
+                    "When Fixture Harbinger enters the battlefield, you may search your library for a Faerie card, "
+                    "reveal it, then shuffle and put that card on top."
+                ),
+            ),
+            source_text="""
+                static final FilterCard filter = new FilterCard("Faerie card");
+                static {
+                    filter.add(SubType.FAERIE.getPredicate());
+                }
+                this.addAbility(FlashAbility.getInstance());
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutOnLibraryEffect(new TargetCardInLibrary(filter), true), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TUTOR_TOP_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_tutor_target"], "any_to_top")
+        self.assertEqual(effect["target_subtypes"], ["faerie"])
+        self.assertEqual(effect["keywords"], ["flash", "flying"])
+        self.assertTrue(effect["flash"])
+        self.assertTrue(effect["flying"])
+
+    def test_creature_etb_library_tutor_to_top_maps_basic_land_or_cave(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutOnLibraryEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Gnome",
+                type_line="Artifact Creature - Gnome",
+                oracle_text=(
+                    "When Fixture Gnome enters the battlefield, you may search your library for a basic land card "
+                    "or Cave card, reveal it, then shuffle and put that card on top."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("basic land card or Cave card");
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutOnLibraryEffect(new TargetCardInLibrary(filter), true), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TUTOR_TOP_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_tutor_target"], "basic_land_or_cave_to_top")
+        self.assertNotIn("target_subtypes", effect)
+
+    def test_creature_etb_library_tutor_to_battlefield_maps_basic_land_or_cave(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInPlayEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Surveyor",
+                type_line="Artifact Creature - Construct",
+                oracle_text=(
+                    "When Fixture Surveyor enters the battlefield, you may search your library for a basic land "
+                    "card or Cave card, put it onto the battlefield tapped, then shuffle."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("basic land card or Cave card");
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutInPlayEffect(new TargetCardInLibrary(filter), true), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_tutor_target"], "basic_land_or_cave_to_battlefield")
+        self.assertTrue(effect["tutor_enters_tapped"])
+        self.assertNotIn("target_subtypes", effect)
+
     def test_creature_etb_library_tutor_to_hand_preserves_keyword_and_any_card(self) -> None:
         row = queue_row(
             split.ETB_TUTOR_HAND_CREATURE_UNIT,

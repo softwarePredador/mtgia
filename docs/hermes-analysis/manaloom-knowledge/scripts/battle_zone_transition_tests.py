@@ -1303,6 +1303,88 @@ def register_tests(battle, player, card):
         assert cheap_artifact in active.library
         assert creature in active.library
 
+    def test_campus_guide_etb_puts_basic_land_on_library_top():
+        active = player("Active")
+        spell = {"name": "Lightning Bolt", "cmc": 1, "type_line": "Instant", "effect": "direct_damage"}
+        plains = {"name": "Plains", "cmc": 0, "type_line": "Basic Land - Plains", "effect": "land"}
+        nonbasic = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
+        active.library = [spell, nonbasic, plains]
+        guide = {"name": "Campus Guide", "cmc": 2, "type_line": "Artifact Creature - Golem"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            guide,
+            turn=10,
+            rng=random.Random(86),
+            effect_data_override={
+                "effect": "creature",
+                "power": 2,
+                "toughness": 1,
+                "etb_tutor_target": "basic_land_to_top",
+                "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+            },
+        )
+
+        assert plains not in active.hand
+        assert active.library[0] is plains
+        assert spell in active.library
+        assert nonbasic in active.library
+
+    def test_compass_gnome_etb_puts_basic_land_or_cave_on_library_top():
+        active = player("Active")
+        spell = {"name": "Lightning Bolt", "cmc": 1, "type_line": "Instant", "effect": "direct_damage"}
+        cave = {"name": "Hidden Grotto", "cmc": 0, "type_line": "Land - Cave", "effect": "land"}
+        nonbasic = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
+        active.library = [spell, nonbasic, cave]
+        gnome = {"name": "Compass Gnome", "cmc": 2, "type_line": "Artifact Creature - Gnome"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            gnome,
+            turn=10,
+            rng=random.Random(87),
+            effect_data_override={
+                "effect": "creature",
+                "power": 2,
+                "toughness": 1,
+                "etb_tutor_target": "basic_land_or_cave_to_top",
+                "battle_model_scope": "xmage_creature_etb_library_search_to_top_v1",
+            },
+        )
+
+        assert active.library[0] is cave
+        assert spell in active.library
+        assert nonbasic in active.library
+
+    def test_scampering_surveyor_etb_puts_basic_land_or_cave_on_battlefield_tapped():
+        active = player("Active")
+        cave = {"name": "Hidden Grotto", "cmc": 0, "type_line": "Land - Cave", "effect": "land"}
+        nonbasic = {"name": "Command Tower", "cmc": 0, "type_line": "Land", "effect": "land"}
+        active.library = [nonbasic, cave]
+        surveyor = {"name": "Scampering Surveyor", "cmc": 4, "type_line": "Artifact Creature - Construct"}
+
+        battle.apply_effect_immediate(
+            active,
+            [],
+            surveyor,
+            turn=10,
+            rng=random.Random(88),
+            effect_data_override={
+                "effect": "creature",
+                "power": 3,
+                "toughness": 2,
+                "etb_tutor_target": "basic_land_or_cave_to_battlefield",
+                "tutor_enters_tapped": True,
+                "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+            },
+        )
+
+        assert cave not in active.library
+        assert any(card.get("name") == "Hidden Grotto" and card.get("tapped") for card in active.battlefield)
+        assert nonbasic in active.library
+
     def test_tutor_trace_uses_contextual_target_scoring():
         decisions = []
         battle.DECISION_TRACE_HANDLER = lambda payload: decisions.append(payload)
@@ -1618,6 +1700,7 @@ def register_tests(battle, player, card):
         test_weathered_wayfarer_activated_tutor_requires_opponent_more_lands,
         test_spellseeker_etb_finds_cheap_instant_or_sorcery_only,
         test_trophy_mage_etb_finds_artifact_with_mana_value_three_only,
+        test_campus_guide_etb_puts_basic_land_on_library_top,
         test_tutor_trace_uses_contextual_target_scoring,
         test_board_wipe_trace_records_asymmetry_context,
         test_wheel_trace_uses_multiplayer_discard_draw_model,
