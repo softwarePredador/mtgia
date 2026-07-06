@@ -312,6 +312,12 @@ GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_LIVE_SOURCE_RESEARCH_EXPANDER = (
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_LIVE_SOURCE_RESEARCH_EXPANDER_TEST = (
     SCRIPT_DIR / "test_global_commander_external_nonpayoff_live_source_research_expander.py"
 )
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_FOLLOWUP_LIVE_SOURCE_RESEARCH_EXPANDER = (
+    SCRIPT_DIR / "global_commander_external_nonpayoff_followup_live_source_research_expander.py"
+)
+GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_FOLLOWUP_LIVE_SOURCE_RESEARCH_EXPANDER_TEST = (
+    SCRIPT_DIR / "test_global_commander_external_nonpayoff_followup_live_source_research_expander.py"
+)
 GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER = (
     SCRIPT_DIR / "global_commander_external_nonpayoff_expanded_source_candidate_reviewer.py"
 )
@@ -685,6 +691,22 @@ GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_CURRENT_DECK_NEGATIVE_REVIEW_COLLECTO
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_MANUAL_NEGATIVE_TRACE_REVIEWER_LIVE_RESEARCH_REPORT = (
     REPO_ROOT
     / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_FOLLOWUP_LIVE_SOURCE_RESEARCH_EXPANDER_AFTER_MANUAL_TRACE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER_FOLLOWUP_LIVE_AFTER_MANUAL_TRACE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md"
+)
+GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_FOLLOWUP_LIVE_AFTER_MANUAL_TRACE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md"
+)
+GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_FOLLOWUP_LIVE_AFTER_MANUAL_TRACE_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md"
 )
 GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_EXPANDED_SOURCES_REPORT = (
     REPO_ROOT
@@ -2772,6 +2794,28 @@ def build_audit() -> dict[str, Any]:
     )
     checks.append(
         check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_FOLLOWUP_LIVE_SOURCE_RESEARCH_EXPANDER,
+            [
+                "global_commander_external_nonpayoff_followup_live_source_research_expander",
+                "manual_negative_trace_review_did_not_clear_current_deck_cuts",
+                "cumulative_previous_candidates_remain_recycled_and_blocked",
+                "candidate_copy_allowed_now",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_FOLLOWUP_LIVE_SOURCE_RESEARCH_EXPANDER_TEST,
+            [
+                "test_followup_blocks_recycled_and_emits_only_new_review_seeds",
+                "Deflecting Swat",
+                "Dolmen Gate",
+                "Black Market Connections",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
             GLOBAL_COMMANDER_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER,
             [
                 "global_commander_external_nonpayoff_expanded_source_candidate_reviewer",
@@ -4479,6 +4523,69 @@ def build_audit() -> dict[str, Any]:
                 "Silence",
                 "Arena of Glory",
                 "find_new_external_source_or_explicit_same_lane_replacement_proof",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_FOLLOWUP_LIVE_SOURCE_RESEARCH_EXPANDER_AFTER_MANUAL_TRACE_REPORT,
+            [
+                "Global Commander External Nonpayoff Followup Live Source Research Expander",
+                "external_nonpayoff_followup_live_source_research_expanded_ready_for_local_review",
+                "manual_negative_review_cleared_count: `0`",
+                "previous_report_count: `14`",
+                "cumulative_previous_candidate_name_count: `95`",
+                "followup_candidate_count: `13`",
+                "followup_ready_for_review_count: `11`",
+                "Dolmen Gate",
+                "Black Market Connections",
+                "Deflecting Swat",
+                "review_expanded_external_nonpayoff_source_candidates_locally_before_seeded_miner",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_EXPANDED_SOURCE_CANDIDATE_REVIEWER_FOLLOWUP_LIVE_AFTER_MANUAL_TRACE_REPORT,
+            [
+                "Global Commander External Nonpayoff Expanded Source Candidate Reviewer",
+                "expanded_external_source_candidates_reviewed_seed_ready_no_deck_action",
+                "reviewed_candidate_count: `13`",
+                "miner_source_seed_allowed_count: `11`",
+                "blocked_recycled_prior_seed_count: `2`",
+                "candidate_copy_allowed_count: `0`",
+                "Dolmen Gate",
+                "Black Market Connections",
+                "rerun_seeded_cut_source_miner_with_reviewed_expanded_external_nonpayoff_sources",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_REVIEWED_EXTERNAL_NONPAYOFF_SEEDED_CUT_SOURCE_MINER_FOLLOWUP_LIVE_AFTER_MANUAL_TRACE_REPORT,
+            [
+                "Global Commander Reviewed External Nonpayoff Seeded Cut Source Miner",
+                "reviewed_external_seeded_cut_source_mining_exhausted_current_deck_no_cut_permission",
+                "reviewed_seed_count: `11`",
+                "fresh_seeded_same_lane_cut_source_count: `0`",
+                "blocked_recycled_seeded_cut_source_count: `47`",
+                "unseeded_target_role_count: `0`",
+                "Black Market Connections",
+                "expand_external_nonpayoff_seed_research_or_collect_current_deck_negative_review_before_candidate_copy",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_SCOPE1_EXTERNAL_NONPAYOFF_SEED_EXHAUSTION_RECOVERY_ROUTER_FOLLOWUP_LIVE_AFTER_MANUAL_TRACE_REPORT,
+            [
+                "Global Commander External Nonpayoff Seed Exhaustion Recovery Router",
+                "external_nonpayoff_seed_exhaustion_recovery_routes_to_source_expansion",
+                "seeded_exhausted_role_count: `3`",
+                "current_deck_negative_review_candidate_count: `0`",
+                "prior_blocked_recycled_seeded_cut_source_count: `47`",
+                "force_access_selected_db_absent_count: `0`",
+                "expand_external_nonpayoff_source_candidate_pool",
             ],
         )
     )

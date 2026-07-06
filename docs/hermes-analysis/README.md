@@ -895,6 +895,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     generico. `manual_negative_review_cleared_count=0`,
     `candidate_copy_allowed_count=0`; o proximo gate segue
     `find_new_external_source_or_explicit_same_lane_replacement_proof`.
+    A rodada follow-up fica em
+    `global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`:
+    ela carrega `previous_report_count=14`,
+    `cumulative_previous_candidate_name_count=95`, encontra
+    `followup_candidate_count=13` e `followup_ready_for_review_count=11`.
+    O reviewer local confirma `miner_source_seed_allowed_count=11`, mas o
+    minerador seeded retorna `fresh_seeded_same_lane_cut_source_count=0` e
+    `blocked_recycled_seeded_cut_source_count=47`; o router follow-up volta para
+    `expand_external_nonpayoff_source_candidate_pool`, sem current-deck negative
+    review candidates e com candidate copy, battle, promocao e value-safe
+    reclassification fechados.
     Observacao operacional: snapshots historicos de candidate-copy, battle-probe,
     battle-feedback e package-chain dependem de artefatos locais ignorados. Se
     faltarem ou forem regenerados sem esses artefatos, a auditoria de superficie

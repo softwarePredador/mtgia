@@ -492,7 +492,13 @@ Operational priority after this pivot:
     weak seen-without-usage evidence before any cut consideration. It may block
     weak negative evidence only; it must keep card-level cut permission,
     candidate copy, battle, promotion, and value-safe reclassification closed;
-66. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
+66. run `global_commander_external_nonpayoff_followup_live_source_research_expander.py`
+    when manual negative trace review clears no current-deck cuts; it must carry
+    all prior source, reviewer, miner, router, negative-review, and manual
+    reports as cumulative recycling evidence, broaden only genuinely fresh live
+    source lanes, and keep card-level cut permission, candidate copy, battle,
+    promotion, and value-safe reclassification closed;
+67. keep Lorehold-specific micro-optimizations, including DRC/Brain/Mana Vault
     probes, as regression evidence only unless they produce a named safe cut and
     equal-gate proof under the Lorehold promotion gate.
 
@@ -509,6 +515,10 @@ Current pivot evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_nonland_core_candidate_model_20260705_global_goal_hermes_only.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_learning_priority_audit_20260706_source_exhaustion_current.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_manual_negative_trace_reviewer_20260706_kaalia_value_safe_stage1_live_research.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_followup_live_source_research_expander_20260706_kaalia_value_safe_stage1_after_manual_trace.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_expanded_source_candidate_reviewer_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_reviewed_external_nonpayoff_seeded_cut_source_miner_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_external_nonpayoff_seed_exhaustion_recovery_router_20260706_kaalia_value_safe_stage1_followup_live_after_manual_trace.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_copy_materializer_20260705_kaalia_nonland_top_pair.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_candidate_battle_probe_audit_20260705_kaalia_nonland_floor_dynamic_target.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_commander_battle_feedback_model_20260705_current.md`
@@ -1378,6 +1388,16 @@ Current external refresh on 2026-07-05:
   card where land play is not generic nonuse. `manual_negative_review_cleared_count=0`,
   `candidate_copy_allowed_count=0`, and the next gate remains
   `find_new_external_source_or_explicit_same_lane_replacement_proof`.
+- Follow-up live source research after manual trace review carries `14`
+  previous reports and `95` cumulative prior candidate names, then finds `13`
+  follow-up candidates with `11` locally review-ready seeds across protection,
+  mana, and tutor/access lanes. The local reviewer confirms all `11` as miner
+  seeds and blocks `2` recycled cards, but the seeded miner still finds
+  `fresh_seeded_same_lane_cut_source_count=0` and
+  `blocked_recycled_seeded_cut_source_count=47`. The recovery router therefore
+  routes all three seeded roles back to broader source expansion with
+  `candidate_copy_allowed_now=false`, `battle_gate_allowed_now=false`, and
+  `promotion_allowed=false`.
 
 ## Global Commander Rollout - 2026-07-01
 

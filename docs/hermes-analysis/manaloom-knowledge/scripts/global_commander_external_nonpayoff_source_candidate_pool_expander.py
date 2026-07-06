@@ -272,6 +272,10 @@ EXTRA_ROLE_TERMS: dict[str, tuple[str, ...]] = {
         "can't cast spells this turn",
         "life total can't change",
         "your life total can't change",
+        "prevent all combat damage",
+        "prevent all combat damage that would be dealt",
+        "prevent all damage",
+        "attacking creatures you control",
     ),
     "mana_acceleration": (
         "add one mana",
