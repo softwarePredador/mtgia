@@ -112,6 +112,9 @@ ETB_TOKEN_CREATURE_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility::"
     "no_target_class::no_condition_class::token,triggered_ability"
 )
+ETB_TOKEN_CREATURE_UNIT_PREFIX = (
+    "token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility"
+)
 DIES_TOKEN_CREATURE_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::DiesSourceTriggeredAbility::"
     "no_target_class::no_condition_class::token,triggered_ability"
@@ -7923,10 +7926,13 @@ def is_creature_etb_fixed_mana_unit(row: dict[str, Any]) -> bool:
 
 
 def is_creature_etb_token_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
     return (
-        str(row.get("adapter_work_unit") or "") == ETB_TOKEN_CREATURE_UNIT
+        str(row.get("adapter_work_unit") or "").startswith(ETB_TOKEN_CREATURE_UNIT_PREFIX)
         and effect_classes(row) == {"CreateTokenEffect"}
-        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"token", "triggered_ability"}
     )
 
@@ -19614,6 +19620,7 @@ def split_row(
     if etb_token_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "etb_token_not_creature"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
         multi_tokens = multi_create_token_effects_from_source(source_text)
         if not isinstance(multi_tokens, str):
             components, token_classes, component_reason = token_components_from_parsed_tokens(
@@ -19647,6 +19654,11 @@ def split_row(
                 "xmage_token_classes": token_classes,
                 "_composite_rule_components": components,
             }
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
             return build_proposal(
                 row,
                 metadata,
@@ -19684,6 +19696,11 @@ def split_row(
             }
             if oracle_treasure_condition:
                 effect_json["etb_treasure_condition"] = oracle_treasure_condition
+            if keyword_list:
+                effect_json["keywords"] = keyword_list
+                effect_json["_keywords_are_self"] = True
+                for keyword in keyword_list:
+                    effect_json[keyword] = True
             return build_proposal(
                 row,
                 metadata,
@@ -19732,6 +19749,11 @@ def split_row(
         for source_key, target_key in optional_token_fields.items():
             if source_key in token_data:
                 effect_json[target_key] = token_data[source_key]
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,

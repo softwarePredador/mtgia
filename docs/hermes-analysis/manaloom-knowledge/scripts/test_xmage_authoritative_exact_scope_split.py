@@ -4382,6 +4382,53 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_token_name"], "Merfolk Token")
         self.assertEqual(effect["etb_token_keywords"], ["hexproof"])
 
+    def test_creature_etb_create_tokens_preserves_source_static_keyword(self) -> None:
+        row = queue_row(
+            "token_maker::xmage_signature::CreateTokenEffect::"
+            "EntersBattlefieldTriggeredAbility,FlyingAbility::"
+            "no_target_class::no_condition_class::token,triggered_ability",
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Aeronaut",
+                type_line="Creature - Human Artificer",
+                oracle_text=(
+                    "Flying\n"
+                    "When Fixture Aeronaut enters the battlefield, create a 1/1 colorless "
+                    "Thopter artifact creature token with flying."
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new CreateTokenEffect(new ThopterColorlessToken())));
+                class ThopterColorlessToken extends TokenImpl {
+                    public ThopterColorlessToken() {
+                        super("Thopter Token", "1/1 colorless Thopter artifact creature token with flying");
+                        cardType.add(CardType.CREATURE);
+                        cardType.add(CardType.ARTIFACT);
+                        subtype.add(SubType.THOPTER);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(FlyingAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_token_name"], "Thopter Token")
+        self.assertEqual(effect["etb_token_keywords"], ["flying"])
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+
     def test_creature_etb_create_multi_tokens_maps_trostanis_summoner(self) -> None:
         row = queue_row(
             split.ETB_TOKEN_CREATURE_UNIT,

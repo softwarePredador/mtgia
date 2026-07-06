@@ -1,0 +1,2874 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg562_etb_token_static_keyword_new_serve_20260706_110958",
+  "deploy_id": "pg562",
+  "execution_scenarios": [
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Armada Wurm",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "trample"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [
+          "trample"
+        ],
+        "mana_produced": null,
+        "name": "Wurm Token",
+        "power": 5,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Wurm",
+        "tapped": false,
+        "toughness": 5
+      },
+      "logical_rule_key": "battle_rule_v1:f0d3264c6a0a1bfaad6e583f216ae7b8",
+      "name": "Armada Wurm enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Aspiring Aeronaut",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_token": {
+        "artifact": true,
+        "colors": [],
+        "count": 1,
+        "keywords": [
+          "flying"
+        ],
+        "mana_produced": null,
+        "name": "Thopter Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Thopter",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:8170c042a33e5547d6ca6ea03a639db1",
+      "name": "Aspiring Aeronaut enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Attended Knight",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "first_strike"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Soldier Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Soldier",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:8860e4951fd9806031704881e298eafa",
+      "name": "Attended Knight enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Chimney Rabble",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "haste"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "R"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Phyrexian Goblin Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Phyrexian Goblin",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:c2597ff4457a57eaeb1f574aa4a73fcf",
+      "name": "Chimney Rabble enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Crested Herdcaller",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "trample"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [
+          "trample"
+        ],
+        "mana_produced": null,
+        "name": "Dinosaur Token",
+        "power": 3,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Dinosaur",
+        "tapped": false,
+        "toughness": 3
+      },
+      "logical_rule_key": "battle_rule_v1:5e951a8f2abb135e5547d2bf1ff6819e",
+      "name": "Crested Herdcaller enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Dragoon's Wyvern",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Hero Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Hero",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:17a5026bf9b84d0b415f32ca90cdadae",
+      "name": "Dragoon's Wyvern enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Elturgard Ranger",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Wolf Token",
+        "power": 2,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Wolf",
+        "tapped": false,
+        "toughness": 2
+      },
+      "logical_rule_key": "battle_rule_v1:172aad49c5b760417ded40be47d6fbd7",
+      "name": "Elturgard Ranger enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Experimental Aviator",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_token": {
+        "artifact": true,
+        "colors": [],
+        "count": 2,
+        "keywords": [
+          "flying"
+        ],
+        "mana_produced": null,
+        "name": "Thopter Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Thopter",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:573d118935962ec89ae3b1ea7aa7d6e0",
+      "name": "Experimental Aviator enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Flamekin Gildweaver",
+        "type_line": "Creature - Pirate"
+      },
+      "expected_keywords": [
+        "trample"
+      ],
+      "expected_treasure_count": 1,
+      "logical_rule_key": "battle_rule_v1:f9851d8f8b75be338b794618805f56ee",
+      "name": "Flamekin Gildweaver ETB creates Treasure",
+      "type": "creature_etb_create_treasure"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Gallant Cavalry",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "vigilance"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [
+          "vigilance"
+        ],
+        "mana_produced": null,
+        "name": "Knight Token",
+        "power": 2,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Knight",
+        "tapped": false,
+        "toughness": 2
+      },
+      "logical_rule_key": "battle_rule_v1:c5c80f22d9d41724067c07de729d17a5",
+      "name": "Gallant Cavalry enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Guarded Heir",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "lifelink"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 2,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Knight Token",
+        "power": 3,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Knight",
+        "tapped": false,
+        "toughness": 3
+      },
+      "logical_rule_key": "battle_rule_v1:3468d09b88fffd7ce4535f82b3db2eab",
+      "name": "Guarded Heir enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Howling Giant",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 2,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Wolf Token",
+        "power": 2,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Wolf",
+        "tapped": false,
+        "toughness": 2
+      },
+      "logical_rule_key": "battle_rule_v1:6ef64f0ace26142e33c6398ffce1726f",
+      "name": "Howling Giant enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Invasion Reinforcements",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flash"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Ally Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Ally",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:0794036815ec26977177be48b9afd747",
+      "name": "Invasion Reinforcements enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Jewel Thief",
+        "type_line": "Creature - Pirate"
+      },
+      "expected_keywords": [
+        "trample",
+        "vigilance"
+      ],
+      "expected_treasure_count": 1,
+      "logical_rule_key": "battle_rule_v1:635a0663f49e4fcbb120b9d533fa54bd",
+      "name": "Jewel Thief ETB creates Treasure",
+      "type": "creature_etb_create_treasure"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Knight of the New Coalition",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "vigilance"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W",
+          "U"
+        ],
+        "count": 1,
+        "keywords": [
+          "vigilance"
+        ],
+        "mana_produced": null,
+        "name": "Knight Token",
+        "power": 2,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Knight",
+        "tapped": false,
+        "toughness": 2
+      },
+      "logical_rule_key": "battle_rule_v1:1aff8713ecfc988abbfb6e6f3c8df31e",
+      "name": "Knight of the New Coalition enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "News Helicopter",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W",
+          "G"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Human Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Human Citizen",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:134fc00e6ef260c9048b4230115ffec9",
+      "name": "News Helicopter enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Oltec Cloud Guard",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_token": {
+        "artifact": true,
+        "colors": [],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Gnome Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Gnome",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:51dfa711f94ca263e1def9de17d9c305",
+      "name": "Oltec Cloud Guard enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Pack Guardian",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flash"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Wolf Token",
+        "power": 2,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Wolf",
+        "tapped": false,
+        "toughness": 2
+      },
+      "logical_rule_key": "battle_rule_v1:865f4e44bc67acf68458118bc93990d6",
+      "name": "Pack Guardian enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Preening Champion",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "U",
+          "R"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Elemental Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Elemental",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:cb9e135cd23ecbfc6fd0c5771b3692c1",
+      "name": "Preening Champion enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Prideful Parent",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "vigilance"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Cat Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Cat",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:a0bca46971a3e5d20810320caecd3166",
+      "name": "Prideful Parent enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Rapacious Dragon",
+        "type_line": "Creature - Pirate"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_treasure_count": 2,
+      "logical_rule_key": "battle_rule_v1:44e4e1a1ece2452eb7130065460722c3",
+      "name": "Rapacious Dragon ETB creates Treasure",
+      "type": "creature_etb_create_treasure"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Resolute Reinforcements",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flash"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Soldier Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Soldier",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:85ed95252b02cc42f5388285deee5af1",
+      "name": "Resolute Reinforcements enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Searchlight Companion",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Spirit Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Spirit",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:ce4ff17ca62caf188e2f7bd02c6b6f1a",
+      "name": "Searchlight Companion enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Treetop Freedom Fighters",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "haste"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Ally Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Ally",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:65536ce94785e368c6962f165016689f",
+      "name": "Treetop Freedom Fighters enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Twin-Silk Spider",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "reach"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "G"
+        ],
+        "count": 1,
+        "keywords": [
+          "reach"
+        ],
+        "mana_produced": null,
+        "name": "Spider Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Spider",
+        "tapped": false,
+        "toughness": 2
+      },
+      "logical_rule_key": "battle_rule_v1:025f9b16ee7c23a387dbd53f2f4222dc",
+      "name": "Twin-Silk Spider enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Valorous Steed",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "vigilance"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [
+          "vigilance"
+        ],
+        "mana_produced": null,
+        "name": "Knight Token",
+        "power": 2,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Knight",
+        "tapped": false,
+        "toughness": 2
+      },
+      "logical_rule_key": "battle_rule_v1:c5c80f22d9d41724067c07de729d17a5",
+      "name": "Valorous Steed enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    },
+    {
+      "card": {
+        "effect": "creature",
+        "name": "Voice of the Provinces",
+        "type_line": "Creature"
+      },
+      "expected_keywords": [
+        "flying"
+      ],
+      "expected_token": {
+        "artifact": false,
+        "colors": [
+          "W"
+        ],
+        "count": 1,
+        "keywords": [],
+        "mana_produced": null,
+        "name": "Human Token",
+        "power": 1,
+        "produced_mana_symbols": [],
+        "produces": null,
+        "sacrifice_for_colorless_mana": false,
+        "subtype": "Human",
+        "tapped": false,
+        "toughness": 1
+      },
+      "logical_rule_key": "battle_rule_v1:09795cb097249a25a3e8807c6f1eb281",
+      "name": "Voice of the Provinces enters and creates modeled creature tokens",
+      "type": "creature_etb_create_tokens"
+    }
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Armada Wurm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f0d3264c6a0a1bfaad6e583f216ae7b8",
+      "min_rule_version": 2,
+      "normalized_name": "armada wurm",
+      "oracle_hash": "19e2db2cc8dc94e783181cbd040f4f5f",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "trample"
+        ],
+        "etb_token_name": "Wurm Token",
+        "etb_token_power": 5,
+        "etb_token_subtype": "Wurm",
+        "etb_token_toughness": 5,
+        "keywords": [
+          "trample"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WurmWithTrampleToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Aspiring Aeronaut",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8170c042a33e5547d6ca6ea03a639db1",
+      "min_rule_version": 2,
+      "normalized_name": "aspiring aeronaut",
+      "oracle_hash": "f1056cbd435562407ec1a2c6a755c1ba",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_artifact_tokens": true,
+        "etb_token_count": 1,
+        "etb_token_flying": true,
+        "etb_token_keywords": [
+          "flying"
+        ],
+        "etb_token_name": "Thopter Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Thopter",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ThopterColorlessToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Attended Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8860e4951fd9806031704881e298eafa",
+      "min_rule_version": 2,
+      "normalized_name": "attended knight",
+      "oracle_hash": "5201a87753c9c21f4959804700222a02",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Soldier Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Soldier",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "first_strike"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SoldierToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chimney Rabble",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c2597ff4457a57eaeb1f574aa4a73fcf",
+      "min_rule_version": 2,
+      "normalized_name": "chimney rabble",
+      "oracle_hash": "39114242d16f7e6fe0e507f7fd49ac21",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "R"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Phyrexian Goblin Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Phyrexian Goblin",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "haste"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "PhyrexianGoblinToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crested Herdcaller",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5e951a8f2abb135e5547d2bf1ff6819e",
+      "min_rule_version": 2,
+      "normalized_name": "crested herdcaller",
+      "oracle_hash": "96c57479fd54a038491967eff3072599",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "trample"
+        ],
+        "etb_token_name": "Dinosaur Token",
+        "etb_token_power": 3,
+        "etb_token_subtype": "Dinosaur",
+        "etb_token_toughness": 3,
+        "keywords": [
+          "trample"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "DinosaurToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragoon's Wyvern",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:17a5026bf9b84d0b415f32ca90cdadae",
+      "min_rule_version": 2,
+      "normalized_name": "dragoon's wyvern",
+      "oracle_hash": "8e7aef4982cbaa073a39b9493b7207d5",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 1,
+        "etb_token_name": "Hero Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Hero",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "HeroToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elturgard Ranger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:172aad49c5b760417ded40be47d6fbd7",
+      "min_rule_version": 2,
+      "normalized_name": "elturgard ranger",
+      "oracle_hash": "c5cdf3dbffc26d71fbe9f7a853c87c8b",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Wolf Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Wolf",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "reach"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WolfToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Experimental Aviator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:573d118935962ec89ae3b1ea7aa7d6e0",
+      "min_rule_version": 2,
+      "normalized_name": "experimental aviator",
+      "oracle_hash": "6b13ddcc2469dfbb84c07af73f31aa13",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_artifact_tokens": true,
+        "etb_token_count": 2,
+        "etb_token_flying": true,
+        "etb_token_keywords": [
+          "flying"
+        ],
+        "etb_token_name": "Thopter Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Thopter",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ThopterColorlessToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flamekin Gildweaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f9851d8f8b75be338b794618805f56ee",
+      "min_rule_version": 2,
+      "normalized_name": "flamekin gildweaver",
+      "oracle_hash": "17562da1ce02918f2b607710b627b69b",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+        "effect": "creature",
+        "etb_treasure_count": 1,
+        "keywords": [
+          "trample"
+        ],
+        "treasure_count": 1,
+        "treasure_recipient": "controller",
+        "treasure_trigger": "enters_battlefield",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "TreasureToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gallant Cavalry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c5c80f22d9d41724067c07de729d17a5",
+      "min_rule_version": 2,
+      "normalized_name": "gallant cavalry",
+      "oracle_hash": "6d96d68f547dcac93e32b52ea7f3944b",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "vigilance"
+        ],
+        "etb_token_name": "Knight Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Knight",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "vigilance"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "KnightToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Guarded Heir",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3468d09b88fffd7ce4535f82b3db2eab",
+      "min_rule_version": 2,
+      "normalized_name": "guarded heir",
+      "oracle_hash": "b7c806e8926806aeb8c9589a847c5117",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 2,
+        "etb_token_name": "Knight Token",
+        "etb_token_power": 3,
+        "etb_token_subtype": "Knight",
+        "etb_token_toughness": 3,
+        "keywords": [
+          "lifelink"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "Knight33Token"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Howling Giant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ef64f0ace26142e33c6398ffce1726f",
+      "min_rule_version": 2,
+      "normalized_name": "howling giant",
+      "oracle_hash": "c19759a9ca80f278f7c010832faacaa9",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 2,
+        "etb_token_name": "Wolf Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Wolf",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "reach"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WolfToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Invasion Reinforcements",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0794036815ec26977177be48b9afd747",
+      "min_rule_version": 2,
+      "normalized_name": "invasion reinforcements",
+      "oracle_hash": "de7c0b9b29891714486741aa115260e7",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Ally Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Ally",
+        "etb_token_toughness": 1,
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "AllyToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jewel Thief",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:635a0663f49e4fcbb120b9d533fa54bd",
+      "min_rule_version": 2,
+      "normalized_name": "jewel thief",
+      "oracle_hash": "a23f928a3f5a9e94efb7c73b9b8314ca",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+        "effect": "creature",
+        "etb_treasure_count": 1,
+        "keywords": [
+          "trample",
+          "vigilance"
+        ],
+        "treasure_count": 1,
+        "treasure_recipient": "controller",
+        "treasure_trigger": "enters_battlefield",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "TreasureToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Knight of the New Coalition",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1aff8713ecfc988abbfb6e6f3c8df31e",
+      "min_rule_version": 2,
+      "normalized_name": "knight of the new coalition",
+      "oracle_hash": "d9aeb1479e2acb39fbb15aa842f95cca",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W",
+          "U"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "vigilance"
+        ],
+        "etb_token_name": "Knight Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Knight",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "vigilance"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "KnightWhiteBlueToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "News Helicopter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:134fc00e6ef260c9048b4230115ffec9",
+      "min_rule_version": 2,
+      "normalized_name": "news helicopter",
+      "oracle_hash": "7854b1e5c681f6882a92efb1219309df",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W",
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Human Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Human Citizen",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "HumanCitizenToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Oltec Cloud Guard",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51dfa711f94ca263e1def9de17d9c305",
+      "min_rule_version": 2,
+      "normalized_name": "oltec cloud guard",
+      "oracle_hash": "733938782602aca6eaaa4518d90aa740",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_artifact_tokens": true,
+        "etb_token_count": 1,
+        "etb_token_name": "Gnome Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Gnome",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "GnomeToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pack Guardian",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:865f4e44bc67acf68458118bc93990d6",
+      "min_rule_version": 2,
+      "normalized_name": "pack guardian",
+      "oracle_hash": "fc8edcba8a1bcb7b1b5d00759d1be10c",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Wolf Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Wolf",
+        "etb_token_toughness": 2,
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WolfToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Preening Champion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb9e135cd23ecbfc6fd0c5771b3692c1",
+      "min_rule_version": 2,
+      "normalized_name": "preening champion",
+      "oracle_hash": "6f6e9ae964bc764c20d912c0a7137800",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "U",
+          "R"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Elemental Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Elemental",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "Elemental11BlueRedToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prideful Parent",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a0bca46971a3e5d20810320caecd3166",
+      "min_rule_version": 2,
+      "normalized_name": "prideful parent",
+      "oracle_hash": "142220b0a047e0f32ac39324ada87662",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Cat Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Cat",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "vigilance"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "Cat11Token"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rapacious Dragon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:44e4e1a1ece2452eb7130065460722c3",
+      "min_rule_version": 2,
+      "normalized_name": "rapacious dragon",
+      "oracle_hash": "a5ff0cfb05abd2f408ea2dbd90e7c2fa",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+        "effect": "creature",
+        "etb_treasure_count": 2,
+        "keywords": [
+          "flying"
+        ],
+        "treasure_count": 2,
+        "treasure_recipient": "controller",
+        "treasure_trigger": "enters_battlefield",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "TreasureToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Resolute Reinforcements",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:85ed95252b02cc42f5388285deee5af1",
+      "min_rule_version": 2,
+      "normalized_name": "resolute reinforcements",
+      "oracle_hash": "d014dbc0e2c720c8140bf75e9fc10030",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Soldier Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Soldier",
+        "etb_token_toughness": 1,
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SoldierToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Searchlight Companion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ce4ff17ca62caf188e2f7bd02c6b6f1a",
+      "min_rule_version": 2,
+      "normalized_name": "searchlight companion",
+      "oracle_hash": "3bfb56630a4d78ec2c69055c0de53aa5",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 1,
+        "etb_token_name": "Spirit Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Spirit",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SpiritToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Treetop Freedom Fighters",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65536ce94785e368c6962f165016689f",
+      "min_rule_version": 2,
+      "normalized_name": "treetop freedom fighters",
+      "oracle_hash": "d681327fb2d309f534db7b58dcc0add2",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Ally Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Ally",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "haste"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "AllyToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Twin-Silk Spider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:025f9b16ee7c23a387dbd53f2f4222dc",
+      "min_rule_version": 2,
+      "normalized_name": "twin-silk spider",
+      "oracle_hash": "3fc77250716d6b470eebbb6c676be881",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "reach"
+        ],
+        "etb_token_name": "Spider Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Spider",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "reach"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SpiderToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Valorous Steed",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c5c80f22d9d41724067c07de729d17a5",
+      "min_rule_version": 2,
+      "normalized_name": "valorous steed",
+      "oracle_hash": "6d96d68f547dcac93e32b52ea7f3944b",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "vigilance"
+        ],
+        "etb_token_name": "Knight Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Knight",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "vigilance"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "KnightToken"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of the Provinces",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09795cb097249a25a3e8807c6f1eb281",
+      "min_rule_version": 2,
+      "normalized_name": "voice of the provinces",
+      "oracle_hash": "3dc80579b5474fdc69f6f93bf2ca39d0",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Human Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Human",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "HumanToken"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_create_tokens": 24,
+    "xmage_creature_etb_create_treasure": 3
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg562_etb_token_static_keyword_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg562_etb_token_static_keyword_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg562_etb_token_static_keyword_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg562_etb_token_static_keyword_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg562_etb_token_static_keyword_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg562_etb_token_static_keyword_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-06T11:09:58+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Armada Wurm"
+      },
+      "card_name": "Armada Wurm",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f0d3264c6a0a1bfaad6e583f216ae7b8",
+      "normalized_name": "armada wurm",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "trample"
+        ],
+        "etb_token_name": "Wurm Token",
+        "etb_token_power": 5,
+        "etb_token_subtype": "Wurm",
+        "etb_token_toughness": 5,
+        "keywords": [
+          "trample"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WurmWithTrampleToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Aspiring Aeronaut"
+      },
+      "card_name": "Aspiring Aeronaut",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8170c042a33e5547d6ca6ea03a639db1",
+      "normalized_name": "aspiring aeronaut",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_artifact_tokens": true,
+        "etb_token_count": 1,
+        "etb_token_flying": true,
+        "etb_token_keywords": [
+          "flying"
+        ],
+        "etb_token_name": "Thopter Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Thopter",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ThopterColorlessToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Attended Knight"
+      },
+      "card_name": "Attended Knight",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8860e4951fd9806031704881e298eafa",
+      "normalized_name": "attended knight",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Soldier Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Soldier",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "first_strike"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SoldierToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Chimney Rabble"
+      },
+      "card_name": "Chimney Rabble",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c2597ff4457a57eaeb1f574aa4a73fcf",
+      "normalized_name": "chimney rabble",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "R"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Phyrexian Goblin Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Phyrexian Goblin",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "haste"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "PhyrexianGoblinToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Crested Herdcaller"
+      },
+      "card_name": "Crested Herdcaller",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5e951a8f2abb135e5547d2bf1ff6819e",
+      "normalized_name": "crested herdcaller",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "trample"
+        ],
+        "etb_token_name": "Dinosaur Token",
+        "etb_token_power": 3,
+        "etb_token_subtype": "Dinosaur",
+        "etb_token_toughness": 3,
+        "keywords": [
+          "trample"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "DinosaurToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Dragoon's Wyvern"
+      },
+      "card_name": "Dragoon's Wyvern",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:17a5026bf9b84d0b415f32ca90cdadae",
+      "normalized_name": "dragoon's wyvern",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 1,
+        "etb_token_name": "Hero Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Hero",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "HeroToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Elturgard Ranger"
+      },
+      "card_name": "Elturgard Ranger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:172aad49c5b760417ded40be47d6fbd7",
+      "normalized_name": "elturgard ranger",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Wolf Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Wolf",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "reach"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WolfToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Experimental Aviator"
+      },
+      "card_name": "Experimental Aviator",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:573d118935962ec89ae3b1ea7aa7d6e0",
+      "normalized_name": "experimental aviator",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_artifact_tokens": true,
+        "etb_token_count": 2,
+        "etb_token_flying": true,
+        "etb_token_keywords": [
+          "flying"
+        ],
+        "etb_token_name": "Thopter Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Thopter",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "ThopterColorlessToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Flamekin Gildweaver"
+      },
+      "card_name": "Flamekin Gildweaver",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f9851d8f8b75be338b794618805f56ee",
+      "normalized_name": "flamekin gildweaver",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+        "effect": "creature",
+        "etb_treasure_count": 1,
+        "keywords": [
+          "trample"
+        ],
+        "treasure_count": 1,
+        "treasure_recipient": "controller",
+        "treasure_trigger": "enters_battlefield",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "TreasureToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Gallant Cavalry"
+      },
+      "card_name": "Gallant Cavalry",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c5c80f22d9d41724067c07de729d17a5",
+      "normalized_name": "gallant cavalry",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "vigilance"
+        ],
+        "etb_token_name": "Knight Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Knight",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "vigilance"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "KnightToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Guarded Heir"
+      },
+      "card_name": "Guarded Heir",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3468d09b88fffd7ce4535f82b3db2eab",
+      "normalized_name": "guarded heir",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 2,
+        "etb_token_name": "Knight Token",
+        "etb_token_power": 3,
+        "etb_token_subtype": "Knight",
+        "etb_token_toughness": 3,
+        "keywords": [
+          "lifelink"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "Knight33Token"
+      }
+    },
+    {
+      "card": {
+        "name": "Howling Giant"
+      },
+      "card_name": "Howling Giant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ef64f0ace26142e33c6398ffce1726f",
+      "normalized_name": "howling giant",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 2,
+        "etb_token_name": "Wolf Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Wolf",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "reach"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WolfToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Invasion Reinforcements"
+      },
+      "card_name": "Invasion Reinforcements",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0794036815ec26977177be48b9afd747",
+      "normalized_name": "invasion reinforcements",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Ally Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Ally",
+        "etb_token_toughness": 1,
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "AllyToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Jewel Thief"
+      },
+      "card_name": "Jewel Thief",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:635a0663f49e4fcbb120b9d533fa54bd",
+      "normalized_name": "jewel thief",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+        "effect": "creature",
+        "etb_treasure_count": 1,
+        "keywords": [
+          "trample",
+          "vigilance"
+        ],
+        "treasure_count": 1,
+        "treasure_recipient": "controller",
+        "treasure_trigger": "enters_battlefield",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "TreasureToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Knight of the New Coalition"
+      },
+      "card_name": "Knight of the New Coalition",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1aff8713ecfc988abbfb6e6f3c8df31e",
+      "normalized_name": "knight of the new coalition",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W",
+          "U"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "vigilance"
+        ],
+        "etb_token_name": "Knight Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Knight",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "vigilance"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "KnightWhiteBlueToken"
+      }
+    },
+    {
+      "card": {
+        "name": "News Helicopter"
+      },
+      "card_name": "News Helicopter",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:134fc00e6ef260c9048b4230115ffec9",
+      "normalized_name": "news helicopter",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W",
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Human Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Human Citizen",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "HumanCitizenToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Oltec Cloud Guard"
+      },
+      "card_name": "Oltec Cloud Guard",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51dfa711f94ca263e1def9de17d9c305",
+      "normalized_name": "oltec cloud guard",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_artifact_tokens": true,
+        "etb_token_count": 1,
+        "etb_token_name": "Gnome Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Gnome",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "GnomeToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Pack Guardian"
+      },
+      "card_name": "Pack Guardian",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:865f4e44bc67acf68458118bc93990d6",
+      "normalized_name": "pack guardian",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Wolf Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Wolf",
+        "etb_token_toughness": 2,
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "WolfToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Preening Champion"
+      },
+      "card_name": "Preening Champion",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb9e135cd23ecbfc6fd0c5771b3692c1",
+      "normalized_name": "preening champion",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "U",
+          "R"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Elemental Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Elemental",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "Elemental11BlueRedToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Prideful Parent"
+      },
+      "card_name": "Prideful Parent",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a0bca46971a3e5d20810320caecd3166",
+      "normalized_name": "prideful parent",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Cat Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Cat",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "vigilance"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "Cat11Token"
+      }
+    },
+    {
+      "card": {
+        "name": "Rapacious Dragon"
+      },
+      "card_name": "Rapacious Dragon",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:44e4e1a1ece2452eb7130065460722c3",
+      "normalized_name": "rapacious dragon",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1",
+        "effect": "creature",
+        "etb_treasure_count": 2,
+        "keywords": [
+          "flying"
+        ],
+        "treasure_count": 2,
+        "treasure_recipient": "controller",
+        "treasure_trigger": "enters_battlefield",
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "TreasureToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Resolute Reinforcements"
+      },
+      "card_name": "Resolute Reinforcements",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:85ed95252b02cc42f5388285deee5af1",
+      "normalized_name": "resolute reinforcements",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Soldier Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Soldier",
+        "etb_token_toughness": 1,
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SoldierToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Searchlight Companion"
+      },
+      "card_name": "Searchlight Companion",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ce4ff17ca62caf188e2f7bd02c6b6f1a",
+      "normalized_name": "searchlight companion",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_count": 1,
+        "etb_token_name": "Spirit Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Spirit",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SpiritToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Treetop Freedom Fighters"
+      },
+      "card_name": "Treetop Freedom Fighters",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65536ce94785e368c6962f165016689f",
+      "normalized_name": "treetop freedom fighters",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Ally Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Ally",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "haste"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "AllyToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Twin-Silk Spider"
+      },
+      "card_name": "Twin-Silk Spider",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:025f9b16ee7c23a387dbd53f2f4222dc",
+      "normalized_name": "twin-silk spider",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "G"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "reach"
+        ],
+        "etb_token_name": "Spider Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Spider",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "reach"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "SpiderToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Valorous Steed"
+      },
+      "card_name": "Valorous Steed",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c5c80f22d9d41724067c07de729d17a5",
+      "normalized_name": "valorous steed",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_keywords": [
+          "vigilance"
+        ],
+        "etb_token_name": "Knight Token",
+        "etb_token_power": 2,
+        "etb_token_subtype": "Knight",
+        "etb_token_toughness": 2,
+        "keywords": [
+          "vigilance"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "KnightToken"
+      }
+    },
+    {
+      "card": {
+        "name": "Voice of the Provinces"
+      },
+      "card_name": "Voice of the Provinces",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09795cb097249a25a3e8807c6f1eb281",
+      "normalized_name": "voice of the provinces",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+        "effect": "creature",
+        "etb_token_colors": [
+          "W"
+        ],
+        "etb_token_count": 1,
+        "etb_token_name": "Human Token",
+        "etb_token_power": 1,
+        "etb_token_subtype": "Human",
+        "etb_token_toughness": 1,
+        "keywords": [
+          "flying"
+        ],
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "CreateTokenEffect",
+        "xmage_token_class": "HumanToken"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Armada Wurm",
+    "Aspiring Aeronaut",
+    "Attended Knight",
+    "Chimney Rabble",
+    "Crested Herdcaller",
+    "Dragoon's Wyvern",
+    "Elturgard Ranger",
+    "Experimental Aviator",
+    "Flamekin Gildweaver",
+    "Gallant Cavalry",
+    "Guarded Heir",
+    "Howling Giant",
+    "Invasion Reinforcements",
+    "Jewel Thief",
+    "Knight of the New Coalition",
+    "News Helicopter",
+    "Oltec Cloud Guard",
+    "Pack Guardian",
+    "Preening Champion",
+    "Prideful Parent",
+    "Rapacious Dragon",
+    "Resolute Reinforcements",
+    "Searchlight Companion",
+    "Treetop Freedom Fighters",
+    "Twin-Silk Spider",
+    "Valorous Steed",
+    "Voice of the Provinces"
+  ],
+  "selected_count": 27,
+  "slug": "etb_token_static_keyword_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Armada Wurm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f0d3264c6a0a1bfaad6e583f216ae7b8",
+      "min_rule_version": 2,
+      "normalized_name": "armada wurm",
+      "oracle_hash": "19e2db2cc8dc94e783181cbd040f4f5f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Aspiring Aeronaut",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8170c042a33e5547d6ca6ea03a639db1",
+      "min_rule_version": 2,
+      "normalized_name": "aspiring aeronaut",
+      "oracle_hash": "f1056cbd435562407ec1a2c6a755c1ba",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Attended Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8860e4951fd9806031704881e298eafa",
+      "min_rule_version": 2,
+      "normalized_name": "attended knight",
+      "oracle_hash": "5201a87753c9c21f4959804700222a02",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chimney Rabble",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c2597ff4457a57eaeb1f574aa4a73fcf",
+      "min_rule_version": 2,
+      "normalized_name": "chimney rabble",
+      "oracle_hash": "39114242d16f7e6fe0e507f7fd49ac21",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crested Herdcaller",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5e951a8f2abb135e5547d2bf1ff6819e",
+      "min_rule_version": 2,
+      "normalized_name": "crested herdcaller",
+      "oracle_hash": "96c57479fd54a038491967eff3072599",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dragoon's Wyvern",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:17a5026bf9b84d0b415f32ca90cdadae",
+      "min_rule_version": 2,
+      "normalized_name": "dragoon's wyvern",
+      "oracle_hash": "8e7aef4982cbaa073a39b9493b7207d5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elturgard Ranger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:172aad49c5b760417ded40be47d6fbd7",
+      "min_rule_version": 2,
+      "normalized_name": "elturgard ranger",
+      "oracle_hash": "c5cdf3dbffc26d71fbe9f7a853c87c8b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Experimental Aviator",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:573d118935962ec89ae3b1ea7aa7d6e0",
+      "min_rule_version": 2,
+      "normalized_name": "experimental aviator",
+      "oracle_hash": "6b13ddcc2469dfbb84c07af73f31aa13",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flamekin Gildweaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f9851d8f8b75be338b794618805f56ee",
+      "min_rule_version": 2,
+      "normalized_name": "flamekin gildweaver",
+      "oracle_hash": "17562da1ce02918f2b607710b627b69b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gallant Cavalry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c5c80f22d9d41724067c07de729d17a5",
+      "min_rule_version": 2,
+      "normalized_name": "gallant cavalry",
+      "oracle_hash": "6d96d68f547dcac93e32b52ea7f3944b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Guarded Heir",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3468d09b88fffd7ce4535f82b3db2eab",
+      "min_rule_version": 2,
+      "normalized_name": "guarded heir",
+      "oracle_hash": "b7c806e8926806aeb8c9589a847c5117",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Howling Giant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ef64f0ace26142e33c6398ffce1726f",
+      "min_rule_version": 2,
+      "normalized_name": "howling giant",
+      "oracle_hash": "c19759a9ca80f278f7c010832faacaa9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Invasion Reinforcements",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0794036815ec26977177be48b9afd747",
+      "min_rule_version": 2,
+      "normalized_name": "invasion reinforcements",
+      "oracle_hash": "de7c0b9b29891714486741aa115260e7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jewel Thief",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:635a0663f49e4fcbb120b9d533fa54bd",
+      "min_rule_version": 2,
+      "normalized_name": "jewel thief",
+      "oracle_hash": "a23f928a3f5a9e94efb7c73b9b8314ca",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Knight of the New Coalition",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1aff8713ecfc988abbfb6e6f3c8df31e",
+      "min_rule_version": 2,
+      "normalized_name": "knight of the new coalition",
+      "oracle_hash": "d9aeb1479e2acb39fbb15aa842f95cca",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "News Helicopter",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:134fc00e6ef260c9048b4230115ffec9",
+      "min_rule_version": 2,
+      "normalized_name": "news helicopter",
+      "oracle_hash": "7854b1e5c681f6882a92efb1219309df",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Oltec Cloud Guard",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51dfa711f94ca263e1def9de17d9c305",
+      "min_rule_version": 2,
+      "normalized_name": "oltec cloud guard",
+      "oracle_hash": "733938782602aca6eaaa4518d90aa740",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pack Guardian",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:865f4e44bc67acf68458118bc93990d6",
+      "min_rule_version": 2,
+      "normalized_name": "pack guardian",
+      "oracle_hash": "fc8edcba8a1bcb7b1b5d00759d1be10c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Preening Champion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb9e135cd23ecbfc6fd0c5771b3692c1",
+      "min_rule_version": 2,
+      "normalized_name": "preening champion",
+      "oracle_hash": "6f6e9ae964bc764c20d912c0a7137800",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prideful Parent",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a0bca46971a3e5d20810320caecd3166",
+      "min_rule_version": 2,
+      "normalized_name": "prideful parent",
+      "oracle_hash": "142220b0a047e0f32ac39324ada87662",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rapacious Dragon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:44e4e1a1ece2452eb7130065460722c3",
+      "min_rule_version": 2,
+      "normalized_name": "rapacious dragon",
+      "oracle_hash": "a5ff0cfb05abd2f408ea2dbd90e7c2fa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_treasure_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Resolute Reinforcements",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:85ed95252b02cc42f5388285deee5af1",
+      "min_rule_version": 2,
+      "normalized_name": "resolute reinforcements",
+      "oracle_hash": "d014dbc0e2c720c8140bf75e9fc10030",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Searchlight Companion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ce4ff17ca62caf188e2f7bd02c6b6f1a",
+      "min_rule_version": 2,
+      "normalized_name": "searchlight companion",
+      "oracle_hash": "3bfb56630a4d78ec2c69055c0de53aa5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Treetop Freedom Fighters",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65536ce94785e368c6962f165016689f",
+      "min_rule_version": 2,
+      "normalized_name": "treetop freedom fighters",
+      "oracle_hash": "d681327fb2d309f534db7b58dcc0add2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Twin-Silk Spider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:025f9b16ee7c23a387dbd53f2f4222dc",
+      "min_rule_version": 2,
+      "normalized_name": "twin-silk spider",
+      "oracle_hash": "3fc77250716d6b470eebbb6c676be881",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Valorous Steed",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c5c80f22d9d41724067c07de729d17a5",
+      "min_rule_version": 2,
+      "normalized_name": "valorous steed",
+      "oracle_hash": "6d96d68f547dcac93e32b52ea7f3944b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Voice of the Provinces",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09795cb097249a25a3e8807c6f1eb281",
+      "min_rule_version": 2,
+      "normalized_name": "voice of the provinces",
+      "oracle_hash": "3dc80579b5474fdc69f6f93bf2ca39d0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_create_tokens_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

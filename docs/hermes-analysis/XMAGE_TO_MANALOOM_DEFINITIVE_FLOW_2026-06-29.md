@@ -15604,6 +15604,61 @@ or rows with auxiliary classes such as flashback, cycling, convoke, overload,
 strive, channel, or unrelated triggered/static behavior. Those require their
 own exact runtime adapter and focused package evidence.
 
+## PG562 ETB Token Static Keyword New Server Evidence
+
+PG562 evidence:
+
+- candidate split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_pg562_etb_token_static_keyword_candidate.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg562_etb_token_static_keyword_new_server_package_package.md`
+- E2E:
+  `docs/hermes-analysis/master_optimizer_reports/pg562_etb_token_static_keyword_new_server_e2e.md`
+- sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg562_etb_token_static_keyword_new_server_sync_report.json`
+- post queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260706_post_pg562_etb_token_static_keyword_new_server.md`
+- post split recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260706_post_pg562_etb_token_static_keyword_recheck.md`
+
+PG562 promoted `27` exact creature ETB token/Treasure rows on the new server:
+
+- `24` `xmage_creature_etb_create_tokens_v1` rows where the source creature has
+  only safe static self keyword auxiliaries plus one exact ETB
+  `CreateTokenEffect`;
+- `3` `xmage_creature_etb_create_treasure_v1` rows where the same static
+  keyword auxiliary rule applies to ETB Treasure creation.
+
+Runtime semantics:
+
+- existing ETB token/Treasure runtime remains the executor;
+- the splitter now accepts safe static self keyword ability classes in addition
+  to `EntersBattlefieldTriggeredAbility` for ETB token rows;
+- the resulting `effect_json` preserves the source creature keywords so the
+  cast permanent keeps abilities such as flying, flash, first strike, haste,
+  lifelink, reach, trample, and vigilance while resolving the ETB token maker.
+
+Validation:
+
+- precheck found `27` target card rows, `0` existing rule rows, and `0` shadow
+  rows to deprecate;
+- apply upserted `27` rows and deprecated `0` shadows;
+- postcheck verified `27/27` promoted rows with `review_status=verified`,
+  `execution_status=auto`, and matching Oracle hash;
+- PG -> Hermes/SQLite sync loaded `9051` PostgreSQL rows, updated `8815`
+  SQLite rows, and exported `6552` canonical snapshot rows;
+- package E2E passed `27` scenarios and `27` battle events, validating created
+  token/Treasure counts plus preserved source keywords;
+- post-PG562 queue moved from `xmage_authoritative_adapter_required_count=25153`
+  to `25126`; split recheck returned `proposal_count=0`.
+
+Residual boundary: PG562 does not authorize conditional ETB tokens, dynamic
+token counts, additional token fanout, noncreature tokens outside the existing
+Treasure model, token classes with unsupported keyword text, token classes with
+unsupported activated abilities, unrelated triggered/static auxiliaries, or
+spell/activated token makers. Those remain blocked under exact reason counts
+and require their own mapper/runtime package.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
